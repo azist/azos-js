@@ -1,1 +1,4 @@
 - https://gomakethings.com/dom-diffing-with-vanilla-js/
+- https://dev.to/joydeep-bhowmik/virtual-dom-diffing-algorithm-implementation-in-vanilla-javascript-2324 (2023)
+- https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
+- 
