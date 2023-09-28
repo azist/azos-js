@@ -49,3 +49,15 @@ Lit example:
   </script>
 </body>
 ```
+
+Create lit element without shado root
+```js
+createRenderRoot() {
+    return this;
+  }
+
+  render() {
+    return html`<p>Hello, ${this.name}!</p>`;
+  }
+```
+
