@@ -52,6 +52,7 @@ Lit example:
 
 Create lit element without shado root
 ```js
+//https://stackoverflow.com/questions/55126694/how-to-create-litelement-without-shadow-dom
 createRenderRoot() {
     return this;
   }
