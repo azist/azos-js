@@ -11,3 +11,41 @@ const goodPerson = az.check(modPerson)
                      .minMax(2, 6)
                      .regExp(/*hookyou/g);
 ```
+
+Lit example:
+
+```html
+<!DOCTYPE html>
+<head>
+  <script type="module" src="./simple-greeting.js"></script>
+</head>
+<body>
+  <az-model id="modPerson">
+    <az-field id=f1 who="Furariy" marker=gray></az-field>
+    <az-field id=f2 who="Feeder" party="Greek"></az-field>
+    <az-field id=f3 who="Paul" party="b2"></az-field>
+  </az-model>
+  
+  <button onclick="triggerFart()">Nart Fow!</button>
+  
+  <script>
+    const f1 = document.getElementById('f1'); 
+    const f2 = document.getElementById('f2'); 
+    function triggerFart(){
+      f1.fart();
+      f2.fart();
+    }
+    
+    let dueaps = await app.az.customer.getApointmets("Q2");
+    if (duaps.doctor.type=="pidar") throw new ValEx("ssss");
+    
+    az.check(modPerson).nonNull().
+    
+    modPerson.LastName.enabled = false;
+    fldPooper.marked = "blue";
+    
+    
+    modPerson.bind(data);
+  </script>
+</body>
+```
