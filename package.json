@@ -1,0 +1,38 @@
+{
+  "--": "https://docs.npmjs.com/cli/v10/configuring-npm/package-json",
+  "name": "@azist/monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Azos Dev root monorepo package",
+  "author": "Azist Group",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azist/azos-js.git"
+  },
+  "keywords": [
+    "azos",
+    "unistack",
+    "sky"
+  ],
+  "bugs": {
+    "url": "https://github.com/azist/azos-js/issues"
+  },
+  "homepage": "https://github.com/azist/azos-js#readme",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=9.8.0"
+  },
+  "workspaces": [
+    "src/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "parcel": "^2.9.3"
+  }
+}
