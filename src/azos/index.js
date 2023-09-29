@@ -6,13 +6,13 @@
 
 // Root azos-js Export Index
 
-import * as coreconsts    from "./coreconsts";
-import * as aver          from "./aver";
-import * as types         from "./types";
-import * as strings       from "./strings";
-import * as localization  from "./localization";
-import * as events        from "./events";
-import * as linq          from "./linq";
+import * as coreconsts    from "./coreconsts.js";
+import * as aver          from "./aver.js";
+import * as types         from "./types.js";
+import * as strings       from "./strings.js";
+import * as localization  from "./localization.js";
+import * as events        from "./events.js";
+import * as linq          from "./linq.js";
 
 // These entities will be exported using UMD library mechanisms
 

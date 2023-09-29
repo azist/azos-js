@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as CC from "./coreconsts";
-import * as types from "./types";
-import * as lcl from "./localization";
+import * as CC from "./coreconsts.js";
+import * as types from "./types.js";
+import * as lcl from "./localization.js";
 
 /**
  * Returns true if the argument is an undefined, null, zero length or an empty string.

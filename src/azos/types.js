@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as CC from "./coreconsts";
-import * as strings from "./strings";
+import * as CC from "./coreconsts.js";
+import * as strings from "./strings.js";
 
 /**
  * Returns true if the argument is assigned - not undefined non-null value, even an empty string is assigned

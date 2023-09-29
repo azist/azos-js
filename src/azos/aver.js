@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as types from "./types";
-import * as str   from "./strings";
-import * as linq  from "./linq";
+import * as types from "./types.js";
+import * as str   from "./strings.js";
+import * as linq  from "./linq.js";
 
 /**
  * Makes an Error() initialized with message
