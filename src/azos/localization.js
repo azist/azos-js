@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as types from "./types";
-import * as aver from "./aver";
-import * as strings from "./strings";
+import * as types from "./types.js";
+import * as aver from "./aver.js";
+import * as strings from "./strings.js";
 
 export const CULTURE_INVARIANT = "*";
 export const CULTURE_US = "us";

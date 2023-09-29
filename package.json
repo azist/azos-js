@@ -7,16 +7,22 @@
   "description": "Azos Dev root monorepo package",
   "author": "Azist Group",
   "license": "MIT",
-  "contributors":[{
-    "name":  "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
-    "email": "d@zhabis.com",
-    "url":   "http://zhabis.io"
-  }],
+  "contributors": [
+    {
+      "name": "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
+      "email": "d@zhabis.com",
+      "url": "http://zhabis.io"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/azist/azos-js.git"
   },
-  "keywords": ["azos", "unistack", "sky"],
+  "keywords": [
+    "azos",
+    "unistack",
+    "sky"
+  ],
   "bugs": {
     "url": "https://github.com/azist/azos-js/issues"
   },
@@ -27,13 +33,18 @@
     "npm": ">=9.8.0"
   },
   "workspaces": [
-    "src/*"
+    "src/**/*",
+    "src/test/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "--test": "echo \"Error: no test specified\" && exit 1",
+    "--test": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
+    "test": "mocha \"./src/test/**/*.js\"",
+    "test-aver": "mocha \"./src/test/**/*.js\" -g \"Aver\""
   },
   "devDependencies": {
     "eslint": "^8.50.0",
+    "mocha": "^10.2.0",
     "parcel": "^2.9.3"
   }
 }

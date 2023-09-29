@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as types from "./types";
-import * as aver from "./aver";
+import * as types from "./types.js";
+import * as aver from "./aver.js";
 
 /*
  DESIGN NOTES:

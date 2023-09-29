@@ -4,9 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as types from "./types";
-
-
+import * as types from "./types.js";
 
 /**
  * Creates a root iterable $LINQ object
