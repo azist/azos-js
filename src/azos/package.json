@@ -1,0 +1,26 @@
+{
+  "name": "azos",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "azos-js Core Package", 
+  "author": "Azist Group",
+  "license": "MIT",
+  "contributors":[{
+    "name":  "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
+    "email": "d@zhabis.com",
+    "url":   "http://zhabis.io"
+  }],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azist/azos-js.git"
+  },
+  "keywords": ["azos", "unistack", "sky"],
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=9.8.0"
+  },
+  "dependencies":{
+
+  }
+}
