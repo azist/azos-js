@@ -7,15 +7,16 @@
   "description": "Azos Dev root monorepo package",
   "author": "Azist Group",
   "license": "MIT",
+  "contributors":[{
+    "name":  "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
+    "email": "d@zhabis.com",
+    "url":   "http://zhabis.io"
+  }],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/azist/azos-js.git"
   },
-  "keywords": [
-    "azos",
-    "unistack",
-    "sky"
-  ],
+  "keywords": ["azos", "unistack", "sky"],
   "bugs": {
     "url": "https://github.com/azist/azos-js/issues"
   },
