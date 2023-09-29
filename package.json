@@ -40,7 +40,7 @@
     "--test": "echo \"Error: no test specified\" && exit 1",
     "--test": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
     "test": "mocha \"./src/test/**/*.js\"",
-    "test-aver": "mocha \"./src/test/**/*.js\" -g \"Aver\""
+    "test-one": "mocha \"./src/test/**/*.js\" -g \"Localization\""
   },
   "devDependencies": {
     "eslint": "^8.50.0",
