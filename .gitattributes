@@ -1,0 +1,13 @@
+* eol=lf
+*.cmd eol=crlf
+*.laconf eol=lf linguist-language=C#
+*.sky eol=lf linguist-language=C#
+*.json eol==lf
+*.yml eol==lf
+*.rschema eol=lf linguist-language=C#
+*.safe binary
+*.png binary
+*.jpg binary
+*.dll binary
+*.pdf binary
+*.pptx binary
