@@ -22,7 +22,8 @@
   },
 
   "scripts": {
-    "test": "mocha \"./test/*-tests.js\" -g"
+    "test": "mocha \"./test/*-tests.js\"",
+    "test-match": "mocha \"./test/*-tests.js\" -g"
   },
 
   "dependencies":{

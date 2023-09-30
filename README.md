@@ -10,16 +10,17 @@ ver 0.0.1 20230923 DKh
 # Test everything
 npm test
 
-# Test named fixture form global scope (across all workspaces)
-npm test Types
-npm test Localization
-npm test Strings
+# Test named fixture (grep) form global scope (across all workspaces)
+npm run test-match Types
+npm run test-match Localization
+npm run test-match Strings
 
 ## Test by workspace -------------------------------------------
 
 # test just azos workspace
 npm run test-azos
 
-# Test strings fixture in azos workspace
-npm run test-azos Strings
+# go to ./packages/azos
+# Run matching tests
+~/packages/azos/$ npm run test-match Loca
 ```
