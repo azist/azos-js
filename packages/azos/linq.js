@@ -109,6 +109,7 @@ export class $LINQ{
   */
   orderBy(f){
     let arr = this.toArray();
+    if (f === null) f = undefined;//null may not be used as of 2023
     arr.sort(f);//f may be undefined
     return new $LINQ(arr);
   }

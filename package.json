@@ -33,14 +33,18 @@
     "npm": ">=9.8.0"
   },
   "workspaces": [
-    "src/**/*",
-    "src/test/*"
+    "packages/azos",
+    "azos-ui"
   ],
   "scripts": {
-    "--test": "echo \"Error: no test specified\" && exit 1",
-    "--test": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
-    "test": "mocha \"./src/test/**/*.js\"",
-    "test-aver": "mocha \"./src/test/**/*.js\" -g \"Aver\""
+
+    "build": "parcel build --dist-dir \"./out\" \"src/azos/index.js\"",
+
+    "//test": "echo \"Error: no test specified\" && exit 1",
+    "//test": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
+    "test": "mocha \"./packages/**/*.js\"",
+    "test-one": "mocha \"./packages/**/*.js\" -g \"Localization\"",
+    "test-azos": "npm test -workspace=azos"
   },
   "devDependencies": {
     "eslint": "^8.50.0",

@@ -20,6 +20,11 @@
     "node": ">=18.18.0",
     "npm": ">=9.8.0"
   },
+
+  "scripts": {
+    "test": "mocha \"./test/*-tests.js\""
+  },
+
   "dependencies":{
 
   }
