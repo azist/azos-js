@@ -22,7 +22,7 @@
   },
 
   "scripts": {
-    "test": "mocha \"./test/*-tests.js\""
+    "test": "mocha \"./test/*-tests.js\" -g"
   },
 
   "dependencies":{
