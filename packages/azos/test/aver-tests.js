@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as sut from "../../azos/aver.js";
+import * as sut from "../aver.js";
 
 
 describe("Aver", function() {

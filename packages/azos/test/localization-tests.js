@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as sut from "../../azos/localization.js";
-import * as aver from "../../azos/aver.js";
+import * as sut from "../localization.js";
+import * as aver from "../aver.js";
 
 describe("Localization", function() {
 
