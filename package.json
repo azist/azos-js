@@ -4,6 +4,8 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "--source": "",
+  "main": "out/azos-js.js",
   "description": "Azos Dev root monorepo package",
   "author": "Azist Group",
   "license": "MIT",
@@ -27,7 +29,6 @@
     "url": "https://github.com/azist/azos-js/issues"
   },
   "homepage": "https://github.com/azist/azos-js#readme",
-  "main": "index.js",
   "engines": {
     "node": ">=18.18.0",
     "npm": ">=9.8.0"
@@ -38,7 +39,8 @@
   ],
   "scripts": {
 
-    "build": "parcel build --dist-dir \"./out\" \"src/azos/index.js\"",
+    "//build": "parcel build \"src/azos/index.js\"",
+    "build": "parcel build \"packages/azos/index.js\"",
 
     "//test": "echo \"Error: no test specified\" && exit 1",
     "//test": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
