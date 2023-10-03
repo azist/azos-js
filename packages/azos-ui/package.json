@@ -1,0 +1,41 @@
+{
+  "name": "azos-ui",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "azos-js UI Package",
+  "author": "Azist Group",
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
+      "email": "d@zhabis.com",
+      "url": "http://zhabis.io"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azist/azos-js.git"
+  },
+  "keywords": [
+    "azos",
+    "unistack",
+    "sky"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=9.8.0"
+  },
+  "scripts": {
+    "test": "mocha \"./test/*-tests.js\"",
+    "test-match": "mocha \"./test/*-tests.js\" -g"
+  },
+  "dependencies": {
+    "lit": "^2.8.0",
+    "azos": "^0.0.0"
+  },
+  "devDependencies": {
+    "azos": "../azos"
+  }
+
+}
