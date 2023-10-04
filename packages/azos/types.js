@@ -21,6 +21,7 @@ export function isAssigned(v){
  * @param {string|symbol} prop property to test
  */
 export function hown(obj, prop){
+  // in 2023 a candidate for Object.hasOwn() which is not yet widely supported
   return obj ? hasOwnProperty.call(obj, prop) : false;
 }
 
