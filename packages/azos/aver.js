@@ -222,7 +222,7 @@ export function areEqualValues(a, b){
 
 
 /**
- * Expects that function thows a message optionaly containing the msg
+ * Expects that function throws a message optionally containing the msg
  * @param {function} f function to call
  * @param {string} [msg] optional message to expect in the error 
  */
