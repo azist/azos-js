@@ -21,6 +21,7 @@ export function isAssigned(v){
  * @param {string|symbol} prop property to test
  */
 export function hown(obj, prop){
+  // in 2023 a candidate for Object.hasOwn() which is not yet widely supported
   return obj ? hasOwnProperty.call(obj, prop) : false;
 }
 
@@ -108,7 +109,7 @@ export function isObjectOrArray(v){
 }
 
 /**
- * Returns true when poassed parameter is a function, not a map object or an array
+ * Returns true when passed parameter is a function, not a map object or an array
  * @param {*} v
  */
 export function isFunction(v){
@@ -328,11 +329,11 @@ export function isNonEmptyString(v){
 
 
 /** Character cases */
-export const CHAR_CASE = { ASIS:  "asis", UPPER: "upper", LOWER: "lower", CAPS: "caps", CAPSNORM: "capsnorm"};
+export const CHAR_CASE = Object.freeze({ ASIS:  "asis", UPPER: "upper", LOWER: "lower", CAPS: "caps", CAPSNORM: "capsnorm"});
 const ALL_CHAR_CASES = allObjectValues(CHAR_CASE);
 
 /** Data Entry field kinds */
-export const DATA_KIND = {
+export const DATA_KIND = Object.freeze({
   TEXT:          "text", 
   SCREENNAME:    "screenname", 
   COLOR:         "color", 
@@ -349,7 +350,7 @@ export const DATA_KIND = {
   URL:     "url", 
   WEEK:    "week", 
   MONEY:   "money"
-};
+});
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
 
 /**
@@ -377,7 +378,7 @@ export function asDataKind(v){
 
 
 export const AS_BOOLEAN_FUN = Symbol("asBoolean");
-const TRUISMS = ["true", "t", "yes", "1", "ok"];
+const TRUISMS = Object.freeze(["true", "t", "yes", "1", "ok"]);
 
 /**
  * Converts primitives into bool. Uses AS_BOOLEAN_FUN on objects.
@@ -547,7 +548,7 @@ export function asArray(v, canUndef=false){
 
 
 /** Data Type Monikers */
-export const TYPE_MONIKER = {
+export const TYPE_MONIKER = Object.freeze({
   STRING:   "str",
   INT:      "int",
   REAL:     "real",
@@ -556,7 +557,7 @@ export const TYPE_MONIKER = {
   DATE:     "date",
   OBJECT:   "object",
   ARRAY:    "array"
-};
+});
 const ALL_TYPE_MONIKERS = allObjectValues(TYPE_MONIKER);
 
 /**

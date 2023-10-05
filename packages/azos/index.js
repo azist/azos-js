@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-// Root azos-js Export Index
+// Root azos Export Index
 
 import * as coreconsts    from "./coreconsts.js";
 import * as aver          from "./aver.js";
