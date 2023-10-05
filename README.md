@@ -3,6 +3,13 @@ Provides Azos base types and services functionality for Java Script apps
 
 ver 0.0.1 20230923 DKh
 
+## UI Dev
+
+```bash
+# Starts parcel server with watch+HMR out of ./out/www (temp testing)
+npm run ui
+```
+
 ## Testing
 
 ```bash
