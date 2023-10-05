@@ -39,6 +39,8 @@
   ],
   "scripts": {
 
+    "pack-local": "npm pack \"./packages/azos/\" --pack-destination=\"./out\" && npm pack \"./packages/azos-ui/\" --pack-destination=\"./out\"",
+
     "//build": "parcel build \"src/azos/index.js\"",
     "build": "parcel build \"packages/azos/index.js\"",
 
