@@ -6,6 +6,7 @@
 
 import * as CC from "./coreconsts.js";
 import * as types from "./types.js";
+import * as aver from "./aver.js";
 import * as lcl from "./localization.js";
 
 /**
@@ -15,7 +16,7 @@ import * as lcl from "./localization.js";
  */
 export function isEmpty(str){
   if (!types.isAssigned(str)) return true;// (!str) is NOT the same test i.e. str=(bool)false is a valid "string"
-  return (str.length === 0 || /^\s*$/.test(str)); 
+  return (str.length === 0 || /^\s*$/.test(str));
 }
 
 /**
@@ -105,9 +106,9 @@ export function isOneOf(str, values, senseCase = false){
   if (types.isString(values)){
     values = values.split(/[|,;]/).filter(s => s.length>0);
   }
-  
+
   if (!senseCase) str = str.toLowerCase();
-  
+
   for(let i in values){
     let e = trim(values[i]);
     if (!senseCase) e = e.toLowerCase();
@@ -137,15 +138,15 @@ export function truncate(str, maxLen, ending){
 /**
  * Provides a textual representation of a value, suitable for report in error logs, exceptions, etc.
  * @param {*} v value to describe
- * @param {int} [maxLen=64] impose maximum length on the resulting description 
+ * @param {int} [maxLen=64] impose maximum length on the resulting description
  */
 export function describe(v, maxLen = 64){
   if (v===undefined) return CC.UNDEFINED;
   if (v===null) return CC.NULL;
-  
+
   let t = types.describeTypeOf(v);
   let subs = v.length ? `[${v.length}]` : "";
-  
+
   let d = CC.UNKNOWN;
   if (types.isDate(v))
     d = lcl.INVARIANT.formatDateTime(v);
@@ -167,15 +168,15 @@ export const REXP_FORMAT = /<<(.*?)>>/g;
  * Expands formatting arguments
  * @param {*} v A format string with tokens: <<path[::format[{format-args-json}]>>. Path is the same as used in types.nav() to address sub/properties of the args object
  * @param {*} args Arguments object: either a map or array
- * @example 
+ * @example
  *  format(`DOB is: <<dob::ld{"dtFormat": "'ShortDate"}>> Salary: <<salary::lm{"iso": "?salary_iso"}>>`, {dob: new Date(1980, 1, 1), salary: 120000, salary_iso: "usd"})
  *  returns "DOB is: 01/01/1980 Salary: $120,000.00"
  */
 export function format(v, args, localizer = null){
   v = asString(v);
   if (!args) return v;
-  if (!types.isObjectOrArray(args)) 
-    throw new Error(".format(args) must be null, object or array"); 
+  if (!types.isObjectOrArray(args))
+    throw new Error(".format(args) must be null, object or array");
 
   const fmap = (s, token) => {
     let key = token;
@@ -204,22 +205,22 @@ export function format(v, args, localizer = null){
     switch(fmt){
       case "ld": { //localized date-time
         if (!localizer) localizer = lcl.currentLocalizer();
-        if (fmta===null) fmta={}; 
-        fmta.dt = tv; 
+        if (fmta===null) fmta={};
+        fmta.dt = tv;
         return localizer.formatDateTime(fmta);
       }
       case "lm": { //localized money
         if (!localizer) localizer = lcl.currentLocalizer();
-        if (fmta===null) fmta={}; 
-        fmta.amt = tv; 
-        if (isEmpty(fmta.iso)) throw new Error(".format() is missing currency iso arg: lm{iso: 'currency-code' | '?key'}"); 
+        if (fmta===null) fmta={};
+        fmta.amt = tv;
+        if (isEmpty(fmta.iso)) throw new Error(".format() is missing currency iso arg: lm{iso: 'currency-code' | '?key'}");
         if (fmta.iso.startsWith("?")){
           fmta.iso = asString( get(fmta.iso.substr(1)) );
         }
         return localizer.formatCurrency(fmta);
       }
       case "tc": { //type cast
-        if (fmta===null) throw new Error(".format() is missing typecast arg: tc{tm: 'type-moniker'}"); 
+        if (fmta===null) throw new Error(".format() is missing typecast arg: tc{tm: 'type-moniker'}");
         tv = types.cast(tv, fmta.tm);
       }
     }
@@ -276,7 +277,7 @@ function isValidScreenNameLetter(c){
 }
 
 function isValidScreenNameLetterOrDigit(c){
-  return isValidScreenNameLetter(c) || (c>="0" && c<="9"); 
+  return isValidScreenNameLetter(c) || (c>="0" && c<="9");
 }
 
 function isValidScreenNameSeparator(c){
@@ -286,13 +287,13 @@ function isValidScreenNameSeparator(c){
 /**
  * Returns true if the string contains a valid Screen Name.
  * Screen names are used for making primary actor (user/room/group etc...) IDS(names)
- * which are always visible (hence the name "screen/stage name of a person") and can be used for emails, 
- * for example "my-name" => "my-name@domain.com". 
+ * which are always visible (hence the name "screen/stage name of a person") and can be used for emails,
+ * for example "my-name" => "my-name@domain.com".
  * Screen names are defined as strings starting from a letter, then followed by letters or digints separated by a single
  * hyphen, dot or underscore
  * @param {*} v A string value representing a s Screen Name
- * @example 
- *  Valid names: "my-name", "name1980", "my.name", "alex-bobby-1980" 
+ * @example
+ *  Valid names: "my-name", "name1980", "my.name", "alex-bobby-1980"
  *  Invalid names: "-my-name", "1980name", "my-.name", "name."
  */
 export function isValidScreenName(v){
@@ -324,7 +325,7 @@ export function isValidScreenName(v){
 /**
  * Parses and formats the supplied string per US telephone number standard: (999) 999-9999x9999
  * The numbers starting with +(international) returned as-is
- * @param {*} v 
+ * @param {*} v
  */
 export function normalizeUSPhone(v){
   v = trim(asString(v));
@@ -369,7 +370,7 @@ export function normalizeUSPhone(v){
         i += 2;
         continue;
       }
-     
+
       if (startsWith(trailer,"EXT.") && number.length >= 7){
         isExt = true;
         i += 3;
@@ -409,6 +410,26 @@ export function normalizeUSPhone(v){
   if (ext.length > 0) ext = "x" + ext;
 
   return "("+area+") " + number + ext;
+}
+
+const HEX_DIGITS = "0123456789abcdef";
+
+/**
+ * Converts an iterable of bytes into a string with hex representation
+ * @param {Iterable} buf - iterable of bytes
+ * @returns String build from hex representation of bytes; null for null or throws on non-iterable object
+ */
+export function bufToHex(buf){
+  if (!types.isAssigned(buf)) return null;
+  aver.isIterable(buf);
+
+  let r = '';
+  for (const one of buf){
+    const v = one & 0xff;
+    r += HEX_DIGITS[v >> 4];
+    r += HEX_DIGITS[v & 0xf];
+  }
+  return r;
 }
 
 

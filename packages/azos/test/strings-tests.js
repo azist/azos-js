@@ -20,8 +20,8 @@ describe("Strings", function() {
     it("true (\" \\n  \\r  \")", function() { aver.isTrue( sut.isEmpty(" \n  \r  ") );});
     it("true ([])",              function() { aver.isTrue( sut.isEmpty([]) );});
     it("true ([\"\"])",          function() { aver.isTrue( sut.isEmpty([""]) );});
-    
-    
+
+
     it("false (true)",            function() { aver.isFalse( sut.isEmpty(true) );});
     it("false (false)",           function() { aver.isFalse( sut.isEmpty(false) );});
     it("false ({})",              function() { aver.isFalse( sut.isEmpty({}) );});
@@ -30,7 +30,7 @@ describe("Strings", function() {
     it("false (\"----------\"])", function() { aver.isFalse( sut.isEmpty("----------") );});
     it("false (\"---\\r\\n-------\"])", function() { aver.isFalse( sut.isEmpty("---\r\n-----") );});
   });
-  
+
   describe("#truncate()", function() {
     it("'' ()",   function() { aver.areEqual("", sut.truncate() );});
     it("'' undef",   function() { aver.areEqual("", sut.truncate(undefined) );});
@@ -141,12 +141,12 @@ describe("Strings", function() {
     it("false",   function() { aver.areEqual("false", sut.asString(false) );});
     it("'defg'",   function() { aver.areEqual("defg", sut.asString(new String("defg")) );});
     it("date",   function() { aver.isTrue( sut.asString(new Date(1980, 1, 18)).indexOf("1980")>0 );});
-  }); 
+  });
 
   describe("#isOneOf()", function() {
     it("()",          function() { aver.isFalse(  sut.isOneOf()    );});
     it("(aaa,)",          function() { aver.isFalse(  sut.isOneOf("aaa")    );});
-    
+
     it("(aaa,bbb)",          function() { aver.isFalse(  sut.isOneOf("aaa","bbb")    );});
     it("(aaa,aaa)",          function() { aver.isTrue(  sut.isOneOf("aaa","aaa")    );});
     it("(aaa,aAA)",          function() { aver.isTrue(  sut.isOneOf("aaa","aAA")    );});
@@ -179,7 +179,7 @@ describe("Strings", function() {
     it("mix of types 5",          function() { aver.isFalse(  sut.isOneOf("good",[ 1, true, 23, "goOD"],true)    );});
 
     it("mix of types 6",          function() { aver.isTrue(  sut.isOneOf(7 , [ 1, 2, 7, "go"])  );});
-  }); 
+  });
 
 
   describe("#describe()", function() {
@@ -259,12 +259,12 @@ describe("Strings", function() {
     });
 
 
-  }); 
+  });
 
 
 
   describe("#string-format()", function() {
-    
+
     it("without sub format 1 level nav",   function() {
       aver.areEqual("a = -2, b = true", sut.format("a = <<a>>, b = <<b>>", {a: -2, b: true}));
     });
@@ -315,11 +315,11 @@ describe("Strings", function() {
         hobbies: [{id: "run", name: "Running"},{id: "wld", name: "Welding"}]
       };
 
-      const msg = 
+      const msg =
        `Dear <<title>> <<lname>>! You were born on <<dob::ld{"dtFormat": "LongDate", "tmDetails": "HMS"}>> and
        saved <<balance::lm{"iso": "@balance_iso", "precision": 0}>>. We appreciate that you like <<hobbies.1.name>>! Thanks <<fname>>!`;
 
-      const expect= 
+      const expect=
        `Dear Mr. Solomon! You were born on 2 January 1980 13:44:12 and
        saved $5,123,456. We appreciate that you like Welding! Thanks Satya!`;
 
@@ -332,7 +332,7 @@ describe("Strings", function() {
 
 
   describe("#isValidEMail()", function() {
-    
+
     it("()",   function() {     aver.isFalse( sut.isValidEMail() );    });
     it("(undefined)",   function() {     aver.isFalse( sut.isValidEMail(undefined) );    });
     it("(null)",   function() {     aver.isFalse( sut.isValidEMail(null) );    });
@@ -356,12 +356,12 @@ describe("Strings", function() {
   });
 
   describe("#isValidScreenName()", function() {
-    
+
     it("()",   function() {     aver.isFalse( sut.isValidScreenName() );    });
     it("(undefined)",   function() {     aver.isFalse( sut.isValidScreenName(undefined) );    });
     it("(null)",   function() {     aver.isFalse( sut.isValidScreenName(null) );    });
     it("(7)",   function() {     aver.isFalse( sut.isValidScreenName(7) );    });
-    
+
     it("(true)",   function() {     aver.isTrue( sut.isValidScreenName(true) );    });
     it("my-name",   function() {     aver.isTrue( sut.isValidScreenName("my-name") );    });
     it("my.name",   function() {     aver.isTrue( sut.isValidScreenName("my.name") );    });
@@ -374,6 +374,35 @@ describe("Strings", function() {
     it("my.name1980.",      function() {     aver.isFalse( sut.isValidScreenName("my.name1980.") );    });
     it("my..name-1980.ok",  function() {     aver.isFalse( sut.isValidScreenName("my..name-1980.ok") );    });
     it("my.-name",          function() {     aver.isFalse( sut.isValidScreenName("my.-name") );    });
+  });
+
+  describe("#bufToHex()", function() {
+
+    it("()",   function() {     aver.isNull( sut.bufToHex() );    });
+    it("(null)",   function() {     aver.isNull( sut.bufToHex(null) );    });
+    it("(undefined)",   function() {     aver.isNull( sut.bufToHex(undefined) );    });
+
+    it("[1,2,3]",   function() {     aver.areEqual("010203", sut.bufToHex([1,2,3]) );  });
+    it("[255,256,-1]",   function() {     aver.areEqual("ff00ff", sut.bufToHex([255,256,-1]) );  });
+    it("[255,257,-1]",   function() {     aver.areEqual("ff01ff", sut.bufToHex([255,257,-1]) );  });
+
+    it("Uint8Array",   function() {
+      let buf = new Uint8Array(120);
+      buf[0] = 0xab;
+      buf[119] = 0xdd;
+      let got = sut.bufToHex(buf);
+      console.info(got);
+      aver.areEqual(120*2, got.length);
+      aver.areEqual("a", got[0]);
+      aver.areEqual("b", got[1]);
+      aver.areEqual("d", got[238]);
+      aver.areEqual("d", got[239]);
+    });
+
+    it("throws",   function() {
+      aver.throws(function(){sut.bufToHex({});}, "isiterable");
+    });
+
   });
 
 });

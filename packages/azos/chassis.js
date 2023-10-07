@@ -6,7 +6,7 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
-import * as strings from "./strings.js";
+import * as str from "./strings.js";
 
 /**
  * Implements a default Application chassis pattern
@@ -39,14 +39,14 @@ export class Application{
   */
   constructor(init){
     aver.isObject(init);
-    this.#instanceId = "aaaa";//crypto.randomUUID();
+    this.#instanceId = types.genGuid();
     this.#startTime = new Date();
 
-    this.#id = strings.dflt(init.id, "#0");
-    this.#name = strings.dflt(init.name, this.#id);
-    this.#description = strings.dflt(init.description, this.#id);
-    this.#copyright = strings.dflt(init.copyright, "2023 Azist Group");
-    this.#envName = strings.dflt(init.envName, "local");
+    this.#id = str.dflt(init.id, "#0");
+    this.#name = str.dflt(init.name, this.#id);
+    this.#description = str.dflt(init.description, this.#id);
+    this.#copyright = str.dflt(init.copyright, "2023 Azist Group");
+    this.#envName = str.dflt(init.envName, "local");
     this.#isTest = types.asBool(init.isTest);
 
     if (Application.#instance !== null){
