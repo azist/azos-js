@@ -630,15 +630,15 @@ export function getRndBytes(cnt = 16){
   let r = 0;
   for(let i=0; i<cnt; i++){
     if (r==0) r = Math.random() * 0xffffffff | 0;
-    buf[i] = buf[i] ^ (r & 0xff);
-    r = r >> 8;
+    buf[i] = r & 0xff;
+    r = r >>> 8;
 
     if (s1>0){
       buf[i] = buf[i] ^ (s1 & 0xff);
-      s1 = s1 >> 8;
+      s1 = s1 >>> 8;
     } else if (s2>0){
       buf[i] = buf[i] ^ (s2 & 0xff);
-      s2 = s2 >> 8;
+      s2 = s2 >>> 8;
     }
   }
 

@@ -402,7 +402,6 @@ describe("Strings", function() {
     it("throws",   function() {
       aver.throws(function(){sut.bufToHex({});}, "isiterable");
     });
-
-  });
+  });//bufToHex
 
 });
