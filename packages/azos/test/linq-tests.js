@@ -4,6 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { describe, it } from "mocha";
 import * as sut from "../linq.js";
 import * as aver from "../aver.js";
 import * as types from "../types.js";

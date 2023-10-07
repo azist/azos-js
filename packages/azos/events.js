@@ -32,26 +32,31 @@ import * as aver from "./aver.js";
  * An archetype for all events dispatched via EventEmitter
  */
 export class Event{
+
+  #sender;
+  #handled;
+  #bag;
+
   constructor(sender, bag){ 
-    this.m_sender = sender; 
-    this.m_handled = false; 
-    this.m_bag = bag===undefined ? null : bag;
+    this.#sender = sender; 
+    this.#handled = false; 
+    this.#bag = bag===undefined ? null : bag;
   }
 
   /** Returns the sender of this event */
-  get sender(){ return this.m_sender; }
+  get sender(){ return this.#sender; }
 
   /** Gets data bag of this event or null */
-  get bag(){ return this.m_bag; }
+  get bag(){ return this.#bag; }
   
   /** Sets data bag of this event or null */
-  set bag(v){ this.m_bag = v===undefined ? null : v; }
+  set bag(v){ this.#bag = v===undefined ? null : v; }
   
   /** Returns true if the event is handled already  */
-  get handled( ){ return this.m_handled; }
+  get handled( ){ return this.#handled; }
   
   /** Sets event handled property. Once set to true the event propagation stops */
-  set handled(v){ this.m_handled = types.asBool(v); }
+  set handled(v){ this.#handled = types.asBool(v); }
 }
 
 /** Defines a function symbol for event handlers attached to objects*/
@@ -67,22 +72,27 @@ export const EVENT_HANDLER_FUN = Symbol("eventHandler");
  * Attention: you must unsubscribe from EventEmitter to prevent memory leaks.
  */
 export class EventEmitter{
+
+  #ctx;
+  #map;
+  #emitSet;
+
   constructor(ctx){
-    this.m_ctx = ctx===undefined ? null : ctx;
-    this.m_map = new Map();
-    this.m_emitSet = new Set();
+    this.#ctx = ctx===undefined ? null : ctx;
+    this.#map = new Map();
+    this.#emitSet = new Set();
   }
 
   /** Event call context, such as an object that owns the emitter. It is
    * passed as this to function subscribers. May be null
    */
-  get context(){ return this.m_ctx; }
+  get context(){ return this.#ctx; }
 
   /**
    * Starts anew by unsubscribing all subscriptions
    */
   clear(){
-    this.m_map.clear();//remove all event mappings
+    this.#map.clear();//remove all event mappings
   }
 
   /**
@@ -98,9 +108,9 @@ export class EventEmitter{
 
     let result = false;
 
-    const map = this.m_map;
-    const set = this.m_emitSet;
-    const ctx = this.m_ctx;
+    const map = this.#map;
+    const set = this.#emitSet;
+    const ctx = this.#ctx;
 
     try
     {
@@ -154,7 +164,7 @@ export class EventEmitter{
     aver.isObjectOrFunction(listener);
     aver.isIterable(etypes);
     
-    const map = this.m_map;
+    const map = this.#map;
 
     let result = false;
     for(let type of etypes){
@@ -183,7 +193,7 @@ export class EventEmitter{
   unsubscribe(listener, ...etypes){
     aver.isObjectOrFunction(listener);
     
-    const map = this.m_map;
+    const map = this.#map;
 
     if (types.isEmptyIterable(etypes)) etypes = map.keys();
 
