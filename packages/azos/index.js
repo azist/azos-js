@@ -13,6 +13,7 @@ import * as strings       from "./strings.js";
 import * as localization  from "./localization.js";
 import * as events        from "./events.js";
 import * as linq          from "./linq.js";
+import * as chassis       from "./chassis.js";
 
 // These entities will be exported using UMD library mechanisms
 
@@ -23,3 +24,4 @@ export const Strings      = strings;
 export const Localization = localization;
 export const Events       = events;
 export const Linq         = linq;
+export const Chassis      = chassis;
