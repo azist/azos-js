@@ -29,7 +29,7 @@ export const FIELD_DAY   = "day";
 export const FIELD_MONTH = "month";
 
 
-export const DATE_FORMAT = {
+export const DATE_FORMAT = Object.freeze({
   LONG_WEEK_DATE:   "LongWeekDate",  //  Tuesday, 30 August 2018
   SHORT_WEEK_DATE:  "ShortWeekDate", //  Tue, 30 Aug 2018
   LONG_DATE:        "LongDate",      //  30 August 2018
@@ -42,26 +42,27 @@ export const DATE_FORMAT = {
 
   LONG_DAY_MONTH:   "LongDayMonth",  //  12 August
   SHORT_DAY_MONTH:  "ShortDayMonth"  //  12 Aug
-};
+});
 
-export const TIME_DETAILS = {
+export const TIME_DETAILS = Object.freeze({
   NONE: "NONE", // time is off
   HM:   "HM",   // hours:minutes
   HMS:  "HMS",  // hours:minutes:seconds
   HMSM: "HMSM"  // hours:minutes:seconds:millis
-};
+});
 
 
-export const INVARIANT_MONTH_LONG_NAMES = [
+export const INVARIANT_MONTH_LONG_NAMES = Object.freeze([
   "January", "February", "March",
   "April", "May", "June",
   "July", "August", "September",
-  "October", "November", "December"];
-
+  "October", "November", "December"]);
 export const INVARIANT_MONTH_SHORT_NAMES = INVARIANT_MONTH_LONG_NAMES.map( v => strings.truncate(v, 3) );
 
-export const INVARIANT_DAY_LONG_NAMES = 
-  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+export const INVARIANT_DAY_LONG_NAMES = Object.freeze([
+  "Sunday", "Monday", "Tuesday", 
+  "Wednesday", "Thursday", "Friday", 
+  "Saturday"]);
 export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => strings.truncate(v, 3) );
 
 
@@ -72,14 +73,21 @@ export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => stri
  */
 export class Localizer{
   
-  constructor(){
-    this.m_Strings = {
-      [ISO_LANG_ENG]: { [ANY_SCHEMA]: {[ANY_FIELD]: {  }} },
-      [ISO_LANG_RUS]: { [ANY_SCHEMA]: {[ANY_FIELD]: {"yes":"да", "no":"нет"}}, "tezt": {[ANY_FIELD]: {"yes":"так", "no":"неа"}} },
-      [ISO_LANG_DEU]: { [ANY_SCHEMA]: {[ANY_FIELD]: {"yes":"ja", "no":"nein"}} },
-      [ISO_LANG_FRA]: { },
-      [ISO_LANG_ESP]: { }
-    };
+  #strings;
+
+  constructor(stringTable){
+    if (types.isAssigned(stringTable)){
+      aver.isObject(stringTable);
+      this.#strings = stringTable;
+    } else{
+      this.#strings = {
+        [ISO_LANG_ENG]: { [ANY_SCHEMA]: {[ANY_FIELD]: {  }} },
+        [ISO_LANG_RUS]: { [ANY_SCHEMA]: {[ANY_FIELD]: {"yes":"да", "no":"нет"}}, "tezt": {[ANY_FIELD]: {"yes":"так", "no":"неа"}} },
+        [ISO_LANG_DEU]: { [ANY_SCHEMA]: {[ANY_FIELD]: {"yes":"ja", "no":"nein"}} },
+        [ISO_LANG_FRA]: { },
+        [ISO_LANG_ESP]: { }
+      };
+    }
   }
 
   get name () { return "Localizer('Invariant')"; }
@@ -246,7 +254,7 @@ export class Localizer{
    * Returns an array of all language ISOs supported by the instance
    */
   getStringLocalizationIsos(){
-    return Object.keys(this.m_Strings).filter(n => n.length === 3);
+    return Object.keys(this.#strings).filter(n => n.length === 3);
   }
 
   /**
@@ -271,7 +279,7 @@ export class Localizer{
     if (strings.isEmpty(field)) field = ANY_FIELD;
     if (strings.isEmpty(schema)) schema = ANY_SCHEMA;
   
-    var node = this.m_Strings;
+    var node = this.#strings;
     if (!types.hown(node, iso)) return value;
     node = node[iso];
   

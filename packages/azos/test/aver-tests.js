@@ -4,6 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { describe, it } from "mocha";
 import * as sut from "../aver.js";
 
 
@@ -23,7 +24,7 @@ describe("Aver", function() {
       }, "averment failure: isundefined");
     });
   });
-  
+
   describe("#isDefined()", function() {
 
     it("pass defined",   function() {
@@ -88,6 +89,26 @@ describe("Aver", function() {
     it("pass object",   function() {
       let x = {};
       sut.isObject(x);
+    });
+
+    it("fail null",   function() {
+      sut.throws(function(){
+        let x = null;
+        sut.isObject(x);
+      }, "averment failure: isobject");
+    });
+
+    it("fail undefined1",   function() {
+      sut.throws(function(){
+        let x = undefined;
+        sut.isObject(x);
+      }, "averment failure: isobject");
+    });
+
+    it("fail undefined2",   function() {
+      sut.throws(function(){
+        sut.isObject();
+      }, "averment failure: isobject");
     });
 
     it("fail []",   function() {
@@ -300,7 +321,7 @@ describe("Aver", function() {
       sut.areEqual("abc", "abc");//may have used areEqualValues() as strings get special treatment
 
       sut.areEqual(null, null);
-      sut.areEqual(undefined, undefined); 
+      sut.areEqual(undefined, undefined);
     });
 
     it("FALSE", function(){
@@ -316,7 +337,7 @@ describe("Aver", function() {
       sut.areNotEqual(0, null);
       sut.areNotEqual(undefined, null);
 
-      //note: Date is ref type, hence two instances are different. 
+      //note: Date is ref type, hence two instances are different.
       //Use areEqualValues() for object equality check based on valueOf()
       sut.areNotEqual(new Date(123), new Date(123));
     });
@@ -336,9 +357,9 @@ describe("Aver", function() {
       sut.areEqualValues("abc", "abc");//may have used areEqual() as strings get special treatment
 
       sut.areEqualValues(null, null);
-      sut.areEqualValues(undefined, undefined); 
+      sut.areEqualValues(undefined, undefined);
 
-      sut.areEqualValues(new Date(123), new Date(123)); 
+      sut.areEqualValues(new Date(123), new Date(123));
     });
 
     it("FALSE", function(){

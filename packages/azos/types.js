@@ -40,7 +40,7 @@ export function allObjectValues(o){
  * Deletes the first occurence of the element in array.
  * Warning: this is an "unsafe" method as it does not do any args checks for speed
  * @param {Array} array to delete from
- * @param {*} elm element to delete 
+ * @param {*} elm element to delete
  * @returns {boolean} true if element was found and deleted
  */
 export function arrayDelete(array, elm){
@@ -127,7 +127,7 @@ export function isObjectOrFunction(v){
 
 /**
  * Returns true when the passed value implements Iterable protocol
- * @param {*} v 
+ * @param {*} v
  */
 export function isIterable(v){
   return isAssigned(v) && isFunction(v[Symbol.iterator]);
@@ -136,7 +136,7 @@ export function isIterable(v){
 
 /**
  * Returns true if the argument is an int32 value
- * @param {*} v 
+ * @param {*} v
  */
 export function isInt32(v){
   if (Number.isInteger) return Number.isInteger(v);
@@ -145,7 +145,7 @@ export function isInt32(v){
 
 /**
  * Returns true if the value is either integer number or a string representing an integer number
- * @param {int|string} v Value to check 
+ * @param {int|string} v Value to check
  */
 export function isIntValue(v){
   if (isNaN(v)) return false;
@@ -155,7 +155,7 @@ export function isIntValue(v){
 
 /**
  * Return true if the value is a Number
- * @param {*} v Value to check 
+ * @param {*} v Value to check
  */
 export function isNumber(v){
   return Object.prototype.toString.call(v) === "[object Number]";
@@ -163,7 +163,7 @@ export function isNumber(v){
 
 /**
  * Return true if the value is a boolean
- * @param {*} v Value to check 
+ * @param {*} v Value to check
  */
 export function isBool(v){
   return Object.prototype.toString.call(v) === "[object Boolean]";
@@ -171,7 +171,7 @@ export function isBool(v){
 
 /**
  * Return true if the value is a symbol
- * @param {*} v Value to check 
+ * @param {*} v Value to check
  */
 export function isSymbol(v){
   return Object.prototype.toString.call(v) === "[object Symbol]";
@@ -181,13 +181,13 @@ export function isSymbol(v){
 /**
  * Describes the type of value returning the string description, not type moniker.
  * Keep in mind that in JS typeof(new String|Date|Number|Boolean(x)) is object, not the actual type, hence this method :)
- * @param {*} v 
+ * @param {*} v
  */
 export function describeTypeOf(v){
   if(v === undefined) return CC.UNDEFINED;
   if(v === null) return CC.NULL;
 
-  // typeof( Boolean(true)) === 'boolean' 
+  // typeof( Boolean(true)) === 'boolean'
   // typeof( new Boolean(true)) === 'object'
   // same for Date, Number, String, [] === object etc
 
@@ -259,7 +259,7 @@ export function mixin(obj, ext, keepExisting = false){
 
 
 /**
- * Tries to navigate the path as far a s possible starting at the root object 
+ * Tries to navigate the path as far a s possible starting at the root object
  * @param {Object|Array} obj Required root object of navigation
  * @param {string|string[]} path Rquired path as '.' delimited segments, or array of strings
  * @param {Object|Array} org Optional origin of the chain, used by chain nav() calls
@@ -269,7 +269,7 @@ export function nav(obj, path, org){
   let result = {
     orig: isAssigned(org) ? org : obj,
     root: obj,
-    full: undefined, 
+    full: undefined,
     value: undefined,
     result: undefined,
     nav: (p) => nav(result.value, p, result.orig)
@@ -277,20 +277,20 @@ export function nav(obj, path, org){
 
   if (!isAssigned(obj)) return result;
   if (!isAssigned(path)) return result;
-  
+
   if (isString(path)){
     path = path.split(".").filter(s => s.length>0);
   }
-  
+
   result.full = false;
   result.value = obj;
   for(let i in path){
     if (!isObjectOrArray(result.value)) return result;
-   
+
     let seg = path[i];
     if (!(seg in result.value)) return result;
     let sub = result.value[seg];
-   
+
     result.value = sub;
   }
 
@@ -334,21 +334,21 @@ const ALL_CHAR_CASES = allObjectValues(CHAR_CASE);
 
 /** Data Entry field kinds */
 export const DATA_KIND = Object.freeze({
-  TEXT:          "text", 
-  SCREENNAME:    "screenname", 
-  COLOR:         "color", 
-  DATE:          "date", 
+  TEXT:          "text",
+  SCREENNAME:    "screenname",
+  COLOR:         "color",
+  DATE:          "date",
   DATETIME:      "datetime",
-  DATETIMELOCAL: "datetime-local", 
-  EMAIL:   "email", 
-  MONTH:   "month", 
-  NUMBER:  "number", 
-  RANGE:   "range", 
-  SEARCH:  "search", 
-  TEL:     "tel", 
-  TIME:    "time", 
-  URL:     "url", 
-  WEEK:    "week", 
+  DATETIMELOCAL: "datetime-local",
+  EMAIL:   "email",
+  MONTH:   "month",
+  NUMBER:  "number",
+  RANGE:   "range",
+  SEARCH:  "search",
+  TEL:     "tel",
+  TIME:    "time",
+  URL:     "url",
+  WEEK:    "week",
   MONEY:   "money"
 });
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
@@ -383,7 +383,7 @@ const TRUISMS = Object.freeze(["true", "t", "yes", "1", "ok"]);
 /**
  * Converts primitives into bool. Uses AS_BOOLEAN_FUN on objects.
  * Yields true only on (bool)true, 1, or ["true", "t", "yes", "1", "ok"]
- * @param {any} v object to test 
+ * @param {any} v object to test
  */
 export function asBool(v){
   if (!v) return false;
@@ -396,7 +396,7 @@ export function asBool(v){
  * Converts primitives into a tri-state bool. Tri state bool values are {undefined|false|true}
  * Uses AS_BOOLEAN_FUN on objects, respecting undefined value.
  * Yields true only on (bool)true, 1, or ["true", "t", "yes", "1", "ok"]. Undefined input is returned as-is
- * @param {any} v object to test 
+ * @param {any} v object to test
  */
 export function asTriBool(v){
   if (v===undefined) return undefined;
@@ -424,12 +424,12 @@ const CAST_ERROR = "Cast error: ";
  * Throws if string conversion is not possible
  * Uses AS_INTEGER_FUN on objects, respecting undefined value.
  * @param {*} v value to convert.
- * @param {boolean} [canUndef=false] Whether undefined is allowed 
+ * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
 export function asInt(v, canUndef=false){
   if (v===undefined) return canUndef ? undefined : 0;
   if (v===null) return 0;
-  
+
   if (isFunction(v[AS_INTEGER_FUN])){
     const r = v[AS_INTEGER_FUN]();
     if (r===undefined) return canUndef ? undefined : 0;
@@ -458,7 +458,7 @@ export function asInt(v, canUndef=false){
 /**
  * Converts value to real number (contrast with asInt())
  * @param {*} v value to convert.
- * @param {boolean} [canUndef=false] Whether undefined is allowed 
+ * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
 export function asReal(v, canUndef=false){
   if (v===undefined) return canUndef ? undefined : 0;
@@ -496,7 +496,7 @@ export function asDate(v, canUndef=false){
   if (v===undefined) return canUndef ? undefined : new Date(0);
   if (v===null) return new Date(0);
   if (isDate(v)) return v;
-  
+
   if (isIntValue(v)) return new Date(asInt(v));
 
   if (isString(v)){
@@ -580,7 +580,7 @@ export function asTypeMoniker(v){
 export function cast(v, tmon, canUndef=false){
   if (arguments.length<2) throw Error("cast(v, tmon) missing 2 req args");
   tmon = asTypeMoniker(tmon);
-  
+
   switch(tmon){
     case TYPE_MONIKER.STRING:   return asString(v, canUndef);
     case TYPE_MONIKER.INT:      return asInt(v, canUndef);
@@ -592,4 +592,62 @@ export function cast(v, tmon, canUndef=false){
     case TYPE_MONIKER.ARRAY:    return asArray(v, canUndef);
     default: return asString(v, canUndef);
   }
+}
+
+
+//crypto module is NOT loaded by default on node. Need async fallback.
+//On browser it is pre-loaded as-is
+let cryptoModule = null;
+if (typeof crypto === "undefined"){
+  import('node:crypto').then(mod => cryptoModule = mod);
+}else{
+  cryptoModule = crypto;
+}
+
+/**
+ * Gets an instance of {@link Uint8Array} filled with random bytes
+ * based on crypto api facade
+ * @param {int} cnt
+ */
+export function getRndBytes(cnt = 16){
+  cnt = cnt | 0;
+  if (cnt <= 0) cnt =16;
+  const buf = new Uint8Array(cnt);
+  if (cryptoModule !== null){
+    cryptoModule.getRandomValues(buf);
+  } else { //async fallback, use pseudo generation
+    let s1 = performance.now() * 1000 | 0;
+    let s2 = Date.now() | 0;
+    let r = 0;
+    for(let i=0; i<cnt; i++){
+      if (r==0) r = Math.random() * 0xffffffff | 0;
+      buf[i] = r & 0xff;
+      r = r >>> 8;
+      if (s1>0){
+        buf[i] = buf[i] ^ (s1 & 0xff);
+        s1 = s1 >>> 8;
+      } else if (s2>0){
+        buf[i] = buf[i] ^ (s2 & 0xff);
+        s2 = s2 >>> 8;
+      }
+    }
+  }
+
+  return buf;
+}
+
+/**
+ * Generates a new v4 random guid
+ * @returns {string} guid representation
+ */
+export function genGuid(){
+  if (cryptoModule !== null && cryptoModule.randomUUID) return cryptoModule.randomUUID();
+
+  let rnd = getRndBytes(16);
+  rnd[6] = 0x40 | (rnd[6] & 0x0f);
+  rnd[8] = 0xc0 | (rnd[8] & 0x1f) |  (rnd[8] & 0x0f);//Msft 110x type
+
+  const srnd = strings.bufToHex(rnd);
+  const guid = `${srnd.slice(0, 8)}-${srnd.slice(8,12)}-${srnd.slice(12,16)}-${srnd.slice(16,20)}-${srnd.slice(20)}`;
+  return guid;
 }

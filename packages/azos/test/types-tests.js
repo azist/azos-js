@@ -4,7 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { describe, it } from "mocha";
 import * as sut from "../types.js";
+import * as strings from "../strings.js";
 import * as aver from "../aver.js";
 
 describe("Types", function() {
@@ -22,7 +24,7 @@ describe("Types", function() {
     it("true for false", function() { aver.isTrue( sut.isAssigned(false)    );});
     it("true for 123",   function() { aver.isTrue( sut.isAssigned(123)    );});
     it("true for Date",  function() { aver.isTrue( sut.isAssigned(new Date(1980,1, 21))    );});
-  }); 
+  });
 
   describe("#hown()", function() {
     it("false for empty()",   function() { aver.isFalse( sut.hown()  );});
@@ -58,7 +60,7 @@ describe("Types", function() {
       aver.isTrue( "B" in obj  );
       aver.isFalse( sut.hown(obj, "B")  );
     });
-  }); 
+  });
 
   describe("#allObjectValues()", function() {
     it("()",          () => aver.areArraysEquivalent([], sut.allObjectValues()) );
@@ -84,7 +86,7 @@ describe("Types", function() {
 
 
   describe("#arrayDelete()", function() {
-    it("deletes int",   function() { 
+    it("deletes int",   function() {
       let a = [1,2,3];
       aver.isTrue( sut.arrayDelete(a, 2)  );
       aver.areEqual(2, a.length );
@@ -92,7 +94,7 @@ describe("Types", function() {
       aver.areEqual(3, a[1] );
     });
 
-    it("deletes int once",   function() { 
+    it("deletes int once",   function() {
       let a = [1,2,3,2];
       aver.isTrue( sut.arrayDelete(a, 2)  );
       aver.areEqual(3, a.length );
@@ -101,7 +103,7 @@ describe("Types", function() {
       aver.areEqual(2, a[2] );
     });
 
-    it("deletes undefined",   function() { 
+    it("deletes undefined",   function() {
       let a = [1,2,undefined];
       aver.isTrue( sut.arrayDelete(a, undefined)  );
       aver.areEqual(2, a.length );
@@ -109,7 +111,7 @@ describe("Types", function() {
       aver.areEqual(2, a[1] );
     });
 
-    it("does not delete absent",   function() { 
+    it("does not delete absent",   function() {
       let a = [1, 2, 3];
       aver.isFalse( sut.arrayDelete(a, 5)  );
       aver.areEqual(3, a.length );
@@ -118,7 +120,7 @@ describe("Types", function() {
       aver.areEqual(3, a[2] );
     });
 
-    it("deletes objects",   function() { 
+    it("deletes objects",   function() {
       let o = {c: 3};
       let a = [{a: 1}, {b: 2}, o];
       aver.isTrue( sut.arrayDelete(a, o)  );
@@ -130,7 +132,7 @@ describe("Types", function() {
 
 
   describe("#arrayCopy()", function() {
-    it("copies",   function() { 
+    it("copies",   function() {
       let a = [1,2,3];
       let b = sut.arrayCopy(a);
 
@@ -140,16 +142,16 @@ describe("Types", function() {
       aver.areEqual(a[1], b[1] );
       aver.areEqual(a[2], b[2] );
     });
-  }); 
-  
+  });
+
   describe("#arrayClear()", function() {
-    it("clears",   function() { 
+    it("clears",   function() {
       const a = [1,2,3];
       let b = sut.arrayClear(a);
       aver.areEqual(a, b );
       aver.areEqual(0, a.length);
     });
-  }); 
+  });
 
   describe("#isString()", function() {
     it("false for empty()",   function() { aver.isFalse( sut.isString()           );});
@@ -165,7 +167,7 @@ describe("Types", function() {
     it("true for 'abc'",   function() { aver.isTrue( sut.isString("abc")    );});
 
     it("true for new String('abc')",   function() { aver.isTrue( sut.isString( new String("abc") )) ;});
-  }); 
+  });
 
 
   describe("#isDate()", function() {
@@ -176,8 +178,8 @@ describe("Types", function() {
     it("true for date",      function() { aver.isTrue( sut.isDate( new Date("December 25, 2014")) );});
     it("true for date(now)", function() { aver.isTrue( sut.isDate( new Date( Date.now() )) );});
   });
-  
-  
+
+
   describe("#isNumber()", function() {
     it("false for empty()",   function() { aver.isFalse( sut.isNumber()           );});
     it("false for undefined", function() { aver.isFalse( sut.isNumber(undefined)  );});
@@ -282,7 +284,7 @@ describe("Types", function() {
     it("true for new Function()",  function() { aver.isTrue( sut.isFunction( new Function("a", "return a*a")) );});
 
 
-    it("true for generator",  function() { 
+    it("true for generator",  function() {
 
       function* gen(){ yield 1; yield 2; }
 
@@ -304,7 +306,7 @@ describe("Types", function() {
     it("false for string",    function() { aver.isFalse( sut.isObjectOrArray("zaza")    );});
 
     it("false for function{}",        function() { aver.isFalse( sut.isObjectOrArray(function(){}) );});
-    
+
     it("true for new Date(1)",        function() { aver.isTrue( sut.isObjectOrArray(new Date(1)) );});
     it("true for new Boolean(true)",  function() { aver.isTrue( sut.isObjectOrArray(new Boolean(true)) );});
     it("true for new Number(1)",      function() { aver.isTrue( sut.isObjectOrArray(new Number(1)) );});
@@ -395,24 +397,24 @@ describe("Types", function() {
     it("for {a: 1}",   function() { aver.areEqual( "object", sut.describeTypeOf({a: 1}) );});
 
 
-    it("for Symbol",   function() { 
+    it("for Symbol",   function() {
       let x = Symbol(9990);
       aver.areEqual( "symbol", sut.describeTypeOf(x) );
     });
 
-    it("for {Iterable}",   function() { 
+    it("for {Iterable}",   function() {
       let x = {
         a: 1, b: true,
-        [Symbol.iterator]: function(){ return null; } 
+        [Symbol.iterator]: function(){ return null; }
       };
       aver.areEqual( "object+Iterable", sut.describeTypeOf(x) );
     });
-    
+
   });
 
   describe("#nav()", function() {
 
-    it("()",   function() { 
+    it("()",   function() {
       let got = sut.nav();
       aver.isNotNull(got);
       aver.isUndefined( got.orig  );
@@ -422,7 +424,7 @@ describe("Types", function() {
       aver.isUndefined( got.result );
     });
 
-    it("({})",   function() { 
+    it("({})",   function() {
       let got = sut.nav({});
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
@@ -432,7 +434,7 @@ describe("Types", function() {
       aver.isUndefined( got.result );
     });
 
-    it("({},'a')",   function() { 
+    it("({},'a')",   function() {
       let obj = {};
       let got = sut.nav(obj,"a");
       aver.isNotNull(got);
@@ -443,7 +445,7 @@ describe("Types", function() {
       aver.isUndefined(got.result);
     });
 
-    it("({a: 1},'a')",   function() { 
+    it("({a: 1},'a')",   function() {
       let obj = {a: 1};
       let got = sut.nav(obj,"a");
       aver.isNotNull(got);
@@ -454,7 +456,7 @@ describe("Types", function() {
       aver.areEqual(1, got.result);
     });
 
-    it("({a: undefined},'a')",   function() { 
+    it("({a: undefined},'a')",   function() {
       let obj = {a: undefined};
       let got = sut.nav(obj,"a");
       aver.isNotNull(got);
@@ -465,7 +467,7 @@ describe("Types", function() {
       aver.areEqual(undefined, got.result);// undefined is a 100% match (because full=true)
     });
 
-    it("({a: undefined},'a.b.c')",   function() { 
+    it("({a: undefined},'a.b.c')",   function() {
       let obj = {a: undefined};
       let got = sut.nav(obj,"a.b.c");
       aver.isNotNull(got);
@@ -477,7 +479,7 @@ describe("Types", function() {
     });
 
 
-    it("([123, undefined, true],'1')",   function() { 
+    it("([123, undefined, true],'1')",   function() {
       let obj = [123, undefined, true ];
       let got = sut.nav(obj,"1");
       aver.isNotNull(got);
@@ -488,87 +490,87 @@ describe("Types", function() {
       aver.areEqual(undefined, got.result);
     });
 
-    it("([123, {a: {b: 567}}, true ],'1.a.b')",   function() { 
+    it("([123, {a: {b: 567}}, true ],'1.a.b')",   function() {
       let obj = [123, {a: {b: 567}}, true ];
       let got = sut.nav(obj,"1.a.b");
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
       aver.isNotNull( got.root  );
-      aver.isTrue   ( got.full  ); 
+      aver.isTrue   ( got.full  );
       aver.areEqual(567, got.value );
       aver.areEqual(567, got.result);
     });
 
-    it("([123, {a: {b: 567}, q: -9}, true],'1.z.b')",   function() { 
+    it("([123, {a: {b: 567}, q: -9}, true],'1.z.b')",   function() {
       let obj = [123, {a: {b: 567}, q: -9}, true ];
       let got = sut.nav(obj,"1.z.b");
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
       aver.isNotNull( got.root  );
-      aver.isFalse   ( got.full  ); 
+      aver.isFalse   ( got.full  );
       aver.areEqual(-9, got.value.q );
       aver.areEqual(undefined, got.result);
     });
 
-    it("([123, {a: {b: 567, xxx: -877}, q: -9}, true ],'1.a.z')",   function() { 
+    it("([123, {a: {b: 567, xxx: -877}, q: -9}, true ],'1.a.z')",   function() {
       let obj = [123, {a: {b: 567, xxx: -877}, q: -9}, true ];
       let got = sut.nav(obj,"1.a.z");
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
       aver.isNotNull( got.root  );
-      aver.isFalse   ( got.full  ); 
+      aver.isFalse   ( got.full  );
       aver.areEqual(-877, got.value.xxx );
       aver.areEqual(undefined, got.result);
     });
 
-    it("([123, {a: {b: 567, xxx: -877}, q: -9}, true ],'1.a.xxx')",   function() { 
+    it("([123, {a: {b: 567, xxx: -877}, q: -9}, true ],'1.a.xxx')",   function() {
       let obj = [123, {a: {b: 567, xxx: -877}, q: -9}, true ];
       let got = sut.nav(obj,"1.a.xxx");
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
       aver.isNotNull( got.root  );
-      aver.isTrue   ( got.full  ); 
+      aver.isTrue   ( got.full  );
       aver.areEqual(-877, got.value );
       aver.areEqual(-877, got.result);
     });
 
 
-    it("([123, [[567, 890],-40, -20, [1001, 1002]], true ],'1.0.1')",   function() { 
+    it("([123, [[567, 890],-40, -20, [1001, 1002]], true ],'1.0.1')",   function() {
       let obj = [123, [[567, 890],-40, -20, [1001, 1002]], true ];
       let got = sut.nav(obj,"1.0.1");
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
       aver.isNotNull( got.root  );
-      aver.isTrue   ( got.full  ); 
+      aver.isTrue   ( got.full  );
       aver.areEqual(890, got.value );
       aver.areEqual(890, got.result);
     });
 
-    it("([123, [[567, 890],-40, -20, [1001, 1002]], true ],'1.0.111')",   function() { 
+    it("([123, [[567, 890],-40, -20, [1001, 1002]], true ],'1.0.111')",   function() {
       let obj = [123, [[567, 890],-40, -20, [1001, 1002]], true ];
       let got = sut.nav(obj,"1.0.111");
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
       aver.isNotNull( got.root  );
-      aver.isFalse   ( got.full  ); 
+      aver.isFalse   ( got.full  );
       aver.areEqual(567, got.value[0] );
       aver.areEqual(undefined, got.result);
     });
 
-    it("([123, [[567, 890],-40, -20, [1001, 1002]], true ],'1.2')",   function() { 
+    it("([123, [[567, 890],-40, -20, [1001, 1002]], true ],'1.2')",   function() {
       let obj = [123, [[567, 890],-40, -20, [1001, 1002]], true ];
       let got = sut.nav(obj,"1.2");
       aver.isNotNull(got);
       aver.isNotNull( got.orig  );
       aver.isNotNull( got.root  );
-      aver.isTrue   ( got.full  ); 
+      aver.isTrue   ( got.full  );
       aver.areEqual(-20, got.value );
       aver.areEqual(-20, got.result);
     });
 
 
     it("simple [] path",   function() {
-      let obj = { 
+      let obj = {
         a: 2,
         b: true
       };
@@ -589,7 +591,7 @@ describe("Types", function() {
     });
 
     it("simple string path",   function() {
-      let obj = { 
+      let obj = {
         a: 2,
         b: true
       };
@@ -611,7 +613,7 @@ describe("Types", function() {
 
 
     it("2 level object path",   function() {
-      let obj = { 
+      let obj = {
         a: {x: 2, y: 3},
         b: "Hello!"
       };
@@ -639,7 +641,7 @@ describe("Types", function() {
     });
 
     it("2 level object path partial",   function() {
-      let obj = { 
+      let obj = {
         a: {x: 2, y: 3, q: 98},
         b: "Hello!"
       };
@@ -655,7 +657,7 @@ describe("Types", function() {
     });
 
     it("3 level object path",   function() {
-      let obj = { 
+      let obj = {
         a: {x: 2, y: 3, q: { name: "abc", descr: "def" }},
         b: "Hello!"
       };
@@ -670,7 +672,7 @@ describe("Types", function() {
     });
 
     it("3 level object/array path",   function() {
-      let obj = { 
+      let obj = {
         a: [232, 323, { name: "abc", descr: "def123" }],
         b: "Hello!"
       };
@@ -685,7 +687,7 @@ describe("Types", function() {
     });
 
     it("3 level chain",   function() {
-      let obj = { 
+      let obj = {
         a: [232, 323, { name: "abc", descr: "def123" }],
         b: "Hello!"
       };
@@ -703,8 +705,8 @@ describe("Types", function() {
     });
 
     it("inherit",   function() {
-      
-      function MyClass(a){ this.A = a; } 
+
+      function MyClass(a){ this.A = a; }
       MyClass.prototype = {B: {c: 1589, d: 2}};
 
       let obj = new MyClass(1234);
@@ -720,8 +722,8 @@ describe("Types", function() {
     });
 
     it("inherit partial",   function() {
-      
-      function MyClass(a){ this.A = a; } 
+
+      function MyClass(a){ this.A = a; }
       MyClass.prototype = {B: {c: 1589, d: 2}};
 
       let obj = new MyClass(1234);
@@ -749,7 +751,7 @@ describe("Types", function() {
       let a = {};
       let b = {d: 2, e: true};
       let c = sut.mixin(a, b);
-    
+
       aver.areEqual(2,  c.d );
       aver.isTrue( c.e );
     });
@@ -758,7 +760,7 @@ describe("Types", function() {
       let a = {d: 4};
       let b = {d: 2, e: true};
       let c = sut.mixin(a, b);
-    
+
       aver.areEqual( 2, c.d );
       aver.isTrue( c.e );
     });
@@ -767,7 +769,7 @@ describe("Types", function() {
       let a = {d: 4};
       let b = {d: 2, e: true};
       let c = sut.mixin(a, b, true);
-    
+
       aver.areEqual(4, c.d );
       aver.isTrue( c.e );
     });
@@ -777,21 +779,21 @@ describe("Types", function() {
       let a = new aver.MockA(3, 4);
       let b = {d: 2, e: true};
       let c = sut.mixin(a, b);
-    
+
       aver.areEqual(2, c.d );
       aver.isTrue( c.e );
     });
 
-    
+
     it("class prototype",   function() {
-      
+
       function classX(){ this.z = 123; }
-      
+
       let a = new classX();
       let b = {d: 2, e: true};
       sut.mixin(classX.prototype, b);
-      
-    
+
+
       aver.areEqual(123, a.z );
       aver.areEqual(2, a.d );
       aver.isTrue( a.e );
@@ -826,7 +828,7 @@ describe("Types", function() {
     it("Custom(true)",   function() { aver.areEqual( true, sut.asBool(new Custom(true)) );});
     it("Custom(false)",   function() { aver.areEqual( false, sut.asBool(new Custom(false)) );});
     it("Custom(undefined)",   function() { aver.areEqual( false, sut.asBool(new Custom(undefined)) );});
-    
+
   });
 
   describe("#asTriBool()", function() {
@@ -855,7 +857,7 @@ describe("Types", function() {
     it("Custom(true)",   function() { aver.areEqual( true, sut.asTriBool(new Custom(true)) );});
     it("Custom(false)",   function() { aver.areEqual( false, sut.asTriBool(new Custom(false)) );});
     it("Custom(undefined)",   function() { aver.areEqual( undefined, sut.asTriBool(new Custom(undefined)) );});
-    
+
   });
 
 
@@ -982,7 +984,7 @@ describe("Types", function() {
     it("'2a' throws",   function() { aver.throws( function(){  sut.asInt("2a"); }, "Cast error");});
     it("'0x2Z' throws",   function() { aver.throws( function(){  sut.asInt("0x2z"); }, "Cast error");});
     it("'0xZ2' throws",   function() { aver.throws( function(){  sut.asInt("0xZ2"); }, "Cast error");});
-    
+
     it("'0b' throws",   function() { aver.throws( function(){  sut.asInt("0b"); }, "Cast error");});
     it("'0b10' = 2",   function() { aver.areEqual( 2,  sut.asInt("0b10") ); });
     it("' 0b11 ' = 3",   function() { aver.areEqual( 3,  sut.asInt(" 0b11 ") ); });
@@ -1017,7 +1019,7 @@ describe("Types", function() {
     it("Custom('-800')",   function() { aver.areEqual( -800, sut.asInt(new Custom("-800.999")) );});
     it("Custom(undefined)",   function() { aver.areEqual( 0, sut.asInt(new Custom(undefined)) );});
     it("Custom(undefined) canUndef",   function() { aver.areEqual( undefined, sut.asInt(new Custom(undefined), true) );});
-    
+
   });
 
   describe("#asReal()", function() {
@@ -1036,17 +1038,17 @@ describe("Types", function() {
     it("'1'",   function() { aver.areEqual( 1, sut.asReal("1") );});
     it("'0'",   function() { aver.areEqual( 0, sut.asReal("0") );});
     it("'-7'",   function() { aver.areEqual( -7, sut.asReal("-7") );});
-    
-    
+
+
     it("1.23 = 1.23",   function() { aver.areEqual( 1.23, sut.asReal(1.23) );});
     it("0.99 = 0.99",   function() { aver.areEqual( 0.99, sut.asReal(0.99) );});
     it("-7.97 = -7.97",   function() { aver.areEqual( -7.97, sut.asReal(-7.97) );});
-    
+
     it("'1.23' = 1.23",   function() { aver.areEqual( 1.23, sut.asReal("1.23") );});
     it("'0.99' = 0.99",   function() { aver.areEqual( 0.99, sut.asReal("0.99") );});
     it("'-7.97' = -7.97",   function() { aver.areEqual( -7.97, sut.asReal("-7.97") );});
-     
-    
+
+
     it("'2gaga' throws",   function() { aver.throws( function(){  sut.asReal("2gaga"); }, "Cast error");});
 
 
@@ -1138,7 +1140,7 @@ describe("Types", function() {
     it("'0'",   function() { aver.areEqualValues( ZERO, sut.asDate("0") );});
     it("'-7'",   function() { aver.areEqualValues( new Date(-7), sut.asDate("-7") );});
 
-    it("April 12, 2012",   function() { 
+    it("April 12, 2012",   function() {
       const d = sut.asDate(" April 12, 2012");
       aver.areEqual( 3, d.getMonth() );
       aver.areEqual( 12, d.getDate() );
@@ -1168,7 +1170,7 @@ describe("Types", function() {
     it("{}",   function() { aver.isObject( sut.asObject({})  );});
     it("'{}'",   function() { aver.isObject( sut.asObject("{}")  );});
 
-    it("{a: 1, b: 234, c: true, d: [7,8,9]}",   function() { 
+    it("{a: 1, b: 234, c: true, d: [7,8,9]}",   function() {
       const o = sut.asObject({a: 1, b: 234, c: true, d: [7,8,9]});
       aver.isObject( o );
       aver.areEqual(1, o.a);
@@ -1177,7 +1179,7 @@ describe("Types", function() {
       aver.areArraysEquivalent([7,8,9], o.d);
     });
 
-    it("'{a: 1, b: 234, c: true, d: [7,8,9]}'",   function() { 
+    it("'{a: 1, b: 234, c: true, d: [7,8,9]}'",   function() {
       const o = sut.asObject("{\"a\": 1, \"b\": 234, \"c\": true, \"d\": [7,8,9]}");
       aver.isObject( o );
       aver.areEqual(1, o.a);
@@ -1208,13 +1210,13 @@ describe("Types", function() {
     it("[]",   function() { aver.areArraysEquivalent([], sut.asArray([])  );});
     it("'[]'",   function() { aver.areArraysEquivalent([], sut.asArray("[]")  );});
 
-    it("[1, -2, 3, true, 'abc']",   function() { 
+    it("[1, -2, 3, true, 'abc']",   function() {
       const a = sut.asArray([1, -2, 3, true, "abc"]);
       aver.isArray( a );
       aver.areArraysEquivalent([1,-2,3,true,"abc"], a);
     });
 
-    it("'[1, -2, 3, true, \"abc\"]'",   function() { 
+    it("'[1, -2, 3, true, \"abc\"]'",   function() {
       const a = sut.asArray("[1, -2, 3, true, \"abc\"]");
       aver.isArray( a );
       aver.areArraysEquivalent([1,-2,3,true,"abc"], a);
@@ -1230,7 +1232,7 @@ describe("Types", function() {
       };
     }
 
-    it("Custom Iterator",   function() { 
+    it("Custom Iterator",   function() {
       const src = new Custom();
       const a = sut.asArray( src );
       aver.isArray( a );
@@ -1266,7 +1268,7 @@ describe("Types", function() {
     it("([1,2,3], array)",   function() { aver.areArraysEquivalent([1,2,3], sut.cast("[1,2,3]", sut.TYPE_MONIKER.ARRAY) );});
 
 
-    it("(set, array)",   function() { 
+    it("(set, array)",   function() {
       let s = new Set();
       s.add(100);
       s.add(-10);
@@ -1278,6 +1280,31 @@ describe("Types", function() {
     it("({a: 1, b:2}, array)",   function() { aver.areEqual(2, sut.cast("{\"a\": 1, \"b\": 2}", sut.TYPE_MONIKER.OBJECT).b );});
   });
 
+  describe("#getRndBytes()", function() {
+
+    it("default",   function() {
+
+      for(let i=0; i<10;i++){
+        let got = sut.getRndBytes(16);
+        console.log(strings.bufToHex(got));
+      }
+    });
+    it("()",   function() { aver.throws( function(){  sut.cast(); }, "missing 2");});
+
+  });//getRndBytes
+
+  describe("#genGuid()", function() {
+
+    it("default",   function() {
+
+      for(let i=0; i<10;i++){
+        let got = sut.genGuid();
+        console.log(got);
+      }
+    });
+    it("()",   function() { aver.throws( function(){  sut.cast(); }, "missing 2");});
+
+  });//genGuid
 
 
 });

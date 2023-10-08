@@ -315,12 +315,14 @@ export function areIterablesEquivalent(a, b, f = null){
  * Used for internal derivation testing
  */
 export class MockBase{
-  constructor(a,b){
-    this.m_A = a | 0;
-    this.m_B = b | 0;
+  #a;
+  #b;
+  constructor(a, b){
+    this.#a = a | 0;
+    this.#b = b | 0;
   }
-  get a( ) { return this.m_A; }  set a(v) { this.m_A = v; }
-  get b( ) { return this.m_B; }  set b(v) { this.m_B = v; }
+  get a( ) { return this.#a; }  set a(v) { this.#a = v; }
+  get b( ) { return this.#b; }  set b(v) { this.#b = v; }
 
   virt(){ return "base"; }
 

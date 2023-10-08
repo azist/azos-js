@@ -18,20 +18,23 @@ export function $(iterable){
  * Provides lazy functional enumeration over iterable source a-la LINQ in C#
  */
 export class $LINQ{
+
+  #src;
+
   constructor(iterable){
     if (!types.isIterable(iterable)) iterable = [];
-    this.m_src = iterable;
+    this.#src = iterable;
   }
 
-  get source(){ return this.m_src;}
+  get source(){ return this.#src;}
 
   [Symbol.iterator](){
-    return this.m_src[Symbol.iterator](); 
+    return this.#src[Symbol.iterator](); 
   }
 
 
   /** Materializes the sequence into an array */
-  toArray(){ return [...this.m_src]; }
+  toArray(){ return [...this.#src]; }
 
   /** 
    * Maps values 
@@ -43,7 +46,7 @@ export class $LINQ{
     const self = this;
     const it = {
       [Symbol.iterator]: function* (){
-        for(let e of self.m_src) yield f(e);
+        for(let e of self.#src) yield f(e);
       }
     };
 
@@ -60,7 +63,7 @@ export class $LINQ{
     const self = this;
     const it = {
       [Symbol.iterator]: function* (){
-        for(let e of self.m_src) if (f(e)) yield e;
+        for(let e of self.#src) if (f(e)) yield e;
       }
     };
 
@@ -74,7 +77,7 @@ export class $LINQ{
     const it = {
       [Symbol.iterator]: function* (){
         let cnt = 0;
-        for(let e of self.m_src) {
+        for(let e of self.#src) {
           if (cnt===n) break;
           yield e;
           cnt++;
@@ -92,7 +95,7 @@ export class $LINQ{
     const it = {
       [Symbol.iterator]: function* (){
         let cnt = 0;
-        for(let e of self.m_src) {
+        for(let e of self.#src) {
           if (cnt>=n) yield e;
           cnt++;
         } 
@@ -121,7 +124,7 @@ export class $LINQ{
   count(f){
     const ass = types.isFunction(f);
     let result = 0;
-    for(let e of this.m_src)
+    for(let e of this.#src)
       if (!ass || f(e)) result++;
     return result;
   }
@@ -132,7 +135,7 @@ export class $LINQ{
    */
   any(f){
     const ass = types.isFunction(f);
-    for(let e of this.m_src)
+    for(let e of this.#src)
       if (!ass || f(e)) return true;
     return false;
   }
@@ -143,7 +146,7 @@ export class $LINQ{
    */
   all(f){
     if (!types.isFunction(f)) return true;
-    for(let e of this.m_src)
+    for(let e of this.#src)
       if (!f(e)) return false;
     return true;
   }
@@ -155,7 +158,7 @@ export class $LINQ{
    */
   firstOrDefault(f){
     const ass = types.isFunction(f);
-    for(let e of this.m_src)
+    for(let e of this.#src)
       if (!ass || f(e)) return {ok: true, value: e};
     
     return {ok: false, value: undefined};
@@ -209,7 +212,7 @@ export class $LINQ{
     const self = this;
     const it = {
       [Symbol.iterator]: function* (){
-        for(let e of self.m_src) yield e;
+        for(let e of self.#src) yield e;
         for(let e of other) yield e;
       }
     };
@@ -227,7 +230,7 @@ export class $LINQ{
     const it = {
       [Symbol.iterator]: function* (){
         const set = new Set();
-        for(let e of self.m_src){
+        for(let e of self.#src){
           let key = ass ? f(e) : e;
           if (set.has(key)) continue;
           set.add(key);

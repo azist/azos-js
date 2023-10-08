@@ -17,6 +17,7 @@ export class Field extends AzosElement {
   constructor() {
     super();  
       //Linq.$(null)
+      //Linq.$([1,3,4])
       //if (types.isAssigned(this))
       this.name = 'Somebody';
   }
