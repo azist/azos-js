@@ -1283,11 +1283,28 @@ describe("Types", function() {
   describe("#getRndBytes()", function() {
 
     it("default",   function() {
-      let got = sut.getRndBytes(32);
-      console.log(strings.bufToHex(got));
+
+      for(let i=0; i<10;i++){
+        let got = sut.getRndBytes(16);
+        console.log(strings.bufToHex(got));
+      }
     });
     it("()",   function() { aver.throws( function(){  sut.cast(); }, "missing 2");});
 
   });//getRndBytes
+
+  describe("#genGuid()", function() {
+
+    it("default",   function() {
+
+      for(let i=0; i<10;i++){
+        let got = sut.genGuid();
+        console.log(got);
+      }
+    });
+    it("()",   function() { aver.throws( function(){  sut.cast(); }, "missing 2");});
+
+  });//genGuid
+
 
 });

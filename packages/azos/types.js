@@ -594,53 +594,60 @@ export function cast(v, tmon, canUndef=false){
   }
 }
 
-/**
- * Generates a new v4 random guid
- * @returns {string} guid representation
- */
-export function genGuid(){
-  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
 
-  let d = Date.now();
-  let d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        let r = Math.random() * 16;
-        if(d > 0){
-            r = (d + r)%16 | 0;
-            d = Math.floor(d/16);
-        } else {
-            r = (d2 + r)%16 | 0;
-            d2 = Math.floor(d2/16);
-        }
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
+//crypto module is NOT loaded by default on node. Need async fallback.
+//On browser it is pre-loaded as-is
+let cryptoModule = null;
+if (typeof crypto === "undefined"){
+  import('node:crypto').then(mod => cryptoModule = mod);
+}else{
+  cryptoModule = crypto;
 }
 
 /**
  * Gets an instance of {@link Uint8Array} filled with random bytes
- * based on rnd generator and clock+performance timestamps
+ * based on crypto api facade
  * @param {int} cnt
  */
 export function getRndBytes(cnt = 16){
   cnt = cnt | 0;
   if (cnt <= 0) cnt =16;
   const buf = new Uint8Array(cnt);
-  let s1 = performance.now() * 1000 | 0;
-  let s2 = Date.now() | 0;
-  let r = 0;
-  for(let i=0; i<cnt; i++){
-    if (r==0) r = Math.random() * 0xffffffff | 0;
-    buf[i] = r & 0xff;
-    r = r >>> 8;
-
-    if (s1>0){
-      buf[i] = buf[i] ^ (s1 & 0xff);
-      s1 = s1 >>> 8;
-    } else if (s2>0){
-      buf[i] = buf[i] ^ (s2 & 0xff);
-      s2 = s2 >>> 8;
+  if (cryptoModule !== null){
+    cryptoModule.getRandomValues(buf);
+  } else { //async fallback, use pseudo generation
+    let s1 = performance.now() * 1000 | 0;
+    let s2 = Date.now() | 0;
+    let r = 0;
+    for(let i=0; i<cnt; i++){
+      if (r==0) r = Math.random() * 0xffffffff | 0;
+      buf[i] = r & 0xff;
+      r = r >>> 8;
+      if (s1>0){
+        buf[i] = buf[i] ^ (s1 & 0xff);
+        s1 = s1 >>> 8;
+      } else if (s2>0){
+        buf[i] = buf[i] ^ (s2 & 0xff);
+        s2 = s2 >>> 8;
+      }
     }
   }
 
   return buf;
+}
+
+/**
+ * Generates a new v4 random guid
+ * @returns {string} guid representation
+ */
+export function genGuid(){
+  if (cryptoModule !== null && cryptoModule.randomUUID) return cryptoModule.randomUUID();
+
+  let rnd = getRndBytes(16);
+  rnd[6] = 0x40 | (rnd[6] & 0x0f);
+  rnd[8] = 0xc0 | (rnd[8] & 0x1f) |  (rnd[8] & 0x0f);//Msft 110x type
+
+  const srnd = strings.bufToHex(rnd);
+  const guid = `${srnd.slice(0, 8)}-${srnd.slice(8,12)}-${srnd.slice(12,16)}-${srnd.slice(16,20)}-${srnd.slice(20)}`;
+  return guid;
 }
