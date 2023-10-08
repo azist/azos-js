@@ -44,8 +44,8 @@
     "//build": "parcel build \"src/azos/index.js\"",
     "build": "parcel build \"packages/azos/index.js\"",
 
-    "//test": "echo \"Error: no test specified\" && exit 1",
-    "//test": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
+    "--test1": "echo \"Error: no test specified\" && exit 1",
+    "--test2": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
     "test": "mocha \"./packages/**/*.js\"",
     "test-match": "mocha \"./packages/**/*.js\" -g",
     "test-azos": "npm test -workspace=azos",

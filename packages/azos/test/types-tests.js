@@ -1289,7 +1289,20 @@ describe("Types", function() {
         console.log(strings.bufToHex(got));
       }
     });
-    it("()",   function() { aver.throws( function(){  sut.cast(); }, "missing 2");});
+
+    it("()",   function() { aver.areEqual(16, sut.getRndBytes().length) });
+    it("(0)",   function() { aver.areEqual(16, sut.getRndBytes(0).length) });
+    it("('-1')",   function() { aver.areEqual(16, sut.getRndBytes("-1").length) });
+
+    it("dispersion",   function() {
+      const got = sut.getRndBytes(256);
+      const unique = got.filter((v,i,s) => s.indexOf(v) === i);
+      //console.info(got);
+      //console.info(unique);
+      const dispersion = unique.length / got.length;
+      console.info(`Dispersion: ${dispersion}%`);
+      aver.isTrue(dispersion > 0.5379);//53%+ are distinct
+    });
 
   });//getRndBytes
 
