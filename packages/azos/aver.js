@@ -21,7 +21,7 @@ const dv = (v) => str.describe(v);//shortcut
 
 /**
  * Performs strict test for undefined
- * @param {*} a 
+ * @param {*} a
  */
 export function isUndefined(a){
   if (a===undefined) return;
@@ -30,7 +30,7 @@ export function isUndefined(a){
 
 /**
  * Performs strict test for not undefined
- * @param {*} a 
+ * @param {*} a
  */
 export function isDefined(a){
   if (a!==undefined) return;
@@ -39,7 +39,7 @@ export function isDefined(a){
 
 /**
  * Performs strict test for being defined null
- * @param {*} a 
+ * @param {*} a
  */
 export function isNull(a){
   if (a!==undefined && a===null) return;
@@ -48,7 +48,7 @@ export function isNull(a){
 
 /**
  * Performs strict test for being defined not-null
- * @param {*} a 
+ * @param {*} a
  */
 export function isNotNull(a){
   if (a!==undefined && a!==null) return;
@@ -57,7 +57,7 @@ export function isNotNull(a){
 
 /**
  * Performs strict test for a non-empty string value
- * @param {*} a 
+ * @param {*} a
  */
 export function isNonEmptyString(a){
   if (types.isNonEmptyString(a)) return;
@@ -66,7 +66,7 @@ export function isNonEmptyString(a){
 
 /**
  * Performs strict test for object (not a primitive, array or function)
- * @param {*} a 
+ * @param {*} a
  */
 export function isObject(a){
   if (types.isObject(a)) return;
@@ -75,7 +75,7 @@ export function isObject(a){
 
 /**
  * Performs strict test for array (not a primitive, object or function)
- * @param {*} a 
+ * @param {*} a
  */
 export function isArray(a){
   if (types.isArray(a)) return;
@@ -84,7 +84,7 @@ export function isArray(a){
 
 /**
  * Performs strict test for object or array (not a primitive or function)
- * @param {*} a 
+ * @param {*} a
  */
 export function isObjectOrArray(a){
   if (types.isObjectOrArray(a)) return;
@@ -93,7 +93,7 @@ export function isObjectOrArray(a){
 
 /**
  * Performs strict test for function (not a primitive, object or array)
- * @param {*} a 
+ * @param {*} a
  */
 export function isFunction(a){
   if (types.isFunction(a)) return;
@@ -102,7 +102,7 @@ export function isFunction(a){
 
 /**
  * Performs strict test for function or object (not a primitive or array)
- * @param {*} a 
+ * @param {*} a
  */
 export function isObjectOrFunction(a){
   if (types.isObjectOrFunction(a)) return;
@@ -111,7 +111,7 @@ export function isObjectOrFunction(a){
 
 /**
  * Performs strict test for Iterable protocol
- * @param {*} a 
+ * @param {*} a
  */
 export function isIterable(a){
   if (types.isIterable(a)) return;
@@ -120,7 +120,7 @@ export function isIterable(a){
 
 /**
  * Performs strict test for date
- * @param {*} a 
+ * @param {*} a
  */
 export function isDate(a){
   if (types.isDate(a)) return;
@@ -129,7 +129,7 @@ export function isDate(a){
 
 /**
  * Performs strict test for number
- * @param {*} a 
+ * @param {*} a
  */
 export function isNumber(a){
   if (types.isNumber(a)) return;
@@ -138,7 +138,7 @@ export function isNumber(a){
 
 /**
  * Performs strict test for string
- * @param {*} a 
+ * @param {*} a
  */
 export function isString(a){
   if (types.isString(a)) return;
@@ -147,7 +147,7 @@ export function isString(a){
 
 /**
  * Performs strict test for bool
- * @param {*} a 
+ * @param {*} a
  */
 export function isBool(a){
   if (types.isBool(a)) return;
@@ -156,7 +156,7 @@ export function isBool(a){
 
 /**
  * Performs strict test for symbol
- * @param {*} a 
+ * @param {*} a
  */
 export function isSymbol(a){
   if (types.isSymbol(a)) return;
@@ -165,7 +165,7 @@ export function isSymbol(a){
 
 /**
  * Performs strict test for false
- * @param {bool} a 
+ * @param {bool} a
  */
 export function isFalse(a){
   if (a===false) return;
@@ -174,7 +174,7 @@ export function isFalse(a){
 
 /**
  * Performs strict test for true
- * @param {bool} a 
+ * @param {bool} a
  */
 export function isTrue(a){
   if (a===true) return;
@@ -183,10 +183,10 @@ export function isTrue(a){
 
 /**
  * Performs strict equality check using ===.
- * Contrast with areEqualValues() which is based on valueOf(); i.e. new Date(0) !== new Date(0) 
+ * Contrast with areEqualValues() which is based on valueOf(); i.e. new Date(0) !== new Date(0)
  *  because those are different references.
- * @param {*} a 
- * @param {*} b 
+ * @param {*} a
+ * @param {*} b
  */
 export function areEqual(a, b){
   if (a===b) return;
@@ -195,8 +195,8 @@ export function areEqual(a, b){
 
 /**
  * Performs strict inequality check using !==
- * @param {*} a 
- * @param {*} b 
+ * @param {*} a
+ * @param {*} b
  */
 export function areNotEqual(a, b){
   if (a!==b) return;
@@ -209,14 +209,14 @@ export function areNotEqual(a, b){
  *   because those are different references, so date values must be equated using areEqualValues(), not
  *  areEquals() which would equate object references instead. Note: strings are handled as special case,
  * and may be equated using either of the methods.
- * @param {*} a 
- * @param {*} b 
+ * @param {*} a
+ * @param {*} b
  */
 export function areEqualValues(a, b){
   if (a===b) return;
   if (types.isAssigned(a) && types.isAssigned(b))
     if (a.valueOf()===b.valueOf()) return;
-    
+
   throw AVERMENT_FAILURE(`areEqualValues(${dv(a)}, ${dv(b)})`);
 }
 
@@ -224,19 +224,19 @@ export function areEqualValues(a, b){
 /**
  * Expects that function throws a message optionally containing the msg
  * @param {function} f function to call
- * @param {string} [msg] optional message to expect in the error 
+ * @param {string} [msg] optional message to expect in the error
  */
 export function throws(f, msg){
   try{
     f();
-  } 
+  }
   catch(e){
     if (!msg) return;
     //  console.log(e);
-    
+
     let got = e.toString().toLowerCase();
     msg = msg.toLowerCase();
-    
+
     if (got.indexOf(msg)==-1)
       throw AVERMENT_FAILURE(`throws(${dv(f)}, expect '${msg}' but was '${got}')`);
 
@@ -248,21 +248,37 @@ export function throws(f, msg){
 
 /**
  * Performs strict instanceof check on object and function args
- * @param {Object} o 
- * @param {type-function} t 
+ * @param {Object} o
+ * @param {type-function} t
+ * @returns original object after successful type check or throws
  */
 export function isOf(o, t){
   if (types.isObject(o) && types.isFunction(t))
-    if (o instanceof t) return;
+    if (o instanceof t) return o;
 
   throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(t)})`);
+}
+
+/**
+ * Performs strict instanceof check on object and function args
+ * @param {Object} o instance to check
+ * @param {typeFunction} ts array of type functions(class names) to check
+ * @returns original object after successful type check or throws
+ */
+export function isOfEither(o, ...ts){
+  if (types.isObject(o)){
+    for(let t of ts)
+      if (types.isFunction(t) && (o instanceof t)) return o;
+  }
+
+  throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(ts)})`);
 }
 
 
 /**
  * Performs strict !instanceof check on object and function args
- * @param {Object} o 
- * @param {type-function} t 
+ * @param {Object} o
+ * @param {type-function} t
  */
 export function isNotOf(o, t){
   if (types.isObject(o) && types.isFunction(t))

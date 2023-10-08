@@ -7,6 +7,62 @@
 import * as CC from "./coreconsts.js";
 import * as strings from "./strings.js";
 
+
+/**
+ * Establishes a "director" protocol - an entity which implements such property returns it's director -
+ *  an entity who "owns" aka "directs" the implementing entity
+ */
+export const DIRECTOR_PROP = Symbol("director");
+
+/**
+ * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -
+ * is capable of being deterministically finalized aka "disposed".
+ * The concept has NOTHING TO DO with the GC, and deals with logical pairing of construction/destruction
+ * of entities which need to finalize their lifecycle (e.g. write a trailer to disk file).
+ * The standard is aligned with the new "using" resource block, as it uses system symbol when available
+ */
+export const DISPOSE_METHOD =  (typeof Symbol.dispose === 'undefined') ? Symbol("dispose") : Symbol.dispose;
+
+/**
+ * When implemented, returns true if the object was already disposed.
+ * This works in conjunction with {@link DISPOSE_METHOD} protocol
+ */
+export const DISPOSED_PROP = Symbol("disposed");
+
+/**
+ * When implemented in derived class, gets invoked by DISPOSE if the object has not been disposed yet
+ * This is the method that descendants need to override
+ */
+export const DESTRUCTOR_METHOD = Symbol("destructor");
+
+/**
+ * Provides implementation base for disposable objects by implementing base system protocols
+ */
+export class DisposableObject{
+  #disposed = false;
+
+  /**
+   * Establishes dispose protocol, see {@link DISPOSE_METHOD}.
+   * Does nothing if the object was already disposed.
+   * Override {@link DESTRUCTOR_METHOD} instead
+   */
+  [DISPOSE_METHOD](){
+    if (this.#disposed) return;
+    this.#disposed = true;
+    [DESTRUCTOR_METHOD]();
+  }
+
+  /**
+   * Override this method to perform custom actions on dispose
+   */
+  [DESTRUCTOR_METHOD](){  }
+
+  /** Returns true if the object was already disposed */
+  get [DISPOSED_PROP](){ return this.#disposed; }
+}
+
+
+
 /**
  * Returns true if the argument is assigned - not undefined non-null value, even an empty string is assigned
  * @param {*} v value

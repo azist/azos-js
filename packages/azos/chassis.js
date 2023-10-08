@@ -11,7 +11,7 @@ import * as str from "./strings.js";
 /**
  * Implements a default Application chassis pattern
  */
-export class Application{
+export class Application extends types.DisposableObject{
   static #instances = [];
   static #instance = null;
 
@@ -38,6 +38,7 @@ export class Application{
    * @return {Application}
   */
   constructor(init){
+    super();
     aver.isObject(init);
     this.#instanceId = types.genGuid();
     this.#startTime = new Date();
@@ -57,12 +58,13 @@ export class Application{
 
   /**
    * Finalizes the application by unmounting services.
+   * Call this method via app[Symbol.dispose] protocol.
    * This also replaces the {@link Application.instance} value
    * with the app instance that was in effect right before call to .ctor
    * or {@link NopApplication.instance} if there are no more apps in the stack.
-   * This method has no effect in `NopApplication`
+   * This method has no effect in `NopApplication`.
   */
-  destructor(){
+  [types.DESTRUCTOR_METHOD](){
     if (this instanceof NopApplication) return;
     let prev = Application.#instances.pop();
     Application.#instance = prev ?? null;
@@ -108,4 +110,50 @@ export class NopApplication extends Application{
       envName: "local"
     });
   }
+}
+
+/**
+ * Base class for application components which work either under {@link Application} directly
+ * or another component. This way components form component trees which application can maintain uniformly
+ */
+export class AppComponent extends types.DisposableObject{
+
+  #director;
+
+  constructor(dir){
+    super();
+    this.#director = aver.isOfEither(dir, Application, AppComponent);
+  }
+
+  /**
+   * Finalizes app component by unregistering from the app
+  */
+  [types.DESTRUCTOR_METHOD](){
+
+  }
+
+  /** Returns a component or an app which direct this component */
+  get [types.DIRECTOR_PROP]() { return this.#director; }
+
+  /** Returns true when this component is owned directly by the {@link Application} vs being owned by by another component */
+  get isDirectedByApp(){ return this.#director instanceof Application; }
+
+  /** Returns the {@link Application} which this component is directed by directly or indirectly through another component*/
+  get app(){ return this.isDirectedByApp ? this.#director : this.#director.app;}
+}
+
+/**
+ * Arena represents a virtual "stage" - what application/user "deals with"
+ * e.g. sees at the present moment.
+ * An arena maintains a state of scenes which get created by components such as
+ * modal dialogs which have a stacking order
+ */
+export class Arena{
+  #app;
+  constructor(app){
+    this.#app = aver.isOf(app, Application);
+  }
+
+  /** Returns the {@link Application} which this arena is a part of*/
+  get app(){ return this.#app;}
 }
