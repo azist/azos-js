@@ -93,6 +93,12 @@ export class Application extends types.DisposableObject{
 
   /** Returns application start time stamp Date object @return {Date}*/
   get startTime(){ return this.#startTime; }
+
+  /** Returns an array of all components directed by this app, directly or indirectly (through other components) */
+  get components(){ return AppComponent.getAllApplicationComponents(this); }
+
+  /** Returns an array of top-level components directed by this app directly */
+  get rootComponents(){ return AppComponent.getRootApplicationComponents(this); }
 }
 
 /**
@@ -112,24 +118,62 @@ export class NopApplication extends Application{
   }
 }
 
+
 /**
  * Base class for application components which work either under {@link Application} directly
  * or another component. This way components form component trees which application can maintain uniformly
  */
 export class AppComponent extends types.DisposableObject{
+  static #appMap = new Map();
+
+  /**
+   * Returns all components of the specified application
+   * @param {Application} app
+   * @returns an array of components or empty array if such app does not have any components or not found
+   */
+  static getAllApplicationComponents(app){
+    aver.isOf(app, Application);
+    const clist = AppComponent.#appMap.get(app);
+    if (clist === undefined) return [];
+    return types.arrayCopy(clist);
+  }
+
+  /**
+   * Returns top-level components of the specified application, directed by that application
+   * @param {Application} app
+   * @returns an array of components or empty array if such app does not have any components or not found
+   */
+  static getRootApplicationComponents(app){
+    aver.isOf(app, Application);
+    const clist = AppComponent.#appMap.get(app);
+    if (clist === undefined) return [];
+    return clist.filter(c => c.director === app);
+  }
 
   #director;
 
   constructor(dir){
     super();
     this.#director = aver.isOfEither(dir, Application, AppComponent);
+    const app = this.app;
+    let clist = AppComponent.#appMap.get(app);
+    if (clist === undefined){
+      clist = [];
+      AppComponent.#appMap.set(app, clist);
+    }
+    clist.push(this);
   }
 
   /**
    * Finalizes app component by unregistering from the app
   */
   [types.DESTRUCTOR_METHOD](){
-
+    const app = this.app;
+    let clist = AppComponent.#appMap.get(app);
+    if (clist !== undefined){
+      types.arrayDelete(clist, this);
+      if (clist.length==0) AppComponent.#appMap.delete(app);
+    }
   }
 
   /** Returns a component or an app which direct this component */
@@ -139,7 +183,13 @@ export class AppComponent extends types.DisposableObject{
   get isDirectedByApp(){ return this.#director instanceof Application; }
 
   /** Returns the {@link Application} which this component is directed by directly or indirectly through another component*/
-  get app(){ return this.isDirectedByApp ? this.#director : this.#director.app;}
+  get app(){ return this.isDirectedByApp ? this.#director : this.#director.app; }
+
+  /** Gets an array of components directed by this one */
+  get directedComponents(){
+    const all = AppComponent.getAllApplicationComponents(this.app);
+    return all.filter(c => c.director === this);
+  }
 }
 
 /**
@@ -148,12 +198,11 @@ export class AppComponent extends types.DisposableObject{
  * An arena maintains a state of scenes which get created by components such as
  * modal dialogs which have a stacking order
  */
-export class Arena{
-  #app;
+export class Arena extends AppComponent{
+
   constructor(app){
-    this.#app = aver.isOf(app, Application);
+    aver.isOf(app, Application);
+    super(app);
   }
 
-  /** Returns the {@link Application} which this arena is a part of*/
-  get app(){ return this.#app;}
 }
