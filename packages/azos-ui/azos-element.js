@@ -1,4 +1,4 @@
-import {Types as types} from "azos";
+import * as types from "azos/types";
 //import { Linq } from "azos";
 
 import {html, css, LitElement} from "lit";

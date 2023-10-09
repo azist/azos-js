@@ -36,6 +36,23 @@ export const DISPOSED_PROP = Symbol("disposed");
 export const DESTRUCTOR_METHOD = Symbol("destructor");
 
 /**
+ * Disposes object by invoking {@link DISPOSE_METHOD} protocol method returning true.
+ * Returns false if the entity does not support disposable protocol
+ * @param {*} v value to dispose (such as an object)
+ * @returns true if disposable protocol was called, false if the entity does not support protocol
+ */
+export function dispose(v){
+  if (v !== undefined && v !== null) {
+    const dsp = v[DISPOSE_METHOD];
+    if (dsp !== undefined) {
+      dsp.call(v);
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Provides implementation base for disposable objects by implementing base system protocols
  */
 export class DisposableObject{
@@ -49,7 +66,7 @@ export class DisposableObject{
   [DISPOSE_METHOD](){
     if (this.#disposed) return;
     this.#disposed = true;
-    [DESTRUCTOR_METHOD]();
+    this[DESTRUCTOR_METHOD]();
   }
 
   /**

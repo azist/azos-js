@@ -7,6 +7,7 @@
 import * as types from "./types.js";
 import * as aver from "./aver.js";
 import * as str from "./strings.js";
+import { Session } from "./session.js";
 
 /**
  * Implements a base Application chassis pattern
@@ -32,6 +33,8 @@ export class Application extends types.DisposableObject{
   #instanceId;
   #startTime;
 
+  #session;
+
   /**
    * Initializes {@link Application} object instance by passing init object,
    * @param {{id,name,description,copyright,envName,isTest}} init
@@ -49,6 +52,8 @@ export class Application extends types.DisposableObject{
     this.#copyright = str.dflt(init.copyright, "2023 Azist Group");
     this.#envName = str.dflt(init.envName, "local");
     this.#isTest = types.asBool(init.isTest);
+
+    this.#session = null;//this._makeSession("");
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
@@ -103,6 +108,25 @@ export class Application extends types.DisposableObject{
    * @returns {ApplicationComponent[]} an array of components or empty array
   */
   get rootComponents(){ return ApplicationComponent.getRootApplicationComponents(this); }
+
+  /**
+   * Returns the app-level session which is used in browser/ui and other apps
+   * which do not support per-logical-flow sessions
+   */
+  get session(){ return this.#session; }
+
+  /** Factory method used to allocate sessions from config object
+   * @param {object} cfg object
+   * @returns {Session}
+  */
+  _makeSession(cfg){
+    if (types.isAssigned(cfg)) {
+       this.#session = types.makeObject(Session, cfg);
+    } else {
+       this.#session = new Session();//empty session
+    }
+  }
+
 }
 
 /**
@@ -203,6 +227,7 @@ export class ApplicationComponent extends types.DisposableObject{
     return all.filter(c => c.director === this);
   }
 }
+
 
 /**
  * Arena represents a virtual "stage" - what application/user "deals with"
