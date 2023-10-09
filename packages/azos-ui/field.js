@@ -1,4 +1,4 @@
-import {Types as types} from "azos";
+import * as types from "azos/types";
 //import { Linq } from "azos";
 import { AzosElement } from "./azos-element.js";
 
@@ -15,7 +15,7 @@ export class Field extends AzosElement {
 
 
   constructor() {
-    super();  
+    super();
       //Linq.$(null)
       //Linq.$([1,3,4])
       //if (types.isAssigned(this))

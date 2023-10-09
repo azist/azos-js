@@ -2,7 +2,7 @@
   "name": "azos",
   "version": "0.0.1",
   "type": "module",
-  "description": "azos-js Core Package", 
+  "description": "azos-js Core Package",
   "author": "Azist Group",
   "license": "MIT",
   "contributors":[{
@@ -15,14 +15,19 @@
     "url": "git+https://github.com/azist/azos-js.git"
   },
   "keywords": ["azos", "unistack", "sky"],
-  "main": "index.js",
+  "--main example how to use main": "index.js",
+  "--exports example how to use specific exports": {
+    "./aver": "./aver.js"
+  },
+  "exports": { "./*": "./*.js" },
+
   "engines": {
     "node": ">=18.18.0",
     "npm": ">=9.8.0"
   },
 
   "scripts": {
-    
+
     "test": "mocha \"./test/*-tests.js\"",
     "test-match": "mocha \"./test/*-tests.js\" -g"
   },
