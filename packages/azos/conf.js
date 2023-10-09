@@ -26,7 +26,7 @@ import * as aver from "./aver.js";
 
 
 /**
- *
+ * Provides configuration tree navigation and formula evaluation
  */
 export class Configuration{
 
@@ -68,6 +68,8 @@ export class Node{
   constructor(cfg, parent, name, val){
     aver.isNotNull(cfg);
     aver.isNonEmptyString(name);
+    if (typeof parent === 'undefined') parent = null;
+    if (typeof val === 'undefined') val = null;
 
     this.#configuration = cfg;
     this.#parent = parent;
@@ -109,12 +111,27 @@ export class Node{
   get value(){ return  this.evaluate(this.#value); }
   get verbatimValue(){ return this.#value; }
 
+  /** Iterates over a section: map or array
+   * Returning KVP {key, idx, value}; index is -1 for object elements
+  */
+  *[Symbol.iterator](){
+    if (!this.isSection()) return;//empty iterable
+    if (types.isArray(this.#value)){
+      const arr = this.#value;
+      for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
+    } else {
+      for(const k in this.#value) yield {key: k, idx: -1, val: this.#value[k]};
+    }
+  }
+
   /**
    * Evaluates an arbitrary value as of this node in a tree
    * @param {*} val
    */
   evaluate(val){
+    if (!types.isString(val)) return val;
 
+    return val;//for now
   }
 
 }
