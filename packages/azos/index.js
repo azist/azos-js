@@ -14,6 +14,8 @@ import * as localization  from "./localization.js";
 import * as events        from "./events.js";
 import * as linq          from "./linq.js";
 import * as chassis       from "./chassis.js";
+import * as session       from "./session.js";
+import * as conf          from "./conf.js";
 
 // These entities will be exported using UMD library mechanisms
 
@@ -25,3 +27,5 @@ export const Localization = localization;
 export const Events       = events;
 export const Linq         = linq;
 export const Chassis      = chassis;
+export const Session      = session;
+export const Conf         = conf;

@@ -31,11 +31,15 @@
     "test-match": "mocha \"./test/*-tests.js\" -g"
   },
   "dependencies": {
-    "lit": "^2.8.0",
-    "azos": "^0.0.0"
+    "azos": "^0.0.0",
+    "lit": "^2.8.0"
   },
   "devDependencies": {
-    "azos": "../azos"
+    "azos": "../azos",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
+    "events": "^3.3.0",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0"
   }
-
 }

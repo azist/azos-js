@@ -53,7 +53,7 @@ export class Application extends types.DisposableObject{
     this.#envName = str.dflt(init.envName, "local");
     this.#isTest = types.asBool(init.isTest);
 
-    this.#session = this._makeSession(cfgSession);
+    this.#session = null;//this._makeSession("");
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
