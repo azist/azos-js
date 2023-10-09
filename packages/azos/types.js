@@ -93,7 +93,7 @@ export function allObjectValues(o){
 }
 
 /**
- * Deletes the first occurence of the element in array.
+ * Deletes the first occurrence of the element in array.
  * Warning: this is an "unsafe" method as it does not do any args checks for speed
  * @param {Array} array to delete from
  * @param {*} elm element to delete
