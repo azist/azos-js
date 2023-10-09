@@ -2,7 +2,7 @@ import {Configuration} from "azos/conf";
 import {Application} from "azos/chassis";
 import * as types from "azos/types";
 
-console.log('Hook you hard barbindoziy');
+console.info('Hook you hard barbindoziy');
 
 
 
@@ -17,6 +17,7 @@ const cfg = new Configuration({
 const app = new Application(cfg.root);
 if (typeof window !== 'undefined') window.AZAPP = app;
 
-console.log(`App instance ${app.instanceId}`);
-app[Symbol.dispose]();
+console.info(`App instance ${app.instanceId}`);
+console.info(`Add dispose 1: ${app[types.DISPOSED_PROP]} - ${types.dispose(app)}`);
+console.info(`Add dispose 2: ${app[types.DISPOSED_PROP]} - ${types.dispose(app)}`);
 
