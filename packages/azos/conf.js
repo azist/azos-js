@@ -236,12 +236,26 @@ evaluate(val){
   }
 
   //#region Typed getters
+  /**
+   * Tries to read a string value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a string, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
   getString(names, dflt){
     if (names === undefined || names===null) return dflt;
     const got = types.isArray(names) ? this.get(...names) : this.get(names);
     return dflt === undefined ? got : strings.isEmpty(got) ? dflt : got;
   }
 
+  /**
+   * Tries to read a bool value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a bool, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
   getBool(names, dflt){
     if (names === undefined || names===null) return dflt;
     const got = types.isArray(names) ? this.get(...names) : this.get(names);
@@ -250,6 +264,11 @@ evaluate(val){
     catch{ return dflt; }
   }
 
+  /**
+   * Tries to read a tri bool (undefined|false|true) value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a bool, returns `undefined`.
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   */
   getTriBool(names){
     if (names === undefined || names===null) return undefined;
     const got = types.isArray(names) ? this.get(...names) : this.get(names);
@@ -257,6 +276,13 @@ evaluate(val){
     catch{ return undefined; }
   }
 
+  /**
+   * Tries to read an int value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as an int, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
   getInt(names, dflt){
     if (names === undefined || names===null) return dflt;
     const got = types.isArray(names) ? this.get(...names) : this.get(names);
@@ -265,6 +291,13 @@ evaluate(val){
     catch{ return dflt; }
   }
 
+  /**
+   * Tries to read a real value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a real, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
   getReal(names, dflt){
     if (names === undefined || names===null) return dflt;
     const got = types.isArray(names) ? this.get(...names) : this.get(names);
@@ -273,6 +306,13 @@ evaluate(val){
     catch{ return dflt; }
   }
 
+  /**
+   * Tries to read a money value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a money, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
   getMoney(names, dflt){
     if (names === undefined || names===null) return dflt;
     const got = types.isArray(names) ? this.get(...names) : this.get(names);
@@ -281,6 +321,13 @@ evaluate(val){
     catch{ return dflt; }
   }
 
+  /**
+   * Tries to read a Date value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a Date, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
   getDate(names, dflt){
     if (names === undefined || names===null) return dflt;
     const got = types.isArray(names) ? this.get(...names) : this.get(names);
