@@ -70,15 +70,17 @@ export class Application extends types.DisposableObject{
   constructor(cfg){
     super();
     this.#config = aver.isOf(cfg, Configuration);
+    const root = cfg.root;
+
     this.#instanceId = types.genGuid();
     this.#startTime = new Date();
 
-    this.#id = str.dflt(init.id, "#0");
-    this.#name = str.dflt(init.name, this.#id);
-    this.#description = str.dflt(init.description, this.#id);
-    this.#copyright = str.dflt(init.copyright, "2023 Azist Group");
-    this.#envName = str.dflt(init.envName, "local");
-    this.#isTest = types.asBool(init.isTest);
+    this.#id = root.getString("id", "#0");
+    this.#name = root.geString("name", this.#id);
+    this.#description = root.getString("description", this.#id);
+    this.#copyright = root.getString("copyright", "2023 Azist Group");
+    this.#envName = root.getString("envName", "local");
+    this.#isTest = root.getBool("isTest", false);
 
     this.#session = null;//this._makeSession("");
 

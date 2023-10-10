@@ -7,8 +7,8 @@ console.info('Hook you hard barbindoziy');
 
 const cfgApp = {
   id: "abc",
-  name: "test",
-  description: "Test application",
+  name: "$(id)",
+  description: "Test '$(name)' application",
   session: {type: "UiSession"},
 };
 

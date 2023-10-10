@@ -184,6 +184,30 @@ export class ConfigNode{
     return -1;
   }
 
+  /** Iterates over a section: map or array
+   * Returning KVP {key, idx, value}; index is -1 for object elements
+  */
+*[Symbol.iterator](){
+  if (!this.isSection) return;//empty iterable
+  if (types.isArray(this.#value)){
+    const arr = this.#value;
+    for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
+  } else {
+    const map = this.#value;
+    for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
+  }
+}
+
+/**
+ * Evaluates an arbitrary value as of this node in a tree
+ * @param {*} val
+ */
+evaluate(val){
+  if (!types.isString(val)) return val;
+
+  return val;//for now
+}
+
   /**
    * Returns child element by the first name for map or index for an array.
    * The names are coalesced from left to right - the first matching element is returned.
@@ -211,28 +235,59 @@ export class ConfigNode{
     return undefined;
   }
 
-  /** Iterates over a section: map or array
-   * Returning KVP {key, idx, value}; index is -1 for object elements
-  */
-  *[Symbol.iterator](){
-    if (!this.isSection) return;//empty iterable
-    if (types.isArray(this.#value)){
-      const arr = this.#value;
-      for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
-    } else {
-      const map = this.#value;
-      for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
-    }
+  //#region Typed getters
+  getString(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    return dflt === undefined ? got : strings.isEmpty(got) ? dflt : got;
   }
 
-  /**
-   * Evaluates an arbitrary value as of this node in a tree
-   * @param {*} val
-   */
-  evaluate(val){
-    if (!types.isString(val)) return val;
-
-    return val;//for now
+  getBool(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asBool(got); }
+    catch{ return dflt; }
   }
+
+  getTriBool(names){
+    if (names === undefined || names===null) return undefined;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    try{ return types.asTriBool(got); }
+    catch{ return undefined; }
+  }
+
+  getInt(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asInt(got, false); }
+    catch{ return dflt; }
+  }
+
+  getReal(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try { return types.asReal(got, false); }
+    catch{ return dflt; }
+  }
+
+  getMoney(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asMoney(got, false); }
+    catch{ return dflt; }
+  }
+
+  getDate(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asDate(got, false); }
+    catch{ return dflt; }
+  }
+  //#endregion
 
 }
