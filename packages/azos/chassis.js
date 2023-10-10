@@ -6,7 +6,6 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
-import * as str from "./strings.js";
 import { Configuration, ConfigNode } from "./conf.js";
 import { Session } from "./session.js";
 
@@ -76,7 +75,7 @@ export class Application extends types.DisposableObject{
     this.#startTime = new Date();
 
     this.#id = root.getString("id", "#0");
-    this.#name = root.geString("name", this.#id);
+    this.#name = root.getString("name", this.#id);
     this.#description = root.getString("description", this.#id);
     this.#copyright = root.getString("copyright", "2023 Azist Group");
     this.#envName = root.getString("envName", "local");
@@ -106,6 +105,9 @@ export class Application extends types.DisposableObject{
 
   /** Returns application id atom @return {atom}*/
   get id(){ return this.#id; }
+
+  /** Returns application configuration object @return {Configuration}*/
+  get config(){ return this.#config; }
 
   /** Returns application short name string @return {string}*/
   get name(){ return this.#name; }
@@ -158,21 +160,20 @@ export class Application extends types.DisposableObject{
 
 }
 
+const cfgNOP = new Configuration({
+  id: "NOP",
+  name: "NOP",
+  description: "Nop application",
+  envName: "local"
+});
+
 /**
  * System stub class which implements an {@link Application} which does nothing
  */
 export class NopApplication extends Application{
   static #instance = new NopApplication();
   static get instance(){ return NopApplication.#instance; }
-
-  constructor(){
-    super({
-      id: "NOP",
-      name: "NOP",
-      description: "Nop application",
-      envName: "local"
-    });
-  }
+  constructor(){ super(cfgNOP); }
 }
 
 
