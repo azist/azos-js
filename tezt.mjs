@@ -10,7 +10,7 @@
 import {Configuration} from "azos/conf";
 
 const cfg = new Configuration({
-  "#2": 23,
+  "22": 23,
   a: 2,
   b: -4,
   c: true,
