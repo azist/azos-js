@@ -26,6 +26,11 @@ import * as aver from "./aver.js";
 
 */
 
+/** Makes new {@link Configuration} object from the specified content
+ * @param {string | object} configuration source
+ * @returns {Configuration}
+*/
+export function config(content){ return new Configuration(content); }
 
 /**
  * Provides configuration tree navigation and formula evaluation functionality
@@ -182,14 +187,29 @@ export class ConfigNode{
   }
 
   /**
-   * Returns child element by name for map or index for an array.
+   * Returns child element by the first name for map or index for an array.
+   * The names are coalesced from left to right - the first matching element is returned.
    * Returns undefined for non-existing element or undefined/null index
    * @returns {*} element value
    */
-  get(elm){
-    if (elm === undefined || elm === null) return undefined;
-    if (types.isObject(this.#value)) return this.#value[elm];
-    if (types.isArray(this.#value)) return this.#value[types.asInt(elm | 0)];
+  get(...names){
+    const val = this.#value;
+
+    if (types.isObject(val)){ //object section
+      for(let name of names){
+        if (name === undefined || name === null) continue;
+        if (types.hown(val, name))
+          return this.#value[name];
+      }
+    } else if (types.isArray(val)){//array section
+      for(let name of names){
+        if (name === undefined || name === null) continue;
+        const idx = (types.isString(name) ? (name.replace('#', '')) : name) | 0;
+        if (idx >=0 && idx < val.length)
+          return val[idx];
+      }
+    }
+
     return undefined;
   }
 

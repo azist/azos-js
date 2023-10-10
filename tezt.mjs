@@ -7,9 +7,9 @@
 //MANUAL TESTING
 //$ node tezt.mjs
 
-import {Configuration} from "azos/conf";
+import {config} from "azos/conf";
 
-const cfg = new Configuration({
+const cfg = config({
   "22": 23,
   a: 2,
   b: -4,
