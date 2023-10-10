@@ -151,6 +151,7 @@ export class ConfigNode{
     let result = this;
     for(var i=0; i < segs.length; i++){
       if (result === null) return undefined;
+      if (!(result instanceof ConfigNode)) return result;
       const seg = strings.trim(segs[i]);
       if (seg==="") {
         result = this.configuration.root;
@@ -164,9 +165,6 @@ export class ConfigNode{
       if (seg.startsWith("#") && seg.length > 1){
         const idx = seg.slice(1) | 0;
         result = result.get(idx);
-      } else if (seg.startsWith("$") && seg.length > 1){
-        const atr = seg.slice(1);
-        return result.get(atr);
       } else {
         result = result.get(seg);
       }
@@ -190,7 +188,7 @@ export class ConfigNode{
    * Returns child element by the first name for map or index for an array.
    * The names are coalesced from left to right - the first matching element is returned.
    * Returns undefined for non-existing element or undefined/null index
-   * @returns {*} element value
+   * @returns {undefined | Node | object} element value which
    */
   get(...names){
     const val = this.#value;

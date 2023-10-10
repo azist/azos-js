@@ -14,8 +14,13 @@ const cfg = config({
   a: 2,
   b: -4,
   c: true,
-  d:{ a: -2, b: { v: -9}},
-  e: [1, 2, {a: {b: { flag: -90e4, val: "`$(/$a)" }}}]
+  d: {
+    a: -2,
+    b: {v: -9}
+  },
+  e: [1, 2, {a: {b: {flag: -90e4, val: "`$(/$a)" }}}],
+  n: null,
+  udf: undefined
 });
 
 console.info(cfg.root.name);
@@ -37,4 +42,8 @@ console.info(cfg.root.get("d").get("b").path);
 console.info(cfg.root.get("e").get("2").get("a").get("b").path);
 
 console.info(cfg.root.nav("/e/#2/a/b").path);
-console.info(cfg.root.nav("/e/#2/a/b/$flag"));
+console.info(cfg.root.nav("/e/#2/a/b/flag"));
+
+console.info(cfg.root.get("e").get('#2').get('a').get('b').get('flag'));
+
+console.info(` root.n = ${cfg.root.get("n")}   root.udf = ${cfg.root.get("udf")}`);
