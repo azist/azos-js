@@ -10,11 +10,12 @@
 import {Configuration} from "azos/conf";
 
 const cfg = new Configuration({
+  "#2": 23,
   a: 2,
   b: -4,
   c: true,
   d:{ a: -2, b: { v: -9}},
-  e: [1, 2, {a: {b: { flag: -90e4 }}}]
+  e: [1, 2, {a: {b: { flag: -90e4, val: "`$(/$a)" }}}]
 });
 
 console.info(cfg.root.name);

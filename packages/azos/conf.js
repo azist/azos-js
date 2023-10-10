@@ -70,6 +70,7 @@ export class ConfigNode{
   constructor(cfg, parent, name, val){
     aver.isNotNull(cfg);
     aver.isNonEmptyString(name);
+
     if (typeof parent === 'undefined') parent = null;
     if (typeof val === 'undefined') val = null;
 
@@ -80,6 +81,8 @@ export class ConfigNode{
     if (types.isObject(val)) {
       const map = {};
       for(var key in val){
+        if (key.indexOf('/') >= 0 || key.indexOf('#') >= 0)
+          throw new Error(`Config node names may not contain '/' or '#' characters: "${key}", under parent "${this.path}"`);
         const kv = val[key];
         if (types.isObjectOrArray(kv))
           map[key] = new ConfigNode(cfg, this, key, kv);
