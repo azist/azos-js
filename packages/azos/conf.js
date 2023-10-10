@@ -5,6 +5,8 @@
 </FILE_LICENSE>*/
 
 import * as types from "./types.js";
+import * as strings from "./strings.js";
+import { NULL } from "./coreconsts.js";
 import * as aver from "./aver.js";
 /*
  {
@@ -26,7 +28,7 @@ import * as aver from "./aver.js";
 
 
 /**
- * Provides configuration tree navigation and formula evaluation
+ * Provides configuration tree navigation and formula evaluation functionality
  */
 export class Configuration{
 
@@ -90,7 +92,7 @@ export class ConfigNode{
       for(var i=0; i < val.length; i++){
         const kv = val[i];
         if (types.isObjectOrArray(kv))
-          arr.push(new ConfigNode(cfg, this, `${name}#${i}`, kv));
+          arr.push(new ConfigNode(cfg, this, `#${i}`, kv));
         else
           arr.push(kv);
       }
@@ -98,6 +100,12 @@ export class ConfigNode{
     } else {
       this.#value = val;
     }
+  }
+
+  get [Symbol.toStringTag]() { return "ConfigNode"; }
+
+  toString() {
+    return `ConfigNode('${this.#name}', ${this.isSection ? (this.isArraySection ? "["+this.count+"]" : "{"+this.count+"}") : (this.#value?.toString() ?? NULL) })`;
   }
 
   get configuration() { return this.#configuration; }
@@ -110,6 +118,65 @@ export class ConfigNode{
 
   get value(){ return  this.evaluate(this.#value); }
   get verbatimValue(){ return this.#value; }
+
+  /**
+   * Returns the absolute path for this section node
+   */
+  get path(){
+    const p = this.#parent;
+    if (p === null) return "/";
+    if (p.parent === null) return `/${this.#name}`;
+    return `${p.path}/${this.#name}`;
+  }
+
+  /**
+   * Navigates the path to the section or value
+   */
+   nav(path){
+    aver.isString(path);
+    path = strings.trim(path);
+    if (path.length === 0) return this;
+    if (path === "./") return this;
+    if (path === "..") return this.parent;
+
+    const segs = path.split("/");
+    let result = this;
+    for(var i=0; i < segs.length; i++){
+      if (result === null) return undefined;
+      const seg = strings.trim(segs[i]);
+      if (seg==="") {
+        result = this.configuration.root;
+        continue;
+      }
+      if (seg===".") continue;
+      if (seg==="..") {
+        result = result.parent;
+        continue;
+      }
+      if (seg.startsWith("#") && seg.length > 1){
+        const idx = seg.slice(1) | 0;
+        result = result.get(idx);
+      } else if (seg.startsWith("$") && seg.length > 1){
+        const atr = seg.slice(1);
+        return result.get(atr);
+      } else {
+        result = result.get(seg);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * For section objects (maps or arrays) returns the number of elements
+   * Returns -1 for non section objects
+   * @returns {int}
+   */
+  get count(){
+    const v = this.#value;
+    if (types.isArray(v)) return v.length;
+    if (types.isObject(v)) return Object.keys(v).length;
+    return -1;
+  }
 
   /**
    * Returns child element by name for map or index for an array.

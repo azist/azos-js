@@ -13,8 +13,8 @@ const cfg = new Configuration({
   a: 2,
   b: -4,
   c: true,
-  d:{ a: -2, b: true},
-  e: [1,2,{}]
+  d:{ a: -2, b: { v: -9}},
+  e: [1, 2, {a: {b: { flag: -90e4 }}}]
 });
 
 console.info(cfg.root.name);
@@ -24,7 +24,16 @@ console.info(cfg.root.get("b"));
 console.info(cfg.root.get("d")?.get("a"));
 
 for(let one of cfg.root.get("e")){
-  console.dir(one);
+  console.info(one);
 }
 
 console.info(cfg.root.get("e").get(2).name);
+console.info(cfg.root.get("a").toString());
+console.info(cfg.root.get("d").toString());
+console.info(cfg.root.get("e").toString());
+
+console.info(cfg.root.get("d").get("b").path);
+console.info(cfg.root.get("e").get("2").get("a").get("b").path);
+
+console.info(cfg.root.nav("/e/#2/a/b").path);
+console.info(cfg.root.nav("/e/#2/a/b/$flag"));
