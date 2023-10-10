@@ -41,7 +41,7 @@ export class Configuration{
 
     aver.isObject(content);
     this.#content = content;
-    this.#root = new Node(this, null, "/", content);
+    this.#root = new ConfigNode(this, null, "/", content);
   }
 
   /**
@@ -52,7 +52,7 @@ export class Configuration{
 
   /**
    * Returns root node
-   * @returns {Node}
+   * @returns {ConfigNode}
    */
   get root(){ return this.#root; }
 }
@@ -60,7 +60,7 @@ export class Configuration{
 /**
  * Configuration tree node
  */
-export class Node{
+export class ConfigNode{
   #configuration;
   #parent;
   #name;
@@ -80,7 +80,7 @@ export class Node{
       for(var key in val){
         const kv = val[key];
         if (types.isObjectOrArray(kv))
-          map[key] = new Node(cfg, this, key, kv);
+          map[key] = new ConfigNode(cfg, this, key, kv);
         else
           map[key] = kv;
       }
@@ -90,7 +90,7 @@ export class Node{
       for(var i=0; i < val.length; i++){
         const kv = val[i];
         if (types.isObjectOrArray(kv))
-          arr.push(new Node(cfg, this, `#${i}`, kv));
+          arr.push(new ConfigNode(cfg, this, `${name}#${i}`, kv));
         else
           arr.push(kv);
       }
@@ -111,11 +111,23 @@ export class Node{
   get value(){ return  this.evaluate(this.#value); }
   get verbatimValue(){ return this.#value; }
 
+  /**
+   * Returns child element by name for map or index for an array.
+   * Returns undefined for non-existing element or undefined/null index
+   * @returns {*} element value
+   */
+  get(elm){
+    if (elm === undefined || elm === null) return undefined;
+    if (types.isObject(this.#value)) return this.#value[elm];
+    if (types.isArray(this.#value)) return this.#value[types.asInt(elm | 0)];
+    return undefined;
+  }
+
   /** Iterates over a section: map or array
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
   *[Symbol.iterator](){
-    if (!this.isSection()) return;//empty iterable
+    if (!this.isSection) return;//empty iterable
     if (types.isArray(this.#value)){
       const arr = this.#value;
       for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
