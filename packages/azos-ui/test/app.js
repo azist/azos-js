@@ -1,20 +1,18 @@
-import {Configuration} from "azos/conf";
-import {Application} from "azos/chassis";
+import {application} from "azos/chassis";
 import * as types from "azos/types";
 
 console.info('Hook you hard barbindoziy');
 
 
 
-const cfg = new Configuration({
+const cfgApp = {
   id: "abc",
-  name: "test",
-  description: "Test application",
+  name: "$(id)",
+  description: "Test '$(name)' application",
   session: {type: "UiSession"},
+};
 
-});
-
-const app = new Application(cfg.root);
+const app = application(cfgApp);
 if (typeof window !== 'undefined') window.AZAPP = app;
 
 console.info(`App instance ${app.instanceId}`);

@@ -6,8 +6,32 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
-import * as str from "./strings.js";
+import { Configuration, ConfigNode } from "./conf.js";
 import { Session } from "./session.js";
+
+/**
+ * A helper factory method creates a new application (new Application(cfg)) from a config object
+ * which is either a plain JS object, or a string representation in JSON format,
+ * or {@link Configuration}, or {@link ConfigNode} objects.
+ * Please see {@link Application} and {@link Configuration} topics
+ * @param {object | Configuration | ConfigNode} cfg plain object, JSON string, Configuration or ConfigNode instance
+ * @returns {Application} New Application instance
+ */
+export function application(cfg){
+  if (cfg === undefined || cfg === null) cfg = { };
+
+  if (types.isString(cfg)){
+    cfg = new Configuration(cfg);
+  }
+  else if (types.isObject(cfg)){
+    if (cfg instanceof ConfigNode) cfg = cfg.configuration;
+    if (!(cfg instanceof Configuration)) cfg = new Configuration(cfg);
+  }
+  else throw new Error("Must pass either (a) plain object, or (b) JSON string, or (c) Configuration, or (d) ConfigNode instance into `application(cfg)` factory function");
+
+  return new Application(cfg);
+}
+
 
 /**
  * Implements a base Application chassis pattern
@@ -23,6 +47,7 @@ export class Application extends types.DisposableObject{
   */
   static get instance(){ return Application.#instance ?? NopApplication.instance; }
 
+  #config;
   #id;
   #name;
   #description;
@@ -36,22 +61,25 @@ export class Application extends types.DisposableObject{
   #session;
 
   /**
-   * Initializes {@link Application} object instance by passing init object,
-   * @param {{id,name,description,copyright,envName,isTest}} init
+   * Initializes {@link Application} object instance by passing {@link Configuration} object.
+   * You can also call {@link application()} helper instead
+   * @param {Configuration} cfg
    * @return {Application}
   */
-  constructor(init){
+  constructor(cfg){
     super();
-    aver.isObject(init);
+    this.#config = aver.isOf(cfg, Configuration);
+    const root = cfg.root;
+
     this.#instanceId = types.genGuid();
     this.#startTime = new Date();
 
-    this.#id = str.dflt(init.id, "#0");
-    this.#name = str.dflt(init.name, this.#id);
-    this.#description = str.dflt(init.description, this.#id);
-    this.#copyright = str.dflt(init.copyright, "2023 Azist Group");
-    this.#envName = str.dflt(init.envName, "local");
-    this.#isTest = types.asBool(init.isTest);
+    this.#id = root.getString("id", "#0");
+    this.#name = root.getString("name", this.#id);
+    this.#description = root.getString("description", this.#id);
+    this.#copyright = root.getString("copyright", "2023 Azist Group");
+    this.#envName = root.getString("envName", "local");
+    this.#isTest = root.getBool("isTest", false);
 
     this.#session = null;//this._makeSession("");
 
@@ -77,6 +105,9 @@ export class Application extends types.DisposableObject{
 
   /** Returns application id atom @return {atom}*/
   get id(){ return this.#id; }
+
+  /** Returns application configuration object @return {Configuration}*/
+  get config(){ return this.#config; }
 
   /** Returns application short name string @return {string}*/
   get name(){ return this.#name; }
@@ -129,21 +160,20 @@ export class Application extends types.DisposableObject{
 
 }
 
+const cfgNOP = new Configuration({
+  id: "NOP",
+  name: "NOP",
+  description: "Nop application",
+  envName: "local"
+});
+
 /**
  * System stub class which implements an {@link Application} which does nothing
  */
 export class NopApplication extends Application{
   static #instance = new NopApplication();
   static get instance(){ return NopApplication.#instance; }
-
-  constructor(){
-    super({
-      id: "NOP",
-      name: "NOP",
-      description: "Nop application",
-      envName: "local"
-    });
-  }
+  constructor(){ super(cfgNOP); }
 }
 
 

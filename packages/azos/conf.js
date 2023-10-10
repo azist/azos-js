@@ -26,6 +26,11 @@ import * as aver from "./aver.js";
 
 */
 
+/** Makes new {@link Configuration} object from the specified content
+ * @param {string | object} configuration source
+ * @returns {Configuration}
+*/
+export function config(content){ return new Configuration(content); }
 
 /**
  * Provides configuration tree navigation and formula evaluation functionality
@@ -146,6 +151,7 @@ export class ConfigNode{
     let result = this;
     for(var i=0; i < segs.length; i++){
       if (result === null) return undefined;
+      if (!(result instanceof ConfigNode)) return result;
       const seg = strings.trim(segs[i]);
       if (seg==="") {
         result = this.configuration.root;
@@ -159,9 +165,6 @@ export class ConfigNode{
       if (seg.startsWith("#") && seg.length > 1){
         const idx = seg.slice(1) | 0;
         result = result.get(idx);
-      } else if (seg.startsWith("$") && seg.length > 1){
-        const atr = seg.slice(1);
-        return result.get(atr);
       } else {
         result = result.get(seg);
       }
@@ -181,40 +184,157 @@ export class ConfigNode{
     return -1;
   }
 
-  /**
-   * Returns child element by name for map or index for an array.
-   * Returns undefined for non-existing element or undefined/null index
-   * @returns {*} element value
-   */
-  get(elm){
-    if (elm === undefined || elm === null) return undefined;
-    if (types.isObject(this.#value)) return this.#value[elm];
-    if (types.isArray(this.#value)) return this.#value[types.asInt(elm | 0)];
-    return undefined;
-  }
-
   /** Iterates over a section: map or array
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
-  *[Symbol.iterator](){
-    if (!this.isSection) return;//empty iterable
-    if (types.isArray(this.#value)){
-      const arr = this.#value;
-      for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
-    } else {
-      const map = this.#value;
-      for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
+*[Symbol.iterator](){
+  if (!this.isSection) return;//empty iterable
+  if (types.isArray(this.#value)){
+    const arr = this.#value;
+    for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
+  } else {
+    const map = this.#value;
+    for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
+  }
+}
+
+/**
+ * Evaluates an arbitrary value as of this node in a tree
+ * @param {*} val
+ */
+evaluate(val){
+  if (!types.isString(val)) return val;
+
+  return val;//for now
+}
+
+  /**
+   * Returns child element by the first name for map or index for an array.
+   * The names are coalesced from left to right - the first matching element is returned.
+   * Returns undefined for non-existing element or undefined/null index
+   * @returns {undefined | Node | object} element value which
+   */
+  get(...names){
+    const val = this.#value;
+
+    if (types.isObject(val)){ //object section
+      for(let name of names){
+        if (name === undefined || name === null) continue;
+        if (types.hown(val, name))
+          return this.#value[name];
+      }
+    } else if (types.isArray(val)){//array section
+      for(let name of names){
+        if (name === undefined || name === null) continue;
+        const idx = (types.isString(name) ? (name.replace('#', '')) : name) | 0;
+        if (idx >=0 && idx < val.length)
+          return val[idx];
+      }
     }
+
+    return undefined;
+  }
+
+  //#region Typed getters
+  /**
+   * Tries to read a string value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a string, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
+  getString(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    return dflt === undefined ? got : strings.isEmpty(got) ? dflt : got;
   }
 
   /**
-   * Evaluates an arbitrary value as of this node in a tree
-   * @param {*} val
+   * Tries to read a bool value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a bool, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
    */
-  evaluate(val){
-    if (!types.isString(val)) return val;
-
-    return val;//for now
+  getBool(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asBool(got); }
+    catch{ return dflt; }
   }
+
+  /**
+   * Tries to read a tri bool (undefined|false|true) value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a bool, returns `undefined`.
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   */
+  getTriBool(names){
+    if (names === undefined || names===null) return undefined;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    try{ return types.asTriBool(got); }
+    catch{ return undefined; }
+  }
+
+  /**
+   * Tries to read an int value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as an int, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
+  getInt(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asInt(got, false); }
+    catch{ return dflt; }
+  }
+
+  /**
+   * Tries to read a real value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a real, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
+  getReal(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try { return types.asReal(got, false); }
+    catch{ return dflt; }
+  }
+
+  /**
+   * Tries to read a money value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a money, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
+  getMoney(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asMoney(got, false); }
+    catch{ return dflt; }
+  }
+
+  /**
+   * Tries to read a Date value coalescing attribute names until a named attribute is found.
+   * If the attribute is not found or value can not be read as a Date, returns optional dflt.
+   * Please note, the dflt value may be of any type
+   * @param {string | string[]} names a single string name, or an array of string attribute names to coalesce the value from
+   * @param {*} dflt optional default
+   */
+  getDate(names, dflt){
+    if (names === undefined || names===null) return dflt;
+    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got === undefined) return dflt;
+    try{ return types.asDate(got, false); }
+    catch{ return dflt; }
+  }
+  //#endregion
 
 }

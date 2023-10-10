@@ -49,7 +49,7 @@
     "test": "mocha \"./packages/**/*.js\"",
     "test-match": "mocha \"./packages/**/*.js\" -g",
     "test-azos": "npm test -workspace=azos",
-    "ui": "parcel --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\""
+    "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\""
   },
   "devDependencies": {
     "eslint": "^8.50.0",
