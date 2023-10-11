@@ -26,6 +26,9 @@ import * as aver from "./aver.js";
 
 */
 
+/** Regular expression that parses out variables <<format tokens>> */
+export const REXP_VAR_DECL = /\$\((.*?)\)/g;  // $(path)
+
 /** Makes new {@link Configuration} object from the specified content
  * @param {string | object} configuration source
  * @returns {Configuration}
@@ -198,6 +201,7 @@ export class ConfigNode{
   }
 }
 
+
 /**
  * Evaluates an arbitrary value as of this node in a tree
  * @param {*} val
@@ -205,16 +209,41 @@ export class ConfigNode{
 evaluate(val){
   if (!types.isString(val)) return val;
 
-  return val;//for now
+  const vmap = (s, path) => {
+    if (strings.isEmpty(path)) return "";
+    if (path.startsWith("^^^")){ //escape
+      path = path.slice(3);
+      return `$(${path})`;
+    }
+    return this.nav(path);
+  };
+
+  const result = val.replace(REXP_VAR_DECL, vmap);
+  return result;
 }
 
   /**
-   * Returns child element by the first name for map or index for an array.
+   * Returns child element by the first matching name for map or index for an array.
    * The names are coalesced from left to right - the first matching element is returned.
    * Returns undefined for non-existing element or undefined/null index
    * @returns {undefined | Node | object} element value which
    */
   get(...names){
+    const vv = this.getVerbatim(...names);
+    const result = this.evaluate(vv);
+    return result;
+  }
+
+  /**
+   * This function is similar to {@link get} but it DOES NOT EVALUATE vars denoted by `$(path)` pattern,
+   * instead it returns a verbatim value.
+   *
+   * Returns child element by the first matching name for map or index for an array.
+   * The names are coalesced from left to right - the first matching element is returned.
+   * Returns undefined for non-existing element or undefined/null index
+   * @returns {undefined | Node | object} element value which
+   */
+  getVerbatim(...names){
     const val = this.#value;
 
     if (types.isObject(val)){ //object section
@@ -234,6 +263,8 @@ evaluate(val){
 
     return undefined;
   }
+
+
 
   //#region Typed getters
   /**
