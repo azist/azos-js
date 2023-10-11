@@ -190,37 +190,37 @@ export class ConfigNode{
   /** Iterates over a section: map or array
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
-*[Symbol.iterator](){
-  if (!this.isSection) return;//empty iterable
-  if (types.isArray(this.#value)){
-    const arr = this.#value;
-    for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
-  } else {
-    const map = this.#value;
-    for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
-  }
-}
-
-
-/**
- * Evaluates an arbitrary value as of this node in a tree
- * @param {*} val
- */
-evaluate(val){
-  if (!types.isString(val)) return val;
-
-  const vmap = (s, path) => {
-    if (strings.isEmpty(path)) return "";
-    if (path.startsWith("^^^")){ //escape
-      path = path.slice(3);
-      return `$(${path})`;
+  *[Symbol.iterator](){
+    if (!this.isSection) return;//empty iterable
+    if (types.isArray(this.#value)){
+      const arr = this.#value;
+      for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
+    } else {
+      const map = this.#value;
+      for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
     }
-    return this.nav(path);
-  };
+  }
 
-  const result = val.replace(REXP_VAR_DECL, vmap);
-  return result;
-}
+
+  /**
+   * Evaluates an arbitrary value as of this node in a tree
+   * @param {*} val
+   */
+  evaluate(val){
+    if (!types.isString(val)) return val;
+
+    const vmap = (s, path) => {
+      if (strings.isEmpty(path)) return "";
+      if (path.startsWith("^^^")){ //escape
+        path = path.slice(3);
+        return `$(${path})`;
+      }
+      return this.nav(path);
+    };
+
+    const result = val.replace(REXP_VAR_DECL, vmap);
+    return result;
+  }
 
   /**
    * Returns child element by the first matching name for map or index for an array.
