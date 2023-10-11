@@ -29,7 +29,9 @@ const cfg = config({
   vr: "-14.000456",
   vb: "yes",
   vd: "1/1/1980",
-  vm: "123.89601"
+  vm: "123.89601",
+
+  vvar: "a=$(vs) b=$(vi) flag=$(/e/#2/a/b/flag) esc=$(^^^escaped)"
 
 });
 
@@ -41,7 +43,11 @@ console.info(cfg.root.getTriBool(["vsw", "vb"], false));
 console.info(cfg.root.getDate(["vsw", "vd"], new Date()));
 console.info(cfg.root.getMoney(["vsw", "vm"], 100.00));
 
-process.exit(0);
+console.info(cfg.root.getVerbatim("vvar"));
+console.info(cfg.root.get("dontExist", "vvar"));
+console.info(cfg.root.getString(["nothere", "vvar"], "Nothing came"));
+
+console.info(cfg.root.evaluate("x = $(d/a) and b = $(/e/#2/a/b/flag)"));
 
 process.exit(0);
 
