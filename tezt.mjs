@@ -18,7 +18,7 @@ const cfg = config({
     a: -2,
     b: {v: -9}
   },
-  e: [1, 2, {a: {b: {flag: -90e4, val: "`$(/$a)" }}}],
+  e: [1, 2, {a: {b: {flag: -90e4, val: "Hello: $(/ra)" }}}],
   n: null,
   //s: "  ",
   kpss: "zzz",
@@ -31,7 +31,11 @@ const cfg = config({
   vd: "1/1/1980",
   vm: "123.89601",
 
-  vvar: "a=$(vs) b=$(vi) flag=$(/e/#2/a/b/flag) esc=$(^^^escaped)"
+  vvar: "a=$(vs) b=$(vi) flag=$(/e/#2/a/b/flag) esc=$(^^^escaped)",
+
+  ra: "$(rb)",
+  rb: "Something $(rc)",
+  rc: "Loop $(/ra)",
 
 });
 
@@ -48,6 +52,8 @@ console.info(cfg.root.get("dontExist", "vvar"));
 console.info(cfg.root.getString(["nothere", "vvar"], "Nothing came"));
 
 console.info(cfg.root.evaluate("x = $(d/a) and b = $(/e/#2/a/b/flag)"));
+
+console.info(cfg.root.nav("/e/#2/a/b").evaluate("$(/ra)"));//.get("val"));
 
 process.exit(0);
 

@@ -77,10 +77,9 @@ export class ConfigNode{
   #value;
   constructor(cfg, parent, name, val){
     aver.isNotNull(cfg);
-    aver.isNonEmptyString(name);
-
     if (typeof parent === 'undefined') parent = null;
-    if (typeof val === 'undefined') val = null;
+    aver.isNonEmptyString(name);
+    aver.isObjectOrArray(val);
 
     this.#configuration = cfg;
     this.#parent = parent;
@@ -123,12 +122,8 @@ export class ConfigNode{
   get name(){ return this.#name; }
   get parent() { return this.#parent; }
 
-  get isAttr(){ return !types.isAssigned(this.#value) || !types.isObjectOrArray(this.#value); }
-  get isSection(){ return types.isObjectOrArray(this.#value); }
-  get isArraySection(){ return types.isArray(this.#value); }
-
-  get value(){ return  this.evaluate(this.#value); }
-  get verbatimValue(){ return this.#value; }
+  get isSection(){ return types.isObject(this.#value); }
+  get isArray(){ return types.isArray(this.#value); }
 
   /**
    * Returns the absolute path for this section node
@@ -177,14 +172,12 @@ export class ConfigNode{
 
   /**
    * For section objects (maps or arrays) returns the number of elements
-   * Returns -1 for non section objects
    * @returns {int}
    */
   get count(){
     const v = this.#value;
     if (types.isArray(v)) return v.length;
-    if (types.isObject(v)) return Object.keys(v).length;
-    return -1;
+    return Object.keys(v).length;
   }
 
   /** Iterates over a section: map or array
@@ -201,7 +194,7 @@ export class ConfigNode{
     }
   }
 
-
+  #evalStack = null;
   /**
    * Evaluates an arbitrary value as of this node in a tree
    * @param {*} val
@@ -209,17 +202,37 @@ export class ConfigNode{
   evaluate(val){
     if (!types.isString(val)) return val;
 
-    const vmap = (s, path) => {
-      if (strings.isEmpty(path)) return "";
-      if (path.startsWith("^^^")){ //escape
-        path = path.slice(3);
-        return `$(${path})`;
-      }
-      return this.nav(path);
-    };
+    let stack = this.#evalStack;
+    if (stack === null) {
+      stack = new Set();
+      stack._level = 0;
+      stack._path = this.path;
+      stack._val = val;
+      this.#evalStack = stack;
+    }
+    stack._level++;
+    try{
+        const vmap = (s, path) => {
+          if (strings.isEmpty(path)) return "";
+          if (path.startsWith("^^^")){ //escape
+            path = path.slice(3);
+            return `$(${path})`;
+          }
+          if (stack.has(path)) throw new Error(`ConfigNode('${stack._path}') can not evaluate '${stack._val}' due to recursive ref to path '${path}' at ref level ${stack._level}`);
+          try{
+            stack.add(path);
+            return this.nav(path);
+          }finally{
+            stack.delete(path);
+          }
+        };
 
-    const result = val.replace(REXP_VAR_DECL, vmap);
-    return result;
+        const result = val.replace(REXP_VAR_DECL, vmap);
+        return result;
+    }finally{
+      stack._level--;
+      if (stack._level === 0) this.#evalStack = null;
+    }
   }
 
   /**
