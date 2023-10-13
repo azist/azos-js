@@ -6,7 +6,7 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
-import { Configuration, ConfigNode } from "./conf.js";
+import { Configuration, ConfigNode, makeNew } from "./conf.js";
 import { Session } from "./session.js";
 
 /**
@@ -152,9 +152,9 @@ export class Application extends types.DisposableObject{
   */
   _makeSession(cfg){
     if (types.isAssigned(cfg)) {
-       this.#session = types.makeObject(Session, cfg);
+       this.#session =  makeNew(cfg.get("session"), this, Session);
     } else {
-       this.#session = new Session();//empty session
+       this.#session = new Session(this, null);//empty session
     }
   }
 

@@ -14,18 +14,22 @@ import * as aver from "./aver.js";
  * around as a reference.
  */
 export class Session extends types.DisposableObject{
+  #app;
   #user;
   #isoLang;
   #culture;
   #settings;
 
-  constructor(){
+  constructor(app, cfg=null){
     super();
+    this.#app = app;
   }
 
   [types.DESTRUCTOR_METHOD](){
 
   }
+
+  get app(){ return this.#app;}
 
   get user(){ return this.#user;}
   set user(usr){

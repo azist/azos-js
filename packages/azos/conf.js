@@ -6,7 +6,7 @@
 
 import * as types from "./types.js";
 import * as strings from "./strings.js";
-import { NULL } from "./coreconsts.js";
+import { NULL, UNKNOWN } from "./coreconsts.js";
 import * as aver from "./aver.js";
 /*
  {
@@ -77,10 +77,9 @@ export class ConfigNode{
   #value;
   constructor(cfg, parent, name, val){
     aver.isNotNull(cfg);
-    aver.isNonEmptyString(name);
-
     if (typeof parent === 'undefined') parent = null;
-    if (typeof val === 'undefined') val = null;
+    aver.isNonEmptyString(name);
+    aver.isObjectOrArray(val);
 
     this.#configuration = cfg;
     this.#parent = parent;
@@ -109,26 +108,22 @@ export class ConfigNode{
       }
       this.#value = arr;
     } else {
-      this.#value = val;
+      throw new Error(`ConfigNode '${name}' value must be either an object or an array`);
     }
   }
 
-  get [Symbol.toStringTag]() { return "ConfigNode"; }
+  get [Symbol.toStringTag]() { return `ConfigNode(${this.path})`; }
 
   toString() {
-    return `ConfigNode('${this.#name}', ${this.isSection ? (this.isArraySection ? "["+this.count+"]" : "{"+this.count+"}") : (this.#value?.toString() ?? NULL) })`;
+    return `ConfigNode('${this.path}', ${this.isArray ? "["+this.count+"]" : "{"+this.count+"}"})`;
   }
 
   get configuration() { return this.#configuration; }
   get name(){ return this.#name; }
   get parent() { return this.#parent; }
 
-  get isAttr(){ return !types.isAssigned(this.#value) || !types.isObjectOrArray(this.#value); }
-  get isSection(){ return types.isObjectOrArray(this.#value); }
-  get isArraySection(){ return types.isArray(this.#value); }
-
-  get value(){ return  this.evaluate(this.#value); }
-  get verbatimValue(){ return this.#value; }
+  get isSection(){ return types.isObject(this.#value); }
+  get isArray(){ return types.isArray(this.#value); }
 
   /**
    * Returns the absolute path for this section node
@@ -165,63 +160,77 @@ export class ConfigNode{
         result = result.parent;
         continue;
       }
-      if (seg.startsWith("#") && seg.length > 1){
-        const idx = seg.slice(1) | 0;
-        result = result.get(idx);
-      } else {
-        result = result.get(seg);
-      }
+      result = result.get(seg);
     }
     return result;
   }
 
   /**
    * For section objects (maps or arrays) returns the number of elements
-   * Returns -1 for non section objects
    * @returns {int}
    */
   get count(){
     const v = this.#value;
     if (types.isArray(v)) return v.length;
-    if (types.isObject(v)) return Object.keys(v).length;
-    return -1;
+    return Object.keys(v).length;
   }
 
   /** Iterates over a section: map or array
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
-*[Symbol.iterator](){
-  if (!this.isSection) return;//empty iterable
-  if (types.isArray(this.#value)){
-    const arr = this.#value;
-    for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
-  } else {
-    const map = this.#value;
-    for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
-  }
-}
-
-
-/**
- * Evaluates an arbitrary value as of this node in a tree
- * @param {*} val
- */
-evaluate(val){
-  if (!types.isString(val)) return val;
-
-  const vmap = (s, path) => {
-    if (strings.isEmpty(path)) return "";
-    if (path.startsWith("^^^")){ //escape
-      path = path.slice(3);
-      return `$(${path})`;
+  *[Symbol.iterator](){
+    if (!this.isSection) return;//empty iterable
+    if (types.isArray(this.#value)){
+      const arr = this.#value;
+      for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
+    } else {
+      const map = this.#value;
+      for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
     }
-    return this.nav(path);
-  };
+  }
 
-  const result = val.replace(REXP_VAR_DECL, vmap);
-  return result;
-}
+  static #evalStack = null;
+  /**
+   * Evaluates an arbitrary value as of this node in a tree
+   * @param {*} val
+   */
+  evaluate(val){
+    if (!types.isString(val)) return val;
 
+    let stack = ConfigNode.#evalStack;
+    if (stack === null) {
+      stack = new Set();
+      stack._level = 0;
+      stack._path = this.path;
+      stack._val = val;
+      ConfigNode.#evalStack = stack;
+    }
+    stack._level++;
+    try{
+        const vmap = (s, path) => {
+          if (strings.isEmpty(path)) return "";
+          if (path.startsWith("^^^")){ //escape
+            path = path.slice(3);
+            return `$(${path})`;
+          }
+          if (stack.has(path)) throw new Error(`ConfigNode('${stack._path}') can not evaluate '${stack._val}' due to recursive ref to path '${path}' at ref level ${stack._level}`);
+          try{
+            stack.add(path);
+            return this.nav(path);
+          }finally{
+            stack.delete(path);
+          }
+        };
+
+        const result = val.replace(REXP_VAR_DECL, vmap);
+        return result;
+    }finally{
+      stack._level--;
+      if (stack._level === 0) ConfigNode.#evalStack = null;
+    }
+  }
+
+  //#region Getters
   /**
    * Returns child element by the first matching name for map or index for an array.
    * The names are coalesced from left to right - the first matching element is returned.
@@ -248,23 +257,30 @@ evaluate(val){
 
     if (types.isObject(val)){ //object section
       for(let name of names){
-        if (name === undefined || name === null) continue;
-        if (types.hown(val, name))
-          return this.#value[name];
+        try{
+          if (name === undefined || name === null) continue;
+          if (types.hown(val, name))
+            return this.#value[name];
+        }catch(e){
+          throw new Error(`ConfigNode error getting map attr '${name}': ${e.message}`, {cause: e})
+        }
       }
     } else if (types.isArray(val)){//array section
       for(let name of names){
-        if (name === undefined || name === null) continue;
-        const idx = (types.isString(name) ? (name.replace('#', '')) : name) | 0;
-        if (idx >=0 && idx < val.length)
-          return val[idx];
+        try{
+          if (name === undefined || name === null) continue;
+          const idx = types.asInt(types.isString(name) ? name.replace('#', '') : name);
+          if (idx >=0 && idx < val.length)
+            return val[idx];
+        }catch(e){
+          throw new Error(`ConfigNode error getting array value by index '${name}': ${e.message}`, {cause: e})
+        }
       }
     }
 
     return undefined;
   }
-
-
+  //#endregion
 
   //#region Typed getters
   /**
@@ -367,5 +383,42 @@ evaluate(val){
     catch{ return dflt; }
   }
   //#endregion
+}
 
+/**
+ * Makes and configures an instance of the specified type using one of the convention ctor signatures.
+ * The type is specified using either a config node with `type` attribute or passed directly in place of config node.
+ * If `dir` is passed then it gets passed as first ctor parameter.
+ * If `cfg` is a {@link ConfigNode} instance, then it gets passed as a second ctor param.
+ * If `cargs` array is passed, it must be an array which gets concatenated after the above params.
+ * If the `cfg` is config node, then the type is read from `type` property, if not specified then defaulted from `tdflt` param.
+ * You can also pass class type directly into `cfg`.
+ * @returns Newly constructed instance of the specified type
+ * @param {ConfigNode | Function} cfg class function, or instance of {@link ConfigNode}
+ * @param {object | null}dir  director of the type being created or null if the type does not support director
+ * @param {Function | null} tdflt default type to use when the `type` attribute is not specified
+ * @param {object[] | null} cargs optional extra arguments to pass to .ctor
+ */
+export function makeNew(cfg, dir = null, tdflt = null, cargs = null){
+  try{
+    aver.isNotNull(cfg);
+    const isNode = cfg instanceof ConfigNode;
+
+    if (!isNode) aver.isFunction(cfg);//must be cnode or .ctor fun
+
+    const type = isNode ? aver.isFunction(cfg.get("type") ?? tdflt) : cfg;//else .ctor fun
+
+    let args = [null];//dummy 'this'
+    if (dir !== undefined && dir !== null) args.push(dir);
+    if (isNode) args.push(cfg);
+    if (cargs !== undefined && cargs !== null){
+      aver.isArray(cargs);
+      args = args.concat(cargs);
+    }
+
+    const result = new (Function.prototype.bind.apply(type, args));
+    return result;
+  }catch(e){
+    throw new Error(`Error making a new instance of '${cfg ?? UNKNOWN}': ${e.message}`, {cause: e});
+  }
 }
