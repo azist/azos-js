@@ -6,7 +6,7 @@
 
 import * as types from "./types.js";
 import * as strings from "./strings.js";
-import { NULL, UNKNOWN } from "./coreconsts.js";
+import { UNKNOWN } from "./coreconsts.js";
 import * as aver from "./aver.js";
 /*
  {
