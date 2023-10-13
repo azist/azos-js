@@ -256,9 +256,13 @@ export class ConfigNode{
 
     if (types.isObject(val)){ //object section
       for(let name of names){
-        if (name === undefined || name === null) continue;
-        if (types.hown(val, name))
-          return this.#value[name];
+        try{
+          if (name === undefined || name === null) continue;
+          if (types.hown(val, name))
+            return this.#value[name];
+        }catch(e){
+          throw new Error(`ConfigNode error getting map attr '${name}': ${e.message}`, {cause: e})
+        }
       }
     } else if (types.isArray(val)){//array section
       for(let name of names){
