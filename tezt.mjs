@@ -7,7 +7,20 @@
 //MANUAL TESTING
 //$ node tezt.mjs
 
-import {config} from "azos/conf";
+import {ConfigNode, config, makeNew} from "azos/conf";
+
+
+class ClassA{
+  #msg = null;
+  constructor(d, n){
+   console.debug(`In ClassA ctor(${arguments.length})`);
+   console.dir(arguments);
+   this.#msg = n.getString("msg", "message")
+  }
+
+  toString(){ return this.#msg;}
+}
+
 
 const cfg = config({
   "22": 23,
@@ -38,7 +51,18 @@ const cfg = config({
   rb: "Something $(rc)",
   rc: "Loop $(/ra)",
 
+  session: { type: ClassA, msg: "I am good!" }
 });
+
+
+const dir = {};
+console.dir(cfg.root.nav("/session"));
+const obj = makeNew(cfg.root.nav("/session"), dir, null, [5, true, "potz"]);
+//const obj = makeNew(ClassA, dir, null, [5, true, "potz"]);
+console.log(obj.toString());
+console.dir(obj);
+process.exit(0);
+
 
 //console.info(cfg.root.nav("/e/#2/a/b").evaluate("$(/ra)"));//.get("val"));
 //console.info(cfg.root.nav("/e/#2/a/b").get("val"));

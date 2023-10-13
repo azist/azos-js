@@ -96,7 +96,7 @@ export function isObjectOrArray(a){
  * @param {*} a
  */
 export function isFunction(a){
-  if (types.isFunction(a)) return;
+  if (types.isFunction(a)) return a;
   throw AVERMENT_FAILURE(`isFunction(${dv(a)})`);
 }
 

@@ -6,7 +6,7 @@
 
 import * as types from "./types.js";
 import * as strings from "./strings.js";
-import { NULL } from "./coreconsts.js";
+import { NULL, UNKNOWN } from "./coreconsts.js";
 import * as aver from "./aver.js";
 /*
  {
@@ -108,14 +108,14 @@ export class ConfigNode{
       }
       this.#value = arr;
     } else {
-      this.#value = val;
+      throw new Error(`ConfigNode '${name}' value must be either an object or an array`);
     }
   }
 
-  get [Symbol.toStringTag]() { return "ConfigNode"; }
+  get [Symbol.toStringTag]() { return `ConfigNode(${this.path})`; }
 
   toString() {
-    return `ConfigNode('${this.#name}', ${this.isSection ? (this.isArraySection ? "["+this.count+"]" : "{"+this.count+"}") : (this.#value?.toString() ?? NULL) })`;
+    return `ConfigNode('${this.path}', ${this.isArray ? "["+this.count+"]" : "{"+this.count+"}"})`;
   }
 
   get configuration() { return this.#configuration; }
@@ -230,6 +230,7 @@ export class ConfigNode{
     }
   }
 
+  //#region Getters
   /**
    * Returns child element by the first matching name for map or index for an array.
    * The names are coalesced from left to right - the first matching element is returned.
@@ -279,8 +280,7 @@ export class ConfigNode{
 
     return undefined;
   }
-
-
+  //#endregion
 
   //#region Typed getters
   /**
@@ -383,5 +383,42 @@ export class ConfigNode{
     catch{ return dflt; }
   }
   //#endregion
+}
 
+/**
+ * Makes and configures an instance of the specified type using one of the convention ctor signatures.
+ * The type is specified using either a config node with `type` attribute or passed directly in place of config node.
+ * If `dir` is passed then it gets passed as first ctor parameter.
+ * If `cfg` is a {@link ConfigNode} instance, then it gets passed as a second ctor param.
+ * If `cargs` array is passed, it must be an array which gets concatenated after the above params.
+ * If the `cfg` is config node, then the type is read from `type` property, if not specified then defaulted from `tdflt` param.
+ * You can also pass class type directly into `cfg`.
+ * @returns Newly constructed instance of the specified type
+ * @param {ConfigNode | Function} cfg class function, or instance of {@link ConfigNode}
+ * @param {object | null}dir  director of the type being created or null if the type does not support director
+ * @param {Function | null} tdflt default type to use when the `type` attribute is not specified
+ * @param {object[] | null} cargs optional extra arguments to pass to .ctor
+ */
+export function makeNew(cfg, dir = null, tdflt = null, cargs = null){
+  try{
+    aver.isNotNull(cfg);
+    const isNode = cfg instanceof ConfigNode;
+
+    if (!isNode) aver.isFunction(cfg);//must be cnode or .ctor fun
+
+    const type = isNode ? aver.isFunction(cfg.get("type") ?? tdflt) : cfg;//else .ctor fun
+
+    let args = [null];//dummy 'this'
+    if (dir !== undefined && dir !== null) args.push(dir);
+    if (isNode) args.push(cfg);
+    if (cargs !== undefined && cargs !== null){
+      aver.isArray(cargs);
+      args = args.concat(cargs);
+    }
+
+    const result = new (Function.prototype.bind.apply(type, args));
+    return result;
+  }catch(e){
+    throw new Error(`Error making a new instance of '${cfg ?? UNKNOWN}': ${e.message}`, {cause: e});
+  }
 }
