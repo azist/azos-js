@@ -18,6 +18,7 @@ const cfg = config({
     a: -2,
     b: {v: -9}
   },
+  msg: ["String 1", "String2: $(/a)$(2)", "String 3: $(../e/2/a/b/val)"],
   e: [1, 2, {a: {b: {flag: -90e4, val: "Hello: $(/ra)" }}}],
   n: null,
   //s: "  ",
@@ -39,6 +40,11 @@ const cfg = config({
 
 });
 
+//console.info(cfg.root.nav("/e/#2/a/b").evaluate("$(/ra)"));//.get("val"));
+//console.info(cfg.root.nav("/e/#2/a/b").get("val"));
+console.info(cfg.root.get("msg").get(1));
+process.exit(0);
+
 console.info(cfg.root.getString(["vsw", "vs"], "Kakurba"));
 console.info(cfg.root.getInt(["vsw", "vi"], 45));
 console.info(cfg.root.getReal(["vsw", "vr"], 41.6));
@@ -53,9 +59,8 @@ console.info(cfg.root.getString(["nothere", "vvar"], "Nothing came"));
 
 console.info(cfg.root.evaluate("x = $(d/a) and b = $(/e/#2/a/b/flag)"));
 
-console.info(cfg.root.nav("/e/#2/a/b").evaluate("$(/ra)"));//.get("val"));
 
-process.exit(0);
+//process.exit(0);
 
 console.info(cfg.root.name);
 console.info(cfg.root.get("a"));

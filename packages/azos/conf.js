@@ -160,12 +160,7 @@ export class ConfigNode{
         result = result.parent;
         continue;
       }
-      if (seg.startsWith("#") && seg.length > 1){
-        const idx = seg.slice(1) | 0;
-        result = result.get(idx);
-      } else {
-        result = result.get(seg);
-      }
+      result = result.get(seg);
     }
     return result;
   }
@@ -194,7 +189,7 @@ export class ConfigNode{
     }
   }
 
-  #evalStack = null;
+  static #evalStack = null;
   /**
    * Evaluates an arbitrary value as of this node in a tree
    * @param {*} val
@@ -202,13 +197,13 @@ export class ConfigNode{
   evaluate(val){
     if (!types.isString(val)) return val;
 
-    let stack = this.#evalStack;
+    let stack = ConfigNode.#evalStack;
     if (stack === null) {
       stack = new Set();
       stack._level = 0;
       stack._path = this.path;
       stack._val = val;
-      this.#evalStack = stack;
+      ConfigNode.#evalStack = stack;
     }
     stack._level++;
     try{
@@ -231,7 +226,7 @@ export class ConfigNode{
         return result;
     }finally{
       stack._level--;
-      if (stack._level === 0) this.#evalStack = null;
+      if (stack._level === 0) ConfigNode.#evalStack = null;
     }
   }
 
@@ -267,10 +262,14 @@ export class ConfigNode{
       }
     } else if (types.isArray(val)){//array section
       for(let name of names){
-        if (name === undefined || name === null) continue;
-        const idx = (types.isString(name) ? (name.replace('#', '')) : name) | 0;
-        if (idx >=0 && idx < val.length)
-          return val[idx];
+        try{
+          if (name === undefined || name === null) continue;
+          const idx = types.asInt(types.isString(name) ? name.replace('#', '') : name);
+          if (idx >=0 && idx < val.length)
+            return val[idx];
+        }catch(e){
+          throw new Error(`ConfigNode error getting array value by index '${name}': ${e.message}`, {cause: e})
+        }
       }
     }
 
