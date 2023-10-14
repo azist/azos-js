@@ -18,15 +18,12 @@ import * as aver from "./aver.js";
       x1: [1, 2, 3, null],
       x2: true,
       x3: "$(/sectionA/a2)"
-
     }
    },
-
  }
-
 */
 
-/** Regular expression that parses out variables <<format tokens>> */
+/** Regular expression that parses out variables $(var_path) */
 export const REXP_VAR_DECL = /\$\((.*?)\)/g;  // $(path)
 
 /** Makes new {@link Configuration} object from the specified content
@@ -36,7 +33,7 @@ export const REXP_VAR_DECL = /\$\((.*?)\)/g;  // $(path)
 export function config(content){ return new Configuration(content); }
 
 /**
- * Provides configuration tree navigation and formula evaluation functionality
+ * Provides configuration tree navigation and variable evaluation functionality
  */
 export class Configuration{
 
@@ -44,11 +41,14 @@ export class Configuration{
   #root;
 
   constructor(content){
-    aver.isNotNull(content);
-    if (types.isString(content)){
-      content = JSON.parse(content);
+    try{
+      aver.isNotNull(content);
+      if (types.isString(content)){
+        content = JSON.parse(content);
+      }
+    }catch(e){
+      throw new Error(`Bad configuration init content: ${e.message}`, {cause: e});
     }
-
     aver.isObject(content);
     this.#content = content;
     this.#root = new ConfigNode(this, null, "/", content);
@@ -416,7 +416,7 @@ export function makeNew(cfg, dir = null, tdflt = null, cargs = null){
       args = args.concat(cargs);
     }
 
-    const result = new (Function.prototype.bind.apply(type, args));
+    const result = new (Function.prototype.bind.apply(type, args)); // see Reflect.construct
     return result;
   }catch(e){
     throw new Error(`Error making a new instance of '${cfg ?? UNKNOWN}': ${e.message}`, {cause: e});

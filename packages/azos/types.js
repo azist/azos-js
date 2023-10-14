@@ -15,6 +15,16 @@ import * as strings from "./strings.js";
 export const DIRECTOR_PROP = Symbol("director");
 
 /**
+ * Establishes a "INamed" protocol - an entity which implements such property returns it's name in a collection
+ */
+export const NAME_PROP = Symbol("name");
+
+/**
+ * Establishes a "IOrdered" protocol - an entity which implements such property returns it's relative int position in a collection
+ */
+export const ORDER_PROP = Symbol("order");
+
+/**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -
  * is capable of being deterministically finalized aka "disposed".
  * The concept has NOTHING TO DO with the GC, and deals with logical pairing of construction/destruction
