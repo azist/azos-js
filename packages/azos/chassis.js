@@ -8,6 +8,7 @@ import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { Configuration, ConfigNode, makeNew } from "./conf.js";
 import { Session } from "./session.js";
+import * as lcl from "./localization.js";
 
 /**
  * A helper factory method creates a new application (new Application(cfg)) from a config object
@@ -59,6 +60,7 @@ export class Application extends types.DisposableObject{
   #startTime;
 
   #session;
+  #localizer;
 
   /**
    * Initializes {@link Application} object instance by passing {@link Configuration} object.
@@ -81,7 +83,8 @@ export class Application extends types.DisposableObject{
     this.#envName = root.getString("envName", "local");
     this.#isTest = root.getBool("isTest", false);
 
-    this.#session = null;//this._makeSession("");
+    this.#session = this._makeSession(root.get("session"));
+    this.#localizer = this._makeLocalizer(root.get("localizer"));
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
@@ -143,6 +146,7 @@ export class Application extends types.DisposableObject{
   /**
    * Returns the app-level session which is used in browser/ui and other apps
    * which do not support per-logical-flow sessions
+   * @returns {Session}
    */
   get session(){ return this.#session; }
 
@@ -152,11 +156,30 @@ export class Application extends types.DisposableObject{
   */
   _makeSession(cfg){
     if (types.isAssigned(cfg)) {
-       this.#session =  makeNew(cfg.get("session"), this, Session);
+       this.#session =  makeNew(cfg);
     } else {
        this.#session = new Session(this, null);//empty session
     }
   }
+
+  /**
+   * Returns the app-level localizer
+   * @returns {Localizer}
+   */
+  get localizer(){ return this.#localizer; }
+
+  /** Factory method used to allocate localizer from config object
+   * @param {object} cfg object
+   * @returns {Session}
+  */
+  _makeLocalizer(cfg){
+    if (types.isAssigned(cfg)) {
+       this.#localizer =  makeNew(cfg, this, lcl.Localizer);
+    } else {
+       this.#localizer = lcl.INVARIANT;
+    }
+  }
+
 
 }
 

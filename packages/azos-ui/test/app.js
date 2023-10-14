@@ -9,7 +9,7 @@ const cfgApp = {
   id: "abc",
   name: "$(id)",
   description: "Test '$(name)' application",
-  session: {type: "UiSession"}
+  session: null//{type: "UiSession"}
 };
 
 const app = application(cfgApp);
