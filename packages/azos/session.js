@@ -6,6 +6,7 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
+import { User } from "./security.js";
 
 /**
  * Session holds data about user session: user, culture, options etc.
@@ -26,15 +27,14 @@ export class Session extends types.DisposableObject{
   }
 
   [types.DESTRUCTOR_METHOD](){
-
   }
 
   get app(){ return this.#app;}
 
   get user(){ return this.#user;}
   set user(usr){
-   // aver.isOf(usr, User);
-    this.#user = usr;
+    usr === null || aver.isOf(usr, User);
+    this.#user = usr ?? User.invalid;
   }
 
   //todo settings
