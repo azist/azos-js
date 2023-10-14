@@ -1,4 +1,4 @@
-import {application} from "azos/chassis";
+import {application} from "azos/application";
 import * as types from "azos/types";
 
 console.info('Hook you hard barbindoziy');
