@@ -7,9 +7,8 @@
 import * as types from "./types.js";
 import * as strings from "./strings.js";
 import * as aver from "./aver.js";
-import { Application } from "./application.js";
-import { AppComponent } from "./components.js";
-import { ConfigNode } from "./conf.js";
+import { $ } from "./linq.js";
+import { UNKNOWN } from "./coreconsts.js";
 
 /**
  * Provides service location functionality - a registry of Typed services descending from some base type which
@@ -29,22 +28,32 @@ export class Linker{
   constructor(tInterface, tHandler){
     this.#tInterface = aver.isFunction(tInterface);
     this.#tHandler = aver.isFunction(tHandler);
+    aver.isSubclassOf(tHandler, tInterface);
     this.#map = new Map();
   }
 
   /**
-   * Returns an array of interfaces
+   * Returns an array of interfaces which handler implements
    * @param {class} handler
    * @returns {class[]} array of interfaces supported by the handler
    */
   getHandlerInterfaces(handler){
     aver.isOf(handler, this.#tHandler);
-    return [];
+    const result = [];
+    // eslint-disable-next-line no-constant-condition
+    while(true){
+      const tparent = types.parentOfClass(handler);
+      if (!tparent) break;
+      if (tparent === this.#tInterface) break;
+      result.push(tparent);
+    }
+
+    return result;
   }
 
   register(handler, intf = null, name = null){
     aver.isOf(handler, this.#tHandler);
-    const interfaces = intf !== undefined && intf !== null ? [aver.isOf(intf, this.#tInterface)] : this.getHandlerInterfaces(handler);
+    const interfaces = intf  ? [aver.isOf(intf, this.#tInterface)] : this.getHandlerInterfaces(handler);
 
     const propName = handler[types.NAME_PROP];
     const nm = !strings.isEmpty(name) ? name : strings.dflt(propName ? propName : null, "*");//any module
@@ -80,9 +89,26 @@ export class Linker{
    */
   tryResolve(intf, name = null){
     aver.isFunction(intf);
-    return null;
+    const bucket = this.#map.get(intf);
+    if (!bucket) return null;
+
+    const result = name ? bucket.get(name) : $(bucket).firstOrDefault().value;
+
+    return result ?? null;
   }
 
+  /**
+   * Service location: tries to find a handler which supports the specified interface with optional name.
+   * Returns such handler or throws if not found
+   * @param {class} intf a type of handler to find
+   * @param {string | null} name  optional name of handler
+   */
+  resolve(intf, name = null){
+    const result = this.tryResolve(intf, name);
+    if (result === null)
+      throw new Error(`Linker error resolving type ${intf}, name '${name ?? UNKNOWN}'`);
 
+    return result;
+  }
 
 }

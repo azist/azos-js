@@ -9,11 +9,12 @@ import * as aver from "./aver.js";
 import { Application } from "./application.js";
 import { AppComponent } from "./components.js";
 import { ConfigNode } from "./conf.js";
+import { Linker } from "./linker.js";
 
 /**
  * Provides module implementation base.
  * Modules unify building blocks for business/app logic functionality
- * as they dynamically link driven by configuration
+ * as they provided logic and dynamically link driven by app configuration
  */
 export class Module extends AppComponent{
 
@@ -49,6 +50,14 @@ export class Module extends AppComponent{
    */
   _appBeforeCleanup(){
   }
+}
 
-
+/**
+ * Dynamically resolves module interface types into concrete implementations
+ * which are registered with the linker
+ */
+export class ModuleLinker extends Linker{
+  constructor(){
+    super(Module, Module);
+  }
 }
