@@ -9,6 +9,7 @@ import * as aver from "./aver.js";
 import { Configuration, ConfigNode, makeNew } from "./conf.js";
 import { Session } from "./session.js";
 import { AppComponent } from "./components.js";
+import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
 
 /**
@@ -62,6 +63,7 @@ export class Application extends types.DisposableObject{
 
   #session;
   #localizer;
+  #moduleLinker;
 
   /**
    * Initializes {@link Application} object instance by passing {@link Configuration} object.
@@ -86,6 +88,7 @@ export class Application extends types.DisposableObject{
 
     this.#session = this._makeSession(root.get("session"));
     this.#localizer = this._makeLocalizer(root.get("localizer"));
+    this.#moduleLinker = this._makeModuleLinker(root.get("modules", "module", "mods", "mod"));
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
@@ -103,6 +106,10 @@ export class Application extends types.DisposableObject{
   */
   [types.DESTRUCTOR_METHOD](){
     if (this instanceof NopApplication) return;
+
+    const all = this.rootComponents;
+    for(const cmp of all) try{ types.dispose(cmp); } catch(e) { console.error(`App dispose root cmp '${cmp}': e.message`, e); }
+
     let prev = Application.#instances.pop();
     Application.#instance = prev ?? null;
   }
@@ -157,9 +164,9 @@ export class Application extends types.DisposableObject{
   */
   _makeSession(cfg){
     if (types.isAssigned(cfg)) {
-       this.#session =  makeNew(cfg);
+       return makeNew(Session, cfg);
     } else {
-       this.#session = new Session(this, null);//empty session
+       return new Session(this, null);//empty session
     }
   }
 
@@ -171,14 +178,32 @@ export class Application extends types.DisposableObject{
 
   /** Factory method used to allocate localizer from config object
    * @param {object} cfg object
-   * @returns {Session}
+   * @returns {Localizer}
   */
   _makeLocalizer(cfg){
     if (types.isAssigned(cfg)) {
-       this.#localizer =  makeNew(cfg, this, lcl.Localizer);
+       return  makeNew(lcl.Localizer, cfg, this, lcl.Localizer);
     } else {
-       this.#localizer = lcl.INVARIANT;
+       return lcl.INVARIANT;
     }
+  }
+
+   /** Factory method used to allocate localizer from config object
+   * @param {object} cfg object
+   * @returns {ModuleLinker}
+   */
+   _makeModuleLinker(cfg){
+     const linker = new ModuleLinker();
+
+     if (types.isAssigned(cfg)) {
+       for(const cfgMod of modules){
+         const module = makeNew(Module, cfgMod, this);
+         aver.isOf(module, Module);
+         linker.register(module);
+       }
+
+     }
+     return linker;
   }
 
 

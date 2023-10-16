@@ -39,6 +39,9 @@ export class Module extends AppComponent{
   */
   get isServerImpl(){ return false; }
 
+  get [types.NAME_PROP](){ return this.#name; }
+  get [types.ORDER_PROP](){ return this.#order; }
+
   /** Called by application after all modules have been created.
    * Override to patch references and startup subordinate daemons
    */
