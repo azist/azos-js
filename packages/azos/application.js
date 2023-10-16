@@ -196,7 +196,7 @@ export class Application extends types.DisposableObject{
      const linker = new ModuleLinker();
 
      if (types.isAssigned(cfg)) {
-       for(const cfgMod of modules){
+       for(const cfgMod of cfg){
          const module = makeNew(Module, cfgMod, this);
          aver.isOf(module, Module);
          linker.register(module);
