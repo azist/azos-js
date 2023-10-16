@@ -8,6 +8,8 @@ import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { Configuration, ConfigNode, makeNew } from "./conf.js";
 import { Session } from "./session.js";
+import { AppComponent } from "./components.js";
+import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
 
 /**
@@ -61,6 +63,7 @@ export class Application extends types.DisposableObject{
 
   #session;
   #localizer;
+  #moduleLinker;
 
   /**
    * Initializes {@link Application} object instance by passing {@link Configuration} object.
@@ -85,6 +88,7 @@ export class Application extends types.DisposableObject{
 
     this.#session = this._makeSession(root.get("session"));
     this.#localizer = this._makeLocalizer(root.get("localizer"));
+    this.#moduleLinker = this._makeModuleLinker(root.get("modules", "module", "mods", "mod"));
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
@@ -102,6 +106,10 @@ export class Application extends types.DisposableObject{
   */
   [types.DESTRUCTOR_METHOD](){
     if (this instanceof NopApplication) return;
+
+    const all = this.rootComponents;
+    for(const cmp of all) try{ types.dispose(cmp); } catch(e) { console.error(`App dispose root cmp '${cmp}': e.message`, e); }
+
     let prev = Application.#instances.pop();
     Application.#instance = prev ?? null;
   }
@@ -134,14 +142,14 @@ export class Application extends types.DisposableObject{
   get startTime(){ return this.#startTime; }
 
   /** Returns an array of all components directed by this app, directly or indirectly (through other components)
-   *  @returns {ApplicationComponent[]} an array of components or empty array
+   *  @returns {AppComponent[]} an array of components or empty array
   */
-  get components(){ return ApplicationComponent.getAllApplicationComponents(this); }
+  get components(){ return AppComponent.getAllApplicationComponents(this); }
 
   /** Returns an array of top-level components directed by this app directly
-   * @returns {ApplicationComponent[]} an array of components or empty array
+   * @returns {AppComponent[]} an array of components or empty array
   */
-  get rootComponents(){ return ApplicationComponent.getRootApplicationComponents(this); }
+  get rootComponents(){ return AppComponent.getRootApplicationComponents(this); }
 
   /**
    * Returns the app-level session which is used in browser/ui and other apps
@@ -156,9 +164,9 @@ export class Application extends types.DisposableObject{
   */
   _makeSession(cfg){
     if (types.isAssigned(cfg)) {
-       this.#session =  makeNew(cfg);
+       return makeNew(Session, cfg);
     } else {
-       this.#session = new Session(this, null);//empty session
+       return new Session(this, null);//empty session
     }
   }
 
@@ -170,14 +178,32 @@ export class Application extends types.DisposableObject{
 
   /** Factory method used to allocate localizer from config object
    * @param {object} cfg object
-   * @returns {Session}
+   * @returns {Localizer}
   */
   _makeLocalizer(cfg){
     if (types.isAssigned(cfg)) {
-       this.#localizer =  makeNew(cfg, this, lcl.Localizer);
+       return  makeNew(lcl.Localizer, cfg, this, lcl.Localizer);
     } else {
-       this.#localizer = lcl.INVARIANT;
+       return lcl.INVARIANT;
     }
+  }
+
+   /** Factory method used to allocate localizer from config object
+   * @param {object} cfg object
+   * @returns {ModuleLinker}
+   */
+   _makeModuleLinker(cfg){
+     const linker = new ModuleLinker();
+
+     if (types.isAssigned(cfg)) {
+       for(const cfgMod of cfg){
+         const module = makeNew(Module, cfgMod, this);
+         aver.isOf(module, Module);
+         linker.register(module);
+       }
+
+     }
+     return linker;
   }
 
 
@@ -200,99 +226,3 @@ export class NopApplication extends Application{
 }
 
 
-/**
- * Base class for application components which work either under {@link Application} directly
- * or another component. This way components form component trees which application can maintain uniformly
- */
-export class ApplicationComponent extends types.DisposableObject{
-  static #appMap = new Map();
-
-  /**
-   * Returns all components of the specified application
-   * @param {Application} app
-   * @returns {ApplicationComponent[]} an array of components or empty array if such app does not have any components or not found
-   */
-  static getAllApplicationComponents(app){
-    aver.isOf(app, Application);
-    const clist = ApplicationComponent.#appMap.get(app);
-    if (clist === undefined) return [];
-    return types.arrayCopy(clist);
-  }
-
-  /**
-   * Returns top-level components of the specified application, directed by that application
-   * @param {Application} app
-   * @returns {ApplicationComponent[]} an array of components or empty array if such app does not have any components or not found
-   */
-  static getRootApplicationComponents(app){
-    aver.isOf(app, Application);
-    const clist = ApplicationComponent.#appMap.get(app);
-    if (clist === undefined) return [];
-    return clist.filter(c => c.director === app);
-  }
-
-  #director;
-
-  constructor(dir){
-    super();
-    this.#director = aver.isOfEither(dir, Application, ApplicationComponent);
-    const app = this.app;
-    let clist = ApplicationComponent.#appMap.get(app);
-    if (clist === undefined){
-      clist = [];
-      ApplicationComponent.#appMap.set(app, clist);
-    }
-    clist.push(this);
-  }
-
-  /**
-   * Finalizes app component by unregistering from the app
-  */
-  [types.DESTRUCTOR_METHOD](){
-    const app = this.app;
-    let clist = ApplicationComponent.#appMap.get(app);
-    if (clist !== undefined){
-      types.arrayDelete(clist, this);
-      if (clist.length==0) ApplicationComponent.#appMap.delete(app);
-    }
-  }
-
-  /** Returns a component or an app instance which directs(owns) this component
-   * @returns {Application | ApplicationComponent}
-  */
-  get [types.DIRECTOR_PROP]() { return this.#director; }
-
-  /** Returns true when this component is owned directly by the {@link Application} vs being owned by another component
-   * @returns {boolean}
-  */
-  get isDirectedByApp(){ return this.#director instanceof Application; }
-
-  /** Returns the {@link Application} which this component is directed by directly or indirectly through another component
-   * @returns {Application}
-  */
-  get app(){ return this.isDirectedByApp ? this.#director : this.#director.app; }
-
-  /** Gets an array of components directed by this one
-   * @returns {ApplicationComponent[]}
-  */
-  get directedComponents(){
-    const all = ApplicationComponent.getAllApplicationComponents(this.app);
-    return all.filter(c => c.director === this);
-  }
-}
-
-
-/**
- * Arena represents a virtual "stage" - what application/user "deals with"
- * e.g. sees at the present moment.
- * An arena maintains a state of scenes which get created by components such as
- * modal dialogs which have a stacking order
- */
-export class Arena extends ApplicationComponent{
-
-  constructor(app){
-    aver.isOf(app, Application);
-    super(app);
-  }
-
-}
