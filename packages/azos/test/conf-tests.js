@@ -243,6 +243,32 @@ describe("ConfigNode", function() {
     aver.areIterablesEquivalent([0, 1, 2], doleItems.select(one => one.idx));
     aver.isTrue(doleItems.all( one => one.key === "dole"));
     aver.areIterablesEquivalent([1, 5, cfg.root.nav("/dole/2")], doleItems.select(one => one.val));
+  });
+
+  it("var path",   function() {
+    const cfg = sut.config({
+      id: "a1bold",
+      paths: {
+        log: "/etc/var/logs",
+        data: "~/data-$(/id)",
+        mongo: "$(data)/mongo"
+      },
+      providers:[
+        { name: "logger", disk: "$(/paths/log)"},
+        { name: "snake", disk: "$(/paths/mongo)"},
+      ]
+    });
+
+    const providers = $(cfg.root.get("providers")).select(one => one.val);
+
+    const logger = providers.firstOrDefault(one => one.get("name") === "logger").value;
+    //console.dir(logger);
+    aver.isNotNull(logger);
+    aver.areEqual("/etc/var/logs", logger.get("disk"));
+
+    const snake = providers.firstOrDefault(one => one.get("name") === "snake").value;
+    aver.isNotNull(snake);
+    aver.areEqual("~/data-a1bold/mongo", snake.get("disk"));
 
   });
 
