@@ -6,6 +6,7 @@
 
 import { describe, it } from "mocha";
 import * as aver from "../aver.js";
+import { $ } from "../linq.js";
 import * as sut from "../conf.js";
 
 describe("Configuration", function() {
@@ -184,21 +185,57 @@ describe("ConfigNode", function() {
         dbl: -9e-8,
       },
       ["long key"]: {
-        x: 18
+        x: 18,
+        empty: {},
+        a: 0, b: null, c: []
       },
       flag: true
     });
+
+
+    aver.areEqual(4, cfg.root.count);
+    aver.areEqual(2, cfg.root.get("a").count);
+    aver.areEqual(1, cfg.root.get("a").get("section1").count);
+
+    aver.areEqual(5, cfg.root.get("long key").count);
+    aver.areEqual(0, cfg.root.get("long key").get("empty").count);
+    aver.areEqual(0, cfg.root.get("long key").get("c").count);
 
     aver.areEqual(null, cfg.root.get("v"));
     aver.areEqual(-9e-8, cfg.root.get("a").get("dbl"));
     aver.areEqual(18, cfg.root.get("long key").get("x"));
     aver.areEqual(18, cfg.root.nav("long key/x"));
 
+    aver.areEqual(null, cfg.root.nav("/a/section1/array/2/1"));
+    aver.areEqual(undefined, cfg.root.nav("/a/section1/array/2/99"));
+
+    aver.areEqual("/a/section1/array/#2/#0", cfg.root.nav("/a/section1/array/2/0").path);
+
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array/2/0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array/#2/#0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").nav("#2/#0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").get("2").nav("#0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").get("2").get("0").nav("string name"));
+  });
+
+  it("iterator",   function() {
+    const cfg = sut.config({
+      abba: 11,
+      bubba: {d: -9, z: 78.12},
+      coll: true,
+      dole: [1,5,{z: -9}]
+    });
+
+    const items = $(cfg.root);
+    for(const one of items)
+      console.dir(one);
+
+    aver.areEqual(4, items.count());
+    aver.areIterablesEquivalent(["abba", "bubba", "coll", "dole"], items.select( one => one.key));
+    aver.isTrue(items.all( one => one.idx === -1));
+    aver.areIterablesEquivalent([11, cfg.root.get("bubba"), true, cfg.root.get("dole")], items.select( one => one.val));
+
+
   });
 
 
