@@ -93,8 +93,6 @@ describe("ConfigNode", function() {
     const cfg = sut.config({a: 1, b: {f: {q: [ {a1: {}}, [{ok: false}] ]}}});
     aver.areEqual("/b", cfg.root.get("b").path);
     aver.areEqual("/b/f", cfg.root.get("b").get("f").path);
-
-    //console.dir(cfg.root.get("b").get("f").get("q").get("#0").get("a1").toString());
     aver.areEqual("/b/f/q/#0/a1", cfg.root.get("b").get("f").get("q").get("#0").get("a1").path);
   });
 
@@ -176,5 +174,32 @@ describe("ConfigNode", function() {
     aver.areEqual(-9, cfg.root.get("b").get("d"));
     aver.areEqual(78.12, cfg.root.get("b").get("z"));
   });
+
+
+  it("complex structure and nav",   function() {
+    const cfg = sut.config({
+      v: null,
+      a: {
+        section1: { array: [null, false, [ {ok: true, ["string name"]: "little bug"}, null] ]},
+        dbl: -9e-8,
+      },
+      ["long key"]: {
+        x: 18
+      },
+      flag: true
+    });
+
+    aver.areEqual(null, cfg.root.get("v"));
+    aver.areEqual(-9e-8, cfg.root.get("a").get("dbl"));
+    aver.areEqual(18, cfg.root.get("long key").get("x"));
+    aver.areEqual(18, cfg.root.nav("long key/x"));
+
+    aver.areEqual("little bug", cfg.root.nav("/a/section1/array/2/0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("/a/section1/array/#2/#0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("/a/section1/array").nav("#2/#0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("/a/section1/array").get("2").nav("#0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("/a/section1/array").get("2").get("0").nav("string name"));
+  });
+
 
 });
