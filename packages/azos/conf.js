@@ -46,10 +46,11 @@ export class Configuration{
       if (types.isString(content)){
         content = JSON.parse(content);
       }
+      aver.isObject(content);
     }catch(e){
       throw new Error(`Bad configuration init content: ${e.message}`, {cause: e});
     }
-    aver.isObject(content);
+
     this.#content = content;
     this.#root = new ConfigNode(this, null, "/", content);
   }

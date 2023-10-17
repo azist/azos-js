@@ -8,7 +8,7 @@ import { describe, it } from "mocha";
 import * as aver from "../aver.js";
 import * as sut from "../conf.js";
 
-describe("General", function() {
+describe("Configuration", function() {
 
   describe(".ctor", function() {
 
