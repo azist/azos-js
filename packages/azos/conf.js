@@ -180,11 +180,10 @@ export class ConfigNode{
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
   *[Symbol.iterator](){
-    if (!this.isSection) return;//empty iterable
     if (types.isArray(this.#value)){
       const arr = this.#value;
       for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
-    } else {
+    } else if (types.isObject(this.#value)){
       const map = this.#value;
       for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
     }

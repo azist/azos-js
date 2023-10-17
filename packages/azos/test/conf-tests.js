@@ -226,15 +226,23 @@ describe("ConfigNode", function() {
       dole: [1,5,{z: -9}]
     });
 
-    const items = $(cfg.root);
-    for(const one of items)
+    const rootItems = $(cfg.root);
+    for(const one of rootItems)
       console.dir(one);
 
-    aver.areEqual(4, items.count());
-    aver.areIterablesEquivalent(["abba", "bubba", "coll", "dole"], items.select( one => one.key));
-    aver.isTrue(items.all( one => one.idx === -1));
-    aver.areIterablesEquivalent([11, cfg.root.get("bubba"), true, cfg.root.get("dole")], items.select( one => one.val));
+    aver.areEqual(4, rootItems.count());
+    aver.areIterablesEquivalent(["abba", "bubba", "coll", "dole"], rootItems.select(one => one.key));
+    aver.isTrue(rootItems.all( one => one.idx === -1));
+    aver.areIterablesEquivalent([11, cfg.root.get("bubba"), true, cfg.root.get("dole")], rootItems.select(one => one.val));
 
+    const doleItems = $(cfg.root.get("dole"));
+    for(const one of doleItems)
+      console.dir(one);
+
+    aver.areEqual(3, doleItems.count());
+    aver.areIterablesEquivalent([0, 1, 2], doleItems.select(one => one.idx));
+    aver.isTrue(doleItems.all( one => one.key === "dole"));
+    aver.areIterablesEquivalent([1, 5, cfg.root.nav("/dole/2")], doleItems.select(one => one.val));
 
   });
 
