@@ -269,7 +269,341 @@ describe("ConfigNode", function() {
     const snake = providers.firstOrDefault(one => one.get("name") === "snake").value;
     aver.isNotNull(snake);
     aver.areEqual("~/data-a1bold/mongo", snake.get("disk"));
+  });
 
+  const cfgGetAccessors = sut.config({
+    vUndefined: undefined,
+    vNull: null,
+
+    vStringEmpty: "",
+    vStringSpace: " ",
+    vStringInt1: "9",
+    vStringInt2: "09",
+    vStringInt3: "-09",
+    vStringBool1: "true",
+    vStringBool2: "yes",
+    vStringBool3: "ok",
+    vStringBool4: "1",
+    vStringReal1: "1.0",
+    vStringReal2: "-1.0",
+    vStringReal3: "-1e5",
+    vStringMoney1: "1.00",
+    vStringMoney2: "-1.01",
+    vStringMoney3: "12345.12345",
+    vStringDate1: "10/12/2021",
+    vStringDate2: "2018-10-31T01:29:18.123Z",
+
+
+    vBool1: true,
+    vBool2: 1,
+    vBool3: false,
+
+    vInt1: 123,
+    vInt2: -123,
+    vInt3: 0xfaca,
+
+    vReal1: 123.0,
+    vReal2: -123.0,
+    vReal3: -5e-9,
+
+    vMoney1: 123.0,
+    vMoney2: -123.0012,
+    vMoney3: -12345.12345,
+
+    vDate1: new Date("2017-10-19")
+  }).root;
+
+  it("getString(undefined)",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getString("vUndefined"));
+    aver.areEqual("Mister X!", cfgGetAccessors.getString("vUndefined", "Mister X!"));
+  });
+
+  it("getString(null)",   function() {
+    aver.areEqual(null, cfgGetAccessors.getString("vNull"));
+    aver.areEqual("Mister Y!", cfgGetAccessors.getString("vNull", "Mister Y!"));
+  });
+
+  it("getString('')",   function() {
+    aver.areEqual("", cfgGetAccessors.getString("vStringEmpty"));
+    aver.areEqual("zzz", cfgGetAccessors.getString("vStringEmpty", "zzz"));
+    aver.areEqual(" ", cfgGetAccessors.getString("vStringSpace"));
+    aver.areEqual("nnn", cfgGetAccessors.getString("vStringSpace", "nnn"));
+  });
+
+  it("getString(int)",   function() {
+    aver.areEqual(0xfaca.toString(), cfgGetAccessors.getString("vInt3"));
+    aver.areEqual(0xfaca.toString(), cfgGetAccessors.getString("vInt3", "kuku"));
+  });
+
+  it("getString(money)",   function() {
+    aver.areEqual("-12345.12345", cfgGetAccessors.getString("vMoney3"));
+    aver.areEqual("-12345.12345", cfgGetAccessors.getString("vMoney3","smoke"));
+  });
+
+  it("getBool(undefined)",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getBool("vUndefined"));
+    aver.areEqual(true, cfgGetAccessors.getBool("vUndefined", true));
+  });
+
+  it("getBool(null)",   function() {
+    aver.areEqual(false, cfgGetAccessors.getBool("vNull"));
+    aver.areEqual(false, cfgGetAccessors.getBool("vNull", true));
+  });
+
+  it("getBool(' ')",   function() {
+    aver.areEqual(false, cfgGetAccessors.getBool("vStringSpace"));
+    aver.areEqual(false, cfgGetAccessors.getBool("vStringSpace", true));
+  });
+
+  it("getBool(str1)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getBool("vStringBool1"));
+    aver.areEqual(true, cfgGetAccessors.getBool("vStringBool1", false));
+  });
+
+  it("getBool(str2)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getBool("vStringBool2"));
+    aver.areEqual(true, cfgGetAccessors.getBool("vStringBool2", false));
+  });
+
+  it("getBool(str3)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getBool("vStringBool3"));
+    aver.areEqual(true, cfgGetAccessors.getBool("vStringBool3", false));
+  });
+
+  it("getBool(bool1)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getBool("vBool1"));
+    aver.areEqual(true, cfgGetAccessors.getBool("vBool1", false));
+  });
+
+  it("getBool(bool2)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getBool("vBool2"));
+    aver.areEqual(true, cfgGetAccessors.getBool("vBool2", false));
+  });
+
+  it("getBool(bool3)",   function() {
+    aver.areEqual(false, cfgGetAccessors.getBool("vBool3"));
+    aver.areEqual(false, cfgGetAccessors.getBool("vBool3", true));
+  });
+
+
+  it("getTriBool(undefined)",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getTriBool("vUndefined"));
+    aver.areEqual(undefined, cfgGetAccessors.getTriBool("vUndefined", true));
+  });
+
+  it("getTriBool(null)",   function() {
+    aver.areEqual(false, cfgGetAccessors.getTriBool("vNull"));
+    aver.areEqual(false, cfgGetAccessors.getTriBool("vNull", true));
+  });
+
+  it("getTriBool(' ')",   function() {
+    aver.areEqual(false, cfgGetAccessors.getTriBool("vStringSpace"));
+    aver.areEqual(false, cfgGetAccessors.getTriBool("vStringSpace", true));
+  });
+
+  it("getTriBool(str1)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool1"));
+    aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool1", false));
+  });
+
+  it("getTriBool(str2)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool2"));
+    aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool2", false));
+  });
+
+  it("getTriBool(str3)",   function() {
+    aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool3"));
+    aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool3", false));
+  });
+
+  it("getInt(undefined)",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getInt("vUndefined"));
+    aver.areEqual(123, cfgGetAccessors.getInt("vUndefined", 123));
+  });
+
+  it("getInt(null)",   function() {
+    aver.areEqual(0, cfgGetAccessors.getInt("vNull"));
+    aver.areEqual(0, cfgGetAccessors.getInt("vNull", 456));
+  });
+
+  it("getInt('')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getInt("vStringEmpty"));
+    aver.areEqual(456, cfgGetAccessors.getInt("vStringEmpty", 456));
+  });
+
+  it("getInt(' ')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getInt("vStringSpace"));
+    aver.areEqual(-456, cfgGetAccessors.getInt("vStringSpace", -456));
+  });
+
+  it("getInt(str1)",   function() {
+    aver.areEqual(9, cfgGetAccessors.getInt("vStringInt1"));
+    aver.areEqual(9, cfgGetAccessors.getInt("vStringInt1", -456));
+  });
+
+  it("getInt(str2)",   function() {
+    aver.areEqual(9, cfgGetAccessors.getInt("vStringInt2"));
+    aver.areEqual(9, cfgGetAccessors.getInt("vStringInt2", -456));
+  });
+
+  it("getInt(str3)",   function() {
+    aver.areEqual(-9, cfgGetAccessors.getInt("vStringInt3"));
+    aver.areEqual(-9, cfgGetAccessors.getInt("vStringInt3", -456));
+  });
+
+  it("getInt(int1)",   function() {
+    aver.areEqual(123, cfgGetAccessors.getInt("vInt1"));
+    aver.areEqual(123, cfgGetAccessors.getInt("vInt1", -456));
+  });
+
+  it("getInt(int2)",   function() {
+    aver.areEqual(-123, cfgGetAccessors.getInt("vInt2"));
+    aver.areEqual(-123, cfgGetAccessors.getInt("vInt2", -456));
+  });
+
+  it("getInt(int3)",   function() {
+    aver.areEqual(0xfaca, cfgGetAccessors.getInt("vInt3"));
+    aver.areEqual(0xfaca, cfgGetAccessors.getInt("vInt3", -456));
+  });
+
+  it("getReal(undefined)",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getReal("vUndefined"));
+    aver.areEqual(123e5, cfgGetAccessors.getReal("vUndefined", 123e5));
+  });
+
+  it("getReal(null)",   function() {
+    aver.areEqual(0, cfgGetAccessors.getReal("vNull"));
+    aver.areEqual(0, cfgGetAccessors.getReal("vNull", 456.1));
+  });
+
+  it("getReal('')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getReal("vStringEmpty"));
+    aver.areEqual(456.2, cfgGetAccessors.getReal("vStringEmpty", 456.2));
+  });
+
+  it("getReal(' ')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getReal("vStringSpace"));
+    aver.areEqual(-456.03, cfgGetAccessors.getReal("vStringSpace", -456.03));
+  });
+
+  it("getReal(str1)",   function() {
+    aver.areEqual(1.0, cfgGetAccessors.getReal("vStringReal1"));
+    aver.areEqual(1.0, cfgGetAccessors.getReal("vStringReal1", -456.02));
+  });
+
+  it("getReal(str2)",   function() {
+    aver.areEqual(-1.0, cfgGetAccessors.getReal("vStringReal2"));
+    aver.areEqual(-1.0, cfgGetAccessors.getReal("vStringReal2", -456.03));
+  });
+
+  it("getReal(str3)",   function() {
+    aver.areEqual(-1e5, cfgGetAccessors.getReal("vStringReal3"));
+    aver.areEqual(-1e5, cfgGetAccessors.getReal("vStringReal3", -456.04));
+  });
+
+  it("getReal(r1)",   function() {
+    aver.areEqual(123.0, cfgGetAccessors.getReal("vReal1"));
+    aver.areEqual(123.0, cfgGetAccessors.getReal("vReal1", -456.1));
+  });
+
+  it("getReal(r2)",   function() {
+    aver.areEqual(-123.0, cfgGetAccessors.getReal("vReal2"));
+    aver.areEqual(-123.0, cfgGetAccessors.getReal("vReal2", -456.2));
+  });
+
+  it("getReal(r3)",   function() {
+    aver.areEqual(-5e-9, cfgGetAccessors.getReal("vReal3"));
+    aver.areEqual(-5e-9, cfgGetAccessors.getReal("vReal3", -456.3));
+  });
+
+
+  it("getMoney(undefined)",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getMoney("vUndefined"));
+    aver.areEqual(100.18, cfgGetAccessors.getMoney("vUndefined", 100.18));
+  });
+
+  it("getMoney(null)",   function() {
+    aver.areEqual(0, cfgGetAccessors.getMoney("vNull"));
+    aver.areEqual(0, cfgGetAccessors.getMoney("vNull", 456.1));
+  });
+
+  it("getMoney('')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getMoney("vStringEmpty"));
+    aver.areEqual(-300.12, cfgGetAccessors.getMoney("vStringEmpty", -300.12));
+  });
+
+  it("getMoney(' ')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getMoney("vStringSpace"));
+    aver.areEqual(-456.03, cfgGetAccessors.getMoney("vStringSpace", -456.03));
+  });
+
+  it("getMoney(str1)",   function() {
+    aver.areEqual(1.0, cfgGetAccessors.getMoney("vStringMoney1"));
+    aver.areEqual(1.0, cfgGetAccessors.getMoney("vStringMoney1", -456.02));
+  });
+
+  it("getMoney(str2)",   function() {
+    aver.areEqual(-1.01, cfgGetAccessors.getMoney("vStringMoney2"));
+    aver.areEqual(-1.01, cfgGetAccessors.getMoney("vStringMoney2", -456.03));
+  });
+
+  it("getMoney(str3)",   function() {
+    aver.areEqual(12345.1234, cfgGetAccessors.getMoney("vStringMoney3"));
+    aver.areEqual(12345.1234, cfgGetAccessors.getMoney("vStringMoney3", -456.04));
+  });
+
+  it("getMoney(m1)",   function() {
+    aver.areEqual(123.0, cfgGetAccessors.getMoney("vMoney1"));
+    aver.areEqual(123.0, cfgGetAccessors.getMoney("vMoney1", -456.1));
+  });
+
+  it("getMoney(m2)",   function() {
+    aver.areEqual(-123.0012, cfgGetAccessors.getMoney("vMoney2"));
+    aver.areEqual(-123.0012, cfgGetAccessors.getMoney("vMoney2", -456.2));
+  });
+
+  it("getMoney(m3)",   function() {
+    aver.areEqual(-12345.1234, cfgGetAccessors.getMoney("vMoney3"));
+    aver.areEqual(-12345.1234, cfgGetAccessors.getMoney("vMoney3", -456.3));
+  });
+
+
+
+  it("getDate(undefined)",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getDate("vUndefined"));
+    aver.areEqual(1980, cfgGetAccessors.getDate("vUndefined", new Date("1980-02-21")).getFullYear());
+  });
+
+  it("getDate(null)",   function() {
+    aver.areEqual(1969, cfgGetAccessors.getDate("vNull").getFullYear());
+    aver.areEqual(1969, cfgGetAccessors.getDate("vNull", new Date("1980-02-21")).getFullYear());
+  });
+
+  it("getDate('')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getDate("vStringEmpty"));
+    aver.areEqual(-300.12, cfgGetAccessors.getDate("vStringEmpty", -300.12));
+  });
+
+  it("getDate(' ')",   function() {
+    aver.areEqual(undefined, cfgGetAccessors.getDate("vStringSpace"));
+    aver.areEqual(-456.03, cfgGetAccessors.getDate("vStringSpace", -456.03));
+  });
+
+  it("getDate(str1)",   function() {
+    aver.areEqual(2021, cfgGetAccessors.getDate("vStringDate1").getFullYear());
+    aver.areEqual(2021, cfgGetAccessors.getDate("vStringDate1", new Date("1980-02-21")).getFullYear());
+  });
+
+  it("getDate(str2)",   function() {
+    aver.areEqual(2018, cfgGetAccessors.getDate("vStringDate2").getFullYear());
+    aver.areEqual(2018, cfgGetAccessors.getDate("vStringDate2", new Date("1980-02-21")).getFullYear());
+  });
+
+
+  it("getDate(d1)",   function() {
+    //console.dir(cfgGetAccessors.getString("vDate1"));
+    aver.areEqual(2017, cfgGetAccessors.getDate("vDate1").getFullYear());
+    aver.areEqual(2017, cfgGetAccessors.getDate("vDate1",  new Date("1980-02-21")).getFullYear());
   });
 
 

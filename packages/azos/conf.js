@@ -92,7 +92,7 @@ export class ConfigNode{
         if (key.indexOf('/') >= 0 || key.indexOf('#') >= 0)
           throw new Error(`Config node names may not contain '/' or '#' characters: "${key}", under parent "${this.path}"`);
         const kv = val[key];
-        if (types.isObjectOrArray(kv))
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date))
           map[key] = new ConfigNode(cfg, this, key, kv);
         else
           map[key] = kv;
@@ -102,7 +102,7 @@ export class ConfigNode{
       const arr = [];
       for(var i=0; i < val.length; i++){
         const kv = val[i];
-        if (types.isObjectOrArray(kv))
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date))
           arr.push(new ConfigNode(cfg, this, `#${i}`, kv));
         else
           arr.push(kv);
@@ -292,7 +292,8 @@ export class ConfigNode{
    */
   getString(names, dflt){
     if (names === undefined || names===null) return dflt;
-    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    let got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got !== null) got = strings.asString(got, true);
     return dflt === undefined ? got : strings.isEmpty(got) ? dflt : got;
   }
 
