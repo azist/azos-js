@@ -46,10 +46,11 @@ export class Configuration{
       if (types.isString(content)){
         content = JSON.parse(content);
       }
+      aver.isObject(content);
     }catch(e){
       throw new Error(`Bad configuration init content: ${e.message}`, {cause: e});
     }
-    aver.isObject(content);
+
     this.#content = content;
     this.#root = new ConfigNode(this, null, "/", content);
   }
@@ -91,7 +92,7 @@ export class ConfigNode{
         if (key.indexOf('/') >= 0 || key.indexOf('#') >= 0)
           throw new Error(`Config node names may not contain '/' or '#' characters: "${key}", under parent "${this.path}"`);
         const kv = val[key];
-        if (types.isObjectOrArray(kv))
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date))
           map[key] = new ConfigNode(cfg, this, key, kv);
         else
           map[key] = kv;
@@ -101,7 +102,7 @@ export class ConfigNode{
       const arr = [];
       for(var i=0; i < val.length; i++){
         const kv = val[i];
-        if (types.isObjectOrArray(kv))
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date))
           arr.push(new ConfigNode(cfg, this, `#${i}`, kv));
         else
           arr.push(kv);
@@ -179,11 +180,10 @@ export class ConfigNode{
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
   *[Symbol.iterator](){
-    if (!this.isSection) return;//empty iterable
     if (types.isArray(this.#value)){
       const arr = this.#value;
       for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
-    } else {
+    } else if (types.isObject(this.#value)){
       const map = this.#value;
       for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
     }
@@ -292,7 +292,8 @@ export class ConfigNode{
    */
   getString(names, dflt){
     if (names === undefined || names===null) return dflt;
-    const got = types.isArray(names) ? this.get(...names) : this.get(names);
+    let got = types.isArray(names) ? this.get(...names) : this.get(names);
+    if (got !== null) got = strings.asString(got, true);
     return dflt === undefined ? got : strings.isEmpty(got) ? dflt : got;
   }
 
