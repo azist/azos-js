@@ -607,4 +607,61 @@ describe("ConfigNode", function() {
   });
 
 
+});//ConfigNode
+
+
+//todo  ConfigNode.evaluate;  makeNew()
+
+class IConfMock{
+  #name;
+  constructor(cfg){
+    this.#name = cfg.getString("name", "no-name");
+  }
+  get name(){ return this.#name; }
+}
+
+class ConfMockA extends IConfMock{
+  #age;
+  constructor(cfg){
+    super(cfg);
+    this.#age = cfg.getInt("age");
+  }
+  get age(){ return this.#age; }
+}
+
+class ConfMockB extends IConfMock{
+  #dob;
+  constructor(cfg){
+    super(cfg);
+    this.#dob = cfg.getDate("dob");
+  }
+  get dob(){ return this.#dob; }
+}
+
+describe("ConfigNode", function() {
+
+  it("makeA",   function() {
+    const cfg = sut.config({
+      type: ConfMockA,
+      name: "MockA",
+      age: 99
+    });
+    const got = sut.makeNew(IConfMock, cfg.root);
+    //console.dir(got);
+    aver.areEqual("MockA", got.name);
+    aver.areEqual(99, got.age);
+  });
+
+  it("makeB",   function() {
+    const cfg = sut.config({
+      type: ConfMockB,
+      name: "MockB",
+      dob: new Date("1980-08-05")  //"1980-08-05"
+    });
+    const got = sut.makeNew(IConfMock, cfg.root);
+    //console.dir(got);
+    aver.areEqual("MockB", got.name);
+    aver.areEqual(1980, got.dob.getFullYear());
+  });
+
 });

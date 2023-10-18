@@ -409,7 +409,7 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
     const isNode = cfg instanceof ConfigNode;
 
 
-    if (!isNode) aver.isFunction(cfg);//must be cnode or .ctor fun
+    if (!isNode && !types.isFunction(cfg)) throw new Error(`Param 'cfg' should be either a 'ConfigNode' or a 'Function'`);
 
     const type = isNode ? aver.isFunction(cfg.get("type") ?? tdflt) : cfg;//else .ctor fun
 
@@ -425,6 +425,6 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
     if (!(result instanceof base)) throw new Error(`instance of type '${type.name}' is not of expected base '${base.name}'`);
     return result;
   }catch(e){
-    throw new Error(`Error making a new instance of '${cfg ?? UNKNOWN}': ${e.message}`, {cause: e});
+    throw new Error(`Error making a new instance of '${base.name ?? UNKNOWN}': ${e.message}`, {cause: e});
   }
 }
