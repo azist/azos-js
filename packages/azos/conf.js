@@ -395,21 +395,23 @@ export class ConfigNode{
  * If the `cfg` is config node, then the type is read from `type` property, if not specified then defaulted from `tdflt` param.
  * You can also pass class type directly into `cfg`.
  * @returns Newly constructed instance of the specified type
- * @param {Function} baseIntf class function for base interface which the allocated instance must derive from
+ * @param {Function} base class function for base interface which the allocated instance must derive from
  * @param {ConfigNode | Function} cfg class function, or instance of {@link ConfigNode}
- * @param {object | null}dir  director of the type being created or null if the type does not support director
+ * @param {object | null} dir  director of the type being created or null if the type does not support director
  * @param {Function | null} tdflt default type to use when the `type` attribute is not specified
  * @param {object[] | null} cargs optional extra arguments to pass to .ctor
  */
 export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
+  let argDescr = "...";
   try{
     aver.isNotNull(cfg);
     aver.isFunction(base);
 
     const isNode = cfg instanceof ConfigNode;
 
-
     if (!isNode && !types.isFunction(cfg)) throw new Error(`Param 'cfg' should be either a 'ConfigNode' or a 'Function'`);
+
+    argDescr = isNode ? `'${cfg.toString()}'` : cfg.name;//function name
 
     const type = isNode ? aver.isFunction(cfg.get("type") ?? tdflt) : cfg;//else .ctor fun
 
@@ -425,6 +427,6 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
     if (!(result instanceof base)) throw new Error(`instance of type '${type.name}' is not of expected base '${base.name}'`);
     return result;
   }catch(e){
-    throw new Error(`Error making a new instance of '${base.name ?? UNKNOWN}': ${e.message}`, {cause: e});
+    throw new Error(`Factory "makeNew(${base.name ?? UNKNOWN}, ${argDescr})" error: ${e.message}`, {cause: e});
   }
 }

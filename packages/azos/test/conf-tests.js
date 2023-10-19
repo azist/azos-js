@@ -638,7 +638,10 @@ class ConfMockB extends IConfMock{
   get dob(){ return this.#dob; }
 }
 
-describe("ConfigNode", function() {
+class ConfMockC extends ConfMockB{ constructor(cfg){ super(cfg); } }
+class ConfMockWrong { constructor(cfg){  } }
+
+describe("MakeNew", function() {
 
   it("makeA",   function() {
     const cfg = sut.config({
@@ -648,6 +651,8 @@ describe("ConfigNode", function() {
     });
     const got = sut.makeNew(IConfMock, cfg.root);
     //console.dir(got);
+    aver.isOf(got, ConfMockA);
+    aver.isOf(got, IConfMock);
     aver.areEqual("MockA", got.name);
     aver.areEqual(99, got.age);
   });
@@ -660,8 +665,32 @@ describe("ConfigNode", function() {
     });
     const got = sut.makeNew(IConfMock, cfg.root);
     //console.dir(got);
+    aver.isOf(got, ConfMockB);
+    aver.isOf(got, IConfMock);
     aver.areEqual("MockB", got.name);
     aver.areEqual(1980, got.dob.getFullYear());
+  });
+
+  it("makeC",   function() {
+    const cfg = sut.config({
+      type: ConfMockC,
+      name: "MockC",
+      dob: new Date("1999-08-05")
+    });
+    const got = sut.makeNew(IConfMock, cfg.root);
+    //console.dir(got);
+
+    aver.isOf(got, ConfMockC);
+    aver.isOf(got, ConfMockB);
+    aver.isOf(got, IConfMock);
+    aver.isNotOf(got, ConfMockA);
+    aver.areEqual("MockC", got.name);
+    aver.areEqual(1999, got.dob.getFullYear());
+  });
+
+  it("makeWrongSubtype",   function() {
+    const cfg = sut.config({ type: ConfMockWrong });
+    aver.throws(() => sut.makeNew(IConfMock, cfg.root), "is not of expected base");
   });
 
 });
