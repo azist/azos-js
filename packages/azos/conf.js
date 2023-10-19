@@ -413,7 +413,11 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
 
     argDescr = isNode ? `'${cfg.toString()}'` : cfg.name;//function name
 
-    const type = isNode ? aver.isFunction(cfg.get("type") ?? tdflt) : cfg;//else .ctor fun
+    let type = cfg;//.ctor fun
+    if (isNode){
+      type = cfg.get("type") ?? tdflt;
+      if (!types.isFunction(type)) throw new Error(`target cls was not supplied as 'type' conf attr and 'tdflt' param was not passed`);
+    }
 
     let args = [null];//dummy 'this'
     if (dir !== undefined && dir !== null) args.push(dir);

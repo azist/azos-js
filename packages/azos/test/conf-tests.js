@@ -639,7 +639,12 @@ class ConfMockB extends IConfMock{
 }
 
 class ConfMockC extends ConfMockB{ constructor(cfg){ super(cfg); } }
-class ConfMockWrong { constructor(cfg){  } }
+
+class ConfMockStandalone {
+  #args;
+  constructor(...args){ this.#args = args; }
+  get args(){ return this.#args;}
+}
 
 describe("MakeNew", function() {
 
@@ -689,8 +694,54 @@ describe("MakeNew", function() {
   });
 
   it("makeWrongSubtype",   function() {
-    const cfg = sut.config({ type: ConfMockWrong });
+    const cfg = sut.config({ type: ConfMockStandalone });
     aver.throws(() => sut.makeNew(IConfMock, cfg.root), "is not of expected base");
+  });
+
+  it("useFactoryFunction",   function() {
+    const got = sut.makeNew(Object, ConfMockStandalone);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(0, got.args.length);
+  });
+
+  it("useFactoryFunction ctor args",   function() {
+    const got = sut.makeNew(Object, ConfMockStandalone, null, null, [1, true, 'abc']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(3, got.args.length);
+    aver.areArraysEquivalent([1, true, 'abc'], got.args);
+  });
+
+  it("useFactoryFunction ctor args with director",   function() {
+    const dir = {a: 1};
+
+    const got = sut.makeNew(Object, ConfMockStandalone, dir, null, [1, true, 'abc']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(4, got.args.length);
+    aver.areArraysEquivalent([dir, 1, true, 'abc'], got.args);
+  });
+
+  it("standalone cfg dir args",   function() {
+    const dir = {a: 1};
+    const cfg = sut.config({ type: ConfMockStandalone });
+    const got = sut.makeNew(Object, cfg.root, dir, null, [-1, true, 'abcd']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(5, got.args.length);
+    aver.areArraysEquivalent([dir, cfg.root, -1, true, 'abcd'], got.args);
+  });
+
+  it("standalone cfg dir default type args",   function() {
+    const dir = {a: 1};
+    const cfg = sut.config({ x: 1 });
+    const got = sut.makeNew(Object, cfg.root, dir, ConfMockStandalone, [-1, true, 'abcd']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(5, got.args.length);
+    aver.areArraysEquivalent([dir, cfg.root, -1, true, 'abcd'], got.args);
+  });
+
+  it("standalone missing dflt type",   function() {
+    const dir = {a: 1};
+    const cfg = sut.config({ x: 1 });
+    aver.throws(() => sut.makeNew(Object, cfg.root, dir, undefined, [-1, true, 'abcd']), "cls was not supplied");
   });
 
 });
