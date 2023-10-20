@@ -212,6 +212,9 @@ describe("ConfigNode", function() {
     aver.areEqual("/a/section1/array/#2/#0", cfg.root.nav("/a/section1/array/2/0").path);
 
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array/2/0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("                           /a/section1/array/2/0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("      /a/section1/array/2/0/string name              "));
+    aver.areEqual("little bug", cfg.root.nav("/a / section1/ array    /    2/   0 /      string name              "));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array/#2/#0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").nav("#2/#0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").get("2").nav("#0/string name"));
@@ -742,6 +745,71 @@ describe("MakeNew", function() {
     const dir = {a: 1};
     const cfg = sut.config({ x: 1 });
     aver.throws(() => sut.makeNew(Object, cfg.root, dir, undefined, [-1, true, 'abcd']), "cls was not supplied");
+  });
+
+});
+
+
+describe("Performance", function() {
+
+  const cfgJson =`{
+    "a": 1, "b": true, "c": false, "d": null, "e": -9e3, "msg": "loaded from json",
+
+    "obj-a": { "ar": [{"a":{"b":[ 1,null,3,4,"sduhfsuihdfiuhsdu",6,7,8,9]}},{}, {"x": -9}, true, true, false, -79] },
+    "obj-b": { "ar": [{},null,{"x": 129}, false, true, false, 500] },
+    "obj-c": { "ar": [{},{},{"x": 4}, false, true, false, 12] },
+    "app":{
+      "paths": { "log": "/etc/testing/book" },
+      "log": { "provider": {"type": "Cutz", "sinks":
+       [
+        {"name": "disk", "path": "$(/app/paths/log)/shneershon/$(/c)-borukh"}
+       ]}}
+     },
+     "mock": {
+        "name": "MockC",
+        "dob": "1567-08-05"
+     }
+    }`;
+
+
+  it("from Json",   function() { // 75K ops/sec on OCTOD
+    this.timeout(500);//ms
+    console.time("cfg");
+    for(let i=0; i<10_000; i++){
+      const cfg = sut.config(cfgJson);
+      aver.areEqual("loaded from json", cfg.root.get("msg"));
+    }
+    console.timeEnd("cfg");
+
+  });
+
+  it("navigate",   function() { // 80K ops/sec on OCTOD
+    this.timeout(500);//ms
+    console.time("cfg");
+    const cfg = sut.config(cfgJson);
+    for(let i=0; i<10_000; i++){
+      aver.areEqual("/etc/testing/book/shneershon/false-borukh", cfg.root.nav("/app/log/provider/sinks/0/path"));
+    }
+    console.timeEnd("cfg");
+
+  });
+
+  it("makeNew",   function() { // 80K ops/sec on OCTOD
+    this.timeout(500);//ms
+    console.time("cfg");
+    const cfg = sut.config(cfgJson);
+    for(let i=0; i<10_000; i++){
+      const got = sut.makeNew(IConfMock, cfg.root.get("mock"), null, ConfMockC);
+
+      aver.isOf(got, ConfMockC);
+      aver.isOf(got, ConfMockB);
+      aver.isOf(got, IConfMock);
+      aver.isNotOf(got, ConfMockA);
+      aver.areEqual("MockC", got.name);
+      aver.areEqual(1567, got.dob.getFullYear());
+    }
+    console.timeEnd("cfg");
+
   });
 
 });
