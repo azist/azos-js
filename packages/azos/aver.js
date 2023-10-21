@@ -24,7 +24,7 @@ const dv = (v) => str.describe(v);//shortcut
  * @param {*} a
  */
 export function isUndefined(a){
-  if (a===undefined) return;
+  if (a===undefined) return a;
   throw AVERMENT_FAILURE(`isUndefined(${dv(a)})`);
 }
 
@@ -33,7 +33,7 @@ export function isUndefined(a){
  * @param {*} a
  */
 export function isDefined(a){
-  if (a!==undefined) return;
+  if (a!==undefined) return a;
   throw AVERMENT_FAILURE(`isDefined(${dv(a)})`);
 }
 
@@ -42,7 +42,7 @@ export function isDefined(a){
  * @param {*} a
  */
 export function isNull(a){
-  if (a!==undefined && a===null) return;
+  if (a!==undefined && a===null) return a;
   throw AVERMENT_FAILURE(`isNull(${dv(a)})`);
 }
 
@@ -51,7 +51,7 @@ export function isNull(a){
  * @param {*} a
  */
 export function isNotNull(a){
-  if (a!==undefined && a!==null) return;
+  if (a!==undefined && a!==null) return a;
   throw AVERMENT_FAILURE(`isNotNull(${dv(a)})`);
 }
 
@@ -60,7 +60,7 @@ export function isNotNull(a){
  * @param {*} a
  */
 export function isNonEmptyString(a){
-  if (types.isNonEmptyString(a)) return;
+  if (types.isNonEmptyString(a)) return a;
   throw AVERMENT_FAILURE(`isNonEmptyString(${dv(a)})`);
 }
 
@@ -69,7 +69,7 @@ export function isNonEmptyString(a){
  * @param {*} a
  */
 export function isObject(a){
-  if (types.isObject(a)) return;
+  if (types.isObject(a)) return a;
   throw AVERMENT_FAILURE(`isObject(${dv(a)})`);
 }
 
@@ -78,7 +78,7 @@ export function isObject(a){
  * @param {*} a
  */
 export function isArray(a){
-  if (types.isArray(a)) return;
+  if (types.isArray(a)) return a;
   throw AVERMENT_FAILURE(`isArray(${dv(a)})`);
 }
 
@@ -87,7 +87,7 @@ export function isArray(a){
  * @param {*} a
  */
 export function isObjectOrArray(a){
-  if (types.isObjectOrArray(a)) return;
+  if (types.isObjectOrArray(a)) return a;
   throw AVERMENT_FAILURE(`isObjectOrArray(${dv(a)})`);
 }
 
@@ -105,7 +105,7 @@ export function isFunction(a){
  * @param {*} a
  */
 export function isObjectOrFunction(a){
-  if (types.isObjectOrFunction(a)) return;
+  if (types.isObjectOrFunction(a)) return a;
   throw AVERMENT_FAILURE(`isObjectOrFunction(${dv(a)})`);
 }
 
@@ -114,7 +114,7 @@ export function isObjectOrFunction(a){
  * @param {*} a
  */
 export function isIterable(a){
-  if (types.isIterable(a)) return;
+  if (types.isIterable(a)) return a;
   throw AVERMENT_FAILURE(`isIterable(${dv(a)})`);
 }
 
@@ -123,7 +123,7 @@ export function isIterable(a){
  * @param {*} a
  */
 export function isDate(a){
-  if (types.isDate(a)) return;
+  if (types.isDate(a)) return a;
   throw AVERMENT_FAILURE(`isDate(${dv(a)})`);
 }
 
@@ -132,7 +132,7 @@ export function isDate(a){
  * @param {*} a
  */
 export function isNumber(a){
-  if (types.isNumber(a)) return;
+  if (types.isNumber(a)) return a;
   throw AVERMENT_FAILURE(`isNumber(${dv(a)})`);
 }
 
@@ -141,7 +141,7 @@ export function isNumber(a){
  * @param {*} a
  */
 export function isString(a){
-  if (types.isString(a)) return;
+  if (types.isString(a)) return a;
   throw AVERMENT_FAILURE(`isString(${dv(a)})`);
 }
 
@@ -150,7 +150,7 @@ export function isString(a){
  * @param {*} a
  */
 export function isBool(a){
-  if (types.isBool(a)) return;
+  if (types.isBool(a)) return a;
   throw AVERMENT_FAILURE(`isBool(${dv(a)})`);
 }
 
@@ -159,7 +159,7 @@ export function isBool(a){
  * @param {*} a
  */
 export function isSymbol(a){
-  if (types.isSymbol(a)) return;
+  if (types.isSymbol(a)) return a;
   throw AVERMENT_FAILURE(`isSymbol(${dv(a)})`);
 }
 
@@ -168,7 +168,7 @@ export function isSymbol(a){
  * @param {bool} a
  */
 export function isFalse(a){
-  if (a===false) return;
+  if (a===false) return a;
   throw AVERMENT_FAILURE(`isFalse(${dv(a)})`);
 }
 
@@ -177,7 +177,7 @@ export function isFalse(a){
  * @param {bool} a
  */
 export function isTrue(a){
-  if (a===true) return;
+  if (a===true) return a;
   throw AVERMENT_FAILURE(`isTrue(${dv(a)})`);
 }
 
@@ -282,7 +282,7 @@ export function isOfEither(o, ...ts){
  */
 export function isNotOf(o, t){
   if (types.isObject(o) && types.isFunction(t))
-    if (!(o instanceof t)) return;
+    if (!(o instanceof t)) return o;
 
   throw AVERMENT_FAILURE(`isNotOf(${dv(o)}, ${dv(t)})`);
 }

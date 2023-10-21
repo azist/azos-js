@@ -176,6 +176,27 @@ export class ConfigNode{
     return Object.keys(v).length;
   }
 
+  /**
+   * Iterable generator method which returns just this node if 'includeSelf=true' and it is a section, that is: not an array.
+   * If this node is an array then it returns all array elements which are {@link ConfigNode} sections (not arrays)
+   * @param {boolean} [includeSelf=true] When true includes this node itself if it is a section, has no effect on array nodes
+   * @returns {Iterable<ConfigNode>}
+   */
+  getChildren(includeSelf = true){
+    const self = this;
+    return {
+      [Symbol.iterator]: function* (){
+        if (types.isArray(self.#value)){
+          const arr = self.#value;
+          for(let i=0; i<arr.length; i++) {
+            const one = arr[i];
+            if (one instanceof ConfigNode && one.isSection) yield one;
+          }
+        } else if (includeSelf) yield self;
+      }
+    };
+  }
+
   /** Iterates over a section: map or array
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
@@ -235,7 +256,7 @@ export class ConfigNode{
    * Returns child element by the first matching name for map or index for an array.
    * The names are coalesced from left to right - the first matching element is returned.
    * Returns undefined for non-existing element or undefined/null index
-   * @returns {undefined | Node | object} element value which
+   * @returns {undefined | ConfigNode | object} element value which
    */
   get(...names){
     const vv = this.getVerbatim(...names);
@@ -395,23 +416,29 @@ export class ConfigNode{
  * If the `cfg` is config node, then the type is read from `type` property, if not specified then defaulted from `tdflt` param.
  * You can also pass class type directly into `cfg`.
  * @returns Newly constructed instance of the specified type
- * @param {Function} baseIntf class function for base interface which the allocated instance must derive from
+ * @param {Function} base class function for base interface which the allocated instance must derive from
  * @param {ConfigNode | Function} cfg class function, or instance of {@link ConfigNode}
- * @param {object | null}dir  director of the type being created or null if the type does not support director
+ * @param {object | null} dir  director of the type being created or null if the type does not support director
  * @param {Function | null} tdflt default type to use when the `type` attribute is not specified
  * @param {object[] | null} cargs optional extra arguments to pass to .ctor
  */
 export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
+  let argDescr = "...";
   try{
     aver.isNotNull(cfg);
     aver.isFunction(base);
 
     const isNode = cfg instanceof ConfigNode;
 
+    if (!isNode && !types.isFunction(cfg)) throw new Error(`Param 'cfg' should be either a 'ConfigNode' or a 'Function'`);
 
-    if (!isNode) aver.isFunction(cfg);//must be cnode or .ctor fun
+    argDescr = isNode ? `'${cfg.toString()}'` : cfg.name;//function name
 
-    const type = isNode ? aver.isFunction(cfg.get("type") ?? tdflt) : cfg;//else .ctor fun
+    let type = cfg;//.ctor fun
+    if (isNode){
+      type = cfg.get("type") ?? tdflt;
+      if (!types.isFunction(type)) throw new Error(`target cls was not supplied as 'type' conf attr and 'tdflt' param was not passed`);
+    }
 
     let args = [null];//dummy 'this'
     if (dir !== undefined && dir !== null) args.push(dir);
@@ -425,6 +452,6 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
     if (!(result instanceof base)) throw new Error(`instance of type '${type.name}' is not of expected base '${base.name}'`);
     return result;
   }catch(e){
-    throw new Error(`Error making a new instance of '${cfg ?? UNKNOWN}': ${e.message}`, {cause: e});
+    throw new Error(`Factory "makeNew(${base.name ?? UNKNOWN}, ${argDescr})" error: ${e.message}`, {cause: e});
   }
 }

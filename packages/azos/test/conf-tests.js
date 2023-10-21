@@ -212,6 +212,9 @@ describe("ConfigNode", function() {
     aver.areEqual("/a/section1/array/#2/#0", cfg.root.nav("/a/section1/array/2/0").path);
 
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array/2/0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("                           /a/section1/array/2/0/string name"));
+    aver.areEqual("little bug", cfg.root.nav("      /a/section1/array/2/0/string name              "));
+    aver.areEqual("little bug", cfg.root.nav("/a / section1/ array    /    2/   0 /      string name              "));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array/#2/#0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").nav("#2/#0/string name"));
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").get("2").nav("#0/string name"));
@@ -245,7 +248,7 @@ describe("ConfigNode", function() {
     aver.areIterablesEquivalent([1, 5, cfg.root.nav("/dole/2")], doleItems.select(one => one.val));
   });
 
-  it("var path",   function() {
+  it("var path eval",   function() {
     const cfg = sut.config({
       id: "a1bold",
       paths: {
@@ -269,7 +272,45 @@ describe("ConfigNode", function() {
     const snake = providers.firstOrDefault(one => one.get("name") === "snake").value;
     aver.isNotNull(snake);
     aver.areEqual("~/data-a1bold/mongo", snake.get("disk"));
+
+    aver.areEqual("Bingo Bongo: a1bold|a1bold", cfg.root.evaluate("Bingo Bongo: $(id)|$(id)"));
+    aver.areEqual("Saved into: ~/data-a1bold/mongo", cfg.root.evaluate("Saved into: $(/providers/1/disk)"));
+
+    aver.areEqual("Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/1").evaluate("Saved into: $(disk)"));
+    aver.areEqual("App `a1bold` Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/#1").evaluate("App `$(/id)` Saved into: $(disk)"));
   });
+
+
+  it("getChildren()",   function() {
+    const cfg = sut.config({
+      a: {x: 123},
+      b: [{x: -11}, {x: -22}],
+      c: [null, true, "yes", {x: -100},[ ], {x: -200}, {xyz: -300}]
+    });
+
+    const aNoSelf = $(cfg.root.get("a").getChildren(false));
+    aver.isFalse(aNoSelf.any());
+
+    const aWithSelf = $(cfg.root.get("a").getChildren());//true by default
+    aver.isTrue(aWithSelf.any());
+    aver.areEqual(1, aWithSelf.count());
+    aver.areEqual(123, aWithSelf.first().get("x"));
+
+    const b = $(cfg.root.get("b").getChildren());
+    aver.isTrue(b.any());
+    aver.areEqual(2, b.count());
+    aver.areEqual(-11, b.first().get("x"));
+    aver.areEqual(-22, b.skip(1).first().get("x"));
+
+    const c = $(cfg.root.get("c").getChildren());
+    aver.isTrue(c.any());
+    aver.areEqual(3, c.count());
+    aver.areEqual(-100, c.first().get("x"));
+    aver.areEqual(-200, c.skip(1).first().get("x"));
+    aver.areEqual(-300, c.skip(2).first().get("xyz"));
+  });
+
+
 
   const cfgGetAccessors = sut.config({
     vUndefined: undefined,
@@ -606,5 +647,207 @@ describe("ConfigNode", function() {
     aver.areEqual(2017, cfgGetAccessors.getDate("vDate1",  new Date("1980-02-21")).getFullYear());
   });
 
+
+});//ConfigNode
+
+
+//todo  ConfigNode.evaluate;
+
+class IConfMock{
+  #name;
+  constructor(cfg){
+    this.#name = cfg.getString("name", "no-name");
+  }
+  get name(){ return this.#name; }
+}
+
+class ConfMockA extends IConfMock{
+  #age;
+  constructor(cfg){
+    super(cfg);
+    this.#age = cfg.getInt("age");
+  }
+  get age(){ return this.#age; }
+}
+
+class ConfMockB extends IConfMock{
+  #dob;
+  constructor(cfg){
+    super(cfg);
+    this.#dob = cfg.getDate("dob");
+  }
+  get dob(){ return this.#dob; }
+}
+
+class ConfMockC extends ConfMockB{ constructor(cfg){ super(cfg); } }
+
+class ConfMockStandalone {
+  #args;
+  constructor(...args){ this.#args = args; }
+  get args(){ return this.#args;}
+}
+
+describe("Config::MakeNew", function() {
+
+  it("makeA",   function() {
+    const cfg = sut.config({
+      type: ConfMockA,
+      name: "MockA",
+      age: 99
+    });
+    const got = sut.makeNew(IConfMock, cfg.root);
+    //console.dir(got);
+    aver.isOf(got, ConfMockA);
+    aver.isOf(got, IConfMock);
+    aver.areEqual("MockA", got.name);
+    aver.areEqual(99, got.age);
+  });
+
+  it("makeB",   function() {
+    const cfg = sut.config({
+      type: ConfMockB,
+      name: "MockB",
+      dob: new Date("1980-08-05")  //"1980-08-05"
+    });
+    const got = sut.makeNew(IConfMock, cfg.root);
+    //console.dir(got);
+    aver.isOf(got, ConfMockB);
+    aver.isOf(got, IConfMock);
+    aver.areEqual("MockB", got.name);
+    aver.areEqual(1980, got.dob.getFullYear());
+  });
+
+  it("makeC",   function() {
+    const cfg = sut.config({
+      type: ConfMockC,
+      name: "MockC",
+      dob: new Date("1999-08-05")
+    });
+    const got = sut.makeNew(IConfMock, cfg.root);
+    //console.dir(got);
+
+    aver.isOf(got, ConfMockC);
+    aver.isOf(got, ConfMockB);
+    aver.isOf(got, IConfMock);
+    aver.isNotOf(got, ConfMockA);
+    aver.areEqual("MockC", got.name);
+    aver.areEqual(1999, got.dob.getFullYear());
+  });
+
+  it("makeWrongSubtype",   function() {
+    const cfg = sut.config({ type: ConfMockStandalone });
+    aver.throws(() => sut.makeNew(IConfMock, cfg.root), "is not of expected base");
+  });
+
+  it("useFactoryFunction",   function() {
+    const got = sut.makeNew(Object, ConfMockStandalone);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(0, got.args.length);
+  });
+
+  it("useFactoryFunction ctor args",   function() {
+    const got = sut.makeNew(Object, ConfMockStandalone, null, null, [1, true, 'abc']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(3, got.args.length);
+    aver.areArraysEquivalent([1, true, 'abc'], got.args);
+  });
+
+  it("useFactoryFunction ctor args with director",   function() {
+    const dir = {a: 1};
+
+    const got = sut.makeNew(Object, ConfMockStandalone, dir, null, [1, true, 'abc']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(4, got.args.length);
+    aver.areArraysEquivalent([dir, 1, true, 'abc'], got.args);
+  });
+
+  it("standalone cfg dir args",   function() {
+    const dir = {a: 1};
+    const cfg = sut.config({ type: ConfMockStandalone });
+    const got = sut.makeNew(Object, cfg.root, dir, null, [-1, true, 'abcd']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(5, got.args.length);
+    aver.areArraysEquivalent([dir, cfg.root, -1, true, 'abcd'], got.args);
+  });
+
+  it("standalone cfg dir default type args",   function() {
+    const dir = {a: 1};
+    const cfg = sut.config({ x: 1 });
+    const got = sut.makeNew(Object, cfg.root, dir, ConfMockStandalone, [-1, true, 'abcd']);
+    aver.isOf(got, ConfMockStandalone);
+    aver.areEqual(5, got.args.length);
+    aver.areArraysEquivalent([dir, cfg.root, -1, true, 'abcd'], got.args);
+  });
+
+  it("standalone missing dflt type",   function() {
+    const dir = {a: 1};
+    const cfg = sut.config({ x: 1 });
+    aver.throws(() => sut.makeNew(Object, cfg.root, dir, undefined, [-1, true, 'abcd']), "cls was not supplied");
+  });
+
+});
+
+
+describe("Config::Performance", function() {
+
+  const cfgJson =`{
+    "a": 1, "b": true, "c": false, "d": null, "e": -9e3, "msg": "loaded from json",
+
+    "obj-a": { "ar": [{"a":{"b":[ 1,null,3,4,"sduhfsuihdfiuhsdu",6,7,8,9]}},{}, {"x": -9}, true, true, false, -79] },
+    "obj-b": { "ar": [{},null,{"x": 129}, false, true, false, 500] },
+    "obj-c": { "ar": [{},{},{"x": 4}, false, true, false, 12] },
+    "app":{
+      "paths": { "log": "/etc/testing/book" },
+      "log": { "provider": {"type": "Cutz", "sinks":
+       [
+        {"name": "disk", "path": "$(/app/paths/log)/shneershon/$(/c)-borukh"}
+       ]}}
+     },
+     "mock": {
+        "name": "MockC",
+        "dob": "1567-08-05"
+     }
+    }`;
+
+
+  it("from Json",   function() { // 75K ops/sec on OCTOD
+    this.timeout(500);//ms
+    console.time("cfg");
+    for(let i=0; i<10_000; i++){
+      const cfg = sut.config(cfgJson);
+      aver.areEqual("loaded from json", cfg.root.get("msg"));
+    }
+    console.timeEnd("cfg");
+
+  });
+
+  it("navigate",   function() { // 80K ops/sec on OCTOD
+    this.timeout(350);//ms
+    console.time("cfg");
+    const cfg = sut.config(cfgJson);
+    for(let i=0; i<10_000; i++){
+      aver.areEqual("/etc/testing/book/shneershon/false-borukh", cfg.root.nav("/app/log/provider/sinks/0/path"));
+    }
+    console.timeEnd("cfg");
+
+  });
+
+  it("makeNew",   function() { // 200K ops/sec on OCTOD
+    this.timeout(300);//ms
+    console.time("cfg");
+    const cfg = sut.config(cfgJson);
+    for(let i=0; i<10_000; i++){
+      const got = sut.makeNew(IConfMock, cfg.root.get("mock"), null, ConfMockC);
+
+      aver.isOf(got, ConfMockC);
+      aver.isOf(got, ConfMockB);
+      aver.isOf(got, IConfMock);
+      aver.isNotOf(got, ConfMockA);
+      aver.areEqual("MockC", got.name);
+      aver.areEqual(1567, got.dob.getFullYear());
+    }
+    console.timeEnd("cfg");
+
+  });
 
 });

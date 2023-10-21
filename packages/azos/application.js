@@ -159,7 +159,7 @@ export class Application extends types.DisposableObject{
   get session(){ return this.#session; }
 
   /** Factory method used to allocate sessions from config object
-   * @param {object} cfg object
+   * @param {ConfigNode} cfg configuration node
    * @returns {Session}
   */
   _makeSession(cfg){
@@ -177,7 +177,7 @@ export class Application extends types.DisposableObject{
   get localizer(){ return this.#localizer; }
 
   /** Factory method used to allocate localizer from config object
-   * @param {object} cfg object
+   * @param {ConfigNode} cfg configuration node
    * @returns {Localizer}
   */
   _makeLocalizer(cfg){
@@ -188,20 +188,24 @@ export class Application extends types.DisposableObject{
     }
   }
 
-  /** Factory method used to allocate localizer from config object
-  * @param {object} cfg object
+  /**
+   * Returns module linker used for service location/DI
+   * @returns {ModuleLinker}
+   */
+  get moduleLinker(){ return this.#moduleLinker; }
+
+  /** Factory method used to allocate module linker from config object
+  * @param {ConfigNode} cfg configuration node
   * @returns {ModuleLinker}
   */
   _makeModuleLinker(cfg){
     const linker = new ModuleLinker();
-
     if (types.isAssigned(cfg)) {
-      for(const cfgMod of cfg){
+      aver.isOf(cfg, ConfigNode);
+      for(const cfgMod of cfg.getChildren(false)){
         const module = makeNew(Module, cfgMod, this);
-        aver.isOf(module, Module);
         linker.register(module);
       }
-
     }
     return linker;
   }
