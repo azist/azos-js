@@ -176,6 +176,27 @@ export class ConfigNode{
     return Object.keys(v).length;
   }
 
+  /**
+   * Iterable generator method which returns just this node if 'includeSelf=true' and it is a section, that is: not an array.
+   * If this node is an array then it returns all array elements which are {@link ConfigNode} sections (not arrays)
+   * @param {boolean} [includeSelf=true] When true includes this node itself if it is a section, has no effect on array nodes
+   * @returns {Iterable<ConfigNode>}
+   */
+  getChildren(includeSelf = true){
+    const self = this;
+    return {
+      [Symbol.iterator]: function* (){
+        if (types.isArray(self.#value)){
+          const arr = self.#value;
+          for(let i=0; i<arr.length; i++) {
+            const one = arr[i];
+            if (one instanceof ConfigNode && one.isSection) yield one;
+          }
+        } else if (includeSelf) yield self;
+      }
+    };
+  }
+
   /** Iterates over a section: map or array
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
@@ -235,7 +256,7 @@ export class ConfigNode{
    * Returns child element by the first matching name for map or index for an array.
    * The names are coalesced from left to right - the first matching element is returned.
    * Returns undefined for non-existing element or undefined/null index
-   * @returns {undefined | Node | object} element value which
+   * @returns {undefined | ConfigNode | object} element value which
    */
   get(...names){
     const vv = this.getVerbatim(...names);

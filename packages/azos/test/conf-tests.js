@@ -248,7 +248,7 @@ describe("ConfigNode", function() {
     aver.areIterablesEquivalent([1, 5, cfg.root.nav("/dole/2")], doleItems.select(one => one.val));
   });
 
-  it("var path",   function() {
+  it("var path eval",   function() {
     const cfg = sut.config({
       id: "a1bold",
       paths: {
@@ -272,7 +272,45 @@ describe("ConfigNode", function() {
     const snake = providers.firstOrDefault(one => one.get("name") === "snake").value;
     aver.isNotNull(snake);
     aver.areEqual("~/data-a1bold/mongo", snake.get("disk"));
+
+    aver.areEqual("Bingo Bongo: a1bold|a1bold", cfg.root.evaluate("Bingo Bongo: $(id)|$(id)"));
+    aver.areEqual("Saved into: ~/data-a1bold/mongo", cfg.root.evaluate("Saved into: $(/providers/1/disk)"));
+
+    aver.areEqual("Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/1").evaluate("Saved into: $(disk)"));
+    aver.areEqual("App `a1bold` Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/#1").evaluate("App `$(/id)` Saved into: $(disk)"));
   });
+
+
+  it("getChildren()",   function() {
+    const cfg = sut.config({
+      a: {x: 123},
+      b: [{x: -11}, {x: -22}],
+      c: [null, true, "yes", {x: -100},[ ], {x: -200}, {xyz: -300}]
+    });
+
+    const aNoSelf = $(cfg.root.get("a").getChildren(false));
+    aver.isFalse(aNoSelf.any());
+
+    const aWithSelf = $(cfg.root.get("a").getChildren());//true by default
+    aver.isTrue(aWithSelf.any());
+    aver.areEqual(1, aWithSelf.count());
+    aver.areEqual(123, aWithSelf.first().get("x"));
+
+    const b = $(cfg.root.get("b").getChildren());
+    aver.isTrue(b.any());
+    aver.areEqual(2, b.count());
+    aver.areEqual(-11, b.first().get("x"));
+    aver.areEqual(-22, b.skip(1).first().get("x"));
+
+    const c = $(cfg.root.get("c").getChildren());
+    aver.isTrue(c.any());
+    aver.areEqual(3, c.count());
+    aver.areEqual(-100, c.first().get("x"));
+    aver.areEqual(-200, c.skip(1).first().get("x"));
+    aver.areEqual(-300, c.skip(2).first().get("xyz"));
+  });
+
+
 
   const cfgGetAccessors = sut.config({
     vUndefined: undefined,
@@ -613,7 +651,7 @@ describe("ConfigNode", function() {
 });//ConfigNode
 
 
-//todo  ConfigNode.evaluate;  makeNew()
+//todo  ConfigNode.evaluate;
 
 class IConfMock{
   #name;
@@ -649,7 +687,7 @@ class ConfMockStandalone {
   get args(){ return this.#args;}
 }
 
-describe("MakeNew", function() {
+describe("Config::MakeNew", function() {
 
   it("makeA",   function() {
     const cfg = sut.config({
@@ -750,7 +788,7 @@ describe("MakeNew", function() {
 });
 
 
-describe("Performance", function() {
+describe("Config::Performance", function() {
 
   const cfgJson =`{
     "a": 1, "b": true, "c": false, "d": null, "e": -9e3, "msg": "loaded from json",
@@ -784,7 +822,7 @@ describe("Performance", function() {
   });
 
   it("navigate",   function() { // 80K ops/sec on OCTOD
-    this.timeout(500);//ms
+    this.timeout(350);//ms
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
@@ -794,8 +832,8 @@ describe("Performance", function() {
 
   });
 
-  it("makeNew",   function() { // 80K ops/sec on OCTOD
-    this.timeout(500);//ms
+  it("makeNew",   function() { // 200K ops/sec on OCTOD
+    this.timeout(300);//ms
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
