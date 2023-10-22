@@ -40,12 +40,14 @@ class MainLogic extends mod.Module{
 
   constructor(dir, cfg){
     super(dir, cfg);
+    console.debug(this.#ref);
     this.link(this.#ref); //dep injection
+    console.debug(this.#ref);
   }
 
-  run(){
-     return `Local weather is: ${this.#ref.weather_local.getWeather()}, County weather is: ${this.#ref.weather_nation.getWeather()} `;
-}
+  runLogic(){
+    return `Local weather is: ${this.#ref.weather_local.getWeather()}, County weather is: ${this.#ref.weather_nation.getWeather()} `;
+  }
 }
 
 const app = apps.application({
@@ -56,8 +58,9 @@ const app = apps.application({
   ]
 });
 
+//console.debug(app.moduleLinker.getHandlerInterfaces(new MainLogic(app, app.config.root)));
 
 const main = app.moduleLinker.resolve(MainLogic, "main");
-main.run();
+console.info( main.runLogic() );
 
 process.exit(0);

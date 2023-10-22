@@ -69,11 +69,14 @@ export class Linker{
     if(types.isFunction(getInterfaces)) return getInterfaces.bind(handler)();
 
     // eslint-disable-next-line no-constant-condition
+    let thandler = types.classOf(handler);
     while(true){
-      const tparent = types.parentOfClass(handler);
+      console.debug(thandler);
+      result.push(thandler);
+      const tparent = types.parentOfClass(thandler);
       if (!tparent) break;
       if (tparent === this.#tInterface) break;
-      result.push(tparent);
+      thandler = tparent;
     }
 
     return result;
@@ -213,6 +216,7 @@ export function link(linker, map, nsplit = "_"){
     const got = linker.tryResolve(tp, nm);
 //console.debug(key, tp, nm);
     if (got === null) throw new Error(`Could not link dependency '${nm}' of type '${tp.name}'`);
+    map[key] = got;
   }
 
   return map;
