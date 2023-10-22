@@ -88,7 +88,9 @@ export class Application extends types.DisposableObject{
 
     this.#session = this._makeSession(root.get("session"));
     this.#localizer = this._makeLocalizer(root.get("localizer"));
-    this.#moduleLinker = this._makeModuleLinker(root.get("modules", "module", "mods", "mod"));
+
+    this.#moduleLinker = new ModuleLinker();
+    this._loadModules(this.#moduleLinker, root.get("modules", "module", "mods", "mod"));
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
@@ -194,12 +196,11 @@ export class Application extends types.DisposableObject{
    */
   get moduleLinker(){ return this.#moduleLinker; }
 
-  /** Factory method used to allocate module linker from config object
-  * @param {ConfigNode} cfg configuration node
-  * @returns {ModuleLinker}
-  */
-  _makeModuleLinker(cfg){
-    const linker = new ModuleLinker();
+  /** Factory method used to allocate modules and register with linker
+   * @param {ModuleLinker} linker
+   * @param {ConfigNode} cfg configuration node
+   */
+  _loadModules(linker, cfg){
     if (types.isAssigned(cfg)) {
       aver.isOf(cfg, ConfigNode);
       for(const cfgMod of cfg.getChildren(false)){
@@ -207,7 +208,6 @@ export class Application extends types.DisposableObject{
         linker.register(module);
       }
     }
-    return linker;
   }
 
 }
