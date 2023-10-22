@@ -6,6 +6,7 @@
         "endregion",
         "hown",
         "intf",
+        "thandler",
         "tparent"
     ]
 }

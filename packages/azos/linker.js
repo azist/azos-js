@@ -68,12 +68,15 @@ export class Linker{
     const getInterfaces = handler[GET_LINKER_INTERFACES_METHOD];
     if(types.isFunction(getInterfaces)) return getInterfaces.bind(handler)();
 
+    let thandler = types.classOf(handler);
     // eslint-disable-next-line no-constant-condition
     while(true){
-      const tparent = types.parentOfClass(handler);
+      ////console.debug(thandler);
+      result.push(thandler);
+      const tparent = types.parentOfClass(thandler);
       if (!tparent) break;
       if (tparent === this.#tInterface) break;
-      result.push(tparent);
+      thandler = tparent;
     }
 
     return result;
@@ -166,9 +169,55 @@ export class Linker{
   resolve(intf, name = null){
     const result = this.tryResolve(intf, name);
     if (result === null)
-      throw new Error(`Linker error resolving type ${intf}, name '${name ?? UNKNOWN}'`);
+      throw new Error(`Linker error resolving type ${intf.name}, name '${name ?? UNKNOWN}'`);
 
     return result;
   }
 
+}
+
+/**
+ * Links requested dependencies in the supplied object of a form: `{name: type, name_x: type2, ...}`
+ * using the supplied linker instance. Each object entry represents a single dependency.
+ * This function keeps the key, but replaces the values which are class types (.ctor functions)
+ * with resolved references to the object instances which implement these class .ctors (e,.g, inherit from classes).
+ * Optionally, you can specify the name for dependency by using the `nsplit` string which is by default "_", e.g.
+ * an object entry of "log_main: ILog" will be linked with an instance of the class which derives from "ILog" and
+ * has a name "main". You can disable named linking by passing null to "nsplit" param
+ * @param {Linker} linker linker to use
+ * @param {object} map target object which contains pairs: `{nm: type,...}`
+ * @param {string} [nsplit="_"] optional split string for name, for example: "logger_main" will link with named object instance "main". The default is '_'. Pass null to disable named dependencies
+ * @returns The original map which was passed-in, having its entries linked
+ * @example  <caption> Example </caption>
+ *  const got = link(linker, {log: ILog, weather_nation: IWeather, weather_local: IWeather})
+ *  //after calling this method, the map will be modified to have its values replaced by
+ *  //real objects implementing these "interfaces"(type .ctors), so we will get:
+ *  got.log // DefaultLog{...}
+ *  got.weather_nation // UsWeatherModule{....}
+ *  got.weather_local // OdessaWeatherService{.....}}
+ *  //Notice that we have used two `IWeather` services, one named "nation" and another "local"- having both reoslve to different
+ *  //instances in spite of both implementing the same "IWeather" contract
+ */
+export function link(linker, map, nsplit = "_"){
+  if (!(linker instanceof Linker) || !map) throw new Error(`Bad 'link()' args: need Linker and map`);
+
+  for(const key in map){
+    let tp = map[key];
+    if (!types.isFunction(tp)) continue;
+    let nm = null;
+
+    if (nsplit){//parse name of the form:  {xyz_name: type}
+      const i = key.indexOf(nsplit);
+      if (i>0 && i<key.length-1){
+        nm = key.slice(i + 1);
+      }
+    }
+
+    const got = linker.tryResolve(tp, nm);
+//console.debug(key, tp, nm);
+    if (got === null) throw new Error(`Could not link dependency '${nm}' of type '${tp.name}'`);
+    map[key] = got;
+  }
+
+  return map;
 }

@@ -7,6 +7,7 @@
 import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { Application } from "./application.js";
+import { link } from "./linker.js";
 
 /**
  * Base class for application components which work either under {@link Application} directly
@@ -86,5 +87,24 @@ export class AppComponent extends types.DisposableObject{
   get directedComponents(){
     const all = AppComponent.getAllApplicationComponents(this.app);
     return all.filter(c => c.director === this);
+  }
+
+  /**
+   * Used for private field dependency injection pattern:
+   *
+   * Links requested module dependencies in the supplied object of a form: `{name: type, name_x: type2, ...}`
+   * using the supplied linker instance. Each object entry represents a single module dependency.
+   * This function keeps the key, but replaces the values which are class types (.ctor functions)
+   * with resolved references to the module object instances which implement these class .ctors (e,.g, inherit from classes).
+   * Optionally, you can specify the name for dependency by using the `nsplit` string which is by default "_", e.g.
+   * an object entry of "log_main: ILog" will be linked with an instance of the class which derives from "ILog" and
+   * has a name "main". You can disable named linking by passing null to "nsplit" param
+   * @param {object} map target object which contains pairs: `{nm: type,...}`
+   * @param {string} [nsplit="_"] optional split string for name, for example: "logger_main" will link with named object instance "main". The default is '_'. Pass null to disable named dependencies
+   * @returns The original map which was passed-in, having its entries linked
+   */
+  link(map, nsplit = "_"){
+    const linker = this.app.moduleLinker;
+    return link(linker, map, nsplit);
   }
 }
