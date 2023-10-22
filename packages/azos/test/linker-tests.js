@@ -9,7 +9,7 @@ import * as aver from "azos/aver";
 import {ABSTRACT} from "azos/coreconsts";
 import * as conf from "azos/conf";
 import * as apps from "azos/application";
-import * as cmp from "azos/components";
+//import * as cmp from "azos/components";
 import * as mod from "azos/modules";
 import * as sut from "azos/linker";
 
@@ -42,16 +42,14 @@ describe("Linker", function() {
       aver.isTrue(  linker.register(new NationWeather(apps.NopApplication.instance, cfg))  );
 
 
-      const localWeather = linker.tryResolve(IWeather);
-      const nationWeather = linker.tryResolve(IWeather, "nat");
+      const weather = linker.tryResolve(IWeather);
+      aver.isNotNull(weather);
+      aver.isNull(linker.tryResolve(IWeather, "nat"));
 
-      aver.isNotNull(localWeather);
-      aver.isNull(nationWeather);
 
-      aver.isOf(localWeather, IWeather);
-      aver.isOf(localWeather, LocalWeather);
-      aver.areEqual("Local weather is cloudy: Z567", localWeather.getWeather("Z567"));
-
+      aver.isOf(weather, IWeather);
+      aver.isOf(weather, LocalWeather);
+      aver.areEqual("Local weather is cloudy: Z567", weather.getWeather("Z567"));
     });
 
 
@@ -60,7 +58,6 @@ describe("Linker", function() {
       const cfg = conf.config({}).root;
       aver.isTrue(  linker.register(new LocalWeather(apps.NopApplication.instance, cfg), null, "loc")  );
       aver.isTrue(  linker.register(new NationWeather(apps.NopApplication.instance, cfg), null, "nat")  );
-
 
       const localWeather = linker.resolve(IWeather, "loc");
       const nationWeather = linker.resolve(IWeather, "nat");
