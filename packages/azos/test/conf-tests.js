@@ -280,6 +280,20 @@ describe("ConfigNode", function() {
     aver.areEqual("App `a1bold` Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/#1").evaluate("App `$(/id)` Saved into: $(disk)"));
   });
 
+  it("var recursion",   function() {
+    const cfg = sut.config({
+      id: "a1bold",
+      paths: {
+        a: "a looks at $(b)",
+        b: "b looks at $(c/#2)",
+        c: [false, null, "$(/paths/a)" ]
+      }
+    });
+
+    aver.areEqual("a looks at $(b)", cfg.root.nav("paths").getVerbatim("a"));
+    aver.throws(() => cfg.root.nav("paths").get("a"), "recursive ref to path");
+  });
+
 
   it("getChildren()",   function() {
     const cfg = sut.config({
