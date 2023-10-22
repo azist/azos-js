@@ -94,7 +94,7 @@ export class Linker{
    */
   register(handler, intf = null, name = null){
     aver.isOf(handler, this.#tHandler);
-    const interfaces = intf  ? [aver.isOf(intf, this.#tInterface)] : this.getHandlerInterfaces(handler);
+    const interfaces = intf  ? [aver.isSubclassOf(intf, this.#tInterface)] : this.getHandlerInterfaces(handler);
 
     const propName = handler[types.NAME_PROP];
     const nm = !strings.isEmpty(name) ? name : strings.dflt(propName ? propName : null, ANY_NAME);

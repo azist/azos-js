@@ -374,6 +374,37 @@ describe("Aver", function() {
   });
 
 
+  describe("#isSubclassOf()", function() {
+    it("TRUE", function(){
+      sut.isSubclassOf(sut.MockA, sut.MockBase);
+      sut.isSubclassOf(sut.MockBC, sut.MockBase);
+    });
+
+    it("FALSE", function(){
+      sut.throws( function(){ sut.isSubclassOf(null, null); }, "isSubclassOf" );
+      sut.throws( function(){ sut.isSubclassOf(undefined, undefined); }, "isSubclassOf" );
+      sut.throws( function(){ sut.isSubclassOf(true, null); }, "isSubclassOf");
+      sut.throws( function(){ sut.isSubclassOf(sut.MockBase, sut.MockBase); }, "isSubclassOf");
+      sut.throws( function(){ sut.isSubclassOf(Object, sut.MockBase); }, "isSubclassOf");
+    });
+  });
+
+  describe("#isNotSubclassOf()", function() {
+    it("TRUE", function(){
+      sut.isNotSubclassOf(sut.MockA, sut.MockB);
+      sut.isNotSubclassOf(Object, sut.MockBase);
+    });
+
+    it("FALSE", function(){
+      sut.throws( function(){ sut.isNotSubclassOf(null, null); }, "isNotSubclassOf" );
+      sut.throws( function(){ sut.isNotSubclassOf(undefined, undefined); }, "isNotSubclassOf" );
+      sut.throws( function(){ sut.isNotSubclassOf(true, null); }, "isNotSubclassOf");
+      sut.throws( function(){ sut.isNotSubclassOf(sut.MockA, sut.MockBase); }, "isNotSubclassOf");
+      sut.throws( function(){ sut.isNotSubclassOf(sut.MockBase, Object); }, "isNotSubclassOf");
+    });
+  });
+
+
 
   describe("#isOf()", function() {
     it("TRUE", function(){
@@ -390,6 +421,8 @@ describe("Aver", function() {
     });
   });
 
+
+
   describe("#isNotOf()", function() {
     it("TRUE", function(){
       let obj = new sut.MockB(1, 2);
@@ -403,6 +436,25 @@ describe("Aver", function() {
       sut.throws( function(){ sut.isNotOf(obj, sut.MockA); }, "isNotOf" );
       sut.throws( function(){ sut.isNotOf(null, null); }, "isNotOf"  );
       sut.throws( function(){ sut.isNotOf(undefined, undefined); }, "isNotOf" );
+    });
+  });
+
+  describe("#isOfEither()", function() {
+    it("TRUE", function(){
+      let obj = new sut.MockA(1, 2);
+      sut.isOfEither(obj, sut.MockBase);
+      sut.isOfEither(obj, sut.MockB, sut.MockBase);
+      sut.isOfEither(obj, sut.MockBase, Object);
+      sut.isOfEither(obj, Object, sut.MockBase);
+      sut.isOfEither(obj, Date, Object, sut.MockA);
+    });
+
+    it("FALSE", function(){
+      let obj = new sut.MockA(1, 2);
+      sut.throws( function(){ sut.isOfEither(obj, Array); }, "isOfEither" );
+      sut.throws( function(){ sut.isOfEither(obj, Date, Array, sut.MockB); }, "isOfEither" );
+      sut.throws( function(){ sut.isOfEither(null, null); }, "isOfEither" );
+      sut.throws( function(){ sut.isOfEither(undefined, undefined); }, "isOfEither");
     });
   });
 

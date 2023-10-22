@@ -247,6 +247,31 @@ export function throws(f, msg){
 }
 
 /**
+ * Succeeds when `t` is a direct or indirect subtype of `base`
+ * @param {Function} t a type to check
+ * @param {Function} base base type
+ * @returns original object after successful type check or throws
+ */
+export function isSubclassOf(t, base){
+  if (types.isSubclassOf(t, base)) return t;
+  throw AVERMENT_FAILURE(`isSubclassOf(${dv(t)}, ${dv(base)})`);
+}
+
+/**
+ * Succeeds when `t` is NOT a direct or indirect subtype of `base`
+ * @param {Function} t a type to check
+ * @param {Function} base base type
+ * @returns original object after successful type check or throws
+ */
+export function isNotSubclassOf(t, base){
+  if (types.isFunction(t) && types.isFunction(base))
+    if (!types.isSubclassOf(t, base)) return t;
+
+  throw AVERMENT_FAILURE(`isNotSubclassOf(${dv(t)}, ${dv(base)})`);
+}
+
+
+/**
  * Performs strict instanceof check on object and function args
  * @param {Object} o
  * @param {type-function} t
@@ -271,7 +296,7 @@ export function isOfEither(o, ...ts){
       if (types.isFunction(t) && (o instanceof t)) return o;
   }
 
-  throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(ts)})`);
+  throw AVERMENT_FAILURE(`isOfEither(${dv(o)}, ${dv(ts)})`);
 }
 
 

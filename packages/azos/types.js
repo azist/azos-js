@@ -308,6 +308,22 @@ export function parentOfClass(cls){
 }
 
 /**
+ * Returns true when `t` is a direct or indirect subtype of `base`, both being assigned functions
+ * @param {Function} t a type to check
+ * @param {Function} base base type
+ * @returns {boolean} true when `t` is a subtype of `base`
+ */
+export function isSubclassOf(t, base){
+  if (!isFunction(t) && !isFunction(base)) return false;
+  return t.prototype instanceof base;
+  // while(t!==null){
+  //   t = parentOfClass(t);
+  //   if (t === base) return true;
+  // }
+  // return false;
+}
+
+/**
  * Mixes in an extension's own keys into an object, conditionally keeping existing keys even if null
  * @param {Object} obj An object to mix into
  * @param {Object} ext An extension to mix into obj
