@@ -58,9 +58,9 @@ const app = apps.application({
   ]
 });
 
-//console.debug(app.moduleLinker.getHandlerInterfaces(new MainLogic(app, app.config.root)));
+console.debug(app.moduleLinker.getHandlerInterfaces(new LocalWeather(app, app.config.root)));
+process.exit(0);
 
 const main = app.moduleLinker.resolve(MainLogic, "main");
 console.info( main.runLogic() );
 
-process.exit(0);

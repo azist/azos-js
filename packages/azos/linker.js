@@ -68,10 +68,10 @@ export class Linker{
     const getInterfaces = handler[GET_LINKER_INTERFACES_METHOD];
     if(types.isFunction(getInterfaces)) return getInterfaces.bind(handler)();
 
-    // eslint-disable-next-line no-constant-condition
     let thandler = types.classOf(handler);
+    // eslint-disable-next-line no-constant-condition
     while(true){
-      console.debug(thandler);
+      ////console.debug(thandler);
       result.push(thandler);
       const tparent = types.parentOfClass(thandler);
       if (!tparent) break;
