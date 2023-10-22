@@ -88,13 +88,13 @@ export class Linker{
    * the types which handler implements by calling {@link getHandlerInterfaces} function.
    * @param {object} handler object of class `tHandler`
    * @param {Function | null} intf optional concrete interface type
-   * @param {string} name optional name
+   * @param {string} [name=null] optional name
    * @returns true when mapping was registered, false when the mapping could not  be registered wither because
    * matching case is already handled by some other handler, or no interface types were yielded from handler
    */
   register(handler, intf = null, name = null){
     aver.isOf(handler, this.#tHandler);
-    const interfaces = intf  ? [aver.isOf(intf, this.#tInterface)] : this.getHandlerInterfaces(handler);
+    const interfaces = intf  ? [aver.isSubclassOf(intf, this.#tInterface)] : this.getHandlerInterfaces(handler);
 
     const propName = handler[types.NAME_PROP];
     const nm = !strings.isEmpty(name) ? name : strings.dflt(propName ? propName : null, ANY_NAME);
@@ -147,15 +147,18 @@ export class Linker{
    * Returns such handler or NULL IF not found.
    * @param {class} intf a type of handler to find
    * @param {string | null} name  optional name of handler
+   * @returns {object | null}
    */
   tryResolve(intf, name = null){
     aver.isFunction(intf);
     const bucket = this.#map.get(intf);
     if (!bucket) return null;
 
-    name = strings.dflt(name, ANY_NAME);
-
-    const result = bucket.get(name);
+    let result = null;
+    if (strings.isEmpty(name))
+      result = bucket.get(ANY_NAME) ?? bucket.values().next().value;//first item
+    else
+      result = bucket.get(name);
 
     return result ?? null;
   }

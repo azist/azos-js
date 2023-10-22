@@ -897,6 +897,36 @@ describe("Types", function() {
     it("Chained",    function() { aver.areEqual( aver.MockBase, sut.parentOfClass(sut.parentOfClass( aver.MockBC))  );});
   });
 
+
+  describe("#isSubclassOf()", function() {
+    it("()",   function() { aver.areEqual( false, sut.isSubclassOf() );});
+    it("null",   function() { aver.areEqual( false, sut.isSubclassOf(null) );});
+    it("undef",   function() { aver.areEqual( false, sut.isSubclassOf(undefined) );});
+    it("123",   function() { aver.areEqual( false, sut.isSubclassOf(123) );});
+    it("bool",   function() { aver.areEqual( false, sut.isSubclassOf(123, true) );});
+
+    it("MockA(MockBase)",    function() { aver.areEqual( true, sut.isSubclassOf( aver.MockA, aver.MockBase));});
+    it("MockBase(MockA)",    function() { aver.areEqual( false, sut.isSubclassOf( aver.MockBase, aver.MockA));});
+
+    it("MockA(MockA)",    function() { aver.areEqual( false, sut.isSubclassOf( aver.MockA, aver.MockA));});
+    it("MockA(object)",    function() { aver.areEqual( true, sut.isSubclassOf( aver.MockA, Object));});
+    it("MockB(object)",    function() { aver.areEqual( true, sut.isSubclassOf( aver.MockB, Object));});
+    it("MockBC(object)",    function() { aver.areEqual( true, sut.isSubclassOf( aver.MockBC, Object));});
+
+    it("MockA(MockB)",    function() { aver.areEqual( false, sut.isSubclassOf( aver.MockA, aver.MockB));});
+    it("MockB(MockA)",    function() { aver.areEqual( false, sut.isSubclassOf( aver.MockB, aver.MockA));});
+
+
+    it("MockB(MockBase)",    function() { aver.areEqual( true, sut.isSubclassOf( aver.MockB, aver.MockBase));});
+    it("MockBC(MockBase)",    function() { aver.areEqual( true, sut.isSubclassOf( aver.MockBC, aver.MockBase));});
+    it("MockBC(MockB)",    function() { aver.areEqual( true, sut.isSubclassOf( aver.MockBC, aver.MockB));});
+
+    it("MockBase(MockB)",    function() { aver.areEqual( false, sut.isSubclassOf(aver.MockBase, aver.MockB ));});
+    it("MockBase(MockBC)",    function() { aver.areEqual( false, sut.isSubclassOf(aver.MockBase, aver.MockBC) );});
+    it("MockB(MockBC)",    function() { aver.areEqual( false, sut.isSubclassOf( aver.MockB, aver.MockBC));});
+  });
+
+
   describe("#isEmptyIterable()", function() {
     it("()",    function()    { aver.isTrue( sut.isEmptyIterable() );});
     it("null",  function()  { aver.isTrue( sut.isEmptyIterable(null) );});
