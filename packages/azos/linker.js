@@ -127,20 +127,35 @@ export class Linker{
     aver.isOf(handler, this.#tHandler);
 
     let deleted = false;
-    for(const bucket of this.#map.entries()){
-      for(const entry of bucket.value.entries()){
-        if (entry.value === handler){
-          bucket.delete(entry.key);
+    for(const [tp, map] of this.#map.entries()){
+      for(const [nm, h] of map.entries()){
+        if (h === handler){
+          map.delete(nm);
           deleted = true;
         }
       }
-      if (bucket.size === 0){
-        this.#map.delete(bucket.key);
+      if (map.size === 0){
+        this.#map.delete(tp);
       }
     }
 
     return deleted;
   }
+
+  /** Dumps linker state as an object graph. This is mostly used for debugging purposes */
+  dump(){
+    const result = {};
+    for(const [tp, map] of this.#map.entries()){
+      const nmap = {};
+      result[tp.name] = nmap;
+      for(const [nm, h] of map.entries()){
+        nmap[nm] = `(${h.constructor.name}) ${h.toString()}`;
+      }
+    }
+
+    return result;
+  }
+
 
   /**
    * Service location: tries to find a handler which supports the specified interface with optional name.
