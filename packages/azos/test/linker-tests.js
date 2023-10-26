@@ -238,6 +238,51 @@ describe("Linker", function() {
       aver.areEqual(0, Object.keys(watch).length);
     });
 
+    it("link()",   function() {
+      const linker = new mod.ModuleLinker();
+      const cfg = conf.config({}).root;
+
+      const modLocal = new LocalWeather(apps.NopApplication.instance, cfg);
+      const modNational = new NationWeather(apps.NopApplication.instance, cfg);
+
+      aver.isTrue(  linker.register(modLocal)  );
+      aver.isTrue(  linker.register(modNational)  );
+      aver.isTrue(  linker.register(modNational, null, "specialNameForNationalWeather")  );
+      aver.isTrue(  linker.register(modNational, null, "presidential_services")  );
+
+      const ref = {
+        a: 1,
+        b: "ok",
+        weather: IWeather
+      };
+
+      sut.link(linker, ref);
+
+      aver.areEqual(1, ref.a);
+      aver.areEqual("ok", ref.b);
+      aver.areEqual(modLocal, ref.weather);
+
+      const ref2 = {
+        weather: IWeather,
+        weather_presidential_services: IWeather,
+        weather_specialNameForNationalWeather: IWeather,
+      };
+
+      sut.link(linker, ref2);
+      aver.areEqual(modLocal, ref2.weather);
+      aver.areEqual(modNational, ref2.weather_presidential_services);
+      aver.areEqual(modNational, ref2.weather_specialNameForNationalWeather);
+
+      const ref3 = {
+        weather: IWeather,
+        weather_XXX: IWeather
+      };
+
+      aver.throws(() => sut.link(linker, ref3), "dependency 'XXX' of type 'IWeather'");
+
+
+    });
+
   });
 
 });
