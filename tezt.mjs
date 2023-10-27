@@ -13,6 +13,9 @@ import * as cmp from "azos/components";
 import * as mod from "azos/modules";
 
 
+//new conf.Configuration("{ bb:");
+
+
 class IWeather extends mod.Module{
   constructor(dir, cfg){ super(dir, cfg); }
 

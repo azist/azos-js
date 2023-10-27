@@ -26,6 +26,11 @@ import * as aver from "./aver.js";
 /** Regular expression that parses out variables $(var_path) */
 export const REXP_VAR_DECL = /\$\((.*?)\)/g;  // $(path)
 
+/** Provides uniform base for Configuration-related exceptions */
+export class ConfigError extends types.AzosError {
+  constructor(message, from = null, cause = null){ super(message, from, cause, 517); }
+}
+
 /** Makes new {@link Configuration} object from the specified content
  * @param {string | object} configuration source
  * @returns {Configuration}
@@ -48,7 +53,7 @@ export class Configuration{
       }
       aver.isObject(content);
     }catch(e){
-      throw new Error(`Bad configuration init content: ${e.message}`, {cause: e});
+      throw new ConfigError(`Bad configuration init content: ${e.message}`, "Config.ctor()", e);
     }
 
     this.#content = content;
@@ -90,7 +95,7 @@ export class ConfigNode{
       const map = {};
       for(var key in val){
         if (key.indexOf('/') >= 0 || key.indexOf('#') >= 0)
-          throw new Error(`Config node names may not contain '/' or '#' characters: "${key}", under parent "${this.path}"`);
+          throw new ConfigError(`Config node names may not contain '/' or '#' characters: "${key}", under parent "${this.path}"`, "ConfigNode.ctor()");
         const kv = val[key];
         if (types.isObjectOrArray(kv) && !(kv instanceof Date))
           map[key] = new ConfigNode(cfg, this, key, kv);
@@ -109,7 +114,7 @@ export class ConfigNode{
       }
       this.#value = arr;
     } else {
-      throw new Error(`ConfigNode '${name}' value must be either an object or an array`);
+      throw new ConfigError(`ConfigNode '${name}' value must be either an object or an array`, "ConfigNode.ctor()");
     }
   }
 
@@ -234,7 +239,7 @@ export class ConfigNode{
             path = path.slice(3);
             return `$(${path})`;
           }
-          if (stack.has(path)) throw new Error(`ConfigNode('${stack._path}') can not evaluate '${stack._val}' due to recursive ref to path '${path}' at ref level ${stack._level}`);
+          if (stack.has(path)) throw new ConfigError(`ConfigNode('${stack._path}') can not evaluate '${stack._val}' due to recursive ref to path '${path}' at ref level ${stack._level}`, "evaluate()");
           try{
             stack.add(path);
             return this.nav(path);
@@ -283,7 +288,7 @@ export class ConfigNode{
           if (types.hown(val, name))
             return this.#value[name];
         }catch(e){
-          throw new Error(`ConfigNode error getting map attr '${name}': ${e.message}`, {cause: e})
+          throw new ConfigError(`ConfigNode error getting map attr '${name}': ${e.message}`, "getVerbatim()", e)
         }
       }
     } else if (types.isArray(val)){//array section
@@ -294,7 +299,7 @@ export class ConfigNode{
           if (idx >=0 && idx < val.length)
             return val[idx];
         }catch(e){
-          throw new Error(`ConfigNode error getting array value by index '${name}': ${e.message}`, {cause: e})
+          throw new ConfigError(`ConfigNode error getting array value by index '${name}': ${e.message}`, "getVerbatim()", e)
         }
       }
     }
@@ -430,14 +435,14 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
 
     const isNode = cfg instanceof ConfigNode;
 
-    if (!isNode && !types.isFunction(cfg)) throw new Error(`Param 'cfg' should be either a 'ConfigNode' or a 'Function'`);
+    if (!isNode && !types.isFunction(cfg)) throw new ConfigError(`Param 'cfg' should be either a 'ConfigNode' or a 'Function'`);
 
     argDescr = isNode ? `'${cfg.toString()}'` : cfg.name;//function name
 
     let type = cfg;//.ctor fun
     if (isNode){
       type = cfg.get("type") ?? tdflt;
-      if (!types.isFunction(type)) throw new Error(`target cls was not supplied as 'type' conf attr and 'tdflt' param was not passed`);
+      if (!types.isFunction(type)) throw new ConfigError(`target cls was not supplied as 'type' conf attr and 'tdflt' param was not passed`);
     }
 
     let args = [null];//dummy 'this'
@@ -449,9 +454,9 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
     }
 
     const result = new (Function.prototype.bind.apply(type, args)); // see Reflect.construct
-    if (!(result instanceof base)) throw new Error(`instance of type '${type.name}' is not of expected base '${base.name}'`);
+    if (!(result instanceof base)) throw new ConfigError(`instance of type '${type.name}' is not of expected base '${base.name}'`);
     return result;
   }catch(e){
-    throw new Error(`Factory "makeNew(${base.name ?? UNKNOWN}, ${argDescr})" error: ${e.message}`, {cause: e});
+    throw new ConfigError(`Factory "makeNew(${base.name ?? UNKNOWN}, ${argDescr})" error: ${e.message}`, "makeNew()", e);
   }
 }
