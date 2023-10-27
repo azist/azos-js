@@ -21,6 +21,12 @@ export const ANY_NAME = "*";
  */
 export const GET_LINKER_INTERFACES_METHOD = Symbol("getLinkerInterfaces");
 
+
+/** Provides uniform base for Linker-related exceptions */
+export class LinkerError extends types.AzosError {
+  constructor(message, from = null, cause = null){ super(message, from, cause, 550); }
+}
+
 /**
  * Provides a registry of handlers: list of associative mappings between a target class (type function aka an `Interface`)
  * and handler object instance/s which can "handle" the requested interface either by handling it directly (e.g. a module), or
@@ -187,7 +193,7 @@ export class Linker{
   resolve(intf, name = null){
     const result = this.tryResolve(intf, name);
     if (result === null)
-      throw new Error(`Linker error resolving type ${intf.name}, name '${name ?? UNKNOWN}'`);
+      throw new LinkerError(`Linker error resolving type ${intf.name}, name '${name ?? UNKNOWN}'`, "resolve()");
 
     return result;
   }
@@ -217,7 +223,7 @@ export class Linker{
  *  //instances in spite of both implementing the same "IWeather" contract
  */
 export function link(linker, map, nsplit = "_"){
-  if (!(linker instanceof Linker) || !map) throw new Error(`Bad 'link()' args: need Linker and map`);
+  if (!(linker instanceof Linker) || !map) throw new LinkerError(`Bad 'link()' args: need Linker and map`, "link()");
 
   for(const key in map){
     let tp = map[key];
@@ -233,7 +239,7 @@ export function link(linker, map, nsplit = "_"){
 
     const got = linker.tryResolve(tp, nm);
 //console.debug(key, tp, nm);
-    if (got === null) throw new Error(`Could not link dependency '${nm}' of type '${tp.name}'`);
+    if (got === null) throw new LinkerError(`Could not link dependency '${nm}' of type '${tp.name}'`, "link()");
     map[key] = got;
   }
 

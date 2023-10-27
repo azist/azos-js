@@ -22,6 +22,7 @@ describe("Configuration", function() {
   });
 
   describe(".ctor", function() {
+
     it("undef",        () => aver.throws(()=> new sut.Configuration(undefined), "init content"));
     it("null",         () => aver.throws(()=> new sut.Configuration(null), "init content"));
     it("empty string", () => aver.throws(() => new sut.Configuration(""), "init content"));

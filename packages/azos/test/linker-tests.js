@@ -278,6 +278,8 @@ describe("Linker", function() {
         weather_XXX: IWeather
       };
 
+      //sut.link(linker, ref3);
+
       aver.throws(() => sut.link(linker, ref3), "dependency 'XXX' of type 'IWeather'");
 
 

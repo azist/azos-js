@@ -89,6 +89,43 @@ export class DisposableObject{
 }
 
 
+/** Provides uniform base for Azos.js exceptions */
+export class AzosError extends Error {
+  #code;
+  #from;
+
+  /**
+   * Creates a base error which has: message, code, from, and optional cause for daisy-chaining calls
+   * @param {string} message
+   * @param {string} from
+   * @param {Error | object} cause
+   * @param {int} code
+   */
+  constructor(message, from = null, cause = null, code = 0){
+    super(message);
+    code |= 0;
+    from = asString(from);
+    this.#code = code;
+    this.#from = from;
+    let nm = `${this.constructor.name} ${code}`;
+    if (!strings.isEmpty(from)) nm += ` @ '${from}'`;
+    this.name = nm;
+    this.cause = cause;
+  }
+
+  /** Returns the name of the causing site - maps to "from" field in log chronicle */
+  get from(){ return this.#from; }
+
+  /** Returns status code, by convention HTTP status codes are used, e.g. 400, 500 etc. */
+  get code(){ return this.#code; }
+
+  toString(){ return `${this.name}: ${this.message}` }
+}
+
+
+
+
+
 
 /**
  * Returns true if the argument is assigned - not undefined non-null value, even an empty string is assigned
