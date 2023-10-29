@@ -12,6 +12,12 @@ import { AppComponent } from "./components.js";
 import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
 
+/** Provides uniform base for App chassis related exceptions */
+export class AppError extends types.AzosError {
+  constructor(message, from = null, cause = null){ super(message, from, cause, 507); }
+}
+
+
 /**
  * A helper factory method creates a new application (new Application(cfg)) from a config object
  * which is either a plain JS object, or a string representation in JSON format,
@@ -30,7 +36,7 @@ export function application(cfg){
     if (cfg instanceof ConfigNode) cfg = cfg.configuration;
     if (!(cfg instanceof Configuration)) cfg = new Configuration(cfg);
   }
-  else throw new Error("Must pass either (a) plain object, or (b) JSON string, or (c) Configuration, or (d) ConfigNode instance into `application(cfg)` factory function");
+  else throw new AppError("Must pass either (a) plain object, or (b) JSON string, or (c) Configuration, or (d) ConfigNode instance into `application(cfg)` factory function", "application()");
 
   return new Application(cfg);
 }

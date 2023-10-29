@@ -124,9 +124,6 @@ export class AzosError extends Error {
 
 
 
-
-
-
 /**
  * Returns true if the argument is assigned - not undefined non-null value, even an empty string is assigned
  * @param {*} v value
@@ -585,7 +582,7 @@ export function asInt(v, canUndef=false){
     } else {
       v = (REXP_NUMBER.test(v)) ? parseFloat(v) : NaN;
     }
-    if (isNaN(v)) throw Error(CAST_ERROR+`asInt("${strings.describe(ov)}")`);
+    if (isNaN(v)) throw new AzosError(CAST_ERROR+`asInt("${strings.describe(ov)}")`);
   }
 
   return v | 0;
@@ -604,7 +601,7 @@ export function asReal(v, canUndef=false){
     const ov = v;
     v = strings.trim(v);
     v = (REXP_NUMBER.test(v)) ? parseFloat(v) : NaN;
-    if (isNaN(v)) throw Error(CAST_ERROR+`asReal("${strings.describe(ov)}")`);
+    if (isNaN(v)) throw new AzosError(CAST_ERROR+`asReal("${strings.describe(ov)}")`);
   }
   return 1.0 * v;
 }
@@ -640,7 +637,7 @@ export function asDate(v, canUndef=false){
     if (!isNaN(ts)) return new Date(ts);
   }
 
-  throw Error(CAST_ERROR+`asDate("${strings.describe(v)}")`);
+  throw new AzosError(CAST_ERROR+`asDate("${strings.describe(v)}")`);
 }
 
 /**
@@ -655,10 +652,10 @@ export function asObject(v, canUndef=false){
 
   try{
     let obj = JSON.parse(asString(v));
-    if (!isObject(obj)) throw Error(CAST_ERROR+`asObject("${strings.describe(v)}") -> not object`);
+    if (!isObject(obj)) throw new AzosError(CAST_ERROR+`asObject("${strings.describe(v)}") -> not object`);
     return obj;
   }catch(e){
-    throw Error(CAST_ERROR+`asObject("${strings.describe(v)}") -> ${e.message}`);
+    throw new AzosError(CAST_ERROR+`asObject("${strings.describe(v)}") -> ${e.message}`);
   }
 }
 
@@ -675,10 +672,10 @@ export function asArray(v, canUndef=false){
 
   try{
     let arr = JSON.parse(asString(v));
-    if (!isArray(arr)) throw Error(CAST_ERROR+`asArray("${strings.describe(v)}") -> not array`);
+    if (!isArray(arr)) throw new AzosError(CAST_ERROR+`asArray("${strings.describe(v)}") -> not array`);
     return arr;
   }catch(e){
-    throw Error(CAST_ERROR+`asArray("${strings.describe(v)}") -> ${e.message}`);
+    throw new AzosError(CAST_ERROR+`asArray("${strings.describe(v)}") -> ${e.message}`, "asArray()", e);
   }
 }
 
@@ -714,7 +711,7 @@ export function asTypeMoniker(v){
  * @param {boolean} [canUndef] true to allow undefined values
  */
 export function cast(v, tmon, canUndef=false){
-  if (arguments.length<2) throw Error("cast(v, tmon) missing 2 req args");
+  if (arguments.length<2) throw new AzosError("cast(v, tmon) missing 2 req args");
   tmon = asTypeMoniker(tmon);
 
   switch(tmon){
