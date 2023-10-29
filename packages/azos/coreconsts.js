@@ -10,6 +10,7 @@ export const UNDEFINED = "<undefined>";
 export const UNKNOWN   = "<unknown>";
 export const EMPTY     = "<empty>";
 
+
 export function ABSTRACT(nm){ return new Error(`Method '${nm ?? UNDEFINED}' is abstract`); }
 
 

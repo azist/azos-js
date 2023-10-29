@@ -176,7 +176,7 @@ export function format(v, args, localizer = null){
   v = asString(v);
   if (!args) return v;
   if (!types.isObjectOrArray(args))
-    throw new Error(".format(args) must be null, object or array");
+    throw new types.AzosError(".format(args) must be null, object or array", "format()");
 
   const fmap = (s, token) => {
     let key = token;
@@ -191,7 +191,7 @@ export function format(v, args, localizer = null){
         try{
           fmta = JSON.parse( fmt.substr(j) );
         }catch(e){
-          throw new Error(`.format('.. ${fmt} ..') Error parsing token format fragment: ${e.message}`);
+          throw new types.AzosError(`.format('.. ${fmt} ..') Error parsing token format fragment: ${e.message}`, "format()");
         }
         fmt = fmt.substr(0, j);
       }
@@ -213,14 +213,14 @@ export function format(v, args, localizer = null){
         if (!localizer) localizer = lcl.currentLocalizer();
         if (fmta===null) fmta={};
         fmta.amt = tv;
-        if (isEmpty(fmta.iso)) throw new Error(".format() is missing currency iso arg: lm{iso: 'currency-code' | '?key'}");
+        if (isEmpty(fmta.iso)) throw new types.AzosError(".format() is missing currency iso arg: lm{iso: 'currency-code' | '?key'}", "format()");
         if (fmta.iso.startsWith("?")){
           fmta.iso = asString( get(fmta.iso.substr(1)) );
         }
         return localizer.formatCurrency(fmta);
       }
       case "tc": { //type cast
-        if (fmta===null) throw new Error(".format() is missing typecast arg: tc{tm: 'type-moniker'}");
+        if (fmta===null) throw new types.AzosError(".format() is missing typecast arg: tc{tm: 'type-moniker'}", "format()");
         tv = types.cast(tv, fmta.tm);
       }
     }

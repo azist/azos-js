@@ -122,6 +122,11 @@ export class AzosError extends Error {
   toString(){ return `${this.name}: ${this.message}` }
 }
 
+/** Provides uniform base for Localization-related exceptions */
+export class LclError extends AzosError { //declared here to avoif circular reference between modules
+  constructor(message, from = null, cause = null){ super(message, from, cause, 518); }
+}
+
 
 
 /**
