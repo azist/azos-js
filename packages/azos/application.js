@@ -6,11 +6,18 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
+import { $ } from "./linq.js";
 import { Configuration, ConfigNode, makeNew } from "./conf.js";
 import { Session } from "./session.js";
 import { AppComponent } from "./components.js";
 import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
+
+/** Provides uniform base for App chassis related exceptions */
+export class AppError extends types.AzosError {
+  constructor(message, from = null, cause = null){ super(message, from, cause, 507); }
+}
+
 
 /**
  * A helper factory method creates a new application (new Application(cfg)) from a config object
@@ -30,7 +37,7 @@ export function application(cfg){
     if (cfg instanceof ConfigNode) cfg = cfg.configuration;
     if (!(cfg instanceof Configuration)) cfg = new Configuration(cfg);
   }
-  else throw new Error("Must pass either (a) plain object, or (b) JSON string, or (c) Configuration, or (d) ConfigNode instance into `application(cfg)` factory function");
+  else throw new AppError("Must pass either (a) plain object, or (b) JSON string, or (c) Configuration, or (d) ConfigNode instance into `application(cfg)` factory function", "application()");
 
   return new Application(cfg);
 }
@@ -83,7 +90,7 @@ export class Application extends types.DisposableObject{
     this.#name = root.getString("name", this.#id);
     this.#description = root.getString("description", this.#id);
     this.#copyright = root.getString("copyright", "2023 Azist Group");
-    this.#envName = root.getString("envName", "local");
+    this.#envName = root.getString(["envName", "env", "environment"], "local");
     this.#isTest = root.getBool("isTest", false);
 
     this.#session = this._makeSession(root.get("session"));
@@ -91,6 +98,7 @@ export class Application extends types.DisposableObject{
 
     this.#moduleLinker = new ModuleLinker();
     this._loadModules(this.#moduleLinker, root.get("modules", "module", "mods", "mod"));
+    this._modulesAfterLoad();
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
@@ -109,8 +117,11 @@ export class Application extends types.DisposableObject{
   [types.DESTRUCTOR_METHOD](){
     if (this instanceof NopApplication) return;
 
+    try{ this._modulesBeforeCleanup(); }
+    catch(e) { console.error(`App dispose _modulesBeforeCleanup() leaked: ${e.message}`, e); }
+
     const all = this.rootComponents;
-    for(const cmp of all) try{ types.dispose(cmp); } catch(e) { console.error(`App dispose root cmp '${cmp}': e.message`, e); }
+    for(const cmp of all) try{ types.dispose(cmp); } catch(e) { console.error(`App dispose root cmp '${cmp}': ${e.message}`, e); }
 
     let prev = Application.#instances.pop();
     Application.#instance = prev ?? null;
@@ -152,6 +163,16 @@ export class Application extends types.DisposableObject{
    * @returns {AppComponent[]} an array of components or empty array
   */
   get rootComponents(){ return AppComponent.getRootApplicationComponents(this); }
+
+  /** Returns an array of all app Modules according to their ORDER
+   * @returns {Module[]} an array of modules ordered according to their `ORDER_PROP` key
+  */
+  get modules(){
+    const mods = $(AppComponent.getAllApplicationComponents(this))
+                 .where(one => one instanceof Module)
+                 .orderBy((a, b) => a[types.ORDER_PROP] < b[types.ORDER_PROP] ? -1 : 1);
+    return mods.toArray();
+  }
 
   /**
    * Returns the app-level session which is used in browser/ui and other apps
@@ -210,6 +231,11 @@ export class Application extends types.DisposableObject{
     }
   }
 
+  /** Called by app after modules loaded, delegates to each module _appAfterLoad */
+  _modulesAfterLoad(){ for(const one of this.modules) one._appAfterLoad(); }
+
+  /** Called by app after modules loaded, delegates to each module _appBeforeCleanup */
+  _modulesBeforeCleanup(){ for(const one of this.modules.reverse()) one._appBeforeCleanup(); }
 }
 
 const cfgNOP = new Configuration({

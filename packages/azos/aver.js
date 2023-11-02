@@ -8,12 +8,13 @@ import * as types from "./types.js";
 import * as str   from "./strings.js";
 import * as linq  from "./linq.js";
 
+
 /**
- * Makes an Error() initialized with message
+ * Makes an AzosError() initialized with message
  * @param {string} m message
  */
-export function AVERMENT_FAILURE(m){
-  return Error(`Averment failure: ${m}`);
+export function AVERMENT_FAILURE(m, cause = null){
+  return new types.AzosError(`Averment failure: ${m}`, m, cause, 500);
 }
 
 const dv = (v) => str.describe(v);//shortcut

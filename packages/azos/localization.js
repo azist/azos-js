@@ -5,6 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as types from "./types.js";
+import {LclError}  from "./types.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 
@@ -33,7 +34,7 @@ export const DATE_FORMAT = Object.freeze({
   LONG_WEEK_DATE:   "LongWeekDate",  //  Tuesday, 30 August 2018
   SHORT_WEEK_DATE:  "ShortWeekDate", //  Tue, 30 Aug 2018
   LONG_DATE:        "LongDate",      //  30 August 2018
-  SHORT_DATE:       "ShortDate",     //  30 Aug 2018 
+  SHORT_DATE:       "ShortDate",     //  30 Aug 2018
   NUM_DATE:         "NumDate",       //  08/30/2018
 
   LONG_MONTH:       "LongMonth",     // August 2018
@@ -60,11 +61,10 @@ export const INVARIANT_MONTH_LONG_NAMES = Object.freeze([
 export const INVARIANT_MONTH_SHORT_NAMES = INVARIANT_MONTH_LONG_NAMES.map( v => strings.truncate(v, 3) );
 
 export const INVARIANT_DAY_LONG_NAMES = Object.freeze([
-  "Sunday", "Monday", "Tuesday", 
-  "Wednesday", "Thursday", "Friday", 
+  "Sunday", "Monday", "Tuesday",
+  "Wednesday", "Thursday", "Friday",
   "Saturday"]);
 export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => strings.truncate(v, 3) );
-
 
 /**
  * Provides default implementation of invariant localizer.
@@ -72,7 +72,7 @@ export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => stri
  *  localization.injectLocalizer(new CustomLocalizer(...))
  */
 export class Localizer{
-  
+
   #strings;
 
   constructor(stringTable){
@@ -105,32 +105,32 @@ export class Localizer{
   formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, utc = false} = {}){
     if (dt===null){
       if (arguments.length==0)
-        throw new Error("'dt' arg is missing");
-    
-      dt = arguments[0]; 
+        throw new LclError("'dt' arg is missing", "formatDateTime()");
+
+      dt = arguments[0];
     }
-    
+
     const v = types.isDate(dt) ? dt : new Date(dt);
-    
+
     const month   = utc ? v.getUTCMonth()    : v.getMonth();
     const daym    = utc ? v.getUTCDate()     : v.getDate();
     const dayw    = utc ? v.getUTCDay()      : v.getDay();
     const year    = utc ? v.getUTCFullYear() : v.getFullYear();
-    
+
     const d2 = (num) => ("0" + num.toString()).slice(-2);
     const d3 = (num) => ("00" + num.toString()).slice(-3);
     const dnl = (idx) => this.localizeCultureString(INVARIANT_DAY_LONG_NAMES[idx], culture, FIELD_DAY);
     const dns = (idx) => this.localizeCultureString(INVARIANT_DAY_SHORT_NAMES[idx], culture, FIELD_DAY);
     const mnl = (idx) => this.localizeCultureString(INVARIANT_MONTH_LONG_NAMES[idx], culture, FIELD_MONTH);
     const mns = (idx) => this.localizeCultureString(INVARIANT_MONTH_SHORT_NAMES[idx], culture, FIELD_MONTH);
-    
+
     let result = "";
-    
+
     switch(dtFormat){
       case DATE_FORMAT.LONG_WEEK_DATE:   result = `${dnl(dayw)}, ${daym} ${mnl(month)} ${year}`;  break; //  Tuesday, 30 August 2018
       case DATE_FORMAT.SHORT_WEEK_DATE:  result = `${dns(dayw)}, ${daym} ${mns(month)} ${year}`;  break; //  Tue, 30 Aug 2018
       case DATE_FORMAT.LONG_DATE:        result = `${daym} ${mnl(month)} ${year}`;  break; //  30 August 2018
-      case DATE_FORMAT.SHORT_DATE:       result = `${daym} ${mns(month)} ${year}`;  break; //  30 Aug 2018 
+      case DATE_FORMAT.SHORT_DATE:       result = `${daym} ${mns(month)} ${year}`;  break; //  30 Aug 2018
       case DATE_FORMAT.NUM_DATE:         result = `${d2(month+1)}/${d2(daym)}/${year}`;  break;//  08/30/2018
 
       case DATE_FORMAT.LONG_MONTH:       result = `${mnl(month)} ${year}`;  break;  // August 2018
@@ -142,16 +142,16 @@ export class Localizer{
       default:
         result = `${daym} ${mnl(month)} ${year}`;
     }
-    
+
     if (tmDetails===TIME_DETAILS.NONE) return result;
-    
+
     const hours   = utc ? v.getUTCHours()    : v.getHours();
     const minutes = utc ? v.getUTCMinutes()  : v.getMinutes();
-    
+
     if (tmDetails===TIME_DETAILS.HM) return `${result} ${d2(hours)}:${d2(minutes)}`;
-    
+
     const seconds = utc ? v.getUTCSeconds()  : v.getSeconds();
-    
+
     if (tmDetails===TIME_DETAILS.HMS) return `${result} ${d2(hours)}:${d2(minutes)}:${d2(seconds)}`;
 
     const millis =  utc ? v.getUTCMilliseconds()  : v.getMilliseconds();
@@ -159,7 +159,7 @@ export class Localizer{
   }
 
   /*eslint-disable no-unused-vars*///------------------------------
-  
+
   /**
   * @typedef {Object} CurrencySymbols
   * @property {string} sym Currency symbol, such as $
@@ -178,7 +178,7 @@ export class Localizer{
 
   /**
    * Returns primary language iso code for the specified culture
-   * @param {string} culture 
+   * @param {string} culture
    */
   getPrimaryLanguageIso(culture){
     return ISO_LANG_ENG;
@@ -186,7 +186,7 @@ export class Localizer{
 
   /**
    * Returns an array of languages in the order of importance for the specified culture
-   * @param {string} culture 
+   * @param {string} culture
    */
   getLanguageIsos(culture){
     return [ISO_LANG_ENG];
@@ -196,7 +196,7 @@ export class Localizer{
 
   /**
    * Formats currency per supplied culture
-   * @param {Object|number}args 
+   * @param {Object|number}args
    * @param {number} args.amt Amount to format - required
    * @param {string} args.iso Currency iso code such as 'usd' - required
    * @param {string} args.culture Formatting culture id
@@ -208,13 +208,13 @@ export class Localizer{
   formatCurrency({amt = NaN, iso = null, culture = null,  precision = 2, symbol = true, sign = true, thousands = true} = {}){
     if (isNaN(amt)){
       if (arguments.length<2)
-        throw new Error("Currency 'amt' and 'iso' args are required");
-      amt = arguments[0]; 
+        throw new LclError("Currency 'amt' and 'iso' args are required", "formatCurrency()");
+      amt = arguments[0];
       iso = arguments[1];
     }
 
-    if (isNaN(amt)) throw new Error("Currency 'amt' isNaN");
-    if (!iso) throw new Error("Currency 'iso' is required");
+    if (isNaN(amt)) throw new LclError("Currency 'amt' isNaN", "formatCurrency()");
+    if (!iso) throw new LclError("Currency 'iso' is required", "formatCurrency()");
     if (!culture) culture = CULTURE_INVARIANT;
     const symbols = this.getCurrencySymbols(culture);
     const neg = amt < 0;
@@ -237,15 +237,15 @@ export class Localizer{
         if (i>1 && (i-1)%3===0) whole = symbols.ts + whole;
         whole = amtw[amtw.length-i] + whole;
       }
-      amtw = whole; 
+      amtw = whole;
     }
 
     let result = neg ? (sign ? "-" : "(") : "";//  - or (
-    
+
     result += symbol ? symbols.sym : "";// $
 
     result += precision>0 ? amtw + symbols.ds + amtf : amtw; // whole.fraction
-    
+
     if (neg && !sign) result += ")";
     return result;
   }
@@ -270,29 +270,29 @@ export class Localizer{
    * @param {string} value to localize/localization key
    * @param {string} iso language iso code
    * @param {string} field field name to which localization is applied, e.g. ANY_FIELD. Fields are resolved under schema
-   * @param {string} schema schema name to which localization is applied, e.g. ANY_SCHEMA 
+   * @param {string} schema schema name to which localization is applied, e.g. ANY_SCHEMA
    */
   localizeString(value, iso, field, schema){
     if (!value) return null;
     if (strings.isEmpty(value) || strings.isEmpty(iso)) return null;
-  
+
     if (strings.isEmpty(field)) field = ANY_FIELD;
     if (strings.isEmpty(schema)) schema = ANY_SCHEMA;
-  
+
     var node = this.#strings;
     if (!types.hown(node, iso)) return value;
     node = node[iso];
-  
+
     if (!types.hown(node, schema)){
       if (!types.hown(node, ANY_SCHEMA)) return value;
       node = node[ANY_SCHEMA];
     } else node = node[schema];
-  
+
     if (!types.hown(node, field)){
       if (!types.hown(node, ANY_FIELD)) return value;
       node = node[ANY_FIELD];
     } else node = node[field];
-  
+
     if (!types.hown(node, value)) return value;
     return node[value];
   }
@@ -309,7 +309,7 @@ let s_Current = INVARIANT;
 
 /**
  * Injects custom localizer, typically this is done in the app.js file for the specific application
- * @param {Localizer} loc 
+ * @param {Localizer} loc
  */
 export function injectLocalizer(loc){
   aver.isOf(loc, Localizer);
