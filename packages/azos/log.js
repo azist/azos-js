@@ -73,12 +73,12 @@ export function normalizeMsg(msg){
     if (msg===undefined || msg===null) throw new LogError("Null msg");
     return {
       guid: types.genGuid(),
-      rel: types.asString(msg.guid),
+      rel: strings.asString(msg.guid),
       type: asMsgType(msg.type),
-      text: types.asString(msg.text),
-      from: types.asString(msg.from),
-      host: "123.0.0.1",//app.host use https://peerip.glitch.me/
-      topic: types.asString(msg.topic),
+      text: strings.asString(msg.text),
+      from: strings.asString(msg.from),
+      host: "123.0.0.1",//app.host see issue #33
+      topic: strings.asString(msg.topic),
       src:   msg.src | 0,
       params: types.isAssigned(msg.params) ? (types.isString(msg.params) ? msg.params : JSON.stringify(msg.params)) : null
     };
