@@ -7,11 +7,12 @@
 import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { $ } from "./linq.js";
-import { Configuration, ConfigNode, makeNew } from "./conf.js";
+import { Configuration, ConfigNode, makeNew, config } from "./conf.js";
 import { Session } from "./session.js";
 import { AppComponent } from "./components.js";
 import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
+import { ConLog, ILog } from "./log.js";
 
 /** Provides uniform base for App chassis related exceptions */
 export class AppError extends types.AzosError {
@@ -71,6 +72,7 @@ export class Application extends types.DisposableObject{
   #session;
   #localizer;
   #moduleLinker;
+  #dfltLog;
 
   /**
    * Initializes {@link Application} object instance by passing {@link Configuration} object.
@@ -93,11 +95,14 @@ export class Application extends types.DisposableObject{
     this.#envName = root.getString(["envName", "env", "environment"], "local");
     this.#isTest = root.getBool("isTest", false);
 
+    this.#dfltLog = new ConLog(this, config({name: "log", [types.ORDER_PROP] : -1_000_000}).root);
+
     this.#session = this._makeSession(root.get("session"));
     this.#localizer = this._makeLocalizer(root.get("localizer"));
 
     this.#moduleLinker = new ModuleLinker();
     this._loadModules(this.#moduleLinker, root.get("modules", "module", "mods", "mod"));
+    if (this.#moduleLinker.tryResolve(ILog)===null) this.#moduleLinker.register(this.#dfltLog);
     this._modulesAfterLoad();
 
     if (Application.#instance !== null){
@@ -123,9 +128,15 @@ export class Application extends types.DisposableObject{
     const all = this.rootComponents;
     for(const cmp of all) try{ types.dispose(cmp); } catch(e) { console.error(`App dispose root cmp '${cmp}': ${e.message}`, e); }
 
+    try{ types.dispose(this.#dfltLog); }
+    catch(e){ console.error(`App dispose dfltLog leaked: ${e.message}`, e); }
+
     let prev = Application.#instances.pop();
     Application.#instance = prev ?? null;
   }
+
+  /** String representation of app */
+  toString(){ return `${this.constructor.name}('${this.#id}')`; }
 
   /** Returns application id atom @return {atom}*/
   get id(){ return this.#id; }
@@ -175,6 +186,15 @@ export class Application extends types.DisposableObject{
   }
 
   /**
+   * Returns an app log or default console log if app was not init with log
+   * @returns {ILog}
+   */
+  get log(){
+    const log = this.#moduleLinker.tryResolve(ILog) ?? this.#dfltLog;
+    return log;
+  }
+
+  /**
    * Returns the app-level session which is used in browser/ui and other apps
    * which do not support per-logical-flow sessions
    * @returns {Session}
@@ -217,7 +237,7 @@ export class Application extends types.DisposableObject{
    */
   get moduleLinker(){ return this.#moduleLinker; }
 
-  /** Factory method used to allocate modules and register with linker
+  /** Factory method used to allocate modules and register with linker.
    * @param {ModuleLinker} linker
    * @param {ConfigNode} cfg configuration node
    */

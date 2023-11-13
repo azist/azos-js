@@ -52,16 +52,48 @@ export const LOG_TYPE = Object.freeze({
 });
 const ALL_TYPES = types.allObjectValues(LOG_TYPE);
 
+/** Log Message types -> int */
+const LOG_TYPE_SEVERITY = Object.freeze({
+  [LOG_TYPE.DEBUG]:        -100,
+  [LOG_TYPE.DEBUG_A]:       -100,
+  [LOG_TYPE.DEBUG_B]:       -100,
+  [LOG_TYPE.DEBUG_C]:       -100,
+
+  [LOG_TYPE.TRACE]:         -50,
+  [LOG_TYPE.TRACE_A]:       -50,
+  [LOG_TYPE.TRACE_B]:       -50,
+  [LOG_TYPE.TRACE_C]:       -50,
+
+  [LOG_TYPE.INFO]:         0,
+  [LOG_TYPE.INFO_A]:       0,
+  [LOG_TYPE.INFO_B]:       0,
+  [LOG_TYPE.INFO_C]:       0,
+
+  [LOG_TYPE.WARNING]:      10,
+  [LOG_TYPE.ERROR]:        100,
+  [LOG_TYPE.ERROR_INFO]:   101,
+
+  [LOG_TYPE.CRITICAL]:    1000,
+  [LOG_TYPE.EMERGENCY]:   2000
+});
+
 /**
  * Converts value to LOG_TYPE coercing it to lowercase string if needed
  * @param {*} v value to convert
  * @returns {LOG_TYPE}
  */
 export function asMsgType(v){
-  v = strings.asString(v).toLowerCase();
-  if (strings.isOneOf(v, ALL_TYPES, true)) return v;
+  v = strings.asString(v);
+  if (strings.isOneOf(v, ALL_TYPES, false)) return v;
   return LOG_TYPE.INFO;
 }
+
+/**
+ * Converts value to LOG_TYPE to integer severity. 0 = info
+ * @param {*} v value to convert
+ * @returns {int}
+ */
+export function getMsgTypeSeverity(v){ return LOG_TYPE_SEVERITY[v] | 0; }
 
 /**
  * Takes a message and normalizes its data converting to appropriate data types and filling require missing data
@@ -84,6 +116,34 @@ export function normalizeMsg(msg){
     };
   } catch(e){
     throw new LogError("Bad log msg", "normalizeMsg(...)", e);
+  }
+}
+
+/**
+ * Writes normalized log message into console
+ * @param {LogMessage} msg
+ */
+export function writeConsole(msg, dTopic = null, dFrom = null){
+  const sev = getMsgTypeSeverity(msg.type);
+
+  if (sev >= LOG_TYPE_SEVERITY[LOG_TYPE.ERROR]){
+    console.error(`%c${msg.type}%c  ${strings.dflt(msg.topic, dTopic)}  ${strings.dflt(msg.from, dFrom)}`,
+        "color: #802000; background-color: #f04000; padding: 2px; border-radius: 4px;",
+        "color: #757575",
+        msg.text,
+        msg);
+  } else {
+    const stl = sev < LOG_TYPE_SEVERITY[LOG_TYPE.INFO] ? "color: #606060; background-color: #e0e0e0; padding: 2px; border-radius: 4px;" :
+                sev < LOG_TYPE_SEVERITY[LOG_TYPE.WARNING] ? "color: #4e7e00; background-color: #45ea12; padding: 2px; border-radius: 4px;"
+                                                : "color: #7f6800; background-color: #f4f200; padding: 2px; border-radius: 4px;"
+
+    const map = {};
+    for(let i in msg) if (msg[i]) map[i] = msg[i];
+    console.log(`%c${msg.type}%c ${strings.dflt(msg.topic, dTopic)} ${strings.dflt(msg.from, dFrom)}`,
+        stl,
+        "color: #8594a8",
+        msg.text,
+        map);
   }
 }
 
@@ -112,4 +172,10 @@ export class ILog extends Module{
 
   // eslint-disable-next-line no-unused-vars
   _doWrite(msgFrame){ throw ABSTRACT("ILog._doWrite()"); }
+}
+
+/** Console logger */
+export class ConLog extends ILog{
+  constructor(dir, cfg){ super(dir, cfg); }
+  _doWrite(msg){ writeConsole(msg, `app('${this.app.id}')`, this.constructor.name); }
 }
