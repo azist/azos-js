@@ -11,6 +11,7 @@ import { ILog } from "../ilog.js";
 import { application } from "../application.js";
 import { Verbatim } from "../conf.js";
 import { dispose } from "../types.js";
+import { Module } from "../modules.js";
 
 
 class IMemoryLog extends ILog{
