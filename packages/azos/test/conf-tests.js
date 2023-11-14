@@ -281,6 +281,38 @@ describe("ConfigNode", function() {
     aver.areEqual("App `a1bold` Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/#1").evaluate("App `$(/id)` Saved into: $(disk)"));
   });
 
+  it("verbatim",   function() {
+    const cfg = sut.config({
+      id: "a1bold",
+      paths: new sut.Verbatim({
+        log: "/etc/var/logs",
+      }),
+      pathsOriginal: {
+        log: "/etc/var/logs",
+      },
+      providers: new sut.Verbatim([
+        { name: "logger", disk: "$(/paths/log)"},
+        { name: "snake", disk: "$(/paths/mongo)"},
+      ])
+    });
+
+    const paths = cfg.root.get("paths");
+    aver.isNotOf(paths, sut.ConfigNode);
+    aver.isObject(paths);
+    aver.areEqual("/etc/var/logs", paths.log);
+
+    const pathsOriginal = cfg.root.get("pathsOriginal");
+    aver.isOf(pathsOriginal, sut.ConfigNode);
+    aver.areEqual("/etc/var/logs", pathsOriginal.get("log"));
+
+    const providers = cfg.root.get("providers");
+    aver.isArray(providers);
+    aver.areEqual("logger", providers[0].name);
+    aver.areEqual("snake", providers[1].name);
+    aver.areEqual("$(/paths/mongo)", providers[1].disk);
+
+  });
+
   it("var recursion",   function() {
     const cfg = sut.config({
       id: "a1bold",
@@ -666,7 +698,6 @@ describe("ConfigNode", function() {
 });//ConfigNode
 
 
-//todo  ConfigNode.evaluate;
 
 class IConfMock{
   #name;

@@ -11,6 +11,14 @@ import * as conf from "azos/conf";
 import * as apps from "azos/application";
 import * as cmp from "azos/components";
 import * as mod from "azos/modules";
+import * as log from "azos/log";
+
+
+
+log.writeConsole(log.normalizeMsg({type: log.LOG_TYPE.EMERGENCY, text: "My text!"}));
+
+process.exit(0);
+
 
 
 //new conf.Configuration("{ bb:");

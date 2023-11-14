@@ -29,7 +29,7 @@ export class Module extends AppComponent{
   constructor(app, cfg){
     aver.isOf(app, Application);
     aver.isOf(cfg, ConfigNode);
-    super(app);
+    super(app, cfg);
     this.#name = cfg.getString("name", types.genGuid());
     this.#order = cfg.getInt("order", 0);
   }

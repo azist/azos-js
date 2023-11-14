@@ -14,11 +14,13 @@ import { dispose } from "../types.js";
 
 class IWeather extends Module{
   constructor(dir, cfg){ super(dir, cfg); }
+  // eslint-disable-next-line no-unused-vars
   getWeather(location){ throw ABSTRACT("getWeather"); }
 }
 
 class INews extends Module{
   constructor(dir, cfg){  super(dir, cfg); }
+  // eslint-disable-next-line no-unused-vars
   getNews(location){ throw ABSTRACT("getNews"); }
 }
 // ===========================================================
