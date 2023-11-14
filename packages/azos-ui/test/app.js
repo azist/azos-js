@@ -1,7 +1,25 @@
 import {application} from "azos/application";
+import {Module} from "azos/modules";
+import {ConLog} from "azos/ilog";
 import { LOG_TYPE } from "azos/log";
 
 console.info('Hook you hard barbindoziy');
+
+
+class MyLogic extends Module{
+  #tmr;
+  constructor(dir, cfg){
+    super(dir, cfg);
+  }
+
+  _appAfterLoad(){
+    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "Hook you hard!"), 1000);
+  }
+
+  _appBeforeCleanup(){
+    clearInterval(this.#tmr);
+  }
+}
 
 
 
@@ -9,7 +27,11 @@ const cfgApp = {
   id: "abc",
   name: "$(id)",
   description: "Test '$(name)' application",
-  session: null//{type: "UiSession"}
+  //session: null, //{type: "UiSession"},
+  modules: [
+    {name: "log", type: ConLog},
+    {name: "logic", type: MyLogic},
+  ]
 };
 
 const app = application(cfgApp);
@@ -24,7 +46,7 @@ app.log.write({type: LOG_TYPE.INFO, text: "Info message text"});
 app.log.write({type: LOG_TYPE.WARNING, text: "Warning message text"});
 app.log.write({type: LOG_TYPE.ERROR, text: "Error message text"});
 
-for(let i=0; i<100; i++){
+for(let i=0; i<5; i++){
   app.log.write({type: LOG_TYPE.INFO, text: "Trace message text", params: {i: i}});
 }
 

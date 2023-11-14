@@ -30,6 +30,7 @@ describe("#AppLog", function() {
     let logBuffer = [];
 
     const app = application({
+      //logLevel: "info",
       modules: [
         {name: "log", type: IMemoryLog, buffer: new Verbatim(logBuffer)}
       ]

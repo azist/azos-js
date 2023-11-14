@@ -8,7 +8,7 @@ import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { Application } from "./application.js";
 import { link } from "./linker.js";
-import * as log from "./log.js";
+import * as logging from "./log.js";
 
 /**
  * Base class for application components which work either under {@link Application} directly
@@ -61,7 +61,7 @@ export class AppComponent extends types.DisposableObject{
 
     if (cfg && cfg.getString)
     {
-      this.#logLevel = log.asMsgType(cfg.getString("logLevel"), true);
+      this.#logLevel = logging.asMsgType(cfg.getString("logLevel"), true);
     }
 
   }
@@ -139,8 +139,8 @@ export class AppComponent extends types.DisposableObject{
    * @returns {guid | null} null if nothing was written or guid of the newly written message
    */
   writeLog(type, text, params, rel, src){
-    const ell = log.getMsgTypeSeverity(this.effectiveLogLevel);
-    if (log.getMsgTypeSeverity(type) < ell) return null;
+    const ell = logging.getMsgTypeSeverity(this.effectiveLogLevel);
+    if (logging.getMsgTypeSeverity(type) < ell) return null;
     const log = this.app.log;
     const guid = log.write({
       type: type,
