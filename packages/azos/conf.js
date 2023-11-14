@@ -38,6 +38,16 @@ export class ConfigError extends types.AzosError {
 export function config(content){ return new Configuration(content); }
 
 /**
+ * Allows to treat complex values in config nodes as verbatim values -without
+ * turing objects into sections and arrays into collection ConfigNodes
+ */
+export class Verbatim{
+  #value;
+  constructor(v){ this.#value = v;}
+  get value(){ return this.#value;}
+}
+
+/**
  * Provides configuration tree navigation and variable evaluation functionality
  */
 export class Configuration{
@@ -97,20 +107,20 @@ export class ConfigNode{
         if (key.indexOf('/') >= 0 || key.indexOf('#') >= 0)
           throw new ConfigError(`Config node names may not contain '/' or '#' characters: "${key}", under parent "${this.path}"`, "ConfigNode.ctor()");
         const kv = val[key];
-        if (types.isObjectOrArray(kv) && !(kv instanceof Date))
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date) && !(kv instanceof Verbatim))
           map[key] = new ConfigNode(cfg, this, key, kv);
         else
-          map[key] = kv;
+          map[key] = kv instanceof Verbatim ? kv.value : kv;
       }
       this.#value = map;
     } else if (types.isArray(val)) {
       const arr = [];
       for(var i=0; i < val.length; i++){
         const kv = val[i];
-        if (types.isObjectOrArray(kv) && !(kv instanceof Date))
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date) && !(kv instanceof Verbatim))
           arr.push(new ConfigNode(cfg, this, `#${i}`, kv));
         else
-          arr.push(kv);
+          arr.push(kv instanceof Verbatim ? kv.value : kv);
       }
       this.#value = arr;
     } else {
