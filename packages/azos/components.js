@@ -8,6 +8,7 @@ import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { Application } from "./application.js";
 import { link } from "./linker.js";
+import * as log from "./log.js";
 
 /**
  * Base class for application components which work either under {@link Application} directly
@@ -15,6 +16,8 @@ import { link } from "./linker.js";
  */
 export class AppComponent extends types.DisposableObject{
   static #appMap = new Map();
+
+  static #idSeed = 0;
 
   /**
    * Returns all components of the specified application
@@ -41,9 +44,12 @@ export class AppComponent extends types.DisposableObject{
   }
 
   #director;
+  #sid;
+  #logLevel = null;
 
-  constructor(dir){
+  constructor(dir, cfg){
     super();
+    this.#sid = ++AppComponent.#idSeed;
     this.#director = aver.isOfEither(dir, Application, AppComponent);
     const app = this.app;
     let clist = AppComponent.#appMap.get(app);
@@ -52,6 +58,12 @@ export class AppComponent extends types.DisposableObject{
       AppComponent.#appMap.set(app, clist);
     }
     clist.push(this);
+
+    if (cfg && cfg.getString)
+    {
+      this.#logLevel = log.asMsgType(cfg.getString("logLevel"), true);
+    }
+
   }
 
   /**
@@ -71,6 +83,11 @@ export class AppComponent extends types.DisposableObject{
   */
   get [types.DIRECTOR_PROP]() { return this.#director; }
 
+  /** Returns int system id of this component. System ids are ever increasing while app runs
+   * @returns {int}
+   */
+  get sid(){ return this.#sid; }
+
   /** Returns true when this component is owned directly by the {@link Application} vs being owned by another component
    * @returns {boolean}
   */
@@ -87,6 +104,63 @@ export class AppComponent extends types.DisposableObject{
   get directedComponents(){
     const all = AppComponent.getAllApplicationComponents(this.app);
     return all.filter(c => c.director === this);
+  }
+
+  /**
+   * Override to provide logging topic, default returns class name
+   */
+  get logTopic(){ return this.constructor.name; }
+
+  /**
+   * Override to provide logging from prefix, default uses class name
+   */
+  get logFrom(){ return `${this.constructor.name}(#${this.#sid})`; }
+
+  /**
+   * Returns log level of this component or null to resort to the director one
+   * The {@link effectiveLogLevel} uses this property
+   */
+  get logLevel(){ return this.#logLevel; }
+
+  /**
+   * Returns log level of this component, or if it is null then from its director
+   */
+  get effectiveLogLevel(){
+    return this.logLevel ?? this.director.effectiveLogLevel;
+  }
+
+  /**
+   * Writes to log if current component effective level permits, returning guid of newly written message
+   * @param {string} type an enumerated type {@link log.LOG_TYPE}
+   * @param {string} text message text
+   * @param {object | null} params optional parameters
+   * @param {string | null} rel optional relation guid
+   * @param {int | null} src optional int src line num
+   * @returns {guid | null} null if nothing was written or guid of the newly written message
+   */
+  writeLog(type, text, params, rel, src){
+    const ell = log.getMsgTypeSeverity(this.effectiveLogLevel);
+    if (log.getMsgTypeSeverity(type) < ell) return null;
+    const log = this.app.log;
+    const guid = log.write({
+      type: type,
+      topic: this.logTopic,
+      from: this.logFrom,
+      text: text,
+      params: params,
+      rel: rel,
+      src: src
+    });
+    return guid;
+  }
+
+
+  /**
+   * Provides short textual component description
+   * @returns {string}
+   */
+  toString(){
+    return `${this.constructor.name}(#${this.#sid})`;
   }
 
   /**

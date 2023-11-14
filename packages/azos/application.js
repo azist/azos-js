@@ -12,7 +12,8 @@ import { Session } from "./session.js";
 import { AppComponent } from "./components.js";
 import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
-import { ConLog, ILog } from "./log.js";
+import { asMsgType, LOG_TYPE } from "./log.js";
+import { ILog, ConLog } from "./ilog.js";
 
 /** Provides uniform base for App chassis related exceptions */
 export class AppError extends types.AzosError {
@@ -73,6 +74,7 @@ export class Application extends types.DisposableObject{
   #localizer;
   #moduleLinker;
   #dfltLog;
+  #logLevel;
 
   /**
    * Initializes {@link Application} object instance by passing {@link Configuration} object.
@@ -87,6 +89,8 @@ export class Application extends types.DisposableObject{
 
     this.#instanceId = types.genGuid();
     this.#startTime = new Date();
+
+    this.#logLevel = asMsgType(root.getString("logLevel", LOG_TYPE.INFO));
 
     this.#id = root.getString("id", "#0");
     this.#name = root.getString("name", this.#id);
@@ -193,6 +197,19 @@ export class Application extends types.DisposableObject{
     const log = this.#moduleLinker.tryResolve(ILog) ?? this.#dfltLog;
     return log;
   }
+
+  /**
+   * Returns log level of this component or null to resort to the director one
+   * The {@link effectiveLogLevel} uses this property
+   */
+  get logLevel(){ return this.#logLevel; }
+
+  /**
+   * Returns the effective log level of the app.
+   * The property is kept for symmetry with {@link AppComponent} design, as it is a shortcut to {@link logLevel}
+   */
+  get effectiveLogLevel(){ return this.logLevel; }
+
 
   /**
    * Returns the app-level session which is used in browser/ui and other apps

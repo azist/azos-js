@@ -6,8 +6,6 @@
 
 import * as types from "./types.js";
 import * as strings from "./strings.js";
-import { ABSTRACT } from "./coreconsts.js";
-import { Module } from "./modules.js";
 
 /**
   * @typedef {Object} LogMessage
@@ -78,11 +76,13 @@ const LOG_TYPE_SEVERITY = Object.freeze({
 });
 
 /**
- * Converts value to LOG_TYPE coercing it to lowercase string if needed
+ * Converts value to LOG_TYPE coercing it to string if needed
  * @param {*} v value to convert
+ * @param {boolean} [canNull=false] pass true to return null for null input
  * @returns {LOG_TYPE}
  */
-export function asMsgType(v){
+export function asMsgType(v, canNull = false){
+  if (canNull && v===null) return null;
   v = strings.asString(v);
   if (strings.isOneOf(v, ALL_TYPES, false)) return v;
   return LOG_TYPE.INFO;
@@ -145,37 +145,4 @@ export function writeConsole(msg, dTopic = null, dFrom = null){
         msg.text,
         map);
   }
-}
-
-
-/**
- * ILog contract
- */
-export class ILog extends Module{
-
-  constructor(dir, cfg){
-    super(dir, cfg);
-
-    //todo build sinks
-  }
-
-  /**
-   * Writes log message into logging system
-   * @param {LogMessage} msg log message to write
-   * @returns {guid} message Guid string
-   */
-  write(msg){
-    msg = normalizeMsg(msg);
-    this._doWrite(msg);
-    return msg.guid;
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  _doWrite(msgFrame){ throw ABSTRACT("ILog._doWrite()"); }
-}
-
-/** Console logger */
-export class ConLog extends ILog{
-  constructor(dir, cfg){ super(dir, cfg); }
-  _doWrite(msg){ writeConsole(msg, `app('${this.app.id}')`, this.constructor.name); }
 }
