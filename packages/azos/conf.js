@@ -38,8 +38,11 @@ export class ConfigError extends types.AzosError {
 export function config(content){ return new Configuration(content); }
 
 /**
- * Allows to treat complex values in config nodes as verbatim values -without
- * turing objects into sections and arrays into collection ConfigNodes
+ * Wraps a complex value in config nodes as a verbatim one - without turning objects
+ * into config sections and arrays into collection ConfigNodes.
+ *
+ * For example, if you need to pass-in an array (e.g. a buffer) directly into a config value
+ * you write something like `{buffer: new Verbatim([])}`
  */
 export class Verbatim{
   #value;

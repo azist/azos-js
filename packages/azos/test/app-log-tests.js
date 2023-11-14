@@ -6,7 +6,7 @@
 
 import { describe, it } from "mocha";
 import * as aver from "../aver.js";
-import { ABSTRACT } from "../coreconsts.js"
+//import { ABSTRACT } from "../coreconsts.js"
 import { ILog } from "../ilog.js";
 import { application } from "../application.js";
 import { Verbatim } from "../conf.js";
@@ -25,7 +25,7 @@ class IMemoryLog extends ILog{
 
 describe("#AppLog", function() {
 
-  it("Basic1",   function() {
+  it("write membuffer",   function() {
 
     let logBuffer = [];
 

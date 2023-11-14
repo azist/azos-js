@@ -9,7 +9,11 @@ import { ABSTRACT } from "./coreconsts.js";
 import { Module } from "./modules.js";
 
 /**
- * ILog contract
+ * ILog contract sets protocol for writing log messages to various loggers/sinks.
+ * To use logger, you need to either use DI to resolve ref using linker or obtain app-wide logger ref via "app.log" prop,
+ * then call {@link write} passing a log message.
+ *
+ * To create custom logging/sinks, you implement this contract by deriving from it and overriding {@link _doWrite()}
  */
 export class ILog extends Module{
 

@@ -1,5 +1,4 @@
 import {application} from "azos/application";
-import * as types from "azos/types";
 import { LOG_TYPE } from "azos/log";
 
 console.info('Hook you hard barbindoziy');
