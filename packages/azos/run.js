@@ -8,7 +8,7 @@ export class Unit{
   constructor(parent, name, init = null){
     parent = parent ?? null;
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
-    this.#name = aver.asString(name);
+    this.#name = aver.isString(name);
     init = init !== null ? aver.isFunction(init) : null;
 
     if (init !== null) init.apply(this);
@@ -29,6 +29,7 @@ export class Unit{
   }
 
   run(ctx){
+    console.info(this.#name);
     for(const one of this.#children){
       one.run(ctx);
     }
@@ -42,7 +43,7 @@ export class Case{
   #body;
   constructor(unit, name, body){
     this.#unit = aver.isOf(unit, Unit);
-    this.#name = aver.asString(name);
+    this.#name = aver.isString(name);
     this.#body = aver.isFunction(body);
     this.#unit.register(this);
   }
@@ -53,6 +54,7 @@ export class Case{
 
   /** Executes case body such as a unit test body */
   run(){
+    console.info(this.#name);
     this.#body.apply(this);
   }
 }
