@@ -241,11 +241,14 @@ export class Runner{
   }
 
   endUnit(unit, error){
-    //todo dump error!!!!
     this.#indent--;
     this.#sindent = "".padStart(this.#indent * 2, "  ");
     this.#sindent2 = this.#sindent;
     console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: \x1b[91m${this.#countError}  \x1b[90mTotal: ${this.#countTotal} \x1b[0m \n`);
+    if (error !== null){
+      this.#countError++;
+      console.error(`\x1b[90m${this.#sindent2}\x1b[30m\x1b[105m Error \x1b[97m\x1b[45m ${unit.name} \x1b[0m \x1b[35m${error.toString()}\x1b[0m `);
+    }
   }
 
   beginCase(cse){
