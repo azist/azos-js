@@ -17,7 +17,7 @@ export class Unit{
   constructor(parent, name, init = null){
     parent = parent ?? null;
     Unit.#idSeed++;
-    this.#id = `U${Unit.#idSeed.toString(16).padStart(4, "0")}`;
+    this.#id = `U${Unit.#idSeed.toString().padStart(4, "0")}`;
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
     this.#name = aver.isString(name);
     init = init !== null ? aver.isFunction(init) : null;
@@ -79,7 +79,7 @@ export class Case{
   #body;
   constructor(unit, name, body){
     Case.#idSeed++;
-    this.#id = `C${Case.#idSeed.toString(16).padStart(4, "0")}`;
+    this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
     this.#body = aver.isFunction(body);
@@ -124,6 +124,7 @@ export class Runner{
 
   #indent;
   #sindent;
+  #sindent2;
 
   #countOk;
   #countError;
@@ -133,6 +134,7 @@ export class Runner{
   constructor(){
     this.#indent = 0;
     this.#sindent = "";
+    this.#sindent2 = "";
 
     this.#countOk = 0;
     this.#countError = 0;
@@ -148,22 +150,24 @@ export class Runner{
   //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
 
   beginUnit(unit){
-    console.log(`${this.#sindent} \x1b[90mBegin unit \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
+    console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
     this.#countUnits++;
     this.#indent++;
-    this.#sindent = "".padStart(this.#indent * 2, "··") + "├";
+    this.#sindent = "".padStart(this.#indent * 2, "  ") + "├─";
+    this.#sindent2 = "".padStart(this.#indent * 2, "  ") + "│ └─";
   }
 
   endUnit(unit, error){
     //todo dump error!!!!
     this.#indent--;
     this.#sindent = "".padStart(this.#indent * 2, "  ");
-    console.log(`\x1b[90m${this.#sindent}  └ \x1b[97m${unit.id} \x1b[90mOK: \x1b[92m${this.#countOk}\x1b[0m  \x1b[90mErrors:  \x1b[91m${this.#countError}\x1b[0m  \x1b[97mTotal: ${this.#countTotal}\x1b[0m \n`);
+    this.#sindent2 = this.#sindent;
+    console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: \x1b[91m${this.#countError}  \x1b[90mTotal: ${this.#countTotal} \x1b[0m \n`);
   }
 
   beginCase(cse){
     this.#countTotal++;
-    console.log(`\x1b[90m${this.#sindent} Case ${cse.unit.id}.${cse.id} -> '${cse.name}' `);
+    console.log(`\x1b[90m${this.#sindent}Case ${cse.unit.id}.\x1b[37m${cse.id} -> \x1b[36m'${cse.name}' \x1b[0m`);
   }
 
   endCase(cse, error){
@@ -171,7 +175,7 @@ export class Runner{
       this.#countOk++;
     } else {
       this.#countError++;
-      console.error(`\x1b[90m${this.#sindent} \x1b[93mError: \x1b[91m${error.toString()}\x1b[0m `);
+      console.error(`\x1b[90m${this.#sindent2}\x1b[30m\x1b[101mError:\x1b[0m \x1b[91m${error.toString()}\x1b[0m `);
     }
   }
 
