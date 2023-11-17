@@ -4,7 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { describe, it } from "mocha";
+//import { describe, it } from "mocha";
+import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as aver from "../aver.js";
 import { $ } from "../linq.js";
 import * as sut from "../conf.js";

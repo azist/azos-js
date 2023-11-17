@@ -1,6 +1,7 @@
-import * as run from "../run.js"
-import * as avers from "./aver-tests.js"
+import {suite, Runner} from "../run.js";
+import "./aver-tests.js";
+//import "./conf-tests.js";
 
 
-run.defineSuite();
-run.rootUnit().run();
+//run.defineSuite();
+suite().run(new Runner());
