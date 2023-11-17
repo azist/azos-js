@@ -145,6 +145,7 @@ export class Runner{
   get countTotal(){ return this.#countTotal; }
   get countUnits(){ return this.#countUnits; }
 
+  //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
 
   beginUnit(unit){
     console.log(`${this.#sindent} \x1b[90mBegin unit \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
@@ -157,18 +158,21 @@ export class Runner{
     //todo dump error!!!!
     this.#indent--;
     this.#sindent = "".padStart(this.#indent * 2, "  ");
-    console.log(`${this.#sindent}  └ \x1b[97m${unit.id} \x1b[90mOK: \x1b[92m${this.#countOk}\x1b[0m  \x1b[90mErrors:  \x1b[91m${this.#countError}\x1b[0m  \x1b[97mTotal: ${this.#countTotal}\x1b[0m \n`);
+    console.log(`\x1b[90m${this.#sindent}  └ \x1b[97m${unit.id} \x1b[90mOK: \x1b[92m${this.#countOk}\x1b[0m  \x1b[90mErrors:  \x1b[91m${this.#countError}\x1b[0m  \x1b[97mTotal: ${this.#countTotal}\x1b[0m \n`);
   }
 
   beginCase(cse){
     this.#countTotal++;
-    console.log(`${this.#sindent} \x1b[90mCase ${cse.unit.id}.${cse.id} -> '${cse.name}' `);
+    console.log(`\x1b[90m${this.#sindent} Case ${cse.unit.id}.${cse.id} -> '${cse.name}' `);
   }
 
   endCase(cse, error){
-    if (error === null) this.#countOk++; else this.countError++;
-  //  console.info(`${this.#sindent} Case ${cse.unit.id}.${cse.id} -> '${cse.name}' `);
-    //todo dump error!!!!
+    if (error === null){
+      this.#countOk++;
+    } else {
+      this.#countError++;
+      console.error(`\x1b[90m${this.#sindent} \x1b[93mError: \x1b[91m${error.toString()}\x1b[0m `);
+    }
   }
 
 }
