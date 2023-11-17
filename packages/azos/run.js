@@ -32,7 +32,6 @@ export class Unit{
       } finally {
         units.pop();
       }
-
     }
   }
 
@@ -113,15 +112,11 @@ export class Case{
   /** Returns a function body for case execution */
   get body(){return this.#body;}
 
-  _match(runner){
-    return runner.matchCase(this);
-  }
+  _match(runner){ return runner.matchCase(this); }
 
   /** Executes case body such as a unit test body */
   run(runner){
     if (!runner) runner = Runner.default;
-
-    //if (!runner.matchCase(this)) return false;
 
     runner.beginCase(this);
     try{
@@ -130,26 +125,60 @@ export class Case{
     }catch(error){
       runner.endCase(this, error);
     }
-
-    return true;
   }
-
 }
 
-export function cmdArgsCaseFilter(cse){
-  if (typeof(process) === 'undefined') return true;//args not avail
+let argsParsed = false;
+let argsUnits = null;
+let argsCases = null;
 
-  const icn = process.argv.indexOf("-c");
-  if (icn > 0 && icn < process.argv.length-1){
-    const cn = process.argv[icn+1];
-    if (cse.name.indexOf(cn) < 0) return false;
+/**
+ * Default implementation for process cmd args parsing `-u UnitName -c CaseName`
+ * @param {*} cse
+ * @returns
+ */
+export function cmdArgsCaseFilter(cse){
+  if (!argsParsed){
+    argsParsed = true;
+    if (typeof(process) === 'undefined') return true;//args not avail
+
+    const idx = process.argv.indexOf("--filter");
+    if (idx > 0 && idx < process.argv.length-1){
+      const filterSegments = process.argv[idx+1].split(" ").filter(one => one !== '');
+      for(const one of filterSegments){
+        if (one.length > 1 && one.startsWith("&")){//case
+          if (argsCases===null) argsCases = [];
+          argsCases.push(one.slice(1));//get rid of &
+        }else{
+          if (argsUnits===null) argsUnits = [];
+          argsUnits.push(one);
+        }
+      }
+    }
   }
 
-  const iun = process.argv.indexOf("-u");
-  if (iun > 0 && iun < process.argv.length-1){
-    const un = process.argv[iun+1];
-    //console.log(`Filter for unit '${un}'`)
-    if (cse.unit.name.indexOf(un) < 0) return false;
+  if (!cse) return false;
+
+  if (argsUnits !== null){
+    let found = false;
+    for(const pat of argsUnits){
+      if (cse.unit.name.indexOf(pat) >=0){
+        found = true;
+        break;
+      }
+    }
+    if (!found) return false;
+  }
+
+  if (argsCases !== null){
+    let found = false;
+    for(const pat of argsCases){
+      if (cse.name.indexOf(pat) >=0){
+        found = true;
+        break;
+      }
+    }
+    if (!found) return false;
   }
 
   return true;

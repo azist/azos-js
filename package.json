@@ -44,7 +44,7 @@
     "--test1": "echo \"Error: no test specified\" && exit 1",
     "--test2": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
     "Xtest": "mocha \"./packages/**/*.js\"",
-    "test": "node  packages/azos/test/app.mjs -- -u",
+    "test": "node  packages/azos/test/app.mjs -- --filter",
     "test-match": "mocha \"./packages/**/*.js\" -g",
     "test-azos": "npm test -workspace=azos",
     "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\"",
