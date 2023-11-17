@@ -51,18 +51,30 @@ export class Unit{
     return true;
   }
 
+  _match(runner){
+    for(const one of this.#children){
+      if (one._match(runner)) return true;
+    }
+    return false;
+  }
+
   run(runner){
     if (!runner) runner = Runner.default;
 
+    const matching = this.#children.filter(one => one._match(runner));
+    if (matching.length === 0) return false;
+
     runner.beginUnit(this);
     try{
-      for(const one of this.#children){
+      for(const one of matching){
         one.run(runner);
       }
       runner.endUnit(this, null);
     }catch(error){
       runner.endUnit(this, error);
     }
+
+    return true;
   }
 }
 
@@ -101,9 +113,15 @@ export class Case{
   /** Returns a function body for case execution */
   get body(){return this.#body;}
 
+  _match(runner){
+    return runner.matchCase(this);
+  }
+
   /** Executes case body such as a unit test body */
   run(runner){
     if (!runner) runner = Runner.default;
+
+    //if (!runner.matchCase(this)) return false;
 
     runner.beginCase(this);
     try{
@@ -112,10 +130,30 @@ export class Case{
     }catch(error){
       runner.endCase(this, error);
     }
+
+    return true;
   }
 
 }
 
+export function cmdArgsCaseFilter(cse){
+  if (typeof(process) === 'undefined') return true;//args not avail
+
+  const icn = process.argv.indexOf("-c");
+  if (icn > 0 && icn < process.argv.length-1){
+    const cn = process.argv[icn+1];
+    if (cse.name.indexOf(cn) < 0) return false;
+  }
+
+  const iun = process.argv.indexOf("-u");
+  if (iun > 0 && iun < process.argv.length-1){
+    const un = process.argv[iun+1];
+    //console.log(`Filter for unit '${un}'`)
+    if (cse.unit.name.indexOf(un) < 0) return false;
+  }
+
+  return true;
+}
 
 export class Runner{
   static #dflt = new Runner();
@@ -130,8 +168,9 @@ export class Runner{
   #countError;
   #countTotal;
   #countUnits;
+  #fCaseFilter;
 
-  constructor(){
+  constructor(fCaseFilter = null){
     this.#indent = 0;
     this.#sindent = "";
     this.#sindent2 = "";
@@ -140,12 +179,27 @@ export class Runner{
     this.#countError = 0;
     this.#countTotal = 0;
     this.#countUnits = 0;
+
+    this.#fCaseFilter = types.isFunction(fCaseFilter) ? fCaseFilter : null;
   }
 
   get countOk(){ return this.#countOk; }
   get countError(){ return this.#countError; }
   get countTotal(){ return this.#countTotal; }
   get countUnits(){ return this.#countUnits; }
+
+  /**
+   * Returns true when the supplied case matches the conditions and should be executed.
+   * You can test for `cse.unit` property as well
+   * @param {Case} cse to match
+   * @returns {boolean} true when case should be ran
+   */
+  matchCase(cse){
+    const f = this.#fCaseFilter;
+    if (f !== null) return f(cse);
+    return true;
+  }
+
 
   //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
 
