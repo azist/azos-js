@@ -133,9 +133,9 @@ let argsUnits = null;
 let argsCases = null;
 
 /**
- * Default implementation for process cmd args parsing `-u UnitName -c CaseName`
- * @param {*} cse
- * @returns
+ * Default implementation for process cmd args parsing `--filter "Unit1 Unit2 &caseX &caseY"`
+ * @param {Case} cse case to filter
+ * @returns true if the supplied case satisfies the logical filter set from via command line args
  */
 export function cmdArgsCaseFilter(cse){
   if (!argsParsed){

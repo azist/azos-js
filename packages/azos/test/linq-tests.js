@@ -4,16 +4,17 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { describe, it } from "mocha";
+//import { describe, it } from "mocha";
+import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as sut from "../linq.js";
 import * as aver from "../aver.js";
 import * as types from "../types.js";
 
 describe("LINQ", function() {
 
- 
+
   describe("#iteration", function() {
-    it("root single",   function() { 
+    it("root single",   function() {
       let a = [1,2,3];
 
       let q = sut.$(a);
@@ -38,7 +39,7 @@ describe("LINQ", function() {
       aver.areEqual(undefined, entry.value);
     });
 
-    it("toArray single",   function() { 
+    it("toArray single",   function() {
       let a = [1,2,3];
 
       let q = sut.$(a).toArray();
@@ -63,7 +64,7 @@ describe("LINQ", function() {
       aver.areEqual(undefined, entry.value);
     });
 
-    it("toArray multiple",   function() { 
+    it("toArray multiple",   function() {
       let a = [1,2,3];
 
       let q = sut.$(a).toArray();
@@ -99,7 +100,7 @@ describe("LINQ", function() {
       aver.areEqual(undefined, entry2.value);
     });
 
-    it("select single",   function() { 
+    it("select single",   function() {
       let a = [1,2,3];
 
       let q = sut.$(a).select(e => e*10);
@@ -124,7 +125,7 @@ describe("LINQ", function() {
       aver.areEqual(undefined, entry.value);
     });
 
-    it("select multiple",   function() { 
+    it("select multiple",   function() {
       let a = [1,2,3];
 
       let q = sut.$(a).select(e => e*10);
@@ -161,10 +162,10 @@ describe("LINQ", function() {
     });
 
   });
-  
-  
+
+
   describe("#select()", function() {
-    it("1",   function() { 
+    it("1",   function() {
       let a = [1,2,3,4,5];
       let q = sut.$(a).select(e => e*10).toArray();
       aver.areArraysEquivalent([10,20,30,40,50], q);
@@ -173,7 +174,7 @@ describe("LINQ", function() {
   });
 
   describe("#select-where()", function() {
-    it("1",   function() { 
+    it("1",   function() {
       let a = [1,2,3,4,5];
       let q = sut.$(a).select(e => e*10).where(e => e>30).toArray();
       aver.areArraysEquivalent([40,50], q);
@@ -183,7 +184,7 @@ describe("LINQ", function() {
 
   describe("#count()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
       aver.areEqual( 0, sut.$().count() );
       aver.areEqual( 0, sut.$(undefined).count() );
       aver.areEqual( 0, sut.$(null).count() );
@@ -192,31 +193,31 @@ describe("LINQ", function() {
     });
 
 
-    it("root",   function() { 
+    it("root",   function() {
       let a = [1,2,3,4,5];
       let cnt = sut.$(a).count();
       aver.areEqual( 5, cnt);
     });
 
-    it("select",   function() { 
+    it("select",   function() {
       let a = [1,2,3,4,5];
       let cnt = sut.$(a).select(e => e*10).count();
       aver.areEqual(5, cnt);
     });
 
-    it("select+filter",   function() { 
+    it("select+filter",   function() {
       let a = [1,2,3,4,5];
       let cnt = sut.$(a).select(e => e*10).count(e => e>30);
       aver.areEqual( 2, cnt);
     });
 
-    it("select+where+filter",   function() { 
+    it("select+where+filter",   function() {
       let a = [1,2,3,4,5];
       let cnt = sut.$(a).select(e => e*10).where(e => e>40).count(e => e>30);
       aver.areEqual( 1, cnt);
     });
 
-    it("mixed",   function() { 
+    it("mixed",   function() {
       let a = [1,2,3,4,5];
       aver.areEqual(1, sut.$(a).select(e => e*10).where(e => e>40).count(e => e>30)  );
       aver.areEqual(2, sut.$(a).select(e => e*10).where(e => e>10).count(e => e>30)  );
@@ -230,7 +231,7 @@ describe("LINQ", function() {
 
   describe("#take()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
       aver.areIterablesEquivalent( [], sut.$().take() );
       aver.areIterablesEquivalent( [], sut.$(undefined).take() );
       aver.areIterablesEquivalent( [], sut.$(null).take() );
@@ -252,7 +253,7 @@ describe("LINQ", function() {
 
   describe("#skip()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
       aver.areIterablesEquivalent( [], sut.$().skip() );
       aver.areIterablesEquivalent( [], sut.$(undefined).skip() );
       aver.areIterablesEquivalent( [], sut.$(null).skip() );
@@ -274,7 +275,7 @@ describe("LINQ", function() {
 
   describe("#any()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
       aver.isFalse( sut.$().any() );
       aver.isFalse( sut.$().any(undefined) );
       aver.isFalse( sut.$().any(null) );
@@ -298,7 +299,7 @@ describe("LINQ", function() {
 
   describe("#all()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
       aver.isTrue( sut.$().all() );
       aver.isTrue( sut.$().all(undefined) );
       aver.isTrue( sut.$().all(null) );
@@ -323,7 +324,7 @@ describe("LINQ", function() {
 
   describe("#isEquivalentTo()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
       aver.isFalse( sut.$().isEquivalentTo() );
       aver.isFalse( sut.$().isEquivalentTo(undefined) );
       aver.isFalse( sut.$().isEquivalentTo(null) );
@@ -331,22 +332,22 @@ describe("LINQ", function() {
       aver.isTrue( sut.$([]).isEquivalentTo([]) );
     });
 
-    it("same",   function() { 
+    it("same",   function() {
       let a = sut.$([1,2,3]);
       aver.isTrue( a.isEquivalentTo(a) );
-    });  
+    });
 
-    it("basic",   function() { 
+    it("basic",   function() {
       aver.isTrue( sut.$([1,2,3]).isEquivalentTo([1,2,3]) );
       aver.isFalse( sut.$([1,2,33]).isEquivalentTo([1,2,3]) );
       aver.isFalse( sut.$([1,2,3]).isEquivalentTo([1,2,33]) );
 
       aver.isFalse( sut.$([1,2,3]).isEquivalentTo([1,2,3,4]) );
       aver.isFalse( sut.$([1,2,3,4]).isEquivalentTo([1,2,3]) );
-      
+
     });
 
-    it("basic wrapped",   function() { 
+    it("basic wrapped",   function() {
       aver.isTrue( sut.$([1,2,3]).isEquivalentTo(   sut.$([1,2,3])  ));
       aver.isFalse( sut.$([1,2,33]).isEquivalentTo( sut.$([1,2,3])  ));
       aver.isFalse( sut.$([1,2,3]).isEquivalentTo(  sut.$([1,2,33]) ));
@@ -355,7 +356,7 @@ describe("LINQ", function() {
       aver.isFalse( sut.$([1,2,3,4]).isEquivalentTo(sut.$([1,2,3])   ));
     });
 
-    it("custom comparer",   function() { 
+    it("custom comparer",   function() {
       aver.isTrue( sut.$([1,2,3]).isEquivalentTo([10,20,30], (a,b) => 10*a === b) );
       aver.isFalse( sut.$([10,20,30]).isEquivalentTo([10,20,30], (a,b) => 10*a === b) );
 
@@ -363,7 +364,7 @@ describe("LINQ", function() {
       aver.isTrue( sut.$([1,2,3]).isEquivalentTo(["1","2","3"], (a,b) => a === types.asInt(b)) );
     });
 
-    it("chained",   function() { 
+    it("chained",   function() {
       const a = sut.$([1,2,3,5,7,9]).where(e => e%2!==0);
       const b = sut.$([1,2,3,4,4,4,4,5,6,7,8,9]).where(e => e%2!==0);
 
@@ -376,49 +377,49 @@ describe("LINQ", function() {
 
   describe("#concat()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
 
       const a = sut.$([1,2,3,4]);
 
-      aver.areIterablesEquivalent(a, a.concat()); 
-      aver.areIterablesEquivalent(a, a.concat(undefined)); 
-      aver.areIterablesEquivalent(a, a.concat(null)); 
+      aver.areIterablesEquivalent(a, a.concat());
+      aver.areIterablesEquivalent(a, a.concat(undefined));
+      aver.areIterablesEquivalent(a, a.concat(null));
     });
 
-    it("basic",   function() { 
+    it("basic",   function() {
       const a = sut.$([1,2,3,4]);
 
-      aver.areIterablesEquivalent([1,2,3,4,-1,1,9], a.concat([-1,1,9])); 
-      aver.areIterablesEquivalent([1,2,3,4,1,2,3,4], a.concat(a)); 
+      aver.areIterablesEquivalent([1,2,3,4,-1,1,9], a.concat([-1,1,9]));
+      aver.areIterablesEquivalent([1,2,3,4,1,2,3,4], a.concat(a));
     });
 
-    it("chained",   function() { 
+    it("chained",   function() {
       const a = sut.$([1,2,3,4]);
 
-      aver.areIterablesEquivalent([3,4,1,2,3,1,2,3,4], a.where(e=>e>=3).concat(a.where(e=>e<4).concat(a))); 
+      aver.areIterablesEquivalent([3,4,1,2,3,1,2,3,4], a.where(e=>e>=3).concat(a.where(e=>e<4).concat(a)));
     });
   });
 
 
   describe("#orderby()", function() {
 
-    it("empty",   function() { 
+    it("empty",   function() {
 
       const a = sut.$([3,2,1,4]);
 
-      aver.areIterablesEquivalent([1,2,3,4], a.orderBy()); 
-      aver.areIterablesEquivalent([1,2,3,4], a.orderBy(undefined)); 
-      aver.areIterablesEquivalent([1,2,3,4], a.orderBy(null)); 
+      aver.areIterablesEquivalent([1,2,3,4], a.orderBy());
+      aver.areIterablesEquivalent([1,2,3,4], a.orderBy(undefined));
+      aver.areIterablesEquivalent([1,2,3,4], a.orderBy(null));
     });
 
-    it("basic",   function() { 
+    it("basic",   function() {
       const a = sut.$([4,2,1,3]);
 
-      aver.areIterablesEquivalent([1,2,3,4], a.orderBy()); 
-      aver.areIterablesEquivalent([4,3,2,1], a.orderBy((a,b) => a>b ? -1 : 1 )); 
+      aver.areIterablesEquivalent([1,2,3,4], a.orderBy());
+      aver.areIterablesEquivalent([4,3,2,1], a.orderBy((a,b) => a>b ? -1 : 1 ));
     });
 
-    it("chained",   function() { 
+    it("chained",   function() {
       const a = sut.$([
         {id: "SRAY", name: "Sugar Ray", age: 123},
         {id: "CJON", name: "Captain John", age: 89},
@@ -426,23 +427,23 @@ describe("LINQ", function() {
         {id: "BIK", name: "Bike Murdock", age: 19},
       ]);
 
-      aver.areIterablesEquivalent([19, 45, 89, 123], a.select(e=>e.age).orderBy((a,b)=>a>b?1:-1)); 
+      aver.areIterablesEquivalent([19, 45, 89, 123], a.select(e=>e.age).orderBy((a,b)=>a>b?1:-1));
 
-      aver.areIterablesEquivalent(["CJON","ALX"], a.orderBy((a,b)=>a.age>b.age?-1:1).select(e=>e.id).skip(1).take(2) ); 
+      aver.areIterablesEquivalent(["CJON","ALX"], a.orderBy((a,b)=>a.age>b.age?-1:1).select(e=>e.id).skip(1).take(2) );
     });
   });
 
 
   describe("#distinct()", function() {
 
-    it("basic",   function() { 
+    it("basic",   function() {
       const a = sut.$([1,2,2,2,2,3,3,4]);
-      aver.areIterablesEquivalent([1,2,3,4], a.distinct()); 
+      aver.areIterablesEquivalent([1,2,3,4], a.distinct());
     });
 
-    it("basic + selector",   function() { 
+    it("basic + selector",   function() {
       const a = sut.$([1,2,2,2,2,3,3,4]);
-      aver.areIterablesEquivalent([1,3], a.distinct(e => e<3 ? 1 : 2 )); 
+      aver.areIterablesEquivalent([1,3], a.distinct(e => e<3 ? 1 : 2 ));
     });
 
     const a = sut.$([
@@ -452,61 +453,61 @@ describe("LINQ", function() {
       {id: 4, age: 34, name: "Alex"},
       {id: 5, age: 35, name: "Alex"}]);
 
-    it("objects + selector",   function() { 
+    it("objects + selector",   function() {
       aver.areIterablesEquivalent([10,12,34,35], a.distinct(e => e.age).select(e => e.age));
-      aver.areIterablesEquivalent(["Alex","Doris","Alex","Alex"], a.distinct(e => e.age).select(e => e.name)); 
+      aver.areIterablesEquivalent(["Alex","Doris","Alex","Alex"], a.distinct(e => e.age).select(e => e.name));
       aver.areIterablesEquivalent([10,12,10], a.distinct(e => e.name).select(e => e.age));
-      aver.areIterablesEquivalent([1,2,3], a.distinct(e => e.name).select(e => e.id)); 
+      aver.areIterablesEquivalent([1,2,3], a.distinct(e => e.name).select(e => e.id));
     });
 
-    it("objects + selector + count",   function() { 
-      aver.areEqual( 4, a.distinct(e => e.age).count() ); 
-      aver.areEqual( 3, a.distinct(e => e.name).count() ); 
+    it("objects + selector + count",   function() {
+      aver.areEqual( 4, a.distinct(e => e.age).count() );
+      aver.areEqual( 3, a.distinct(e => e.name).count() );
     });
   });
-  
+
 
   describe("#firstOrDefault()", function() {
 
-    it("empty+basic",   function() { 
+    it("empty+basic",   function() {
 
       const a = sut.$([3,2,1,4]);
 
       let match = a.firstOrDefault();
       aver.isTrue(match.ok);
-      aver.areEqual(3, match.value); 
+      aver.areEqual(3, match.value);
 
       match = a.firstOrDefault(undefined);
       aver.isTrue(match.ok);
       aver.areEqual(3, match.value);
     });
 
-    it("with predicate",   function() { 
+    it("with predicate",   function() {
       const a = sut.$([3,2,1,4]);
 
       let match = a.firstOrDefault(e => e>3);
       aver.isTrue(match.ok);
-      aver.areEqual(4, match.value); 
+      aver.areEqual(4, match.value);
 
       match = a.firstOrDefault(e => e<0);
       aver.isFalse(match.ok);
-      aver.isUndefined(match.value); 
+      aver.isUndefined(match.value);
     });
 
-    it("chained",   function() { 
+    it("chained",   function() {
       const a = sut.$([1,2,3,4,5,6,7,8,9,0]);
 
-      aver.areEqual( 22, a.where(e => e> 1).select(e => (e*10)+e).firstOrDefault().value); 
-      aver.areEqual( 88, a.where(e => e> 1).select(e => (e*10)+e).firstOrDefault(e => e>80).value); 
+      aver.areEqual( 22, a.where(e => e> 1).select(e => (e*10)+e).firstOrDefault().value);
+      aver.areEqual( 88, a.where(e => e> 1).select(e => (e*10)+e).firstOrDefault(e => e>80).value);
     });
   });
 
   describe("#first()", function() {
 
-    it("basic",   function() { 
+    it("basic",   function() {
 
       const a = sut.$([3,2,1,4]);
-      aver.areEqual(3,a.first()); 
+      aver.areEqual(3,a.first());
 
       aver.throws( function(){
         a.first(e => e<0);
@@ -514,7 +515,7 @@ describe("LINQ", function() {
 
     });
 
-    it("empty sequence",   function() { 
+    it("empty sequence",   function() {
       const a = sut.$();
       aver.throws( function(){
         a.first();

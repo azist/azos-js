@@ -4,19 +4,20 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { describe, it } from "mocha";
+//import { describe, it } from "mocha";
+import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as sut from "../localization.js";
 import * as aver from "../aver.js";
 
 describe("Localization", function() {
 
   describe("#Localizer", function() {
-    
+
     const dloc = new sut.Localizer();//Default Localizer
 
 
     describe("#getCurrencySymbols()", function() {
-      it("returns object", function(){ 
+      it("returns object", function(){
         let got = dloc.getCurrencySymbols(sut.CULTURE_INVARIANT);
         console.log( got );
         aver.areEqual("$", got.sym);
@@ -24,9 +25,9 @@ describe("Localization", function() {
         aver.areEqual(".", got.ds);
       });
     });
-    
+
     describe("#getPrimaryLanguageIso()", function() {
-      it("returns ENG", function(){ 
+      it("returns ENG", function(){
         let got = dloc.getPrimaryLanguageIso(sut.CULTURE_INVARIANT);
         console.log( got );
         aver.areEqual(sut.ISO_LANG_ENG, got);
@@ -34,7 +35,7 @@ describe("Localization", function() {
     });
 
     describe("#getLanguageIsos()", function() {
-      it("returns ENG", function(){ 
+      it("returns ENG", function(){
         let got = dloc.getLanguageIsos(sut.CULTURE_INVARIANT);
         aver.isArray(got);
         aver.areEqual(sut.ISO_LANG_ENG, got[0]);
@@ -42,7 +43,7 @@ describe("Localization", function() {
     });
 
     describe("#getStringLocalizationIsos()", function() {
-      it("returns ENG", function(){ 
+      it("returns ENG", function(){
         let got = dloc.getStringLocalizationIsos();
         aver.isArray(got);
         aver.areEqual(5, got.length);
@@ -69,95 +70,95 @@ describe("Localization", function() {
 
 
     describe("#formatDateTime()", function() {
-      
+
       const dt = new Date(2017, 5, 12,  15, 43, 19, 89);// 12/june/2017 = Monday
 
-      it("arg0s", function(){ 
+      it("arg0s", function(){
         let got = dloc.formatDateTime(dt);
         console.log( got );
         aver.areEqual("06/12/2017", got);
       });
 
-      it("LONG_WEEK_DATE", function(){ 
+      it("LONG_WEEK_DATE", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_WEEK_DATE});
         console.log( got );
         aver.areEqual("Monday, 12 June 2017", got);
       });
 
-      it("SHORT_WEEK_DATE", function(){ 
+      it("SHORT_WEEK_DATE", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.SHORT_WEEK_DATE});
         console.log( got );
         aver.areEqual("Mon, 12 Jun 2017", got);
       });
 
-      it("LONG_DATE", function(){ 
+      it("LONG_DATE", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_DATE});
         console.log( got );
         aver.areEqual("12 June 2017", got);
       });
 
-      it("SHORT_DATE", function(){ 
+      it("SHORT_DATE", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.SHORT_DATE});
         console.log( got );
         aver.areEqual("12 Jun 2017", got);
       });
 
-      it("NUM_DATE", function(){ 
+      it("NUM_DATE", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.NUM_DATE});
         console.log( got );
         aver.areEqual("06/12/2017", got);
       });
 
-      it("LONG_MONTH", function(){ 
+      it("LONG_MONTH", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_MONTH});
         console.log( got );
         aver.areEqual("June 2017", got);
       });
 
-      it("SHORT_MONTH", function(){ 
+      it("SHORT_MONTH", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.SHORT_MONTH});
         console.log( got );
         aver.areEqual("Jun 2017", got);
       });
 
-      it("NUM_MONTH", function(){ 
+      it("NUM_MONTH", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.NUM_MONTH});
         console.log( got );
         aver.areEqual("06/2017", got);
       });
 
-      it("LONG_DAY_MONTH", function(){ 
+      it("LONG_DAY_MONTH", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_DAY_MONTH});
         console.log( got );
         aver.areEqual("12 June", got);
       });
 
-      it("SHORT_DAY_MONTH", function(){ 
+      it("SHORT_DAY_MONTH", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.SHORT_DAY_MONTH});
         console.log( got );
         aver.areEqual("12 Jun", got);
       });
 
 
-      it("LONG_WEEK_DATE+HM", function(){ 
+      it("LONG_WEEK_DATE+HM", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_WEEK_DATE, tmDetails: sut.TIME_DETAILS.HM});
         console.log( got );
         aver.areEqual("Monday, 12 June 2017 15:43", got);
       });
 
-      it("LONG_WEEK_DATE+HMS", function(){ 
+      it("LONG_WEEK_DATE+HMS", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_WEEK_DATE, tmDetails: sut.TIME_DETAILS.HMS});
         console.log( got );
         aver.areEqual("Monday, 12 June 2017 15:43:19", got);
       });
 
-      it("LONG_WEEK_DATE+HMSM", function(){ 
+      it("LONG_WEEK_DATE+HMSM", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_WEEK_DATE, tmDetails: sut.TIME_DETAILS.HMSM});
         console.log( got );
         aver.areEqual("Monday, 12 June 2017 15:43:19:089", got);
       });
 
-      it("LONG_WEEK_DATE+HMSM in UTC", function(){ 
+      it("LONG_WEEK_DATE+HMSM in UTC", function(){
         let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_WEEK_DATE, tmDetails: sut.TIME_DETAILS.HMSM, utc: true});
         console.log( got );
         aver.areNotEqual("Monday, 12 June 2017 15:43:19:089", got);// the actual time shift depends on the workstation
@@ -224,7 +225,7 @@ describe("Localization", function() {
       });
 
 
-    }); 
+    });
 
   });
 
