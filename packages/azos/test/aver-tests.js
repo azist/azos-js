@@ -13,8 +13,6 @@ describe("Aver", function() {
 
   describe("#isUndefined()", function() {
 
-   console.log(this.name);
-
     it("pass undefined",   function() {
       let x = undefined;
       sut.isUndefined(x);

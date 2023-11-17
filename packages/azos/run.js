@@ -17,7 +17,7 @@ export class Unit{
   constructor(parent, name, init = null){
     parent = parent ?? null;
     Unit.#idSeed++;
-    this.#id = `U-${Unit.#idSeed.toString(16).padStart(4, "0")}`;
+    this.#id = `U${Unit.#idSeed.toString(16).padStart(4, "0")}`;
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
     this.#name = aver.isString(name);
     init = init !== null ? aver.isFunction(init) : null;
@@ -25,7 +25,15 @@ export class Unit{
     if (parent !== null){
       this.#parent.register(this);
     }
-    if (init !== null) init.apply(this);
+    if (init !== null){
+      units.push(this);
+      try{
+        init.apply(this);
+      } finally {
+        units.pop();
+      }
+
+    }
   }
 
   /**
@@ -71,7 +79,7 @@ export class Case{
   #body;
   constructor(unit, name, body){
     Case.#idSeed++;
-    this.#id = `C-${Case.#idSeed.toString(16).padStart(4, "0")}`;
+    this.#id = `C${Case.#idSeed.toString(16).padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
     this.#body = aver.isFunction(body);
@@ -116,28 +124,49 @@ export class Runner{
 
   #indent;
   #sindent;
+
+  #countOk;
+  #countError;
+  #countTotal;
+  #countUnits;
+
   constructor(){
     this.#indent = 0;
+    this.#sindent = "";
+
+    this.#countOk = 0;
+    this.#countError = 0;
+    this.#countTotal = 0;
+    this.#countUnits = 0;
   }
 
+  get countOk(){ return this.#countOk; }
+  get countError(){ return this.#countError; }
+  get countTotal(){ return this.#countTotal; }
+  get countUnits(){ return this.#countUnits; }
+
+
   beginUnit(unit){
+    console.log(`${this.#sindent} \x1b[90mBegin unit \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
+    this.#countUnits++;
     this.#indent++;
-    this.#sindent = ">".padStart(this.#indent * 2, " ");
-    console.info(`${this.#sindent} Begin unit: [${unit.id}]('${unit.name}') >`);
+    this.#sindent = "".padStart(this.#indent * 2, "··") + "├";
   }
 
   endUnit(unit, error){
-    console.info(`${this.#sindent} End unit [${unit.id}]('${unit.name}') >`);
     //todo dump error!!!!
     this.#indent--;
-    this.#sindent = ">".padStart(this.#indent * 2, " ");
+    this.#sindent = "".padStart(this.#indent * 2, "  ");
+    console.log(`${this.#sindent}  └ \x1b[97m${unit.id} \x1b[90mOK: \x1b[92m${this.#countOk}\x1b[0m  \x1b[90mErrors:  \x1b[91m${this.#countError}\x1b[0m  \x1b[97mTotal: ${this.#countTotal}\x1b[0m \n`);
   }
 
   beginCase(cse){
-  //  console.info(`${this.#sindent} Case ${cse.unit.id}.${cse.id} -> '${cse.name}' `);
+    this.#countTotal++;
+    console.log(`${this.#sindent} \x1b[90mCase ${cse.unit.id}.${cse.id} -> '${cse.name}' `);
   }
 
   endCase(cse, error){
+    if (error === null) this.#countOk++; else this.countError++;
   //  console.info(`${this.#sindent} Case ${cse.unit.id}.${cse.id} -> '${cse.name}' `);
     //todo dump error!!!!
   }
@@ -146,13 +175,20 @@ export class Runner{
 
 
 
-const root = new Unit(null, "*");
+const units = [new Unit(null, "*")];
 
 /**
  * Returns a root of the run suite, an instance of {@link Unit} class.
  * There is always a default top-level unit with the name "*" called "root".
  */
-export function suite() { return root; }
+export function suite() { return units[0]; }
+
+/**
+ * Returns most current inner unit being declared.
+ * The top level unit is always returned at the end
+ * @returns {Unit}
+ */
+export function current(){ return units[units.length-1]; }
 
 /**
  * Defines a suite of runnable cases by supplying either an init function
@@ -161,13 +197,13 @@ export function suite() { return root; }
  * @returns {Unit} return a suite root unit
  */
 export function defineSuite(def){
-  if (types.isFunction(def)) def.apply(root);
+  if (types.isFunction(def)) def.apply(units[0]);
   else if (types.isArray(def)){
     for(const one of def){
-      root.register(one);
+      units[0].register(one);
     }
   }
-  return root;
+  return units[0];
 }
 
 /**
@@ -178,7 +214,7 @@ export function defineSuite(def){
  * @returns {Unit} newly created unit
  */
 export function defineUnit(name, body){
-  const parent = this instanceof Unit ? this : root;
+  const parent = this instanceof Unit ? this : current();
   return new Unit(parent, name, body);
 }
 
@@ -190,6 +226,6 @@ export function defineUnit(name, body){
  * @returns {Case} newly created run case
  */
 export function defineCase(name, body){
-  const parent = this instanceof Unit ? this : root;
+  const parent = this instanceof Unit ? this : current();
   return new Case(parent, name, body);
 }
