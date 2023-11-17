@@ -258,7 +258,7 @@ export class Runner{
       this.#countOk++;
     } else {
       this.#countError++;
-      console.error(`\x1b[90m${this.#sindent2}\x1b[30m\x1b[101mError:\x1b[0m \x1b[91m${error.toString()}\x1b[0m `);
+      console.error(`\x1b[90m${this.#sindent2}\x1b[30m\x1b[101m Error \x1b[97m\x1b[41m ${cse.unit.name}::${cse.name} \x1b[0m \x1b[91m${error.toString()}\x1b[0m `);
     }
   }
 
