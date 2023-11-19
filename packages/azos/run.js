@@ -57,7 +57,8 @@ export class Unit{
     return false;
   }
 
-  run(runner){
+  /** Async method runs all child units/cases */
+  async run(runner){
     if (!runner) runner = Runner.default;
 
     const matching = this.#children.filter(one => one._match(runner));
@@ -66,7 +67,7 @@ export class Unit{
     runner.beginUnit(this);
     try{
       for(const one of matching){
-        one.run(runner);
+        await one.run(runner);
       }
       runner.endUnit(this, null);
     }catch(error){
@@ -114,13 +115,17 @@ export class Case{
 
   _match(runner){ return runner.matchCase(this); }
 
-  /** Executes case body such as a unit test body */
-  run(runner){
+  /** Async: executes case body such as a unit test body */
+  async run(runner){
     if (!runner) runner = Runner.default;
 
     runner.beginCase(this);
     try{
-      this.#body.call(this, runner);
+
+      const got = this.#body.call(this, runner);
+
+      if (types.isAssigned(got)) await got;
+
       runner.endCase(this, null);
     }catch(error){
       runner.endCase(this, error);
@@ -184,6 +189,10 @@ export function cmdArgsCaseFilter(cse){
   return true;
 }
 
+/**
+ * Provides basic counts of success/errors and overridable `begin/end` style hooks
+ * for units and cases. `matchCase` returns true for cases which will run.
+ */
 export class Runner{
   static #dflt = new Runner();
   /** Returns default runner instance */
@@ -199,6 +208,9 @@ export class Runner{
   #countUnits;
   #fCaseFilter;
 
+  /** Optionally takes a filter predicate `f(Case): bool`.
+   * You can pass default {@link cmdArgsCaseFilter()} which handles command line args in node
+   */
   constructor(fCaseFilter = null){
     this.#indent = 0;
     this.#sindent = "";
@@ -244,7 +256,13 @@ export class Runner{
     this.#indent--;
     this.#sindent = "".padStart(this.#indent * 2, "  ");
     this.#sindent2 = this.#sindent;
-    console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: \x1b[91m${this.#countError}  \x1b[90mTotal: ${this.#countTotal} \x1b[0m \n`);
+
+    if (this.countError > 0){
+      console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: \x1b[91m${this.#countError}  \x1b[90mTotal: \x1b[93m${this.#countTotal} (!) \x1b[0m \n`);
+    } else{
+      console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: ${this.#countError}  \x1b[90mTotal: ${this.#countTotal} \x1b[0m \n`);
+    }
+
     if (error !== null){
       this.#countError++;
       console.error(`\x1b[90m${this.#sindent2}\x1b[30m\x1b[105m Error \x1b[97m\x1b[45m ${unit.name} \x1b[0m \x1b[35m${error.toString()}\x1b[0m `);
@@ -296,7 +314,8 @@ export function defineSuite(def){
     for(const one of def){
       units[0].register(one);
     }
-  }
+  } else { throw new Error("`defineSuite()` needs either an init function or an array of units and/or cases");}
+
   return units[0];
 }
 

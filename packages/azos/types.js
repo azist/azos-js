@@ -236,7 +236,7 @@ export function isObjectOrArray(v){
  */
 export function isFunction(v){
   const t = Object.prototype.toString.call(v);
-  return t === "[object Function]" || t === "[object GeneratorFunction]";
+  return t === "[object Function]" || t === "[object GeneratorFunction]" || t === "[object AsyncFunction]";
 }
 
 /**
