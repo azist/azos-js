@@ -80,8 +80,8 @@ export class BrowserStorage extends IStorage{
 
   get length(){ return this.getStorage().length; }
   key(index){ return this.getStorage().key(index); }
-  getItem(keyName){ return this.getStorage().getItem(keyName);  }
-  setItem(keyName, keyValue){ return this.getStorage().setItem(keyName, keyValue);  }
-  removeItem(keyName){ return this.getStorage().removeItem(keyName);  }
-  clear(){ return this.getStorage().clear();  }
+  getItem(keyName){ return this.getStorage().getItem(keyName); }
+  setItem(keyName, keyValue){ return this.getStorage().setItem(keyName, keyValue); }
+  removeItem(keyName){ return this.getStorage().removeItem(keyName); }
+  clear(){ return this.getStorage().clear(); }
 }
