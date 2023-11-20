@@ -16,7 +16,7 @@ import { Module } from "./modules.js";
  * Storage only supports storing and retrieving strings. If you need to save other data types,
  * you have to convert them to strings. For plain objects and arrays, you can use JSON.stringify().
  */
-export class ILocalStorage extends Module{
+export class IStorage extends Module{
   constructor(dir, cfg){ super(dir, cfg); }
 
   /**
@@ -64,7 +64,7 @@ export class ILocalStorage extends Module{
 }
 
 /** Provides abstraction for working with local/session storage in the Browser. */
-export class BrowserStorage extends ILocalStorage{
+export class BrowserStorage extends IStorage{
   #isSession;
   constructor(dir, cfg){
     aver.isTrue(window && window.sessionStorage && window.localStorage);
