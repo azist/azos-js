@@ -7,6 +7,12 @@
 import * as types from "./types.js";
 import * as aver from "./aver.js";
 
+
+/** Thrown for runner-related exceptions */
+export class RunError extends types.AzosError {
+  constructor(message, from = null, cause = null){ super(message, from, cause, 528); }
+}
+
 /**
  * A unit is a logical grouping of registered cases which can be run.
  * A unit can have child units and/or cases.
@@ -95,6 +101,10 @@ export class Case{
   #unit;
   #name;
   #body;
+
+  #startMs = 0;
+  #endMs = 0;
+  #timeoutMs = 0;
   constructor(unit, name, body){
     Case.#idSeed++;
     this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
@@ -119,6 +129,16 @@ export class Case{
   /** Returns a function body for case execution */
   get body(){return this.#body;}
 
+  /** Last/current execution start timestamp */
+  get startMs(){ return this.#startMs; }
+  /** Last/current execution end timestamp */
+  get endMs(){ return this.#endMs; }
+
+  /** Timeout constraint for this test; default 0 = no timeout */
+  get timeoutMs() {return this.#timeoutMs; }
+  /** Timeout constraint for this test; default 0 = no timeout */
+  set timeoutMs(v) { this.#timeoutMs = v | 0; }
+
   _match(runner){ return runner.matchCase(this); }
 
   /** Async: executes case body such as a unit test body */
@@ -126,14 +146,19 @@ export class Case{
     if (!runner) runner = Runner.default;
 
     runner.beginCase(this);
+    this.#startMs = performance.now();
     try{
-
       const got = this.#body.call(this, runner);
+      if (types.isAssigned(got)) await got; //block on async call
 
-      if (types.isAssigned(got)) await got;
+      this.#endMs = performance.now();
+
+      if (this.#timeoutMs > 0 && (this.#endMs - this.#startMs) > this.#timeoutMs)
+        throw new RunError(`Run timeout of ${this.#timeoutMs} ms exceeded`, "case.run()");
 
       runner.endCase(this, null);
     }catch(error){
+      this.#endMs = performance.now();
       runner.endCase(this, error);
     }
   }
@@ -212,6 +237,7 @@ export class Runner{
   #countError;
   #countTotal;
   #countUnits;
+  #elapsedMs;
   #fCaseFilter;
 
   /** Optionally takes a filter predicate `f(Case): bool`.
@@ -226,6 +252,7 @@ export class Runner{
     this.#countError = 0;
     this.#countTotal = 0;
     this.#countUnits = 0;
+    this.#elapsedMs = 0;
 
     this.#fCaseFilter = types.isFunction(fCaseFilter) ? fCaseFilter : null;
   }
@@ -234,6 +261,7 @@ export class Runner{
   get countError(){ return this.#countError; }
   get countTotal(){ return this.#countTotal; }
   get countUnits(){ return this.#countUnits; }
+  get elapsedMs(){ return this.#elapsedMs; }
 
   /**
    * Returns true when the supplied case matches the conditions and should be executed.
@@ -264,9 +292,9 @@ export class Runner{
     this.#sindent2 = this.#sindent;
 
     if (this.countError > 0){
-      console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: \x1b[91m${this.#countError}  \x1b[90mTotal: \x1b[93m${this.#countTotal} (!) \x1b[0m \n`);
+      console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: \x1b[91m${this.#countError}  \x1b[90mTotal: \x1b[93m${this.#countTotal} (!) \x1b[90m Running time: \x1b[34m${this.#elapsedMs.toFixed(1)} ms\x1b[0m \n`);
     } else{
-      console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: ${this.#countError}  \x1b[90mTotal: ${this.#countTotal} \x1b[0m \n`);
+      console.log(`\x1b[90m${this.#sindent}  └──\x1b[90m ${unit.id}  \x1b[90mOK: \x1b[92m${this.#countOk}  \x1b[90mErrors: ${this.#countError}  \x1b[90mTotal: ${this.#countTotal} \x1b[90m Running time: \x1b[34m${this.#elapsedMs.toFixed(1)} ms\x1b[0m \n`);
     }
 
     if (error !== null){
@@ -277,10 +305,14 @@ export class Runner{
 
   beginCase(cse){
     this.#countTotal++;
-    console.log(`\x1b[90m${this.#sindent}Case ${cse.unit.id}.\x1b[37m${cse.id} -> \x1b[36m'${cse.name}' \x1b[0m`);
   }
 
   endCase(cse, error){
+    const elapsedMs = cse.endMs - cse.startMs;
+    this.#elapsedMs += elapsedMs;
+
+    console.log(`\x1b[90m${this.#sindent}Case ${cse.unit.id}.\x1b[37m${cse.id} -> \x1b[36m'${cse.name}' \x1b[34m${elapsedMs.toFixed(3)} ms \x1b[0m`);
+
     if (error === null){
       this.#countOk++;
     } else {

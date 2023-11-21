@@ -1350,5 +1350,19 @@ describe("Types", function() {
 
   });//genGuid
 
+  describe("MinMaxBetween", function() {
+
+    it("atMin(123.45, 10)",   function() { aver.areEqual(123.45, sut.atMin(123.45, 10));  });
+    it("atMin(-10, 0)",   function() { aver.areEqual(0, sut.atMin(-10, 0));  });
+
+    it("atMax(123.45, 10)",   function() { aver.areEqual(10, sut.atMax(123.45, 10));  });
+    it("atMax(-10, 0)",   function() { aver.areEqual(-10, sut.atMax(-10, 0));  });
+
+    it("keepBetween(15, -10, 0)",   function() { aver.areEqual(0, sut.keepBetween(15, -10, 0));  });
+    it("keepBetween(-18, -10, 0)",   function() { aver.areEqual(-10, sut.keepBetween(-18, -10, 0));  });
+    it("keepBetween(0.1, -10, 0)",   function() { aver.areEqual(0, sut.keepBetween(0.1, -10, 0));  });
+
+  });//MinMaxBetween
+
 
 });

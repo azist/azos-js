@@ -26,10 +26,10 @@ defineCase("runner.function", function(){
 defineCase("runner.arrow", () => aver.areEqual(5, 2 + 3));
 
 defineCase("runner.asyncArrowInstant", async () => aver.areEqual(5, 2 + 3));
-defineCase("runner.asyncArrowDelay", async () => await new Promise(r => setTimeout(r, 500)));
+defineCase("runner.asyncArrowDelay", async () => await new Promise(r => setTimeout(r, 100)));
 
 defineCase("runner.promiseFunctionInstant", function(){ return Promise.resolve(123); } );
-defineCase("runner.promiseFunctionDelay", function(){ return new Promise(r => setTimeout(r, 1500)); });
+defineCase("runner.promiseFunctionDelay", function(){ return new Promise(r => setTimeout(r, 100)); });
 
 //run.defineSuite();
 const runner = new Runner(cmdArgsCaseFilter);

@@ -858,7 +858,7 @@ describe("Config::Performance", function() {
 
 
   it("from Json",   function() { // 75K ops/sec on OCTOD
-    this.timeout(500);//ms
+    this.timeoutMs = 500;
     console.time("cfg");
     for(let i=0; i<10_000; i++){
       const cfg = sut.config(cfgJson);
@@ -869,7 +869,7 @@ describe("Config::Performance", function() {
   });
 
   it("navigate",   function() { // 80K ops/sec on OCTOD
-    this.timeout(350);//ms
+    this.timeoutMs = 350;
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
@@ -880,7 +880,7 @@ describe("Config::Performance", function() {
   });
 
   it("makeNew",   function() { // 200K ops/sec on OCTOD
-    this.timeout(300);//ms
+    this.timeoutMs = 300;
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
