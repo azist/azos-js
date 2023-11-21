@@ -148,7 +148,7 @@ export class AppComponent extends types.DisposableObject{
       from: this.logFrom,
       text: text,
       params: params,
-      rel: rel,
+      rel: rel ?? this.app.instanceId,
       src: src
     });
     return guid;

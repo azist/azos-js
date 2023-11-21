@@ -789,3 +789,10 @@ export function genGuid(){
   const guid = `${srnd.slice(0, 8)}-${srnd.slice(8,12)}-${srnd.slice(12,16)}-${srnd.slice(16,20)}-${srnd.slice(20)}`;
   return guid;
 }
+
+/** Macro caps value at minimum. No type checks are done */
+export function atMin(v, min){ return v < min ? min : v; }
+/** Macro caps value at maximum. No type checks are done */
+export function atMax(v, max){ return v > max ? max : v; }
+/** Macro keeps value between min/max. No type checks are done */
+export function keepBetween(v, min, max){ return v > min ? (v > max ? max : v) : min; }

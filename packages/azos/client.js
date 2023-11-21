@@ -6,10 +6,10 @@
 
 /* eslint-disable no-unused-vars */
 
-import { HEADERS, CONTENT_TYPE } from "./coreconsts.js";
+import { ABSTRACT, METHODS, HEADERS, CONTENT_TYPE } from "./coreconsts.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
-import { ABSTRACT } from "./coreconsts.js";
+import * as types from "./types.js";
 import { LOG_TYPE } from "./log.js";
 import { Module } from "./modules.js";
 
@@ -89,13 +89,13 @@ export class IClient extends Module{
   }
 
   async #obtainNewSessionUserToken(){
-    const rel = this.writeLog(LOG_TYPE.TRACE, "About to obtain AUTH token");
+    this.writeLog(LOG_TYPE.TRACE, "About to obtain AUTH token");
     const refreshToken = this.app.session.user.authRefreshToken;
 
     //make a server call
     const authResponse = await fetch("auth/token",
     {
-      method: "post",
+      method: METHODS.POST,
       body: JSON.stringify({
         refresh: refreshToken
       }),
@@ -107,14 +107,20 @@ export class IClient extends Module{
     const got = await authResponse.json();
 
     const newToken = got["access_token"];
+    const newTokenType = got["token_type"];
     const newRefreshToken = got["refresh_token"];
     const newJwt = got["id_token"];
-    const newTokenType = got["token_type"];
-    const newExpiresInSec = got["expires_in"];
+    const newExpiresInSec = types.asInt(got["expires_in"]);
 
-    //set jwt to session
+    if (newExpiresInSec > 0 && newExpiresInSec < this.#tokenRefreshSec){
+      this.#tokenRefreshSec = types.atMin(0.75 * newExpiresInSec | 0, 10);
+      this.writeLog(LOG_TYPE.WARNING, `Server advised of sooner token expiration in ${newExpiresInSec} sec. Adjusted refresh interval accordingly to ${this.#tokenRefreshSec} sec`);
+    }
 
-    if (rel) this.writeLog(LOG_TYPE.INFO, "Obtained auth token", null, rel);
+    //set identity/jwt to session
+    this.app.session.updateIdentity(newRefreshToken, newJwt);
+
+    this.writeLog(LOG_TYPE.INFO, `Obtained auth token for ${newJwt.sub}`);
     return newToken;
   }
 }
