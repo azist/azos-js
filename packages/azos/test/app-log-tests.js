@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 //import { describe, it } from "mocha";
-import { defineUnit as describe, defineCase as it } from "../run.js";
+import { defineUnit as describe, defineCase as it, condir } from "../run.js";
 import * as aver from "../aver.js";
 import { ILog } from "../ilog.js";
 import * as log from "../log.js";
@@ -55,7 +55,7 @@ describe("Log.Common", function() {
 
   it("exceptionToData(new Error())",   function() {
     const got = log.exceptionToData(new Error("crap message"));
-    console.log(JSON.stringify(got, null, 2));
+    condir("new Error()", got);
     aver.areEqual("Error", got["TypeName"]);
     aver.areEqual("crap message", got["Message"]);
     aver.areEqual(0, got["Code"]);
@@ -68,7 +68,7 @@ describe("Log.Common", function() {
       throw new Error("crap message");
     } catch(err) {
       const got = log.exceptionToData(err);
-      console.log(JSON.stringify(got, null, 2));
+      condir("throw new Error()", got);
       aver.areEqual("Error", got["TypeName"]);
       aver.areEqual("crap message", got["Message"]);
       aver.areEqual(0, got["Code"]);
@@ -79,7 +79,7 @@ describe("Log.Common", function() {
 
   it("exceptionToData(new AzosError())",   function() {
     const got = log.exceptionToData(new AzosError("AZ5 msg", "reactor4", null, -1234));
-    console.log(JSON.stringify(got, null, 2));
+    condir("new AzosError()", got);
     aver.areEqual("AzosError -1234 @ 'reactor4'", got["TypeName"]);
     aver.areEqual("AZ5 msg", got["Message"]);
     aver.areEqual(-1234, got["Code"]);
@@ -96,7 +96,7 @@ describe("Log.Common", function() {
       }
     } catch(err) {
       const got = log.exceptionToData(err);
-      console.log(JSON.stringify(got, null, 2));
+      condir("throw nested azerr", got);
       aver.areEqual("AzosError -1234 @ 'reactor4'", got["TypeName"]);
       aver.areEqual("AZ5 msg", got["Message"]);
       aver.areEqual(-1234, got["Code"]);

@@ -232,8 +232,9 @@ describe("ConfigNode", function() {
     });
 
     const rootItems = $(cfg.root);
-    for(const one of rootItems)
-      console.dir(one);
+    console.groupCollapsed("Iterator.rootItems");
+    for(const one of rootItems) console.dir(one);
+    console.groupEnd();
 
     aver.areEqual(4, rootItems.count());
     aver.areIterablesEquivalent(["abba", "bubba", "coll", "dole"], rootItems.select(one => one.key));
@@ -241,8 +242,9 @@ describe("ConfigNode", function() {
     aver.areIterablesEquivalent([11, cfg.root.get("bubba"), true, cfg.root.get("dole")], rootItems.select(one => one.val));
 
     const doleItems = $(cfg.root.get("dole"));
-    for(const one of doleItems)
-      console.dir(one);
+    console.groupCollapsed("Iterator.doleItems");
+    for(const one of doleItems) console.dir(one);
+    console.groupEnd();
 
     aver.areEqual(3, doleItems.count());
     aver.areIterablesEquivalent([0, 1, 2], doleItems.select(one => one.idx));

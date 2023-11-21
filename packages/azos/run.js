@@ -383,3 +383,10 @@ export function defineCase(name, body){
   const parent = this instanceof Unit ? this : current();
   return new Case(parent, name, body);
 }
+
+/** Macro for con.dir(obj) in a collapsed group, used for testing */
+export function condir(grp, obj){
+  console.groupCollapsed(grp ?? "Group");
+  console.dir(obj);
+  console.groupEnd();
+}
