@@ -124,7 +124,7 @@ export function normalizeMsg(msg){
 /** Converts error/exceptions object into `WrappedExceptionData`-compatible datagram
  * @returns {WrappedExceptionData | null}
 */
-export function exceptionToData(app, ex){
+export function exceptionToData(ex, app){
   if (!ex) return null;
   const result = {};
   result["TypeName"] = strings.dflt(ex.name, "Error");
@@ -134,7 +134,7 @@ export function exceptionToData(app, ex){
   result["StackTrace"] = strings.dflt(ex.stack, "");
   if (app && app.id) result["AppId"] = app.id;
 
-  if (ex.cause) result["InnerException"] = exceptionToData(ex.cause);//unwind inner exception
+  if (ex.cause) result["InnerException"] = exceptionToData(ex.cause, app);//unwind inner exception
   if (types.isFunction(ex.provideExternalStatus)) result["ExternalStatus"] = ex.provideExternalStatus();
   return result;
 }

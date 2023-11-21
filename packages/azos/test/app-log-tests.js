@@ -54,7 +54,7 @@ describe("#AppLog", function() {
 describe("Log.Common", function() {
 
   it("exceptionToData(new Error())",   function() {
-    const got = log.exceptionToData(null, new Error("crap message"));
+    const got = log.exceptionToData(new Error("crap message"));
     console.log(JSON.stringify(got, null, 2));
     aver.areEqual("Error", got["TypeName"]);
     aver.areEqual("crap message", got["Message"]);
@@ -67,7 +67,7 @@ describe("Log.Common", function() {
     try{
       throw new Error("crap message");
     } catch(err) {
-      const got = log.exceptionToData(null, err);
+      const got = log.exceptionToData(err);
       console.log(JSON.stringify(got, null, 2));
       aver.areEqual("Error", got["TypeName"]);
       aver.areEqual("crap message", got["Message"]);
@@ -78,15 +78,43 @@ describe("Log.Common", function() {
   });
 
   it("exceptionToData(new AzosError())",   function() {
-    const got = log.exceptionToData(null, new AzosError("AZ5 msg", "reactor4", null, -1234));
+    const got = log.exceptionToData(new AzosError("AZ5 msg", "reactor4", null, -1234));
     console.log(JSON.stringify(got, null, 2));
     aver.areEqual("AzosError -1234 @ 'reactor4'", got["TypeName"]);
     aver.areEqual("AZ5 msg", got["Message"]);
     aver.areEqual(-1234, got["Code"]);
     aver.areEqual("reactor4", got["Source"]);
     aver.isTrue(got["StackTrace"].length > 0);
+  });
 
-    throw new AzosError("AZ5 msg", "reactor4", null, -1234);
+  it("exceptionToData(throw new AzosError(nested))",   function() {
+    try{
+      try{
+        throw new AzosError("Inner msg", "site-3", null, 37);
+      }catch(inner){
+        throw new AzosError("AZ5 msg", "reactor4", inner, -1234);
+      }
+    } catch(err) {
+      const got = log.exceptionToData(err);
+      console.log(JSON.stringify(got, null, 2));
+      aver.areEqual("AzosError -1234 @ 'reactor4'", got["TypeName"]);
+      aver.areEqual("AZ5 msg", got["Message"]);
+      aver.areEqual(-1234, got["Code"]);
+      aver.areEqual("reactor4", got["Source"]);
+      aver.isTrue(got["StackTrace"].length > 0);
+      aver.isObject(got["ExternalStatus"]);
+      aver.areEqual("js", got["ExternalStatus"]["ns"]);
+
+      const cause = got["InnerException"];
+      aver.isObject(cause);
+      aver.areEqual("AzosError 37 @ 'site-3'", cause["TypeName"]);
+      aver.areEqual("Inner msg", cause["Message"]);
+      aver.areEqual(37, cause["Code"]);
+      aver.areEqual("site-3", cause["Source"]);
+      aver.isTrue(cause["StackTrace"].length > 0);
+      aver.isObject(cause["ExternalStatus"]);
+      aver.areEqual("js", cause["ExternalStatus"]["ns"]);
+    }
   });
 
 
