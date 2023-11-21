@@ -303,6 +303,7 @@ export class Runner{
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   beginCase(cse){
     this.#countTotal++;
   }
