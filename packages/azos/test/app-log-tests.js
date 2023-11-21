@@ -7,12 +7,11 @@
 //import { describe, it } from "mocha";
 import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as aver from "../aver.js";
-//import { ABSTRACT } from "../coreconsts.js"
 import { ILog } from "../ilog.js";
+import * as log from "../log.js";
 import { application } from "../application.js";
 import { Verbatim } from "../conf.js";
-import { dispose } from "../types.js";
-import { Module } from "../modules.js";
+import { dispose, AzosError } from "../types.js";
 
 
 class IMemoryLog extends ILog{
@@ -48,6 +47,46 @@ describe("#AppLog", function() {
     aver.areEqual("Message 1", logBuffer[0].text);
     aver.areEqual("Message 2", logBuffer[1].text);
     aver.areEqual("3 Message", logBuffer[2].text);
+  });
+
+});
+
+describe("Log.Common", function() {
+
+  it("exceptionToData(new Error())",   function() {
+    const got = log.exceptionToData(null, new Error("crap message"));
+    console.log(JSON.stringify(got, null, 2));
+    aver.areEqual("Error", got["TypeName"]);
+    aver.areEqual("crap message", got["Message"]);
+    aver.areEqual(0, got["Code"]);
+    aver.areEqual("", got["Source"]);
+    aver.isTrue(got["StackTrace"].length > 0);
+  });
+
+  it("exceptionToData(throw new Error())",   function() {
+    try{
+      throw new Error("crap message");
+    } catch(err) {
+      const got = log.exceptionToData(null, err);
+      console.log(JSON.stringify(got, null, 2));
+      aver.areEqual("Error", got["TypeName"]);
+      aver.areEqual("crap message", got["Message"]);
+      aver.areEqual(0, got["Code"]);
+      aver.areEqual("", got["Source"]);
+      aver.isTrue(got["StackTrace"].length > 0);
+    }
+  });
+
+  it("exceptionToData(new AzosError())",   function() {
+    const got = log.exceptionToData(null, new AzosError("AZ5 msg", "reactor4", null, -1234));
+    console.log(JSON.stringify(got, null, 2));
+    aver.areEqual("AzosError -1234 @ 'reactor4'", got["TypeName"]);
+    aver.areEqual("AZ5 msg", got["Message"]);
+    aver.areEqual(-1234, got["Code"]);
+    aver.areEqual("reactor4", got["Source"]);
+    aver.isTrue(got["StackTrace"].length > 0);
+
+    throw new AzosError("AZ5 msg", "reactor4", null, -1234);
   });
 
 

@@ -29,8 +29,8 @@ export class AppTabSync extends Module{
     try{
       this.#channel.close();
       this.writeLog(LOG_TYPE.TRACE, `Closed broadcast channel '${cn}'`);
-    } catch(e) {
-      this.writeLog(LOG_TYPE.ERROR, `Closing broadcast channel '${cn}' leaked`, {e})
+    } catch(err) {
+      this.writeLog(LOG_TYPE.ERROR, `Closing broadcast channel '${cn}' leaked`, err)
     }
   }
 }

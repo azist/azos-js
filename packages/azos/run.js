@@ -306,9 +306,11 @@ export class Runner{
   // eslint-disable-next-line no-unused-vars
   beginCase(cse){
     this.#countTotal++;
+    //console.groupCollapsed(cse.name);
   }
 
   endCase(cse, error){
+    //console.groupEnd();
     const elapsedMs = cse.endMs - cse.startMs;
     this.#elapsedMs += elapsedMs;
 
