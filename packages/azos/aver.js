@@ -14,7 +14,7 @@ import * as linq  from "./linq.js";
  * @param {string} m message
  */
 export function AVERMENT_FAILURE(m, cause = null){
-  return new types.AzosError(`Averment failure: ${m}`, m, cause, 500);
+  return new types.AzosError(`Averment failure: ${m}}`, m, cause, 500);
 }
 
 const dv = (v) => str.describe(v);//shortcut

@@ -123,7 +123,7 @@ export class AzosError extends Error {
 }
 
 /** Provides uniform base for Localization-related exceptions */
-export class LclError extends AzosError { //declared here to avoif circular reference between modules
+export class LclError extends AzosError { //declared here to avoid circular reference between modules
   constructor(message, from = null, cause = null){ super(message, from, cause, 518); }
 }
 
@@ -236,7 +236,7 @@ export function isObjectOrArray(v){
  */
 export function isFunction(v){
   const t = Object.prototype.toString.call(v);
-  return t === "[object Function]" || t === "[object GeneratorFunction]";
+  return t === "[object Function]" || t === "[object GeneratorFunction]" || t === "[object AsyncFunction]";
 }
 
 /**
@@ -789,3 +789,10 @@ export function genGuid(){
   const guid = `${srnd.slice(0, 8)}-${srnd.slice(8,12)}-${srnd.slice(12,16)}-${srnd.slice(16,20)}-${srnd.slice(20)}`;
   return guid;
 }
+
+/** Macro caps value at minimum. No type checks are done */
+export function atMin(v, min){ return v < min ? min : v; }
+/** Macro caps value at maximum. No type checks are done */
+export function atMax(v, max){ return v > max ? max : v; }
+/** Macro keeps value between min/max. No type checks are done */
+export function keepBetween(v, min, max){ return v > min ? (v > max ? max : v) : min; }

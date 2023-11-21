@@ -10,7 +10,27 @@ export const UNDEFINED = "<undefined>";
 export const UNKNOWN   = "<unknown>";
 export const EMPTY     = "<empty>";
 
+export const METHODS = Object.freeze({
+  GET: "GET",
+  HEAD: "HEAD",
+  POST: "POST",
+  PUT: "PUT",
+  PATCH: "PATCH",
+  OPTIONS: "OPTIONS",
+  DELETE: "DELETE"
+});
 
+export const HEADERS = Object.freeze({
+  AUTH: "Authorization",
+  CONTENT_TYPE: "Content-Type",
+  WV_DATA_CTX: "wv-data-ctx"
+});
+
+export const CONTENT_TYPE = Object.freeze({
+  JSON: "application/json"
+});
+
+/** Creates an `Error` exception ready to be thrown indicating that operation is abstract and is not implemented */
 export function ABSTRACT(nm){ return new Error(`Method '${nm ?? UNDEFINED}' is abstract`); }
 
 

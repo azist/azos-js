@@ -4,13 +4,15 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { describe, it } from "mocha";
+//import { describe, it } from "mocha";
+import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as aver from "../aver.js";
 //import { ABSTRACT } from "../coreconsts.js"
 import { ILog } from "../ilog.js";
 import { application } from "../application.js";
 import { Verbatim } from "../conf.js";
 import { dispose } from "../types.js";
+import { Module } from "../modules.js";
 
 
 class IMemoryLog extends ILog{
@@ -30,6 +32,7 @@ describe("#AppLog", function() {
     let logBuffer = [];
 
     const app = application({
+      //logLevel: "info",
       modules: [
         {name: "log", type: IMemoryLog, buffer: new Verbatim(logBuffer)}
       ]

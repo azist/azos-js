@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Azos Tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+  <h1>
+    See Console
+  </h1>
+  <p>
+    Test results are in the console (hit F12)
+  </p>
+  <p>
+    Azos uses ES6 modules. ES6 modules can not be loaded form local file system due to CORS limitations.<br>
+    You need a server to serve those modules from local FS.<br>
+    We use Parcel built-in dev server.<br>
+    <br>
+    Execute the test by running this in command prompt, then open "localhost:1234" in browser
+  </p>
+
+  <pre>
+  $ npm run test-bro
+  </pre>
+
+  <script type="module" src="app.mjs"> </script>
+</body>
+</html>

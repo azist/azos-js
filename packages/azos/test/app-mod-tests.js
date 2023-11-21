@@ -4,12 +4,13 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { describe, it } from "mocha";
-import * as aver from "../aver.js";
+//import { describe, it } from "mocha";
+import { defineUnit as describe, defineCase as it } from "../run.js";
 import { ABSTRACT } from "../coreconsts.js"
-import { Module } from "../modules.js";
-import { application } from "../application.js";
 import { dispose } from "../types.js";
+import * as aver from "../aver.js";
+import { application } from "../application.js";
+import { Module } from "../modules.js";
 
 
 class IWeather extends Module{

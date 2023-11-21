@@ -5,6 +5,7 @@
   "version": "0.0.1",
   "type": "module",
   "--source": "",
+
   "main": "out/azos-js.js",
   "description": "Azos Dev root monorepo package",
   "author": "Azist Group",
@@ -39,20 +40,16 @@
   ],
   "scripts": {
     "pack-local": "npm pack \"./packages/azos/\" --pack-destination=\"./out\" && npm pack \"./packages/azos-ui/\" --pack-destination=\"./out\"",
-    "//build": "parcel build \"src/azos/index.js\"",
     "build": "parcel build \"packages/azos/index.js\"",
     "--test1": "echo \"Error: no test specified\" && exit 1",
     "--test2": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
-    "test": "mocha \"./packages/**/*.js\"",
-    "test-match": "mocha \"./packages/**/*.js\" -g",
+    "test": "node  packages/azos/test/app.mjs -- --filter",
     "test-azos": "npm test -workspace=azos",
     "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\"",
-    "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/index.htm\""
+    "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/test/index.htm\""
   },
   "devDependencies": {
     "eslint": "^8.50.0",
-    "mocha": "^10.2.0",
-    "parcel": "^2.9.3",
-    "util": "^0.12.5"
+    "parcel": "^2.9.3"
   }
 }
