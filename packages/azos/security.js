@@ -7,8 +7,7 @@
 import * as types from "./types.js";
 import * as strings from "./strings.js";
 import * as aver from "./aver.js";
-import { UNKNOWN } from "./coreconsts.js";
-import { ConfigNode, Configuration } from "./conf.js";
+import { Configuration } from "./conf.js";
 
 /** Provides uniform base for Security-related exceptions */
 export class SecurityError extends types.AzosError {
@@ -106,8 +105,48 @@ export class User {
     return result;
   }
 
+  /** Returns the date/time stamp as of which this object state was captured @returns {Date} */
+  get asof(){return this.#asof; }
 
   /** Returns user name @returns {string} */
   get name(){return this.#name; }
 
+  /** Returns user description @returns {string} */
+  get description(){return this.#descr; }
+
+  /** Returns user status @returns {USER_STATUS} */
+  get status(){return this.#status; }
+
+  /** Returns user auth token, such as OAuth refresh token @returns {string} */
+  get authToken(){return this.#authToken; }
+
+  /** Returns user claims node @returns {ConfigNode} */
+  get claims(){return this.#claims.root; }
+
+  /** Returns user rights node @returns {ConfigNode} */
+  get rights(){return this.#rights.root; }
+
+  //See OIDC Standard claims
+  //https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+
+  /** Returns JWT "iss" claim @returns {string} */
+  get claims_Issuer(){ return this.#claims.root.getString("iss", null); }
+
+  /** Returns JWT "aud" claim @returns {string} */
+  get claims_Audience(){ return this.#claims.root.getString("aud", null); }
+
+  /** Returns JWT "exp" claim in Unix seconds @returns {int} */
+  get claims_ExpirationTime(){ return this.#claims.root.getInt("exp", 0); }
+
+  /** Returns JWT "iat" claim in Unix seconds @returns {int} */
+  get claims_IssuedAtTime(){ return this.#claims.root.getInt("iat", 0); }
+
+  /** Returns JWT "sub" claim  @returns {string} */
+  get claims_Subject(){ return this.#claims.root.getString("sub", null); }
+
+  /** Returns JWT "name" claim  @returns {string} */
+  get claims_Name(){ return this.#claims.root.getString("name", null); }
+
+  /** Returns JWT "picture" claim containing URL of user image  @returns {string} */
+  get claims_Picture(){ return this.#claims.root.getString("picture", null); }
 }
