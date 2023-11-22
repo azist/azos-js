@@ -17,6 +17,7 @@ import * as strings from "./strings.js";
   * @property {string} topic optional topic
   * @property {string} text message text
   * @property {object} params optional parameters
+  * @property {object} exception optional exception object
   */
 
 /** Provides uniform base for Log-related exceptions */
@@ -112,12 +113,32 @@ export function normalizeMsg(msg){
       host: "123.0.0.1",//app.host see issue #33
       topic: strings.asString(msg.topic),
       src:   msg.src | 0,
-      params: types.isAssigned(msg.params) ? (types.isString(msg.params) ? msg.params : JSON.stringify(msg.params)) : null
+      params: types.isAssigned(msg.params) ? (types.isString(msg.params) ? msg.params : JSON.stringify(msg.params)) : null,
+      exception: msg.exception ??  null
     };
   } catch(e){
     throw new LogError("Bad log msg", "normalizeMsg(...)", e);
   }
 }
+
+/** Converts error/exceptions object into `WrappedExceptionData`-compatible datagram
+ * @returns {WrappedExceptionData | null}
+*/
+export function exceptionToData(ex, app){
+  if (!ex) return null;
+  const result = {};
+  result["TypeName"] = strings.dflt(ex.name, "Error");
+  result["Message"] = strings.dflt(ex.message, " ");
+  result["Code"] = ex.code | 0;
+  result["Source"] = strings.dflt(ex.from, "");
+  result["StackTrace"] = strings.dflt(ex.stack, "");
+  if (app && app.id) result["AppId"] = app.id;
+
+  if (ex.cause) result["InnerException"] = exceptionToData(ex.cause, app);//unwind inner exception
+  if (types.isFunction(ex.provideExternalStatus)) result["ExternalStatus"] = ex.provideExternalStatus();
+  return result;
+}
+
 
 /**
  * Writes normalized log message into console

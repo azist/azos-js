@@ -133,12 +133,13 @@ export class AppComponent extends types.DisposableObject{
    * Writes to log if current component effective level permits, returning guid of newly written message
    * @param {string} type an enumerated type {@link log.LOG_TYPE}
    * @param {string} text message text
+   * @param {Error} ex optional exception object
    * @param {object | null} params optional parameters
    * @param {string | null} rel optional relation guid
    * @param {int | null} src optional int src line num
    * @returns {guid | null} null if nothing was written or guid of the newly written message
    */
-  writeLog(type, text, params, rel, src){
+  writeLog(type, text, ex, params, rel, src){
     const ell = logging.getMsgTypeSeverity(this.effectiveLogLevel);
     if (logging.getMsgTypeSeverity(type) < ell) return null;
     const log = this.app.log;
@@ -149,7 +150,8 @@ export class AppComponent extends types.DisposableObject{
       text: text,
       params: params,
       rel: rel ?? this.app.instanceId,
-      src: src
+      src: src,
+      exception: ex ?? null
     });
     return guid;
   }

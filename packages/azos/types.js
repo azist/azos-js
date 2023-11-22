@@ -119,7 +119,16 @@ export class AzosError extends Error {
   /** Returns status code, by convention HTTP status codes are used, e.g. 400, 500 etc. */
   get code(){ return this.#code; }
 
+  /** Override to change namespace which is returned from external status */
+  get ns(){ return "js"; }
+
   toString(){ return `${this.name}: ${this.message}` }
+
+  /** Override to add details which are provided to callers via external status,
+   * for example validation exception adds schema and field names so it can be structurally gotten
+   * by the handler
+   */
+  provideExternalStatus(){ return { ns: this.ns }; }
 }
 
 /** Provides uniform base for Localization-related exceptions */

@@ -18,21 +18,50 @@ export class User {
   /** Returns a singleton invalid user instance @returns {User} */
   static get invalid(){ return User.#invalid;}
 
+  #asof;
   #name;
+  #descr;
+  #status;
+  #authRefreshToken;
+  #claims;
+  #rights;
+
+  static makeUser(){
+    const init = {};
+    //structuredClone(); on config
+    return new User(init);
+  }
 
   /**
    *
-   * @param {ConfigNode} cfg
+   * @param {object} init
    */
-  constructor(cfg){
-    if (cfg === undefined || cfg === null){//invalid user
-      this.#name = UNKNOWN;
-      return;
-    }
+  constructor(init){
+    // if (cfg === undefined || cfg === null){//invalid user
+    //   this.#name = UNKNOWN;
+    //   return;
+    // }
 
-    aver.isOf(cfg, ConfigNode);
-    this.#name = cfg.getString("name", UNKNOWN);
+    // aver.isOf(cfg, ConfigNode);
+    // this.#name = cfg.getString("name", UNKNOWN);
   }
+
+  /** Returns User as serializable init object which can be stored (e.g. local storage)
+   * and later read back into user object via .ctor(init)
+   */
+  toInitObject(){
+    const result = {
+      asof: this.#asof,
+      name: this.#name,
+      descr: this.#descr,
+      status: this.#status,
+      auth: this.#authRefreshToken,
+      claims: this.#claims.content,
+      rights: this.#rights.content,
+    };
+    return result;
+  }
+
 
   /** Returns user name @returns {string} */
   get name(){return this.#name; }
