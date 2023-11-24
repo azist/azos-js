@@ -30,6 +30,12 @@ It uses the following modern ES6+ features:
 
 ## Chief Traits
 1. Minimize dependencies on 3rd party (core pkg has zero run dependencies)
+2. Use basic language features which are going to be around for extended time
+3. For building large-scale complex business applications (e.g. medical/rx, financial, construction, insurance):
+   - having hundreds of complex data-entry screens
+   - with many fields/tabs/groupings etc.,
+   - validation logic, cross-field/section/form
+   - lots of metadata driving business rules
 2. Modular design - reuse all pieces in different applications a-la "components"
 3. OOP used for composition/structural framework
 4. FP used for data processing/streaming (iterators)
