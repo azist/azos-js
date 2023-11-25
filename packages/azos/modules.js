@@ -34,6 +34,11 @@ export class Module extends AppComponent{
     this.#order = cfg.getInt("order", 0);
   }
 
+  /**
+   * Override to provide logging from prefix, default uses class name
+   */
+  get logFrom(){ return `${this.constructor.name}(#${this.sid}, '${this.name}', ${this.#order})`; }
+
   /** Returns true when this implementation is the server one, so certain functions (such as dependencies) are required
    * vs being a client pass-through implementation
   */

@@ -10,8 +10,19 @@ import { ABSTRACT, METHODS, HEADERS, CONTENT_TYPE } from "./coreconsts.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 import * as types from "./types.js";
-import { LOG_TYPE } from "./log.js";
+import { LOG_TYPE, getMsgTypeSeverity } from "./log.js";
 import { Module } from "./modules.js";
+
+
+/** Provides uniform base for Client-related exceptions */
+export class ClientError extends types.AzosError {
+  constructor(message, from = null, cause = null){ super(message, from, cause, 517); }
+}
+
+export async function defaultResponseHandler(response){
+  //todo: get JSON or buffer - examine content type
+}
+
 
 /**
  * Provides abstraction for consuming remote services via Http/s
@@ -38,40 +49,62 @@ export class IClient extends Module{
   get rootUrl() { return this.#rootUrl; }
 
 
-  async get(){ }
-  async post(){ }
-  async put(){ }
-  async patch(){ }
-  async delete(){  }
+  async get(uri, headers = null, fResponseHandler = null){
+    return await this.call(METHODS.GET, uri, null, headers, fResponseHandler);
+  }
+  async post(uri, body, headers = null, fResponseHandler = null){
+    return await this.call(METHODS.POST, uri, body, headers, fResponseHandler);
+  }
+  async put(uri, body, headers = null, fResponseHandler = null){
+    return await this.call(METHODS.PUT, uri, body, headers, fResponseHandler);
+  }
+  async patch(uri, body, headers = null, fResponseHandler = null){
+    return await this.call(METHODS.PATCH, uri, body, headers, fResponseHandler);
+  }
+  async delete(uri, body = null, headers = null, fResponseHandler = null){
+    return await this.call(METHODS.DELETE, uri, body, headers, fResponseHandler);
+  }
 
-  assembleRequest(method, uri, body, headers){
+  _assembleRequest(method, uri, body, headers){
     aver.isString(method);
     aver.isString(uri);
 
-    const url = this.#rootUrl + uri;
-    const init = {
+    const hdrs = {};
+    for(const [k, v] of Object.entries(headers))
+      if (types.isAssigned(v)) hdrs[k] = v;
+
+    while (uri.startsWith("/")) uri = uri.slice(1);
+
+    const url = this.#rootUrl + url;
+    const request = {
       method: method,
       body: JSON.stringify(body),
-      headers: {}
+      headers: hdrs
     };
 
-    return {url, init};
+    return {url, request};
   }
 
-
-
-  async call(method, uri, body, headers, fProcessResponse){
-    const {url, init} = this.assembleRequest(method, uri, body, headers);
-    await this.#addAuthInfo(init);
-    const response = await fetch(url, init);
-    const result = await fProcessResponse(response);
-    return result;
+  async call(method, uri, body, headers, fResponseHandler = null){
+    try{
+      fResponseHandler = fResponseHandler ?? defaultResponseHandler;
+      aver.isFunction(fResponseHandler);
+      const {url, request} = this._assembleRequest(method, uri, body, headers);
+      await this.#addAuthInfo(request);
+      const response = await fetch(url, request);
+      const result = await fResponseHandler(response);
+      return result;
+    } catch(cause) {
+      const ce = new ClientError(`Error calling '${method} ${uri}: ${cause.message}`, `${this.constructor.name}.call()`, cause);
+      this.writeLog(LOG_TYPE.TRACE, "Error making client call", ce, {method, uri});
+      throw ce;
+    }
   }
 
   //this is a private method, outside parties should not be leaking token
-  async #addAuthInfo(init){
+  async #addAuthInfo(request){
     const token = await this.#getAccessToken();
-    init.headers[HEADERS.AUTH] = `Bearer ${token}`;
+    request.headers[HEADERS.AUTH] = `Bearer ${token}`;
   }
 
   //this is a private method, outside parties should not be leaking token
