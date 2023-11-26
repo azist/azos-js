@@ -6,11 +6,11 @@
 
 /* eslint-disable no-unused-vars */
 
-import { ABSTRACT, METHODS, HEADERS, CONTENT_TYPE, UNKNOWN } from "./coreconsts.js";
+import { METHODS, HEADERS, CONTENT_TYPE, UNKNOWN } from "./coreconsts.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 import * as types from "./types.js";
-import { LOG_TYPE, getMsgTypeSeverity } from "./log.js";
+import { LOG_TYPE } from "./log.js";
 import { Module } from "./modules.js";
 
 
