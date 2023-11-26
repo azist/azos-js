@@ -27,7 +27,8 @@ export const HEADERS = Object.freeze({
 });
 
 export const CONTENT_TYPE = Object.freeze({
-  JSON: "application/json"
+  JSON: "application/json",
+  TEXT_FAMILY: "text/",
 });
 
 /** Creates an `Error` exception ready to be thrown indicating that operation is abstract and is not implemented */

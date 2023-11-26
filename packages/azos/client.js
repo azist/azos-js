@@ -6,21 +6,51 @@
 
 /* eslint-disable no-unused-vars */
 
-import { ABSTRACT, METHODS, HEADERS, CONTENT_TYPE } from "./coreconsts.js";
+import { METHODS, HEADERS, CONTENT_TYPE, UNKNOWN } from "./coreconsts.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 import * as types from "./types.js";
-import { LOG_TYPE, getMsgTypeSeverity } from "./log.js";
+import { LOG_TYPE } from "./log.js";
 import { Module } from "./modules.js";
 
 
 /** Provides uniform base for Client-related exceptions */
 export class ClientError extends types.AzosError {
-  constructor(message, from = null, cause = null){ super(message, from, cause, 517); }
+  #responseBody;
+  constructor(message, from = null, cause = null, code = 500, responseBody = null){
+    super(message, from, cause, code);
+    this.#responseBody = responseBody ?? null;
+  }
+
+  /** Returns response body if one was set or null */
+  responseBody(){ return this.#responseBody; }
+  ns(){ return "client"; }
+  provideExternalStatus(){
+    const status = super.provideExternalStatus();
+    status["responseBody"] = this.#responseBody;
+    return status;
+  }
 }
 
+/**
+ * Provides default handling of response based on `Content-Type` header
+ * @param {Response} response object obtained from `fetch(req)`
+ * @returns {object} a tuple of `{status: int, ctp: string, data: string | object | Blob}`
+ */
 export async function defaultResponseHandler(response){
-  //todo: get JSON or buffer - examine content type
+  if (response === undefined || response === null) return null;
+  const ctp = response.headers.get(HEADERS.CONTENT_TYPE) ?? UNKNOWN;
+
+  if (ctp.indexOf(CONTENT_TYPE.TEXT_FAMILY) >=0){
+    const text = await response.text();
+    return {status: response.status, ctp: ctp,  data: text};
+  } else if (ctp.indexOf(CONTENT_TYPE.JSON) >=0){
+    const obj  = await response.json();
+    return {status: response.status, ctp: ctp, data: obj};
+  } else { //default - handle as BLOB
+    const blob = await response.blob();
+    return {status: response.status, ctp: ctp, data: blob};
+  }
 }
 
 
@@ -84,20 +114,39 @@ export class IClient extends Module{
 
     return {url, request};
   }
-
-  async call(method, uri, body, headers, fResponseHandler = null){
-    try{
+  /**
+   * Performs a service call using the specified METHOD, uri, body, headers, response handler and optionally performing
+   * response status check for 2xx Http code.
+   * @param {*} method
+   * @param {*} uri
+   * @param {*} body
+   * @param {*} headers
+   * @param {*} fResponseHandler
+   * @param {*} noStatusCheck
+   * @returns
+   */
+  async call(method, uri, body, headers, fResponseHandler = null, noStatusCheck = false){
+    try {
       fResponseHandler = fResponseHandler ?? defaultResponseHandler;
       aver.isFunction(fResponseHandler);
       const {url, request} = this._assembleRequest(method, uri, body, headers);
       await this.#addAuthInfo(request);
+      //call
       const response = await fetch(url, request);
+
+      //get response
       const result = await fResponseHandler(response);
-      return result;
+
+      //check response
+      if (!noStatusCheck && !response.ok) {
+        throw new ClientError(`Http code ${response.status}/${response.statusText}`, null, null, result.status, result);
+      }
+
+      return result;//all OK ======================
     } catch(cause) {
-      const ce = new ClientError(`Error calling '${method} ${uri}: ${cause.message}`, `${this.constructor.name}.call()`, cause);
-      this.writeLog(LOG_TYPE.TRACE, "Error making client call", ce, {method, uri});
-      throw ce;
+      const clErr = new ClientError(`Error calling '${method} ${uri}: ${cause.message}`, `${this.constructor.name}.call()`, cause, cause.code ?? 599);
+      this.writeLog(LOG_TYPE.TRACE, "Error making client call", clErr, {method, uri});
+      throw clErr;
     }
   }
 
