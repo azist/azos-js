@@ -62,6 +62,7 @@ export class IClient extends Module{
   #accessToken;
   #accessTokenStamp;
   #tokenRefreshSec;
+  #defaultTimeoutMs;
 
   constructor(dir, cfg){
     super(dir, cfg);
@@ -73,10 +74,14 @@ export class IClient extends Module{
     }
 
     this.#tokenRefreshSec = cfg.getInt("tokenRefreshSec", 600);
+    this.#defaultTimeoutMs = types.keepBetween(cfg.getInt("defaultTimeoutMs", 7935), 0, 5 * 60 * 1000);
   }
 
   /** Returns root url. It always ends with a trailing forward slash */
   get rootUrl() { return this.#rootUrl; }
+
+  /** Returns default timeout in milliseconds which is applied when no explicit abort signal is passed */
+  get defaultTimeoutMs() { return this.#defaultTimeoutMs; }
 
 
   async get(uri, headers = null, fResponseHandler = null){
@@ -95,44 +100,98 @@ export class IClient extends Module{
     return await this.call(METHODS.DELETE, uri, body, headers, fResponseHandler);
   }
 
-  _assembleRequest(method, uri, body, headers){
+  /**
+   * This protected method is called as a part of {@link _assembleRequest}
+   * Converts body into request body, e.g. an object into a JSON string,
+   * Returning a tuple [ctp?: string, body?: any] or [null, null] if there is no body
+   */
+  _prepareBody(payload){
+    if (!payload) return [null, null];
+
+    //https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
+    //Any body that you want to add to your request: this can be a
+    //  Blob, an ArrayBuffer, a TypedArray, a DataView, a FormData, a URLSearchParams, a string, or a ReadableStream object.
+    //Note that a request using the GET or HEAD method cannot have a body.
+
+    //payload is either an object, then ctp is calculated, or its a tuple of {ctp: string, body: any}
+    let ctp = null;
+    let body = null;
+    if (types.hown(payload, "ctp") && types.hown(payload, "body")){
+      ctp = types.asString(payload.ctp);
+      body = payload.body;
+    } else body = payload;
+
+    if (!body) return [null, null];
+
+    if (body instanceof String){ return [ctp ?? CONTENT_TYPE.TEXT_PLAIN, body]; }
+    else if (body instanceof Blob){ return [ctp, body]; }
+    else if (body instanceof ArrayBuffer){ return [ctp ?? CONTENT_TYPE.BINARY, body]; }
+    else if (body instanceof FormData){ return [ctp, body]; }
+
+    return [ctp ?? CONTENT_TYPE.JSON, JSON.stringify(body)];
+  }
+
+  /**
+   * Assembles a `Request` object out of parameters
+   * @param {string} method
+   * @param {string} uri
+   * @param {any?} body
+   * @param {object?} headers
+   * @param {AbortSignal?} abort
+   * @returns {Request}
+   */
+  _assembleRequest(method, uri, body, headers, abort){
     aver.isString(method);
     aver.isString(uri);
 
-    const hdrs = {};
+    const [ctp, requestBody] = this._prepareBody(body);
+
+    const hdrs = { };
+    if (ctp !== null) hdrs[HEADERS.CONTENT_TYPE] = ctp;
+
     for(const [k, v] of Object.entries(headers))
       if (types.isAssigned(v)) hdrs[k] = v;
 
     while (uri.startsWith("/")) uri = uri.slice(1);
 
     const url = this.#rootUrl + url;
-    const request = {
-      method: method,
-      body: JSON.stringify(body),
-      headers: hdrs
-    };
 
-    return {url, request};
+    const opts = {
+      method: method,
+      headers: hdrs,
+      credentials: "same-origin",
+      redirect: "follow",
+      keepalive: true,
+    };
+    if (requestBody !== null)  opts["body"] = requestBody;
+    if (abort !== null)  opts["signal"] = abort;
+
+    return new Request(url, opts);
   }
   /**
-   * Performs a service call using the specified METHOD, uri, body, headers, response handler and optionally performing
+   * Performs a service call using the specified METHOD, uri, body, headers, AbortSignal, response handler and optionally performing
    * response status check for 2xx Http code.
-   * @param {*} method
-   * @param {*} uri
-   * @param {*} body
-   * @param {*} headers
-   * @param {*} fResponseHandler
-   * @param {*} noStatusCheck
+   * @param {string} method
+   * @param {string} uri
+   * @param {any?} body
+   * @param {object?} headers
+   * @param {AbortSignal?} abort
+   * @param {Function} fResponseHandler
+   * @param {boolean} noStatusCheck
    * @returns
    */
-  async call(method, uri, body, headers, fResponseHandler = null, noStatusCheck = false){
+  async call(method, uri, body, headers, abort = null, fResponseHandler = null, noStatusCheck = false){
     try {
       fResponseHandler = fResponseHandler ?? defaultResponseHandler;
       aver.isFunction(fResponseHandler);
-      const {url, request} = this._assembleRequest(method, uri, body, headers);
+
+      //Default timeout
+      if (!abort && this.#defaultTimeoutMs > 0) abort = AbortSignal.timeout(this.#defaultTimeoutMs);
+
+      const request = this._assembleRequest(method, uri, body, headers, abort);
       await this.#addAuthInfo(request);
       //call
-      const response = await fetch(url, request);
+      const response = await fetch(request);
 
       //get response
       const result = await fResponseHandler(response);

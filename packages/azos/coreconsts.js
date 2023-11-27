@@ -27,8 +27,11 @@ export const HEADERS = Object.freeze({
 });
 
 export const CONTENT_TYPE = Object.freeze({
+  MULTIPART_FORM: "multipart/form-data",
   JSON: "application/json",
   TEXT_FAMILY: "text/",
+  TEXT_PLAIN: "text/plain",
+  BINARY: "application/octet-stream"
 });
 
 /** Creates an `Error` exception ready to be thrown indicating that operation is abstract and is not implemented */
