@@ -243,7 +243,7 @@ export class IClient extends Module{
       headers: {
         [HEADERS.CONTENT_TYPE]: CONTENT_TYPE.JSON
       },
-      credentials: 'same-origin' //AUTH cookies!!!!!!!!!!!! <==============
+      credentials: "same-origin" //AUTH cookies!!!!!!!!!!!! <==============
     });
     const got = await authResponse.json();
 
