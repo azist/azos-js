@@ -84,20 +84,20 @@ export class IClient extends Module{
   get defaultTimeoutMs() { return this.#defaultTimeoutMs; }
 
 
-  async get(uri, headers = null, fResponseHandler = null){
-    return await this.call(METHODS.GET, uri, null, headers, fResponseHandler);
+  async get(uri, headers = null, abort = null, fResponseHandler = null){
+    return await this.call(METHODS.GET, uri, null, headers, abort, fResponseHandler);
   }
-  async post(uri, body, headers = null, fResponseHandler = null){
-    return await this.call(METHODS.POST, uri, body, headers, fResponseHandler);
+  async post(uri, body, headers = null, abort = null, fResponseHandler = null){
+    return await this.call(METHODS.POST, uri, body, headers, abort, fResponseHandler);
   }
-  async put(uri, body, headers = null, fResponseHandler = null){
-    return await this.call(METHODS.PUT, uri, body, headers, fResponseHandler);
+  async put(uri, body, headers = null, abort = null, fResponseHandler = null){
+    return await this.call(METHODS.PUT, uri, body, headers, abort, fResponseHandler);
   }
-  async patch(uri, body, headers = null, fResponseHandler = null){
-    return await this.call(METHODS.PATCH, uri, body, headers, fResponseHandler);
+  async patch(uri, body, headers = null, abort = null, fResponseHandler = null){
+    return await this.call(METHODS.PATCH, uri, body, headers, abort, fResponseHandler);
   }
-  async delete(uri, body = null, headers = null, fResponseHandler = null){
-    return await this.call(METHODS.DELETE, uri, body, headers, fResponseHandler);
+  async delete(uri, body = null, headers = null, abort = null, fResponseHandler = null){
+    return await this.call(METHODS.DELETE, uri, body, headers, abort, fResponseHandler);
   }
 
   /**
