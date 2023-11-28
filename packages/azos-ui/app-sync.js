@@ -19,7 +19,7 @@ export class AppTabSync extends Module{
     const chn = new BroadcastChannel(`Azos-app-${this.app.id}`);
     chn.onmessage = (evt) => {
       //todo: handle event such as access token change etc.
-      console.log(evt);
+      console.log(evt.data);
     };
     this.#channel = chn;
   }

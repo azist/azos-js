@@ -1364,5 +1364,22 @@ describe("Types", function() {
 
   });//MinMaxBetween
 
+  describe("trimUri", function() {
+
+    it("trimUri(undefined, true)",   function() { aver.areEqual(undefined, sut.trimUri(undefined, false, false, true));  });
+    it("trimUri(undefined, false)",   function() { aver.areEqual("", sut.trimUri(undefined, false, false, false));  });
+
+    it("trimUri(1)",   function() { aver.areEqual("ok", sut.trimUri(" ok "));  });
+    it("trimUri(2)",   function() { aver.areEqual("/ ok/", sut.trimUri(" / ok/ "));  });
+    it("trimUri(3)",   function() { aver.areEqual("/ok", sut.trimUri(" ok ", true));  });
+    it("trimUri(4)",   function() { aver.areEqual("ok/", sut.trimUri("  ok ", false, true));  });
+
+    it("trimUri(5)",   function() { aver.areEqual("/ok/", sut.trimUri(" /ok/", true));  });
+    it("trimUri(6)",   function() { aver.areEqual("/ok/", sut.trimUri("  /ok/ ", false, true));  });
+    it("trimUri(7)",   function() { aver.areEqual("/ok/", sut.trimUri("  ok ", true, true));  });
+
+
+  });//MinMaxBetween
+
 
 });

@@ -805,3 +805,27 @@ export function atMin(v, min){ return v < min ? min : v; }
 export function atMax(v, max){ return v > max ? max : v; }
 /** Macro keeps value between min/max. No type checks are done */
 export function keepBetween(v, min, max){ return v > min ? (v > max ? max : v) : min; }
+
+/**
+ * Takes a value, coercing it to string, optionally passing-through an undefined value;
+ * trims it and optionally checks of leading and trailing forward slashes
+ * @param {string} uri uri to process
+ * @param {boolean?} lsl true to check for leading slash, if not present then it will be added
+ * @param {boolean?} tsl true to check for trailing slash, if not present then it will be added
+ * @param {boolean?} canUndef true to pass `undefined` through as-is
+ * @returns {string} uri
+ */
+export function trimUri(uri, lsl = false, tsl = false, canUndef = false){
+  uri = strings.asString(uri, canUndef);
+  if (uri === undefined) return undefined;
+  uri = uri.trim();
+  if (lsl){
+    if (!uri.startsWith("/")) uri = "/" + uri;
+  }
+
+  if (tsl){
+    if (!uri.endsWith("/")) uri =  uri + "/";
+  }
+
+  return uri;
+}

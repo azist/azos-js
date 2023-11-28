@@ -59,6 +59,8 @@ export async function defaultResponseHandler(response){
  */
 export class IClient extends Module{
   #rootUrl;
+  #useOAuth;
+  #oAuthUrl;
   #accessToken;
   #accessTokenStamp;
   #tokenRefreshSec;
@@ -66,11 +68,16 @@ export class IClient extends Module{
 
   constructor(dir, cfg){
     super(dir, cfg);
+    this.#rootUrl = types.trimUri(cfg.getString(["url", "rootUrl"], "./"), false, true);
+    this.#oAuthUrl = types.trimUri(cfg.getString(["oauth", "oauthurl", "oAuthUrl", "OAuthUrl"], "/system/oauth/token"), false, true);
+
     this.#accessToken = null;
     this.#accessTokenStamp = 0;
-    this.#rootUrl = strings.trim(cfg.getString(["url", "root-url"], "./"));
-    if (!this.#rootUrl.endsWith("/")){
-      this.#rootUrl += "/";
+
+    this.#useOAuth = cfg.getBool("useOAuth", true);
+    if (!this.#useOAuth){
+      this.#accessToken = cfg.getString("accessToken", null);
+      this.#accessTokenStamp = Date.now();
     }
 
     this.#tokenRefreshSec = cfg.getInt("tokenRefreshSec", 600);
@@ -79,6 +86,12 @@ export class IClient extends Module{
 
   /** Returns root url. It always ends with a trailing forward slash */
   get rootUrl() { return this.#rootUrl; }
+
+  /** Returns true (default) when the client will get access token from OAuth server */
+  get useOAuth() { return this.#useOAuth; }
+
+  /** Returns OAuth url to use when {@link useOAuth} is enabled */
+  get oAuthUrl() { return this.#oAuthUrl; }
 
   /** Returns default timeout in milliseconds which is applied when no explicit abort signal is passed */
   get defaultTimeoutMs() { return this.#defaultTimeoutMs; }
@@ -225,6 +238,7 @@ export class IClient extends Module{
 
     if (needNew){
       this.#accessToken = await this.#obtainNewSessionUserToken();
+      this.#accessTokenStamp = Date.now();
     }
     return this.#accessToken;
   }
