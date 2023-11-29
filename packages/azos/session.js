@@ -7,6 +7,7 @@
 import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { User } from "./security.js";
+import { Application } from "./application.js";
 
 /**
  * Session holds data about user session: user, culture, options etc.
@@ -21,24 +22,37 @@ export class Session extends types.DisposableObject{
   #culture;
   #settings;
 
+  // eslint-disable-next-line no-unused-vars
   constructor(app, cfg=null){
     super();
-    this.#app = app;
+    this.#app = aver.isOf(app, Application);
+    this.#user = User.invalid;
   }
 
   [types.DESTRUCTOR_METHOD](){
   }
 
-  get app(){ return this.#app;}
+  /** @returns {Application} */
+  get app(){ return this.#app; }
 
-  get user(){ return this.#user;}
+  /**
+   * Returns current session user. This property is never null because {@link User.invalid} is returned
+   * when no specific user is set
+   * @returns {User}
+   */
+  get user(){ return this.#user; }
   set user(usr){
-    usr === null || aver.isOf(usr, User);
-    this.#user = usr ?? User.invalid;
+    const was = this.#user;
+    if (!types.isAssigned(usr)) usr = User.invalid;
+    this.#user = aver.isOf(usr, User);
+
+    if (this.#user !== was){ //Broadcast change
+      //broadcast user change
+      const sync = this.app.moduleLinker.tryResolve(IAppSync);
+      if (sync !== null) sync.broadcast({user: this.#user.toInitObject()});
+    }
   }
 
   //todo settings
   //todo culture...
-
-
 }

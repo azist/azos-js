@@ -69,7 +69,7 @@ export class IClient extends Module{
   constructor(dir, cfg){
     super(dir, cfg);
     this.#rootUrl = types.trimUri(cfg.getString(["url", "rootUrl"], "./"), false, true);
-    this.#oAuthUrl = types.trimUri(cfg.getString(["oauth", "oauthurl", "oAuthUrl", "OAuthUrl"], "/system/oauth/token"), false, true);
+    this.#oAuthUrl = types.trimUri(cfg.getString(["oauthurl", "oAuthUrl", "OAuthUrl"], "/system/oauth/token"), false, true);
 
     this.#accessToken = null;
     this.#accessTokenStamp = 0;
@@ -230,6 +230,8 @@ export class IClient extends Module{
 
   //this is a private method, outside parties should not be leaking token
   async #getAccessToken(){
+    if (!this.#useOAuth) return this.#accessToken;
+
     let needNew = !this.#accessToken;
     if (!needNew){
       const ageSec = (Date.now() - this.#accessTokenStamp) / 1000;
@@ -248,7 +250,7 @@ export class IClient extends Module{
     const refreshToken = this.app.session.user.authRefreshToken;
 
     //make a server call
-    const authResponse = await fetch("auth/token",
+    const authResponse = await fetch(this.#oAuthUrl,
     {
       method: METHODS.POST,
       body: JSON.stringify({

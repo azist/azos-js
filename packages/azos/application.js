@@ -224,7 +224,7 @@ export class Application extends types.DisposableObject{
   */
   _makeSession(cfg){
     if (types.isAssigned(cfg)) {
-       return makeNew(Session, cfg);
+       return makeNew(Session, cfg, this);
     } else {
        return new Session(this, null);//empty session
     }
