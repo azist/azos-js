@@ -53,6 +53,11 @@ export class Session extends types.DisposableObject{
     }
   }
 
+  updateIdentity(refreshToken, jwt){
+
+  }
+
+
   //todo settings
   //todo culture...
 }

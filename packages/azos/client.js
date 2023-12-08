@@ -10,6 +10,7 @@ import { METHODS, HEADERS, CONTENT_TYPE, UNKNOWN } from "./coreconsts.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 import * as types from "./types.js";
+import { parseJwtToken } from "./security.js";
 import { LOG_TYPE } from "./log.js";
 import { Module } from "./modules.js";
 
@@ -61,6 +62,7 @@ export class IClient extends Module{
   #rootUrl;
   #useOAuth;
   #oAuthUrl;
+  #accessTokenScheme;
   #accessToken;
   #accessTokenStamp;
   #tokenRefreshSec;
@@ -72,10 +74,12 @@ export class IClient extends Module{
     this.#oAuthUrl = types.trimUri(cfg.getString(["oauthurl", "oAuthUrl", "OAuthUrl"], "/system/oauth/token"), false, true);
 
     this.#accessToken = null;
+    this.#accessTokenScheme = "Bearer";
     this.#accessTokenStamp = 0;
 
     this.#useOAuth = cfg.getBool("useOAuth", true);
     if (!this.#useOAuth){
+      this.#accessTokenScheme = cfg.getString("accessTokenScheme", "Bearer");
       this.#accessToken = cfg.getString("accessToken", null);
       this.#accessTokenStamp = Date.now();
     }
@@ -92,6 +96,9 @@ export class IClient extends Module{
 
   /** Returns OAuth url to use when {@link useOAuth} is enabled */
   get oAuthUrl() { return this.#oAuthUrl; }
+
+  /** Returns access token scheme or "Bearer" */
+  get accessTokenScheme() { return strings.dflt(this.#accessTokenScheme, "Bearer"); }
 
   /** Returns default timeout in milliseconds which is applied when no explicit abort signal is passed */
   get defaultTimeoutMs() { return this.#defaultTimeoutMs; }
@@ -224,13 +231,14 @@ export class IClient extends Module{
 
   //this is a private method, outside parties should not be leaking token
   async #addAuthInfo(request){
-    const token = await this.#getAccessToken();
-    request.headers[HEADERS.AUTH] = `Bearer ${token}`;
+    const [scheme, token] = await this.#getAccessToken();
+    request.headers[HEADERS.AUTH] = `${scheme} ${token}`;
   }
 
   //this is a private method, outside parties should not be leaking token
+  //returns {scheme, token}
   async #getAccessToken(){
-    if (!this.#useOAuth) return this.#accessToken;
+    if (!this.#useOAuth) return [this.accessTokenScheme, this.#accessToken];
 
     let needNew = !this.#accessToken;
     if (!needNew){
@@ -239,10 +247,10 @@ export class IClient extends Module{
     }
 
     if (needNew){
-      this.#accessToken = await this.#obtainNewSessionUserToken();
+      [this.#accessTokenScheme, this.#accessToken] = await this.#obtainNewSessionUserToken();
       this.#accessTokenStamp = Date.now();
     }
-    return this.#accessToken;
+    return [this.accessTokenScheme, this.#accessToken];
   }
 
   async #obtainNewSessionUserToken(){
@@ -263,10 +271,10 @@ export class IClient extends Module{
     });
     const got = await authResponse.json();
 
-    const newToken = got["access_token"];
-    const newTokenType = got["token_type"];
-    const newRefreshToken = got["refresh_token"];
-    const newJwt = got["id_token"];
+    const newToken        = types.asString(got["access_token"]);
+    const newTokenType    = types.asString(got["token_type"]);
+    const newRefreshToken = types.asString(got["refresh_token"]);
+    const newJwtString    = types.asString(got["id_token"]);
     const newExpiresInSec = types.asInt(got["expires_in"]);
 
     if (newExpiresInSec > 0 && newExpiresInSec < this.#tokenRefreshSec){
@@ -274,10 +282,12 @@ export class IClient extends Module{
       this.writeLog(LOG_TYPE.WARNING, `Server advised of sooner token expiration in ${newExpiresInSec} sec. Adjusted refresh interval accordingly to ${this.#tokenRefreshSec} sec`);
     }
 
+    const newJwt = parseJwtToken(newJwtString);
+
     //set identity/jwt to session
     this.app.session.updateIdentity(newRefreshToken, newJwt);
 
-    this.writeLog(LOG_TYPE.INFO, `Obtained auth token for ${newJwt.sub}`);
-    return newToken;
+    this.writeLog(LOG_TYPE.INFO, `Obtained auth token for '${newJwt.sub}'`);
+    return [newTokenType, newToken];
   }
 }
