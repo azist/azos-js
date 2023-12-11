@@ -8,6 +8,7 @@ import * as types from "./types.js";
 import * as aver from "./aver.js";
 import { User } from "./security.js";
 import { Application } from "./application.js";
+import { AppSync, SYNC_EVT_TYPE_SESSION } from "./appsync.js";
 
 /**
  * Session holds data about user session: user, culture, options etc.
@@ -54,6 +55,17 @@ export class Session extends types.DisposableObject{
   }
 
   updateIdentity(refreshToken, jwt){
+   // resolve event AppSync andbrodcast an event
+   const linker = this.#app.moduleLinker;
+   const sync = linker.tryResolve(AppSync);
+   if (sync!==null) sync.postEvent(SYNC_EVT_TYPE_SESSION, {});
+  }
+
+  /**
+   * Synchronizes this session with another one, e.g. from another browser tab.
+   * The data parameter contains new principal/user
+  */
+  sync(data){
 
   }
 
