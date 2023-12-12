@@ -140,6 +140,21 @@ export class User {
   /** Returns user status @returns {USER_STATUS} */
   get status(){return this.#status; }
 
+  /** Returns true when user status is either `USER`|`ADMIN`|`SYS`, otherwise user considered to be invalid @returns {boolean}*/
+  get isValid(){
+    const s = this.#status;
+    return s === USER_STATUS.User || s === USER_STATUS.Admin || s === USER_STATUS.System;
+  }
+
+  /** Returns true when user status is `USER` @returns {boolean}*/
+  get isUser()   { return this.#status === USER_STATUS.User; }
+
+  /** Returns true when user status is `ADMIN` @returns {boolean}*/
+  get isAdmin()  { return this.#status === USER_STATUS.Admin; }
+
+  /** Returns true when user status is `SYSTEM` @returns {boolean}*/
+  get isSystem() { return this.#status === USER_STATUS.System; }
+
   /** Returns user auth token, such as OAuth refresh token @returns {string} */
   get authToken(){return this.#authToken; }
 
