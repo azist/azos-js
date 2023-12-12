@@ -10,7 +10,7 @@ import { LOG_TYPE } from "./log.js";
 
 
 /** Session synchronization */
-export const SYNC_EVT_TYPE_SESSION = "session";
+export const SYNC_EVT_TYPE_SESSION_CHANGE = "session-change";
 
 /** Synchronizes global state between application instances running in different browser windows/tabs */
 export class AppSync extends Module{
@@ -31,7 +31,7 @@ export class AppSync extends Module{
       if (evt.data){
         this.writeLog(LOG_TYPE.TRACE, `Got channel '${chn.name}' event '${evt.data.type}'`);
         try{
-          this.handleEvent(evt);
+          this.prepareAndHandleEvent(evt);
         } catch(err){
           this.writeLog(LOG_TYPE.ERROR, `Error processing broadcast channel '${chn.name}' leaked`, err);
         }
@@ -55,15 +55,16 @@ export class AppSync extends Module{
   prepareAndHandleEvent(evt){
     const tp = aver.isString(evt.data.type);
     const body = aver.isNotNull(evt.data.body);
-    this.handleEvent(tp, body);
+    return this._doHandleEvent(tp, body);
   }
 
   /** Override to handle your custom events. The default implementation synchronizes session state */
-  handleEvent(tp, body){
-    if (tp === SYNC_EVT_TYPE_SESSION){
-      this.app.session.sync(body);
+  _doHandleEvent(tp, body){
+    if (tp === SYNC_EVT_TYPE_SESSION_CHANGE){
+      this.app.session._sync(body);
       return true;
     }
+    return false;
   }
 
   /** Post event object into app sync channel */
@@ -71,7 +72,7 @@ export class AppSync extends Module{
     aver.isString(tp);
     aver.isNotNull(body);
     const chn = this.#channel;
-    if (chn!==null) {
+    if (chn !== null) {
       chn.postMessage({type: tp, body: body});
     }
   }
