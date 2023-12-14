@@ -28,6 +28,10 @@ export class Session extends types.DisposableObject{
   #culture;
   #settings;
 
+    //todo settings
+  //todo culture...
+
+
   // eslint-disable-next-line no-unused-vars
   constructor(app, cfg=null){
     super();
@@ -52,7 +56,8 @@ export class Session extends types.DisposableObject{
     if (!types.isAssigned(usr)) usr = User.invalid;
     this.#user = aver.isOf(usr, User);
 
-    if (this.#user !== was){ //Broadcast change
+    if (this.#user !== was){ //Store local user and Broadcast change
+      this.#storeUser(this.#user);
       //broadcast user change
       this.#broadcastSessionChange();
     }
@@ -78,8 +83,18 @@ export class Session extends types.DisposableObject{
       sync.postEvent(SYNC_EVT_TYPE_SESSION_CHANGE, {user: this.#user.toInitObject()});
     }
   }
-  //todo settings
-  //todo culture...
+
+  #storeUser(user){
+    const storage = this.#app.moduleLinker.tryResolve(IStorage);
+    if (storage === null) return;
+
+    const ini = {
+      expNow: Date.now() + (3 * 24 * 60 * 60 * 1000),//todo: Move to setting/constant instead
+      user: user.toInitObject()
+    };
+
+    storage.setItem(STORAGE_SESSION_KEY, ini);
+  }
 
   /**
    * Usually called at/after application boot - initializes this session object using the
@@ -115,7 +130,10 @@ export class Session extends types.DisposableObject{
     }
 
     //2 - read init
-    //read user...
+    const uini = init.user;
+    if (!types.isAssigned(uini)) return;
+    const usr = new User(uini);
+    this.user = usr;
   }
 
 }
