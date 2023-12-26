@@ -51,7 +51,6 @@ for(let i=0; i<5; i++){
   app.log.write({type: LOG_TYPE.INFO, text: "Trace message text", params: {i: i}});
 }
 
-app.session.boot(window.G8_USER_OBJECT_INIT);
 
 //console.info(`Add dispose 1: ${app[types.DISPOSED_PROP]} - ${types.dispose(app)}`);
 //console.info(`Add dispose 2: ${app[types.DISPOSED_PROP]} - ${types.dispose(app)}`);
