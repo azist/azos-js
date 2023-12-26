@@ -99,7 +99,7 @@ export class Application extends types.DisposableObject{
     this.#envName = root.getString(["envName", "env", "environment"], "local");
     this.#isTest = root.getBool("isTest", false);
 
-    this.#dfltLog = new ConLog(this, config({name: "log", [types.ORDER_PROP] : -1_000_000}).root);
+    this.#dfltLog = new ConLog(this, config({name: "log", [types.ORDER_PROP]: -1_000_000}).root);
 
     this.#session = this._makeSession(root.get("session"));
     this.#localizer = this._makeLocalizer(root.get("localizer"));
@@ -224,7 +224,7 @@ export class Application extends types.DisposableObject{
   */
   _makeSession(cfg){
     if (types.isAssigned(cfg)) {
-       return makeNew(Session, cfg);
+       return makeNew(Session, cfg, this);
     } else {
        return new Session(this, null);//empty session
     }

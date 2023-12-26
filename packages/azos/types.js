@@ -744,12 +744,17 @@ export function cast(v, tmon, canUndef=false){
 
 //crypto module is NOT loaded by default on node. Need async fallback.
 //On browser it is pre-loaded as-is
-let cryptoModule = null;
-if (typeof crypto === "undefined"){
-  import('node:crypto').then(mod => cryptoModule = mod);
-}else{
-  cryptoModule = crypto;
-}
+//let cryptoModule = null;
+let cryptoModule = typeof(window) !== "undefined" ? window.crypto : null;
+
+////20231226 DKh commented because parcel browserifies this with 3.5 mb of polyfill which we do not need
+//// If you need to run this on node, we will figure it out in future using import vuia Data uri see:
+////  https://2ality.com/2019/10/eval-via-import.html
+// if (typeof crypto === "undefined"){
+//   import('node:crypto').then(mod => cryptoModule = mod);
+// }else{
+//   cryptoModule = crypto;
+// }
 
 /**
  * Gets an instance of {@link Uint8Array} filled with random bytes
@@ -805,3 +810,27 @@ export function atMin(v, min){ return v < min ? min : v; }
 export function atMax(v, max){ return v > max ? max : v; }
 /** Macro keeps value between min/max. No type checks are done */
 export function keepBetween(v, min, max){ return v > min ? (v > max ? max : v) : min; }
+
+/**
+ * Takes a value, coercing it to string, optionally passing-through an undefined value;
+ * trims it and optionally checks of leading and trailing forward slashes
+ * @param {string} uri uri to process
+ * @param {boolean?} lsl true to check for leading slash, if not present then it will be added
+ * @param {boolean?} tsl true to check for trailing slash, if not present then it will be added
+ * @param {boolean?} canUndef true to pass `undefined` through as-is
+ * @returns {string} uri
+ */
+export function trimUri(uri, lsl = false, tsl = false, canUndef = false){
+  uri = strings.asString(uri, canUndef);
+  if (uri === undefined) return undefined;
+  uri = uri.trim();
+  if (lsl){
+    if (!uri.startsWith("/")) uri = "/" + uri;
+  }
+
+  if (tsl){
+    if (!uri.endsWith("/")) uri =  uri + "/";
+  }
+
+  return uri;
+}
