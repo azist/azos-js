@@ -744,12 +744,17 @@ export function cast(v, tmon, canUndef=false){
 
 //crypto module is NOT loaded by default on node. Need async fallback.
 //On browser it is pre-loaded as-is
-let cryptoModule = null;
-if (typeof crypto === "undefined"){
-  import('node:crypto').then(mod => cryptoModule = mod);
-}else{
-  cryptoModule = crypto;
-}
+//let cryptoModule = null;
+let cryptoModule = typeof(window) !== "undefined" ? window.crypto : null;
+
+////20231226 DKh commented because parcel browserifies this with 3.5 mb of polyfill which we do not need
+//// If you need to run this on node, we will figure it out in future using import vuia Data uri see:
+////  https://2ality.com/2019/10/eval-via-import.html
+// if (typeof crypto === "undefined"){
+//   import('node:crypto').then(mod => cryptoModule = mod);
+// }else{
+//   cryptoModule = crypto;
+// }
 
 /**
  * Gets an instance of {@link Uint8Array} filled with random bytes
