@@ -35,7 +35,7 @@ const cfgApp = {
 };
 
 const app = application(cfgApp);
-app.session.boot(window.__AZ_SESSIONINIT__);
+app.session.boot(window.XYZ_USER_OBJECT_INIT);
 if (typeof window !== 'undefined') window.AZAPP = app;
 
 console.info(`App instance ${app.instanceId}`);
