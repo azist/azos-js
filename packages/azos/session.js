@@ -10,6 +10,7 @@ import { User } from "./security.js";
 import { Application } from "./application.js";
 import { AppSync, SYNC_EVT_TYPE_SESSION_CHANGE } from "./appsync.js";
 import { IStorage } from "./storage.js";
+import { LOG_TYPE } from "./log.js";
 
 
 export const STORAGE_SESSION_KEY = "az-session";
@@ -125,6 +126,7 @@ export class Session extends types.DisposableObject{
     if (!types.isObject(init)) return;
     const expNow = types.asInt(init.expNow);
     if (Date.now() > expNow){
+      this.#app.log.write({type: LOG_TYPE.WARNING, text: "User init expired"});
       if (storage !== null) storage.removeItem(STORAGE_SESSION_KEY);
       return;
     }
@@ -132,6 +134,7 @@ export class Session extends types.DisposableObject{
     //2 - read init
     const uini = init.user;
     if (!types.isAssigned(uini)) return;
+    this.#app.log.write({type: LOG_TYPE.INFO, text: "Initializing session user", params: uini});
     const usr = new User(uini);
     this.user = usr;
   }

@@ -105,8 +105,8 @@ export class User {
       const claims = types.isObject(init.claims) ? (wasJson ? init.claims : structuredClone(init.claims)) : { };
       const rights = types.isObject(init.rights) ? (wasJson ? init.rights : structuredClone(init.rights)) : { };
 
-      init.claims = new Configuration(claims);
-      init.rights = new Configuration(rights);
+      this.#claims = new Configuration(claims);
+      this.#rights = new Configuration(rights);
     }catch(e){
       throw new SecurityError(`Bad User init content: ${e.message}`, "User.ctor()", e);
     }
