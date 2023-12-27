@@ -124,7 +124,7 @@ export class Session extends types.DisposableObject{
     }
 
     if (!types.isObject(init)) return;
-    const expNow = types.asInt(init.expNow);
+    const expNow = 1000 * types.asInt(init.expNowSec);
     if (Date.now() > expNow){
       this.#app.log.write({type: LOG_TYPE.WARNING, text: "User init expired"});
       if (storage !== null) storage.removeItem(STORAGE_SESSION_KEY);
