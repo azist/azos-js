@@ -71,7 +71,7 @@ export class BrowserStorage extends IStorage{
     aver.isNotNull(window.sessionStorage);
     aver.isNotNull(window.localStorage);
     super(dir, cfg);
-    this.#isSession = cfg.getBoolean(["isSession", "session"], false);
+    this.#isSession = cfg.getBool(["isSession", "session"], false);
   }
 
   /** True if this is a session storage */
