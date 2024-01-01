@@ -94,7 +94,7 @@ export class Session extends types.DisposableObject{
       user: user.toInitObject()
     };
 
-    storage.setItem(STORAGE_SESSION_KEY, ini);
+    storage.setItem(STORAGE_SESSION_KEY, JSON.stringify(ini));
   }
 
   /**
