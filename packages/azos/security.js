@@ -33,6 +33,9 @@ export function asUserStatus(v, canNull = false){
   if (canNull && v===null) return null;
   v = strings.asString(v);
   if (strings.isOneOf(v, ALL_STATUSES, false)) return v;
+  //Aliases
+  if (strings.isOneOf(v, "U,Usr", false)) return USER_STATUS.User;
+  if (strings.isOneOf(v, "A;Adm;Administrator", false)) return USER_STATUS.Admin;
   return USER_STATUS.Invalid;
 }
 
