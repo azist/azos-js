@@ -114,7 +114,7 @@ export function normalizeMsg(msg){
       topic: strings.asString(msg.topic),
       src:   msg.src | 0,
       params: types.isAssigned(msg.params) ? (types.isString(msg.params) ? msg.params : JSON.stringify(msg.params)) : null,
-      exception: msg.exception ??  null
+      exception: msg.exception ?? null
     };
   } catch(e){
     throw new LogError("Bad log msg", "normalizeMsg(...)", e);

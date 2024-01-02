@@ -81,6 +81,7 @@ export class Session extends types.DisposableObject{
     const linker = this.#app.moduleLinker;
     const sync = linker.tryResolve(AppSync);
     if (sync !== null){
+      this.#app.log.write({type: LOG_TYPE.INFO, from: "sess.change()", text: "Broadcast user change"});
       sync.postEvent(SYNC_EVT_TYPE_SESSION_CHANGE, {user: this.#user.toInitObject()});
     }
   }
@@ -115,18 +116,28 @@ export class Session extends types.DisposableObject{
    * This method is designed for just that - booting an application session in terms of identity.
    */
   boot(init){
+    const LFROM ="sess.boot()";
     //1 - try to get init from storage
     let storage = null;
     if (!types.isObject(init)){
       storage = this.#app.moduleLinker.tryResolve(IStorage);
-      if (storage === null) return;
-      init = storage.getItem(STORAGE_SESSION_KEY);
+      if (storage === null) {
+        this.#app.log.write({type: LOG_TYPE.WARNING, from: LFROM, text: "Exiting - no IStorage"});
+        return;
+      }
+      try{
+        const json = storage.getItem(STORAGE_SESSION_KEY);
+        if (json) init = JSON.parse(json);
+      }catch(e){
+        this.#app.log.write({type: LOG_TYPE.ERROR, from: LFROM, text: `Storage load: ${e.message}`, exception: e});
+        return;
+      }
     }
 
     if (!types.isObject(init)) return;
     const expNow = 1000 * types.asInt(init.expNowSec);
     if (Date.now() > expNow){
-      this.#app.log.write({type: LOG_TYPE.WARNING, text: "User init expired"});
+      this.#app.log.write({type: LOG_TYPE.WARNING, from: LFROM, text: "User init expired"});
       if (storage !== null) storage.removeItem(STORAGE_SESSION_KEY);
       return;
     }
@@ -134,7 +145,7 @@ export class Session extends types.DisposableObject{
     //2 - read init
     const uini = init.user;
     if (!types.isAssigned(uini)) return;
-    this.#app.log.write({type: LOG_TYPE.INFO, text: "Initializing session user", params: uini});
+    this.#app.log.write({type: LOG_TYPE.INFO, from: LFROM, text: "Initializing session user", params: uini});
     const usr = new User(uini);
     this.user = usr;
   }
