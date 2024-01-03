@@ -61,7 +61,7 @@ export class AppSync extends Module{
   /** Override to handle your custom events. The default implementation synchronizes session state */
   _doHandleEvent(tp, body){
     if (tp === SYNC_EVT_TYPE_SESSION_CHANGE){
-      this.writeLog(LOG_TYPE.INFO, "GOt session change event");
+      this.writeLog(LOG_TYPE.INFO, "Got session change event");
       this.app.session._sync(body);
       return true;
     }
