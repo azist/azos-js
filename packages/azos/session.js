@@ -78,7 +78,9 @@ export class Session extends types.DisposableObject{
     if (!types.isObject(init)) return;
     this.#app.log.write({type: LOG_TYPE.INFO, from: "sess._sync()", text: "Sync user", params: init});
     const usr = new User(init);
-    this.user = usr;
+    this.#user = usr;//notice assignment into pvt and no broadcast change
+
+    //TBD: We might need to rise event here about session change
   }
 
   #broadcastSessionChange(){

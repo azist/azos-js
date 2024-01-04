@@ -53,6 +53,12 @@ export class AppSync extends Module{
 
   /** Override to handle channel event. Most of times you will need to override `handleEvent(tp, body)` instead */
   prepareAndHandleEvent(evt){
+    const appId = aver.isString(evt.data.appId);
+    if (this.app.id !== appId) return false; //prevent other app on same origin
+
+    const appInstance = aver.isString(evt.data.appInstance);
+    if (this.app.instanceId === appInstance) return false; //prevent circular traffic
+
     const tp = aver.isString(evt.data.type);
     const body = aver.isNotNull(evt.data.body);
     return this._doHandleEvent(tp, body);
@@ -74,7 +80,7 @@ export class AppSync extends Module{
     aver.isNotNull(body);
     const chn = this.#channel;
     if (chn !== null) {
-      chn.postMessage({type: tp, body: body});
+      chn.postMessage({appId: this.app.id, appInstance: this.app.instanceId, type: tp, body: body});
     }
   }
 }
