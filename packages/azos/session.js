@@ -97,7 +97,7 @@ export class Session extends types.DisposableObject{
     if (storage === null) return;
 
     const ini = {
-      expNow: Date.now() + (3 * 24 * 60 * 60 * 1000),//todo: Move to setting/constant instead
+      expNowSec: (Date.now() / 1000) + (3 * 24 * 60 * 60),//todo: Move to setting/constant instead
       user: user.toInitObject()
     };
 
