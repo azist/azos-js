@@ -74,7 +74,11 @@ export class Session extends types.DisposableObject{
    * The data parameter contains new principal/user
   */
   _sync(data){
-   //todo:  refreshToken and jwt need to be serialized
+    const init = data.user;
+    if (!types.isObject(init)) return;
+    this.#app.log.write({type: LOG_TYPE.INFO, from: "sess._sync()", text: "Sync user", params: init});
+    const usr = new User(init);
+    this.user = usr;
   }
 
   #broadcastSessionChange(){
