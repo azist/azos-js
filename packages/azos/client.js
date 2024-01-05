@@ -255,14 +255,14 @@ export class IClient extends Module{
 
   async #obtainNewSessionUserToken(){
     this.writeLog(LOG_TYPE.TRACE, "About to obtain AUTH token");
-    const refreshToken = this.app.session.user.authToken;
+    const token = this.app.session.user.authToken;
 
     //make a server call
     const authResponse = await fetch(this.#oAuthUrl,
     {
       method: METHODS.POST,
       body: JSON.stringify({
-        refreshToken: refreshToken
+        partialToken: token
       }),
       headers: {
         [HEADERS.CONTENT_TYPE]: CONTENT_TYPE.JSON
