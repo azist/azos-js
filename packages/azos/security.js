@@ -103,7 +103,7 @@ export class User {
       this.#name = strings.asString(init.name);
       this.#descr = strings.asString(init.descr);
       this.#status = asUserStatus(init.status);
-      this.#authToken = types.asString(init.token);
+      this.#authToken = types.asString(init.authToken);
 
       const claims = types.isObject(init.claims) ? (wasJson ? init.claims : structuredClone(init.claims)) : { };
       const rights = types.isObject(init.rights) ? (wasJson ? init.rights : structuredClone(init.rights)) : { };
