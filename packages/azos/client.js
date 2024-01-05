@@ -10,7 +10,7 @@ import { METHODS, HEADERS, CONTENT_TYPE, UNKNOWN } from "./coreconsts.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 import * as types from "./types.js";
-import { parseJwtToken } from "./security.js";
+import { User, parseJwtToken } from "./security.js";
 import { LOG_TYPE } from "./log.js";
 import { Module } from "./modules.js";
 
@@ -255,39 +255,40 @@ export class IClient extends Module{
 
   async #obtainNewSessionUserToken(){
     this.writeLog(LOG_TYPE.TRACE, "About to obtain AUTH token");
-    const refreshToken = this.app.session.user.authRefreshToken;
+    const refreshToken = this.app.session.user.authToken;
 
     //make a server call
     const authResponse = await fetch(this.#oAuthUrl,
     {
       method: METHODS.POST,
       body: JSON.stringify({
-        refresh: refreshToken
+        refreshToken: refreshToken
       }),
       headers: {
         [HEADERS.CONTENT_TYPE]: CONTENT_TYPE.JSON
       },
       credentials: "same-origin" //AUTH cookies!!!!!!!!!!!! <==============
     });
-    const got = await authResponse.json();
+    const init = await authResponse.json();
 
-    const newToken        = types.asString(got["access_token"]);
-    const newTokenType    = types.asString(got["token_type"]);
-    const newRefreshToken = types.asString(got["refresh_token"]);
-    const newJwtString    = types.asString(got["id_token"]);
-    const newExpiresInSec = types.asInt(got["expires_in"]);
+    const newToken        = types.asString(init["access_token"]);
+    const newTokenType    = types.asString(init["token_type"]);
+    const newExpNowSec = types.asInt(init["expNowSec"]);
 
-    if (newExpiresInSec > 0 && newExpiresInSec < this.#tokenRefreshSec){
-      this.#tokenRefreshSec = types.atMin(0.75 * newExpiresInSec | 0, 10);
-      this.writeLog(LOG_TYPE.WARNING, `Server advised of sooner token expiration in ${newExpiresInSec} sec. Adjusted refresh interval accordingly to ${this.#tokenRefreshSec} sec`);
+    const expInSec = newExpNowSec - (Date.now() / 1000);
+
+    if (expInSec > 0 && expInSec < this.#tokenRefreshSec){
+      this.#tokenRefreshSec = types.atMin(0.75 * (expInSec | 0), 10);
+      this.writeLog(LOG_TYPE.WARNING, `Server advised of sooner token expiration in ${expInSec} sec. Adjusted refresh interval accordingly to ${this.#tokenRefreshSec} sec`);
     }
 
-    const newJwt = parseJwtToken(newJwtString);
+    //set updated identity
+    const uini = init.user;
+    if (types.isAssigned(uini)) {
+      this.app.session.user = new User(uini);
+    }
 
-    //set identity/jwt to session
-    this.app.session.updateIdentity(newRefreshToken, newJwt);
-
-    this.writeLog(LOG_TYPE.INFO, `Obtained auth token for '${newJwt.sub}'`);
+    this.writeLog(LOG_TYPE.INFO, `Obtained auth token for '${this.app.session.user.name}'`);
     return [newTokenType, newToken];
   }
 }

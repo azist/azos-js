@@ -11,8 +11,10 @@
         "hdrs",
         "hown",
         "intf",
+        "LFROM",
         "linq",
         "thandler",
-        "tparent"
+        "tparent",
+        "uini"
     ]
 }

@@ -64,13 +64,8 @@ export class Session extends types.DisposableObject{
     }
   }
 
-  updateIdentity(refreshToken, jwt){
-   // resolve event AppSync and broadcast an event
-   this.#broadcastSessionChange();
-  }
-
   /**
-   * Synchronizes this session with another one, e.g. from another browser tab.
+   * Internal: Synchronizes this session with another one, e.g. from another browser tab.
    * The data parameter contains new principal/user
   */
   _sync(data){
