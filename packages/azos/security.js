@@ -124,7 +124,7 @@ export class User {
       name: this.#name,
       descr: this.#descr,
       status: this.#status,
-      auth: this.#authToken,
+      authToken: this.#authToken,
       claims: this.#claims.content,
       rights: this.#rights.content,
     };
