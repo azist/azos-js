@@ -169,12 +169,14 @@ export class IClient extends Module{
     const hdrs = { };
     if (ctp !== null) hdrs[HEADERS.CONTENT_TYPE] = ctp;
 
-    for(const [k, v] of Object.entries(headers))
-      if (types.isAssigned(v)) hdrs[k] = v;
+    if (types.isAssigned(headers)){
+      for(const [k, v] of Object.entries(headers))
+        if (types.isAssigned(v)) hdrs[k] = v;
+    }
 
     while (uri.startsWith("/")) uri = uri.slice(1);
 
-    const url = this.#rootUrl + url;
+    const url = this.#rootUrl + uri;
 
     const opts = {
       method: method,
