@@ -10,6 +10,7 @@ import { User } from "./security.js";
 import { Application } from "./application.js";
 import { AppSync, SYNC_EVT_TYPE_SESSION_CHANGE } from "./appsync.js";
 import { IStorage } from "./storage.js";
+import { LOG_TYPE } from "./log.js";
 
 
 export const STORAGE_SESSION_KEY = "az-session";
@@ -63,23 +64,25 @@ export class Session extends types.DisposableObject{
     }
   }
 
-  updateIdentity(refreshToken, jwt){
-   // resolve event AppSync and broadcast an event
-   this.#broadcastSessionChange();
-  }
-
   /**
-   * Synchronizes this session with another one, e.g. from another browser tab.
+   * Internal: Synchronizes this session with another one, e.g. from another browser tab.
    * The data parameter contains new principal/user
   */
   _sync(data){
-   //todo:  refreshToken and jwt need to be serialized
+    const init = data.user;
+    if (!types.isObject(init)) return;
+    this.#app.log.write({type: LOG_TYPE.INFO, from: "sess._sync()", text: "Sync user", params: init});
+    const usr = new User(init);
+    this.#user = usr;//notice assignment into pvt and no broadcast change
+
+    //TBD: We might need to rise event here about session change
   }
 
   #broadcastSessionChange(){
     const linker = this.#app.moduleLinker;
     const sync = linker.tryResolve(AppSync);
     if (sync !== null){
+      this.#app.log.write({type: LOG_TYPE.INFO, from: "sess.change()", text: "Broadcast user change"});
       sync.postEvent(SYNC_EVT_TYPE_SESSION_CHANGE, {user: this.#user.toInitObject()});
     }
   }
@@ -89,11 +92,11 @@ export class Session extends types.DisposableObject{
     if (storage === null) return;
 
     const ini = {
-      expNow: Date.now() + (3 * 24 * 60 * 60 * 1000),//todo: Move to setting/constant instead
+      expNowSec: (Date.now() / 1000) + (3 * 24 * 60 * 60),//todo: Move to setting/constant instead
       user: user.toInitObject()
     };
 
-    storage.setItem(STORAGE_SESSION_KEY, ini);
+    storage.setItem(STORAGE_SESSION_KEY, JSON.stringify(ini));
   }
 
   /**
@@ -114,17 +117,28 @@ export class Session extends types.DisposableObject{
    * This method is designed for just that - booting an application session in terms of identity.
    */
   boot(init){
+    const LFROM ="sess.boot()";
     //1 - try to get init from storage
     let storage = null;
     if (!types.isObject(init)){
       storage = this.#app.moduleLinker.tryResolve(IStorage);
-      if (storage === null) return;
-      init = storage.getItem(STORAGE_SESSION_KEY);
+      if (storage === null) {
+        this.#app.log.write({type: LOG_TYPE.WARNING, from: LFROM, text: "Exiting - no IStorage"});
+        return;
+      }
+      try{
+        const json = storage.getItem(STORAGE_SESSION_KEY);
+        if (json) init = JSON.parse(json);
+      }catch(e){
+        this.#app.log.write({type: LOG_TYPE.ERROR, from: LFROM, text: `Storage load: ${e.message}`, exception: e});
+        return;
+      }
     }
 
     if (!types.isObject(init)) return;
-    const expNow = types.asInt(init.expNow);
+    const expNow = 1000 * types.asInt(init.expNowSec);
     if (Date.now() > expNow){
+      this.#app.log.write({type: LOG_TYPE.WARNING, from: LFROM, text: "User init expired"});
       if (storage !== null) storage.removeItem(STORAGE_SESSION_KEY);
       return;
     }
@@ -132,6 +146,7 @@ export class Session extends types.DisposableObject{
     //2 - read init
     const uini = init.user;
     if (!types.isAssigned(uini)) return;
+    this.#app.log.write({type: LOG_TYPE.INFO, from: LFROM, text: "Initializing session user", params: uini});
     const usr = new User(uini);
     this.user = usr;
   }

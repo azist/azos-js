@@ -33,6 +33,9 @@ export function asUserStatus(v, canNull = false){
   if (canNull && v===null) return null;
   v = strings.asString(v);
   if (strings.isOneOf(v, ALL_STATUSES, false)) return v;
+  //Aliases
+  if (strings.isOneOf(v, "U,Usr", false)) return USER_STATUS.User;
+  if (strings.isOneOf(v, "A;Adm;Administrator", false)) return USER_STATUS.Admin;
   return USER_STATUS.Invalid;
 }
 
@@ -100,13 +103,13 @@ export class User {
       this.#name = strings.asString(init.name);
       this.#descr = strings.asString(init.descr);
       this.#status = asUserStatus(init.status);
-      this.#authToken = types.asString(init.token);
+      this.#authToken = types.asString(init.authToken);
 
       const claims = types.isObject(init.claims) ? (wasJson ? init.claims : structuredClone(init.claims)) : { };
       const rights = types.isObject(init.rights) ? (wasJson ? init.rights : structuredClone(init.rights)) : { };
 
-      init.claims = new Configuration(claims);
-      init.rights = new Configuration(rights);
+      this.#claims = new Configuration(claims);
+      this.#rights = new Configuration(rights);
     }catch(e){
       throw new SecurityError(`Bad User init content: ${e.message}`, "User.ctor()", e);
     }
@@ -121,7 +124,7 @@ export class User {
       name: this.#name,
       descr: this.#descr,
       status: this.#status,
-      auth: this.#authToken,
+      authToken: this.#authToken,
       claims: this.#claims.content,
       rights: this.#rights.content,
     };
