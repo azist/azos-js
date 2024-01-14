@@ -19,6 +19,7 @@ import "./linker-tests.js";
 import "./app-log-tests.js";
 import "./security-tests.js";
 
+////clearSuite();
 
 defineCase("runner.function", function(){
   aver.areEqual(4, 2 + 2);

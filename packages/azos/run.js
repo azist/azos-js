@@ -13,6 +13,9 @@ export class RunError extends types.AzosError {
   constructor(message, from = null, cause = null){ super(message, from, cause, 528); }
 }
 
+//All Units
+const allUnits = [];
+
 /**
  * A unit is a logical grouping of registered cases which can be run.
  * A unit can have child units and/or cases.
@@ -37,14 +40,9 @@ export class Unit{
     if (parent !== null){
       this.#parent.register(this);
     }
-    if (init !== null){
-      units.push(this);
-      try{
-        init.apply(this);
-      } finally {
-        units.pop();
-      }
-    }
+
+    allUnits.push(this);
+    this.addDefinition(init);
   }
 
   /**
@@ -54,6 +52,24 @@ export class Unit{
   get id(){ return this.#id;}
   get parent(){return this.#parent;}
   get name(){return this.#name;}
+
+  /**
+   * Adds unit definition by applying the supplied init function in unit scope
+   * @param {Function} init - initialization function body
+   * @returns {Unit} returns self
+   */
+  addDefinition(init){
+    if (!init) return this;
+    aver.isFunction(init);
+    units.push(this);
+    try{
+      init.apply(this);
+    } finally {
+      units.pop();
+    }
+    return this;
+  }
+
 
   register(child){
     aver.isOfEither(child, Unit, Case);
@@ -327,7 +343,7 @@ export class Runner{
 }
 
 
-
+//Unit STACK
 const units = [new Unit(null, "*")];
 
 /**
@@ -335,6 +351,15 @@ const units = [new Unit(null, "*")];
  * There is always a default top-level unit with the name "*" called "root".
  */
 export function suite() { return units[0]; }
+
+/**
+ * Deletes all units defined in suite
+ */
+export function clearSuite() {
+  types.arrayClear(units);
+  types.arrayClear(allUnits);
+  units.push(new Unit(null, "*"));
+}
 
 /**
  * Returns most current inner unit being declared.
@@ -361,15 +386,22 @@ export function defineSuite(def){
 }
 
 /**
- * Defines a new unit in the scope of the declaring unit.
+ * Defines a new unit in the scope of the declaring unit OR if unit with such name already exists, adds definition to existing one.
  * This parameter is pointing at the declaring parent unit or root unit
  * @param {string} name unit string name
  * @param {function} body unit init body function containing cases and/or child declarations
- * @returns {Unit} newly created unit
+ * @returns {Unit} newly created unit or existing unit
  */
 export function defineUnit(name, body){
   const parent = this instanceof Unit ? this : current();
-  return new Unit(parent, name, body);
+  let existing = allUnits.find(one => one.parent === parent && one.name === name);
+
+  if (!existing) {
+    return new Unit(parent, name, body);
+  } else {
+    existing.addDefinition(body);
+    return existing;
+  }
 }
 
 /**
