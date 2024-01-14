@@ -1,0 +1,61 @@
+html {
+  box-sizing: border-box;/* Universal box sizing */
+}
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
+  line-height: 1.4;
+  background-color: var(--bg-color);
+  color: var(--color);
+  font: var(--font);
+  font-size: var(--font-sz);
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+  font: inherit;
+}
+
+ul[class], ol[class] {
+  list-style: none;
+}
+
+/* A elements that don't have a class get default styles */
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+}
+
+/* Remove all animations and transitions for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+h1 {
+  font-size: 3em;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 2.2em;
+  font-weight: bold;
+}
+
+h3 {
+  font-size: 2em;
+  font-weight: normal;
+}
+
+p {
+  padding: var(--p-padding);
+}
