@@ -1,22 +1,24 @@
-# Package `azos-ui` aka `AZU` (ah-zoo)
+# Package `azos-ui` aka `AZ` (ah-zee)
 
 Contains base services and components for user interface construction.
 
-> AZU solution is created for large complex enterprise systems and high modularity of controls/screens/forms/applets and even whole UI app modules
 
-Key concepts in AZU architecture:
-- All AZU apps run on azos application chassis
+> AZ solution is created for large complex enterprise systems and high modularity of controls/screens/forms/applets and even whole UI app modules.
+> All component adhere to **uniform design system** in terms of UI design and logical flow UX
+
+Key concepts in AZ architecture:
+- All AZ apps run on azos application chassis
 - All business logic is in modules - use inversion of control linker DI/svc location
 - View Models agnostic of actual rasterizer/UI renderer
 - Web Components for modularity
-- Modular private CSS with global theming via css vars
+- Modular private CSS with **design system theming** via css vars
 - Layered application design: Arena, Menu, Applet, Area
 
 
 ## UI Architecture
 
-A complex UI solution needs a layered design which allows for interoperability, reuse, and re-composition of bites and pieces of
-a large system constituent pieces, for example, we may need to reuse a data entry form which can be displayed as a modal popup/dialog
+A complex UI solution needs a layered design which allows for interoperability, reuse, and re-composition of bits and pieces in
+a larger system, for example, we may need to reuse a data entry form which can be displayed as a modal popup/dialog
 in different places. That form may have an accompanying business logic which may be complex and should not be duplicated, however
 it is also possible that such form would not have much logic at all.
 
