@@ -103,21 +103,71 @@ export class IClient extends Module{
   /** Returns default timeout in milliseconds which is applied when no explicit abort signal is passed */
   get defaultTimeoutMs() { return this.#defaultTimeoutMs; }
 
+  /**
+  * Defines a tuple returned from web calls a vector of (status: int, ctp: string, data: any)
+  * @typedef {Object} ResponseTuple
+  * @property {int} status - Http status code
+  * @property {string} ctp - Returns content type header/mime type
+  * @property {any} data - The actual data returned by the server, e.g. a blob array or an image or a JSON parsing result
+  */
 
+  /** Executes a GET call returning a tuple of `(status: int, ctp: string, data: any)`
+   * @param {string} uri
+   * @param {object?} headers - if not defined then system adds `Accept: application/json`; pass an empty object `{}` to prevent defaults
+   * @param {AbortSignal?} abort - Optional abort controller
+   * @param {Function?} fResponseHandler - Optional response handler which reacts to different content types. By default system uses in-built one
+   * @returns {Promise<ResponseTuple>}
+   */
   async get(uri, headers = null, abort = null, fResponseHandler = null){
-    return await this.call(METHODS.GET, uri, null, headers, abort, fResponseHandler);
+    return await this.call(METHODS.GET, uri, null, headers ?? {[HEADERS.ACCEPT]: CONTENT_TYPE.JSON}, abort, fResponseHandler);
   }
+
+  /** Executes a POST call returning a tuple of `(status: int, ctp: string, data: any)`
+   * @param {string} uri
+   * @param {object?} body - post body
+   * @param {object?} headers - if not defined then system adds `Accept: application/json`; pass an empty object `{}` to prevent defaults
+   * @param {AbortSignal?} abort - Optional abort controller
+   * @param {Function?} fResponseHandler - Optional response handler which reacts to different content types. By default system uses in-built one
+   * @returns {Promise<ResponseTuple>}
+   */
   async post(uri, body, headers = null, abort = null, fResponseHandler = null){
-    return await this.call(METHODS.POST, uri, body, headers, abort, fResponseHandler);
+    return await this.call(METHODS.POST, uri, body, headers ?? {[HEADERS.ACCEPT]: CONTENT_TYPE.JSON}, abort, fResponseHandler);
   }
+
+  /** Executes a PUT call returning a tuple of `(status: int, ctp: string, data: any)`
+   * @param {string} uri
+   * @param {object?} body - put body
+   * @param {object?} headers - if not defined then system adds `Accept: application/json`; pass an empty object `{}` to prevent defaults
+   * @param {AbortSignal?} abort - Optional abort controller
+   * @param {Function?} fResponseHandler - Optional response handler which reacts to different content types. By default system uses in-built one
+   * @returns {Promise<ResponseTuple>}
+   */
   async put(uri, body, headers = null, abort = null, fResponseHandler = null){
-    return await this.call(METHODS.PUT, uri, body, headers, abort, fResponseHandler);
+    return await this.call(METHODS.PUT, uri, body, headers ?? {[HEADERS.ACCEPT]: CONTENT_TYPE.JSON}, abort, fResponseHandler);
   }
+
+  /** Executes a PATCH call returning a tuple of `(status: int, ctp: string, data: any)`
+   * @param {string} uri
+   * @param {object?} body - patch body
+   * @param {object?} headers - if not defined then system adds `Accept: application/json`; pass an empty object `{}` to prevent defaults
+   * @param {AbortSignal?} abort - Optional abort controller
+   * @param {Function?} fResponseHandler - Optional response handler which reacts to different content types. By default system uses in-built one
+   * @returns {Promise<ResponseTuple>}
+   */
   async patch(uri, body, headers = null, abort = null, fResponseHandler = null){
-    return await this.call(METHODS.PATCH, uri, body, headers, abort, fResponseHandler);
+    return await this.call(METHODS.PATCH, uri, body, headers ?? {[HEADERS.ACCEPT]: CONTENT_TYPE.JSON}, abort, fResponseHandler);
   }
+
+  /** Executes a DELETE call returning a tuple of `(status: int, ctp: string, data: any)`
+   * @param {string} uri
+   * @param {object?} body - optional delete body
+   * @param {object?} headers - if not defined then system adds `Accept: application/json`; pass an empty object `{}` to prevent defaults
+   * @param {AbortSignal?} abort - Optional abort controller
+   * @param {Function?} fResponseHandler - Optional response handler which reacts to different content types. By default system uses in-built one
+   * @returns {Promise<ResponseTuple>}
+   */
   async delete(uri, body = null, headers = null, abort = null, fResponseHandler = null){
-    return await this.call(METHODS.DELETE, uri, body, headers, abort, fResponseHandler);
+    return await this.call(METHODS.DELETE, uri, body, headers ?? {[HEADERS.ACCEPT]: CONTENT_TYPE.JSON}, abort, fResponseHandler);
   }
 
   /**

@@ -13,6 +13,7 @@
         "intf",
         "LFROM",
         "linq",
+        "rasterizer",
         "thandler",
         "tparent",
         "uini"
