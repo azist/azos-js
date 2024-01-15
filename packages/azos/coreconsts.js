@@ -22,8 +22,9 @@ export const METHODS = Object.freeze({
 
 export const HEADERS = Object.freeze({
   AUTH: "Authorization",
+  ACCEPT: "Accept",
   CONTENT_TYPE: "Content-Type",
-  WV_DATA_CTX: "wv-data-ctx"
+  WV_DATA_CTX: "wv-data-ctx",
 });
 
 export const CONTENT_TYPE = Object.freeze({
