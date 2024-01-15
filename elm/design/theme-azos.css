@@ -3,5 +3,11 @@
   --color: #484848;
   --font: "Verdana";
   --font-sz: 16px;
-  --p-padding: 4px;
+
+  --content-padding: 4px;
+  --content-margin: 4px;
+  --content-border: 1px solid #e8e8e8;
+  --content-border-radius: 4px;
+
+  --btn-border-radius: 4px;
 }
