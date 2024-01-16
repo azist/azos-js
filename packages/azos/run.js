@@ -29,12 +29,14 @@ export class Unit{
   #parent;
   #name;
   #children = [];
-  constructor(parent, name, init = null){
+  #skipFunction;
+  constructor(parent, name, init = null, skipFunction = null){
     parent = parent ?? null;
     Unit.#idSeed++;
     this.#id = `U${Unit.#idSeed.toString().padStart(4, "0")}`;
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
     this.#name = aver.isString(name);
+    this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     init = init !== null ? aver.isFunction(init) : null;
 
     if (parent !== null){
@@ -52,6 +54,9 @@ export class Unit{
   get id(){ return this.#id;}
   get parent(){return this.#parent;}
   get name(){return this.#name;}
+
+  /** Optional f(runner, unit): bool */
+  get skipFunction(){ return this.#skipFunction; }
 
   /**
    * Adds unit definition by applying the supplied init function in unit scope
@@ -133,11 +138,14 @@ export class Case{
   #startMs = 0;
   #endMs = 0;
   #timeoutMs = 0;
-  constructor(unit, name, body){
+
+  #skipFunction;
+  constructor(unit, name, body, skipFunction = null){
     Case.#idSeed++;
     this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
+    this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     this.#body = aver.isFunction(body);
     this.#unit.register(this);
   }
@@ -156,6 +164,9 @@ export class Case{
 
   /** Returns a function body for case execution */
   get body(){return this.#body;}
+
+  /** Optional f(runner, cse): bool */
+  get skipFunction(){ return this.#skipFunction; }
 
   /** Last/current execution start timestamp */
   get startMs(){ return this.#startMs; }
@@ -321,17 +332,18 @@ export class Runner{
    * @returns {boolean} true when case should be skipped
    */
   shouldSkipUnit(unit){
-    return false;
+    const sf = unit.skipFunction;
+    if (sf) return sf(this, unit);
   }
 
   /**
    * Returns true when the supplied case matches the conditions and should be skipped.
-   * You can test for `cse.unit` property as well
    * @param {Case} cse to match
    * @returns {boolean} true when case should be skipped
    */
   shouldSkipCase(cse){
-    return false;
+    const sf = cse.skipFunction;
+    if (sf) return sf(this, cse);
   }
 
   //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
