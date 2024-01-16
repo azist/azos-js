@@ -78,6 +78,7 @@ export class Unit{
     return true;
   }
 
+  /** Determines if this unit should be included or excluded from a run. Returns true if it should be included */
   _match(runner){
     for(const one of this.#children){
       if (one._match(runner)) return true;
@@ -85,9 +86,20 @@ export class Unit{
     return false;
   }
 
+  /** Determines if this unit should or should not be skipped while running. It is similar to `_match()`
+  however skipped units get printed out into runner as skipped */
+  _shouldSkip(runner){
+    return runner._shouldSkipUnit(this);
+  }
+
   /** Async method runs all child units/cases */
   async run(runner){
     if (!runner) runner = Runner.default;
+
+    if (this._shouldSkip(runner)){
+      runner.skipUnit(this);
+      return false;
+    }
 
     const matching = this.#children.filter(one => one._match(runner));
     if (matching.length === 0) return false;
@@ -155,11 +167,21 @@ export class Case{
   /** Timeout constraint for this test; default 0 = no timeout */
   set timeoutMs(v) { this.#timeoutMs = v | 0; }
 
-  _match(runner){ return runner.matchCase(this); }
+  /** Determines if this case should be included or excluded from a run. Returns true if it should be included */
+  _match(runner){ return runner._matchCase(this); }
+
+  /** Determines if this case should or should not be skipped while running. It is similar to `_match()`
+  however skipped units get printed out into runner as skipped */
+  _shouldSkip(runner){ return runner._shouldSkipCase(this); }
 
   /** Async: executes case body such as a unit test body */
   async run(runner){
     if (!runner) runner = Runner.default;
+
+    if (this._shouldSkip(runner)){
+      runner.skipCase(this);
+      return false;
+    }
 
     runner.beginCase(this);
     this.#startMs = performance.now();
@@ -177,6 +199,8 @@ export class Case{
       this.#endMs = performance.now();
       runner.endCase(this, error);
     }
+
+    return true;
   }
 }
 
@@ -285,14 +309,41 @@ export class Runner{
    * @param {Case} cse to match
    * @returns {boolean} true when case should be ran
    */
-  matchCase(cse){
+  _matchCase(cse){
     const f = this.#fCaseFilter;
     if (f !== null) return f(cse);
     return true;
   }
 
+  /**
+   * Returns true when the supplied unit matches the conditions and should be skipped.
+   * @param {Unit} unit to match
+   * @returns {boolean} true when case should be skipped
+   */
+  _shouldSkipUnit(unit){
+    return false;
+  }
+
+  /**
+   * Returns true when the supplied case matches the conditions and should be skipped.
+   * You can test for `cse.unit` property as well
+   * @param {Case} cse to match
+   * @returns {boolean} true when case should be skipped
+   */
+  _shouldSkipCase(cse){
+    return false;
+  }
 
   //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
+
+  skipUnit(unit){
+    console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m skipped`);
+  }
+
+  skipCase(cse){
+    console.log(`\x1b[90m${this.#sindent}Case ${cse.unit.id}.\x1b[37m${cse.id} -> \x1b[36m'${cse.name}' skipped`);
+  }
+
 
   beginUnit(unit){
     console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
