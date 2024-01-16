@@ -8,6 +8,7 @@
         "ctor",
         "descr",
         "endregion",
+        "fskip",
         "hdrs",
         "hown",
         "intf",

@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import {suite, Runner, cmdArgsCaseFilter, defineCase} from "../run.js";
+import {suite, Runner, cmdArgsCaseFilter, defineUnit, defineCase} from "../run.js";
 import * as aver from "../aver.js";
 
 import "./types-tests.js";
@@ -32,6 +32,12 @@ defineCase("runner.asyncArrowDelay", async () => await new Promise(r => setTimeo
 
 defineCase("runner.promiseFunctionInstant", function(){ return Promise.resolve(123); } );
 defineCase("runner.promiseFunctionDelay", function(){ return new Promise(r => setTimeout(r, 100)); });
+
+defineUnit("Runner.SkippedUnit", function(){
+  defineCase("nevrRun", function(){  });
+}, () => true);
+defineCase("runner.thisCaseWillBeSkipped", function(){  }, () => true);
+
 
 //run.defineSuite();
 const runner = new Runner(cmdArgsCaseFilter);
