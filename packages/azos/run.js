@@ -89,7 +89,7 @@ export class Unit{
   /** Determines if this unit should or should not be skipped while running. It is similar to `_match()`
   however skipped units get printed out into runner as skipped */
   _shouldSkip(runner){
-    return runner._shouldSkipUnit(this);
+    return runner.shouldSkipUnit(this);
   }
 
   /** Async method runs all child units/cases */
@@ -168,11 +168,11 @@ export class Case{
   set timeoutMs(v) { this.#timeoutMs = v | 0; }
 
   /** Determines if this case should be included or excluded from a run. Returns true if it should be included */
-  _match(runner){ return runner._matchCase(this); }
+  _match(runner){ return runner.matchCase(this); }
 
   /** Determines if this case should or should not be skipped while running. It is similar to `_match()`
   however skipped units get printed out into runner as skipped */
-  _shouldSkip(runner){ return runner._shouldSkipCase(this); }
+  _shouldSkip(runner){ return runner.shouldSkipCase(this); }
 
   /** Async: executes case body such as a unit test body */
   async run(runner){
@@ -309,7 +309,7 @@ export class Runner{
    * @param {Case} cse to match
    * @returns {boolean} true when case should be ran
    */
-  _matchCase(cse){
+  matchCase(cse){
     const f = this.#fCaseFilter;
     if (f !== null) return f(cse);
     return true;
@@ -320,7 +320,7 @@ export class Runner{
    * @param {Unit} unit to match
    * @returns {boolean} true when case should be skipped
    */
-  _shouldSkipUnit(unit){
+  shouldSkipUnit(unit){
     return false;
   }
 
@@ -330,18 +330,18 @@ export class Runner{
    * @param {Case} cse to match
    * @returns {boolean} true when case should be skipped
    */
-  _shouldSkipCase(cse){
+  shouldSkipCase(cse){
     return false;
   }
 
   //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
 
   skipUnit(unit){
-    console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m skipped`);
+    console.log(`${this.#sindent}\x1b[105m\x1b[30m Unit \x1b[40m \x1b[95m${unit.id}::'${unit.name} skipped`);
   }
 
   skipCase(cse){
-    console.log(`\x1b[90m${this.#sindent}Case ${cse.unit.id}.\x1b[37m${cse.id} -> \x1b[36m'${cse.name}' skipped`);
+    console.log(`\x1b[35m${this.#sindent}Case ${cse.unit.id}.${cse.id} -> '${cse.name}' skipped`);
   }
 
 
