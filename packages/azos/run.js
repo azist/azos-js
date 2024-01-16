@@ -453,14 +453,15 @@ export function defineSuite(def){
  * This parameter is pointing at the declaring parent unit or root unit
  * @param {string} name unit string name
  * @param {function} body unit init body function containing cases and/or child declarations
+ * @param {function} fskip optional skip test function `f(runner, unit): bool`
  * @returns {Unit} newly created unit or existing unit
  */
-export function defineUnit(name, body){
+export function defineUnit(name, body, fskip = null){
   const parent = this instanceof Unit ? this : current();
   let existing = allUnits.find(one => one.parent === parent && one.name === name);
 
   if (!existing) {
-    return new Unit(parent, name, body);
+    return new Unit(parent, name, body, fskip);
   } else {
     existing.addDefinition(body);
     return existing;
@@ -472,11 +473,12 @@ export function defineUnit(name, body){
  * `this` parameter is pointing at the declaring unit
  * @param {string} name case string
  * @param {function} body case execution body
+ * @param {function} fskip optional skip test function `f(runner, cse): bool`
  * @returns {Case} newly created run case
  */
-export function defineCase(name, body){
+export function defineCase(name, body, fskip){
   const parent = this instanceof Unit ? this : current();
-  return new Case(parent, name, body);
+  return new Case(parent, name, body, fskip);
 }
 
 /** Macro for con.dir(obj) in a collapsed group, used for testing */
