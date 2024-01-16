@@ -29,12 +29,14 @@ export class Unit{
   #parent;
   #name;
   #children = [];
-  constructor(parent, name, init = null){
+  #skipFunction;
+  constructor(parent, name, init = null, skipFunction = null){
     parent = parent ?? null;
     Unit.#idSeed++;
     this.#id = `U${Unit.#idSeed.toString().padStart(4, "0")}`;
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
     this.#name = aver.isString(name);
+    this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     init = init !== null ? aver.isFunction(init) : null;
 
     if (parent !== null){
@@ -52,6 +54,9 @@ export class Unit{
   get id(){ return this.#id;}
   get parent(){return this.#parent;}
   get name(){return this.#name;}
+
+  /** Optional f(runner, unit): bool */
+  get skipFunction(){ return this.#skipFunction; }
 
   /**
    * Adds unit definition by applying the supplied init function in unit scope
@@ -78,6 +83,7 @@ export class Unit{
     return true;
   }
 
+  /** Determines if this unit should be included or excluded from a run. Returns true if it should be included */
   _match(runner){
     for(const one of this.#children){
       if (one._match(runner)) return true;
@@ -85,9 +91,20 @@ export class Unit{
     return false;
   }
 
+  /** Determines if this unit should or should not be skipped while running. It is similar to `_match()`
+  however skipped units get printed out into runner as skipped */
+  _shouldSkip(runner){
+    return runner.shouldSkipUnit(this);
+  }
+
   /** Async method runs all child units/cases */
   async run(runner){
     if (!runner) runner = Runner.default;
+
+    if (this._shouldSkip(runner)){
+      runner.skipUnit(this);
+      return false;
+    }
 
     const matching = this.#children.filter(one => one._match(runner));
     if (matching.length === 0) return false;
@@ -121,11 +138,14 @@ export class Case{
   #startMs = 0;
   #endMs = 0;
   #timeoutMs = 0;
-  constructor(unit, name, body){
+
+  #skipFunction;
+  constructor(unit, name, body, skipFunction = null){
     Case.#idSeed++;
     this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
+    this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     this.#body = aver.isFunction(body);
     this.#unit.register(this);
   }
@@ -145,6 +165,9 @@ export class Case{
   /** Returns a function body for case execution */
   get body(){return this.#body;}
 
+  /** Optional f(runner, cse): bool */
+  get skipFunction(){ return this.#skipFunction; }
+
   /** Last/current execution start timestamp */
   get startMs(){ return this.#startMs; }
   /** Last/current execution end timestamp */
@@ -155,11 +178,21 @@ export class Case{
   /** Timeout constraint for this test; default 0 = no timeout */
   set timeoutMs(v) { this.#timeoutMs = v | 0; }
 
+  /** Determines if this case should be included or excluded from a run. Returns true if it should be included */
   _match(runner){ return runner.matchCase(this); }
+
+  /** Determines if this case should or should not be skipped while running. It is similar to `_match()`
+  however skipped units get printed out into runner as skipped */
+  _shouldSkip(runner){ return runner.shouldSkipCase(this); }
 
   /** Async: executes case body such as a unit test body */
   async run(runner){
     if (!runner) runner = Runner.default;
+
+    if (this._shouldSkip(runner)){
+      runner.skipCase(this);
+      return false;
+    }
 
     runner.beginCase(this);
     this.#startMs = performance.now();
@@ -177,6 +210,8 @@ export class Case{
       this.#endMs = performance.now();
       runner.endCase(this, error);
     }
+
+    return true;
   }
 }
 
@@ -253,6 +288,8 @@ export class Runner{
   #countError;
   #countTotal;
   #countUnits;
+  #countSkippedUnits;
+  #countSkippedCases;
   #elapsedMs;
   #fCaseFilter;
 
@@ -269,6 +306,8 @@ export class Runner{
     this.#countTotal = 0;
     this.#countUnits = 0;
     this.#elapsedMs = 0;
+    this.#countSkippedUnits = 0;
+    this.#countSkippedCases = 0;
 
     this.#fCaseFilter = types.isFunction(fCaseFilter) ? fCaseFilter : null;
   }
@@ -277,6 +316,8 @@ export class Runner{
   get countError(){ return this.#countError; }
   get countTotal(){ return this.#countTotal; }
   get countUnits(){ return this.#countUnits; }
+  get countSkippedUnits(){ return this.#countSkippedUnits; }
+  get countSkippedCases(){ return this.#countSkippedCases; }
   get elapsedMs(){ return this.#elapsedMs; }
 
   /**
@@ -291,8 +332,38 @@ export class Runner{
     return true;
   }
 
+  /**
+   * Returns true when the supplied unit matches the conditions and should be skipped.
+   * @param {Unit} unit to match
+   * @returns {boolean} true when case should be skipped
+   */
+  shouldSkipUnit(unit){
+    const sf = unit.skipFunction;
+    if (sf) return sf(this, unit);
+  }
+
+  /**
+   * Returns true when the supplied case matches the conditions and should be skipped.
+   * @param {Case} cse to match
+   * @returns {boolean} true when case should be skipped
+   */
+  shouldSkipCase(cse){
+    const sf = cse.skipFunction;
+    if (sf) return sf(this, cse);
+  }
 
   //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
+
+  skipUnit(unit){
+    this.#countSkippedUnits++;
+    console.log(`${this.#sindent}\x1b[105m\x1b[30m Unit \x1b[40m \x1b[95m${unit.id}::'${unit.name} skipped`);
+  }
+
+  skipCase(cse){
+    this.#countSkippedCases++;
+    console.log(`\x1b[35m${this.#sindent}Case ${cse.unit.id}.${cse.id} -> '${cse.name}' skipped`);
+  }
+
 
   beginUnit(unit){
     console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
@@ -338,6 +409,16 @@ export class Runner{
       this.#countError++;
       console.error(`\x1b[90m${this.#sindent2}\x1b[30m\x1b[101m Error \x1b[97m\x1b[41m ${cse.unit.name}::${cse.name} \x1b[0m \x1b[91m${error.toString()}\x1b[0m `);
     }
+  }
+
+  summarize(){
+    console.info(`\x1b[40m\x1b[97m               Summary\x1b[90m
+─────────────────────────────────────
+\x1b[90m OK(\x1b[92m${this.countOk}\x1b[90m) + Errors(\x1b[91m${this.countError}\x1b[90m) = Total(\x1b[97m${this.countTotal}\x1b[90m)
+\x1b[90m Units:  \x1b[94m${this.countUnits}
+\x1b[90m Skipped Units: \x1b[95m${this.countSkippedUnits}\x1b[90m
+\x1b[90m Skipped Cases: \x1b[95m${this.countSkippedCases}
+\x1b[90m Total time: \x1b[34m${this.elapsedMs.toFixed(1)} ms`)
   }
 
 }
@@ -390,14 +471,15 @@ export function defineSuite(def){
  * This parameter is pointing at the declaring parent unit or root unit
  * @param {string} name unit string name
  * @param {function} body unit init body function containing cases and/or child declarations
+ * @param {function} fskip optional skip test function `f(runner, unit): bool`
  * @returns {Unit} newly created unit or existing unit
  */
-export function defineUnit(name, body){
+export function defineUnit(name, body, fskip = null){
   const parent = this instanceof Unit ? this : current();
   let existing = allUnits.find(one => one.parent === parent && one.name === name);
 
   if (!existing) {
-    return new Unit(parent, name, body);
+    return new Unit(parent, name, body, fskip);
   } else {
     existing.addDefinition(body);
     return existing;
@@ -409,11 +491,12 @@ export function defineUnit(name, body){
  * `this` parameter is pointing at the declaring unit
  * @param {string} name case string
  * @param {function} body case execution body
+ * @param {function} fskip optional skip test function `f(runner, cse): bool`
  * @returns {Case} newly created run case
  */
-export function defineCase(name, body){
+export function defineCase(name, body, fskip){
   const parent = this instanceof Unit ? this : current();
-  return new Case(parent, name, body);
+  return new Case(parent, name, body, fskip);
 }
 
 /** Macro for con.dir(obj) in a collapsed group, used for testing */
