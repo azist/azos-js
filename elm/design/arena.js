@@ -12,4 +12,5 @@ btnMenuClose.addEventListener("click", closeMenu);
 
 document.addEventListener("click", e => { if (!btnMenuOpen.contains(e.target)) closeMenu(); });
 
+
 //});

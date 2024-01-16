@@ -1,9 +1,10 @@
-import {application} from "azos/application";
-import {Module} from "azos/modules";
-import {ConLog} from "azos/ilog";
+import { makeUiApplication } from "../ui.js";
+import { Arena } from "../arena.js";
 import { LOG_TYPE } from "azos/log";
+import { ConLog } from "azos/ilog";
 
-console.info('Hook you hard barbindoziy');
+import { dispose } from "azos/types";
+import { Module } from "azos/modules";
 
 
 class MyLogic extends Module{
@@ -13,7 +14,7 @@ class MyLogic extends Module{
   }
 
   _appAfterLoad(){
-    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "Hook you hard!"), 1000);
+    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 5_000);
   }
 
   _appBeforeCleanup(){
@@ -27,31 +28,31 @@ const cfgApp = {
   id: "abc",
   name: "$(id)",
   description: "Test '$(name)' application",
-  //session: null, //{type: "UiSession"},
   modules: [
     {name: "log", type: ConLog},
     {name: "logic", type: MyLogic},
   ]
 };
 
-const app = application(cfgApp);
-app.session.boot(window.XYZ_USER_OBJECT_INIT);
-if (typeof window !== 'undefined') window.AZAPP = app;
-
+const app = makeUiApplication(cfgApp);
 console.info(`App instance ${app.instanceId}`);
+app.session.boot(window.XYZ_USER_OBJECT_INIT);
 
-app.log.write({text: "aaaaaaaaaaaaaaa"});
-app.log.write({type: LOG_TYPE.DEBUG, text: "Debug message"});
-app.log.write({type: LOG_TYPE.TRACE, text: "Trace message text"});
-app.log.write({type: LOG_TYPE.INFO, text: "Info message text"});
-app.log.write({type: LOG_TYPE.WARNING, text: "Warning message text"});
-app.log.write({type: LOG_TYPE.ERROR, text: "Error message text"});
+app.log.write({type: LOG_TYPE.DEBUG, text: "Launching arena..."});
+Arena.launch();
+app.log.write({type: LOG_TYPE.DEBUG, text: "...arena launched"});
 
-for(let i=0; i<5; i++){
-  app.log.write({type: LOG_TYPE.INFO, text: "Trace message text", params: {i: i}});
-}
+// Handle UNLOADING/CLOSING of tab/window
+//https://developer.chrome.com/docs/web-platform/page-lifecycle-api
+window.addEventListener("beforeunload", (evt) => {
+  if (app.dirty){
+    evt.preventDefault();
+    evt.returnValue = true;
+    return;
+  }
+});
 
-
-//console.info(`Add dispose 1: ${app[types.DISPOSED_PROP]} - ${types.dispose(app)}`);
-//console.info(`Add dispose 2: ${app[types.DISPOSED_PROP]} - ${types.dispose(app)}`);
+//Called on tab close POST-factum asking questions.
+//Not called if user decides to cancel tab close
+window.addEventListener("pagehide", () => dispose(app));
 
