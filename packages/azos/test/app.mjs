@@ -48,6 +48,7 @@ const runner = new Runner(cmdArgsCaseFilter);
 //////process.exitCode = runner.countError;
 suite().run(runner)
        .then(() => {
+          runner.summarize();
           if (runner.countError > 0){
             console.warn(`\x1b[93m\x1b[40m  *** Test suite has ${runner.countError} errors !!! *** \x1b[0m`);
             process.exitCode = runner.countError;//process is polyfilled by Parcel

@@ -288,6 +288,8 @@ export class Runner{
   #countError;
   #countTotal;
   #countUnits;
+  #countSkippedUnits;
+  #countSkippedCases;
   #elapsedMs;
   #fCaseFilter;
 
@@ -304,6 +306,8 @@ export class Runner{
     this.#countTotal = 0;
     this.#countUnits = 0;
     this.#elapsedMs = 0;
+    this.#countSkippedUnits = 0;
+    this.#countSkippedCases = 0;
 
     this.#fCaseFilter = types.isFunction(fCaseFilter) ? fCaseFilter : null;
   }
@@ -312,6 +316,8 @@ export class Runner{
   get countError(){ return this.#countError; }
   get countTotal(){ return this.#countTotal; }
   get countUnits(){ return this.#countUnits; }
+  get countSkippedUnits(){ return this.#countSkippedUnits; }
+  get countSkippedCases(){ return this.#countSkippedCases; }
   get elapsedMs(){ return this.#elapsedMs; }
 
   /**
@@ -349,10 +355,12 @@ export class Runner{
   //https://en.m.wikipedia.org/wiki/ANSI_escape_code#Colors
 
   skipUnit(unit){
+    this.#countSkippedUnits++;
     console.log(`${this.#sindent}\x1b[105m\x1b[30m Unit \x1b[40m \x1b[95m${unit.id}::'${unit.name} skipped`);
   }
 
   skipCase(cse){
+    this.#countSkippedCases++;
     console.log(`\x1b[35m${this.#sindent}Case ${cse.unit.id}.${cse.id} -> '${cse.name}' skipped`);
   }
 
@@ -401,6 +409,16 @@ export class Runner{
       this.#countError++;
       console.error(`\x1b[90m${this.#sindent2}\x1b[30m\x1b[101m Error \x1b[97m\x1b[41m ${cse.unit.name}::${cse.name} \x1b[0m \x1b[91m${error.toString()}\x1b[0m `);
     }
+  }
+
+  summarize(){
+    console.info(`\x1b[40m\x1b[97m               Summary\x1b[90m
+─────────────────────────────────────
+\x1b[90m OK(\x1b[92m${this.countOk}\x1b[90m) + Errors(\x1b[91m${this.countError}\x1b[90m) = Total(\x1b[97m${this.countTotal}\x1b[90m)
+\x1b[90m Units:  \x1b[94m${this.countUnits}
+\x1b[90m Skipped Units: \x1b[95m${this.countSkippedUnits}\x1b[90m
+\x1b[90m Skipped Cases: \x1b[95m${this.countSkippedCases}
+\x1b[90m Total time: \x1b[34m${this.elapsedMs.toFixed(1)} ms`)
   }
 
 }
