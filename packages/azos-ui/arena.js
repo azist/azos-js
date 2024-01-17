@@ -25,10 +25,18 @@ export class Arena extends AzosElement {
     //hook application by element name
     const allArenas = document.getElementsByTagName(elementName);
     for(const one of allArenas){
-      one.____bindApplication(app);
+      one.____bindApplicationAtLaunch(app);
     }
   }
 
+  //Sharing style sheets between Shadow Dom
+  //// Create an element in the document and then create a shadow root:
+  //const node = document.createElement("div");
+  //const shadow = node.attachShadow({ mode: "open" });
+  ////Adopt the same sheet into the shadow DOM
+  //shadow.adoptedStyleSheets = [sheet];
+  //https://stackoverflow.com/questions/69702129/how-to-use-adoptedstylesheets-in-lit
+  //https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptedStyleSheets
   static styles = css`p { color: blue }`;
 
   static properties = {
@@ -41,8 +49,8 @@ export class Arena extends AzosElement {
     this.name = 'Somebody';
   }
 
-  /** System internal, dont use */
-  ____bindApplication(app){
+  /** System internal, don't use */
+  ____bindApplicationAtLaunch(app){
     this.#app = app;
     this.requestUpdate();
   }
@@ -50,7 +58,7 @@ export class Arena extends AzosElement {
   /** Returns {@link Application} instance where this arena was launched
    * @returns {Application}
   */
-  get app(){ const app = this.#app; if (!app) throw new AzosError("Arena app is not bound. Must `Arena.launch(app...)`"); return app; }
+  get app(){ const app = this.#app; if (!app) throw new AzosError("Arena app is not bound. Must call `Arena.launch(app...)`"); return app; }
 
   render() {
     const app = this.#app;

@@ -25,5 +25,18 @@ export const svg = lit_svg;
 /** Provides uniform base derivation point for `AzosElements` - all elements must derive from here */
 export class AzosElement extends LitElement {
   constructor() {   super();   }
+
+  /** Returns {@link Application} instance from the first (great/grand)parent element that defines app ref
+   * @returns {Application}
+  */
+  get app(){
+    let n = this.parentNode;
+    while(typeof n.app === 'undefined'){
+      n = n.parentNode;
+    }
+    return n.app;
+  }
+
+
   render() { return html`>>AZOS ELEMENT<<`; }
 }
