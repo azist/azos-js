@@ -1,4 +1,4 @@
-import { makeUiApplication } from "../ui.js";
+import { application } from "azos/application";
 import { Arena } from "../arena.js";
 import { LOG_TYPE } from "azos/log";
 import { ConLog } from "azos/ilog";
@@ -14,7 +14,7 @@ class MyLogic extends Module{
   }
 
   _appAfterLoad(){
-    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 5_000);
+    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 25_000);
   }
 
   _appBeforeCleanup(){
@@ -34,12 +34,14 @@ const cfgApp = {
   ]
 };
 
-const app = makeUiApplication(cfgApp);
-console.info(`App instance ${app.instanceId}`);
+const app = application(cfgApp);
+window.AZOS_APP = app;//for debugging
+console.info(`App instance ${app.instanceId} assigned into 'window.AZOS_APP' for debugging`);
 app.session.boot(window.XYZ_USER_OBJECT_INIT);
 
+
 app.log.write({type: LOG_TYPE.DEBUG, text: "Launching arena..."});
-Arena.launch();
+Arena.launch(app);
 app.log.write({type: LOG_TYPE.DEBUG, text: "...arena launched"});
 
 // Handle UNLOADING/CLOSING of tab/window
