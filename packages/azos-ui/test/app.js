@@ -39,7 +39,6 @@ window.AZOS_APP = app;//for debugging
 console.info(`App instance ${app.instanceId} assigned into 'window.AZOS_APP' for debugging`);
 app.session.boot(window.XYZ_USER_OBJECT_INIT);
 
-
 app.log.write({type: LOG_TYPE.DEBUG, text: "Launching arena..."});
 Arena.launch(app);
 app.log.write({type: LOG_TYPE.DEBUG, text: "...arena launched"});
