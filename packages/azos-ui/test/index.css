@@ -1,8 +1,18 @@
-h1 {
-  color: #4e2a9c;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  /* border: 1px solid red; */
-  font-size: 28px;
-  display: block;
-  text-align: center;
+body{
+  color: #454545;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-size: 14px;
+  margin: 0px;
+  padding: 0px;
+}
+
+
+.theme-azos{
+  --paper: #ff0000;
+
+}
+
+.theme-odessa{
+  --paper: #40a0ff;
+
 }
