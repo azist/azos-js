@@ -42,27 +42,27 @@ header{
         display: block;
         position: fixed;
         z-index: 200;
-        left: 0;
+        left: -500px;
         top: 0;
-        width: 0;
+        width: 250px;
         height: 100vh;
         background:#f09020;
-        opacity: 0.95;
+        opacity: 0.98;
         color: #fff;
-        transition: 0.5s;
+        transition: 0.75s;
         font-size: 1.5em;
         overflow: hidden;
       }
 
       header .side-menu_expanded{
-        width: 250px;
+        left: 0px;
       }
 
       header .side-menu .close-button{
-        font-size: 1.4em;
+        font-size: 1.6em;
         position: absolute;
-        top: 2px;
-        right: 2px;
+        top: 4px;
+        right: 6px;
         margin-top: -10px;
       }
 
@@ -109,8 +109,7 @@ header{
         display: block;
         font-size: 1.6rem;
         padding: 6px 2px 0px 8px;
-        XXcolor: #dbdbdb;
-        color: var(--paper);
+        color: #d8d8d8;
         letter-spacing:  -1.5px;
       }
 
@@ -126,6 +125,7 @@ header{
 /* ------------------- */
 
 main{
+  background-color: var(--paper);
   padding: 40px 16px 16px 16px;
   text-align: justify;
 }

@@ -4,11 +4,13 @@ body{
   font-size: 14px;
   margin: 0px;
   padding: 0px;
+  background: #c0c0c0;
 }
 
 
 .theme-azos{
-  --paper: #ff0000;
+  --paper: #f0f0f0;
+  --bar: #e4e4e4;
 
 }
 
