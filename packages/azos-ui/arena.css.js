@@ -13,6 +13,7 @@ header{
   min-width: 360px;
   left: 0px;
   width: 100%;
+  height: var(--hdr-height);
   top: 0px;
   z-index: 100;
   margin-top: 0px;
@@ -21,23 +22,6 @@ header{
   background-color: var(--hdr-bg-color);
   box-shadow: var(--hdr-shadow);
 }
-
-      header .social-buttons{
-        position: fixed;
-        right: 0px;
-        top:  calc(50% - 96px);
-        z-index: 500;
-        overflow: hidden;
-      }
-
-      header .social-buttons a{
-        display: block;
-      }
-
-      header .social-buttons svg{
-        width: 48px; height: 48px;
-      }
-
       header .side-menu{
         display: block;
         position: fixed;
@@ -98,7 +82,7 @@ header{
         display: block;
         margin: 8px auto 8px auto;
         width: 30px;
-        height: var(--hdr-item-height);
+        height: 30px;
 
         stroke: var(--menu-svg-color);
         stroke-width: var(--menu-svg-stroke);
@@ -107,21 +91,47 @@ header{
 
 
       header .title{
-        float: left;
+        //float: left;
+        position: absolute;
+        left: var(--menu-btn-width);
+        top: 0px;
         display: block;
         font-size: 1.6rem;
         padding: 6px 2px 0px 8px;
         color: #d8d8d8;
         letter-spacing:  -1.5px;
+        width: 100%;
+        Xborder: 1px solid lime;
       }
 
-
-      header .user{
+      header .strip{
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        display: flex;
         float: right;
-        display: block;
-        text-align: right;
+        flex-direction: row-reverse;
+        flex-wrap: nowrap;
+        Xborder: 1px solid lime;
+        height: 100%;
+        background-color: var(--hdr-bg-color);
+      }
+
+      header .strip-btn{
+        display: inline-block;
         font-size: 0.9rem;
-        padding: 20px 8px 0px 4px;
+        text-align: center;
+        width: 45px;
+        margin: 2px 1px 2px 4px;
+        Xbackground-color: #808080;
+        color: #ff0000;
+        padding: 4px;
+        stroke: white;
+        stroke-width: 1px;
+      }
+
+      header .strip-btn:hover{
+        background-color: rgba(255, 255, 255, 0.1);
       }
 
 /* ------------------- */
