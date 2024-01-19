@@ -126,11 +126,12 @@ header{
         margin: 2px 1px 2px 4px;
         Xbackground-color: #808080;
         color: #ff0000;
-        padding: 4px;
+        padding-top: 4px;
 
-        stroke: white;
-        stroke-width: 1px;
-        fill: #e8e8e8;
+        stroke: #e0e0e0;
+        stroke-width: 0.8px;
+        fill: none;
+        stroke-linecap="round";
       }
 
       header .strip-btn:hover{
