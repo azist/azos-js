@@ -17,9 +17,9 @@ header{
   z-index: 100;
   margin-top: 0px;
   padding-top: 0px;
-  background-color: #404040;
-  box-shadow: 0px 0px 12px rgba(0,0,0, 0.35);
-  color: #d0d0d0;
+  color: var(--hdr-color);
+  background-color: var(--hdr-bg-color);
+  box-shadow: var(--hdr-shadow);
 }
 
       header .social-buttons{
@@ -46,23 +46,25 @@ header{
         top: 0;
         width: 250px;
         height: 100vh;
-        background:#f09020;
-        opacity: 0.98;
-        color: #fff;
+        color: var(--menu-color);
+        background: var(--menu-bg-color);
+        opacity: var(--menu-opacity);
         transition: 0.75s;
-        font-size: 1.5em;
+        font-size: var(--menu-font-size);
         overflow: hidden;
+        box-shadow: var(--menu-shadow);
       }
 
       header .side-menu_expanded{
         left: 0px;
+        opacity: var(--menu-opacity);
       }
 
       header .side-menu .close-button{
-        font-size: 1.6em;
+        font-size: 1.8em;
         position: absolute;
-        top: 4px;
-        right: 6px;
+        top: 6px;
+        left: 6px;
         margin-top: -10px;
       }
 
@@ -86,20 +88,20 @@ header{
 
       header .menu{
         float: left;
-        width: 58px;
+        width: var(--menu-btn-width);
         height: 100%;
         display: block;
-        background:#f09020;
+        background: var(--menu-btn-color);
       }
 
       header .menu svg{
         display: block;
         margin: 8px auto 8px auto;
         width: 30px;
-        height: 30px;
+        height: var(--hdr-item-height);
 
-        stroke: #f0f0f0;
-        stroke-width: 4px;
+        stroke: var(--menu-svg-color);
+        stroke-width: var(--menu-svg-stroke);
       }
 
 

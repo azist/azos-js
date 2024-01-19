@@ -20,9 +20,7 @@ function menuClose(){
 export function renderHeader(app, self){
   return html`
   <a href="#" class="menu" id="btnMenuOpen" @click="${menuOpen}">
-    <svg style="stroke:#f0f0f0; stroke-width: 3px;">
-      <path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/>
-    </svg>
+    <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
   </a>
 
   <nav class="side-menu" id="navMenu">
