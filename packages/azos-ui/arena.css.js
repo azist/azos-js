@@ -112,9 +112,10 @@ header{
         float: right;
         flex-direction: row-reverse;
         flex-wrap: nowrap;
-        Xborder: 1px solid lime;
+        /*border: 1px solid lime;*/
         height: 100%;
-        background-color: var(--hdr-bg-color);
+        background: linear-gradient(to right, rgba(100,100,100, 0.0), var(--hdr-bg-color) 15%);
+        padding-left: 20px;
       }
 
       header .strip-btn{
@@ -126,8 +127,10 @@ header{
         Xbackground-color: #808080;
         color: #ff0000;
         padding: 4px;
+
         stroke: white;
         stroke-width: 1px;
+        fill: #e8e8e8;
       }
 
       header .strip-btn:hover{

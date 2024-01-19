@@ -38,7 +38,7 @@ export function renderHeader(app, self){
   <div class="strip">
     <div class="strip-btn">${app.session.user.name}</div>
     <div class="strip-btn"><svg style="width: 40px; height: 40px;"><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg></div>
-    <div class="strip-btn">B3</div>
+    <div class="strip-btn"><svg style="width: 40px; height: 40px;"><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg></div>
     </div>
 
   </div>
