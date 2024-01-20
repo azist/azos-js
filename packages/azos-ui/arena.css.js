@@ -141,9 +141,88 @@ header{
 /* ------------------- */
 
 main{
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+  background: var(--main-bg);
+}
+
+main::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+
+main .strip{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: var(--menu-btn-width);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: auto;
+  padding-top: 55px;
+}
+
+main .strip-btn{
+  display: inline-block;
+  font-size: 0.9rem;
+  text-align: center;
+  width: 45px;
+  margin: 2px 1px 2px 4px;
+  XXXbackground-color: #808080;
+  color: #ff0000;
+  padding-top: 4px;
+
+  stroke: #505050;
+  stroke-width: 0.8px;
+  fill: none;
+  stroke-linecap="round";
+}
+
+main .strip-btn-selected{
+  border-left: 4px solid #40a0ff;
+  margin-left: 0px;
+}
+
+main .strip-btn:hover{
+  background-color: rgba(255, 255, 255, .2);
+  stroke-width: 1px;
+  stroke: #404040;
+}
+
+main .applet-container{
+  display: block;
+  width: calc(100% - var(--menu-btn-width));
+  box-sizing: border-box;
+  float: right;
+  XXXborder: 1px solid red;
   background-color: var(--paper);
   padding: 40px 16px 16px 16px;
   text-align: justify;
+}
+
+@media screen and (max-width: 420px) {
+  main .strip{
+    top: unset;
+    position: fixed;
+    bottom: 0px;
+    padding: 1px 2px 4px 2px;
+    border-top: 1px solid #d0d0d0;
+    left: 0px;
+    width: 100vw;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 38px;
+    background: #e4e4e4;
+  }
+
+  main .applet-container{
+    width: 100%;
+  }
 }
 
 /* ------------------- */

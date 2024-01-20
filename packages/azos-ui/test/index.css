@@ -13,7 +13,9 @@ body{
   --hdr-bg-color: #404040;
   --hdr-color: #d0d0d0;
   --hdr-height: 44px;
-  --hdr-shadow: 0px 0px 12px rgba(0,0,0, 0.35);
+  --hdr-shadow: 50px 0px 12px rgba(0,0,0, 0.35);
+
+  --main-bg: #e0e0e0;
 
   --menu-btn-color: #f09020;
   --menu-btn-width: 58px;
