@@ -197,10 +197,10 @@ main .applet-container{
   width: calc(100% - var(--menu-btn-width));
   box-sizing: border-box;
   float: right;
-  XXXborder: 1px solid red;
   background-color: var(--paper);
   padding: 40px 16px 16px 16px;
   text-align: justify;
+  overflow: auto;
 }
 
 @media screen and (max-width: 420px) {
