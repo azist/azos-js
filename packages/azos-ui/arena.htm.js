@@ -35,6 +35,8 @@ export function renderHeader(app, self){
 
   <div class="title">A very long name for the Arena: ${app.name}</div>
 
+  <!--  https://www.svgrepo.com/collection/solar-outline-icons/ -->
+
   <!--<div class="strip-btn">${app.session.user.name}</div> -->
   <div class="strip">
     <div class="strip-btn">
@@ -73,6 +75,25 @@ export function renderMain(app, self){
     esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
     in culpa qui officia deserunt mollit anim id est laborum.
   </p>
+  <h2>Who is who?</h2>
+  <p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit
+    esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+    in culpa qui officia deserunt mollit anim id est laborum.
+  </p>
+  <p>
+  The newest member of the Copilot family offers priority access to the top AI models and, for
+  Microsoft 365 Home and Microsoft 365 Family subscribers, an AI companion in the Microsoft 365 apps
+  <img style="width: 180px; float: right; margin: 8px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Surgeon_Vice-Admiral_Alasdair_Walker.jpg/800px-Surgeon_Vice-Admiral_Alasdair_Walker.jpg">
+   you already use every day. If you already redeemed a product key, you're simply reinstalling the apps, or you
+   know you have an assigned license through work or school, you can skip ahead and go to the section sign in to download
+    and install Microsoft 365 or Office. However, if this is the first time you're installing Microsoft 365 or Office, you
+     may have some steps to do first. Expand the Learn more section below for more info.
+  </p>
+  <p>Walker became Assistant Medical Director at the Plymouth Hospitals NHS Trust in 2005, and after being deployed to Afghanistan,
+  he was promoted to commodore and became Medical Director at Joint Medical Command in 2009.</p>
   `;
 }
 
