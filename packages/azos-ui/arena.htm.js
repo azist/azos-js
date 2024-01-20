@@ -33,7 +33,7 @@ export function renderHeader(app, self){
     </ul>
   </nav>
 
-  <div class="title">A very long name for the Arena: ${app.name}</div>
+  <div class="title">${app.description}</div>
 
   <!--  https://www.svgrepo.com/collection/solar-outline-icons/ -->
 

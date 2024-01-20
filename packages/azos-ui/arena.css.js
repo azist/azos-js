@@ -215,6 +215,7 @@ main .applet-container{
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    justify-content: center;
     height: 38px;
     background: #e4e4e4;
   }
@@ -222,6 +223,13 @@ main .applet-container{
   main .applet-container{
     width: 100%;
   }
+
+  main .strip-btn-selected{
+    border: unset;
+    border-bottom: 4px solid #40a0ff;
+    margin-bottom: 0px;
+  }
+
 }
 
 /* ------------------- */
