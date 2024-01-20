@@ -1,8 +1,47 @@
-h1 {
-  color: #4e2a9c;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  /* border: 1px solid red; */
-  font-size: 28px;
-  display: block;
-  text-align: center;
+body{
+  color: #454545;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-size: 14px;
+  margin: 0px;
+  padding: 0px;
+  background: #c0c0c0;
+}
+
+
+.theme-azos{
+  --paper: #f0f0f0;
+  --hdr-bg-color: #404040;
+  --hdr-color: #d0d0d0;
+  --hdr-height: 44px;
+  --hdr-shadow: 50px 0px 12px rgba(0,0,0, 0.35);
+
+  --main-bg: #e0e0e0;
+
+  --menu-btn-color: #f09020;
+  --menu-btn-width: 58px;
+  --menu-svg-color: #f4f4f4;
+  --menu-svg-stroke: 2.2px;
+  --menu-shadow: 4px 0px 24px rgba(0,0,0,0.25);
+  --menu-bg-color: linear-gradient(#f09020, #ffaf4f);
+  --menu-color: #fff;
+  --menu-opacity: 1.0;
+  --menu-font-size: 1.5em;
+
+}
+
+.theme-odessa{
+  --paper: #f0f0f8;
+  --hdr-bg-color: #4080d0;
+  --hdr-color: #d0d0d0;
+  --hdr-item-height: 30px;
+  --hdr-shadow: 0px 0px 12px rgba(0,0,0, 0.35);
+
+  --menu-btn-color: #e0c010;
+  --menu-btn-width: 50px;
+  --menu-svg-color: #a0a0f0;
+  --menu-shadow: 1px 1px 24px rgba(0,0,0,0.25);
+  --menu-bg-color: #f0d020;
+  --menu-color: #505050;
+  --menu-opacity: 1.0;
+  --menu-font-size: 1.2em;
 }
