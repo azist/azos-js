@@ -7,7 +7,6 @@
 import { css } from "./ui.js";
 
 export const ARENA_STYLES = css`
-
 header{
   position: fixed;
   min-width: 360px;
