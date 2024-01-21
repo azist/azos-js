@@ -1,5 +1,6 @@
 import { application } from "azos/application";
 import { Arena } from "../arena.js";
+import { ArenaLogic } from "../arena-logic.js";
 import { LOG_TYPE } from "azos/log";
 import { ConLog } from "azos/ilog";
 
@@ -22,7 +23,24 @@ class MyLogic extends Module{
   }
 }
 
+class XyzApplet{//this is temp
 
+}
+
+const appMenu = [
+  {uri: "processing", caption: "Processing", nodes: [
+
+  ], access: "/ns/permission1"},
+  {uri: "reports", caption: "Reports and Analytics", nodes: [
+
+  ]},
+  {uri: "setup", caption: "Data Setup", nodes: [
+    {uri: "codes", caption: "Codes and Classifications", nodes: [
+      {uri: "facility", caption: "Facility Master", run: {type: XyzApplet, a: 1, b: true}},
+      {uri: "postal", caption: "Postal Codes", run: {type: XyzApplet, x: -5, b: "ok"}},
+    ]}
+  ]}
+];
 
 const cfgApp = {
   id: "abc",
@@ -31,6 +49,10 @@ const cfgApp = {
   modules: [
     {name: "log", type: ConLog},
     {name: "logic", type: MyLogic},
+    {
+      name: "arena", type: ArenaLogic,
+      menu: { root: [...appMenu] }
+    },
   ]
 };
 

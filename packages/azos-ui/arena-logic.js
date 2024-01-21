@@ -4,10 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as types from "./types.js";
-import * as aver from "./aver.js";
-import { Application } from "./application.js";
-import { AppComponent } from "./components.js";
+import * as types from "azos/types";
+import * as aver from "azos/aver";
+import { Module } from "azos/modules";
 
 /**
  * Arena represents a virtual "stage" - what application/user "deals with"
@@ -15,11 +14,11 @@ import { AppComponent } from "./components.js";
  * An arena maintains a state of scenes which get created by components such as
  * modal dialogs which have a stacking order
  */
-export class Arena extends AppComponent{
+export class ArenaLogic extends Module{
 
-  constructor(app){
-    aver.isOf(app, Application);
-    super(app);
+  constructor(dir, cfg){
+    super(dir, cfg);
   }
+
 
 }
