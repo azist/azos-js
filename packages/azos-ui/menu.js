@@ -8,8 +8,24 @@ import * as types from "azos/types";
 import * as aver from "azos/aver";
 import { Module } from "azos/modules";
 
+/*
+ - Menu Defined as config, there is no special "menu hierarchy"
+ - Menu defined at menu(app, ConfigNode)
+ - Menu turns config node into array of MenuItem which is a model for menu rendering
+
+ - Menu does this by interpreting BY CONVENTION config vector
+ - Nodes may also have "handler" which generates dynamic sub/tree of MenuItem
+
+
+
+*/
+
+
 /**
- * Manages menu tree
+ * Menus are logical lists of dispatchable commands, optionally organized in hierarchies of nodes.
+ * Menus are used everywhere: a). Primary arena menu b). Arena toolstrip menu c). Arena applet areas menu d). context menus.
+ * Menus may have dynamic handlers which generate menu sub-tree upon invocation, e.g. "a list of recent files".
+ * Menus are owned by the declaration site, e.g. an applet menu is owned by an applet.
  */
 export class Menu{
   #root;

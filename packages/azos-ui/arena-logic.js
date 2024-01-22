@@ -7,6 +7,7 @@
 import * as types from "azos/types";
 import * as aver from "azos/aver";
 import { Module } from "azos/modules";
+import { ConfigNode } from "azos/conf";
 
 /**
  * Arena represents a virtual "stage" - what application/user "deals with"
@@ -22,10 +23,23 @@ export class ArenaLogic extends Module{
 
 
   /** Calculates menu tree as of current state
-   * Returns enumerable of tuple (level, html...)
+   * Returns [] of tuple (level, html...)
   */
   calculateMenu(){
-
+    return {
+      id: 1,//command id - ever increasing integer
+      level: 1,//in the tree
+      parent: null,//parent item
+      uriFull: "/full/path",
+      uri: "path",
+      kind: "",//section|split|check|cmd
+      htmlIcon: "",//icon
+      htmlContent: "", //caption is rendered
+      hint: "",//optional description as plain text
+      shortcut: "",//optional shortcut name in plain text e.g. "Ctrl+A"
+      checked: true,
+      handler: ConfigNode
+    };
   }
 
 }
