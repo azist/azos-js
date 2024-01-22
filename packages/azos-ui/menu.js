@@ -9,15 +9,19 @@ import * as aver from "azos/aver";
 import { Module } from "azos/modules";
 
 /*
- - Menu Defined as config, there is no special "menu hierarchy"
- - Menu defined at menu(app, ConfigNode)
+ - Usage: menu() function is called BEFORE UI MENU POPUP so you can build menu before it gets displayed
+ - Menu Defined as config, there is no special "menu hierarchy" data types which "hold menu"
+ - Menu defined at menu<Tdirector>(director, ConfigNode)
  - Menu turns config node into array of MenuItem which is a model for menu rendering
 
  - Menu does this by interpreting BY CONVENTION config vector
- - Nodes may also have "handler" which generates dynamic sub/tree of MenuItem
+ - Important: What you get out of Menu may be different what you feed in, eg. u get "last 5" files menu items,
+    whereas in the menu config you get only one handler
+ - Nodes may also have "handler" which generates dynamic sub/tree of MenuItem (see above)
 
-
-
+ - A get handler is a function delegate which "handles" menu construction.
+ - A run handler is a function delegate which "handles" menu invocation
+ - System handlers provide default functions (e.g. for wrapping Applet invocation etc).
 */
 
 
