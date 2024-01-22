@@ -21,4 +21,11 @@ export class ArenaLogic extends Module{
   }
 
 
+  /** Calculates menu tree as of current state
+   * Returns enumerable of tuple (level, html...)
+  */
+  calculateMenu(){
+
+  }
+
 }

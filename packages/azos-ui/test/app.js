@@ -23,21 +23,30 @@ class MyLogic extends Module{
   }
 }
 
-class XyzApplet{//this is temp
+class XyzApplet{//this is tempnpm
 
 }
 
 const appMenu = [
-  {uri: "processing", caption: "Processing", nodes: [
-
-  ], access: "/ns/permission1"},
-  {uri: "reports", caption: "Reports and Analytics", nodes: [
-
-  ]},
+  {
+    uri: "processing",
+    caption: "Processing",
+    icon: "<svg></svg>",
+    nodes: [
+    ],
+    access: "/ns/permission1"
+  },
+  {
+    uri: "reports",
+    caption: "Reports and Analytics",
+    icon: "<svg></svg>",
+    nodes: [
+    ]
+  },
   {uri: "setup", caption: "Data Setup", nodes: [
     {uri: "codes", caption: "Codes and Classifications", nodes: [
-      {uri: "facility", caption: "Facility Master", run: {type: XyzApplet, a: 1, b: true}},
-      {uri: "postal", caption: "Postal Codes", run: {type: XyzApplet, x: -5, b: "ok"}},
+      {uri: "facility", caption: "Facility Master", handler: {type: XyzApplet, a: 1, b: true}, icon: "<svg></svg>"},
+      {uri: "postal", caption: "Postal Codes", handler: {type: XyzApplet, x: -5, b: "ok"}, icon: "<svg></svg>"},
     ]}
   ]}
 ];
