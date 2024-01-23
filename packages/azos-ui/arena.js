@@ -64,6 +64,12 @@ export class Arena extends AzosElement {
     this.requestUpdate();
   }
 
+
+  /** Returns {@link Arena} self
+   * @returns {Arena} self
+  */
+  get arena(){ return this; }
+
   /** Returns {@link Application} instance where this arena was launched
    * @returns {Application}
   */

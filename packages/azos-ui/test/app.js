@@ -6,6 +6,7 @@ import { ConLog } from "azos/ilog";
 
 import { dispose } from "azos/types";
 import { Module } from "azos/modules";
+import { Applet } from "../applet.js";
 
 
 class MyLogic extends Module{
@@ -23,7 +24,7 @@ class MyLogic extends Module{
   }
 }
 
-class XyzApplet{//this is tempnpm
+class XyzApplet extends Applet{//this is tempnpm
 
 }
 

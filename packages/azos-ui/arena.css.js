@@ -195,10 +195,11 @@ main .strip-btn:hover{
 main .applet-container{
   display: block;
   width: calc(100% - var(--menu-btn-width));
+  min-height: 50vh;
   box-sizing: border-box;
   float: right;
   background-color: var(--paper);
-  padding: 40px 16px 16px 16px;
+  padding:  calc(4px + var(--hdr-height)) 16px 16px 16px;
   text-align: justify;
   overflow: auto;
 }

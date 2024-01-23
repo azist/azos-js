@@ -4,10 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as aver from "azos/aver";
-import { isSubclassOf, AzosError } from "azos/types";
 import { html, AzosElement } from "./ui.js";
-import { Application } from "azos/application.js";
 
 //import { APPLET_STYLES } from "./applet.css.js";
 //import * as DEFAULT_HTML from "./applet.htm.js";
@@ -25,23 +22,30 @@ export class Applet extends AzosElement {
     name: {type: String},
   };
 
-  #app;
   constructor() {
     super();
     this.name = 'Somebody';
   }
 
-  /** Must override */
-  get tagName(){ return "az-applet";}
+  /** Returns the name of the applet displayed in the Arena title bar */
+  get title() { return this.constructor.name; }
+
+  /** Returns short description */
+  get description() { return ""; }
+
+  onClick(){
+    //alert("Ura!!!");
+    this.arena.name+="a";
+    //this.arena.requestUpdate();
+  }
+
 
   render() {
-    const app = this.#app;
-    if (!app) return "";
-    //---------------------------
-
-    return html` applet `;
+    return html` applet
+     <button @click="${this.onClick}"> Click me </button>
+    `;
   }//render
 
-}//Arena
+}//Applet
 
-
+window.customElements.define("az-applet", Applet);

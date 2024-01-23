@@ -26,17 +26,18 @@ export const svg = lit_svg;
 export class AzosElement extends LitElement {
   constructor() {   super();   }
 
-  /** Returns {@link Application} instance from the first (great/grand)parent element that defines app ref
-   * @returns {Application}
-  */
-  get app(){
-    let n = this.parentNode;
-    while(typeof n.app === 'undefined'){
-      n = n.parentNode;
-    }
-    return n.app;
-  }
 
+  /** Returns {@link Arena} instance from the first (great/grand)parent element that defines arena ref
+   * @returns {Arena}
+  */
+  get arena(){
+    let n = this.parentNode;
+    while(typeof n.arena === 'undefined'){
+      n =  (n.parentNode ?? n.host);
+    }
+
+    return n.arena;
+  }
 
   render() { return html`>>AZOS ELEMENT<<`; }
 }

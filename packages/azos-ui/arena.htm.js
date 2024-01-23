@@ -33,7 +33,7 @@ export function renderHeader(app, self){
     </ul>
   </nav>
 
-  <div class="title">${app.description}</div>
+  <div class="title">${app.description}${self.name}</div>
 
   <!--  https://www.svgrepo.com/collection/solar-outline-icons/ -->
 
@@ -84,7 +84,8 @@ export function renderMain(app, self){
   </nav>
 
   <div class="applet-container" role="main">
-     <slot name="applet-content"> </slot>
+     <!--slot name="applet-content"> </slot-->
+     <az-applet></az-applet>
   </div>
   `;
 }
