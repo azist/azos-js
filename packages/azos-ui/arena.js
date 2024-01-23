@@ -53,6 +53,7 @@ export class Arena extends AzosElement {
   };
 
   #app;
+  #applet = null;
   constructor() {
     super();
     this.name = 'Somebody';
@@ -74,6 +75,34 @@ export class Arena extends AzosElement {
    * @returns {Application}
   */
   get app(){ const app = this.#app; if (!app) throw new AzosError("Arena app is not bound. Must call `Arena.launch(app...)`"); return app; }
+
+  /** Returns currently open {@link Applet} instance, or null if nothing is open yet, or applet was closed */
+  get applet(){ return this.#applet; }
+
+  /** Installs tool items in the arena.
+   * Items uninstall upon their disposal or you can uninstall them explicitly by calling this method with `isInstall` false */
+  setupToolBarItems(isInstall, items){
+
+  }
+
+  /** Installs applet area button(s) (e.g. on a sid or bottom bar).
+   * Pass null/empty array to unregister all areas (make them disappear)
+   */
+  registerAppletAreas(areas){
+
+  }
+
+  /** Sets the specified applet as the current one */
+  appletOpen(ctorApplet){
+
+  }
+
+  /** Closes applet returning to default state */
+  appletClose(){
+
+  }
+
+
 
   render() {
     const app = this.#app;
