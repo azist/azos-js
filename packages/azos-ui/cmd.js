@@ -51,7 +51,7 @@ export class KeyboardShortcut {
  * A large UI app (e.g. VS Code) may have 100s of commands presented to the user via various
  * main and context menus, and various tool strips/side bars;
  */
-export class Command{
+export class Command {
 
   static #idSeed = 0;
 
@@ -66,6 +66,11 @@ export class Command{
   #onExec;
 
   #args;
+
+  constructor(cfg){
+
+  }
+
 
   /** Executes the command. Commands do NOT return anything */
   exec(sender){
