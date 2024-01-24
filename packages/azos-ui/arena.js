@@ -79,10 +79,16 @@ export class Arena extends AzosElement {
   /** Returns currently open {@link Applet} instance, or null if nothing is open yet, or applet was closed */
   get applet(){ return this.#applet; }
 
-  /** Installs tool items in the arena.
-   * Items uninstall upon their disposal or you can uninstall them explicitly by calling this method with `isInstall` false */
-  setupToolBarCommands(isInstall, commands){
+  /** Installs tool items in the arena
+   * @param {Command[]} commands
+   */
+  installToolbar(commands){
+  }
 
+  /** Uninstalls tool items in the arena
+   * @param {string[]} ids array of commands ids
+   */
+  uninstallToolbar(ids){
   }
 
   /** Installs applet area button(s) (e.g. on a sid or bottom bar).

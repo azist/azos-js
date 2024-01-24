@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { ConfigNode } from "azos/conf";
+import { makeNew, config, ConfigNode } from "azos/conf";
 
 /** Define a keyboard shortcut */
 export class KeyboardShortcut {
@@ -52,29 +52,87 @@ export class KeyboardShortcut {
  * main and context menus, and various tool strips/side bars;
  */
 export class Command {
-
-  static #idSeed = 0;
-
-  #id;
-  #caption;
+  #ctx;
+  #uri;
+  #title;
   #hint;
   #icon;
 
+  #active = true;
+  #visible = true;
+  #enabled = true;
+  #readonly = false;
+
   #shortcut;
-  #enabled;
   #value;
-  #onExec;
+  #handler;
 
-  #args;
+  constructor(ctx, cfg){
+    this.#ctx = ctx ?? null;
+    aver.isNotNull(cfg);
 
-  constructor(cfg){
+    if (!(cfg instanceof ConfigNode)){
+      cfg = config(cfg).root;
+    }
+
+    this.#uri = cfg.getString("uri", null);
+    this.#title = cfg.getString("title", null);
+    this.#hint = cfg.getString("hint", null);
+    this.#icon = cfg.getString("icon", null);
+    this.#active = cfg.getBool("active", true);
+    this.#visible = cfg.getBool("visible", true);
+    this.#enabled = cfg.getBool("enabled", true);
+    this.#readonly = cfg.getBool("readonly", false);
+
+    const nsh = cfg.get("shortcut");
+    if (nsh instanceof ConfigNode){
+      this.#shortcut = makeNew(KeyboardShortcut, nsh, null, KeyboardShortcut);
+    }
+    this.#value = cfg.get("value") ?? null;
+    this.#handler = aver.isFunctionOrNull(cfg.get("handler"));
 
   }
 
+  get ctx(){ return this.#ctx; }
 
-  /** Executes the command. Commands do NOT return anything */
-  exec(sender){
-    if (this.#onExec) this.#onExec.call(this, sender);
+  get uri(){ return this.#uri; }
+  set uri(v){ this.#uri = aver.isNonEmptyString(v); }
+
+  get title(){ return this.#title; }
+  set title(v){ this.#title = aver.isStringOrNull(v); }
+
+  get hint(){ return this.#hint; }
+  set hint(v){ this.#hint = aver.isStringOrNull(v); }
+
+  get icon(){ return this.#icon; }
+  set icon(v){ this.#icon = aver.isStringOrNull(v); }
+
+  get active(){ return this.#active; }
+  set active(v){ this.#active = !!v; }
+
+  get visible(){ return this.#visible; }
+  set visible(v){ this.#visible = !!v; }
+
+  get enabled(){ return this.#enabled; }
+  set enabled(v){ this.#enabled = !!v; }
+
+  get readonly(){ return this.#readonly; }
+  set readonly(v){ this.#readonly = !!v; }
+
+  get shortcut(){ return this.#shortcut; }
+  set shortcut(v){ this.#shortcut = aver.isOfOrNull(v, KeyboardShortcut); }
+
+  get value(){ return this.#value; }
+  set value(v){ this.#value = v; }
+
+  get handler(){ return this.#handler; }
+  set handler(v){ this.#handler = aver.isFunctionOrNull(v); }
+
+
+  /** Executes the command. Commands return a Promise which completes upon command execution */
+  async exec(sender){
+    if (!this.#active) return;
+    if (this.#handler) await this.#handler.call(this, sender);
   }
 
   /**

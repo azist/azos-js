@@ -102,6 +102,16 @@ export function isFunction(a){
 }
 
 /**
+ * Performs strict test for function (not a primitive, object or array), OR null/undefined. Undefined is returned as null
+ * @param {*} a
+ */
+export function isFunctionOrNull(a){
+  if (a === undefined || a === null) return null;
+  if (types.isFunction(a)) return a;
+  throw AVERMENT_FAILURE(`isFunctionOrNull(${dv(a)})`);
+}
+
+/**
  * Performs strict test for function or object (not a primitive or array)
  * @param {*} a
  */
@@ -144,6 +154,16 @@ export function isNumber(a){
 export function isString(a){
   if (types.isString(a)) return a;
   throw AVERMENT_FAILURE(`isString(${dv(a)})`);
+}
+
+/**
+ * Performs strict test for string or null/undefined (converted to null)
+ * @param {*} a
+ */
+export function isStringOrNull(a){
+  if (a === undefined || a === null) return null;
+  if (types.isString(a)) return a;
+  throw AVERMENT_FAILURE(`isStringOrNull(${dv(a)})`);
 }
 
 /**
@@ -283,6 +303,20 @@ export function isOf(o, t){
     if (o instanceof t) return o;
 
   throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(t)})`);
+}
+
+/**
+ * Performs strict instanceof check on object and function args; if object is null or undefined returns null
+ * @param {Object} o
+ * @param {type-function} t
+ * @returns original object after successful type check or throws or NULL for undefined/null object
+ */
+export function isOfOrNull(o, t){
+  if (o === undefined || o === null) return null;
+  if (types.isObject(o) && types.isFunction(t))
+    if (o instanceof t) return o;
+
+  throw AVERMENT_FAILURE(`isOfOrNull(${dv(o)}, ${dv(t)})`);
 }
 
 /**
