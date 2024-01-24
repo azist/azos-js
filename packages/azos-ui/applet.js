@@ -33,6 +33,15 @@ export class Applet extends AzosElement {
   /** Returns short description */
   get description() { return ""; }
 
+  /** Override to prompt the user on Close, e.g. if your Applet is "dirty"/contains unsaved changes
+   * you may pop-up a confirmation box. Return "true" to allow close, false to prevent it.
+   * The method is called by arena before evicting this applet and replacing it with a new one
+   */
+  closeQuery(){
+    return true;
+  }
+
+
   onClick(){
     //alert("Ura!!!");
     this.arena.name+="a";

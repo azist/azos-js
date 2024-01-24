@@ -81,7 +81,7 @@ export class Arena extends AzosElement {
 
   /** Installs tool items in the arena.
    * Items uninstall upon their disposal or you can uninstall them explicitly by calling this method with `isInstall` false */
-  setupToolBarItems(isInstall, items){
+  setupToolBarCommands(isInstall, commands){
 
   }
 
@@ -92,14 +92,31 @@ export class Arena extends AzosElement {
 
   }
 
-  /** Sets the specified applet as the current one */
-  appletOpen(ctorApplet){
+  /** Sets the specified applet as the current one in the area main.
+   * If there is an existing applet, then the system would prompt user for CloseQuery
+   * if the applet is dirty, or bypass close query if "force=true"
+   */
+  async appletOpen(tapplet, force = false){
+    const tagName = customElements.getName(tapplet);
+    aver.isNotNull(tagName);
 
+    //check if current one is loaded
+    if (this.#applet !== null){
+      const canClose = await this.#applet.closeQuery();
+      if (!force && !canClose) return false;
+      this.appletClose();
+    }
+
+    //re-register ToolBarCommands()
+    //re-register areas()
+    //re-render with render(tagName)
+
+    return true;
   }
 
   /** Closes applet returning to default state */
-  appletClose(){
-
+  async appletClose(){
+    this.#applet = null;
   }
 
 
