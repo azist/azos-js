@@ -5,10 +5,11 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError } from "azos/types";
+import { isSubclassOf, AzosError, arrayDelete } from "azos/types";
 import { html, AzosElement } from "./ui.js";
 import { Application } from "azos/application.js";
 
+import { Command } from "./cmd.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
 
@@ -54,6 +55,7 @@ export class Arena extends AzosElement {
 
   #app;
   #applet = null;
+  #toolbar = [];
   constructor() {
     super();
     this.name = 'Somebody';
@@ -79,24 +81,46 @@ export class Arena extends AzosElement {
   /** Returns currently open {@link Applet} instance, or null if nothing is open yet, or applet was closed */
   get applet(){ return this.#applet; }
 
-  /** Installs tool items in the arena
-   * @param {Command[]} commands
+  /**
+   * Installs tool items in the arena and requests update
+   * @param {Command[]} commands an array of {@link Command} instances
+   * @returns void
    */
-  installToolbar(commands){
+  installToolbarCommands(commands){
+    aver.isArray(commands);
+    for(const cmd of commands){
+      const idx = this.#toolbar.indexOf(cmd);
+      if (idx < 0)
+        this.#toolbar.push(cmd);
+      else
+        this.#toolbar.splice(idx, 1);
+    }
+    this.updateToolbar();
   }
 
-  /** Uninstalls tool items in the arena
-   * @param {string[]} ids array of commands ids
+  /** Uninstalls tool items in the arena and requests update
+   * @param {string[] | Command[]} commands an array of either command string URIs or {@link Command} objects to uninstall
+   * @returns void
    */
-  uninstallToolbar(ids){
+  uninstallToolbarCommands(commands){
+    aver.isArray(commands);
+    for(const one in commands){
+      const cmd = one instanceof Command ? one : this.#toolbar.find(c => c.uri === one);
+      if (cmd) arrayDelete(this.#toolbar, cmd);
+    }
+    this.updateToolbar();
   }
 
-  /** Installs applet area button(s) (e.g. on a sid or bottom bar).
-   * Pass null/empty array to unregister all areas (make them disappear)
+  /** Request an update of arena to reflect changes in Toolbars.
+   * You may want to call this method WHEN the command definition/s change
+   * for example, command icon or title change programmatically.
+   * The install/uninstall methods already call this method.
+   * @returns void
    */
-  registerAppletAreas(areas){
-
+  updateToolbar(){
+    DEFAULT_HTML.renderToolbar(this.app, this, this.#toolbar);
   }
+
 
   /** Sets the specified applet as the current one in the area main.
    * If there is an existing applet, then the system would prompt user for CloseQuery

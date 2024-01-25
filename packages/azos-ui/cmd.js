@@ -105,6 +105,7 @@ export class Command {
 
   get ctx(){ return this.#ctx; }
 
+  /** Globally (cross-applet) unique URI of the command. The convention is to use this pattern `Applet/Area/Ns/Cmd` */
   get uri(){ return this.#uri; }
   set uri(v){ this.#uri = aver.isNonEmptyString(v); }
 

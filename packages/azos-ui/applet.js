@@ -46,6 +46,9 @@ export class Applet extends AzosElement {
     //alert("Ura!!!");
     this.arena.name+="a";
     //this.arena.requestUpdate();
+
+    this.arena.updateToolbar();// .installToolbarCommands();
+
   }
 
 

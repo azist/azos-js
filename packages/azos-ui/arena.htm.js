@@ -6,13 +6,45 @@
 
 /* eslint-disable no-unused-vars */
 
-import { html } from "./ui.js";
+import { html, domRef, domCreateRef, renderInto } from "./ui.js";
+
+// SVG Icons
+// https://www.svgrepo.com/collection/solar-outline-icons/
+
 
 function menuOpen(){
   this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
 }
 function menuClose(){
   this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
+}
+
+function getRefToolbar(arena){
+  let refToolbar = arena.__refToolbar;
+  if (!refToolbar){
+    arena.__refToolbar = refToolbar = domCreateRef();
+  }
+  return refToolbar;
+}
+
+
+/** @param {Application} app   @param {Arena} self  */
+export function renderToolbar(app, self, commands){
+  const divToolbar = getRefToolbar(self).value;
+  if (!divToolbar) return;
+
+  const content = html`
+  <div class="strip-btn">
+  <svg width="28px" height="28px" viewBox="0 0 24 24">
+  <circle cx="12" cy="6" r="4"/>
+  <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
+  </svg>
+  </div>
+
+  [DYNAMIC]
+    `;
+
+  renderInto(content, divToolbar);
 }
 
 
@@ -34,10 +66,10 @@ export function renderHeader(app, self){
   </nav>
 
   <div class="title">${app.description}${self.name}</div>
+  <div class="strip" ${domRef(getRefToolbar(self))}> </div>
+`;
 
-  <!--  https://www.svgrepo.com/collection/solar-outline-icons/ -->
-
-  <!--<div class="strip-btn">${app.session.user.name}</div> -->
+/*
   <div class="strip">
     <div class="strip-btn">
       <svg width="28px" height="28px" viewBox="0 0 24 24">
@@ -60,7 +92,7 @@ export function renderHeader(app, self){
       </svg>
     </div>
   </div>
-`;
+ */
 
 }
 
