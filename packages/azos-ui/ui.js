@@ -4,23 +4,20 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html as lit_html, css as lit_css, svg as lit_svg, LitElement } from "lit";
+import { html as lit_html,  css as lit_css, svg as lit_svg, LitElement } from "lit";
+import { unsafeHTML as lit_unsafe_html } from "lit/directives/unsafe-html";
 
 /** CSS template processing pragma: css`p{color: blue}` */
 export const css = lit_css;
-//export function css(content, ...values){
-//  return lit_css(content, values);
-//}
+
 /** Html template processing pragma, use in `render()` e.g. "return html`<p>Hello ${this.name}!</p>`;" */
 export const html = lit_html;
-//export function html(content, values){
-//  return lit_html(content, values);
-//}
+
 /** Svg template processing pragma */
 export const svg = lit_svg;
-//export function svg(content, ...values){
-//  return lit_svg(content, values);
-//}
+
+/** Adds ability to include direct HTML snippets like so: html` This is ${verbatimHtml(raw)}` */
+export const verbatimHtml = lit_unsafe_html;
 
 /** Provides uniform base derivation point for `AzosElements` - all elements must derive from here */
 export class AzosElement extends LitElement {

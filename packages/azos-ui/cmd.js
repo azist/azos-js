@@ -6,6 +6,7 @@
 
 import * as aver from "azos/aver";
 import { makeNew, config, ConfigNode } from "azos/conf";
+import { html, verbatimHtml } from "./ui.js";
 
 /** Define a keyboard shortcut */
 export class KeyboardShortcut {
@@ -45,6 +46,13 @@ export class KeyboardShortcut {
 
 }
 
+/** Command types */
+export const CMD_KIND = Object.freeze({
+  BUTTON:      "Button",
+  CHECK:       "Check",
+  CUSTOM:      "Custom",
+});
+
 /** Baseline abstraction of command object pattern used for various UI actions.
  * Typically commands get triggered by actions on menus and tool bar items, such as buttons.
  * An example command would be "File/Open" or "Project/Compile".
@@ -53,6 +61,7 @@ export class KeyboardShortcut {
  */
 export class Command {
   #ctx;
+  #kind;
   #uri;
   #title;
   #hint;
@@ -75,6 +84,7 @@ export class Command {
       cfg = config(cfg).root;
     }
 
+    this.#kind = cfg.getString("kind", null);
     this.#uri = cfg.getString("uri", null);
     this.#title = cfg.getString("title", null);
     this.#hint = cfg.getString("hint", null);
@@ -97,6 +107,9 @@ export class Command {
 
   get uri(){ return this.#uri; }
   set uri(v){ this.#uri = aver.isNonEmptyString(v); }
+
+  get kind(){ return this.#kind; }
+  set kind(v){ this.#kind = aver.isStringOrNull(v); }
 
   get title(){ return this.#title; }
   set title(v){ this.#title = aver.isStringOrNull(v); }
@@ -138,9 +151,16 @@ export class Command {
   /**
    * Provides a main representation of the command in a toolbar/menu in a form of markup,
    * such as SVG for image. It is possible to provide a complex markup such as flex container with text input and a button etc..
+   * @returns {TemplateResult} return html template fragment
    * */
+  // eslint-disable-next-line no-unused-vars
   provideMarkup(target){
-   return "";
+    const ico = this.#icon;
+    if (!ico){
+      return html`<div class="command-button">${this.title}</div>`;
+    }
+
+    return html`<div class="command-icon">${verbatimHtml(this.icon)}</div>`;
   }
 
 }
