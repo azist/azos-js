@@ -97,7 +97,7 @@ export class Command {
     const nsh = cfg.get("shortcut");
     if (nsh instanceof ConfigNode){
       this.#shortcut = makeNew(KeyboardShortcut, nsh, null, KeyboardShortcut);
-    }
+    } else this.#shortcut = null;
     this.#value = cfg.get("value") ?? null;
     this.#handler = aver.isFunctionOrNull(cfg.get("handler"));
 

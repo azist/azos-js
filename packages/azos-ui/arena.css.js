@@ -119,13 +119,17 @@ header{
 
       header .strip-btn{
         display: inline-block;
-        font-size: 0.9rem;
+        font-size: 0.75em;
         text-align: center;
-        width: 45px;
-        margin: 2px 1px 2px 4px;
-        Xbackground-color: #808080;
-        color: #ff0000;
-        padding-top: 4px;
+        width: auto;
+        min-width: 45px;
+        max-width: 20vw;
+        margin: 2px 1px 2px 2px;
+        color: #d0d0d0;
+        padding: 4px 2px 2px 2px;
+
+        XXXborder: 1px solid red;
+        overflow: hidden;
 
         stroke: #e0e0e0;
         stroke-width: 0.8px;
@@ -172,7 +176,7 @@ main .strip-btn{
   width: 45px;
   margin: 2px 1px 2px 4px;
   XXXbackground-color: #808080;
-  color: #ff0000;
+  color: #858585;
   padding-top: 4px;
 
   stroke: #505050;

@@ -104,7 +104,7 @@ export class Arena extends AzosElement {
    */
   uninstallToolbarCommands(commands){
     aver.isArray(commands);
-    for(const one in commands){
+    for(const one of commands){
       const cmd = one instanceof Command ? one : this.#toolbar.find(c => c.uri === one);
       if (cmd) arrayDelete(this.#toolbar, cmd);
     }

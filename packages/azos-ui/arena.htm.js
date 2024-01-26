@@ -19,6 +19,14 @@ function menuClose(){
   this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
 }
 
+function showUser(){
+  alert("Logged in user is: " + this.session.user.name);
+}
+
+async function toolbarClick(){
+  await this.exec(this);
+}
+
 function getRefToolbar(arena){
   let refToolbar = arena.__refToolbar;
   if (!refToolbar){
@@ -33,15 +41,26 @@ export function renderToolbar(app, self, commands){
   const divToolbar = getRefToolbar(self).value;
   if (!divToolbar) return;
 
+  const itemContent = [];
+
+  let i=0;
+  for(let cmd of commands){
+    const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${toolbarClick.bind(cmd)}">
+      ${cmd.provideMarkup(self)}
+    </div>`;
+    itemContent.push(one);
+  }
+
+
   const content = html`
-  <div class="strip-btn">
-  <svg width="28px" height="28px" viewBox="0 0 24 24">
-  <circle cx="12" cy="6" r="4"/>
-  <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
-  </svg>
+  <div class="strip-btn" id="divToolbar_User" @click="${showUser.bind(app)}">
+    <svg width="28px" height="28px" viewBox="0 0 24 24">
+      <circle cx="12" cy="6" r="4"/>
+      <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
+    </svg>
   </div>
 
-  [DYNAMIC]
+  ${itemContent}
     `;
 
   renderInto(content, divToolbar);
