@@ -6,7 +6,7 @@
 
 /* eslint-disable no-unused-vars */
 
-import { html, domRef, domCreateRef, renderInto } from "./ui.js";
+import { html, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
 
 // SVG Icons
 // https://www.svgrepo.com/collection/solar-outline-icons/
@@ -117,6 +117,9 @@ export function renderHeader(app, self){
 
 /** @param {Application} app   @param {Arena} self  */
 export function renderMain(app, self){
+
+  const appletHtml = !self.applet ? `<slot name="applet-content"> </slot>`
+                                  : `<az-applet></az-applet>`;
   return html`
 
   <nav class="strip" id="navAreas">
@@ -134,9 +137,8 @@ export function renderMain(app, self){
     </div>
   </nav>
 
-  <div class="applet-container" role="main">
-     <!--slot name="applet-content"> </slot-->
-     <az-applet></az-applet>
+  <div class="applet-container" role="main" >
+    ${verbatimHtml(appletHtml)}
   </div>
   `;
 }

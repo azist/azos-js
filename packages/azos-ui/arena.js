@@ -118,7 +118,9 @@ export class Arena extends AzosElement {
    * @returns void
    */
   updateToolbar(){
-    DEFAULT_HTML.renderToolbar(this.app, this, this.#toolbar);
+    const app = this.#app;
+    if (!app) return;
+    DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
   }
 
 
