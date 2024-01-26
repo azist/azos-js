@@ -55,6 +55,7 @@ export class Arena extends AzosElement {
 
   #app;
   #applet = null;
+  #appletTagName = null;
   #toolbar = [];
   constructor() {
     super();
@@ -139,8 +140,10 @@ export class Arena extends AzosElement {
       this.appletClose();
     }
 
+    this.#appletTagName = tagName;
     //re-register ToolBarCommands()
     //re-register areas()
+    this.requestUpdate();
     //re-render with render(tagName)
 
     return true;
@@ -174,7 +177,7 @@ ${this.renderFooter(app)}
   renderHeader(app){ return DEFAULT_HTML.renderHeader(app, this); }
 
   /** @param {Application} app  */
-  renderMain(app){ return DEFAULT_HTML.renderMain(app, this); }
+  renderMain(app){ return DEFAULT_HTML.renderMain(app, this, this.#appletTagName); }
 
   /** @param {Application} app  */
   renderFooter(app){ return DEFAULT_HTML.renderFooter(app, this); }
