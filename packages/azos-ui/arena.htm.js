@@ -118,7 +118,7 @@ export function renderHeader(app, self){
 /** @param {Application} app   @param {Arena} self  */
 export function renderMain(app, self, appletTagName){
 
-  const appletHtml = appletTagName ? `<${appletTagName}></${appletTagName}>` : `<slot name="applet-content"> </slot>`;
+  const appletHtml = appletTagName ? `<${appletTagName} id="elmActiveApplet"></${appletTagName}>` : `<slot name="applet-content"> </slot>`;
 
   return html`
   <nav class="strip" id="navAreas">

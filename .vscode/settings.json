@@ -15,6 +15,7 @@
         "LFROM",
         "linq",
         "rasterizer",
+        "tapplet",
         "thandler",
         "tparent",
         "uini"

@@ -6,7 +6,7 @@ import { ConLog } from "azos/ilog";
 
 import { dispose } from "azos/types";
 import { Module } from "azos/modules";
-import { Applet } from "../applet.js";
+import { XyzApplet } from "./xyz-applet.js";
 
 
 class MyLogic extends Module{
@@ -22,10 +22,6 @@ class MyLogic extends Module{
   _appBeforeCleanup(){
     clearInterval(this.#tmr);
   }
-}
-
-class XyzApplet extends Applet{//this is tempnpm
-
 }
 
 const appMenu = [
@@ -72,8 +68,11 @@ console.info(`App instance ${app.instanceId} assigned into 'window.AZOS_APP' for
 app.session.boot(window.XYZ_USER_OBJECT_INIT);
 
 app.log.write({type: LOG_TYPE.DEBUG, text: "Launching arena..."});
-Arena.launch(app);
+const arena = Arena.launch(app)[0];
+window.ARENA = arena;
+arena.appletOpen(XyzApplet);
 app.log.write({type: LOG_TYPE.DEBUG, text: "...arena launched"});
+
 
 // Handle UNLOADING/CLOSING of tab/window
 //https://developer.chrome.com/docs/web-platform/page-lifecycle-api

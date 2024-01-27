@@ -12,6 +12,7 @@ import { Application } from "azos/application.js";
 import { Command } from "./cmd.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
+import { Applet } from "./applet.js";
 
 /**
  * Defines a root UI element which displays the whole Azos app.
@@ -24,6 +25,7 @@ export class Arena extends AzosElement {
    * @param {Application} app required application instance which arena works under
    * @param {string?} elementName - null or string name of arena custom element, `az-arena` used by default
    * @param {Function?} arenaClass - null or Arena or its subclass, `Arena` class used by default
+   * @returns {Arena[]} array of connected arenas (in most cases with a single arena, while it is possible to have multiple)
    */
   static launch(app, elementName, arenaClass){
     aver.isOf(app, Application);
@@ -37,6 +39,8 @@ export class Arena extends AzosElement {
     for(const one of allArenas){
       one.____bindApplicationAtLaunch(app);
     }
+
+    return [...allArenas];
   }
 
   //Sharing style sheets between Shadow Dom
@@ -81,6 +85,11 @@ export class Arena extends AzosElement {
 
   /** Returns currently open {@link Applet} instance, or null if nothing is open yet, or applet was closed */
   get applet(){ return this.#applet; }
+
+  firstUpdated(){
+    this.updateToolbar();
+  }
+
 
   /**
    * Installs tool items in the arena and requests update
@@ -130,6 +139,7 @@ export class Arena extends AzosElement {
    * if the applet is dirty, or bypass close query if "force=true"
    */
   async appletOpen(tapplet, force = false){
+    aver.isSubclassOf(tapplet, Applet);
     const tagName = customElements.getName(tapplet);
     aver.isNotNull(tagName);
 
@@ -141,10 +151,11 @@ export class Arena extends AzosElement {
     }
 
     this.#appletTagName = tagName;
-    //re-register ToolBarCommands()
-    //re-register areas()
-    this.requestUpdate();
+
     //re-render with render(tagName)
+    await this.requestUpdate();
+    this.updateToolbar();
+    this.#applet = this.shadowRoot.getElementById("elmActiveApplet");
 
     return true;
   }
