@@ -10,12 +10,9 @@ import { Module } from "azos/modules";
 import { ConfigNode } from "azos/conf";
 
 /**
- * Arena represents a virtual "stage" - what application/user "deals with"
- * e.g. sees at the present moment.
- * An arena maintains a state of scenes which get created by components such as
- * modal dialogs which have a stacking order
+ * Handles app routing and menu in a browser
  */
-export class ArenaLogic extends Module{
+export class Router extends Module{
 
   constructor(dir, cfg){
     super(dir, cfg);

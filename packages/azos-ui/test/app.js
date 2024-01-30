@@ -1,6 +1,6 @@
 import { application } from "azos/application";
 import { Arena } from "../arena.js";
-import { ArenaLogic } from "../arena-logic.js";
+import { Router } from "../router.js";
 import { LOG_TYPE } from "azos/log";
 import { ConLog } from "azos/ilog";
 
@@ -56,7 +56,7 @@ const cfgApp = {
     {name: "log", type: ConLog},
     {name: "logic", type: MyLogic},
     {
-      name: "arena", type: ArenaLogic,
+      name: "router", type: Router,
       menu: { root: [...appMenu] }
     },
   ]
