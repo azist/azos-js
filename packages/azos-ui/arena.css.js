@@ -108,7 +108,7 @@ header{
         top: 0px;
         right: 0px;
         display: flex;
-        float: right;
+        /*float: right;*/
         flex-direction: row-reverse;
         flex-wrap: nowrap;
         /*border: 1px solid lime;*/
