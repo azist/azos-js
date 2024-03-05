@@ -33,6 +33,8 @@ export const CONTENT_TYPE = Object.freeze({
   TEXT_FAMILY: "text/",
   TEXT_PLAIN: "text/plain",
   TEXT_HTML: "text/html",
+  IMG_JPEG: "image/jpeg",
+  IMG_PNG: "image/png",
   BINARY: "application/octet-stream"
 });
 
