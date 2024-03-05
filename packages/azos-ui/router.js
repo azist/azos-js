@@ -14,9 +14,15 @@ import { ConfigNode } from "azos/conf";
  */
 export class Router extends Module{
 
+  #menu;//ConfigNode
   constructor(dir, cfg){
     super(dir, cfg);
+    this.#menu = aver.isOf(cfg.get("menu"), ConfigNode);
   }
+
+  //TODO: Need router methods which navigate menu
+
+  
 
 
   /** Calculates menu tree as of current state

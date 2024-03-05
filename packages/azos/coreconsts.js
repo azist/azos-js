@@ -32,6 +32,7 @@ export const CONTENT_TYPE = Object.freeze({
   JSON: "application/json",
   TEXT_FAMILY: "text/",
   TEXT_PLAIN: "text/plain",
+  TEXT_HTML: "text/html",
   BINARY: "application/octet-stream"
 });
 
