@@ -14,7 +14,7 @@ import { Linker } from "./linker.js";
 /**
  * Provides module implementation base.
  * Modules unify building blocks for business/app logic functionality
- * as they provided logic and dynamically link driven by app configuration
+ * as they provide logic and dynamically link (DI/service locate) as driven by the application configuration
  */
 export class Module extends AppComponent{
 

@@ -5,12 +5,14 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError } from "azos/types";
+import { isSubclassOf, AzosError, arrayDelete } from "azos/types";
 import { html, AzosElement } from "./ui.js";
 import { Application } from "azos/application.js";
 
+import { Command } from "./cmd.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
+import { Applet } from "./applet.js";
 
 /**
  * Defines a root UI element which displays the whole Azos app.
@@ -23,6 +25,7 @@ export class Arena extends AzosElement {
    * @param {Application} app required application instance which arena works under
    * @param {string?} elementName - null or string name of arena custom element, `az-arena` used by default
    * @param {Function?} arenaClass - null or Arena or its subclass, `Arena` class used by default
+   * @returns {Arena[]} array of connected arenas (in most cases with a single arena, while it is possible to have multiple)
    */
   static launch(app, elementName, arenaClass){
     aver.isOf(app, Application);
@@ -36,6 +39,8 @@ export class Arena extends AzosElement {
     for(const one of allArenas){
       one.____bindApplicationAtLaunch(app);
     }
+
+    return [...allArenas];
   }
 
   //Sharing style sheets between Shadow Dom
@@ -53,6 +58,9 @@ export class Arena extends AzosElement {
   };
 
   #app;
+  #applet = null;
+  #appletTagName = null;
+  #toolbar = [];
   constructor() {
     super();
     this.name = 'Somebody';
@@ -64,10 +72,100 @@ export class Arena extends AzosElement {
     this.requestUpdate();
   }
 
+
+  /** Returns {@link Arena} self
+   * @returns {Arena} self
+  */
+  get arena(){ return this; }
+
   /** Returns {@link Application} instance where this arena was launched
    * @returns {Application}
   */
   get app(){ const app = this.#app; if (!app) throw new AzosError("Arena app is not bound. Must call `Arena.launch(app...)`"); return app; }
+
+  /** Returns currently open {@link Applet} instance, or null if nothing is open yet, or applet was closed */
+  get applet(){ return this.#applet; }
+
+  firstUpdated(){
+    this.updateToolbar();
+  }
+
+
+  /**
+   * Installs tool items in the arena and requests update
+   * @param {Command[]} commands an array of {@link Command} instances
+   * @returns void
+   */
+  installToolbarCommands(commands){
+    aver.isArray(commands);
+    for(const cmd of commands){
+      const idx = this.#toolbar.indexOf(cmd);
+      if (idx < 0)
+        this.#toolbar.push(cmd);
+      else
+        this.#toolbar.splice(idx, 1);
+    }
+    this.updateToolbar();
+  }
+
+  /** Uninstalls tool items in the arena and requests update
+   * @param {string[] | Command[]} commands an array of either command string URIs or {@link Command} objects to uninstall
+   * @returns void
+   */
+  uninstallToolbarCommands(commands){
+    aver.isArray(commands);
+    for(const one of commands){
+      const cmd = one instanceof Command ? one : this.#toolbar.find(c => c.uri === one);
+      if (cmd) arrayDelete(this.#toolbar, cmd);
+    }
+    this.updateToolbar();
+  }
+
+  /** Request an update of arena to reflect changes in Toolbars.
+   * You may want to call this method WHEN the command definition/s change
+   * for example, command icon or title change programmatically.
+   * The install/uninstall methods already call this method.
+   * @returns void
+   */
+  updateToolbar(){
+    const app = this.#app;
+    if (!app) return;
+    DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+  }
+
+
+  /** Sets the specified applet as the current one in the area main.
+   * If there is an existing applet, then the system would prompt user for CloseQuery
+   * if the applet is dirty, or bypass close query if "force=true"
+   */
+  async appletOpen(tapplet, force = false){
+    aver.isSubclassOf(tapplet, Applet);
+    const tagName = customElements.getName(tapplet);
+    aver.isNotNull(tagName);
+
+    //check if current one is loaded
+    if (this.#applet !== null){
+      const canClose = await this.#applet.closeQuery();
+      if (!force && !canClose) return false;
+      this.appletClose();
+    }
+
+    this.#appletTagName = tagName;
+
+    //re-render with render(tagName)
+    await this.requestUpdate();
+    this.updateToolbar();
+    this.#applet = this.shadowRoot.getElementById("elmActiveApplet");
+
+    return true;
+  }
+
+  /** Closes applet returning to default state */
+  async appletClose(){
+    this.#applet = null;
+  }
+
+
 
   render() {
     const app = this.#app;
@@ -90,7 +188,7 @@ ${this.renderFooter(app)}
   renderHeader(app){ return DEFAULT_HTML.renderHeader(app, this); }
 
   /** @param {Application} app  */
-  renderMain(app){ return DEFAULT_HTML.renderMain(app, this); }
+  renderMain(app){ return DEFAULT_HTML.renderMain(app, this, this.#appletTagName); }
 
   /** @param {Application} app  */
   renderFooter(app){ return DEFAULT_HTML.renderFooter(app, this); }

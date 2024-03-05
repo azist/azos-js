@@ -14,7 +14,9 @@
         "intf",
         "LFROM",
         "linq",
+        "nsplit",
         "rasterizer",
+        "tapplet",
         "thandler",
         "tparent",
         "uini"

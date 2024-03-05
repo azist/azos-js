@@ -219,7 +219,7 @@ export class Linker{
  *  got.log // DefaultLog{...}
  *  got.weather_nation // UsWeatherModule{....}
  *  got.weather_local // OdessaWeatherService{.....}}
- *  //Notice that we have used two `IWeather` services, one named "nation" and another "local"- having both reoslve to different
+ *  //Notice that we have used two `IWeather` services, one named "nation" and another "local"- having both resolve to different
  *  //instances in spite of both implementing the same "IWeather" contract
  */
 export function link(linker, map, nsplit = "_"){

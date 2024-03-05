@@ -6,13 +6,64 @@
 
 /* eslint-disable no-unused-vars */
 
-import { html } from "./ui.js";
+import { html, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
+
+// SVG Icons
+// https://www.svgrepo.com/collection/solar-outline-icons/
+
 
 function menuOpen(){
   this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
 }
 function menuClose(){
   this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
+}
+
+function showUser(){
+  alert("Logged in user is: " + this.session.user.name);
+}
+
+async function toolbarClick(){
+  await this.exec(this);
+}
+
+function getRefToolbar(arena){
+  let refToolbar = arena.__refToolbar;
+  if (!refToolbar){
+    arena.__refToolbar = refToolbar = domCreateRef();
+  }
+  return refToolbar;
+}
+
+
+/** @param {Application} app   @param {Arena} self  */
+export function renderToolbar(app, self, commands){
+  const divToolbar = getRefToolbar(self).value;
+  if (!divToolbar) return;
+
+  const itemContent = [];
+
+  let i=0;
+  for(let cmd of commands){
+    const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${toolbarClick.bind(cmd)}">
+      ${cmd.provideMarkup(self)}
+    </div>`;
+    itemContent.push(one);
+  }
+
+
+  const content = html`
+  <div class="strip-btn" id="divToolbar_User" @click="${showUser.bind(app)}">
+    <svg width="28px" height="28px" viewBox="0 0 24 24">
+      <circle cx="12" cy="6" r="4"/>
+      <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
+    </svg>
+  </div>
+
+  ${itemContent}
+    `;
+
+  renderInto(content, divToolbar);
 }
 
 
@@ -33,11 +84,11 @@ export function renderHeader(app, self){
     </ul>
   </nav>
 
-  <div class="title">${app.description}</div>
+  <div class="title">${app.description}${self.name}</div>
+  <div class="strip" ${domRef(getRefToolbar(self))}> </div>
+`;
 
-  <!--  https://www.svgrepo.com/collection/solar-outline-icons/ -->
-
-  <!--<div class="strip-btn">${app.session.user.name}</div> -->
+/*
   <div class="strip">
     <div class="strip-btn">
       <svg width="28px" height="28px" viewBox="0 0 24 24">
@@ -60,14 +111,16 @@ export function renderHeader(app, self){
       </svg>
     </div>
   </div>
-`;
+ */
 
 }
 
 /** @param {Application} app   @param {Arena} self  */
-export function renderMain(app, self){
-  return html`
+export function renderMain(app, self, appletTagName){
 
+  const appletHtml = appletTagName ? `<${appletTagName} id="elmActiveApplet"></${appletTagName}>` : `<slot name="applet-content"> </slot>`;
+
+  return html`
   <nav class="strip" id="navAreas">
     <div class="strip-btn strip-btn-selected">
       <svg width="28px" height="28px" viewBox="0 0 24 24">
@@ -83,8 +136,8 @@ export function renderMain(app, self){
     </div>
   </nav>
 
-  <div class="applet-container" role="main">
-     <slot name="applet-content"> </slot>
+  <div class="applet-container" role="main" >
+    ${verbatimHtml(appletHtml)}
   </div>
   `;
 }
