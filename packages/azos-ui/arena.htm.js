@@ -69,24 +69,34 @@ export function renderToolbar(app, self, commands){
 
 /** @param {Application} app   @param {Arena} self  */
 export function renderHeader(app, self){
-  return html`
-  <a href="#" class="menu" id="btnMenuOpen" @click="${menuOpen}">
-    <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
-  </a>
 
-  <nav class="side-menu" id="navMenu">
-    <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
-    <ul>
-      <li><a href="1.app">Applet 1</a></li>
-      <li><a href="another.app">Another Applet </a></li>
-      <li><a href="settings.app">Settings </a></li>
-      <li><a href="x.app" >Menu Item X  </a></li>
-    </ul>
-  </nav>
+  const applet = self.applet;
+  const title = applet !== null ? html`${applet.title}` : html`${app.description} - ${self.name}`
 
-  <div class="title">${app.description}${self.name}</div>
-  <div class="strip" ${domRef(getRefToolbar(self))}> </div>
-`;
+  if (self.menu==="show"){
+    return html`
+    <a href="#" class="menu" id="btnMenuOpen" @click="${menuOpen}">
+      <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
+    </a>
+
+    <nav class="side-menu" id="navMenu">
+      <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
+      <ul>
+        <li><a href="1.app">Applet 1</a></li>
+        <li><a href="another.app">Another Applet </a></li>
+        <li><a href="settings.app">Settings </a></li>
+        <li><a href="x.app" >Menu Item X  </a></li>
+      </ul>
+    </nav>
+
+    <div class="title">${title}</div>
+    <div class="strip" ${domRef(getRefToolbar(self))}> </div>
+  `;
+  } else {//noMenu
+    return html`
+     <div class="title" style="left: 0px;">${title}</div>
+     <div class="strip" ${domRef(getRefToolbar(self))}> </div>`;
+  }
 
 /*
   <div class="strip">

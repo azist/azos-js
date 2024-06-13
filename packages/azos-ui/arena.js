@@ -55,6 +55,7 @@ export class Arena extends AzosElement {
 
   static properties = {
     name: {type: String},
+    menu: {type: String}
   };
 
   #app;
@@ -63,7 +64,8 @@ export class Arena extends AzosElement {
   #toolbar = [];
   constructor() {
     super();
-    this.name = 'Somebody';
+    this.name = 'Arena';
+    this.menu = "show";
   }
 
   /** System internal, don't use */
@@ -149,7 +151,6 @@ export class Arena extends AzosElement {
       if (!force && !canClose) return false;
       this.appletClose();
     }
-
     this.#appletTagName = tagName;
 
     //re-render with render(tagName)

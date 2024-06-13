@@ -48,5 +48,8 @@ export class AzosElement extends LitElement {
     return n.arena;
   }
 
+  /** Returns custom HTML element tag name for this element type registered with `customElements` collection */
+  get customElementTagName() { return customElements.getName(this.constructor); }
+
   render() { return html`>>AZOS ELEMENT<<`; }
 }
