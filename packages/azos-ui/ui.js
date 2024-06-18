@@ -35,17 +35,20 @@ export const renderInto = lit_render;
 export class AzosElement extends LitElement {
   constructor() {   super();   }
 
+  #arena = null;
 
   /** Returns {@link Arena} instance from the first (great/grand)parent element that defines arena ref
    * @returns {Arena}
   */
   get arena(){
-    let n = this.parentNode;
-    while(typeof n.arena === 'undefined'){
-      n =  (n.parentNode ?? n.host);
+    if (this.#arena === null){
+      let n = this.parentNode;
+      while(typeof n.arena === 'undefined'){
+        n =  (n.parentNode ?? n.host);
+      }
+      this.#arena =  n.arena;
     }
-
-    return n.arena;
+    return this.#arena;
   }
 
   /** Returns custom HTML element tag name for this element type registered with `customElements` collection */

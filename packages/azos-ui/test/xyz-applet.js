@@ -52,8 +52,8 @@ export class XyzApplet extends Applet {
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 
-  #x = 0;
 
+  #x = 0;
   get title(){ return `XYZ Applet / x = ${this.#x}`}
 
   onClick1(){
@@ -70,11 +70,16 @@ export class XyzApplet extends Applet {
     this.arena.uninstallToolbarCommands([this.#cmdHelp]);
   }
 
+  onClick3(){
+    this.arena.appletClose();
+  }
+
 
   render() {
     return html` applet
      <button @click="${this.onClick1}"> Click me </button>
      <button @click="${this.onClick2}"> Click me </button>
+     <button @click="${this.onClick3}"> Close This Applet </button>
     `;
   }//render
 

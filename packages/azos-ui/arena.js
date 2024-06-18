@@ -158,7 +158,8 @@ export class Arena extends AzosElement {
     return true;
   }
 
-  /** Closes applet returning to default state. Pass force=true to bypass closeQuery()
+  /** Closes applet returning to default state. Pass force=true to bypass closeQuery().
+   * All toolbar commands installed by an applet are automatically uninstalled
    * @param {boolean} [force=false] pass true to bypass closeQuery
    * @returns {boolean} true if applet was closed or there was no applet to close to begin with. false when closeQuery prevented the close
   */
@@ -166,6 +167,7 @@ export class Arena extends AzosElement {
     if (!this.#applet) return true;
     const canClose = force ? true : await this.#applet.closeQuery();
     if (!canClose) return false;
+    this.uninstallToolbarCommands([...this.#toolbar]);
     this.#applet = null;
     this.#appletTagName = null;
     this.requestUpdate();//async
