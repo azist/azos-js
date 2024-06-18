@@ -146,24 +146,30 @@ export class Arena extends AzosElement {
     aver.isNotNull(tagName);
 
     //check if current one is loaded
-    if (this.#applet !== null){
-      const canClose = await this.#applet.closeQuery();
-      if (!force && !canClose) return false;
-      this.appletClose();
-    }
-    this.#appletTagName = tagName;
+    const closed = await this.appletClose(force);
+    if (!closed) return false;
 
     //re-render with render(tagName)
-    await this.requestUpdate();
+    this.#appletTagName = tagName;
+    this.update();//synchronous update including DOM rebuild
     this.updateToolbar();
     this.#applet = this.shadowRoot.getElementById("elmActiveApplet");
-
+    this.requestUpdate();
     return true;
   }
 
-  /** Closes applet returning to default state */
-  async appletClose(){
+  /** Closes applet returning to default state. Pass force=true to bypass closeQuery()
+   * @param {boolean} [force=false] pass true to bypass closeQuery
+   * @returns {boolean} true if applet was closed or there was no applet to close to begin with. false when closeQuery prevented the close
+  */
+  async appletClose(force = false){
+    if (!this.#applet) return true;
+    const canClose = force ? true : await this.#applet.closeQuery();
+    if (!canClose) return false;
     this.#applet = null;
+    this.#appletTagName = null;
+    this.requestUpdate();//async
+    return true;
   }
 
 

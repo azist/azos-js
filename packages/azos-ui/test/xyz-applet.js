@@ -52,12 +52,17 @@ export class XyzApplet extends Applet {
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 
+  #x = 0;
+
+  get title(){ return `XYZ Applet / x = ${this.#x}`}
+
   onClick1(){
     //alert("Ura!!!");
-    this.arena.name+="a";
-    //this.arena.requestUpdate();
+    //this.arena.name+="a";
+    this.#x++;
+    this.arena.requestUpdate();
 
-    this.#cmdHelp.title += "a";
+    this.#cmdAbout.title += "a";
     this.arena.updateToolbar();
   }
 
