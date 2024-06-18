@@ -131,7 +131,7 @@ export function renderMain(app, self, appletTagName){
   const appletHtml = appletTagName ? `<${appletTagName} id="elmActiveApplet"></${appletTagName}>` : `<slot name="applet-content"> </slot>`;
 
   return html`
-  <nav class="strip" id="navAreas">
+  <!--nav class="strip" id="navAreas">  THIS will be moved out into tab group control
     <div class="strip-btn strip-btn-selected">
       <svg width="28px" height="28px" viewBox="0 0 24 24">
       <circle cx="12" cy="6" r="4"/>
@@ -144,7 +144,7 @@ export function renderMain(app, self, appletTagName){
       <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
       </svg>
     </div>
-  </nav>
+  </nav-->
 
   <div class="applet-container" role="main" >
     ${verbatimHtml(appletHtml)}

@@ -156,7 +156,7 @@ main::after {
   display: table;
 }
 
-
+/*
 main .strip{
   position: fixed;
   top: 0px;
@@ -195,20 +195,26 @@ main .strip-btn:hover{
   stroke-width: 1px;
   stroke: #404040;
 }
+*/
 
 main .applet-container{
   display: block;
-  width: calc(100% - var(--menu-btn-width));
+  width: 100%; /* calc(100% - var(--menu-btn-width)); */
   min-height: 50vh;
   box-sizing: border-box;
   float: right;
   background-color: var(--paper);
-  padding:  calc(4px + var(--hdr-height)) 16px 16px 16px;
+  padding:  calc(8px + var(--hdr-height)) 12px 12px 12px;
   text-align: justify;
   overflow: auto;
 }
 
+/*
 @media screen and (max-width: 420px) {
+  main .applet-container{
+  width: 100%;
+  }
+
   main .strip{
     top: unset;
     position: fixed;
@@ -225,17 +231,14 @@ main .applet-container{
     background: #e4e4e4;
   }
 
-  main .applet-container{
-    width: 100%;
-  }
 
   main .strip-btn-selected{
     border: unset;
     border-bottom: 4px solid #40a0ff;
     margin-bottom: 0px;
   }
-
 }
+ */
 
 /* ------------------- */
 
