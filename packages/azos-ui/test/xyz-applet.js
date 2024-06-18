@@ -52,6 +52,10 @@ export class XyzApplet extends Applet {
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 
+  async closeQuery(){
+    return await confirm("We will close the form. Yes/no?")
+  }
+
 
   #x = 0;
   get title(){ return `XYZ Applet / x = ${this.#x}`}

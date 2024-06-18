@@ -136,9 +136,9 @@ export class Arena extends AzosElement {
   }
 
 
-  /** Sets the specified applet as the current one in the area main.
-   * If there is an existing applet, then the system would prompt user for CloseQuery
-   * if the applet is dirty, or bypass close query if "force=true"
+  /** Sets the specified applet as the current one in the arena.
+   * If there is an existing applet, then the system would prompt user via  `closeQuery(): bool`
+   * call where the applet can check itself of it is dirty, or bypass close query if "force=true"
    */
   async appletOpen(tapplet, force = false){
     aver.isSubclassOf(tapplet, Applet);
