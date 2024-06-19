@@ -78,9 +78,10 @@ export class XyzApplet extends Applet {
     this.arena.appletClose();
   }
 
-  onClick4(){
+  async onClick4(){
     const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
-    dlgTest1.show();
+    const dr = await dlgTest1.show();
+    alert("Dialog result is: " + dr);
   }
 
 

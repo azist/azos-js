@@ -87,7 +87,7 @@ export class ModalDialog extends AzosElement {
 
   render() {
     return html`
-<dialog onclose="${this.onDialogClose}">
+<dialog @close="${this.onDialogClose}">
   ${this.renderTitle()}
   ${this.renderBody()}
   ${this.renderFooter()}
