@@ -7,6 +7,7 @@
 import { html } from "../ui.js";
 import { Applet } from "../applet.js";
 import { Command } from "../cmd.js";
+import "../modal-dialog.js";
 
 //import { APPLET_STYLES } from "./applet.css.js";
 //import * as DEFAULT_HTML from "./applet.htm.js";
@@ -77,12 +78,25 @@ export class XyzApplet extends Applet {
     this.arena.appletClose();
   }
 
+  onClick4(){
+    const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
+    dlgTest1.showModal();
+  }
+
 
   render() {
     return html` applet
      <button @click="${this.onClick1}"> Click me </button>
      <button @click="${this.onClick2}"> Click me </button>
      <button @click="${this.onClick3}"> Close This Applet </button>
+     <button @click="${this.onClick4}"> Open Dialog Box </button>
+
+     <az-modal-dialog id="dlgTest1" title="Dialog Title">
+      <div slot="body">
+        <h1>This is dialog content</h1>
+        Blah beh blue
+      </div>
+     </az-modal-dialog>
     `;
   }//render
 
