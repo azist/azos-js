@@ -81,7 +81,7 @@ export class XyzApplet extends Applet {
   async onClick4(){
     const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
     const dr = (await dlgTest1.show()).modalResult;
-    setTimeout(() => alert("Dialog result is: " + dr), 100);
+    console.info("Dialog result is: " + dr);
   }
 
 
@@ -95,7 +95,17 @@ export class XyzApplet extends Applet {
      <az-modal-dialog id="dlgTest1" title="Add User">
       <div slot="body">
         <h1>This is dialog content</h1>
-        Blah beh blue
+        Blah beh blue very long line twhat goes unstopppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
+        <!--line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+-->
       </div>
      </az-modal-dialog>
     `;
