@@ -42,13 +42,33 @@ export class ModalDialog extends AzosElement {
 
   };
 
+  #shownPromise = null;
+  #resolve = null;
+
   constructor() {
     super();
   }
 
-  showModal(){
+
+  /** Returns true if this dialog instance is already shown  */
+  get isShown(){ return this.#shownPromise !== null;}
+
+  /** Returns a Promise which resolves with modal dialog result, or null if `show()` has not been called yet */
+  get shownPromise() { return this.#shownPromise; }
+
+  /** Opens a modal dialog box
+   *
+   * @returns {Promise<modal_result>}
+  */
+  show(){
+    if (this.#shownPromise !== null) return this.#shownPromise;
     const dlg = this.shadowRoot.querySelector("dialog");
     dlg.showModal();
+    this.#shownPromise = new Promise((resolve, reject) =>{
+     this.#resolve = resolve;
+    });
+
+    return this.#shownPromise;
   }
 
 
@@ -60,9 +80,14 @@ export class ModalDialog extends AzosElement {
     return true;
   }
 
+  onDialogClose(){
+    this.#resolve("closed");
+    this.#shownPromise = null;
+  }
+
   render() {
     return html`
-<dialog>
+<dialog onclose="${this.onDialogClose}">
   ${this.renderTitle()}
   ${this.renderBody()}
   ${this.renderFooter()}

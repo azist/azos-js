@@ -80,7 +80,7 @@ export class XyzApplet extends Applet {
 
   onClick4(){
     const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
-    dlgTest1.showModal();
+    dlgTest1.show();
   }
 
 
