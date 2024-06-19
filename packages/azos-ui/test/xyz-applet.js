@@ -80,8 +80,8 @@ export class XyzApplet extends Applet {
 
   async onClick4(){
     const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
-    const dr = await dlgTest1.show();
-    alert("Dialog result is: " + dr);
+    const dr = (await dlgTest1.show()).modalResult;
+    setTimeout(() => alert("Dialog result is: " + dr), 100);
   }
 
 
@@ -92,7 +92,7 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
 
-     <az-modal-dialog id="dlgTest1" title="Dialog Title">
+     <az-modal-dialog id="dlgTest1" title="Add User">
       <div slot="body">
         <h1>This is dialog content</h1>
         Blah beh blue
