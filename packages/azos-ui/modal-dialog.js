@@ -65,9 +65,11 @@ export class ModalDialog extends AzosElement {
  }
 
  .dlg-body{
+  padding: 8px;
  }
 
  .dlg-footer{
+  padding: 8px;
  }
 
    `;//styles
