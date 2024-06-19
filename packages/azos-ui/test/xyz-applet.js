@@ -13,8 +13,7 @@ import { Command } from "../cmd.js";
 
 /**
  * Defines a root UI element which represents an Applet - a part of application.
- * Applets run inside of arenas.
- * Applets expose "Areas" which show in arena sidebars
+ * Applets run inside of arenas. Arena is akin to a "desktop" while applets are akin to "applications" running in such desktop
  */
 export class XyzApplet extends Applet {
 

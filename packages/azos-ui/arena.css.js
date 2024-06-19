@@ -156,7 +156,7 @@ main::after {
   display: table;
 }
 
-/*
+/* This will be moved out into TAB group control of some sort
 main .strip{
   position: fixed;
   top: 0px;

@@ -17,6 +17,7 @@ import { Applet } from "./applet.js";
 /**
  * Defines a root UI element which displays the whole Azos app.
  * See architecture introduction in root `readme.md`
+ * Applets run inside of arenas. Arena is akin to a "desktop" while applets are akin to "applications" running in such desktop
  */
 export class Arena extends AzosElement {
 
