@@ -9,46 +9,46 @@ import { css } from "./ui.js";
 export const ARENA_STYLES = css`
 header{
   position: fixed;
-  min-width: 360px;
+  min-width: var(--arn-min-width);
   left: 0px;
   width: 100%;
-  height: var(--hdr-height);
+  height: var(--arn-hdr-height);
   top: 0px;
   z-index: 100;
   margin-top: 0px;
   padding-top: 0px;
-  color: var(--hdr-color);
-  background-color: var(--hdr-bg-color);
-  box-shadow: var(--hdr-shadow);
+  color: var(--arn-hdr-color);
+  background-color: var(--arn-hdr-bg-color);
+  box-shadow: var(--arn-hdr-shadow);
 }
       header .side-menu{
         display: block;
         position: fixed;
-        z-index: 200;
-        left: -500px;
+        z-index: 1200;
+        left: var(--arn-mnu-left);
         top: 0;
-        width: 250px;
+        width: var(--arn-mnu-width);
         height: 100vh;
-        color: var(--menu-color);
-        background: var(--menu-bg-color);
-        opacity: var(--menu-opacity);
-        transition: 0.75s;
-        font-size: var(--menu-font-size);
+        color: var(--arn-mnu-color);
+        background: var(--arn-mnu-bg);
+        opacity: var(--arn-mnu-opacity);
+        transition:var(--arn-mnu-transition);
+        font-size: var(--arn-mnu-font-size);
         overflow: hidden;
-        box-shadow: var(--menu-shadow);
+        box-shadow: var(--arn-menu-shadow);
       }
 
       header .side-menu_expanded{
         left: 0px;
-        opacity: var(--menu-opacity);
+        opacity: var(--arn-mnu-opacity);
       }
 
       header .side-menu .close-button{
-        font-size: 1.8em;
+        font-size: var(--arn-mnu-close-font-size);
         position: absolute;
-        top: 6px;
-        left: 6px;
-        margin-top: -10px;
+        top: var(--arn-mnu-close-top);
+        left: var(--arn-mnu-close-left);
+        margin-top: var(--arn-mnu-close-margin-top);
       }
 
       header .side-menu a{
@@ -57,50 +57,49 @@ header{
         transition: 0.3s;
       }
       header .side-menu a:hover{
-        color: #d8d8d8;
+       color: var(--arn-mnu-hover-color);
       }
 
       header .side-menu ul{
         list-style: none;
-        padding: 28px 24px 8px 48px;
+        padding: var(--arn-mnu-ul-padding);
       }
 
       header .side-menu li{
-        padding: 8px;
+        padding: var(--arn-mnu-li-padding);
       }
 
       header .menu{
         float: left;
-        width: var(--menu-btn-width);
+        width: var(--arn-mnu-btn-width);
         height: 100%;
         display: block;
-        background: var(--menu-btn-color);
+        background: var(--arn-mnu-btn-color);
       }
 
       header .menu svg{
         display: block;
-        margin: 8px auto 8px auto;
-        width: 30px;
-        height: 30px;
+        margin: var(--arn-mnu-svg-margin);
+        width: var(--arn-mnu-svg-width);
+        height: var(--arn-mnu-svg-height);
 
-        stroke: var(--menu-svg-color);
-        stroke-width: var(--menu-svg-stroke);
+        stroke: var(--arn-mnu-svg-color);
+        stroke-width: var(--arn-mnu-svg-stroke);
       }
 
 
 
       header .title{
-        //float: left;
         position: absolute;
-        left: var(--menu-btn-width);
+        left: var(--arn-mnu-btn-width);
         top: 0px;
         display: block;
-        font-size: 1.6rem;
-        padding: 6px 2px 0px 8px;
-        color: #d8d8d8;
-        letter-spacing:  -1.5px;
-        width: 100%;
-        Xborder: 1px solid lime;
+        font-size: var(--arn-title-font-size);
+        padding: var(--arn-title-padding);
+        color: var(--arn-title-color);
+        letter-spacing:  var(--arn-title-letter-spacing);
+        height: 1lh;
+        overflow: hidden;
       }
 
       header .strip{
@@ -108,12 +107,10 @@ header{
         top: 0px;
         right: 0px;
         display: flex;
-        /*float: right;*/
         flex-direction: row-reverse;
         flex-wrap: nowrap;
-        /*border: 1px solid lime;*/
         height: 100%;
-        background: linear-gradient(to right, rgba(100,100,100, 0.0), var(--hdr-bg-color) 15%);
+        background: linear-gradient(to right, rgba(100,100,100, 0.0), var(--arn-hdr-bg-color) 15%);
         padding-left: 20px;
       }
 
@@ -161,7 +158,7 @@ main .strip{
   position: fixed;
   top: 0px;
   left: 0px;
-  width: var(--menu-btn-width);
+  width: var(--ar-mnu-btn-width);
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -204,7 +201,7 @@ main .applet-container{
   box-sizing: border-box;
   float: right;
   background-color: var(--paper);
-  padding:  calc(8px + var(--hdr-height)) 12px 12px 12px;
+  padding:  calc(8px + var(--arn-hdr-height)) 12px 12px 12px;
   text-align: justify;
   overflow: auto;
 }
