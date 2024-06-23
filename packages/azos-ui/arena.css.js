@@ -145,6 +145,7 @@ main{
   margin: 0px;
   box-sizing: border-box;
   background: var(--main-bg);
+  min-width: var(--arn-min-width);
 }
 
 main::after {
@@ -199,9 +200,9 @@ main .applet-container{
   width: 100%; /* calc(100% - var(--menu-btn-width)); */
   min-height: 50vh;
   box-sizing: border-box;
-  float: right;
   background-color: var(--paper);
   padding:  calc(8px + var(--arn-hdr-height)) 12px 12px 12px;
+  margin: 0px;
   text-align: justify;
   overflow: auto;
 }
@@ -243,6 +244,8 @@ footer{
   background-color: #606060;
   color: #aaa;
   padding: 10px;
+  min-width: var(--arn-min-width);
+  box-sizing: border-box;
 }
 
       /*footer .bottom-menu{
