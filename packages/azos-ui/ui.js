@@ -83,7 +83,8 @@ export class AzosElement extends LitElement {
   #arena = null;
   constructor() {
      super();
-     this.status = RANK.NORMAL;
+     this.status = null;
+     this.rank = RANK.NORMAL;
   }
 
   /** Returns {@link Arena} instance from the first (great/grand)parent element that defines arena ref
