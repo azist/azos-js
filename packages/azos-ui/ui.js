@@ -32,7 +32,7 @@ export const renderInto = lit_render;
 
 /** Ranks define the "importance"/size of the element. 1 is the biggest/highest rank aka 'RANK.HUGE', 6 is the smallest aka 'RANK.TINY' */
 export const RANK = Object.freeze({
-  UNDEFINED:       0,
+  UNDEFINED:   0,
   HUGE:        1,
   LARGE:       2,
   NORMAL:      3,
@@ -41,6 +41,9 @@ export const RANK = Object.freeze({
   TINY:        6
 });
 const ALL_RANK_NAMES = ["undefined","huge","large","normal","medium","small","tiny"];
+
+//  <g8-customer-filter-dialog rank="tiny" status="warning" />
+
 
 /**
  * Returns a numeric 0..6 rank representation of numeric or string specifier
@@ -53,7 +56,7 @@ export function parseRank(v){
   const sv = v.toString().toLowerCase();
   const i = ALL_RANK_NAMES.indexOf(sv);
   if (i>=0) return i;
-  return RANK.UNSET;
+  return RANK.UNDEFINED;
 }
 
 
