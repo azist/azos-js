@@ -1,7 +1,6 @@
 body{
   color: #454545;
-  XXXfont-family: Tahoma, Verdana, Arial, sans-serif;
-  font-family: Roboto, sans-serif;
+  font-family: Roboto, Tahoma, sans-serif;
   font-size: 14px;
   margin: 0px;
   padding: 0px;
@@ -49,15 +48,13 @@ body{
   --main-bg: #e0e0e0;
 }
 
-.--bw{
-  filter: grayscale(100%);
-}
-
-
-.--invert{
-    filter: grayscale(100%) invert(1);
-}
 
 
 
-.theme-odessa{ }
+/* stock theme modifiers: apply them to body class e.g. <body class="theme-azos --bw">.....*/
+.--bw    { filter: grayscale(100%); }
+.--green { filter: hue-rotate(50deg); }
+.--sky   { filter: hue-rotate(165deg); }
+.--dp    { filter: hue-rotate(240deg); }
+.--invert{ filter: grayscale(100%) invert(1); }
+
