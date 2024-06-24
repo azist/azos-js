@@ -53,10 +53,24 @@ body{
   --arn-strip-max-width: 20vw;
 
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
-  --paper: #f0f0f0;
-
   /* ink is primary text color omn paper */
-  --ink: #454545;
+  --paper: #f0f0f0; --ink: #454545;
+
+  /* statuses */
+  --s-ok-fg:    #234510; --s-ok-bg:    #45e467;
+  --s-info-fg:  #b0b8ff; --s-info-bg:  #207af5;
+  --s-warn-fg:  #4e4e40; --s-warn-bg:  #e4e450;
+  --s-alert-fg: #3e1050; --s-alert-bg: #e820ff;
+  --s-error-fg: #501000; --s-error-bg: #ff1000;
+
+  /* ranks */
+  --r1-fs: 2em;
+  --r2-fs: 1.5em;
+  --r3-fs: 1em;
+  --r4-fs: 0.85em;
+  --r5-fs: 0.6em;
+  --r6-fs: 0.4em;
+
 
 }
 
