@@ -69,24 +69,34 @@ export function renderToolbar(app, self, commands){
 
 /** @param {Application} app   @param {Arena} self  */
 export function renderHeader(app, self){
-  return html`
-  <a href="#" class="menu" id="btnMenuOpen" @click="${menuOpen}">
-    <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
-  </a>
 
-  <nav class="side-menu" id="navMenu">
-    <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
-    <ul>
-      <li><a href="1.app">Applet 1</a></li>
-      <li><a href="another.app">Another Applet </a></li>
-      <li><a href="settings.app">Settings </a></li>
-      <li><a href="x.app" >Menu Item X  </a></li>
-    </ul>
-  </nav>
+  const applet = self.applet;
+  const title = applet !== null ? html`${applet.title}` : html`${app.description} - ${self.name}`
 
-  <div class="title">${app.description}${self.name}</div>
-  <div class="strip" ${domRef(getRefToolbar(self))}> </div>
-`;
+  if (self.menu==="show"){
+    return html`
+    <a href="#" class="menu" id="btnMenuOpen" @click="${menuOpen}">
+      <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
+    </a>
+
+    <nav class="side-menu" id="navMenu">
+      <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
+      <ul>
+        <li><a href="1.app">Applet 1</a></li>
+        <li><a href="another.app">Another Applet </a></li>
+        <li><a href="settings.app">Settings </a></li>
+        <li><a href="x.app" >Menu Item X  </a></li>
+      </ul>
+    </nav>
+
+    <div class="title">${title}</div>
+    <div class="strip" ${domRef(getRefToolbar(self))}> </div>
+  `;
+  } else {//noMenu
+    return html`
+     <div class="title" style="left: 0px;">${title}</div>
+     <div class="strip" ${domRef(getRefToolbar(self))}> </div>`;
+  }
 
 /*
   <div class="strip">
@@ -121,7 +131,7 @@ export function renderMain(app, self, appletTagName){
   const appletHtml = appletTagName ? `<${appletTagName} id="elmActiveApplet"></${appletTagName}>` : `<slot name="applet-content"> </slot>`;
 
   return html`
-  <nav class="strip" id="navAreas">
+  <!--nav class="strip" id="navAreas">  THIS will be moved out into tab group control
     <div class="strip-btn strip-btn-selected">
       <svg width="28px" height="28px" viewBox="0 0 24 24">
       <circle cx="12" cy="6" r="4"/>
@@ -134,7 +144,7 @@ export function renderMain(app, self, appletTagName){
       <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
       </svg>
     </div>
-  </nav>
+  </nav-->
 
   <div class="applet-container" role="main" >
     ${verbatimHtml(appletHtml)}

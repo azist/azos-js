@@ -1,47 +1,86 @@
 body{
-  color: #454545;
-  font-family: Tahoma, Verdana, Arial, sans-serif;
+  color: #202020;
+  background: #c0c0c0;
+  font-family: Roboto, Tahoma, sans-serif;
   font-size: 14px;
   margin: 0px;
   padding: 0px;
-  background: #c0c0c0;
 }
 
 
 .theme-azos{
-  --paper: #f0f0f0;
-  --hdr-bg-color: #404040;
-  --hdr-color: #d0d0d0;
-  --hdr-height: 44px;
-  --hdr-shadow: 50px 0px 12px rgba(0,0,0, 0.35);
+  --arn-min-width: 360px;
+  --arn-hdr-height: 44px;
+  --arn-hdr-color: #d0d0d0;
+  --arn-hdr-bg-color: #404040;
+  --arn-hdr-shadow: 50px 0px 12px rgba(0,0,0, 0.35);
 
-  --main-bg: #e0e0e0;
+  --arn-title-font-size: 1.6rem;
+  --arn-title-padding: 6px 2px 0px 8px;
+  --arn-title-color: #d8d8d8;
+  --arn-title-letter-spacing: -1.1px;
 
-  --menu-btn-color: #f09020;
-  --menu-btn-width: 58px;
-  --menu-svg-color: #f4f4f4;
-  --menu-svg-stroke: 2.2px;
-  --menu-shadow: 4px 0px 24px rgba(0,0,0,0.25);
-  --menu-bg-color: linear-gradient(#f09020, #ffaf4f);
-  --menu-color: #fff;
-  --menu-opacity: 1.0;
-  --menu-font-size: 1.5em;
+  --arn-mnu-left: -500px;
+  --arn-mnu-width: 250px;
+  --arn-mnu-transition: 0.75s;
+  --arn-mnu-color: #fff;
+  --arn-mnu-bg: linear-gradient(#f09020, #ffaf4f);
+  --arn-mnu-opacity: 1.0;
+  --arn-mnu-font-size: 1.5em;
+  --arn-mnu-shadow: 4px 0px 24px rgba(0,0,0,0.25);
+  --arn-mnu-close-font-size: 1.8em;
+  --arn-mnu-close-top: 6px;
+  --arn-mnu-close-left: 6px;
+  --arn-mnu-close-margin-top: -10px;
+  --arn-mnu-hover-color: #d8d8d8;
+  --arn-mnu-ul-padding: 28px 24px 8px 48px;
+  --arn-mnu-li-padding: 8px;
+  --arn-mnu-btn-width: 58px;
+  --arn-mnu-btn-color: #f09020;
+  --arn-mnu-svg-stroke: #f4f4f4;
+  --arn-mnu-svg-stroke-width: 2.2px;
+  --arn-mnu-svg-width: 30px;
+  --arn-mnu-svg-height: 30px;
+  --arn-mnu-svg-margin: 8px auto 8px auto;
+
+  --arn-strip-color: #d0d0d0;
+  --arn-strip-svg-stroke: #e0e0e0;
+  --arn-strip-svg-stroke-width: 0.8px;
+  --arn-strip-margin: 2px 1px 2px 2px;
+  --arn-strip-padding:  4px 2px 2px 2px;
+  --arn-strip-font-size: 0.75em;
+  --arn-strip-min-width: 45px;
+  --arn-strip-max-width: 20vw;
+
+  /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
+  /* ink is primary text color omn paper */
+  --paper: #f0f0f0; --ink: #454545;
+
+  /* statuses */
+  --s-ok-fg:    #234510; --s-ok-bg:    #45e467;
+  --s-info-fg:  #b0b8ff; --s-info-bg:  #207af5;
+  --s-warn-fg:  #4e4e40; --s-warn-bg:  #e4e450;
+  --s-alert-fg: #3e1050; --s-alert-bg: #e820ff;
+  --s-error-fg: #501000; --s-error-bg: #ff1000;
+
+  /* ranks */
+  --r1-fs: 2em;
+  --r2-fs: 1.5em;
+  --r3-fs: 1em;
+  --r4-fs: 0.85em;
+  --r5-fs: 0.6em;
+  --r6-fs: 0.4em;
+
 
 }
 
-.theme-odessa{
-  --paper: #f0f0f8;
-  --hdr-bg-color: #4080d0;
-  --hdr-color: #d0d0d0;
-  --hdr-item-height: 30px;
-  --hdr-shadow: 0px 0px 12px rgba(0,0,0, 0.35);
 
-  --menu-btn-color: #e0c010;
-  --menu-btn-width: 50px;
-  --menu-svg-color: #a0a0f0;
-  --menu-shadow: 1px 1px 24px rgba(0,0,0,0.25);
-  --menu-bg-color: #f0d020;
-  --menu-color: #505050;
-  --menu-opacity: 1.0;
-  --menu-font-size: 1.2em;
-}
+
+
+/* stock theme modifiers: apply them to body class e.g. <body class="theme-azos --bw">.....*/
+.--bw    { filter: grayscale(100%); }
+.--green { filter: hue-rotate(50deg); }
+.--sky   { filter: hue-rotate(165deg); }
+.--dp    { filter: hue-rotate(240deg); }
+.--invert{ filter: grayscale(100%) invert(1); }
+

@@ -7,14 +7,14 @@
 import { html } from "../ui.js";
 import { Applet } from "../applet.js";
 import { Command } from "../cmd.js";
+import "../modal-dialog.js";
 
 //import { APPLET_STYLES } from "./applet.css.js";
 //import * as DEFAULT_HTML from "./applet.htm.js";
 
 /**
  * Defines a root UI element which represents an Applet - a part of application.
- * Applets run inside of arenas.
- * Applets expose "Areas" which show in arena sidebars
+ * Applets run inside of arenas. Arena is akin to a "desktop" while applets are akin to "applications" running in such desktop
  */
 export class XyzApplet extends Applet {
 
@@ -52,12 +52,21 @@ export class XyzApplet extends Applet {
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 
+  async closeQuery(){
+    return await confirm("We will close the form. Yes/no?")
+  }
+
+
+  #x = 0;
+  get title(){ return `XYZ Applet / x = ${this.#x}`}
+
   onClick1(){
     //alert("Ura!!!");
-    this.arena.name+="a";
-    //this.arena.requestUpdate();
+    //this.arena.name+="a";
+    this.#x++;
+    this.arena.requestUpdate();
 
-    this.#cmdHelp.title += "a";
+    this.#cmdAbout.title += "a";
     this.arena.updateToolbar();
   }
 
@@ -65,11 +74,40 @@ export class XyzApplet extends Applet {
     this.arena.uninstallToolbarCommands([this.#cmdHelp]);
   }
 
+  onClick3(){
+    this.arena.appletClose();
+  }
+
+  async onClick4(){
+    const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
+    const dr = (await dlgTest1.show()).modalResult;
+    console.info("Dialog result is: " + dr);
+  }
+
 
   render() {
     return html` applet
      <button @click="${this.onClick1}"> Click me </button>
      <button @click="${this.onClick2}"> Click me </button>
+     <button @click="${this.onClick3}"> Close This Applet </button>
+     <button @click="${this.onClick4}"> Open Dialog Box </button>
+
+     <az-modal-dialog id="dlgTest1" title="Add User">
+      <div slot="body">
+        <h1>This is dialog content</h1>
+        Blah beh blue very long line twhat goes unstopppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
+        <!--line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+-->
+      </div>
+     </az-modal-dialog>
     `;
   }//render
 

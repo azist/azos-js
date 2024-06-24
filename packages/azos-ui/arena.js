@@ -17,6 +17,7 @@ import { Applet } from "./applet.js";
 /**
  * Defines a root UI element which displays the whole Azos app.
  * See architecture introduction in root `readme.md`
+ * Applets run inside of arenas. Arena is akin to a "desktop" while applets are akin to "applications" running in such desktop
  */
 export class Arena extends AzosElement {
 
@@ -55,6 +56,7 @@ export class Arena extends AzosElement {
 
   static properties = {
     name: {type: String},
+    menu: {type: String}
   };
 
   #app;
@@ -63,7 +65,8 @@ export class Arena extends AzosElement {
   #toolbar = [];
   constructor() {
     super();
-    this.name = 'Somebody';
+    this.name = 'Arena';
+    this.menu = "show";
   }
 
   /** System internal, don't use */
@@ -134,9 +137,9 @@ export class Arena extends AzosElement {
   }
 
 
-  /** Sets the specified applet as the current one in the area main.
-   * If there is an existing applet, then the system would prompt user for CloseQuery
-   * if the applet is dirty, or bypass close query if "force=true"
+  /** Sets the specified applet as the current one in the arena.
+   * If there is an existing applet, then the system would prompt user via  `closeQuery(): bool`
+   * call where the applet can check itself of it is dirty, or bypass close query if "force=true"
    */
   async appletOpen(tapplet, force = false){
     aver.isSubclassOf(tapplet, Applet);
@@ -144,25 +147,32 @@ export class Arena extends AzosElement {
     aver.isNotNull(tagName);
 
     //check if current one is loaded
-    if (this.#applet !== null){
-      const canClose = await this.#applet.closeQuery();
-      if (!force && !canClose) return false;
-      this.appletClose();
-    }
-
-    this.#appletTagName = tagName;
+    const closed = await this.appletClose(force);
+    if (!closed) return false;
 
     //re-render with render(tagName)
-    await this.requestUpdate();
+    this.#appletTagName = tagName;
+    this.update();//synchronous update including DOM rebuild
     this.updateToolbar();
     this.#applet = this.shadowRoot.getElementById("elmActiveApplet");
-
+    this.requestUpdate();
     return true;
   }
 
-  /** Closes applet returning to default state */
-  async appletClose(){
+  /** Closes applet returning to default state. Pass force=true to bypass closeQuery().
+   * All toolbar commands installed by an applet are automatically uninstalled
+   * @param {boolean} [force=false] pass true to bypass closeQuery
+   * @returns {boolean} true if applet was closed or there was no applet to close to begin with. false when closeQuery prevented the close
+  */
+  async appletClose(force = false){
+    if (!this.#applet) return true;
+    const canClose = force ? true : await this.#applet.closeQuery();
+    if (!canClose) return false;
+    this.uninstallToolbarCommands([...this.#toolbar]);
     this.#applet = null;
+    this.#appletTagName = null;
+    this.requestUpdate();//async
+    return true;
   }
 
 
