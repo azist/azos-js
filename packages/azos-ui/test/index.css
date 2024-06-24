@@ -1,10 +1,10 @@
 body{
-  color: #454545;
+  color: #202020;
+  background: #c0c0c0;
   font-family: Roboto, Tahoma, sans-serif;
   font-size: 14px;
   margin: 0px;
   padding: 0px;
-  background: #c0c0c0;
 }
 
 
@@ -37,15 +37,27 @@ body{
   --arn-mnu-li-padding: 8px;
   --arn-mnu-btn-width: 58px;
   --arn-mnu-btn-color: #f09020;
-  --arn-mnu-svg-color: #f4f4f4;
-  --arn-mnu-svg-stroke: 2.2px;
+  --arn-mnu-svg-stroke: #f4f4f4;
+  --arn-mnu-svg-stroke-width: 2.2px;
   --arn-mnu-svg-width: 30px;
   --arn-mnu-svg-height: 30px;
   --arn-mnu-svg-margin: 8px auto 8px auto;
 
+  --arn-strip-color: #d0d0d0;
+  --arn-strip-svg-stroke: #e0e0e0;
+  --arn-strip-svg-stroke-width: 0.8px;
+  --arn-strip-margin: 2px 1px 2px 2px;
+  --arn-strip-padding:  4px 2px 2px 2px;
+  --arn-strip-font-size: 0.75em;
+  --arn-strip-min-width: 45px;
+  --arn-strip-max-width: 20vw;
 
+  /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
   --paper: #f0f0f0;
-  --main-bg: #e0e0e0;
+
+  /* ink is primary text color omn paper */
+  --ink: #454545;
+
 }
 
 

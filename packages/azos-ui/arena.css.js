@@ -83,8 +83,8 @@ header{
         width: var(--arn-mnu-svg-width);
         height: var(--arn-mnu-svg-height);
 
-        stroke: var(--arn-mnu-svg-color);
-        stroke-width: var(--arn-mnu-svg-stroke);
+        stroke: var(--arn-mnu-svg-stroke);
+        stroke-width: var(--arn-mnu-svg-stroke-width);
       }
 
 
@@ -116,22 +116,19 @@ header{
 
       header .strip-btn{
         display: inline-block;
-        font-size: 0.75em;
+        font-size: var(--arn-strip-font-size);
         text-align: center;
         width: auto;
-        min-width: 45px;
-        max-width: 20vw;
-        margin: 2px 1px 2px 2px;
-        color: #d0d0d0;
-        padding: 4px 2px 2px 2px;
-
-        XXXborder: 1px solid red;
+        min-width: var(--arn-strip-min-width);
+        max-width:  var(--arn-strip-max-width);
+        margin: var(--arn-strip-margin);
+        color: var(--arn-strip-color);
+        padding: var(--arn-strip-padding);
         overflow: hidden;
-
-        stroke: #e0e0e0;
-        stroke-width: 0.8px;
+        stroke: var(--arn-strip-svg-stroke);
+        stroke-width: var(--arn-strip-svg-stroke-width);
         fill: none;
-        stroke-linecap="round";
+        stroke-linecap: round;
       }
 
       header .strip-btn:hover{
@@ -144,7 +141,8 @@ main{
   padding: 0px;
   margin: 0px;
   box-sizing: border-box;
-  background: var(--main-bg);
+  color: var(--ink);
+  background: var(--paper);
   min-width: var(--arn-min-width);
 }
 
@@ -173,7 +171,6 @@ main .strip-btn{
   text-align: center;
   width: 45px;
   margin: 2px 1px 2px 4px;
-  XXXbackground-color: #808080;
   color: #858585;
   padding-top: 4px;
 
@@ -200,7 +197,6 @@ main .applet-container{
   width: 100%; /* calc(100% - var(--menu-btn-width)); */
   min-height: 50vh;
   box-sizing: border-box;
-  background-color: var(--paper);
   padding:  calc(8px + var(--arn-hdr-height)) 12px 12px 12px;
   margin: 0px;
   text-align: justify;
