@@ -6,7 +6,7 @@ export class AzRadioGroup extends AzosElement{
     constructor(){
         super();
         (!this.getAttribute('type')||this.getAttribute('type')=='radio') ? this.check='radio' : this.getAttribute('type')=='check' ? this.check='check' : this.check='switch';
-        
+
     }
     render(){
         const ranks=['','xl','lg','md','sm','xs'];
@@ -25,7 +25,7 @@ export class AzRadioGroup extends AzosElement{
                     <input type="radio" class="${this.check}" id="${this.id}_${i}" name="${this.id}" ?disabled=${this.disabled}>
                     <span>${option}</span>
                 </label>
-            </div>    
+            </div>
         `)}`;
 
         return html`

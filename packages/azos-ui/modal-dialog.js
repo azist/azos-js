@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css } from "./ui.js";
+import { AzosElement, html, css, parseRank, parseStatus } from "./ui.js";
 
 /**
  * Provides abstraction for modal dialog boxes
@@ -155,9 +155,9 @@ export class ModalDialog extends AzosElement {
   #getDlgElm() { return this.shadowRoot.querySelector("dialog"); }
 
   render() {
-    const cls = "";
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;// book="123" class="${cls}">
     return html`
-<dialog @close="${this.#onDialogClose} class="${cls}">
+<dialog @close="${this.#onDialogClose}" class="${cls}">
   ${this.renderTitle()}
   ${this.renderBody()}
   ${this.renderFooter()}
