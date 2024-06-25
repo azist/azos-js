@@ -155,8 +155,9 @@ export class ModalDialog extends AzosElement {
   #getDlgElm() { return this.shadowRoot.querySelector("dialog"); }
 
   render() {
+    const cls = "";
     return html`
-<dialog @close="${this.#onDialogClose}">
+<dialog @close="${this.#onDialogClose} class="${cls}">
   ${this.renderTitle()}
   ${this.renderBody()}
   ${this.renderFooter()}
