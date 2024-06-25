@@ -1,11 +1,9 @@
 import {AzosElement, html,css} from '../../../../azos-js/packages/azos-ui/ui.js';
-import {selectStyles,colorStyles,iconStyles} from './styles.js';
+//import {selectStyles,colorStyles,iconStyles} from './styles.js';
 
 export class AzSelect extends AzosElement{
-    static properties={
-        listItems:{}
-    };
-    static styles=[selectStyles,colorStyles,iconStyles,css`.addPadding{padding:5px 15px;}`];
+    static properties={ listItems:{} };
+    //static styles=[selectStyles,colorStyles,iconStyles,css`.addPadding{padding:5px 15px;}`];
     constructor(){
         super();
         this.listItems=this.getAttribute('choices').split('|');
