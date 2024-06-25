@@ -13,15 +13,14 @@ export class ModalDialog extends AzosElement {
 
   static styles = css`
   dialog{
-   background: #f0f0f0;
-   color: #4e4e4e;
-   border: 1px solid #a5a5a5;
-   border-radius: 6px;
-   box-shadow: 6px 8px 18px rgba(0, 0, 0, 0.45);
+   background: var(--paper);
+   color: var(--ink);
+
+   border: none;
+   border-radius: var(--r3-brad-win);
+   box-shadow: var(--modal-shadow);
    padding: 0px;
-
    margin-top: 15vh;
-
    opacity: 0;
    transform: scale(0.8, 0.5);
  }
@@ -40,19 +39,27 @@ export class ModalDialog extends AzosElement {
 }
 
  dialog::backdrop{
-   background: rgba(100,100,100,0.45);
-   backdrop-filter: blur(4px);
+   background: var(--modal-backdrop-bg);
+   backdrop-filter: var(--modal-backdrop-filter);
  }
+
+ .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-win); }
+ .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-win); }
+ .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-win); }
+ .r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-win); }
+ .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-win); }
+ .r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-win); }
+
 
  .dlg-title{
    width: 100%;
    height: auto;
-   background: #b5b5b5;
+   background: var(--modal-title-bg);
+   color: var(--modal-title-fg);
    margin: 0px;
    padding: 8px 8px 8px 12px;
    font-size: 1.4em;
    font-weight: bold;
-   color: #505050;
    box-sizing: border-box;
  }
 
@@ -64,20 +71,36 @@ export class ModalDialog extends AzosElement {
     cursor: pointer;
     margin-top: 1px;
     margin-right: 8px;
- }
+  }
 
- .dlg-body{
-   margin: 0px;
-   padding: 8px;
-   max-height: 70vh;
-   overflow: auto;
- }
+  .dlg-body{
+    margin: 0px;
+    padding: 8px;
+    max-height: 70vh;
+    overflow: auto;
+  }
 
- .dlg-footer{
-  padding: 8px;
- }
+  .dlg-footer{
+    padding: 8px;
+   }
 
-   `;//styles
+  .ok      .dlg-title{ background: var(--s-ok-bg);     color: var(--s-ok-fg); }
+  .info    .dlg-title{ background: var(--s-info-bg);   color: var(--s-info-fg); }
+  .warning .dlg-title{ background: var(--s-warn-bg);   color: var(--s-warn-fg); }
+  .alert   .dlg-title{ background: var(--s-alert-bg);  color: var(--s-alert-fg); }
+  .error   .dlg-title{ background: var(--s-error-bg);  color: var(--s-error-fg); }
+
+  dialog.error  { border: 2px solid var(--s-error-bg); }
+  dialog.warning{ border: 2px solid var(--s-warn-bg); }
+  dialog.alert  { border: 2px solid var(--s-alert-bg); }
+  dialog.error  { border: 2px solid var(--s-error-bg); }
+
+  .ok      .dlg-title-close{  color: var(--s-ok-fg); }
+  .info    .dlg-title-close{  color: var(--s-info-fg); }
+  .warning .dlg-title-close{  color: var(--s-warn-fg); }
+  .alert   .dlg-title-close{  color: var(--s-alert-fg); }
+  .error   .dlg-title-close{  color: var(--s-error-fg); }
+`;//styles
 
   static properties = {
     title: {type: String},
@@ -155,7 +178,7 @@ export class ModalDialog extends AzosElement {
   #getDlgElm() { return this.shadowRoot.querySelector("dialog"); }
 
   render() {
-    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;// book="123" class="${cls}">
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     return html`
 <dialog @close="${this.#onDialogClose}" class="${cls}">
   ${this.renderTitle()}
