@@ -1,6 +1,6 @@
 # azos-js
 Provides Azos base types and services functionality for Java Script apps
-
+a
 ver. 0.0.1 20230923 DKh<br>rev. 20231122 DKh
 
 
