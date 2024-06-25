@@ -1,8 +1,8 @@
 import {AzosElement, html} from '../../../../azos-js/packages/azos-ui/ui.js';
-import {sliderStyles,colorStyles,iconStyles} from './styles.js';
+//import {sliderStyles,colorStyles,iconStyles} from './styles.js';
 
 export class AzSlider extends AzosElement{
-    static styles=[sliderStyles,colorStyles,iconStyles];
+    //static styles=[sliderStyles,colorStyles,iconStyles];
     constructor(){
         super();
         !this.getAttribute('color')||this.getAttribute('color')=='' ? this.colorChoice='text_dark' : this.colorChoice=this.getAttribute('color');
