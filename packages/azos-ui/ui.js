@@ -7,6 +7,7 @@
 import { html as lit_html, css as lit_css, svg as lit_svg, render as lit_render, LitElement } from "lit";
 import { unsafeHTML as lit_unsafe_html } from "lit/directives/unsafe-html";
 import { ref as lit_ref, createRef as lit_create_ref } from "lit/directives/ref";
+import { isOneOf } from "../azos/strings";
 
 
 /** CSS template processing pragma: css`p{color: blue}` */
@@ -32,7 +33,7 @@ export const renderInto = lit_render;
 
 /** Ranks define the "importance"/size of the element. 1 is the biggest/highest rank aka 'RANK.HUGE', 6 is the smallest aka 'RANK.TINY' */
 export const RANK = Object.freeze({
-  UNDEFINED:       0,
+  UNDEFINED:   0,
   HUGE:        1,
   LARGE:       2,
   NORMAL:      3,
@@ -40,20 +41,46 @@ export const RANK = Object.freeze({
   SMALL:       5,
   TINY:        6
 });
-const ALL_RANK_NAMES = ["undefined","huge","large","normal","medium","small","tiny"];
+const ALL_RANK_NAMES = ["undefined", "huge", "large", "normal", "medium", "small", "tiny"];
 
 /**
- * Returns a numeric 0..6 rank representation of numeric or string specifier
+ * Returns a numeric 0..6 rank representation of a specifier value supplied as a numeric or string
  * @param {Number|string} v number or string value
- * @returns {Number} an integer specified 0..6. O denotes "UNSET"
+ * @param {boolean} [isCss=false] when true returns default rank as an empty string which is suitable for CSS class name modifier; returns rank class names as `r1`..`r6`
+ * @returns {Number} an integer specified 0..6. O denotes "UNDEFINED"
  */
-export function parseRank(v){
-  if (typeof v ==="undefined" || v===null || v===undefined) return RANK.UNDEFINED;
+export function parseRank(v, isCss = false){
+  if (v===undefined || v===null) return isCss ? "" : RANK.UNDEFINED;
   if (v >= 0 && v <= 6) return v | 0;
   const sv = v.toString().toLowerCase();
   const i = ALL_RANK_NAMES.indexOf(sv);
-  if (i>=0) return i;
-  return RANK.UNSET;
+  if (i>=0) return isCss ? `r${i}` : i;
+  return isCss ? "" : RANK.UNDEFINED;
+}
+
+/** System statuses assign logical conditions for elements, e.g.: `ok/info/warning/alert/error` */
+export const STATUS = Object.freeze({
+  DEFAULT:   "default",
+  OK:        "ok",
+  INFO:      "info",
+  WARNING:   "warning",
+  ALERT:     "alert",
+  ERROR:     "error"
+});
+const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error"];
+
+/**
+ * Returns status string which is either of system statuses as declared in `STATUS` enumeration
+ * or `STATUS.DEFAULT`
+ * @param {String} v string status value
+ * @param {boolean} [isCss=false] when true returns default status as an empty string which is suitable for CSS class name modifier
+ * @returns {String} one of members of `STATUS` enum
+ */
+export function parseStatus(v, isCss = false){
+  if (v===undefined || v===null) return isCss ? "" :STATUS.DEFAULT;
+  v = v.toString().toLowerCase();
+  if (isOneOf(v, ALL_STATUS_VALUES)) return v;
+  return isCss ? "" : STATUS.DEFAULT;
 }
 
 
@@ -61,23 +88,8 @@ export function parseRank(v){
 export class AzosElement extends LitElement {
 
   static properties = {
-    status: {
-      type: String,
-      reflect: true,
-      converter: {
-        fromAttribute: (v) => {
-          return v;
-        },
-        toAttribute: (v) => {
-          return v;
-        }
-      }
-    },
-    rank:   {
-      type: Number,
-      reflect: true,
-      converter: { fromAttribute: (v) => parseRank(v) }
-    }
+    status: { type: String, reflect: true,  converter: { fromAttribute: (v) => parseStatus(v) }  },
+    rank:   { type: Number, reflect: true,  converter: { fromAttribute: (v) => parseRank(v) }  }
   };
 
   #arena = null;
