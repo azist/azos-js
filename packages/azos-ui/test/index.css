@@ -57,11 +57,11 @@ body{
   --paper: #f0f0f0; --ink: #454545;
 
   /* statuses */
-  --s-ok-fg:    #236510; --s-ok-bg:    #45e467;
-  --s-info-fg:  #d0d8ff; --s-info-bg:  #207af5;
+  --s-ok-fg:    #236510; --s-ok-bg:    #75f487;
+  --s-info-fg:  #2562b0; --s-info-bg:  #40baf5;
   --s-warn-fg:  #4e4e40; --s-warn-bg:  #e4e450;
-  --s-alert-fg: #f0d0f0; --s-alert-bg: #e820ff;
-  --s-error-fg: #ffd0d0; --s-error-bg: #ff1000;
+  --s-alert-fg: #804053; --s-alert-bg: #e850e0;
+  --s-error-fg: #704050; --s-error-bg: #ff5720;
 
   /* rank font sizes */
   --r1-fs: 1.60em;

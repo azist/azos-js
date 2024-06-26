@@ -75,14 +75,10 @@ export class ModalDialog extends AzosElement {
 
   .dlg-body{
     margin: 0px;
-    padding: 8px;
-    max-height: 70vh;
+    padding: 0.5lh 1ch 0.5lh 1ch;
+    max-height: 72vh;
     overflow: auto;
   }
-
-  .dlg-footer{
-    padding: 8px;
-   }
 
   .ok      .dlg-title{ background: var(--s-ok-bg);     color: var(--s-ok-fg); }
   .info    .dlg-title{ background: var(--s-info-bg);   color: var(--s-info-fg); }
@@ -183,7 +179,6 @@ export class ModalDialog extends AzosElement {
 <dialog @close="${this.#onDialogClose}" class="${cls}">
   ${this.renderTitle()}
   ${this.renderBody()}
-  ${this.renderFooter()}
 </dialog>`;
   }//render
 
@@ -198,12 +193,6 @@ export class ModalDialog extends AzosElement {
   renderBody(){
     return html`<div class="dlg-body"><slot name="body"></slot></div>`;
   }
-
-  /** Override to render dialog footer bar  */
-  renderFooter(){
-    return html`<div class="dlg-footer"> </div>`;
-  }
-
 
 }//ModalDialog
 
