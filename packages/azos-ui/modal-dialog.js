@@ -12,24 +12,26 @@ import { AzosElement, html, css, parseRank, parseStatus } from "./ui.js";
 export class ModalDialog extends AzosElement {
 
   static styles = css`
-  dialog{
-   background: var(--paper);
-   color: var(--ink);
+dialog{
+  background: var(--paper);
+  color: var(--ink);
 
-   border: none;
-   border-radius: var(--r3-brad-win);
-   box-shadow: var(--modal-shadow);
-   padding: 0px;
-   margin-top: 15vh;
-   opacity: 0;
-   transform: scale(0.8, 0.5);
- }
+  border: none;
+  border-radius: var(--r3-brad-win);
+  box-shadow: var(--modal-shadow);
+  padding: 0px;
+  margin-top: 15vh;
+  opacity: 0;
+  transform: scale(0.8, 0.5);
+}
 
- dialog[open] {
+dialog[open] {
   opacity: 1;
   transform: scale(1,1);
   transition: 0.12s ease-out;
 }
+
+dialog:focus-visible, dialog:hover{ outline: none; }
 
 @starting-style {
   dialog[open] {
@@ -38,69 +40,68 @@ export class ModalDialog extends AzosElement {
   }
 }
 
- dialog::backdrop{
-   background: var(--modal-backdrop-bg);
-   backdrop-filter: var(--modal-backdrop-filter);
- }
+dialog::backdrop{
+  background: var(--modal-backdrop-bg);
+  backdrop-filter: var(--modal-backdrop-filter);
+}
 
- .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-win); }
- .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-win); }
- .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-win); }
- .r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-win); }
- .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-win); }
- .r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-win); }
+.r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-win); }
+.r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-win); }
+.r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-win); }
+.r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-win); }
+.r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-win); }
+.r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-win); }
 
 
- .dlg-title{
-   width: 100%;
-   height: auto;
-   background: var(--modal-title-bg);
-   color: var(--modal-title-fg);
-   margin: 0px;
-   padding: 0.25lh 1ch 0.25lh 1ch;
-   font-size: 1.4em;
+.dlg-title{
+  width: 100%;
+  height: auto;
+  background: var(--modal-title-bg);
+  color: var(--modal-title-fg);
+  margin: 0px;
+  padding: 0.25lh 1ch 0.25lh 1ch;
+  font-size: 1.4em;
+  font-weight: bold;
+  box-sizing: border-box;
+  min-height: 20px;
+}
+
+.dlg-title-close{
+   float: right;
+   font-size: 2em;
    font-weight: bold;
-   box-sizing: border-box;
-   min-height: 20px;
- }
+   color: var(--modal-title-fg);
+   cursor: pointer;
+   margin-right: 0.5ch;
+}
 
- .dlg-title-close{
-    float: right;
-    font-size: 2em;
-    font-weight: bold;
-    color: var(--modal-title-fg);
-    cursor: pointer;
-    margin-right: 0.5ch;
-  }
+.dlg-body{
+  margin: 0px;
+  padding: 0.5lh 1ch 0.5lh 1ch;
+  max-height: 72vh;
+  overflow: auto;
+}
 
-  .dlg-body{
-    margin: 0px;
-    padding: 0.5lh 1ch 0.5lh 1ch;
-    max-height: 72vh;
-    overflow: auto;
-  }
+.ok      .dlg-title{ background: var(--s-ok-bg);     color: var(--s-ok-fg); }
+.info    .dlg-title{ background: var(--s-info-bg);   color: var(--s-info-fg); }
+.warning .dlg-title{ background: var(--s-warn-bg);   color: var(--s-warn-fg); }
+.alert   .dlg-title{ background: var(--s-alert-bg);  color: var(--s-alert-fg); }
+.error   .dlg-title{ background: var(--s-error-bg);  color: var(--s-error-fg); }
 
-  .ok      .dlg-title{ background: var(--s-ok-bg);     color: var(--s-ok-fg); }
-  .info    .dlg-title{ background: var(--s-info-bg);   color: var(--s-info-fg); }
-  .warning .dlg-title{ background: var(--s-warn-bg);   color: var(--s-warn-fg); }
-  .alert   .dlg-title{ background: var(--s-alert-bg);  color: var(--s-alert-fg); }
-  .error   .dlg-title{ background: var(--s-error-bg);  color: var(--s-error-fg); }
+dialog.error  { border: 2px solid var(--s-error-bg); }
+dialog.warning{ border: 2px solid var(--s-warn-bg); }
+dialog.alert  { border: 2px solid var(--s-alert-bg); }
+dialog.error  { border: 2px solid var(--s-error-bg); }
 
-  dialog.error  { border: 2px solid var(--s-error-bg); }
-  dialog.warning{ border: 2px solid var(--s-warn-bg); }
-  dialog.alert  { border: 2px solid var(--s-alert-bg); }
-  dialog.error  { border: 2px solid var(--s-error-bg); }
-
-  .ok      .dlg-title-close{  color: var(--s-ok-fg); }
-  .info    .dlg-title-close{  color: var(--s-info-fg); }
-  .warning .dlg-title-close{  color: var(--s-warn-fg); }
-  .alert   .dlg-title-close{  color: var(--s-alert-fg); }
-  .error   .dlg-title-close{  color: var(--s-error-fg); }
+.ok      .dlg-title-close{  color: var(--s-ok-fg); }
+.info    .dlg-title-close{  color: var(--s-info-fg); }
+.warning .dlg-title-close{  color: var(--s-warn-fg); }
+.alert   .dlg-title-close{  color: var(--s-alert-fg); }
+.error   .dlg-title-close{  color: var(--s-error-fg); }
 `;//styles
 
   static properties = {
     title: {type: String},
-
   };
 
   #shownPromise = null;
@@ -151,8 +152,6 @@ export class ModalDialog extends AzosElement {
     return true;
   }
 
-
-
   /**
    * Override to prompt the user on Close, e.g. if your Dialog is "dirty"/contains unsaved changes
    * you may pop-up a confirmation box. Return "true" to allow close, false to prevent it.
@@ -162,7 +161,7 @@ export class ModalDialog extends AzosElement {
   closeQuery(){ return true; }
 
   #onDialogClose(){
-    this.#modalResult = "Undetermined";
+    this.#modalResult = null;
     this.#resolve(this);
     this.#shownPromise = null;
   }

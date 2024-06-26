@@ -92,7 +92,7 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
 
-     <az-modal-dialog id="dlgTest1" title="Add User" rank="normal" status="info" >
+     <az-modal-dialog id="dlgTest1" title="Add User" rank="normal" status="ok" >
       <div slot="body">
         <h1>This is dialog content</h1>
         Blah beh blue very long line twhat goes unstopppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
