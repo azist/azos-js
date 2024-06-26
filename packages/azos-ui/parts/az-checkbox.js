@@ -1,4 +1,4 @@
-import {AzosElement, html} from '../../../../azos-js/packages/azos-ui/ui.js';
+import {AzosElement, html} from '../ui.js';
 import {baseStyles,checkStyles,switchStyles} from './styles.js';
 
 export class AzCheckbox extends AzosElement{
