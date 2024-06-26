@@ -23,6 +23,7 @@ dialog{
   margin-top: 15vh;
   opacity: 0;
   transform: scale(0.8, 0.5);
+  overflow: hidden;
 }
 
 dialog[open] {
@@ -64,6 +65,7 @@ dialog::backdrop{
   font-weight: bold;
   box-sizing: border-box;
   min-height: 20px;
+  text-align: left;
 }
 
 .dlg-title-close{
