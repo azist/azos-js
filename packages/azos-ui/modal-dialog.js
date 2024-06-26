@@ -57,20 +57,20 @@ export class ModalDialog extends AzosElement {
    background: var(--modal-title-bg);
    color: var(--modal-title-fg);
    margin: 0px;
-   padding: 8px 8px 8px 12px;
+   padding: 0.25lh 1ch 0.25lh 1ch;
    font-size: 1.4em;
    font-weight: bold;
    box-sizing: border-box;
+   min-height: 20px;
  }
 
  .dlg-title-close{
     float: right;
     font-size: 2em;
     font-weight: bold;
-    color: #505050;
+    color: var(--modal-title-fg);
     cursor: pointer;
-    margin-top: 1px;
-    margin-right: 8px;
+    margin-right: 0.5ch;
   }
 
   .dlg-body{
