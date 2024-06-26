@@ -20,6 +20,9 @@ export class XyzDialog extends ModalDialog{
     return html`<div class="dlg-body">Hello, ${this.toad}<br> I am XYZ, did you wash your hands?</div> `;
   }
 
+  closeQuery(){
+    return false;//prevent close
+  }
 
 }
 
