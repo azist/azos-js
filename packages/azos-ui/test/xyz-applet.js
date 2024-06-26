@@ -92,10 +92,15 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
 
-     <az-modal-dialog id="dlgTest1" title="Add User" rank="normal" status="ok" >
+     <az-modal-dialog id="dlgTest1" title="My Dialog Box for Users" rank="normal" status="info">
+      <style>
+        h1{margin: 6px;}
+        h2{margin: 4px;}
+      </style>
       <div slot="body">
         <h1>This is dialog content</h1>
         Blah beh blue very long line twhat goes unstopppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
+        <h2>This is header two</h2>
         <line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
