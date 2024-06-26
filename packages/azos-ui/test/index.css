@@ -57,21 +57,41 @@ body{
   --paper: #f0f0f0; --ink: #454545;
 
   /* statuses */
-  --s-ok-fg:    #234510; --s-ok-bg:    #45e467;
-  --s-info-fg:  #b0b8ff; --s-info-bg:  #207af5;
+  --s-ok-fg:    #236510; --s-ok-bg:    #75f487;
+  --s-info-fg:  #2562b0; --s-info-bg:  #40baf5;
   --s-warn-fg:  #4e4e40; --s-warn-bg:  #e4e450;
-  --s-alert-fg: #3e1050; --s-alert-bg: #e820ff;
-  --s-error-fg: #501000; --s-error-bg: #ff1000;
+  --s-alert-fg: #804053; --s-alert-bg: #e850e0;
+  --s-error-fg: #704050; --s-error-bg: #ff5720;
 
-  /* ranks */
-  --r1-fs: 2em;
-  --r2-fs: 1.5em;
+  /* rank font sizes */
+  --r1-fs: 1.60em;
+  --r2-fs: 1.40em;
   --r3-fs: 1em;
   --r4-fs: 0.85em;
-  --r5-fs: 0.6em;
-  --r6-fs: 0.4em;
+  --r5-fs: 0.65em;
+  --r6-fs: 0.5em;
 
+  /* rank border radius for window-level objects/containers */
+  --r1-brad-win: 10px;
+  --r2-brad-win: 8px;
+  --r3-brad-win: 6px;
+  --r4-brad-win: 6px;
+  --r5-brad-win: 4px;
+  --r6-brad-win: 2px;
 
+  /* rank border radius for smaller parts */
+  --r1-brad-ctl: 4px;
+  --r2-brad-ctl: 4px;
+  --r3-brad-ctl: 4px;
+  --r4-brad-ctl: 4px;
+  --r5-brad-ctl: 4px;
+  --r6-brad-ctl: 1px;
+
+  --modal-title-bg: #b5b5b5;
+  --modal-title-fg: #505050;
+  --modal-shadow: 6px 8px 18px rgba(0, 0, 0, 0.45);
+  --modal-backdrop-bg: rgba(100, 100, 100, 0.45);
+  --modal-backdrop-filter:  blur(4px);
 }
 
 

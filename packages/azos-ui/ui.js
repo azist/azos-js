@@ -50,11 +50,11 @@ const ALL_RANK_NAMES = ["undefined", "huge", "large", "normal", "medium", "small
  * @returns {Number} an integer specified 0..6. O denotes "UNDEFINED"
  */
 export function parseRank(v, isCss = false){
-  if (v===undefined || v===null) return isCss ? "" : RANK.UNDEFINED;
-  if (v >= 0 && v <= 6) return v | 0;
+  if (v===undefined || v===null || v===0) return isCss ? "" : RANK.UNDEFINED;
+  if (v > 0 && v <= 6) return isCss ? `r${v | 0}` : v | 0;
   const sv = v.toString().toLowerCase();
   const i = ALL_RANK_NAMES.indexOf(sv);
-  if (i>=0) return isCss ? `r${i}` : i;
+  if (i>0) return isCss ? `r${i}` : i;
   return isCss ? "" : RANK.UNDEFINED;
 }
 
