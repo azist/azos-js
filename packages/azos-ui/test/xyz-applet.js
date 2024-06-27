@@ -8,6 +8,7 @@ import { html } from "../ui.js";
 import { Applet } from "../applet.js";
 import { Command } from "../cmd.js";
 import "../modal-dialog.js";
+import "./xyz-dialog.js";
 
 //import { APPLET_STYLES } from "./applet.css.js";
 //import * as DEFAULT_HTML from "./applet.htm.js";
@@ -84,6 +85,13 @@ export class XyzApplet extends Applet {
     console.info("Dialog result is: " + dr);
   }
 
+  async onClick5(){
+    const dlgXyz = this.shadowRoot.getElementById("dlgXyz");
+    const dr = (await dlgXyz.show()).modalResult;
+    console.info("Small Dialog result is: " + dr);
+  }
+
+
 
   render() {
     return html` applet
@@ -91,12 +99,20 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick2}"> Click me </button>
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
+     <button @click="${this.onClick5}"> Did you wash your hands? </button>
 
-     <az-modal-dialog id="dlgTest1" title="Add User">
+
+     <az-modal-dialog id="dlgTest1" title="My Dialog Box for Users" rank="normal" status="info">
+      <style>
+        h1{margin: 6px;}
+        h2{margin: 4px;}
+      </style>
       <div slot="body">
         <h1>This is dialog content</h1>
         Blah beh blue very long line twhat goes unstopppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
-        <!--line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
+        <button @click="${this.onClick5}"> HOOK HARD!!! </button>
+        <h2>This is header two</h2>
+        <line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
@@ -105,9 +121,11 @@ export class XyzApplet extends Applet {
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
         line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
--->
       </div>
      </az-modal-dialog>
+
+     <xyz-dialog id="dlgXyz" title="Confirm the TOad" rank="medium"> </xyz-dialog>
+
     `;
   }//render
 

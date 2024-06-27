@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css } from "./ui.js";
+import { AzosElement, html, css, parseRank, parseStatus } from "./ui.js";
 
 /**
  * Provides abstraction for modal dialog boxes
@@ -12,25 +12,27 @@ import { AzosElement, html, css } from "./ui.js";
 export class ModalDialog extends AzosElement {
 
   static styles = css`
-  dialog{
-   background: #f0f0f0;
-   color: #4e4e4e;
-   border: 1px solid #a5a5a5;
-   border-radius: 6px;
-   box-shadow: 6px 8px 18px rgba(0, 0, 0, 0.45);
-   padding: 0px;
+dialog{
+  background: var(--paper);
+  color: var(--ink);
 
-   margin-top: 15vh;
+  border: none;
+  border-radius: var(--r3-brad-win);
+  box-shadow: var(--modal-shadow);
+  padding: 0px;
+  margin-top: 15vh;
+  opacity: 0;
+  transform: scale(0.8, 0.5);
+  overflow: hidden;
+}
 
-   opacity: 0;
-   transform: scale(0.8, 0.5);
- }
-
- dialog[open] {
+dialog[open] {
   opacity: 1;
   transform: scale(1,1);
   transition: 0.12s ease-out;
 }
+
+dialog:focus-visible, dialog:hover{ outline: none; }
 
 @starting-style {
   dialog[open] {
@@ -39,49 +41,69 @@ export class ModalDialog extends AzosElement {
   }
 }
 
- dialog::backdrop{
-   background: rgba(100,100,100,0.45);
-   backdrop-filter: blur(4px);
- }
+dialog::backdrop{
+  background: var(--modal-backdrop-bg);
+  backdrop-filter: var(--modal-backdrop-filter);
+}
 
- .dlg-title{
-   width: 100%;
-   height: auto;
-   background: #b5b5b5;
-   margin: 0px;
-   padding: 8px 8px 8px 12px;
-   font-size: 1.4em;
+.r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-win); }
+.r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-win); }
+.r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-win); }
+.r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-win); }
+.r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-win); }
+.r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-win); }
+
+
+.dlg-title{
+  width: 100%;
+  height: auto;
+  background: var(--modal-title-bg);
+  color: var(--modal-title-fg);
+  margin: 0px;
+  padding: 0.25lh 1ch 0.25lh 1ch;
+  font-size: 1.4em;
+  font-weight: bold;
+  box-sizing: border-box;
+  min-height: 20px;
+  text-align: left;
+}
+
+.dlg-title-close{
+   float: right;
+   font-size: 2em;
    font-weight: bold;
-   color: #505050;
-   box-sizing: border-box;
- }
+   color: var(--modal-title-fg);
+   cursor: pointer;
+   margin-right: 0.5ch;
+}
 
- .dlg-title-close{
-    float: right;
-    font-size: 2em;
-    font-weight: bold;
-    color: #505050;
-    cursor: pointer;
-    margin-top: 1px;
-    margin-right: 8px;
- }
+.dlg-body{
+  margin: 0px;
+  padding: 0.5lh 1ch 0.5lh 1ch;
+  max-height: 72vh;
+  overflow: auto;
+}
 
- .dlg-body{
-   margin: 0px;
-   padding: 8px;
-   max-height: 70vh;
-   overflow: auto;
- }
+.ok      .dlg-title{ background: var(--s-ok-bg);     color: var(--s-ok-fg); }
+.info    .dlg-title{ background: var(--s-info-bg);   color: var(--s-info-fg); }
+.warning .dlg-title{ background: var(--s-warn-bg);   color: var(--s-warn-fg); }
+.alert   .dlg-title{ background: var(--s-alert-bg);  color: var(--s-alert-fg); }
+.error   .dlg-title{ background: var(--s-error-bg);  color: var(--s-error-fg); }
 
- .dlg-footer{
-  padding: 8px;
- }
+dialog.error  { border: 2px solid var(--s-error-bg); }
+dialog.warning{ border: 2px solid var(--s-warn-bg); }
+dialog.alert  { border: 2px solid var(--s-alert-bg); }
+dialog.error  { border: 2px solid var(--s-error-bg); }
 
-   `;//styles
+.ok      .dlg-title-close{  color: var(--s-ok-fg); }
+.info    .dlg-title-close{  color: var(--s-info-fg); }
+.warning .dlg-title-close{  color: var(--s-warn-fg); }
+.alert   .dlg-title-close{  color: var(--s-alert-fg); }
+.error   .dlg-title-close{  color: var(--s-error-fg); }
+`;//styles
 
   static properties = {
     title: {type: String},
-
   };
 
   #shownPromise = null;
@@ -132,8 +154,6 @@ export class ModalDialog extends AzosElement {
     return true;
   }
 
-
-
   /**
    * Override to prompt the user on Close, e.g. if your Dialog is "dirty"/contains unsaved changes
    * you may pop-up a confirmation box. Return "true" to allow close, false to prevent it.
@@ -143,7 +163,7 @@ export class ModalDialog extends AzosElement {
   closeQuery(){ return true; }
 
   #onDialogClose(){
-    this.#modalResult = "Undetermined";
+    this.#modalResult = null;
     this.#resolve(this);
     this.#shownPromise = null;
   }
@@ -155,12 +175,11 @@ export class ModalDialog extends AzosElement {
   #getDlgElm() { return this.shadowRoot.querySelector("dialog"); }
 
   render() {
-    const cls = "";
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     return html`
-<dialog @close="${this.#onDialogClose} class="${cls}">
+<dialog @close="${this.#onDialogClose}" class="${cls}">
   ${this.renderTitle()}
   ${this.renderBody()}
-  ${this.renderFooter()}
 </dialog>`;
   }//render
 
@@ -175,12 +194,6 @@ export class ModalDialog extends AzosElement {
   renderBody(){
     return html`<div class="dlg-body"><slot name="body"></slot></div>`;
   }
-
-  /** Override to render dialog footer bar  */
-  renderFooter(){
-    return html`<div class="dlg-footer"> </div>`;
-  }
-
 
 }//ModalDialog
 
