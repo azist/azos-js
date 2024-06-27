@@ -21,7 +21,8 @@ export class XyzDialog extends ModalDialog{
   }
 
   closeQuery(){
-    return false;//prevent close
+    return confirm("Hook you hard? and close");
+    //return false;//prevent close
   }
 
 }
