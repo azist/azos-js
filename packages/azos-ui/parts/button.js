@@ -1,19 +1,20 @@
 
-import { html, css} from '../ui.js';
+import { html, css, parseRank, parseStatus } from '../ui.js';
 import { AzosPart } from './part.js';
-import {baseStyles} from './styles.js';
+import { baseStyles } from './styles.js';
 
 /** Defines a simple button exposed as `az-button` tag */
 export class Button extends AzosPart{
   static styles = [baseStyles, css`
   button{
-    background: red;
-    border: 1px solid lime;
-    padding: 4px 4px 4px 4px;
-    margin: 1px 1px 1px 1px;
-    transform: rotate(5deg);
-    box-shadow: 1px 1px 3px rgba(100,100,100,0.5);
+    border: 1px solid gray;
+    padding: 0.5lh 1ch 0.5lh 1ch;
+    margin: 0.5lh 0.5ch 0.5lh 0.5ch;
+    min-width: 10ch;
   }
+    button:hover{
+      filter:  brightness(1.15);
+    }
   `];
 
   static properties = {
@@ -24,7 +25,7 @@ export class Button extends AzosPart{
   constructor(){ super(); }
 
   renderPart(){
-    const cls = "none";
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     return html`<button class="${cls}" .disabled=${this.isDisabled}>  ${this.title}</button>`;
   }
 }

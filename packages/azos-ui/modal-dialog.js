@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css, parseRank, parseStatus, noContent } from "./ui.js";
+import { AzosElement, html, css, parseRank, parseStatus } from "./ui.js";
 
 
 function onDocumentKeydown(e){
@@ -207,7 +207,6 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
     window.document.removeEventListener("keydown", onDocumentKeydown);
     super.disconnectedCallback();
   }
-
 
   #getDlgElm(){ return this.shadowRoot.querySelector("dialog"); }
 

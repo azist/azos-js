@@ -95,7 +95,7 @@ export class XyzApplet extends Applet {
   async onClick6(){
     //this.$("btnSave").isHidden = !this.$("btnSave").isHidden;
     //this.$("btnSave").isVisible = !this.$("btnSave").isVisible;
-    console.dir(this);
+    //console.dir(this);
     this.btnSave.isVisible = !this.btnSave.isVisible;
   }
 

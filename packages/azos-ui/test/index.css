@@ -62,7 +62,7 @@ body{
   --s-alert-fg: #804053; --s-alert-bg: #e850e0;
   --s-error-fg: #704050; --s-error-bg: #ff5720;
 
-  /* rank font sizes */
+  /* rank font sizes - MUST be in EM */
   --r1-fs: 1.60em;
   --r2-fs: 1.40em;
   --r3-fs: 1em;
@@ -79,11 +79,11 @@ body{
   --r6-brad-win: 2px;
 
   /* rank border radius for smaller parts */
-  --r1-brad-ctl: 4px;
-  --r2-brad-ctl: 4px;
-  --r3-brad-ctl: 4px;
-  --r4-brad-ctl: 4px;
-  --r5-brad-ctl: 4px;
+  --r1-brad-ctl: 0.5em;
+  --r2-brad-ctl: 0.42em;
+  --r3-brad-ctl: 0.4em;
+  --r4-brad-ctl: 0.3em;
+  --r5-brad-ctl: 0.2em;
   --r6-brad-ctl: 1px;
 
   --modal-title-bg: #b5b5b5;
