@@ -1,5 +1,5 @@
 
-import { html, css} from '../ui.js';
+import { html, css, verbatimHtml} from '../ui.js';
 import { AzosPart } from './part.js';
 import {baseStyles} from './styles.js';
 
@@ -7,6 +7,12 @@ import {baseStyles} from './styles.js';
 export class Button extends AzosPart{
   static styles = [baseStyles, css`
   button{
+    background: red;
+    border: 1px solid lime;
+    padding: 4px 4px 4px 4px;
+    margin: 1px 1px 1px 1px;
+    transform: rotate(5deg);
+    box-shadow: 1px 1px 3px rgba(100,100,100,0.5);
   }
   `];
 
@@ -19,16 +25,9 @@ export class Button extends AzosPart{
       super();
   }
 
-
-  render(){
+  renderPart(){
     const cls = "none";
-    const stl = this.calcStyles();
-
-//https://frontendmasters.com/blog/light-dom-only/
-// we should consider using light dom for parts
-
-
-    return html`<button class="${cls}" style="${stl}">${this.title}</button>`;
+    return html`<button class="${cls}" .disabled=${this.isDisabled}>  ${this.title}</button>`;
   }
 }
 

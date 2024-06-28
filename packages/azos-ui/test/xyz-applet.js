@@ -101,7 +101,11 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
      <button @click="${this.onClick5}"> Did you wash your hands? </button>
-     <az-button title="Click me">
+
+     <az-button title="Click me"> </az-button>
+     <az-button title="Twerk now"> </az-button>
+     <az-button title="Sony for Philips"> </az-button>
+
 
 
      <az-modal-dialog id="dlgTest1" title="My Dialog Box for Users" rank="normal" status="info">
