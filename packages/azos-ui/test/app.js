@@ -77,7 +77,7 @@ app.log.write({type: LOG_TYPE.DEBUG, text: "...arena launched"});
 // Handle UNLOADING/CLOSING of tab/window
 //https://developer.chrome.com/docs/web-platform/page-lifecycle-api
 window.addEventListener("beforeunload", (evt) => {
-  if (app.dirty){
+  if (arena.dirty){
     evt.preventDefault();
     evt.returnValue = true;
     return;

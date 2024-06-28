@@ -8,6 +8,7 @@ import { html } from "../ui.js";
 import { Applet } from "../applet.js";
 import { Command } from "../cmd.js";
 import "../modal-dialog.js";
+import "../parts/button.js";
 import "./xyz-dialog.js";
 
 //import { APPLET_STYLES } from "./applet.css.js";
@@ -100,6 +101,7 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
      <button @click="${this.onClick5}"> Did you wash your hands? </button>
+     <az-button title="Click me">
 
 
      <az-modal-dialog id="dlgTest1" title="My Dialog Box for Users" rank="normal" status="info">
@@ -109,7 +111,7 @@ export class XyzApplet extends Applet {
       </style>
       <div slot="body">
         <h1>This is dialog content</h1>
-        Blah beh blue very long line twhat goes unstopppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
+        Blah beh blue very long line twhat goes unstope
         <button @click="${this.onClick5}"> HOOK HARD!!! </button>
         <h2>This is header two</h2>
         <line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
@@ -124,7 +126,12 @@ export class XyzApplet extends Applet {
       </div>
      </az-modal-dialog>
 
-     <xyz-dialog id="dlgXyz" title="Confirm the TOad" rank="medium"> </xyz-dialog>
+     <xyz-dialog id="dlgXyz" title="Confirm the TOad" rank="medium">
+
+       I want to kiss my own ass if this works!!
+       <button>Call Gurariy Hard!!</button>
+
+     </xyz-dialog>
 
     `;
   }//render
