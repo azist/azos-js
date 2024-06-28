@@ -6,7 +6,7 @@ export class AzosPart extends AzosElement{
   //////static styles=[baseStyles, buttonStyles];
 
   static properties = {
-    /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see reversed accessors below */
+    /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see the reversed accessors below */
     isDisabled:  {type: Boolean, reflect: true},
     isNa:        {type: Boolean, reflect: true},
     isHidden:    {type: Boolean, reflect: true},
@@ -52,5 +52,6 @@ export class AzosPart extends AzosElement{
     return stl ? html`<style>:host{ ${stl}}</style> ${this.renderPart()}` : this.renderPart();
   }
 
+  /** Override to render your specific part */
   renderPart(){ return "***NOTHING***"; }
 }

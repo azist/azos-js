@@ -81,8 +81,8 @@ export class XyzApplet extends Applet {
   }
 
   async onClick4(){
-    const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
-    const dr = (await dlgTest1.show()).modalResult;
+    //const dlgTest1 = this.dlgTest1;// this.shadowRoot.getElementById("dlgTest1");
+    const dr = (await this.dlgTest1.show()).modalResult;
     console.info("Dialog result is: " + dr);
   }
 
@@ -110,13 +110,13 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick5}"> Did you wash your hands? </button>
      <button @click="${this.onClick6}"> btnSave.isVisible </button>
 
-     <az-button id="btnSave"    scope="self" title="Save" status="ok"> </az-button>
+     <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
      <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
      <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
 
 
 
-     <az-modal-dialog id="dlgTest1" title="My Dialog Box for Users" rank="normal" status="info">
+     <az-modal-dialog id="dlgTest1" scope="self" title="My Dialog Box for Users" rank="normal" status="info">
       <style>
         h1{margin: 6px;}
         h2{margin: 4px;}

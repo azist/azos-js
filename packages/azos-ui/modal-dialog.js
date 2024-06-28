@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css, parseRank, parseStatus } from "./ui.js";
+import { AzosElement, html, css, parseRank, parseStatus, noContent } from "./ui.js";
 
 
 function onDocumentKeydown(e){
@@ -212,12 +212,13 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   #getDlgElm() { return this.shadowRoot.querySelector("dialog"); }
 
   render() {
+
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-    return html`
-<dialog  @close="${this.#onDialogClose}" class="${cls}">
+    return /*this.isShown*/ true ? html`
+    <dialog  @close="${this.#onDialogClose}" class="${cls}">
   ${this.renderTitle()}
   ${this.renderBody()}
-</dialog>`;
+</dialog>` : html`<dialog> </dialog>`;
   }//render
 
   /** Override to render title bar  */

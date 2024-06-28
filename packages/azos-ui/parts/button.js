@@ -1,5 +1,5 @@
 
-import { html, css, verbatimHtml} from '../ui.js';
+import { html, css} from '../ui.js';
 import { AzosPart } from './part.js';
 import {baseStyles} from './styles.js';
 
@@ -21,9 +21,7 @@ export class Button extends AzosPart{
   };
 
 
-  constructor(){
-      super();
-  }
+  constructor(){ super(); }
 
   renderPart(){
     const cls = "none";

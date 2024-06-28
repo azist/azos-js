@@ -16,8 +16,17 @@ export class XyzDialog extends ModalDialog{
     this.title = "Did Uncle Toad wash before Supper?"
   }
 
+  btnOkClick(){
+    //console.dir(this.btnOk);
+    //this.btnOk.isAbsent = true;
+    this.btnOk.title += "1";
+  }
+
   renderBody(){
     return html`<div class="dlg-body">Hello, ${this.toad}<br> I am XYZ, did you wash your hands? <br>
+
+      <az-button id="btnOk" scope="this" title="OK!" status="ok" @click="${this.btnOkClick}">
+
       ${verbatimHtml(this.innerHTML)}
     </div>  `;
   }
