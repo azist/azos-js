@@ -17,6 +17,28 @@ export class AzosPart extends AzosElement{
     super();
   }
 
+ /** Programmatic accessor with reversed meaning for `isDisabled` */
+ get isEnabled() { return !this.isDisabled; }
+
+ /** Programmatic accessor with reversed meaning for `isDisabled` */
+ set isEnabled(v) { this.isDisabled = !v; }
+
+  /** Programmatic accessor with reversed meaning for `isNa` */
+  get isApplicable() { return !this.isNa; }
+
+  /** Programmatic accessor with reversed meaning for `isNa` */
+  set isApplicable(v) { this.isNa = !v; }
+
+  /** Programmatic accessor with reversed meaning for `isHidden` */
+  get isVisible() { return !this.isHidden; }
+
+  /** Programmatic accessor with reversed meaning for `isHidden` */
+  set isVisible(v) { this.isHidden = !v; }
+
+
+
+
+
   /** Override to calculate styles based on current state, the dflt implementation emits css for invisible and non-displayed items.
    * The styles are applied to root element being rendered via a `style` which overrides the default classes
    */

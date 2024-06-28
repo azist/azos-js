@@ -92,6 +92,13 @@ export class XyzApplet extends Applet {
     console.info("Small Dialog result is: " + dr);
   }
 
+  async onClick6(){
+    //this.$("btnSave").isHidden = !this.$("btnSave").isHidden;
+    //this.$("btnSave").isVisible = !this.$("btnSave").isVisible;
+    console.dir(this);
+    this.btnSave.isVisible = !this.btnSave.isVisible;
+  }
+
 
 
   render() {
@@ -101,10 +108,11 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
      <button @click="${this.onClick5}"> Did you wash your hands? </button>
+     <button @click="${this.onClick6}"> btnSave.isVisible </button>
 
-     <az-button title="Click me"> </az-button>
-     <az-button title="Twerk now"> </az-button>
-     <az-button title="Sony for Philips"> </az-button>
+     <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
+     <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
+     <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
 
 
 

@@ -89,7 +89,8 @@ export class AzosElement extends LitElement {
 
   static properties = {
     status: { type: String, reflect: true,  converter: { fromAttribute: (v) => parseStatus(v) }  },
-    rank:   { type: Number, reflect: true,  converter: { fromAttribute: (v) => parseRank(v) }  }
+    rank:   { type: Number, reflect: true,  converter: { fromAttribute: (v) => parseRank(v) }  },
+    scope:  { type: String}
   };
 
   #arena = null;
@@ -115,6 +116,24 @@ export class AzosElement extends LitElement {
 
   /** Returns custom HTML element tag name for this element type registered with `customElements` collection */
   get customElementTagName() { return customElements.getName(this.constructor); }
+
+  connectedCallback(){
+    super.connectedCallback();
+    if (this.scope){
+     console.dir(this.parentNode.host);
+     this.parentNode.host[this.id] = this;
+    }
+  }
+
+  disconnectedCallback(){
+    if (this.scope){
+      delete this.parentNode.host[this.id];
+    }
+    super.disconnectedCallback();
+  }
+
+  /** Returns an element by id of the renderRoot */
+  $(id){ return this.shadowRoot.getElementById(id); }
 
   render() { return html`>>AZOS ELEMENT<<`; }
 }
