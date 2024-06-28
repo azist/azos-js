@@ -6,6 +6,7 @@ export class AzosPart extends AzosElement{
   //////static styles=[baseStyles, buttonStyles];
 
   static properties = {
+    /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see reversed accessors below */
     isDisabled:  {type: Boolean, reflect: true},
     isNa:        {type: Boolean, reflect: true},
     isHidden:    {type: Boolean, reflect: true},
@@ -13,15 +14,13 @@ export class AzosPart extends AzosElement{
     isReadonly:  {type: Boolean, reflect: true}
   };
 
-  constructor(){
-    super();
-  }
+  constructor(){ super(); }
 
- /** Programmatic accessor with reversed meaning for `isDisabled` */
- get isEnabled() { return !this.isDisabled; }
+  /** Programmatic accessor with reversed meaning for `isDisabled` */
+  get isEnabled() { return !this.isDisabled; }
 
- /** Programmatic accessor with reversed meaning for `isDisabled` */
- set isEnabled(v) { this.isDisabled = !v; }
+  /** Programmatic accessor with reversed meaning for `isDisabled` */
+  set isEnabled(v) { this.isDisabled = !v; }
 
   /** Programmatic accessor with reversed meaning for `isNa` */
   get isApplicable() { return !this.isNa; }
@@ -34,9 +33,6 @@ export class AzosPart extends AzosElement{
 
   /** Programmatic accessor with reversed meaning for `isHidden` */
   set isVisible(v) { this.isHidden = !v; }
-
-
-
 
 
   /** Override to calculate styles based on current state, the dflt implementation emits css for invisible and non-displayed items.
