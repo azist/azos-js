@@ -117,18 +117,24 @@ export class AzosElement extends LitElement {
   /** Returns custom HTML element tag name for this element type registered with `customElements` collection */
   get customElementTagName() { return customElements.getName(this.constructor); }
 
+  /** When `scope` property is set, returns an element which is pointed at by id, unless scope is set to either of: `self`|`this`|`host` in which
+   *  case the hosting parent is used. Null if scoping element is not found */
+  getScopeContext(){
+    const scope = this.scope;
+    if (!scope) return null;
+    if (isOneOf(scope, ["this", "host", "self"])) return this.parentNode.host;
+    return document.getElementById(scope);//or null
+  }
+
   connectedCallback(){
     super.connectedCallback();
-    if (this.scope){
-     console.dir(this.parentNode.host);
-     this.parentNode.host[this.id] = this;
-    }
+    const ctx = this.getScopeContext();
+    if (ctx) ctx[this.id] = this;
   }
 
   disconnectedCallback(){
-    if (this.scope){
-      delete this.parentNode.host[this.id];
-    }
+    const ctx = this.getScopeContext();
+    if (ctx) delete ctx[this.id];
     super.disconnectedCallback();
   }
 

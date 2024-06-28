@@ -110,7 +110,7 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick5}"> Did you wash your hands? </button>
      <button @click="${this.onClick6}"> btnSave.isVisible </button>
 
-     <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
+     <az-button id="btnSave"    scope="self" title="Save" status="ok"> </az-button>
      <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
      <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
 
