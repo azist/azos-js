@@ -209,30 +209,18 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   }
 
 
-  #getDlgElm() { return this.shadowRoot.querySelector("dialog"); }
+  #getDlgElm(){ return this.shadowRoot.querySelector("dialog"); }
 
-  render() {
-
+  render(){
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-    return /*this.isShown*/ true ? html`
-    <dialog  @close="${this.#onDialogClose}" class="${cls}">
-  ${this.renderTitle()}
-  ${this.renderBody()}
-</dialog>` : html`<dialog> </dialog>`;
+    return html`<dialog  @close="${this.#onDialogClose}" class="${cls}"> ${this.renderTitle()} ${this.renderBody()}</dialog>`;
   }//render
 
   /** Override to render title bar  */
-  renderTitle(){
-    return html`
-    <span class="dlg-title-close" @click="${this.#onTitleXClick}">×</span>
-    <div class="dlg-title">${this.title} </div>`;
-  }
+  renderTitle(){return html`<span class="dlg-title-close" @click="${this.#onTitleXClick}">×</span> <div class="dlg-title">${this.title} </div>`; }
 
   /** Override to render dialog body section */
-  renderBody(){
-    return html`<div class="dlg-body"><slot name="body"></slot></div>`;
-  }
-
+  renderBody(){return html`<div class="dlg-body"><slot name="body"></slot></div>`; }
 }//ModalDialog
 
 window.customElements.define("az-modal-dialog", ModalDialog);
