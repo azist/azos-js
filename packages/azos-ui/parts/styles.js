@@ -58,3 +58,251 @@ button:disabled{
 }
 
 `;
+
+/*STG edits start here*/
+export const checkStyles=css`
+  div{
+    display:block;
+    margin:10px;
+  }
+  label{
+    cursor:pointer;
+    display:grid;
+    grid-template-columns: 1em auto;
+    align-items:center;
+  }
+  label:has(.check){ gap:.75em; }
+  label:has(.check):hover,label:has(.check):focus,.check:hover,.check:focus{
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
+  }
+  .check{
+    cursor:pointer;
+    margin:0;
+    appearance:none;
+    background-color:var(--s-default-bg-ctl);
+    border:.1em solid var(--s-default-fg-ctl);
+    display:grid;
+    place-content:center;
+  }
+  .r1 label .check{
+    width:var(--r1-fs);
+    height:var(--r1-fs);
+  }
+  .r2 label .check{
+    width:var(--r2-fs);
+    height:var(--r2-fs);
+  }
+  .r3 label .check{
+    width:var(--r3-fs);
+    height:var(--r3-fs);
+  }
+  .r4 label .check{
+    width:var(--r4-fs);
+    height:var(--r4-fs);
+  }
+  .r5 label .check{
+    width:var(--r5-fs);
+    height:var(--r5-fs);
+  }
+  .r6 label .check{
+    width:var(--r6-fs);
+    height:var(--r6-fs);
+  }
+  .check::before{
+    content:"\u{2713}";
+    text-align:center;
+    position:relative;
+    transform:scale(0);
+    transform-origin:center center;
+    transition:.1s transform ease-in-out;
+  }
+  .check:checked::before{ transform:scale(1); }
+  .r1 label .check::before{ font-size:var(--r1-fs); }
+  .r2 label .check::before{ font-size:var(--r2-fs); }
+  .r3 label .check::before{ font-size:var(--r3-fs); }
+  .r4 label .check::before{ font-size:var(--r4-fs); }
+  .r5 label .check::before{ font-size:var(--r5-fs); }
+  .r6 label .check::before{ font-size:var(--r6-fs); }
+`;
+
+export const switchStyles=css`
+    label:has(.switch){ align-items:center; }
+    .r1 label:has(.switch){ gap:calc(var(--r1-fs)*2); }
+    .r2 label:has(.switch){ gap:calc(var(--r2-fs)*2); }
+    .r3 label:has(.switch){ gap:calc(var(--r3-fs)*2); }
+    .r4 label:has(.switch){ gap:calc(var(--r4-fs)*2); }
+    .r5 label:has(.switch){ gap:calc(var(--r5-fs)*2); }
+    .r6 label:has(.switch){ gap:calc(var(--r6-fs)*2); }
+    .switch{
+      cursor:pointer;
+      appearance:none;
+      position:relative;
+      color:inherit;
+      font-size:inherit;
+      box-sizing:content-box;
+      border:1px solid var(--s-default-fg);
+      border-radius:1em;
+      vertical-align:middle;
+      background: var(--s-default-bg);
+      transition:.2 all ease;
+    }
+  .r1 label .switch{
+    width:calc(var(--r1-fs)*2);
+    height:var(--r1-fs);
+  }
+  .r2 label .switch{
+    width:calc(var(--r2-fs)*2);
+    height:var(--r2-fs);
+  }
+  .r3 label .switch{
+    width:calc(var(--r3-fs)*2);
+    height:var(--r3-fs);
+  }
+  .r4 label .switch{
+    width:calc(var(--r4-fs)*2);
+    height:var(--r4-fs);
+  }
+  .r5 label .switch{
+    width:calc(var(--r5-fs)*2);
+    height:var(--r5-fs);
+  }
+  .r6 label .switch{
+    width:calc(var(--r6-fs)*2);
+    height:var(--r6-fs);
+  }
+  label:has(.switch):hover,label:has(.switch):focus,.switch:hover,.switch:focus{
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
+  }
+  .switch:checked,
+  .error label .switch:checked,.ok label .switch:checked,.warn label .switch:checked,.info label .switch:checked,.alert label .switch:checked{ background: var(--s-default-bg); }
+  .switch::before{
+    content:"";
+    position:absolute;
+    box-sizing:border-box;
+    border:none;
+    border-radius:50%;
+    background-color: var(--s-default-fg-ctl);
+    transition:.2s all ease;
+    top:50%;
+    left:0;
+    transform:translate(0,-50%);
+    margin:0 .15em;
+  }
+  .switch:checked::before{
+    background-color:currentColor;
+    left:calc(50% - .15em);
+  }
+  .r1 label .switch::before{
+    width:calc(var(--r1-fs)*.85);
+    height:calc(var(--r1-fs)*.85);
+  }
+  .r2 label .switch::before{
+    width:calc(var(--r2-fs)*.85);
+    height:calc(var(--r2-fs)*.85);
+  }
+  .r3 label .switch::before{
+    width:calc(var(--r3-fs)*.85);
+    height:calc(var(--r3-fs)*.85);
+  }
+  .r4 label .switch::before{
+    width:calc(var(--r4-fs)*.85);
+    height:calc(var(--r4-fs)*.85);
+  }
+  .r5 label .switch::before{
+    width:calc(var(--r5-fs)*.85);
+    height:calc(var(--r5-fs)*.85);
+  }
+  .r6 label .switch::before{
+    width:calc(var(--r6-fs)*.85);
+    height:calc(var(--r6-fs)*.85);
+  }
+`;
+
+export const radioStyles=css`
+    div{
+        display:block;
+        margin:10px;
+    }
+    label{
+        cursor:pointer;
+        display:grid;
+        grid-template-columns: 1em auto;
+        gap:.75em;
+    }
+    label:has(.radio):hover,.radio:hover,label:has(.radio):focus,.radio:focus{
+      outline: var(--focus-ctl-outline);
+      box-shadow: var(--focus-ctl-box-shadow);
+    }
+    .radio{
+        cursor:pointer;
+        appearance:none;
+        margin:0;
+        background-color:var(--s-default-bg);
+        border-radius:50%;
+        border:.1em solid var(--s-default-fg);
+        display:grid;
+        place-content:center;
+    }
+    .radio::before{
+        content:"";
+        position:relative;
+        top:0;
+        left:0;
+        border-radius:50%;
+        background:var(--s-default-fg);
+        transform:scale(0);
+        transform-origin:center center;
+        transition:.1s transform ease-in-out;
+    }
+    .radio:checked::before{ transform:scale(1); }
+  .r1 label .radio{ 
+    width:var(--r1-fs);
+    height:var(--r1-fs);
+  }
+  .r2 label .radio{
+    width:var(--r2-fs);
+    height:var(--r2-fs);
+  }
+  .r3 label .radio{
+    width:var(--r3-fs);
+    height:var(--r3-fs);
+  }
+  .r4 label .radio{
+    width:var(--r4-fs);
+    height:var(--r4-fs);
+  }
+  .r5 label .radio{
+    width:var(--r5-fs);
+    height:var(--r5-fs);
+  }
+  .r6 label .radio{
+    width:var(--r6-fs);
+    height:var(--r6-fs);
+  }
+  .r1 label .radio::before{
+    width:calc(var(--r1-fs)*.5);
+    height:calc(var(--r1-fs)*.5);
+  }
+  .r2 label .radio::before{
+    width:calc(var(--r2-fs)*.5);
+    height:calc(var(--r2-fs)*.5);
+  }
+  .r3 label .radio::before{
+    width:calc(var(--r3-fs)*.5);
+    height:calc(var(--r3-fs)*.5);
+  }
+  .r4 label .radio::before{
+    width:calc(var(--r4-fs)*.5);
+    height:calc(var(--r4-fs)*.5);
+  }
+  .r5 label .radio::before{
+    width:calc(var(--r5-fs)*.5);
+    height:calc(var(--r5-fs)*.5);
+  }
+  .r6 label .radio::before{
+    width:calc(var(--r6-fs)*.5);
+    height:calc(var(--r6-fs)*.5);
+  }
+`;

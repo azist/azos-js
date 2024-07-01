@@ -1,6 +1,8 @@
 import { AzosElement, html, css } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
+import "../parts/checkbox.js";
+import "../parts/radio-group.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement{
@@ -75,9 +77,15 @@ export class Showcase extends AzosElement{
   </div>
 
 <h2>Radios</h2>
-..tbd
+    <az-radio-group id="baseGroup" title="Group of radios (choose only 1)">
+      <az-radio-option>Option 1</az-radio-option>
+      <az-radio-option>Second Choice</az-radio-option>
+      <az-radio-option>Choice number 3</az-radio-option>
+    </az-radio-group>
 <h2>Checkboxes and switches</h2>
-..tbd
+    <az-checkbox id="normalCheckbox" title="This is a checkbox"></az-checkbox>
+    <az-checkbox id="switch" title="Is this a switch?" type="switch"></az-checkbox>
+    <az-checkbox id="errorCheck" title="Error! Error!" status="error" rank="1"></az-checkbox>
 <h2>Text boxes</h2>
 ..tbd
 <h2>Selects/Combos</h2>
