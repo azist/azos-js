@@ -30,18 +30,14 @@ button{
     margin: 0.5lh 0.5ch 0.5lh 0.5ch;
     min-width: 10ch;
     transition: 0.2s;
+
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   button:focus{
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
-  }
-
-  button:disabled{
-    color: #aaaaaa;
-    background: #cecece;
-    font-weight: 100;
-    border: none;
   }
 
   button:hover{
@@ -51,5 +47,15 @@ button{
   button:active{
     transform: translateY(1.2px);
   }
+
+  button:disabled{
+    color: #b4b4b4;
+    border: 1px solid #c0c0c0;
+    background: var(--paper);
+    font-weight: 100;
+    filter: none;
+    transform: none;
+  }
+
 
 `;
