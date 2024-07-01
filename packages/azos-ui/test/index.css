@@ -131,9 +131,14 @@ body{
   --ctl-button-fweight: bold;
   --ctl-button-fstyle: normal;
 
-  --ctl-codebox-bg: #424242;
-  --ctl-codebox-fg: #e4e4e4;
-  --ctl-codebox-ffamily: 'Lucida Console', 'Courier New', monospace;
+  --vcl-codebox-bg: #424242;
+  --vcl-codebox-fg: #e4e4e4;
+  --vcl-codebox-ffamily: 'Lucida Console', 'Courier New', monospace;
+  --vcl-codebox-hi-key: #949494;
+  --vcl-codebox-hi-string: #20d4ff;
+  --vcl-codebox-hi-number: #70f010;
+  --vcl-codebox-hi-boolean: #f0d090;
+  --vcl-codebox-hi-null: #f48080;
 
   }
 

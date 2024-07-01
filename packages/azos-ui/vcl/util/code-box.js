@@ -6,20 +6,20 @@ export class CodeBox extends AzosElement{
 
   static styles = css`
   .codebox{
-    font-family: var(--ctl-codebox-ffamily);
+    font-family: var(--vcl-codebox-ffamily);
     font-size: 1em;
     white-space: pre;
     overflow: auto;
-    color: var(--ctl-codebox-fg);
-    background: var(--ctl-codebox-bg);
+    color: var(--vcl-codebox-fg);
+    background: var(--vcl-codebox-bg);
     padding: 0.25lh 1ch;
   }
 
-  .code-key     { color: #949494; }
-  .code-string  { color: #20d4ff; }
-  .code-number  { color: #70f010; }
-  .code-boolean { color: #f0d090; }
-  .code-null    { color: #f48080; }
+  .code-key     { color: var(--vcl-codebox-hi-key); }
+  .code-string  { color: var(--vcl-codebox-hi-string); }
+  .code-number  { color: var(--vcl-codebox-hi-number); }
+  .code-boolean { color: var(--vcl-codebox-hi-boolean); }
+  .code-null    { color: var(--vcl-codebox-hi-null); }
   `;
 
   static properties = {
