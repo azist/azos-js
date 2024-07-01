@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html as lit_html, css as lit_css, svg as lit_svg, render as lit_render, LitElement } from "lit";
+import { html as lit_html, css as lit_css, svg as lit_svg, render as lit_render, LitElement, nothing as lit_nothing } from "lit";
 import { unsafeHTML as lit_unsafe_html } from "lit/directives/unsafe-html";
 import { ref as lit_ref, createRef as lit_create_ref } from "lit/directives/ref";
 import { isOneOf } from "../azos/strings";
@@ -18,6 +18,9 @@ export const html = lit_html;
 
 /** Svg template processing pragma */
 export const svg = lit_svg;
+
+/** Renders no content = nothing */
+export const noContent = lit_nothing;
 
 /** Adds ability to include direct HTML snippets like so: html` This is ${verbatimHtml(raw)}` */
 export const verbatimHtml = lit_unsafe_html;
@@ -89,7 +92,8 @@ export class AzosElement extends LitElement {
 
   static properties = {
     status: { type: String, reflect: true,  converter: { fromAttribute: (v) => parseStatus(v) }  },
-    rank:   { type: Number, reflect: true,  converter: { fromAttribute: (v) => parseRank(v) }  }
+    rank:   { type: Number, reflect: true,  converter: { fromAttribute: (v) => parseRank(v) }  },
+    scope:  { type: String}
   };
 
   #arena = null;
@@ -115,6 +119,38 @@ export class AzosElement extends LitElement {
 
   /** Returns custom HTML element tag name for this element type registered with `customElements` collection */
   get customElementTagName() { return customElements.getName(this.constructor); }
+
+  /** When `scope` property is set, returns an element which is pointed at by id, unless scope is set to either of: `self`|`this`|`host` in which
+   *  case the hosting parent is used. Null if scoping element is not found */
+  getScopeContext(){
+    const scope = this.scope;
+    if (!scope) return null;
+    if (isOneOf(scope, ["win", "window"])) return window;
+    if (isOneOf(scope, ["this", "host", "self"])) {
+      let result = this;
+      while(result){
+        if (result.host) return result.host;
+        result = result.parentNode;
+      }
+      return null;
+    }
+    return document.getElementById(scope);//or null
+  }
+
+  connectedCallback(){
+    super.connectedCallback();
+    const ctx = this.getScopeContext();
+    if (ctx && this.id) ctx[this.id] = this;
+  }
+
+  disconnectedCallback(){
+    const ctx = this.getScopeContext();
+    if (ctx && this.id) delete ctx[this.id];
+    super.disconnectedCallback();
+  }
+
+  /** Returns an element by id of the renderRoot */
+  $(id){ return this.renderRoot.getElementById(id); }
 
   render() { return html`>>AZOS ELEMENT<<`; }
 }

@@ -8,7 +8,9 @@ import { html } from "../ui.js";
 import { Applet } from "../applet.js";
 import { Command } from "../cmd.js";
 import "../modal-dialog.js";
+import "../parts/button.js";
 import "./xyz-dialog.js";
+import "./showcase.js";
 
 //import { APPLET_STYLES } from "./applet.css.js";
 //import * as DEFAULT_HTML from "./applet.htm.js";
@@ -80,8 +82,8 @@ export class XyzApplet extends Applet {
   }
 
   async onClick4(){
-    const dlgTest1 = this.shadowRoot.getElementById("dlgTest1");
-    const dr = (await dlgTest1.show()).modalResult;
+    //const dlgTest1 = this.dlgTest1;// this.shadowRoot.getElementById("dlgTest1");
+    const dr = (await this.dlgTest1.show()).modalResult;
     console.info("Dialog result is: " + dr);
   }
 
@@ -89,6 +91,13 @@ export class XyzApplet extends Applet {
     const dlgXyz = this.shadowRoot.getElementById("dlgXyz");
     const dr = (await dlgXyz.show()).modalResult;
     console.info("Small Dialog result is: " + dr);
+  }
+
+  async onClick6(){
+    //this.$("btnSave").isHidden = !this.$("btnSave").isHidden;
+    //this.$("btnSave").isVisible = !this.$("btnSave").isVisible;
+    //console.dir(this);
+    this.btnSave.isVisible = !this.btnSave.isVisible;
   }
 
 
@@ -100,31 +109,35 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick3}"> Close This Applet </button>
      <button @click="${this.onClick4}"> Open Dialog Box </button>
      <button @click="${this.onClick5}"> Did you wash your hands? </button>
+     <button @click="${this.onClick6}"> btnSave.isVisible </button>
+
+     <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
+     <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
+     <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
 
 
-     <az-modal-dialog id="dlgTest1" title="My Dialog Box for Users" rank="normal" status="info">
+
+     <az-modal-dialog id="dlgTest1" scope="self" title="My Dialog Box for Users" rank="normal" status="info">
       <style>
         h1{margin: 6px;}
         h2{margin: 4px;}
       </style>
       <div slot="body">
-        <h1>This is dialog content</h1>
-        Blah beh blue very long line twhat goes unstopppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
+        <az-test-showcase></az-test-showcase>
+        Long line
         <button @click="${this.onClick5}"> HOOK HARD!!! </button>
         <h2>This is header two</h2>
-        <line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
-        line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>line one<br> line two<br> three hsiufhiushiufh<br>
       </div>
      </az-modal-dialog>
 
-     <xyz-dialog id="dlgXyz" title="Confirm the TOad" rank="medium"> </xyz-dialog>
+     <xyz-dialog id="dlgXyz" title="Confirm the TOad" rank="medium">
+
+       I want to kiss my own ass if this works!!
+       <button>Call Gurariy Hard!!</button>
+
+     </xyz-dialog>
+
+     <az-test-showcase></az-test-showcase>
 
     `;
   }//render

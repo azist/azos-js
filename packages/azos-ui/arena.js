@@ -13,6 +13,7 @@ import { Command } from "./cmd.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
+import { ModalDialog } from "./modal-dialog.js";
 
 /**
  * Defines a root UI element which displays the whole Azos app.
@@ -88,6 +89,15 @@ export class Arena extends AzosElement {
 
   /** Returns currently open {@link Applet} instance, or null if nothing is open yet, or applet was closed */
   get applet(){ return this.#applet; }
+
+  /** Returns true when the arena state is considered "unsaved" and this should prevent browser window close
+   * The default implementation returns true when there are any dialogs open or applet is activ e and it is `dirty`
+  */
+  get dirty(){
+    if (ModalDialog.topmost !== null) return true;//there are open pending modals
+    if (this.#applet !== null && this.#applet.dirty) return true;//applet has unsaved data
+    return false;
+  }
 
   firstUpdated(){
     this.updateToolbar();

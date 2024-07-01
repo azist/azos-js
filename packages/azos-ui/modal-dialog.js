@@ -6,6 +6,19 @@
 
 import { AzosElement, html, css, parseRank, parseStatus } from "./ui.js";
 
+
+function onDocumentKeydown(e){
+  if (e.key === "Escape"){
+    const dlg = ModalDialog.topmost;
+    if (!dlg) return;
+    //console.log("====KEYDOWN ESCAPE SUPRESSED in: ", dlg.title);
+    dlg.close();
+    e.preventDefault();
+  }
+}
+
+
+
 /**
  * Provides abstraction for modal dialog boxes
  */
@@ -106,6 +119,18 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
     title: {type: String},
   };
 
+  static #instances = [];
+
+  /** Returns a stack of open dialogs, the top one being the last one in the array */
+  static get instances(){ return [...ModalDialog.#instances]; }
+
+  /** Returns a top-most global dialog instance open in this browser window or null if nothing is open */
+  static get topmost(){
+    const stack = ModalDialog.#instances;
+    if (stack.length < 1) return null;
+    return stack[stack.length - 1];
+  }
+
   #shownPromise = null;
   #resolve = null;
   #modalResult = null;
@@ -138,6 +163,7 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
     const dlg = this.#getDlgElm();
     dlg.showModal();
     this.#shownPromise = new Promise((resolve) => this.#resolve = resolve);
+    ModalDialog.#instances.push(this);
     return this.#shownPromise;
   }
 
@@ -158,43 +184,42 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
    * Override to prompt the user on Close, e.g. if your Dialog is "dirty"/contains unsaved changes
    * you may pop-up a confirmation box. Return "true" to allow close, false to prevent it.
    * The method is called by the close/flow. By default returns true to always allow close
-   * @returns {Promise<boolean> | boolean} Returns "true" to allow close, false to prevent it
-   */
+   * @returns {Promise<boolean> | boolean} Returns "true" (or Promise(true)) to allow close, false to prevent it
+  */
   closeQuery(){ return true; }
 
   #onDialogClose(){
     this.#modalResult = null;
+    ModalDialog.#instances.pop();
     this.#resolve(this);
     this.#shownPromise = null;
   }
 
-  #onTitleXClick(){
-    this.close();
+  #onTitleXClick(){ this.close(); }
+
+
+  connectedCallback(){
+    super.connectedCallback();
+    window.document.addEventListener("keydown", onDocumentKeydown);
   }
 
-  #getDlgElm() { return this.shadowRoot.querySelector("dialog"); }
+  disconnectedCallback(){
+    window.document.removeEventListener("keydown", onDocumentKeydown);
+    super.disconnectedCallback();
+  }
 
-  render() {
+  #getDlgElm(){ return this.shadowRoot.querySelector("dialog"); }
+
+  render(){
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-    return html`
-<dialog @close="${this.#onDialogClose}" class="${cls}">
-  ${this.renderTitle()}
-  ${this.renderBody()}
-</dialog>`;
+    return html`<dialog  @close="${this.#onDialogClose}" class="${cls}"> ${this.renderTitle()} ${this.renderBody()}</dialog>`;
   }//render
 
   /** Override to render title bar  */
-  renderTitle(){
-    return html`
-    <span class="dlg-title-close" @click="${this.#onTitleXClick}">×</span>
-    <div class="dlg-title">${this.title} </div>`;
-  }
+  renderTitle(){return html`<span class="dlg-title-close" @click="${this.#onTitleXClick}">×</span> <div class="dlg-title">${this.title} </div>`; }
 
   /** Override to render dialog body section */
-  renderBody(){
-    return html`<div class="dlg-body"><slot name="body"></slot></div>`;
-  }
-
+  renderBody(){return html`<div class="dlg-body"><slot name="body"></slot></div>`; }
 }//ModalDialog
 
 window.customElements.define("az-modal-dialog", ModalDialog);
