@@ -52,7 +52,7 @@ body{
   --arn-strip-max-width: 20vw;
 
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
-  /* ink is primary text color omn paper */
+  /* ink is primary text color on paper */
   --paper: #f4f4f4; --ink: #484848;
 
   /* statuses */
