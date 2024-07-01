@@ -1,4 +1,4 @@
-import {AzosElement, html} from '../../../../azos-js/packages/azos-ui/ui.js';
+import {AzosElement, html} from '../ui.js';
 import {baseStyles,buttonStyles} from './styles.js';
 
 export class AzButton extends AzosElement{
