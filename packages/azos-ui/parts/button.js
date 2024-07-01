@@ -1,34 +1,22 @@
 
-import { html, css} from '../ui.js';
+import { html, parseRank, parseStatus } from '../ui.js';
 import { AzosPart } from './part.js';
-import {baseStyles} from './styles.js';
+import { baseStyles, buttonStyles } from './styles.js';
 
 /** Defines a simple button exposed as `az-button` tag */
 export class Button extends AzosPart{
-  static styles = [baseStyles, css`
-  button{
-  }
-  `];
+  static styles = [baseStyles, buttonStyles];
 
   static properties = {
     title:   {type: String}
   };
 
 
-  constructor(){
-      super();
-  }
+  constructor(){ super(); }
 
-
-  render(){
-    const cls = "none";
-    const stl = this.calcStyles();
-
-//https://frontendmasters.com/blog/light-dom-only/
-// we should consider using light dom for parts
-
-
-    return html`<button class="${cls}" style="${stl}">${this.title}</button>`;
+  renderPart(){
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+    return html`<button class="${cls}" .disabled=${this.isDisabled}>  ${this.title}</button>`;
   }
 }
 

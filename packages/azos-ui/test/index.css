@@ -53,16 +53,48 @@ body{
 
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
   /* ink is primary text color omn paper */
-  --paper: #f0f0f0; --ink: #454545;
+  --paper: #f4f4f4; --ink: #484848;
 
   /* statuses */
-  --s-ok-fg:    #236510; --s-ok-bg:    #75f487;
-  --s-info-fg:  #2562b0; --s-info-bg:  #40baf5;
-  --s-warn-fg:  #4e4e40; --s-warn-bg:  #e4e450;
-  --s-alert-fg: #804053; --s-alert-bg: #e850e0;
-  --s-error-fg: #704050; --s-error-bg: #ff5720;
+  --s-default-fg:    var(--ink);
+  --s-default-bg:    var(--paper);
+  --s-default-fg-ctl: var(--ink);
+  --s-default-bg-ctl: linear-gradient(110deg, #e4e4e4 0%, #cecece 45%);
+  --s-default-bor-ctl: 1px solid #c0c0c0;
+  --s-default-fw-ctl: bold;
 
-  /* rank font sizes */
+  --s-ok-fg:    #546454;
+  --s-ok-bg:    #75f487;
+  --s-ok-fg-ctl: #546454;
+  --s-ok-bg-ctl: linear-gradient(170deg, #f0fff0 0%, #a0ffa0 45%);
+  --s-ok-bor-ctl: 1px solid #a4f4a4;
+
+  --s-info-fg:  #5a5a5a;
+  --s-info-bg:  #a0d8ff;
+  --s-info-fg-ctl:  #5a5a5a;
+  --s-info-bg-ctl: linear-gradient(170deg, #f0f0ff 0%, #a0d8ff 45%);
+  --s-info-bor-ctl: 1px solid #c5d8ff;
+
+  --s-warn-fg:  #6a6a40;
+  --s-warn-bg:  #f8f850;
+  --s-warn-fg-ctl:  #6a6a40;
+  --s-warn-bg-ctl: linear-gradient(170deg, #ffffe0 0%, #fff8a0 45%);
+  --s-warn-bor-ctl: 1px solid #e2e2a0;
+
+  --s-alert-fg: #e8daff;
+  --s-alert-bg: #e040f0;
+  --s-alert-fg-ctl: #6a406a;
+  --s-alert-bg-ctl: linear-gradient(170deg, #ffe0ff 0%, #ffa0ff 45%);
+  --s-alert-bor-ctl: 1px solid #e8c5f4;
+
+  --s-error-fg: #ffe0e0;
+  --s-error-bg: #ff4720;
+  --s-error-fg-ctl: #655040;
+  --s-error-bg-ctl: linear-gradient(170deg, #ffe0ff 0%, #ffa0a0 45%);
+  --s-error-bor-ctl: 1px solid #f2c5a0;
+
+
+  /* rank font sizes - MUST be in EM */
   --r1-fs: 1.60em;
   --r2-fs: 1.40em;
   --r3-fs: 1em;
@@ -79,11 +111,11 @@ body{
   --r6-brad-win: 2px;
 
   /* rank border radius for smaller parts */
-  --r1-brad-ctl: 4px;
-  --r2-brad-ctl: 4px;
-  --r3-brad-ctl: 4px;
-  --r4-brad-ctl: 4px;
-  --r5-brad-ctl: 4px;
+  --r1-brad-ctl: 0.5em;
+  --r2-brad-ctl: 0.42em;
+  --r3-brad-ctl: 0.4em;
+  --r4-brad-ctl: 0.3em;
+  --r5-brad-ctl: 0.2em;
   --r6-brad-ctl: 1px;
 
   --modal-title-bg: #b5b5b5;
@@ -91,7 +123,14 @@ body{
   --modal-shadow: 6px 8px 18px rgba(0, 0, 0, 0.45);
   --modal-backdrop-bg: rgba(100, 100, 100, 0.45);
   --modal-backdrop-filter:  blur(4px);
-}
+
+  /* focus */
+  --focus-ctl-outline: 3px solid rgba(10, 128, 255, 0.55);
+  --focus-ctl-box-shadow: none; /*0px 0px 8px rgba(10, 128, 255, .9);*/
+
+  --ctl-button-fweight: bold;
+  --ctl-button-fstyle: normal;
+  }
 
 
 
