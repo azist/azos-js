@@ -1,13 +1,19 @@
 import { isOneOf } from "azos/strings";
-import { AzosElement, css, html, verbatimHtml, escHtml } from "../../ui";
+import { AzosElement, css, html, verbatimHtml, escHtml, parseRank, parseStatus } from "../../ui";
 
 /** Provides code display functionality with optional syntax highlighting */
 export class CodeBox extends AzosElement{
 
   static styles = css`
+  .r1 { font-size: var(--r1-fs); }
+  .r2 { font-size: var(--r2-fs); }
+  .r3 { font-size: var(--r3-fs); }
+  .r4 { font-size: var(--r4-fs); }
+  .r5 { font-size: var(--r5-fs); }
+  .r6 { font-size: var(--r6-fs); }
+
   .codebox{
     font-family: var(--vcl-codebox-ffamily);
-    font-size: 1em;
     white-space: pre;
     overflow: auto;
     color: var(--vcl-codebox-fg);
@@ -53,11 +59,13 @@ export class CodeBox extends AzosElement{
 
   render(){
     const src = this.source ? this.source : this.innerHTML;
+    let cls = `codebox ${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+
     if (isOneOf(this.highlight, ["js", "json"])){
       const hs = this.hiJson(src);
-      return html` <div class="codebox"> ${verbatimHtml(hs)} </div>`;
+      return html` <div class="${cls}" .disabled=${this.isDisabled}> ${verbatimHtml(hs)} </div>`;
     }
-   return html`<div class="codebox"> ${src} </div>`;
+   return html`<div class="${cls}" .disabled=${this.isDisabled}> ${src} </div>`;
   }
 
 }
