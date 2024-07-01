@@ -34,6 +34,14 @@ export const domCreateRef = lit_create_ref;
 /** Helper method which renders template content into a specified root element e.g.: `renderInto(htmlResult, document.body)`*/
 export const renderInto = lit_render;
 
+
+const HTML_TAGS = {'&': '&amp;', '<': '&lt;', '>': '&gt;' };
+function rtg(tag) { return HTML_TAGS[tag] || tag; }
+
+/** Escapes HTML tags like: & < > */
+export function escHtml(str) { return str === undefined || str == null || !(str.replace) ? "" : str.replace(/[&<>]/g, rtg); }
+
+
 /** Ranks define the "importance"/size of the element. 1 is the biggest/highest rank aka 'RANK.HUGE', 6 is the smallest aka 'RANK.TINY' */
 export const RANK = Object.freeze({
   UNDEFINED:   0,

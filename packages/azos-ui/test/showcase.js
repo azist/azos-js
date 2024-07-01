@@ -1,6 +1,7 @@
 import { AzosElement, html, css } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
+import "../vcl/util/code-box.js"
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement{
@@ -44,6 +45,16 @@ export class Showcase extends AzosElement{
 
   </div>
 </az-modal-dialog>
+
+<h2> VCL / Codebox</h2>
+
+<az-code-box highlight="json" source="">
+//this is my json object
+{
+  "a": 1, "b": 2, "c": true,
+  d: ["string1", "string2"]
+}
+</az-code-box>
 
 <h2>Buttons</h2>
   Regular buttons of default status:
