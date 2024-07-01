@@ -3,6 +3,7 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/checkbox.js";
 import "../parts/radio-group.js";
+import "../vcl/util/code-box.js"
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement{
@@ -22,6 +23,8 @@ export class Showcase extends AzosElement{
 
   onDlg1Open(){ this.dlg1.show(); }
   onDlg1Close(){ this.dlg1.close(); }
+  onDlg2Open(){ this.dlg2.show(); }
+  onDlg2Close(){ this.dlg2.close(); }
 
   render(){
     return html`
@@ -29,8 +32,13 @@ export class Showcase extends AzosElement{
 <h1>Showcase of Azos Controls</h1>
 
 <h2>Modal dialog</h2>
+<p>
+Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
+</p>
 
 <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
+<az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
+
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
   <div slot="body">
@@ -43,9 +51,32 @@ export class Showcase extends AzosElement{
      sometimes on purpose (injected humour and the like). Yes
     </p>
     <az-button @click="${this.onDlg1Close}" title="Close" style="float: right;"></az-button>
-
   </div>
 </az-modal-dialog>
+
+
+<az-modal-dialog id="dlg2" scope="self" title="Code Box Snippet" status="info">
+  <div slot="body">
+    <az-code-box highlight="js" source="">
+//this is my json object
+{
+  "a": 1, "b": 2, "c": true,
+  d: ["string1", null, true, false, {"name": "string2", "salary": 100.67}]
+}
+</az-code-box> <br>
+    <az-button @click="${this.onDlg2Close}" title="Close" style="float: right;"></az-button>
+  </div>
+</az-modal-dialog>
+
+<h2> VCL / Codebox</h2>
+
+<az-code-box highlight="js" source="">
+//this is my json object
+{
+  "a": 1, "b": 2, "c": true,
+  d: ["string1", null, true, false, {"name": "string2", "salary": 100.67}]
+}
+</az-code-box>
 
 <h2>Buttons</h2>
   Regular buttons of default status:
