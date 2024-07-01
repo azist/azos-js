@@ -48,11 +48,11 @@ export class Showcase extends AzosElement{
 
 <h2> VCL / Codebox</h2>
 
-<az-code-box highlight="json" source="">
+<az-code-box highlight="js" source="">
 //this is my json object
 {
   "a": 1, "b": 2, "c": true,
-  d: ["string1", "string2"]
+  d: ["string1", null, true, false, {"name": "string2", "salary": 100.67}]
 }
 </az-code-box>
 
