@@ -19,37 +19,42 @@ export const baseStyles = css`
 
 export const buttonStyles = css`
 button{
-    font-weight: var(--ctl-button-fweight);
-    font-style: var(--ctl-button-fstyle);
-    border: var(--s-default-bor-ctl);
-    color:  var(--s-default-fg-ctl);
-    background: var(--s-default-bg-ctl);
+  font-weight: var(--ctl-button-fweight);
+  font-style: var(--ctl-button-fstyle);
+  border: var(--s-default-bor-ctl);
+  color:  var(--s-default-fg-ctl);
+  background: var(--s-default-bg-ctl);
 
-   /* box-shadow: 0px 0px 2px rgba(25, 25, 25, .25); */
-    padding: 0.5lh 1ch 0.5lh 1ch;
-    margin: 0.5lh 0.5ch 0.5lh 0.5ch;
-    min-width: 10ch;
-    transition: 0.2s;
-  }
+  /* box-shadow: 0px 0px 2px rgba(25, 25, 25, .25); */
+  padding: 0.5lh 1ch 0.5lh 1ch;
+  margin: 0.5lh 0.5ch 0.5lh 0.5ch;
+  min-width: 10ch;
+  transition: 0.2s;
 
-  button:focus{
-    outline: var(--focus-ctl-outline);
-    box-shadow: var(--focus-ctl-box-shadow);
-  }
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-  button:disabled{
-    color: #aaaaaa;
-    background: #cecece;
-    font-weight: 100;
-    border: none;
-  }
+button:focus{
+  outline: var(--focus-ctl-outline);
+  box-shadow: var(--focus-ctl-box-shadow);
+}
 
-  button:hover{
-    filter:  brightness(1.08);
-  }
+button:hover{
+  filter:  brightness(1.08);
+}
 
-  button:active{
-    transform: translateY(1.2px);
-  }
+button:active{
+  transform: translateY(1.2px);
+}
+
+button:disabled{
+  color: #b4b4b4;
+  border: 1px solid #c0c0c0;
+  background: var(--paper);
+  font-weight: 100;
+  filter: none;
+  transform: none;
+}
 
 `;

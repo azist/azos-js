@@ -1,4 +1,5 @@
 import { AzosElement, html, css } from "../ui";
+import "../modal-dialog.js";
 import "../parts/button.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
@@ -17,10 +18,32 @@ export class Showcase extends AzosElement{
   `;
 
 
+  onDlg1Open(){ this.dlg1.show(); }
+  onDlg1Close(){ this.dlg1.close(); }
+
   render(){
     return html`
 
 <h1>Showcase of Azos Controls</h1>
+
+<h2>Modal dialog</h2>
+
+<az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
+
+<az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
+  <div slot="body">
+    <style>p{width: 60vw; min-width: 300px; text-align: left;}</style>
+    <p>
+     It is a long established fact that <strong>a reader will be distracted</strong> by the readable content of a page when looking at its layout.
+     The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here',
+     making it look like readable English. Many desktop publishing packages and web page editors now use <strong>Lorem Ipsum</strong> as their default model text,
+     and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident,
+     sometimes on purpose (injected humour and the like). Yes
+    </p>
+    <az-button @click="${this.onDlg1Close}" title="Close" style="float: right;"></az-button>
+
+  </div>
+</az-modal-dialog>
 
 <h2>Buttons</h2>
   Regular buttons of default status:
