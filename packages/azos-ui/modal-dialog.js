@@ -161,6 +161,7 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   show(){
     if (this.#shownPromise !== null) return this.#shownPromise;
     const dlg = this.#getDlgElm();
+    this.#modalResult = null;
     dlg.showModal();
     this.#shownPromise = new Promise((resolve) => this.#resolve = resolve);
     ModalDialog.#instances.push(this);
@@ -189,7 +190,6 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   closeQuery(){ return true; }
 
   #onDialogClose(){
-    this.#modalResult = null;
     ModalDialog.#instances.pop();
     this.#resolve(this);
     this.#shownPromise = null;
