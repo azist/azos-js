@@ -16,8 +16,7 @@ export class Showcase extends AzosElement{
     margin: 0.5em 0em 1em 0em;
   }
 
-  .strip > az-button{
-  }
+  p{ font-size: 1rem; }
   `;
 
 
@@ -108,15 +107,28 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   </div>
 
 <h2>Radios</h2>
+<p>A long-used form of placeholder text in design mockups and more, the standard use of dummy text has come under fire in recent years as web design grows (and the internet makes the spread of opinions much more efficient).</p>
+  <div class="strip-h">
     <az-radio-group id="baseGroup" title="Group of radios (choose only 1)">
       <az-radio-option>Option 1</az-radio-option>
       <az-radio-option>Second Choice</az-radio-option>
       <az-radio-option>Choice number 3</az-radio-option>
     </az-radio-group>
+    <az-radio-group id="disabledGroup" title="Group of radios with disabled choices" isDisabled>
+      <az-radio-option>isDisabled cannot be applied to an az-radio-option</az-radio-option>
+      <az-radio-option>Second Choice</az-radio-option>
+      <az-radio-option>Choice number 3</az-radio-option>
+    </az-radio-group>
+  </div>
 <h2>Checkboxes and switches</h2>
+  <div class="strip-h">
     <az-checkbox id="normalCheckbox" title="This is a checkbox"></az-checkbox>
+    <az-checkbox id="disabledCheckbox" title="Disabled checkbox" isdisabled></az-checkbox>
+  </div>
+  <div class="strip-h">
     <az-checkbox id="switch" title="Is this a switch?" type="switch"></az-checkbox>
-    <az-checkbox id="errorCheck" title="Error! Error!" status="error" rank="1"></az-checkbox>
+    <az-checkbox id="disabledSwitch" title="This switch is disabled" type="switch" isdisabled></az-checkbox>
+  </div>
 <h2>Text boxes</h2>
 ..tbd
 <h2>Selects/Combos</h2>

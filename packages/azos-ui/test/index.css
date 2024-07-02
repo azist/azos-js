@@ -1,18 +1,18 @@
-body{
+body {
   color: #202020;
   background: #c0c0c0;
   font-family: Roboto, Tahoma, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   margin: 0px;
   padding: 0px;
 }
 
-.theme-azos{
+.theme-azos {
   --arn-min-width: 360px;
   --arn-hdr-height: 44px;
   --arn-hdr-color: #d0d0d0;
   --arn-hdr-bg-color: #404040;
-  --arn-hdr-shadow: 50px 0px 12px rgba(0,0,0, 0.35);
+  --arn-hdr-shadow: 50px 0px 12px rgba(0, 0, 0, 0.35);
 
   --arn-title-font-size: 1.6rem;
   --arn-title-padding: 6px 2px 0px 8px;
@@ -26,7 +26,7 @@ body{
   --arn-mnu-bg: linear-gradient(#f09020, #ffaf4f);
   --arn-mnu-opacity: 1.0;
   --arn-mnu-font-size: 1.5em;
-  --arn-mnu-shadow: 4px 0px 24px rgba(0,0,0,0.25);
+  --arn-mnu-shadow: 4px 0px 24px rgba(0, 0, 0, 0.25);
   --arn-mnu-close-font-size: 1.8em;
   --arn-mnu-close-top: 6px;
   --arn-mnu-close-left: 6px;
@@ -46,38 +46,39 @@ body{
   --arn-strip-svg-stroke: #e0e0e0;
   --arn-strip-svg-stroke-width: 0.8px;
   --arn-strip-margin: 2px 1px 2px 2px;
-  --arn-strip-padding:  4px 2px 2px 2px;
+  --arn-strip-padding: 4px 2px 2px 2px;
   --arn-strip-font-size: 0.75em;
   --arn-strip-min-width: 45px;
   --arn-strip-max-width: 20vw;
 
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
   /* ink is primary text color on paper */
-  --paper: #f4f4f4; --ink: #484848;
+  --paper: #f4f4f4;
+  --ink: #484848;
 
   /* statuses */
-  --s-default-fg:    var(--ink);
-  --s-default-bg:    var(--paper);
+  --s-default-fg: var(--ink);
+  --s-default-bg: var(--paper);
   --s-default-fg-ctl: var(--ink);
   --s-default-bg-ctl: linear-gradient(110deg, #e4e4e4 0%, #cecece 45%);
   --s-default-bor-ctl: 1px solid #c0c0c0;
   --s-default-fw-ctl: bold;
 
-  --s-ok-fg:    #546454;
-  --s-ok-bg:    #75f487;
+  --s-ok-fg: #546454;
+  --s-ok-bg: #75f487;
   --s-ok-fg-ctl: #546454;
   --s-ok-bg-ctl: linear-gradient(170deg, #f0fff0 0%, #a0ffa0 45%);
   --s-ok-bor-ctl: 1px solid #a4f4a4;
 
-  --s-info-fg:  #5a5a5a;
-  --s-info-bg:  #a0d8ff;
-  --s-info-fg-ctl:  #5a5a5a;
+  --s-info-fg: #5a5a5a;
+  --s-info-bg: #a0d8ff;
+  --s-info-fg-ctl: #5a5a5a;
   --s-info-bg-ctl: linear-gradient(170deg, #f0f0ff 0%, #a0d8ff 45%);
   --s-info-bor-ctl: 1px solid #c5d8ff;
 
-  --s-warn-fg:  #6a6a40;
-  --s-warn-bg:  #f8f850;
-  --s-warn-fg-ctl:  #6a6a40;
+  --s-warn-fg: #6a6a40;
+  --s-warn-bg: #f8f850;
+  --s-warn-fg-ctl: #6a6a40;
   --s-warn-bg-ctl: linear-gradient(170deg, #ffffe0 0%, #fff8a0 45%);
   --s-warn-bor-ctl: 1px solid #e2e2a0;
 
@@ -122,11 +123,12 @@ body{
   --modal-title-fg: #505050;
   --modal-shadow: 6px 8px 18px rgba(0, 0, 0, 0.45);
   --modal-backdrop-bg: rgba(100, 100, 100, 0.45);
-  --modal-backdrop-filter:  blur(4px);
+  --modal-backdrop-filter: blur(4px);
 
   /* focus */
   --focus-ctl-outline: 3px solid rgba(10, 128, 255, 0.55);
-  --focus-ctl-box-shadow: none; /*0px 0px 8px rgba(10, 128, 255, .9);*/
+  --focus-ctl-box-shadow: none;
+  /*0px 0px 8px rgba(10, 128, 255, .9);*/
 
   --ctl-button-fweight: bold;
   --ctl-button-fstyle: normal;
@@ -140,15 +142,28 @@ body{
   --vcl-codebox-hi-boolean: #a0209a;
   --vcl-codebox-hi-null: #e75e45;
 
-  }
+}
 
 
 
 
 /* stock theme modifiers: apply them to body class e.g. <body class="theme-azos --bw">.....*/
-.--bw    { filter: grayscale(100%); }
-.--green { filter: hue-rotate(50deg); }
-.--sky   { filter: hue-rotate(165deg); }
-.--dp    { filter: hue-rotate(240deg); }
-.--invert{ filter: grayscale(100%) invert(1); }
+.--bw {
+  filter: grayscale(100%);
+}
 
+.--green {
+  filter: hue-rotate(50deg);
+}
+
+.--sky {
+  filter: hue-rotate(165deg);
+}
+
+.--dp {
+  filter: hue-rotate(240deg);
+}
+
+.--invert {
+  filter: grayscale(100%) invert(1);
+}
