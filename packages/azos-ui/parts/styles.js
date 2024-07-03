@@ -14,6 +14,18 @@ export const baseStyles = css`
 .warning { background: var(--s-warn-bg-ctl);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
 .alert   { background: var(--s-alert-bg-ctl);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
 .error   { background: var(--s-error-bg-ctl);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+
+.okBg      { background: var(--s-ok-bg-ctl); }
+.infoBg    { background: var(--s-info-bg-ctl); }
+.warningBg { background: var(--s-warn-bg-ctl); }
+.alertBg   { background: var(--s-alert-bg-ctl); }
+.errorBg   { background: var(--s-error-bg-ctl); }
+
+.okTxt      { color: var(--s-ok-fg-ctl); }
+.infoTxt    { color: var(--s-info-fg-ctl); }
+.warningTxt { color: var(--s-warn-fg-ctl); }
+.alertTxt   { color: var(--s-alert-fg-ctl); }
+.errorTxt   { color: var(--s-error-fg-ctl); }
 `;
 
 export const buttonStyles = css`
@@ -73,11 +85,11 @@ export const checkStyles=css`
     cursor:pointer;
     appearance:none;
     background-color:var(--s-default-bg-ctl);
-    border:.15em solid var(--s-default-fg-ctl);
+    border:.2em solid var(--s-default-fg-ctl);
     display:grid;
     place-content:center;
-    width:1em;
-    height:1em;
+    width:1.7em;
+    height:1.7em;
     border-radius:.25em;
   }
   .check:focus{
@@ -91,10 +103,15 @@ export const checkStyles=css`
     transform:scale(0);
     transform-origin:center center;
     transition:.1s transform ease-in-out;
-    font-size:.75em;
+    font-size:1.5em;
     font-weight:bolder;
     color:var(--s-default-fg-ctl);
   }
+  .okBg[class~="check"]::before { color: var(--s-ok-fg-ctl); }
+  .infoBg[class~="check"]::before { color: var(--s-info-fg-ctl); }
+  .warningBg[class~="check"]::before { color: var(--s-warn-fg-ctl); }
+  .alertBg[class~="check"]::before { color: var(--s-alert-fg-ctl); }
+  .errorBg[class~="check"]::before { color: var(--s-error-fg-ctl); }
   .check:checked::before{ transform:scale(1); }
   .check:disabled{
     border: 1px solid #c0c0c0;
@@ -113,13 +130,13 @@ export const switchStyles=css`
     color:inherit;
     font-size:inherit;
     box-sizing:content-box;
-    border:1px solid var(--s-default-fg);
-    border-radius:1em;
+    border:.2em solid var(--s-default-fg);
+    border-radius:1.7em;
     vertical-align:middle;
-    background: var(--s-default-bg);
+    background-color: var(--s-default-bg);
     transition:.2 all ease;
-    width:2em;
-    height:1em;
+    width:3.4em;
+    height:1.7em;
   }
   .switch:focus{
     outline: var(--focus-ctl-outline);
@@ -135,15 +152,17 @@ export const switchStyles=css`
     transition:.2s all ease;
     top:50%;
     left:0;
-    width:.85em;
-    height:.85em;
+    width:1.25em;
+    height:1.25em;
     transform:translate(0,-50%);
     margin:0 .15em;
   }
-  .switch:checked::before{
-    background-color:currentColor;
-    left:calc(50% - .15em);
-  }
+  .okBg[class~="switch"]::before { background-color: var(--s-ok-fg-ctl); }
+  .infoBg[class~="switch"]::before { background-color: var(--s-info-fg-ctl); }
+  .warningBg[class~="switch"]::before { background-color: var(--s-warn-fg-ctl); }
+  .alertBg[class~="switch"]::before { background-color: var(--s-alert-fg-ctl); }
+  .errorBg[class~="switch"]::before { background-color: var(--s-error-fg-ctl); }
+  .switch:checked::before{ left:50%; }
   .switch:disabled{
     border: 1px solid #c0c0c0;
   }
@@ -159,8 +178,14 @@ export const radioStyles=css`
   label{
     cursor:pointer;
     display:flex;
-    align-items:center;
+    align-items:baseline;
     gap:0 1em;
+  }
+  label:has(.switch){
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:0 .5em;
   }
   .radio:focus{
     outline: var(--focus-ctl-outline);
@@ -170,28 +195,30 @@ export const radioStyles=css`
     cursor:pointer;
     appearance:none;
     background-color:var(--s-default-bg);
-    border:.15em solid var(--s-default-fg-ctl);
+    border:.2em solid var(--s-default-fg-ctl);
     border-radius:50%;
     display:grid;
     place-content:center;
-    width:1.68em;
-    min-width:1.68em;
-    max-width:1.68em;
-    height:1.68em;
+    width:1.7em;
+    min-width:1.7em;
+    max-width:1.7em;
+    height:1.7em;
   }
   .radio::before{
     content:"";
-    position:relative;
-    top:0;
-    left:0;
-    width:.9em;
-    height:.9em;
+    width:.85em;
+    height:.85em;
     border-radius:50%;
     background:var(--s-default-fg);
     transform:scale(0);
     transform-origin:center center;
     transition:.1s transform ease-in-out;
   }
+  .okBg[class~="radio"]::before { background-color: var(--s-ok-fg-ctl); }
+  .infoBg[class~="radio"]::before { background-color: var(--s-info-fg-ctl); }
+  .warningBg[class~="radio"]::before { background-color: var(--s-warn-fg-ctl); }
+  .alertBg[class~="radio"]::before { background-color: var(--s-alert-fg-ctl); }
+  .errorBg[class~="radio"]::before { background-color: var(--s-error-fg-ctl); }
   .radio:checked::before{ transform:scale(1); }
   .radio:disabled{
     border: 1px solid #c0c0c0;

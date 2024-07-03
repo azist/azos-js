@@ -14,12 +14,14 @@ export class Checkbox extends AzosPart{
         (!this.getAttribute('type')||this.getAttribute('type')=='check') ? this.check='check' : this.check='switch';
     }
     renderPart(){
-        let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)} ${this.isDisabled ? 'disabled' : ''}`;
+        let rank=`${parseRank(this.rank, true)}`;
+        let status=`${parseStatus(this.status, true)}`;
+        let disableClass = `${this.isDisabled ? 'disabled' : ''}`;
         return html`
-            <div class="${cls}">
+            <div class="${rank} ${disableClass}">
                 <label for="${this.id}">
-                    <input type="checkbox" class="${this.check} ${parseRank(this.rank, true)}" id="${this.id}" name="${this.id}" .disabled=${this.isDisabled}>
-                    <span>${this.title}</span>
+                    <input type="checkbox" class="${this.check} ${rank} ${status}Bg" id="${this.id}" name="${this.id}" .disabled=${this.isDisabled}>
+                    <span class="${status}Txt">${this.title}</span>
                 </label>
             </div>
         `;

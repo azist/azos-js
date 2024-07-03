@@ -120,6 +120,11 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-radio-option>Choice number 3</az-radio-option>
     </az-radio-group>
   </div>
+  <az-radio-group id="switchGroup" title="Group of switch radios" type="switch">
+    <az-radio-option>This should be a good switch</az-radio-option>
+    <az-radio-option>Second Choice</az-radio-option>
+    <az-radio-option>Choice number 3</az-radio-option>
+  </az-radio-group>
 <h2>Checkboxes and switches</h2>
   <div class="strip-h">
     <az-checkbox id="normalCheckbox" title="This is a checkbox"></az-checkbox>

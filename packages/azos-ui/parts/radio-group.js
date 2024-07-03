@@ -13,7 +13,9 @@ export class RadioGroup extends AzosPart{
         (!this.getAttribute('type')||this.getAttribute('type')=='radio') ? this.check='radio' : this.check='switch';
     }
     render(){
-        let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)} ${this.isDisabled ? 'disabled' : ''}`;
+        let rank=`${parseRank(this.rank, true)}`;
+        let status=`${parseStatus(this.status, true)}`;
+        let disableClass = `${this.isDisabled ? 'disabled' : ''}`;
         const options=[];
         for(let i=0;i<this.getElementsByTagName('az-radio-option').length;i++){
             options.push(this.getElementsByTagName('az-radio-option')[i].innerText);
@@ -21,14 +23,14 @@ export class RadioGroup extends AzosPart{
         const optionList=html`${options.map((option,i)=>html`
             <div>
                 <label>
-                    <input type="radio" class="${this.check} ${parseRank(this.rank, true)}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
-                    <span>${option}</span>
+                    <input type="radio" class="${this.check} ${rank} ${status}Bg" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
+                    <span class="${status}Txt">${option}</span>
                 </label>
             </div>
         `)}`;
 
         return html`
-            <div class="${cls}">
+            <div class="${rank} ${disableClass}">
                 <p>${this.title}</p>
                 ${optionList}
             </div>
