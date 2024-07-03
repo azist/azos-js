@@ -15,6 +15,17 @@ export const baseStyles = css`
 .alert   { background: var(--s-alert-bg-ctl);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
 .error   { background: var(--s-error-bg-ctl);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
 
+.okBg      { background: var(--s-ok-bg-ctl); }
+.infoBg    { background: var(--s-info-bg-ctl); }
+.warningBg { background: var(--s-warn-bg-ctl); }
+.alertBg   { background: var(--s-alert-bg-ctl); }
+.errorBg   { background: var(--s-error-bg-ctl); }
+
+.okTxt      { color: var(--s-ok-fg-ctl); }
+.infoTxt    { color: var(--s-info-fg-ctl); }
+.warningTxt { color: var(--s-warn-fg-ctl); }
+.alertTxt   { color: var(--s-alert-fg-ctl); }
+.errorTxt   { color: var(--s-error-fg-ctl); }
 `;
 
 export const buttonStyles = css`
@@ -59,7 +70,6 @@ button:disabled{
 
 `;
 
-/*STG edits start here*/
 export const checkStyles=css`
   div{
     display:block;
@@ -67,47 +77,24 @@ export const checkStyles=css`
   }
   label{
     cursor:pointer;
-    display:grid;
-    grid-template-columns: 1em auto;
+    display:flex;
     align-items:center;
-  }
-  label:has(.check){ gap:.75em; }
-  label:has(.check):hover,label:has(.check):focus,.check:hover,.check:focus{
-    outline: var(--focus-ctl-outline);
-    box-shadow: var(--focus-ctl-box-shadow);
+    gap:0 .5em;
   }
   .check{
     cursor:pointer;
-    margin:0;
     appearance:none;
     background-color:var(--s-default-bg-ctl);
-    border:.1em solid var(--s-default-fg-ctl);
+    border:.2em solid var(--s-default-fg-ctl);
     display:grid;
     place-content:center;
+    width:1.7em;
+    height:1.7em;
+    border-radius:.25em;
   }
-  .r1 label .check{
-    width:var(--r1-fs);
-    height:var(--r1-fs);
-  }
-  .r2 label .check{
-    width:var(--r2-fs);
-    height:var(--r2-fs);
-  }
-  .r3 label .check{
-    width:var(--r3-fs);
-    height:var(--r3-fs);
-  }
-  .r4 label .check{
-    width:var(--r4-fs);
-    height:var(--r4-fs);
-  }
-  .r5 label .check{
-    width:var(--r5-fs);
-    height:var(--r5-fs);
-  }
-  .r6 label .check{
-    width:var(--r6-fs);
-    height:var(--r6-fs);
+  .check:focus{
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
   }
   .check::before{
     content:"\u{2713}";
@@ -116,67 +103,45 @@ export const checkStyles=css`
     transform:scale(0);
     transform-origin:center center;
     transition:.1s transform ease-in-out;
+    font-size:1.5em;
+    font-weight:bolder;
+    color:var(--s-default-fg-ctl);
   }
+  .okBg[class~="check"]::before { color: var(--s-ok-fg-ctl); }
+  .infoBg[class~="check"]::before { color: var(--s-info-fg-ctl); }
+  .warningBg[class~="check"]::before { color: var(--s-warn-fg-ctl); }
+  .alertBg[class~="check"]::before { color: var(--s-alert-fg-ctl); }
+  .errorBg[class~="check"]::before { color: var(--s-error-fg-ctl); }
   .check:checked::before{ transform:scale(1); }
-  .r1 label .check::before{ font-size:var(--r1-fs); }
-  .r2 label .check::before{ font-size:var(--r2-fs); }
-  .r3 label .check::before{ font-size:var(--r3-fs); }
-  .r4 label .check::before{ font-size:var(--r4-fs); }
-  .r5 label .check::before{ font-size:var(--r5-fs); }
-  .r6 label .check::before{ font-size:var(--r6-fs); }
+  .check:disabled{
+    border: 1px solid #c0c0c0;
+  }
+  .disabled{
+    color: #b4b4b4;
+    font-weight: 100;
+  }
 `;
 
 export const switchStyles=css`
-    label:has(.switch){ align-items:center; }
-    .r1 label:has(.switch){ gap:calc(var(--r1-fs)*2); }
-    .r2 label:has(.switch){ gap:calc(var(--r2-fs)*2); }
-    .r3 label:has(.switch){ gap:calc(var(--r3-fs)*2); }
-    .r4 label:has(.switch){ gap:calc(var(--r4-fs)*2); }
-    .r5 label:has(.switch){ gap:calc(var(--r5-fs)*2); }
-    .r6 label:has(.switch){ gap:calc(var(--r6-fs)*2); }
-    .switch{
-      cursor:pointer;
-      appearance:none;
-      position:relative;
-      color:inherit;
-      font-size:inherit;
-      box-sizing:content-box;
-      border:1px solid var(--s-default-fg);
-      border-radius:1em;
-      vertical-align:middle;
-      background: var(--s-default-bg);
-      transition:.2 all ease;
-    }
-  .r1 label .switch{
-    width:calc(var(--r1-fs)*2);
-    height:var(--r1-fs);
+  .switch{
+    cursor:pointer;
+    appearance:none;
+    position:relative;
+    color:inherit;
+    font-size:inherit;
+    box-sizing:content-box;
+    border:.2em solid var(--s-default-fg);
+    border-radius:1.7em;
+    vertical-align:middle;
+    background-color: var(--s-default-bg);
+    transition:.2 all ease;
+    width:3.4em;
+    height:1.7em;
   }
-  .r2 label .switch{
-    width:calc(var(--r2-fs)*2);
-    height:var(--r2-fs);
-  }
-  .r3 label .switch{
-    width:calc(var(--r3-fs)*2);
-    height:var(--r3-fs);
-  }
-  .r4 label .switch{
-    width:calc(var(--r4-fs)*2);
-    height:var(--r4-fs);
-  }
-  .r5 label .switch{
-    width:calc(var(--r5-fs)*2);
-    height:var(--r5-fs);
-  }
-  .r6 label .switch{
-    width:calc(var(--r6-fs)*2);
-    height:var(--r6-fs);
-  }
-  label:has(.switch):hover,label:has(.switch):focus,.switch:hover,.switch:focus{
+  .switch:focus{
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
-  .switch:checked,
-  .error label .switch:checked,.ok label .switch:checked,.warn label .switch:checked,.info label .switch:checked,.alert label .switch:checked{ background: var(--s-default-bg); }
   .switch::before{
     content:"";
     position:absolute;
@@ -187,122 +152,80 @@ export const switchStyles=css`
     transition:.2s all ease;
     top:50%;
     left:0;
+    width:1.25em;
+    height:1.25em;
     transform:translate(0,-50%);
     margin:0 .15em;
   }
-  .switch:checked::before{
-    background-color:currentColor;
-    left:calc(50% - .15em);
+  .okBg[class~="switch"]::before { background-color: var(--s-ok-fg-ctl); }
+  .infoBg[class~="switch"]::before { background-color: var(--s-info-fg-ctl); }
+  .warningBg[class~="switch"]::before { background-color: var(--s-warn-fg-ctl); }
+  .alertBg[class~="switch"]::before { background-color: var(--s-alert-fg-ctl); }
+  .errorBg[class~="switch"]::before { background-color: var(--s-error-fg-ctl); }
+  .switch:checked::before{ left:50%; }
+  .switch:disabled{
+    border: 1px solid #c0c0c0;
   }
-  .r1 label .switch::before{
-    width:calc(var(--r1-fs)*.85);
-    height:calc(var(--r1-fs)*.85);
-  }
-  .r2 label .switch::before{
-    width:calc(var(--r2-fs)*.85);
-    height:calc(var(--r2-fs)*.85);
-  }
-  .r3 label .switch::before{
-    width:calc(var(--r3-fs)*.85);
-    height:calc(var(--r3-fs)*.85);
-  }
-  .r4 label .switch::before{
-    width:calc(var(--r4-fs)*.85);
-    height:calc(var(--r4-fs)*.85);
-  }
-  .r5 label .switch::before{
-    width:calc(var(--r5-fs)*.85);
-    height:calc(var(--r5-fs)*.85);
-  }
-  .r6 label .switch::before{
-    width:calc(var(--r6-fs)*.85);
-    height:calc(var(--r6-fs)*.85);
-  }
+  .switch:disabled::before{background:#c0c0c0;}
 `;
 
 export const radioStyles=css`
-    div{
-        display:block;
-        margin:10px;
-    }
-    label{
-        cursor:pointer;
-        display:grid;
-        grid-template-columns: 1em auto;
-        gap:.75em;
-    }
-    label:has(.radio):hover,.radio:hover,label:has(.radio):focus,.radio:focus{
-      outline: var(--focus-ctl-outline);
-      box-shadow: var(--focus-ctl-box-shadow);
-    }
-    .radio{
-        cursor:pointer;
-        appearance:none;
-        margin:0;
-        background-color:var(--s-default-bg);
-        border-radius:50%;
-        border:.1em solid var(--s-default-fg);
-        display:grid;
-        place-content:center;
-    }
-    .radio::before{
-        content:"";
-        position:relative;
-        top:0;
-        left:0;
-        border-radius:50%;
-        background:var(--s-default-fg);
-        transform:scale(0);
-        transform-origin:center center;
-        transition:.1s transform ease-in-out;
-    }
-    .radio:checked::before{ transform:scale(1); }
-  .r1 label .radio{ 
-    width:var(--r1-fs);
-    height:var(--r1-fs);
+  div{
+    display:block;
+    margin:10px;
+    text-align:left;
   }
-  .r2 label .radio{
-    width:var(--r2-fs);
-    height:var(--r2-fs);
+  label{
+    cursor:pointer;
+    display:flex;
+    align-items:baseline;
+    gap:0 1em;
   }
-  .r3 label .radio{
-    width:var(--r3-fs);
-    height:var(--r3-fs);
+  label:has(.switch){
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:0 .5em;
   }
-  .r4 label .radio{
-    width:var(--r4-fs);
-    height:var(--r4-fs);
+  .radio:focus{
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
   }
-  .r5 label .radio{
-    width:var(--r5-fs);
-    height:var(--r5-fs);
+  .radio{
+    cursor:pointer;
+    appearance:none;
+    background-color:var(--s-default-bg);
+    border:.2em solid var(--s-default-fg-ctl);
+    border-radius:50%;
+    display:grid;
+    place-content:center;
+    width:1.7em;
+    min-width:1.7em;
+    max-width:1.7em;
+    height:1.7em;
   }
-  .r6 label .radio{
-    width:var(--r6-fs);
-    height:var(--r6-fs);
+  .radio::before{
+    content:"";
+    width:.85em;
+    height:.85em;
+    border-radius:50%;
+    background:var(--s-default-fg);
+    transform:scale(0);
+    transform-origin:center center;
+    transition:.1s transform ease-in-out;
   }
-  .r1 label .radio::before{
-    width:calc(var(--r1-fs)*.5);
-    height:calc(var(--r1-fs)*.5);
+  .okBg[class~="radio"]::before { background-color: var(--s-ok-fg-ctl); }
+  .infoBg[class~="radio"]::before { background-color: var(--s-info-fg-ctl); }
+  .warningBg[class~="radio"]::before { background-color: var(--s-warn-fg-ctl); }
+  .alertBg[class~="radio"]::before { background-color: var(--s-alert-fg-ctl); }
+  .errorBg[class~="radio"]::before { background-color: var(--s-error-fg-ctl); }
+  .radio:checked::before{ transform:scale(1); }
+  .radio:disabled{
+    border: 1px solid #c0c0c0;
   }
-  .r2 label .radio::before{
-    width:calc(var(--r2-fs)*.5);
-    height:calc(var(--r2-fs)*.5);
-  }
-  .r3 label .radio::before{
-    width:calc(var(--r3-fs)*.5);
-    height:calc(var(--r3-fs)*.5);
-  }
-  .r4 label .radio::before{
-    width:calc(var(--r4-fs)*.5);
-    height:calc(var(--r4-fs)*.5);
-  }
-  .r5 label .radio::before{
-    width:calc(var(--r5-fs)*.5);
-    height:calc(var(--r5-fs)*.5);
-  }
-  .r6 label .radio::before{
-    width:calc(var(--r6-fs)*.5);
-    height:calc(var(--r6-fs)*.5);
+  .radio:disabled::before{background:#c0c0c0;}
+  .disabled{
+    color: #b4b4b4;
+    font-weight: 100;
   }
 `;
