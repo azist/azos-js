@@ -7,6 +7,7 @@ import { ConLog } from "azos/ilog";
 import { dispose } from "azos/types";
 import { Module } from "azos/modules";
 import { XyzApplet } from "./xyz-applet.js";
+import { ChronicleClient } from "azos/sysvc/chron/chron-client.js";
 
 
 class MyLogic extends Module{
@@ -53,6 +54,7 @@ const cfgApp = {
   name: "$(id)",
   description: "Test '$(name)' application",
   modules: [
+    {name: "chronClient", type: ChronicleClient},
     {name: "log", type: ConLog},
     {name: "logic", type: MyLogic},
     {

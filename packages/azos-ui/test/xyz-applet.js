@@ -7,10 +7,12 @@
 import { html } from "../ui.js";
 import { Applet } from "../applet.js";
 import { Command } from "../cmd.js";
+import { ChronicleApplet } from "../vcl/chron/chron-applet.js";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
 import "./showcase.js";
+
 
 //import { APPLET_STYLES } from "./applet.css.js";
 //import * as DEFAULT_HTML from "./applet.htm.js";
@@ -56,7 +58,7 @@ export class XyzApplet extends Applet {
   }
 
   async closeQuery(){
-    return await confirm("We will close the form. Yes/no?")
+    return true;//await confirm("We will close the form. Yes/no?")
   }
 
 
@@ -100,6 +102,10 @@ export class XyzApplet extends Applet {
     this.btnSave.isVisible = !this.btnSave.isVisible;
   }
 
+  async btnChronicleClick(){
+    this.arena.appletOpen(ChronicleApplet);
+  }
+
 
 
   render() {
@@ -111,6 +117,7 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick5}"> Did you wash your hands? </button>
      <button @click="${this.onClick6}"> btnSave.isVisible </button>
 
+     <az-button id="btnChronicle" scope="this" title="Chronicle" @click="${this.btnChronicleClick}"> </az-button>
      <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
      <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
      <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
