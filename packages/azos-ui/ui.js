@@ -7,7 +7,8 @@
 import { html as lit_html, css as lit_css, svg as lit_svg, render as lit_render, LitElement, nothing as lit_nothing } from "lit";
 import { unsafeHTML as lit_unsafe_html } from "lit/directives/unsafe-html";
 import { ref as lit_ref, createRef as lit_create_ref } from "lit/directives/ref";
-import { isOneOf } from "../azos/strings";
+import { isOneOf } from "azos/strings.js";
+import { link as linkModule } from "azos/linker.js";
 
 
 /** CSS template processing pragma: css`p{color: blue}` */
@@ -159,6 +160,12 @@ export class AzosElement extends LitElement {
 
   /** Returns an element by id of the renderRoot */
   $(id){ return this.renderRoot.getElementById(id); }
+
+  /** An alias for `link(app.moduleLinker, map, nsplit)` */
+  link(map, nsplit){
+    linkModule(this.arena.app.moduleLinker, map, nsplit);
+  }
+
 
   render() { return html`>>AZOS ELEMENT<<`; }
 }

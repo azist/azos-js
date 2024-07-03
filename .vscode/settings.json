@@ -16,6 +16,7 @@
         "linq",
         "nsplit",
         "rasterizer",
+        "sysvc",
         "tapplet",
         "thandler",
         "tparent",
