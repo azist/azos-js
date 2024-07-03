@@ -218,8 +218,13 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   /** Override to render title bar  */
   renderTitle(){return html`<span class="dlg-title-close" @click="${this.#onTitleXClick}">×</span> <div class="dlg-title">${this.title} </div>`; }
 
-  /** Override to render dialog body section */
-  renderBody(){return html`<div class="dlg-body"><slot name="body"></slot></div>`; }
+  /** Override to render dialog body section, in most cases you need to override `renderBodyContent()` instead as this one renders default
+   * section with `dlg-body` system class and delegates content rendering to `renderBodyContent()`
+   */
+  renderBody(){return html`<section class="dlg-body">${this.renderBodyContent()}</section>`; }
+
+  /** Override to render dialog content inside body section */
+  renderBodyContent(){return html`<slot name="body"></slot>`; }
 }//ModalDialog
 
 window.customElements.define("az-modal-dialog", ModalDialog);

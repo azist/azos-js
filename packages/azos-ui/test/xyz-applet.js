@@ -58,7 +58,7 @@ export class XyzApplet extends Applet {
   }
 
   async closeQuery(){
-    return await confirm("We will close the form. Yes/no?")
+    return true;//await confirm("We will close the form. Yes/no?")
   }
 
 
