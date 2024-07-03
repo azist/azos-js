@@ -1,6 +1,8 @@
 import { html } from "../../ui";
 import { ModalDialog } from "../../modal-dialog";
 
+import "../../parts/button";
+
 export class ChronicleFilterDialog extends ModalDialog{
   constructor(){
     super();
