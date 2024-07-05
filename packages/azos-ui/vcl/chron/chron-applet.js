@@ -10,6 +10,7 @@ import { Applet } from "azos-ui/applet.js";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 
 import "./filter-dialog.js";
+import "./grid.js";
 
 /** Provides Azos SKY Chronicle log viewer functionality  */
 export class ChronicleApplet extends Applet{
@@ -27,8 +28,9 @@ export class ChronicleApplet extends Applet{
     handler: async function(){
      const filter = (await this.ctx.dlgFilter.show()).modalResult;
      if (!filter) return;
-     const result = await this.ctx.#ref.svcChronicle.getLogList({filter: filter});
-     return result;
+     const response = await this.ctx.#ref.svcChronicle.getLogList({filter: filter});
+     console.dir(response.data.data);
+     this.ctx.grdData.data = response.data.data;
     }
   });
 
@@ -46,7 +48,7 @@ export class ChronicleApplet extends Applet{
      <az-sky-chronicle-filter-dialog id="dlgFilter" scope="this" title="Chronicle Filter">
      </az-sky-chronicle-filter-dialog>
 
-     <az-sky-chronicle-grid id="grdData" scope="this">
+     <az-sky-chronicle-grid id="grdData" scope="this" showFullGuids showChannel>
      </az-sky-chronicle-grid>
 
      <!-- Another popup for details -->
