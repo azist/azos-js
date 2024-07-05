@@ -15,11 +15,11 @@ export const baseStyles = css`
 .alert   { background: var(--s-alert-bg-ctl);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
 .error   { background: var(--s-error-bg-ctl);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
 
-.okBg      { background: var(--s-ok-bg-ctl); }
-.infoBg    { background: var(--s-info-bg-ctl); }
-.warningBg { background: var(--s-warn-bg-ctl); }
-.alertBg   { background: var(--s-alert-bg-ctl); }
-.errorBg   { background: var(--s-error-bg-ctl); }
+.okBg      { background: var(--s-ok-bg); }
+.infoBg    { background: var(--s-info-bg); }
+.warningBg { background: var(--s-warn-bg); }
+.alertBg   { background: var(--s-alert-bg); }
+.errorBg   { background: var(--s-error-bg); }
 
 .okTxt      { color: var(--s-ok-fg-ctl); }
 .infoTxt    { color: var(--s-info-fg-ctl); }
@@ -229,3 +229,37 @@ export const radioStyles=css`
     font-weight: 100;
   }
 `;
+
+export const textInputStyles = css`
+  div {
+    display:block;
+    margin:10px;
+    text-align:left;
+  }
+  label {
+    display: block;
+    margin-bottom: .5em;
+  }
+  input[type="text"], textarea {
+    padding: 0.5em;
+    border: 1px solid var(--s-default-bor-ctl);
+    width: 100%;
+    box-sizing: border-box;
+    font-family: Roboto, Tahoma, sans-serif;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
+  }
+  input[type="text"]:disabled, textarea:disabled {
+    background: #e0e0e0;
+    border: 1px solid #c0c0c0;
+    color: #b0b0b0;
+  }
+  .okTxt ~ input[type="text"]::placeholder,      .okTxt ~ textarea::placeholder      { color: var(--s-ok-fg-ctl); }
+  .infoTxt ~ input[type="text"]::placeholder,    .infoTxt ~ textarea::placeholder    { color: var(--s-info-fg-ctl); }
+  .warningTxt ~ input[type="text"]::placeholder, .warningTxt ~ textarea::placeholder { color: var(--s-warn-fg-ctl); }
+  .alertTxt ~ input[type="text"]::placeholder,   .alertTxt ~ textarea::placeholder   { color: var(--s-alert-fg-ctl); }
+  .errorTxt ~ input[type="text"]::placeholder,   .errorTxt ~ textarea::placeholder   { color: var(--s-error-fg-ctl); }
+`;
+
