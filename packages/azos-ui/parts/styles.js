@@ -80,16 +80,17 @@ export const checkStyles=css`
     display:flex;
     align-items:center;
     gap:0 .5em;
+    user-select:none;
   }
   .check{
     cursor:pointer;
     appearance:none;
     background-color:var(--s-default-bg-ctl);
-    border:.2em solid var(--s-default-fg-ctl);
+    border:.12em solid var(--s-default-fg-ctl);
     display:grid;
     place-content:center;
-    width:1.7em;
-    height:1.7em;
+    width:1.5em;
+    height:1.5em;
     border-radius:.25em;
   }
   .check:focus{
@@ -103,7 +104,7 @@ export const checkStyles=css`
     transform:scale(0);
     transform-origin:center center;
     transition:.1s transform ease-in-out;
-    font-size:1.5em;
+    font-size:1.3em;
     font-weight:bolder;
     color:var(--s-default-fg-ctl);
   }
@@ -130,13 +131,13 @@ export const switchStyles=css`
     color:inherit;
     font-size:inherit;
     box-sizing:content-box;
-    border:.2em solid var(--s-default-fg);
-    border-radius:1.7em;
+    border:.12em solid var(--s-default-fg);
+    border-radius:1.5em;
     vertical-align:middle;
     background-color: var(--s-default-bg);
     transition:.2 all ease;
-    width:3.4em;
-    height:1.7em;
+    width:3em;
+    height:1.5em;
   }
   .switch:focus{
     outline: var(--focus-ctl-outline);
@@ -152,8 +153,8 @@ export const switchStyles=css`
     transition:.2s all ease;
     top:50%;
     left:0;
-    width:1.25em;
-    height:1.25em;
+    width:1.2em;
+    height:1.2em;
     transform:translate(0,-50%);
     margin:0 .15em;
   }
@@ -180,6 +181,7 @@ export const radioStyles=css`
     display:flex;
     align-items:baseline;
     gap:0 1em;
+    user-select:none;
   }
   label:has(.switch){
     cursor:pointer;
@@ -195,19 +197,19 @@ export const radioStyles=css`
     cursor:pointer;
     appearance:none;
     background-color:var(--s-default-bg);
-    border:.2em solid var(--s-default-fg-ctl);
+    border:.12em solid var(--s-default-fg-ctl);
     border-radius:50%;
     display:grid;
     place-content:center;
-    width:1.7em;
-    min-width:1.7em;
-    max-width:1.7em;
-    height:1.7em;
+    width:1.5em;
+    min-width:1.5em;
+    max-width:1.5em;
+    height:1.5em;
   }
   .radio::before{
     content:"";
-    width:.85em;
-    height:.85em;
+    width:.75em;
+    height:.75em;
     border-radius:50%;
     background:var(--s-default-fg);
     transform:scale(0);
