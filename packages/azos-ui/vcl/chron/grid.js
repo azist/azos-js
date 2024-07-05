@@ -30,11 +30,12 @@ tr{
 
 }
 
+tr:nth-child(even) { background-color: #e8e8e8; }
+
 tr:hover{
-  box-shadow: -0px -0px 10px inset #00a0ff;
+  box-shadow: -0px -0px 4em inset #00a0ff;
 }
 
-tr:nth-child(even) { background-color: #e8e8e8; }
 
 
 thead{
@@ -128,6 +129,10 @@ thead{
 .wide{
   max-width: 75em;
 }
+
+.shard-0{ padding: 3px; background: rgba(120, 240, 10, 0.5); color: #50b010; margin-right: 6px; border-radius: 2px; box-shadow: 1px 1px 4px #70d080; opacity: 0.85;}
+.shard-1{ padding: 3px; background: rgba(10, 120, 240, 0.6); color: #a0e0ff; margin-right: 6px; border-radius: 2px; box-shadow: 1px 1px 4px #a0a0ff; opacity: 0.85;}
+.shard-2{ padding: 3px; background: rgba(250, 120, 10, 0.5); color: #d06010; margin-right: 6px; border-radius: 2px; box-shadow: 1px 1px 4px #d08070; opacity: 0.85;}
   `;
 
 
