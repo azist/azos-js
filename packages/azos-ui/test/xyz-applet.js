@@ -53,7 +53,8 @@ export class XyzApplet extends Applet {
     handler: function(){ alert("Command 2 activated"); }
   });
 
-  firstUpdated(){
+  connectedCallback(){
+    super.connectedCallback();
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 
