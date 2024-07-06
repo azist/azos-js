@@ -26,17 +26,11 @@ td{
   border-right: 1px dotted #ddd;
 }
 
-tr{
+tr{ }
 
-}
+tr:nth-child(even) { background-color: #eaeaea; }
 
-tr:nth-child(even) { background-color: #e8e8e8; }
-
-tr:hover{
-  box-shadow: -0px -0px 4em inset #00a0ff;
-}
-
-
+tr:hover{ background-color:  rgba(82, 145, 255, 0.35) !important; }
 
 thead{
  background: #e0e0e0;
@@ -60,15 +54,15 @@ thead{
 }
 
 .col-rel {
- color: #9050a0;
+ color: #5070e4;
  background-color: rgba(100,150,250,0.05);
 }
 
 .col-type {
- color: #a0a0a0;
+ color: #848484;
  font-size: 0.75em;
  text-align: center;
- background-color: rgba(150,150,150,0.05);
+ background-color: rgba(150,150,150,0.12);
 }
 
 .col-utc {
@@ -84,11 +78,11 @@ thead{
 }
 
 .msg-type-warning{
- background-color: #f4f4a0 !important;
+ background-color: #ffffc0 !important;
 }
 
 .msg-type-error{
- background-color: #f4c0c0 !important;
+ background-color: #ffd0d0 !important;
 }
 
 .msg-type-emergency{

@@ -29,7 +29,7 @@ export class ChronicleApplet extends Applet{
      const filter = (await this.ctx.dlgFilter.show()).modalResult;
      if (!filter) return;
      const response = await this.ctx.#ref.svcChronicle.getLogList({filter: filter});
-     console.dir(response.data.data);
+     //console.dir(response.data.data);
      this.ctx.grdData.data = response.data.data;
     }
   });
