@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "azos-ui/ui.js";
+import { html, css } from "azos-ui/ui.js";
 import { Command } from "azos-ui/cmd.js";
 import { Applet } from "azos-ui/applet.js";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
@@ -15,6 +15,16 @@ import "./grid.js";
 /** Provides Azos SKY Chronicle log viewer functionality  */
 export class ChronicleApplet extends Applet{
   constructor(){ super(); }
+
+  static styles = css`
+  :host{ display: block; padding: 1ch 1ch; }
+  .full-screen{
+    display: block;
+    width: calc(100vw - calc(100vw - 100%));
+    height: calc(100vh - var(--arn-hdr-height) - 2ch);
+    overflow: scroll;
+    box-sizing: border-box;
+  }`;
 
   #ref = {svcChronicle: ChronicleClient};
 
@@ -38,6 +48,7 @@ export class ChronicleApplet extends Applet{
 
   connectedCallback(){
     super.connectedCallback();
+    this.arena.hideFooter(true);
     this.link(this.#ref);
     this.arena.installToolbarCommands([this.#cmdFilter]);
   }
@@ -48,8 +59,10 @@ export class ChronicleApplet extends Applet{
      <az-sky-chronicle-filter-dialog id="dlgFilter" scope="this" title="Chronicle Filter">
      </az-sky-chronicle-filter-dialog>
 
-     <az-sky-chronicle-grid id="grdData" scope="this" showFullGuids showChannel>
-     </az-sky-chronicle-grid>
+     <div class="full-screen">
+      <az-sky-chronicle-grid id="grdData" scope="this" showFullGuids showChannel>
+      </az-sky-chronicle-grid>
+     </div>
 
      <!-- Another popup for details -->
     `;

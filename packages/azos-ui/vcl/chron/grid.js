@@ -124,9 +124,9 @@ thead{
   max-width: 75em;
 }
 
-.shard-0{ padding: 3px; background: rgba(120, 240, 10, 0.5); color: #50b010; margin-right: 6px; border-radius: 2px; box-shadow: 1px 1px 4px #70d080; opacity: 0.85;}
-.shard-1{ padding: 3px; background: rgba(10, 120, 240, 0.6); color: #a0e0ff; margin-right: 6px; border-radius: 2px; box-shadow: 1px 1px 4px #a0a0ff; opacity: 0.85;}
-.shard-2{ padding: 3px; background: rgba(250, 120, 10, 0.5); color: #d06010; margin-right: 6px; border-radius: 2px; box-shadow: 1px 1px 4px #d08070; opacity: 0.85;}
+.shard-0{ padding: 1.5px 4px; background: rgba(230, 100, 10, .8); color: #f8c090; margin-right: 6px; border-radius: 12px; opacity: 0.75;}
+.shard-1{ padding: 1.5px 4px; background: rgba(10, 120, 240, .8); color: #a0e0ff; margin-right: 6px; border-radius: 12px; opacity: 0.75;}
+.shard-2{ padding: 1.5px 4px; background: rgba(220, 34, 250, .8); color: #ffb0ff; margin-right: 6px; border-radius: 12px; opacity: 0.75;}
   `;
 
 
