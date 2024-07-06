@@ -197,9 +197,9 @@ main .applet-container{
   width: 100%; /* calc(100% - var(--menu-btn-width)); */
   min-height: 50vh;
   box-sizing: border-box;
-  padding:  calc(8px + var(--arn-hdr-height)) 12px 12px 12px;
+  padding:  calc(var(--arn-hdr-height)) 0px 0px 0px;
   margin: 0px;
-  text-align: justify;
+  text-align: left;
   overflow: auto;
 }
 

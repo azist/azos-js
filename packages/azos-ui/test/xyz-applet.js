@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "../ui.js";
+import { html, css } from "../ui.js";
 import { Applet } from "../applet.js";
 import { Command } from "../cmd.js";
 import { ChronicleApplet } from "../vcl/chron/chron-applet.js";
@@ -23,7 +23,7 @@ import "./showcase.js";
  */
 export class XyzApplet extends Applet {
 
-  static styles = [];//APPLET_STYLES; //[ARENA_STYLES, css`p { color: blue }`];
+  static styles = [css`:host{ display: block; padding: 1ch 2ch; }`];
 
   static properties = {
     name: {type: String},
@@ -53,7 +53,8 @@ export class XyzApplet extends Applet {
     handler: function(){ alert("Command 2 activated"); }
   });
 
-  firstUpdated(){
+  connectedCallback(){
+    super.connectedCallback();
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 

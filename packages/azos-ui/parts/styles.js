@@ -34,9 +34,8 @@ button{
   font-style: var(--ctl-button-fstyle);
   border: var(--s-default-bor-ctl);
   color:  var(--s-default-fg-ctl);
-  background: var(--s-default-bg-ctl);
+  background: var(--s-default-bg-ctl-btn);
 
-  /* box-shadow: 0px 0px 2px rgba(25, 25, 25, .25); */
   padding: 0.5lh 1ch 0.5lh 1ch;
   margin: 0.5lh 0.5ch 0.5lh 0.5ch;
   min-width: 10ch;
@@ -59,6 +58,13 @@ button:active{
   transform: translateY(1.2px);
 }
 
+
+button.ok      { background: var(--s-ok-bg-ctl-btn);     color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl);}
+button.info    { background: var(--s-info-bg-ctl-btn);   color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl);}
+button.warning { background: var(--s-warn-bg-ctl-btn);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
+button.alert   { background: var(--s-alert-bg-ctl-btn);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
+button.error   { background: var(--s-error-bg-ctl-btn);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+
 button:disabled{
   color: #b4b4b4;
   border: 1px solid #c0c0c0;
@@ -66,9 +72,7 @@ button:disabled{
   font-weight: 100;
   filter: none;
   transform: none;
-}
-
-`;
+}`;
 
 export const checkStyles=css`
   div{
@@ -196,7 +200,7 @@ export const radioStyles=css`
   .radio{
     cursor:pointer;
     appearance:none;
-    background-color:var(--s-default-bg);
+    XXXbackground-color:var(--s-default-bg);
     border:.12em solid var(--s-default-fg-ctl);
     border-radius:50%;
     display:grid;

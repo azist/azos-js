@@ -182,9 +182,18 @@ export class Arena extends AzosElement {
     this.#applet = null;
     this.#appletTagName = null;
     this.requestUpdate();//async
+    this.hideFooter(false);
     return true;
   }
 
+  /** Hides footer from arena markup. This may be needed for some applets which control their own full-screen scrolling such as large table-based grids.
+   * You need to call this method with (true) arg to hide the footer.
+   * Upon applet close arena automatically un-hides the footer.
+   */
+  hideFooter(h){
+    if (h) this.$("arenaFooter").style.display = "none";
+    else this.$("arenaFooter").style.display = "unset;";
+  }
 
 
   render() {
@@ -199,7 +208,7 @@ ${this.renderHeader(app)}
 <main>
 ${this.renderMain(app)}
 </main>
-<footer>
+<footer id="arenaFooter">
 ${this.renderFooter(app)}
 </footer>`;
   }//render
