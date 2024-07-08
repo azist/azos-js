@@ -3,6 +3,7 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/checkbox.js";
 import "../parts/radio-group.js";
+import "../parts/text-input.js";
 import "../vcl/util/code-box.js"
 
 /** Test element used as a showcase of various parts and form elements in action */
@@ -148,7 +149,22 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-checkbox id="disabledSwitch" title="This switch is disabled" type="switch" isdisabled></az-checkbox>
   </div>
 <h2>Text boxes</h2>
-..tbd
+  <div class="strip-h">
+    <az-text-input id="single-line-input" type="input" title="Single Line Input" placeholder="Enter text here"></az-text-input>
+    <az-text-input id="multiline-input" type="textarea" title="Multiline Input" placeholder="Enter multiline text here"></az-text-input>
+  </div>
+  <div class="strip-h">
+    <az-text-input id="single-line-input" type="input" title="Single Line Input" placeholder="Enter text here" status="ok"></az-text-input>
+    <az-text-input id="multiline-input" type="textarea" title="Multiline Input" placeholder="Enter multiline text here" status="ok"></az-text-input>
+  </div>
+  <div class="strip-h">
+    <az-text-input id="single-line-input" type="input" title="Single Line Input" placeholder="Enter text here" status="error"></az-text-input>
+    <az-text-input id="multiline-input" type="textarea" title="Multiline Input" placeholder="Enter multiline text here" status="error"></az-text-input>
+  </div>
+  <div class="strip-h">
+    <az-text-input id="disabled-input" type="input" title="Disabled Input" placeholder="Disabled input" status="alert" isdisabled></az-text-input>
+    <az-text-input id="disabled-textarea" type="textarea" title="Disabled Textarea" placeholder="Disabled textarea" status="alert" isdisabled></az-text-input>
+  </div>
 <h2>Selects/Combos</h2>
 ..tbd
 <h2> Various elements combined</h2>
