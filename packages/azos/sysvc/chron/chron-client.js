@@ -15,7 +15,7 @@ export class ChronicleClient extends IClient{
   /** Gets a list of Chronicle log messages for the supplied filter */
   async getLogList(filter){
     isObject(filter);
-    const got = await this.post("list", filter);
+    const got = await this.post("filter", filter);
     return got;
   }
 

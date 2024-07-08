@@ -54,7 +54,7 @@ const cfgApp = {
   name: "$(id)",
   description: "Test '$(name)' application",
   modules: [
-    {name: "chronClient", type: ChronicleClient},
+    {name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET},
     {name: "log", type: ConLog},
     {name: "logic", type: MyLogic},
     {
