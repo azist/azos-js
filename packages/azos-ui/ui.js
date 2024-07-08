@@ -10,6 +10,7 @@ import { ref as lit_ref, createRef as lit_create_ref } from "lit/directives/ref"
 import { isOneOf } from "azos/strings.js";
 import { link as linkModule } from "azos/linker.js";
 import { AzosError } from "azos/types";
+import { asString } from "azos/strings";
 
 
 /** CSS template processing pragma: css`p{color: blue}` */
@@ -60,14 +61,16 @@ const ALL_RANK_NAMES = ["undefined", "huge", "large", "normal", "medium", "small
  * Returns a numeric 0..6 rank representation of a specifier value supplied as a numeric or string
  * @param {Number|string} v number or string value
  * @param {boolean} [isCss=false] when true returns default rank as an empty string which is suitable for CSS class name modifier; returns rank class names as `r1`..`r6`
+ * @param {String|null} [clsSuffix=null] when set, adds a trailer to CSS class name
  * @returns {Number} an integer specified 0..6. O denotes "UNDEFINED"
  */
-export function parseRank(v, isCss = false){
+export function parseRank(v, isCss = false, clsSuffix = null){
   if (v===undefined || v===null || v===0) return isCss ? "" : RANK.UNDEFINED;
-  if (v > 0 && v <= 6) return isCss ? `r${v | 0}` : v | 0;
+  clsSuffix = asString(clsSuffix);
+  if (v > 0 && v <= 6) return isCss ? `r${v | 0}${clsSuffix}` : v | 0;
   const sv = v.toString().toLowerCase();
   const i = ALL_RANK_NAMES.indexOf(sv);
-  if (i>0) return isCss ? `r${i}` : i;
+  if (i>0) return isCss ? `r${i}${clsSuffix}` : i;
   return isCss ? "" : RANK.UNDEFINED;
 }
 
@@ -87,12 +90,14 @@ const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error"];
  * or `STATUS.DEFAULT`
  * @param {String} v string status value
  * @param {boolean} [isCss=false] when true returns default status as an empty string which is suitable for CSS class name modifier
+ * @param {String|null} [clsSuffix=null] when you need to add a trailing part to the css class name
  * @returns {String} one of members of `STATUS` enum
  */
-export function parseStatus(v, isCss = false){
-  if (v===undefined || v===null) return isCss ? "" :STATUS.DEFAULT;
+export function parseStatus(v, isCss = false, clsSuffix = null){
+  if (v===undefined || v===null) return isCss ? "" : STATUS.DEFAULT;
+  clsSuffix = asString(clsSuffix);
   v = v.toString().toLowerCase();
-  if (isOneOf(v, ALL_STATUS_VALUES)) return v;
+  if (isOneOf(v, ALL_STATUS_VALUES)) return `${v}${clsSuffix}`;
   return isCss ? "" : STATUS.DEFAULT;
 }
 

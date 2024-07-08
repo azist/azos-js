@@ -32,7 +32,7 @@ export const buttonStyles = css`
 button{
   font-weight: var(--ctl-button-fweight);
   font-style: var(--ctl-button-fstyle);
-  border: var(--s-default-bor-ctl);
+  border: var(--s-default-bor-ctl-btn);
   color:  var(--s-default-fg-ctl);
   background: var(--s-default-bg-ctl-btn);
 
@@ -59,11 +59,11 @@ button:active{
 }
 
 
-button.ok      { background: var(--s-ok-bg-ctl-btn);     color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl);}
-button.info    { background: var(--s-info-bg-ctl-btn);   color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl);}
-button.warning { background: var(--s-warn-bg-ctl-btn);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
-button.alert   { background: var(--s-alert-bg-ctl-btn);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
-button.error   { background: var(--s-error-bg-ctl-btn);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+button.ok      { background: var(--s-ok-bg-ctl-btn);     color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl-btn);}
+button.info    { background: var(--s-info-bg-ctl-btn);   color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl-btn);}
+button.warning { background: var(--s-warn-bg-ctl-btn);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl-btn);}
+button.alert   { background: var(--s-alert-bg-ctl-btn);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl-btn);}
+button.error   { background: var(--s-error-bg-ctl-btn);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl-btn);}
 
 button:disabled{
   color: #b4b4b4;
@@ -201,7 +201,7 @@ export const radioStyles=css`
     cursor:pointer;
     appearance:none;
     XXXbackground-color:var(--s-default-bg);
-    border:.12em solid var(--s-default-fg-ctl);
+    border: var(--s-default-bor-ctl);
     border-radius:50%;
     display:grid;
     place-content:center;
