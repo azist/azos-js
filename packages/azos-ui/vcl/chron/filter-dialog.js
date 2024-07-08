@@ -42,12 +42,16 @@ label{
 input, select, textarea{
   margin: .5em;
   width: 38ch;
-  border: 1px solid #545454;
+  border: var(--s-default-bor-ctl);
   border-radius: 4px;
   padding: .45em;
-  background: #fff;
+  background: var(--s-default-bg-ctl);
   color: #424242;
   float: inline-end;
+}
+
+input::placeholder{
+  color: var(--ghost);
 }
 
 textarea{
