@@ -53,52 +53,59 @@ body {
 
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
   /* ink is primary text color on paper */
-  --paper: #f4f4f4;
+  --paper: #f0f0f0;
   --ink: #484848;
+  --ghost: #c2c2c2;
 
   /* statuses */
   --s-default-fg: var(--ink);
   --s-default-bg: var(--paper);
   --s-default-fg-ctl: var(--ink);
-  --s-default-bg-ctl: #cecece;
+  --s-default-bg-ctl: #e4e4e4;
+  --s-default-bor-ctl: 1.2px solid #8a8a8a;
   --s-default-bg-ctl-btn: linear-gradient(110deg, #e4e4e4 0%, #cecece 45%);
-  --s-default-bor-ctl: 1px solid #c0c0c0;
+  --s-default-bor-ctl-btn: 1px solid #c0c0c0;
   --s-default-fw-ctl: bold;
 
   --s-ok-fg: #546454;
   --s-ok-bg: #75f487;
   --s-ok-fg-ctl: #546454;
-  --s-ok-bg-ctl: #a0ffa0;
-  --s-ok-bg-ctl-btn: linear-gradient(110deg, #e0ffe0 0%, #a0ffa0 45%);
-  --s-ok-bor-ctl: 1px solid #85f494;
+  --s-ok-bg-ctl: #d2ffd2;
+  --s-ok-bor-ctl: 1px solid #256434;
+  --s-ok-bg-ctl-btn: linear-gradient(110deg, #e0f4e0 0%, #a0f9a0 45%);
+  --s-ok-bor-ctl-btn: 1px solid #85f494;
 
   --s-info-fg: #5a5a5a;
   --s-info-bg: #a0d8ff;
   --s-info-fg-ctl: #5a5a5a;
   --s-info-bg-ctl: #a0d8ff;
+  --s-info-bor-ctl: 1px solid #405280;
   --s-info-bg-ctl-btn: linear-gradient(110deg, #e0e0f0 0%, #a0d8ff 45%);
-  --s-info-bor-ctl: 1px solid #d0c2f0;
+  --s-info-bor-ctl-btn: 1px solid #d0c2f0;
 
   --s-warn-fg: #6a6a40;
   --s-warn-bg: #f8f850;
   --s-warn-fg-ctl: #6a6a40;
   --s-warn-bg-ctl: #fff8a0;
+  --s-warn-bor-ctl: 1px solid #585830;
   --s-warn-bg-ctl-btn: linear-gradient(110deg, #f8f8e0 0%, #f8f458 45%);
-  --s-warn-bor-ctl: 1px solid #d8d890;
+  --s-warn-bor-ctl-btn: 1px solid #d8d890;
 
   --s-alert-fg: #e8daff;
   --s-alert-bg: #e040f0;
   --s-alert-fg-ctl: #6a406a;
   --s-alert-bg-ctl: #ffa0ff;
+  --s-alert-bor-ctl: 1px solid #534064;
   --s-alert-bg-ctl-btn: linear-gradient(110deg, #ffc8ff 0%, #f8a0f8 45%);
-  --s-alert-bor-ctl: 1px solid #c5c0e4;
+  --s-alert-bor-ctl-btn: 1px solid #c5c0e4;
 
   --s-error-fg: #ffe0e0;
   --s-error-bg: #ff4720;
   --s-error-fg-ctl: #655040;
   --s-error-bg-ctl: #ffa0a0;
+  --s-error-bor-ctl: 1px solid #a05012;
   --s-error-bg-ctl-btn: linear-gradient(110deg, #f8d0f8 0%, #ffa0a0 45%);
-  --s-error-bor-ctl: 1px solid #f0b582;
+  --s-error-bor-ctl-btn: 1px solid #f0b582;
 
 
   /* rank font sizes - MUST be in EM */
