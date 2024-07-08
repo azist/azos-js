@@ -22,25 +22,24 @@ export class TextInput extends AzosPart {
   }
 
   renderPart() {
-    let rank=`${parseRank(this.rank, true)}`;
-    let status=`${parseStatus(this.status, true)}` || 'default';
-    let disableClass = `${this.isDisabled ? 'disabled' : ''}`;
-    
-    if (this.type === 'textarea') {
-      return html`
-        <div class="${disableClass}">
-          <label for="${this.id}" class="${rank} ${status}Txt">${this.title}</label>
-          <textarea id="${this.id}" class="${rank} ${status}Bg ${status}Txt" placeholder="${this.placeholder}" .disabled=${this.isDisabled}>${this.value}</textarea>
-        </div>
-      `;
-    } else {
-      return html`
-        <div class="${disableClass}">
-          <label for="${this.id}" class="${rank} ${status}Txt">${this.title}</label>
-          <input type="text" id="${this.id}" class="${rank} ${status}Bg ${status}Txt" placeholder="${this.placeholder}" .value="${this.value}" .disabled=${this.isDisabled} />
-        </div>
-      `;
-    }
+    const rank=`${parseRank(this.rank, true)}`;
+    const status=`${parseStatus(this.status, true)}` || 'default';
+    const disableClass = `${this.isDisabled ? 'disabled' : ''}`;
+
+    const inputElement = html`${this.type === 'textarea'
+      ? html`
+        <textarea id="${this.id}" class="${rank} ${status}Bg ${status}Txt" placeholder="${this.placeholder}" .disabled=${this.isDisabled}>${this.value}</textarea>
+      ` : html`
+        <input type="text" id="${this.id}" class="${rank} ${status}Bg ${status}Txt" placeholder="${this.placeholder}" .value="${this.value}" .disabled=${this.isDisabled} />
+      `
+    }`;
+
+    return html`
+      <div class="${disableClass}">
+        <label for="${this.id}" class="${rank} ${status}Txt">${this.title}</label>
+        ${inputElement}
+      </div>
+    `;
   }
 }
 
