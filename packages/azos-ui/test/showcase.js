@@ -114,6 +114,19 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-radio-option>Second Choice</az-radio-option>
       <az-radio-option>Choice number 3</az-radio-option>
     </az-radio-group>
+
+    <az-radio-group id="baseGroupOk" title="Radio Group OK" status="ok">
+      <az-radio-option>Option 1</az-radio-option>
+      <az-radio-option>Second Choice</az-radio-option>
+      <az-radio-option>Choice number 3</az-radio-option>
+    </az-radio-group>
+
+    <az-radio-group id="baseGroupInfo" title="Radio Group Info" status="info">
+      <az-radio-option>Option 1</az-radio-option>
+      <az-radio-option>Second Choice</az-radio-option>
+      <az-radio-option>Choice number 3</az-radio-option>
+    </az-radio-group>
+
     <az-radio-group id="disabledGroup" title="Group of radios with disabled choices" isDisabled>
       <az-radio-option>isDisabled cannot be applied to an az-radio-option</az-radio-option>
       <az-radio-option>Second Choice</az-radio-option>
