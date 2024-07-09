@@ -100,28 +100,31 @@ export const checkStyles=css`
     box-shadow: var(--focus-ctl-box-shadow);
   }
   .check::before{
-    content:"\u{2713}";
+    content:"×"; /*"\u{2713}";*/
+    color: var(--s-default-fg-ctl);
     text-align:center;
     position:relative;
     transform:scale(0);
     transform-origin:center center;
     transition:.1s transform ease-in-out;
-    font-size:1.3em;
+    font-size:1.85em;
     font-weight:bolder;
   }
   .check:checked::before{ transform:scale(1); }
   .check:disabled{
     border: 1px solid #c0c0c0;
+    background: none;
   }
   .disabled{
     color: #b4b4b4;
     font-weight: 100;
   }
-  .okBg { background-color: var(--s-ok-bg-ctl); }
-  .infoBg { background-color: var(--s-info-bg-ctl); }
-  .warningBg { background-color: var(--s-warn-bg-ctl); }
-  .alertBg { background-color: var(--s-alert-bg-ctl); }
-  .errorBg { background-color: var(--s-error-bg-ctl); }
+  .okBg { background-color: var(--s-ok-bg-ctl);        border: var(--s-ok-bor-ctl);}
+  .infoBg { background-color: var(--s-info-bg-ctl);    border: var(--s-info-bor-ctl);}
+  .warningBg { background-color: var(--s-warn-bg-ctl); border: var(--s-warn-bor-ctl);}
+  .alertBg { background-color: var(--s-alert-bg-ctl);  border: var(--s-alert-bor-ctl);}
+  .errorBg { background-color: var(--s-error-bg-ctl);  border: var(--s-error-bor-ctl);}
+
   .okBg[class~="check"]::before { background-color:none; color: var(--s-ok-fg-ctl); }
   .infoBg[class~="check"]::before { background-color:none; color: var(--s-info-fg-ctl); }
   .warningBg[class~="check"]::before { background-color:none; color: var(--s-warn-fg-ctl); }
@@ -152,6 +155,7 @@ export const switchStyles=css`
     font-size:inherit;
     box-sizing:content-box;
     border: var(--s-default-bor-ctl);
+    background-color: var(--s-default-bg-ctl);
     border-radius:1.5em;
     vertical-align:middle;
     transition:.2 all ease;
@@ -184,6 +188,7 @@ export const switchStyles=css`
   }
   .switch:disabled{
     border: 1px solid #c0c0c0;
+    background: none;
   }
   .switch:disabled::before{background:#c0c0c0;}
   .okBg[class~="switch"]::before { background-color: var(--s-ok-fg-ctl); }
@@ -191,6 +196,12 @@ export const switchStyles=css`
   .warningBg[class~="switch"]::before { background-color: var(--s-warn-fg-ctl); }
   .alertBg[class~="switch"]::before { background-color: var(--s-alert-fg-ctl); }
   .errorBg[class~="switch"]::before { background-color: var(--s-error-fg-ctl); }
+
+  .okBg[class~="switch"]    { background: var(--s-ok-bg-ctl);    border: var(--s-ok-bor-ctl);}
+  .infoBg[class~="switch"]  { background: var(--s-info-bg-ctl);  border: var(--s-info-bor-ctl);}
+  .warningBg[class~="switch"] { background: var(--s-warn-bg-ctl);border: var(--s-warn-bor-ctl); }
+  .alertBg[class~="switch"] { background: var(--s-alert-bg-ctl); border: var(--s-alert-bor-ctl);}
+  .errorBg[class~="switch"] { background: var(--s-error-bg-ctl); border: var(--s-error-bor-ctl);}
 `;
 
 export const radioStyles=css`
@@ -223,6 +234,7 @@ export const radioStyles=css`
     appearance:none;
     border: var(--s-default-bor-ctl);
     border-radius:50%;
+    background: var(--s-default-bg-ctl);
     display:grid;
     place-content:center;
     width:1.5em;
@@ -234,6 +246,7 @@ export const radioStyles=css`
     content:"";
     width:.75em;
     height:.75em;
+    background-color: var(--s-default-fg-ctl);
     border-radius:50%;
     transform:scale(0);
     transform-origin:center center;
@@ -242,6 +255,7 @@ export const radioStyles=css`
   .radio:checked::before{ transform:scale(1); }
   .radio:disabled{
     border: 1px solid #c0c0c0;
+    background: none;
   }
   .radio:disabled::before{background:#c0c0c0;}
   .disabled{
@@ -253,4 +267,10 @@ export const radioStyles=css`
   .warningBg[class~="radio"]::before { background-color: var(--s-warn-fg-ctl); }
   .alertBg[class~="radio"]::before { background-color: var(--s-alert-fg-ctl); }
   .errorBg[class~="radio"]::before { background-color: var(--s-error-fg-ctl); }
+
+  .okBg[class~="radio"]    { background: var(--s-ok-bg-ctl);     border: var(--s-ok-bor-ctl);}
+  .infoBg[class~="radio"]  { background: var(--s-info-bg-ctl);   border: var(--s-info-bor-ctl);}
+  .warningBg[class~="radio"] { background: var(--s-warn-bg-ctl); border: var(--s-warn-bor-ctl);}
+  .alertBg[class~="radio"] { background: var(--s-alert-bg-ctl);  border: var(--s-alert-bor-ctl);}
+  .errorBg[class~="radio"] { background: var(--s-error-bg-ctl);  border: var(--s-error-bor-ctl);}
 `;
