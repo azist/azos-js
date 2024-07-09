@@ -1,5 +1,5 @@
 import { isOneOf } from 'azos/strings';
-import { html, parseRank, parseStatus } from '../ui.js';
+import { html, parseRank, parseStatus, parsePosition } from '../ui.js';
 import { AzosPart } from './part.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
 
@@ -7,7 +7,8 @@ export class RadioGroup extends AzosPart{
 
   static properties = {
     title:    {type: String},
-    itemType: {type: String}
+    itemType: {type: String},
+    position: {type: String}
   };
 
   static styles = [baseStyles, radioStyles, switchStyles];
@@ -26,13 +27,14 @@ export class RadioGroup extends AzosPart{
     const clsStatus = `${parseStatus(this.status, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
+    const clsPosition = `${this.position ? parsePosition(this.position,true) : "middle_right"}`;
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
     const optionList = html`${allOptions.map((option, i) => html`
       <div>
-        <label>
-          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
+        <label class="${clsPosition}" for="${this.id}_${i}">
           <span>${option.innerText}</span>
+          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
         </label>
       </div>
     `)}`;

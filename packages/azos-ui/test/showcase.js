@@ -132,6 +132,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
         <az-radio-option>Second Choice</az-radio-option>
         <az-radio-option>Choice number 3</az-radio-option>
       </az-radio-group>
+
+      <az-radio-group id="middleLeftGroup" title="Group of radios with middle_left position" position="middle_left">
+        <az-radio-option>Position attribute is applied to the AZRadioGroup</az-radio-option>
+        <az-radio-option>At this point, position attribute cannot be applied separately to individual options</az-radio-option>
+        <az-radio-option>Choice number 3</az-radio-option>
+      </az-radio-group>
   </div>
 
 
@@ -191,6 +197,22 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-checkbox id="warnSwitch" title="This is a warning switch" itemType="switch" status="warning"></az-checkbox>
     <az-checkbox id="okSwitch" title="This is an OK switch" itemType="switch" status="ok"></az-checkbox>
     <az-checkbox id="disabledSwitch" title="This switch is disabled" itemType="switch" isdisabled></az-checkbox>
+  </div>
+  <h3>Label Positioning</h3>
+  <p>Clockwise, the following positions are: <strong>top_center, top_right, middle_right, bottom_right, bottom_center, bottom_left, middle_left, top_left</strong>. The default position for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default position for text boxes should be <strong>top_left</strong>.</p>
+  <div class="strip-h">
+    <az-checkbox id="topLeftSwitch" title="aAa" itemType="switch" position="top_left"></az-checkbox>
+    <az-checkbox id="topCenterSwitch" title="aAa" itemType="switch" position="top_center"></az-checkbox>
+    <az-checkbox id="topRightSwitch" title="aAa" itemType="switch" position="top_right"></az-checkbox>
+  </div>
+  <div class="strip-h">
+    <az-checkbox id="middleLeftSwitch" title="aAa" itemType="switch" position="middle_left"></az-checkbox>
+    <az-checkbox id="middleRightSwitch" title="aAa" itemType="switch" position="middle_right"></az-checkbox>
+  </div>
+  <div class="strip-h">
+    <az-checkbox id="bottomLeftSwitch" title="aAa" itemType="switch" position="bottom_left"></az-checkbox>
+    <az-checkbox id="bottomCenterSwitch" title="aAa" itemType="switch" position="bottom_center"></az-checkbox>
+    <az-checkbox id="bottomRightSwitch" title="aAa" itemType="switch" position="bottom_right"></az-checkbox>
   </div>
 <h2>Text boxes</h2>
 ..tbd

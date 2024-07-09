@@ -22,6 +22,33 @@ export const baseStyles = css`
 .warningBg { background: var(--s-warn-bg-ctl); }
 .alertBg   { background: var(--s-alert-bg-ctl); }
 .errorBg   { background: var(--s-error-bg-ctl); }
+
+/* Styles for POSITION enumerated type */
+/* Built to work for the current input layout:
+    <label class="POSITION">
+      <span> Input Title/Label </span>
+      <input />
+    </label>
+*/
+.top_left,.top_center,.top_right,
+.middle_left,.middle_right,
+.bottom_left,.bottom_center,.bottom_right { display:flex; }
+
+.top_left,.top_center,.top_right          { flex-direction:column; }
+.top_left > span                          { text-align:left; }
+.top_center > span                        { text-align:center; }
+.top_right > span                         { text-align:right; }
+
+.middle_left                              { flex-direction:row; align-items:center; justify-content:right;}
+.middle_left > span                       { text-align:right; }
+
+.middle_right                             { flex-direction:row-reverse; align-items:center; justify-content:left; }
+.middle_right > span                      { text-align:left; }
+
+.bottom_left,.bottom_center,.bottom_right { flex-direction:column-reverse; }
+.bottom_left > span                       { text-align:left; }
+.bottom_center > span                     { text-align:center; }
+.bottom_right > span                      { text-align:right; }
 `;
 
 export const buttonStyles = css`
@@ -78,10 +105,8 @@ export const checkStyles=css`
     background-color:unset !important;
   }
   label{
-    cursor:pointer;
-    display:flex;
-    align-items:center;
     gap:0 .5em;
+    cursor:pointer;
     user-select:none;
   }
   .check{
@@ -142,8 +167,6 @@ export const switchStyles=css`
   }
   label{
     cursor:pointer;
-    display:flex;
-    align-items:center;
     gap:0 .5em;
     user-select:none;
   }
@@ -214,16 +237,8 @@ export const radioStyles=css`
   }
   label{
     cursor:pointer;
-    display:flex;
-    align-items:baseline;
     gap:0 .5em;
     user-select:none;
-  }
-  label:has(.switch){
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:0 .5em;
   }
   .radio:focus{
     outline: var(--focus-ctl-outline);
