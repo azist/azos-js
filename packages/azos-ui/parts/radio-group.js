@@ -6,7 +6,7 @@ import { baseStyles, radioStyles, switchStyles } from './styles.js';
 export class RadioGroup extends AzosPart{
 
   static properties = {
-    title:     {type: String},
+    title:    {type: String},
     itemType: {type: String}
   };
 
@@ -23,21 +23,22 @@ export class RadioGroup extends AzosPart{
 
   render(){
     const clsRank =   `${parseRank(this.rank, true)}`;
-    const clsStatus = `${parseStatus(this.status, true, "Bg")}`;
+    const clsStatus = `${parseStatus(this.status, true)}`;
+    const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
     const optionList = html`${allOptions.map((option, i) => html`
       <div>
         <label>
-          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatus}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
-          <span class="${clsStatus}">${option.innerText}</span>
-      </label>
+          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
+          <span>${option.innerText}</span>
+        </label>
       </div>
     `)}`;
 
     return html`
-        <div class="${clsRank} ${clsDisable}">
+        <div class="${clsRank} ${clsStatus} ${clsDisable}">
             <p>${this.title}</p>
             ${optionList}
         </div>
