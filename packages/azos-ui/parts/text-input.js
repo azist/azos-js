@@ -23,7 +23,7 @@ export class TextInput extends AzosPart{
   get isPassword(){ return isOneOf(this.itemType, ["password", "pass", "pw", "masked"]); }
 
   /* True if text input is <input type="text"> */
-  get isInputText(){ if(!this.isTextArea && !this.isPassword) return true; }
+  get isInputText(){ return !this.isTextArea && !this.isPassword; }
 
   render(){
     const clsRank     = `${parseRank(this.rank, true)}`;
