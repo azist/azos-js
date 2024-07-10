@@ -101,6 +101,34 @@ export function parseStatus(v, isCss = false, clsSuffix = null){
   return isCss ? "" : STATUS.DEFAULT;
 }
 
+/** Directional positioning for how label text appears in relation to input element (e.g. text input field, checkbox, radio button, etc.) */
+export const POSITION = Object.freeze({
+  DEFAULT:       "default",
+  TOP_CENTER:    "top_center",
+  TOP_RIGHT:     "top_right",
+  MIDDLE_RIGHT:  "middle_right",
+  BOTTOM_RIGHT:  "bottom_right",
+  BOTTOM_CENTER: "bottom_center",
+  BOTTOM_LEFT:   "bottom_left",
+  MIDDLE_LEFT:   "middle_left",
+  TOP_LEFT:      "top_left"
+});
+const ALL_POSITION_VALUES = ["default","top_center", "top_right", "middle_right", "bottom_right", "bottom_center", "bottom_left", "middle_left", "top_left"];
+
+/**
+ * Returns position string to determine how label text appears in relation to an input element.
+ * @param {String} v string status value
+ * @param {boolean} [isCss=false] when true returns default position as an empty string which is suitable for CSS class name modifier
+ * NOTE: "DEFAULT" must be later redefined as "TOP_LEFT" for text input field classes and "MIDDLE_RIGHT" for boolean input field classes (i.e. checkbox, radio, etc.)
+ * @returns {String} one of members of `POSITION` enum
+ */
+export function parsePosition(v, isCss = false){
+  if (v===undefined || v===null) return isCss ? "" : POSITION.DEFAULT;
+  v = v.toString().toLowerCase();
+  if (isOneOf(v, ALL_POSITION_VALUES)) return `${v}`;
+  return isCss ? "" : POSITION.DEFAULT;
+}
+
 
 /** Provides uniform base derivation point for `AzosElements` - all elements must derive from here */
 export class AzosElement extends LitElement {
