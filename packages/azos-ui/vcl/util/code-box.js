@@ -21,7 +21,7 @@ export class CodeBox extends AzosElement{
     padding: 0.25lh 1ch;
   }
 
-  .code-key     { color: var(--vcl-codebox-hi-key); }
+  .code-key     { color: var(--vcl-codebox-hi-key); font-weight: bold; }  .code-key:hover{ filter: invert(1);  }
   .code-string  { color: var(--vcl-codebox-hi-string); }
   .code-number  { color: var(--vcl-codebox-hi-number); }
   .code-boolean { color: var(--vcl-codebox-hi-boolean); }
