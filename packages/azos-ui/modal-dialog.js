@@ -79,15 +79,20 @@ dialog::backdrop{
   box-sizing: border-box;
   min-height: 20px;
   text-align: left;
+
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .dlg-title-close{
-   float: right;
-   font-size: 2em;
-   font-weight: bold;
-   color: var(--modal-title-fg);
-   cursor: pointer;
-   margin-right: 0.5ch;
+  float: right;
+  font-size: 2em;
+  font-weight: bold;
+  color: var(--modal-title-fg);
+  cursor: pointer;
+  margin-right: 0.5ch;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .dlg-body{

@@ -73,7 +73,7 @@ body {
   --s-ok-bg-ctl: #d2ffd2;
   --s-ok-bor-ctl: 1.2px solid #558454;
   --s-ok-bg-ctl-btn: linear-gradient(175deg, #e0f4e0 0%, #a0f9a0 70%);
-  --s-ok-bor-ctl-btn: 1px solid #85f494;
+  --s-ok-bor-ctl-btn: 1px solid #b8d8b8;
 
   --s-info-fg: #5a5a5a;
   --s-info-bg: #a0d8ff;
@@ -81,7 +81,7 @@ body {
   --s-info-bg-ctl: #c0e8ff;
   --s-info-bor-ctl: 1.2px solid #7072aa;
   --s-info-bg-ctl-btn: linear-gradient(175deg, #e0e0f0 0%, #a0d8ff 70%);
-  --s-info-bor-ctl-btn: 1px solid #d0c2f0;
+  --s-info-bor-ctl-btn: 1px solid #c4c4d8;
 
   --s-warn-fg: #6a6a40;
   --s-warn-bg: #f8f850;
@@ -89,7 +89,7 @@ body {
   --s-warn-bg-ctl: #fff8a0;
   --s-warn-bor-ctl: 1px solid #585830;
   --s-warn-bg-ctl-btn: linear-gradient(175deg, #f8f8e0 0%, #f8f458 70%);
-  --s-warn-bor-ctl-btn: 1px solid #d8d890;
+  --s-warn-bor-ctl-btn: 1px solid #d0d085;
 
   --s-alert-fg: #e8daff;
   --s-alert-bg: #e040f0;
@@ -146,12 +146,12 @@ body {
   --ctl-button-fweight: bold;
   --ctl-button-fstyle: normal;
 
-  --vcl-codebox-bg: #e6e6e6;
-  --vcl-codebox-fg: #646464;
+  --vcl-codebox-bg: #e0e0e0;
+  --vcl-codebox-fg: #747474;
   --vcl-codebox-ffamily: 'Lucida Console', 'Courier New', monospace;
-  --vcl-codebox-hi-key: #383838;
+  --vcl-codebox-hi-key: #484848;
   --vcl-codebox-hi-string: #1094c8;
-  --vcl-codebox-hi-number: #40a010;
+  --vcl-codebox-hi-number:  #108510;
   --vcl-codebox-hi-boolean: #a0209a;
   --vcl-codebox-hi-null: #e75e45;
 }
