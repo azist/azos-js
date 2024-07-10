@@ -38,19 +38,25 @@ export class ChronicleApplet extends Applet{
     handler: async function(){
       const filter = (await this.ctx.dlgFilter.show()).modalResult;
       if (!filter) return;
-      const response = await this.ctx.#ref.svcChronicle.getLogList({filter: filter});
-      //console.dir(response.data.data);
-      this.ctx.grdData.data = response.data.data;
+      await this.ctx.#loadData(filter);
     }
   });
 
   get title(){ return "Log Chronicle Viewer"; }
 
-  connectedCallback(){
+  async connectedCallback(){
     super.connectedCallback();
     this.arena.hideFooter(true);
     this.link(this.#ref);
     this.arena.installToolbarCommands([this.#cmdFilter]);
+    await this.#loadData();
+  }
+
+
+  async #loadData(filter){
+    const response = await this.#ref.svcChronicle.getLogList({filter: filter ?? {}});
+    //console.dir(response.data.data);
+    this.grdData.data = response.data.data;
   }
 
 
