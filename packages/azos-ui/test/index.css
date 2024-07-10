@@ -55,7 +55,8 @@ body {
   /* ink is primary text color on paper */
   --paper: #f0f0f0;
   --ink: #585858;
-  --ghost: #c2c2c2;
+  --ghost: rgba(0, 0, 0, .2);
+  /*#c2c2c2*/
 
   /* statuses */
   --s-default-fg: var(--ink);
@@ -63,7 +64,8 @@ body {
   --s-default-fg-ctl: var(--ink);
   --s-default-bg-ctl: #fff;
   --s-default-bor-ctl: 1.2px solid #8a8a8a;
-  --s-default-bg-ctl-btn: linear-gradient(175deg, #e4e4e4 0%, #cecece 70%);/*linear-gradient(175deg, #e4e4e4 0%, #cecece 45%);*/
+  --s-default-bg-ctl-btn: linear-gradient(175deg, #e4e4e4 0%, #cecece 70%);
+  /*linear-gradient(175deg, #e4e4e4 0%, #cecece 45%);*/
   --s-default-bor-ctl-btn: 1px solid #c0c0c0;
   --s-default-fw-ctl: bold;
 
@@ -151,7 +153,7 @@ body {
   --vcl-codebox-ffamily: 'Lucida Console', 'Courier New', monospace;
   --vcl-codebox-hi-key: #484848;
   --vcl-codebox-hi-string: #1094c8;
-  --vcl-codebox-hi-number:  #108510;
+  --vcl-codebox-hi-number: #108510;
   --vcl-codebox-hi-boolean: #a0209a;
   --vcl-codebox-hi-null: #e75e45;
 }

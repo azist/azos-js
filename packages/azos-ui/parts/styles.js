@@ -289,3 +289,33 @@ export const radioStyles=css`
   .alertBg[class~="radio"] { background: var(--s-alert-bg-ctl);  border: var(--s-alert-bor-ctl);}
   .errorBg[class~="radio"] { background: var(--s-error-bg-ctl);  border: var(--s-error-bor-ctl);}
 `;
+
+export const textInputStyles=css`
+  div{
+    display:block;
+    margin:10px;
+    text-align:left;
+    border:none !important;
+    background-color:unset !important;
+  }
+  label{
+    gap:0 .5em;
+    user-select:none;
+  }
+  input[type=text],input[type=password],textarea{
+    padding:.35em .5em .25em .5em;
+    border: var(--s-default-bor-ctl);
+    background: var(--s-default-bg-ctl);
+    color: var(--s-default-fg-ctl);
+  }
+  input[type=text]::placeholder,
+  input[type=password]::placeholder,
+  textarea::placeholder{ color: var(--ghost); }
+  textarea{font-family:inherit;}
+
+  .okBg      { color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl);}
+  .infoBg    { color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl);}
+  .warningBg { color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
+  .alertBg   { color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
+  .errorBg   { color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+`;

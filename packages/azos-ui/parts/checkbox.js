@@ -16,10 +16,10 @@ export class Checkbox extends AzosPart{
     this.checked=false;
   }
 
-  /** True if the radio group has radio buttons instead of switches */
+  /** True if this part has a checkbox instead of a switch */
   get isCheck() { return !this.isSwitch;}
 
-  /** True if the radio group has switches instead of radio buttons */
+  /** True if this part has a switch instead of a checkbox */
   get isSwitch(){  return isOneOf(this.itemType, ["switch", "sw"]);}
 
   renderPart(){
