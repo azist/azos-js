@@ -96,7 +96,7 @@ const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error"];
 export function parseStatus(v, isCss = false, clsSuffix = null){
   if (v===undefined || v===null) return isCss ? "" : STATUS.DEFAULT;
   clsSuffix = asString(clsSuffix);
-  v = v.toString().toLowerCase();
+  v = v.toString();
   if (isOneOf(v, ALL_STATUS_VALUES)) return `${v}${clsSuffix}`;
   return isCss ? "" : STATUS.DEFAULT;
 }
@@ -104,16 +104,16 @@ export function parseStatus(v, isCss = false, clsSuffix = null){
 /** Directional positioning for how label text appears in relation to input element (e.g. text input field, checkbox, radio button, etc.) */
 export const POSITION = Object.freeze({
   DEFAULT:       "default",
-  TOP_CENTER:    "top_center",
-  TOP_RIGHT:     "top_right",
-  MIDDLE_RIGHT:  "middle_right",
-  BOTTOM_RIGHT:  "bottom_right",
-  BOTTOM_CENTER: "bottom_center",
-  BOTTOM_LEFT:   "bottom_left",
-  MIDDLE_LEFT:   "middle_left",
-  TOP_LEFT:      "top_left"
+  TOP_CENTER:    "top-center",
+  TOP_RIGHT:     "top-right",
+  MIDDLE_RIGHT:  "mid-right",
+  BOTTOM_RIGHT:  "bot-right",
+  BOTTOM_CENTER: "bot-center",
+  BOTTOM_LEFT:   "bot-left",
+  MIDDLE_LEFT:   "mid-left",
+  TOP_LEFT:      "top-left"
 });
-const ALL_POSITION_VALUES = ["default","top_center", "top_right", "middle_right", "bottom_right", "bottom_center", "bottom_left", "middle_left", "top_left"];
+const ALL_POSITION_VALUES = [...Object.values(POSITION)];
 
 /**
  * Returns position string to determine how label text appears in relation to an input element.
@@ -124,7 +124,7 @@ const ALL_POSITION_VALUES = ["default","top_center", "top_right", "middle_right"
  */
 export function parsePosition(v, isCss = false){
   if (v===undefined || v===null) return isCss ? "" : POSITION.DEFAULT;
-  v = v.toString().toLowerCase();
+  v = v.toString();
   if (isOneOf(v, ALL_POSITION_VALUES)) return `${v}`;
   return isCss ? "" : POSITION.DEFAULT;
 }
