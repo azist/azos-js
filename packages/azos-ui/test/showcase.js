@@ -3,6 +3,7 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/checkbox.js";
 import "../parts/radio-group.js";
+import "../parts/text-input.js";
 import "../vcl/util/code-box.js"
 
 /** Test element used as a showcase of various parts and form elements in action */
@@ -132,6 +133,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
         <az-radio-option>Second Choice</az-radio-option>
         <az-radio-option>Choice number 3</az-radio-option>
       </az-radio-group>
+
+      <az-radio-group id="middleLeftGroup" title="Group of radios with middle_left position" position="middle_left">
+        <az-radio-option>Position attribute is applied to the AZRadioGroup</az-radio-option>
+        <az-radio-option>At this point, position attribute cannot be applied separately to individual options</az-radio-option>
+        <az-radio-option>Choice number 3</az-radio-option>
+      </az-radio-group>
   </div>
 
 
@@ -192,8 +199,61 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-checkbox id="okSwitch" title="This is an OK switch" itemType="switch" status="ok"></az-checkbox>
     <az-checkbox id="disabledSwitch" title="This switch is disabled" itemType="switch" isdisabled></az-checkbox>
   </div>
+  <h3>Label Positioning</h3>
+  <p>Clockwise, the following positions are: <strong>top_center, top_right, middle_right, bottom_right, bottom_center, bottom_left, middle_left, top_left</strong>. The default position for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default position for text boxes should be <strong>top_left</strong>.</p>
+  <div class="strip-h">
+    <az-checkbox id="topLeftSwitch" title="aAa" itemType="switch" position="top_left"></az-checkbox>
+    <az-checkbox id="topCenterSwitch" title="aAa" itemType="switch" position="top_center"></az-checkbox>
+    <az-checkbox id="topRightSwitch" title="aAa" itemType="switch" position="top_right"></az-checkbox>
+  </div>
+  <div class="strip-h">
+    <az-checkbox id="middleLeftSwitch" title="aAa" itemType="switch" position="middle_left"></az-checkbox>
+    <az-checkbox id="middleRightSwitch" title="aAa" itemType="switch" position="middle_right"></az-checkbox>
+  </div>
+  <div class="strip-h">
+    <az-checkbox id="bottomLeftSwitch" title="aAa" itemType="switch" position="bottom_left"></az-checkbox>
+    <az-checkbox id="bottomCenterSwitch" title="aAa" itemType="switch" position="bottom_center"></az-checkbox>
+    <az-checkbox id="bottomRightSwitch" title="aAa" itemType="switch" position="bottom_right"></az-checkbox>
+  </div>
 <h2>Text boxes</h2>
-..tbd
+  <div class="strip-h">
+    <az-text-input id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;"></az-text-input>
+    <az-text-input id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text-input>
+    <az-text-input id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text-input>
+  </div>
+  <hr>
+  <div class="strip-h">
+    <az-text-input id="defaultTextInput" title="Top Left" placeholder="Type something here&hellip;"></az-text-input>
+    <az-text-input id="topCenterTextInput" title="Top Center" placeholder="Type something here&hellip;" position="top_center"></az-text-input>
+    <az-text-input id="topRightTextInput" title="Top Right" placeholder="Type something here&hellip;" position="top_right"></az-text-input>
+  </div>
+  <div class="strip-h">
+    <az-text-input id="middleLeftTextInput" title="Middle Left" placeholder="Type something here&hellip;" position="middle_left"></az-text-input>
+    <az-text-input id="middleRightTextInput" title="Middle Right" placeholder="Type something here&hellip;" position="middle_right"></az-text-input>
+  </div>
+  <div class="strip-h">
+    <az-text-input id="bottomLeftTextInput" title="Bottom Left" placeholder="Type something here&hellip;" position="bottom_left"></az-text-input>
+    <az-text-input id="bottomCenterTextInput" title="Bottom Center" placeholder="Type something here&hellip;" position="bottom_center"></az-text-input>
+    <az-text-input id="bottomRightTextInput" title="Bottom Right" placeholder="Type something here&hellip;" position="bottom_right"></az-text-input>
+  </div>
+  <hr>
+  <div class="strip-h">
+    <az-text-input id="rankOneInput" title="Rank Huge" placeholder="Type something here&hellip;" rank="1"></az-text-input>
+    <az-text-input id="rankTwoInput" title="Rank Large" placeholder="Type something here&hellip;" rank="2"></az-text-input>
+    <az-text-input id="rankThreeInput" title="Rank Default" placeholder="Type something here&hellip;"></az-text-input>
+    <az-text-input id="rankFourInput" title="Rank Medium" placeholder="Type something here&hellip;" rank="4"></az-text-input>
+    <az-text-input id="rankFiveInput" title="Rank Small" placeholder="Type something here&hellip;" rank="5"></az-text-input>
+    <az-text-input id="rankSixInput" title="Rank Tiny" placeholder="Type something here&hellip;" rank="6"></az-text-input>
+  </div>
+  <hr>
+  <div class="strip-h">
+    <az-text-input id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;" itemType="long"></az-text-input>
+    <az-text-input id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" itemType="long" status="ok"></az-text-input>
+    <az-text-input id="infoTextArea" title="Info Status" placeholder="Type something here&hellip;" itemType="long" status="info"></az-text-input>
+    <az-text-input id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" itemType="long" status="warning"></az-text-input>
+    <az-text-input id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" itemType="long" status="alert"></az-text-input>
+    <az-text-input id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" itemType="long" status="error"></az-text-input>
+  </div>
 <h2>Selects/Combos</h2>
 ..tbd
 <h2> Various elements combined</h2>
