@@ -16,13 +16,13 @@ export class TextInput extends AzosPart{
   static styles=[baseStyles, textInputStyles];
   constructor(){ super(); }
 
-  /* True if text input is <textarea> */
+  /** True if text input is <textarea> */
   get isTextArea(){ return isOneOf(this.itemType, ["multiline", "long", "textarea"]); }
 
-  /* True if text input is <input type="password"> */
+  /** True if text input is <input type="password"> */
   get isPassword(){ return isOneOf(this.itemType, ["password", "pass", "pw", "masked"]); }
 
-  /* True if text input is <input type="text"> */
+  /** True if text input is <input type="text"> */
   get isInputText(){ return !this.isTextArea && !this.isPassword; }
 
   render(){
