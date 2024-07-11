@@ -27,7 +27,7 @@ export class Checkbox extends AzosPart{
     const clsStatus=`${parseStatus(this.status, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
-    const clsPosition = `${this.position ? parsePosition(this.position,true) : "middle_right"}`;
+    const clsPosition = `${this.position ? parsePosition(this.position,true) : "mid-right"}`;
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable}">
         <label class="${clsPosition}" for="${this.id}">

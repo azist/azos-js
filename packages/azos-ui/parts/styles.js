@@ -1,5 +1,5 @@
 
-import {css} from "../ui.js"
+import {css} from "../ui.js";
 
 export const baseStyles = css`
 .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl); }
@@ -30,25 +30,31 @@ export const baseStyles = css`
       <input />
     </label>
 */
-.top_left,.top_center,.top_right,
-.middle_left,.middle_right,
-.bottom_left,.bottom_center,.bottom_right { display:flex; }
+.top-left,.top-center,.top-right,
+.mid-left,.mid-right,
+.bot-left,.bot-center,.bot-right { display:flex; }
 
-.top_left,.top_center,.top_right          { flex-direction:column; }
-.top_left > span                          { text-align:left; }
-.top_center > span                        { text-align:center; }
-.top_right > span                         { text-align:right; }
+.top-left,.top-center,.top-right { flex-direction:column; }
+.top-left > span                 { text-align:left; margin-bottom: .33em; }
+.top-center > span               { text-align:center; margin-bottom: .33em; }
+.top-right > span                { text-align:right; margin-bottom: .33em; }
 
-.middle_left                              { flex-direction:row; align-items:center; justify-content:right;}
-.middle_left > span                       { text-align:right; }
+.mid-left                        { flex-direction:row; align-items:center; justify-content:right;}
+.mid-left > span                 { text-align:right; }
 
-.middle_right                             { flex-direction:row-reverse; align-items:center; justify-content:left; }
-.middle_right > span                      { text-align:left; }
+.mid-right                       { flex-direction:row-reverse; align-items:center; justify-content:left; }
+.mid-right > span                { text-align:left; }
 
-.bottom_left,.bottom_center,.bottom_right { flex-direction:column-reverse; }
-.bottom_left > span                       { text-align:left; }
-.bottom_center > span                     { text-align:center; }
-.bottom_right > span                      { text-align:right; }
+.bot-left,.bot-center,.bot-right { flex-direction:column-reverse; }
+.bot-left > span                 { text-align:left; margin-top: .33em; }
+.bot-center > span               { text-align:center; margin-top: .33em; }
+.bot-right > span                { text-align:right; margin-top: .33em; }
+
+@media screen and (max-width:500px){
+  .mid-right,.mid-left{flex-direction:column;}
+  .mid-right > span{margin-left:0;}
+  .mid-left > span{margin-right:0;}
+}
 `;
 
 export const buttonStyles = css`
@@ -90,7 +96,7 @@ button.error   { background: var(--s-error-bg-ctl-btn);  color: var(--s-error-fg
 
 button:disabled{
   color: #b4b4b4;
-  border: 1px solid #c0c0c0;
+  border: 1px solid var(--ghost);
   background: var(--paper);
   font-weight: 100;
   filter: none;
@@ -137,7 +143,7 @@ export const checkStyles=css`
   }
   .check:checked::before{ transform:scale(1); }
   .check:disabled{
-    border: 1px solid #c0c0c0;
+    border: 1px solid var(--ghost);
     background: none;
   }
   .disabled{
@@ -210,10 +216,10 @@ export const switchStyles=css`
     height:1.2em;
   }
   .switch:disabled{
-    border: 1px solid #c0c0c0;
+    border: 1px solid var(--ghost);
     background: none;
   }
-  .switch:disabled::before{background:#c0c0c0;}
+  .switch:disabled::before{background:var(--ghost);}
   .okBg[class~="switch"]::before { background-color: var(--s-ok-fg-ctl); }
   .infoBg[class~="switch"]::before { background-color: var(--s-info-fg-ctl); }
   .warningBg[class~="switch"]::before { background-color: var(--s-warn-fg-ctl); }
@@ -269,10 +275,10 @@ export const radioStyles=css`
   }
   .radio:checked::before{ transform:scale(1); }
   .radio:disabled{
-    border: 1px solid #c0c0c0;
+    border: 1px solid var(--ghost);
     background: none;
   }
-  .radio:disabled::before{background:#c0c0c0;}
+  .radio:disabled::before{background:var(--ghost);}
   .disabled{
     color: #b4b4b4;
     font-weight: 100;
@@ -318,4 +324,11 @@ export const textInputStyles=css`
   .warningBg { color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
   .alertBg   { color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
   .errorBg   { color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+
+  .disabled{ color: #b4b4b4; font-weight: 100; }
+  input[type=text]:disabled,input[type=password]:disabled,textarea:disabled{
+    border: 1px solid var(--ghost);
+    background: none;
+    color: var(--ghost);
+  }
 `;

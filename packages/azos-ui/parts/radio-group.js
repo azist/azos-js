@@ -27,7 +27,7 @@ export class RadioGroup extends AzosPart{
     const clsStatus = `${parseStatus(this.status, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
-    const clsPosition = `${this.position ? parsePosition(this.position,true) : "middle_right"}`;
+    const clsPosition = `${this.position ? parsePosition(this.position,true) : "mid-right"}`;
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
     const optionList = html`${allOptions.map((option, i) => html`
