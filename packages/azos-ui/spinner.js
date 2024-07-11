@@ -56,6 +56,7 @@ export class Spinner extends AzosElement {
   color:  var(--s-default-fg);
   overflow: hidden;
   padding: 1em;
+  box-shadow: 0px 0px 24px #7f7f7f50;
 }
 
 div.pop:popover-open{
