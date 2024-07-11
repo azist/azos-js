@@ -36,7 +36,7 @@ export class Spinner extends AzosElement {
 
   /**
    * Asynchronously executes an action `fAction` showing a modal (blocking) spinner before the invocation and
-   * ensuring that the spinner is hidden right after the invocation even if error is thrown
+   * ensuring that the spinner is hidden right after the invocation even if an error is thrown
    */
   static async exec(fAction, title = null, rank = RANK.NORMAL, status = STATUS.DEFAULT){
     isFunction(fAction);
@@ -47,28 +47,46 @@ export class Spinner extends AzosElement {
 
 
   static styles = css`
-.lds-ring {
-  /* change color here */
-  color: #1c4c5b
+
+.pop{
+  font-size: 25px;
+
+  width: 7em;
+  height: 7em;
+  border: none;
+  border-radius: 1em;
+  background-color: rgba(155, 155, 155, 0.45);
+  overflow: hidden;
+  padding: 1em;
 }
+
+div.pop:popover-open{
+  opacity: 1;
+  transition: 0.51s ease-in;
+}
+
+@starting-style{div.pop:popover-open{opacity: 0;}}
+
+
 .lds-ring,
-.lds-ring div {
-  box-sizing: border-box;
-}
+.lds-ring div {  box-sizing: border-box; }
+
 .lds-ring {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 80px;
+  display: block;
+  color: var(--ink);
+  width: 7em;
+  height: 7em;
+  margin: auto;
+  padding: 0px;
 }
 .lds-ring div {
   box-sizing: border-box;
   display: block;
   position: absolute;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border: 8px solid currentColor;
+  width: 7em;
+  height: 7em;
+  margin: 0px;
+  border: 0.5em solid currentColor;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   border-color: currentColor transparent transparent transparent;
@@ -116,10 +134,16 @@ export class Spinner extends AzosElement {
   show(){
     if (this.#isShown) return false;
     this.#isShown = true;
-    if (this.parentElement === null){
-      document.appendChild(this);
+    this.#isStandalone = false;
+
+    if (this.parentNode === null){
+      document.body.appendChild(this);
+      this.update();//sync update dom build
       this.#isStandalone = true;
     }
+
+    const div = this.$("pop");
+    div.showPopover();
 
     this.#tmr = setTimeout(() => this.hide(), this.timeout);
     return true;
@@ -127,20 +151,25 @@ export class Spinner extends AzosElement {
 
   /** Hides the shown spinner returning true if it was hidden, or false if it was already hidden before this call*/
   hide(){
-    if (this.#isShown) return false;
+    if (!this.#isShown) return false;
     this.#isShown = false;
     if (this.#tmr) clearTimeout(this.#tmr);
 
+    const div = this.$("pop");
+    div.hidePopover();
+
     if (this.#isStandalone){
-      setTimeout(() => document.removeChild(this), 1000);
+      setTimeout(() => document.body.removeChild(this), 1000);
     }
 
     return true;
   }
 
-  renderBody(){
+  render(){
     return html`
-    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+    <div id="pop" popover="manual" class="pop">
+      <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+    </div>
     `;
   }
 

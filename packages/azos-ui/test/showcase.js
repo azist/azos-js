@@ -4,7 +4,8 @@ import "../parts/button.js";
 import "../parts/checkbox.js";
 import "../parts/radio-group.js";
 import "../parts/text-input.js";
-import "../vcl/util/code-box.js"
+import "../vcl/util/code-box.js";
+import { Spinner } from "../spinner.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement{
@@ -26,6 +27,11 @@ export class Showcase extends AzosElement{
   onDlg2Open(){ this.dlg2.show(); }
   onDlg2Close(){ this.dlg2.close(); }
 
+  onSpinnerOpen(){ this.spinner1.show(); }
+  onSpinnerClose(){ this.spinner1.hide(); }
+
+  onAutoSpinnerOpen(){ Spinner.show(); }
+
   render(){
     return html`
 
@@ -38,6 +44,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
 <az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
+<az-button @click="${this.onSpinnerOpen}" title="Open Spinner..." status="info"></az-button>
+<az-button @click="${this.onSpinnerClose}" title="Close Spinner..." status="info"></az-button>
+
+<az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
+
+<az-spinner id="spinner1" scope="this"></az-spinner>
 
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
