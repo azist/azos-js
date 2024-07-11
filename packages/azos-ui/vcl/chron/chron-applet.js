@@ -11,6 +11,7 @@ import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 
 import "./filter-dialog.js";
 import "./grid.js";
+import { Spinner } from "../../spinner.js";
 
 /** Provides Azos SKY Chronicle log viewer functionality  */
 export class ChronicleApplet extends Applet{
@@ -54,9 +55,11 @@ export class ChronicleApplet extends Applet{
 
 
   async #loadData(filter){
-    const response = await this.#ref.svcChronicle.getLogList({filter: filter ?? {}});
-    //console.dir(response.data.data);
-    this.grdData.data = response.data.data;
+    Spinner.exec(async () => {
+      const response = await this.#ref.svcChronicle.getLogList({filter: filter ?? {}});
+      //console.dir(response.data.data);
+      this.grdData.data = response.data.data;
+    });
   }
 
 
