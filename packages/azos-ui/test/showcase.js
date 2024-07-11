@@ -49,7 +49,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
 
-<az-spinner id="spinner1" scope="this"></az-spinner>
+<az-spinner id="spinner1" scope="this" status="info" timeout="120000"></az-spinner>
 
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">

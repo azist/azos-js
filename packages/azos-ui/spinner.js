@@ -47,15 +47,13 @@ export class Spinner extends AzosElement {
 
 
   static styles = css`
-
 .pop{
-  font-size: 25px;
-
   width: 7em;
   height: 7em;
   border: none;
   border-radius: 1em;
-  background-color: rgba(155, 155, 155, 0.45);
+  background: rgba(from var(--s-default-fg) r g b / .25);
+  color:  var(--s-default-fg);
   overflow: hidden;
   padding: 1em;
 }
@@ -73,7 +71,6 @@ div.pop:popover-open{
 
 .lds-ring {
   display: block;
-  color: var(--ink);
   width: 7em;
   height: 7em;
   margin: auto;
@@ -108,7 +105,18 @@ div.pop:popover-open{
     transform: rotate(360deg);
   }
 }
-  `;
+.r1 { font-size: var(--r1-fs); }
+.r2 { font-size: var(--r2-fs); }
+.r3 { font-size: var(--r3-fs); }
+.r4 { font-size: var(--r4-fs); }
+.r5 { font-size: var(--r5-fs); }
+.r6 { font-size: var(--r6-fs); }
+.ok      { background: rgba(from var(--s-ok-bg-ctl) r g b / .5);     color: var(--s-ok-fg-ctl);    }
+.info    { background: rgba(from var(--s-info-bg-ctl) r g b / .5);   color: var(--s-info-fg-ctl);  }
+.warning { background: rgba(from var(--s-warn-bg-ctl) r g b / .5);   color: var(--s-warn-fg-ctl);  }
+.alert   { background: rgba(from var(--s-alert-bg-ctl) r g b / .5);  color: var(--s-alert-fg-ctl); }
+.error   { background: rgba(from var(--s-error-bg-ctl) r g b / .5);  color: var(--s-error-fg-ctl); }
+`;
 
 
   static properties = {
@@ -166,8 +174,9 @@ div.pop:popover-open{
   }
 
   render(){
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     return html`
-    <div id="pop" popover="manual" class="pop">
+    <div id="pop" popover="manual" class="pop ${cls}">
       <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
     </div>
     `;

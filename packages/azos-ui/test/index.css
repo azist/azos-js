@@ -56,11 +56,10 @@ body {
   --paper: #f0f0f0;
   --ink: #585858;
   --ghost: rgba(0, 0, 0, .2);
-  /*#c2c2c2*/
 
   /* statuses */
   --s-default-fg: var(--ink);
-  --s-default-bg: var(--paper);
+  --s-default-bg: #c0c0c0;
   --s-default-fg-ctl: var(--ink);
   --s-default-bg-ctl: #fff;
   --s-default-bor-ctl: 1.2px solid #8a8a8a;
