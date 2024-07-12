@@ -52,8 +52,8 @@ export const baseStyles = css`
 
 @media screen and (max-width:500px){
   .mid-right,.mid-left{flex-direction:column;}
-  .mid-right > span{margin-left:0;}
-  .mid-left > span{margin-right:0;}
+  .mid-right > span{margin-left:0 !important; margin-bottom:.33em;}
+  .mid-left > span{margin-right:0 !important; margin-bottom:.33em; text-align:left;}
 }
 `;
 
@@ -308,11 +308,15 @@ export const textInputStyles=css`
     gap:0 .5em;
     user-select:none;
   }
-  input[type=text],input[type=password],textarea{
+  input[type=text],input[type=password],textarea,select{
     padding:.35em .5em .25em .5em;
     border: var(--s-default-bor-ctl);
     background: var(--s-default-bg-ctl);
     color: var(--s-default-fg-ctl);
+  }
+  input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
   }
   input[type=text]::placeholder,
   input[type=password]::placeholder,
@@ -326,7 +330,7 @@ export const textInputStyles=css`
   .errorBg   { color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
 
   .disabled{ color: #b4b4b4; font-weight: 100; }
-  input[type=text]:disabled,input[type=password]:disabled,textarea:disabled{
+  input[type=text]:disabled,input[type=password]:disabled,textarea:disabled,select:disabled{
     border: 1px solid var(--ghost);
     background: none;
     color: var(--ghost);
