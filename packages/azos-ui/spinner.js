@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isFunction } from "azos/aver";
-import { AzosElement, html, css, parseRank, parseStatus, STATUS, RANK } from "./ui.js";
+import { AzosElement, html, css, parseRank, parseStatus, STATUS, RANK, noContent } from "./ui.js";
 
 
 /**
@@ -14,13 +14,14 @@ import { AzosElement, html, css, parseRank, parseStatus, STATUS, RANK } from "./
 export class Spinner extends AzosElement {
 
   /**
-   * Shows a spinner with optional title, rank, status and modal mode.
+   * Shows a spinner with optional message, timeout, rank, status and modal mode.
    * This function create a new spinner instance every time and returns it.
    * You can pass the returned spinner instance into `spinner.hide()` to deterministically close it
   */
-  static show(title = null, rank = RANK.NORMAL, status = STATUS.DEFAULT, isModal = false){
+  static show(msg = null, timeout = 0, rank = RANK.NORMAL, status = STATUS.DEFAULT, isModal = false){
     const spinner = new Spinner();
-    spinner.title = title;
+    spinner.message = msg;
+    spinner.timeout = timeout | 0;
     spinner.rank = rank;
     spinner.status = status;
     spinner.isModal = isModal | false;
@@ -28,32 +29,33 @@ export class Spinner extends AzosElement {
     return spinner;
   }
 
-  /** Shows a modal spinner with optional title, rank, and status
+  /** Shows a modal spinner with optional message, timeout, rank, and status
    * This function create a new spinner instance every time and returns it.
    * You can pass the returned spinner instance into `hide(spinner)` to deterministically dispose it
   */
-  static showModal(title = null, rank = RANK.NORMAL, status = STATUS.DEFAULT){ return Spinner.show(title, rank, status, true); }
+  static showModal(msg = null, timeout = 0, rank = RANK.NORMAL, status = STATUS.DEFAULT){ return Spinner.show(msg, timeout, rank, status, true); }
 
   /**
    * Asynchronously executes an action `fAction` showing a modal (blocking) spinner before the invocation and
    * ensuring that the spinner is hidden right after the invocation even if an error is thrown
    */
-  static async exec(fAction, title = null, rank = RANK.NORMAL, status = STATUS.DEFAULT){
+  static async exec(fAction, msg = null, rank = RANK.NORMAL, status = STATUS.DEFAULT){
     isFunction(fAction);
-    const spinner = Spinner.showModal(title, rank, status);
-    try     { await fAction(); }
+    const spinner = Spinner.showModal(msg, -1, rank, status);
+    try     { await fAction(spinner); }
     finally { spinner.hide(); }
   }
 
 
   static styles = css`
 dialog{
+  display: block;
   border: none;
   border-radius: 1em;
   background: rgba(from var(--s-default-fg) r g b / .25);
   color:  var(--s-default-fg);
   overflow: hidden;
-  padding: 4em;
+  padding: 1em;
   box-shadow: 0px 0px 24px #7f7f7f30;
   opacity: 0;
 }
@@ -71,22 +73,20 @@ dialog:popover-open, dialog[open]{
 @starting-style{dialog:popover-open, dialog[open]{opacity: 0;}}
 
 
-.lds-ring,
-.lds-ring div {  box-sizing: border-box; }
+.ring,.ring div {  box-sizing: border-box; }
 
-.lds-ring {
+.ring {
   display: block;
-  margin: auto;
-  padding: 0px;
+  width: 5em;
+  height: 5em;
+  padding 0px;
+  margin: .5em auto .5em auto;
 }
-.lds-ring div {
-  box-sizing: border-box;
-  display: block;
+.ring div {
+  display: inline-block;
   position: absolute;
-  left: 2em;
-  top: 2em;
-  width: 4em;
-  height: 4em;
+  width: 5em;
+  height: 5em;
   margin: auto;
   border: 0.5em solid currentColor;
   border-radius: 50%;
@@ -110,22 +110,35 @@ dialog:popover-open, dialog[open]{
     transform: rotate(360deg);
   }
 }
+
+.msg{
+  display: block;
+  font-size: 0.75em;
+  font-weight: bold;
+  text-align: center;
+  max-width: 24ch;
+  min-width: 20ch;
+  margin-top: 1em;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .r1 { font-size: var(--r1-fs); }
 .r2 { font-size: var(--r2-fs); }
 .r3 { font-size: var(--r3-fs); }
 .r4 { font-size: var(--r4-fs); }
 .r5 { font-size: var(--r5-fs); }
 .r6 { font-size: var(--r6-fs); }
-.ok      { background: rgba(from var(--s-ok-bg-ctl) r g b / .7);     color: var(--s-ok-fg-ctl);    }
-.info    { background: rgba(from var(--s-info-bg-ctl) r g b / .7);   color: var(--s-info-fg-ctl);  }
-.warning { background: rgba(from var(--s-warn-bg-ctl) r g b / .7);   color: var(--s-warn-fg-ctl);  }
-.alert   { background: rgba(from var(--s-alert-bg-ctl) r g b / .7);  color: var(--s-alert-fg-ctl); }
-.error   { background: rgba(from var(--s-error-bg-ctl) r g b / .7);  color: var(--s-error-fg-ctl); }
+.ok      { background: rgba(from var(--s-ok-bg-ctl) r g b / .45);     color: var(--s-ok-fg-ctl);    }
+.info    { background: rgba(from var(--s-info-bg-ctl) r g b / .45);   color: var(--s-info-fg-ctl);  }
+.warning { background: rgba(from var(--s-warn-bg-ctl) r g b / .45);   color: var(--s-warn-fg-ctl);  }
+.alert   { background: rgba(from var(--s-alert-bg-ctl) r g b / .45);  color: var(--s-alert-fg-ctl); }
+.error   { background: rgba(from var(--s-error-bg-ctl) r g b / .45);  color: var(--s-error-fg-ctl); }
 `;
 
 
   static properties = {
-    title: {type: String},
+    message: {type: String},
     isModal: {type: Boolean},
     timeout: {type: Number}
   };
@@ -163,7 +176,8 @@ dialog:popover-open, dialog[open]{
     else
       dlg.showPopover();
 
-    this.#tmr = setTimeout(() => this.hide(), this.timeout);
+    const to = this.timeout === 0 ? 40_000 : this.timeout;
+    this.#tmr = to > 0 ? setTimeout(() => this.hide(), to) : null;
     return true;
   }
 
@@ -188,10 +202,20 @@ dialog:popover-open, dialog[open]{
 
   render(){
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+
     if (this.isModal) cls += " modal";
+
+    const msg = this.message ? html`<div class="msg">${this.message}</div>` : noContent;
+
     return html`
     <dialog id="pop" popover="manual" class="pop ${cls}">
-      <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+      <div class="ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+      ${msg}
     </dialog>
     `;
   }
