@@ -28,10 +28,33 @@ export class Showcase extends AzosElement{
   onDlg2Open(){ this.dlg2.show(); }
   onDlg2Close(){ this.dlg2.close(); }
 
-  onSpinnerOpen(){ this.spinner1.show(); }
-  onSpinnerClose(){ this.spinner1.hide(); }
+  async onSpinnerProcess(){
+    Spinner.exec(async sp => {
+     sp.message = `Prepping DB...`;
+     await new Promise(resolve => setTimeout(resolve, 1070));
+     sp.message = `Exec DDL 1 of 5 ...`;
+     await new Promise(resolve => setTimeout(resolve, 1500));
+     sp.message = `Exec DDL 2 of 5 ...`;
+     await new Promise(resolve => setTimeout(resolve, 890));
+     sp.message = `Exec DDL 3 of 5 ...`;
+     await new Promise(resolve => setTimeout(resolve, 1232));
+     sp.status = "error";
+     sp.message = `Recovering DDL error...`;
+     await new Promise(resolve => setTimeout(resolve, 2370));
+     sp.status = "warning";
+     sp.message = `Exec DDL 4 of 5 ...`;
+     await new Promise(resolve => setTimeout(resolve, 1870));
+     sp.message = `Exec DDL 5 of 5 ...`;
+     sp.status = "ok";
+     await new Promise(resolve => setTimeout(resolve, 2360));
+    });
+  }
 
-  onAutoSpinnerOpen(){ Spinner.show(); }
+  onModalSpinnerOpen(){ this.spinnerModal.show(); }
+  onNonModalSpinnerOpen(){ this.spinnerNonModal.show(); }
+  onNonModalSpinnerClose(){ this.spinnerNonModal.hide(); }
+
+  onAutoSpinnerOpen(){ Spinner.show(null, 3000); }
 
   render(){
     return html`
@@ -45,12 +68,17 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
 <az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
-<az-button @click="${this.onSpinnerOpen}" title="Open Spinner..." status="info"></az-button>
-<az-button @click="${this.onSpinnerClose}" title="Close Spinner..." status="info"></az-button>
+
+<az-button @click="${this.onModalSpinnerOpen}" title="Open Modal Spinner..." status="alert"></az-button>
+<az-button @click="${this.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
+
+<az-button @click="${this.onNonModalSpinnerOpen}" title="Open NM Spinner..." status="info"></az-button>
+<az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
 
 <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
 
-<az-spinner id="spinner1" scope="this" status="info" timeout="120000" isModal></az-spinner>
+<az-spinner id="spinnerModal" scope="this" status="alert" timeout="5000" isModal></az-spinner>
+<az-spinner id="spinnerNonModal" scope="this" status="info" timeout="10000" ></az-spinner>
 
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
