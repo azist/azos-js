@@ -47,24 +47,28 @@ export class Spinner extends AzosElement {
 
 
   static styles = css`
-.pop{
-  width: 7em;
-  height: 7em;
+dialog{
   border: none;
   border-radius: 1em;
   background: rgba(from var(--s-default-fg) r g b / .25);
   color:  var(--s-default-fg);
   overflow: hidden;
-  padding: 1em;
-  box-shadow: 0px 0px 24px #7f7f7f50;
+  padding: 4em;
+  box-shadow: 0px 0px 24px #7f7f7f30;
+  opacity: 0;
 }
 
-div.pop:popover-open{
+dialog.modal::backdrop{
+  background: var(--modal-spin-backdrop-bg);
+  backdrop-filter: var(--modal-spin-backdrop-filter);
+}
+
+dialog:popover-open, dialog[open]{
   opacity: 1;
   transition: 0.51s ease-in;
 }
 
-@starting-style{div.pop:popover-open{opacity: 0;}}
+@starting-style{dialog:popover-open, dialog[open]{opacity: 0;}}
 
 
 .lds-ring,
@@ -72,8 +76,6 @@ div.pop:popover-open{
 
 .lds-ring {
   display: block;
-  width: 7em;
-  height: 7em;
   margin: auto;
   padding: 0px;
 }
@@ -81,9 +83,11 @@ div.pop:popover-open{
   box-sizing: border-box;
   display: block;
   position: absolute;
-  width: 7em;
-  height: 7em;
-  margin: 0px;
+  left: 2em;
+  top: 2em;
+  width: 4em;
+  height: 4em;
+  margin: auto;
   border: 0.5em solid currentColor;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
@@ -112,11 +116,11 @@ div.pop:popover-open{
 .r4 { font-size: var(--r4-fs); }
 .r5 { font-size: var(--r5-fs); }
 .r6 { font-size: var(--r6-fs); }
-.ok      { background: rgba(from var(--s-ok-bg-ctl) r g b / .5);     color: var(--s-ok-fg-ctl);    }
-.info    { background: rgba(from var(--s-info-bg-ctl) r g b / .5);   color: var(--s-info-fg-ctl);  }
-.warning { background: rgba(from var(--s-warn-bg-ctl) r g b / .5);   color: var(--s-warn-fg-ctl);  }
-.alert   { background: rgba(from var(--s-alert-bg-ctl) r g b / .5);  color: var(--s-alert-fg-ctl); }
-.error   { background: rgba(from var(--s-error-bg-ctl) r g b / .5);  color: var(--s-error-fg-ctl); }
+.ok      { background: rgba(from var(--s-ok-bg-ctl) r g b / .7);     color: var(--s-ok-fg-ctl);    }
+.info    { background: rgba(from var(--s-info-bg-ctl) r g b / .7);   color: var(--s-info-fg-ctl);  }
+.warning { background: rgba(from var(--s-warn-bg-ctl) r g b / .7);   color: var(--s-warn-fg-ctl);  }
+.alert   { background: rgba(from var(--s-alert-bg-ctl) r g b / .7);  color: var(--s-alert-fg-ctl); }
+.error   { background: rgba(from var(--s-error-bg-ctl) r g b / .7);  color: var(--s-error-fg-ctl); }
 `;
 
 
@@ -130,6 +134,7 @@ div.pop:popover-open{
   #tmr = null;
   #isStandalone = true;
   #isShown = false;
+  #shownAsModal = false;
   constructor(){
     super();
     this.timeout = 25_000;
@@ -151,8 +156,12 @@ div.pop:popover-open{
       this.#isStandalone = true;
     }
 
-    const div = this.$("pop");
-    div.showPopover();
+    const dlg = this.$("pop");
+    this.#shownAsModal = this.isModal;
+    if (this.#shownAsModal)
+      dlg.showModal();
+    else
+      dlg.showPopover();
 
     this.#tmr = setTimeout(() => this.hide(), this.timeout);
     return true;
@@ -164,8 +173,11 @@ div.pop:popover-open{
     this.#isShown = false;
     if (this.#tmr) clearTimeout(this.#tmr);
 
-    const div = this.$("pop");
-    div.hidePopover();
+    const dlg = this.$("pop");
+    if (this.#shownAsModal)
+      dlg.close();
+    else
+      dlg.hidePopover();
 
     if (this.#isStandalone){
       setTimeout(() => document.body.removeChild(this), 1000);
@@ -176,10 +188,11 @@ div.pop:popover-open{
 
   render(){
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+    if (this.isModal) cls += " modal";
     return html`
-    <div id="pop" popover="manual" class="pop ${cls}">
+    <dialog id="pop" popover="manual" class="pop ${cls}">
       <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-    </div>
+    </dialog>
     `;
   }
 

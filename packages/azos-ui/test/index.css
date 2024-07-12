@@ -138,6 +138,8 @@ body {
   --modal-shadow: 6px 8px 18px rgba(0, 0, 0, 0.45);
   --modal-backdrop-bg: rgba(100, 100, 100, 0.45);
   --modal-backdrop-filter: blur(4px);
+  --modal-spin-backdrop-bg: rgba(100, 100, 100, 0.2);
+  --modal-spin-backdrop-filter: grayscale(0.65) blur(1.5px);
 
   /* focus */
   --focus-ctl-outline: 3px solid rgba(10, 128, 255, 0.55);
