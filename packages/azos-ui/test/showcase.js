@@ -1,10 +1,10 @@
 import { AzosElement, html, css } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
-import "../parts/checkbox.js";
-import "../parts/radio-group.js";
-import "../parts/text-input.js";
-import "../parts/select.js";
+import "../parts/check-field.js";
+import "../parts/radio-group-field.js";
+import "../parts/text-field.js";
+import "../parts/select-field.js";
 import "../vcl/util/code-box.js";
 import { Spinner } from "../spinner.js";
 
@@ -175,9 +175,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
         <az-radio-option>Choice number 3</az-radio-option>
       </az-radio-group>
 
-      <az-radio-group id="midLeftGroup" title="Group of radios with mid-left position" position="mid-left">
-        <az-radio-option>Position attribute is applied to the AZRadioGroup</az-radio-option>
-        <az-radio-option>At this point, position attribute cannot be applied separately to individual options</az-radio-option>
+      <az-radio-group id="midLeftGroup" title="Group of radios with mid-left titlePosition" titlePosition="mid-left">
+        <az-radio-option>titlePosition attribute is applied to the AZRadioGroup</az-radio-option>
+        <az-radio-option>At this point, titlePosition attribute cannot be applied separately to individual options</az-radio-option>
         <az-radio-option>Choice number 3</az-radio-option>
       </az-radio-group>
   </div>
@@ -240,21 +240,21 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-checkbox id="okSwitch" title="This is an OK switch" itemType="switch" status="ok"></az-checkbox>
     <az-checkbox id="disabledSwitch" title="This switch is disabled" itemType="switch" isdisabled></az-checkbox>
   </div>
-  <h3>Label Positioning</h3>
-  <p>Clockwise, the following positions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bot-left, bot-center, bot-right</strong>. The default position for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default position for text boxes should be <strong>top_left</strong>.</p>
+  <h3>Title Positioning</h3>
+  <p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bot-left, bot-center, bot-right</strong>. The default titlePosition for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default titlePosition for text boxes should be <strong>top_left</strong>.</p>
   <div class="strip-h">
-    <az-checkbox id="topLeftSwitch" title="aAa" itemType="switch" position="top-left"></az-checkbox>
-    <az-checkbox id="topCenterSwitch" title="aAa" itemType="switch" position="top-center"></az-checkbox>
-    <az-checkbox id="topRightSwitch" title="aAa" itemType="switch" position="top-right"></az-checkbox>
+    <az-checkbox id="topLeftSwitch" title="aAa" itemType="switch" titlePosition="top-left"></az-checkbox>
+    <az-checkbox id="topCenterSwitch" title="aAa" itemType="switch" titlePosition="top-center"></az-checkbox>
+    <az-checkbox id="topRightSwitch" title="aAa" itemType="switch" titlePosition="top-right"></az-checkbox>
   </div>
   <div class="strip-h">
-    <az-checkbox id="midLeftSwitch" title="aAa" itemType="switch" position="mid-left"></az-checkbox>
-    <az-checkbox id="midRightSwitch" title="aAa" itemType="switch" position="mid-right"></az-checkbox>
+    <az-checkbox id="midLeftSwitch" title="aAa" itemType="switch" titlePosition="mid-left"></az-checkbox>
+    <az-checkbox id="midRightSwitch" title="aAa" itemType="switch" titlePosition="mid-right"></az-checkbox>
   </div>
   <div class="strip-h">
-    <az-checkbox id="botLeftSwitch" title="aAa" itemType="switch" position="bot-left"></az-checkbox>
-    <az-checkbox id="botCenterSwitch" title="aAa" itemType="switch" position="bot-center"></az-checkbox>
-    <az-checkbox id="botRightSwitch" title="aAa" itemType="switch" position="bot-right"></az-checkbox>
+    <az-checkbox id="botLeftSwitch" title="aAa" itemType="switch" titlePosition="bot-left"></az-checkbox>
+    <az-checkbox id="botCenterSwitch" title="aAa" itemType="switch" titlePosition="bot-center"></az-checkbox>
+    <az-checkbox id="botRightSwitch" title="aAa" itemType="switch" titlePosition="bot-right"></az-checkbox>
   </div>
 <h2>Text boxes</h2>
   <div class="strip-h">
@@ -265,23 +265,23 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   </div>
   <hr>
   <div style="border:1px dotted;padding:10px;"><az-text-input id="ignoreLabelMarginTextInput" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Top-left label. Ignoring labelMargin attribute." labelMargin="25"></az-text-input></div>
-  <div style="border:1px dotted;padding:10px;"><az-text-input id="testLabelMarginTextInput" title="labelMargin = 10. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Mid-left label. Applying labelMargin attribute." labelMargin="10" position="mid-left"></az-text-input></div>
-  <div style="border:1px dotted;padding:10px;"><az-text-input id="testLabelMarginTextInput" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Mid-right label. Applying labelMargin attribute." labelMargin="25" position="mid-right"></az-text-input></div>
-  <div style="border:1px dotted;padding:10px;"><az-text-input id="ignoreLabelMarginTextInputAgain" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Bottom-right label. Ignoring labelMargin attribute." labelMargin="25" position="bot-right"></az-text-input></div>
+  <div style="border:1px dotted;padding:10px;"><az-text-input id="testLabelMarginTextInput" title="labelMargin = 10. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Mid-left label. Applying labelMargin attribute." labelMargin="10" titlePosition="mid-left"></az-text-input></div>
+  <div style="border:1px dotted;padding:10px;"><az-text-input id="testLabelMarginTextInput" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Mid-right label. Applying labelMargin attribute." labelMargin="25" titlePosition="mid-right"></az-text-input></div>
+  <div style="border:1px dotted;padding:10px;"><az-text-input id="ignoreLabelMarginTextInputAgain" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Bottom-right label. Ignoring labelMargin attribute." labelMargin="25" titlePosition="bot-right"></az-text-input></div>
   <hr>
   <div class="strip-h">
     <az-text-input id="defaultTextInput" title="Top Left" placeholder="Type something here&hellip;"></az-text-input>
-    <az-text-input id="topCenterTextInput" title="Top Center" placeholder="Type something here&hellip;" position="top-center"></az-text-input>
-    <az-text-input id="topRightTextInput" title="Top Right" placeholder="Type something here&hellip;" position="top-right"></az-text-input>
+    <az-text-input id="topCenterTextInput" title="Top Center" placeholder="Type something here&hellip;" titlePosition="top-center"></az-text-input>
+    <az-text-input id="topRightTextInput" title="Top Right" placeholder="Type something here&hellip;" titlePosition="top-right"></az-text-input>
   </div>
   <div class="strip-h">
-    <az-text-input id="midLeftTextInput" title="Middle Left" placeholder="Type something here&hellip;" position="mid-left"></az-text-input>
-    <az-text-input id="midRightTextInput" title="Middle Right" placeholder="Type something here&hellip;" position="mid-right"></az-text-input>
+    <az-text-input id="midLeftTextInput" title="Middle Left" placeholder="Type something here&hellip;" titlePosition="mid-left"></az-text-input>
+    <az-text-input id="midRightTextInput" title="Middle Right" placeholder="Type something here&hellip;" titlePosition="mid-right"></az-text-input>
   </div>
   <div class="strip-h">
-    <az-text-input id="botLeftTextInput" title="Bottom Left" placeholder="Type something here&hellip;" position="bot-left"></az-text-input>
-    <az-text-input id="botCenterTextInput" title="Bottom Center" placeholder="Type something here&hellip;" position="bot-center"></az-text-input>
-    <az-text-input id="botRightTextInput" title="Bottom Right" placeholder="Type something here&hellip;" position="bot-right"></az-text-input>
+    <az-text-input id="botLeftTextInput" title="Bottom Left" placeholder="Type something here&hellip;" titlePosition="bot-left"></az-text-input>
+    <az-text-input id="botCenterTextInput" title="Bottom Center" placeholder="Type something here&hellip;" titlePosition="bot-center"></az-text-input>
+    <az-text-input id="botRightTextInput" title="Bottom Right" placeholder="Type something here&hellip;" titlePosition="bot-right"></az-text-input>
   </div>
   <hr>
   <div class="strip-h">

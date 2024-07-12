@@ -3,7 +3,7 @@ import { html, parseRank, parseStatus, parsePosition } from '../ui.js';
 import { AzosPart } from './part.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
 
-export class RadioGroup extends AzosPart{
+export class RadioGroupField extends AzosPart{
 
   static properties = {
     title:    {type: String},
@@ -48,4 +48,4 @@ export class RadioGroup extends AzosPart{
   }
 }
 
-window.customElements.define("az-radio-group", RadioGroup);
+window.customElements.define("az-radio-group", RadioGroupField);
