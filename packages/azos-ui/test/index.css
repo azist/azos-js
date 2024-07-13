@@ -149,13 +149,14 @@ body {
   --ctl-button-fweight: bold;
   --ctl-button-fstyle: normal;
 
-  --vcl-codebox-bg: #e0e0e0;
-  --vcl-codebox-fg: #747474;
+  --vcl-codebox-bg: #323232;
+  --vcl-codebox-fg: #8a8a8a;
   --vcl-codebox-ffamily: 'Lucida Console', 'Courier New', monospace;
-  --vcl-codebox-hi-key: #484848;
+  --vcl-codebox-fsize: 0.9em;
+  --vcl-codebox-hi-key: #d2d2d2;
   --vcl-codebox-hi-string: #1094c8;
-  --vcl-codebox-hi-number: #108510;
-  --vcl-codebox-hi-boolean: #a0209a;
+  --vcl-codebox-hi-number: #10a510;
+  --vcl-codebox-hi-boolean: #c030eb;
   --vcl-codebox-hi-null: #e75e45;
 }
 

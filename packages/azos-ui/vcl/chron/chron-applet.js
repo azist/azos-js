@@ -4,14 +4,19 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html, css } from "azos-ui/ui.js";
-import { Command } from "azos-ui/cmd.js";
-import { Applet } from "azos-ui/applet.js";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
+
+import { html, css, STATUS } from "azos-ui/ui";
+import { Command } from "azos-ui/cmd";
+import { Applet } from "azos-ui/applet";
+import { Spinner } from "azos-ui/spinner";
+
+import "azos-ui/modal-dialog";
+import "azos-ui/parts/button";
+import "azos-ui/vcl/util/code-box";
 
 import "./filter-dialog.js";
 import "./grid.js";
-import { Spinner } from "../../spinner.js";
 
 /** Provides Azos SKY Chronicle log viewer functionality  */
 export class ChronicleApplet extends Applet{
@@ -69,13 +74,53 @@ export class ChronicleApplet extends Applet{
      </az-sky-chronicle-filter-dialog>
 
      <div class="full-screen">
-      <az-sky-chronicle-grid id="grdData" scope="this" showFullGuids showChannel>
+      <az-sky-chronicle-grid id="grdData" scope="this" showFullGuids showChannel @showRowData=${this.onShowRowData}>
       </az-sky-chronicle-grid>
      </div>
 
      <!-- Another popup for details -->
+     <az-modal-dialog id="dlgData" scope="this" title="Data" status="normal">
+     <div slot="body">
+        <az-code-box id="codeBox" scope="this"  highlight="js" style="max-width: 120ch"></az-code-box>
+        <br>
+        <az-button @click="${this.onDlgDataClose}" title="Close" style="float: right;"></az-button>
+      </div>
+     </az-modal-dialog>
     `;
   }
+
+  onDlgDataClose(){ this.dlgData.close();  }
+
+  onShowRowData(e){
+
+    this.codeBox.highlight = "json";
+
+    if (e.detail.what==="error"){
+      this.dlgData.status = STATUS.ERROR;
+      this.dlgData.title = `Error Details`;
+      this.codeBox.source = JSON.stringify({ gdid: e.detail.row.Gdid, error: e.detail.row.ExceptionData}, null, 2);
+      this.dlgData.show();
+    } else if (e.detail.what==="pars"){
+      //e.detail.row.Pars
+      this.dlgData.status = STATUS.INFO;
+      this.dlgData.title = `Log Message Parameters`;
+      this.codeBox.source = JSON.stringify({ gdid: e.detail.row.Gdid, Parameters: e.detail.row.Parameters}, null, 2);
+      this.dlgData.show();
+    } else if (e.detail.what==="text"){
+      this.dlgData.status = STATUS.OK;
+      this.dlgData.title = `Text`;
+      this.codeBox.highlight = "text";
+      this.codeBox.source = e.detail.row.Text;
+      this.dlgData.show();
+    } else {
+      //whole row json
+      this.dlgData.status = STATUS.DEFAULT;
+      this.dlgData.title = `Log Message Details`;
+      this.codeBox.source = JSON.stringify(e.detail.row, null, 2);
+      this.dlgData.show();
+    }
+  }
+
 }
 
 window.customElements.define("az-sky-chronicle-applet", ChronicleApplet);

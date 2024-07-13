@@ -5,12 +5,14 @@ import { AzosElement, css, html, verbatimHtml, escHtml, parseRank, parseStatus }
 export class CodeBox extends AzosElement{
 
   static styles = css`
-  .r1 { font-size: var(--r1-fs); }
-  .r2 { font-size: var(--r2-fs); }
-  .r3 { font-size: var(--r3-fs); }
-  .r4 { font-size: var(--r4-fs); }
-  .r5 { font-size: var(--r5-fs); }
-  .r6 { font-size: var(--r6-fs); }
+  :host{ font-size: var(--vcl-codebox-fsize);}
+
+  .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl);}
+  .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-ctl);}
+  .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-ctl);}
+  .r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-ctl);}
+  .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-ctl);}
+  .r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl);}
 
   .codebox{
     font-family: var(--vcl-codebox-ffamily);
@@ -18,10 +20,11 @@ export class CodeBox extends AzosElement{
     overflow: auto;
     color: var(--vcl-codebox-fg);
     background: var(--vcl-codebox-bg);
-    padding: 0.25lh 1ch;
+    padding: 1ch;
+    max-width: inherit;
   }
 
-  .code-key     { color: var(--vcl-codebox-hi-key); font-weight: bold; }  .code-key:hover{ filter: invert(1);  }
+  .code-key     { color: var(--vcl-codebox-hi-key); }  .code-key:hover{ filter: invert(1);  }
   .code-string  { color: var(--vcl-codebox-hi-string); }
   .code-number  { color: var(--vcl-codebox-hi-number); }
   .code-boolean { color: var(--vcl-codebox-hi-boolean); }
