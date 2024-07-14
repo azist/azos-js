@@ -16,16 +16,19 @@ export class CodeBox extends AzosElement{
 
   .codebox{
     font-family: var(--vcl-codebox-ffamily);
-    white-space: pre;
+    white-space: pre-wrap;
+    word-break: break-all;
     overflow: auto;
     color: var(--vcl-codebox-fg);
     background: var(--vcl-codebox-bg);
-    padding: 1ch;
+    padding: 0.5em;
     max-width: inherit;
+    max-height: inherit;
+    margin: inherit;
   }
 
-  .code-key     { color: var(--vcl-codebox-hi-key); }  .code-key:hover{ filter: invert(1);  }
-  .code-string  { color: var(--vcl-codebox-hi-string); }
+  .code-key     { color: var(--vcl-codebox-hi-key); }
+  .code-string  { color: var(--vcl-codebox-hi-string); } .code-string:hover{  color: var(--vcl-codebox-hi-string-hover); transition: 0.5s; }
   .code-number  { color: var(--vcl-codebox-hi-number); }
   .code-boolean { color: var(--vcl-codebox-hi-boolean); }
   .code-null    { color: var(--vcl-codebox-hi-null); }
@@ -66,9 +69,9 @@ export class CodeBox extends AzosElement{
 
     if (isOneOf(this.highlight, ["js", "json"])){
       const hs = this.hiJson(src);
-      return html` <div class="${cls}" .disabled=${this.isDisabled}> ${verbatimHtml(hs)} </div>`;
+      return html` <div class="${cls}" .disabled=${this.isDisabled}>${verbatimHtml(hs)}</div>`;
     }
-   return html`<div class="${cls}" .disabled=${this.isDisabled}> ${src} </div>`;
+   return html`<div class="${cls}" .disabled=${this.isDisabled}>${src}</div>`;
   }
 
 }

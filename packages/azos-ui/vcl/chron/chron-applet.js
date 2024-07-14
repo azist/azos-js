@@ -81,7 +81,7 @@ export class ChronicleApplet extends Applet{
      <!-- Another popup for details -->
      <az-modal-dialog id="dlgData" scope="this" title="Data" status="normal">
      <div slot="body">
-        <az-code-box id="codeBox" scope="this"  highlight="js" style="max-width: 120ch"></az-code-box>
+        <az-code-box id="codeBox" scope="this"  highlight="js" style="max-width: 120ch; max-height: 55vh"></az-code-box>
         <br>
         <az-button @click="${this.onDlgDataClose}" title="Close" style="float: right;"></az-button>
       </div>
@@ -103,19 +103,26 @@ export class ChronicleApplet extends Applet{
     } else if (e.detail.what==="pars"){
       //e.detail.row.Pars
       this.dlgData.status = STATUS.INFO;
-      this.dlgData.title = `Log Message Parameters`;
-      this.codeBox.source = JSON.stringify({ gdid: e.detail.row.Gdid, Parameters: e.detail.row.Parameters}, null, 2);
+
+      try{
+        const jsp = JSON.parse(e.detail.row.Parameters);
+        this.dlgData.title = `Parameters of (${e.detail.row.Gdid}) as JSON`;
+        this.codeBox.source = JSON.stringify(jsp, null, 2);
+      }catch{
+        this.dlgData.title = `Parameters of (${e.detail.row.Gdid})`;
+        this.codeBox.source = e.detail.row.Parameters;
+      }
       this.dlgData.show();
     } else if (e.detail.what==="text"){
       this.dlgData.status = STATUS.OK;
-      this.dlgData.title = `Text`;
+      this.dlgData.title = `Log Text`;
       this.codeBox.highlight = "text";
       this.codeBox.source = e.detail.row.Text;
       this.dlgData.show();
     } else {
       //whole row json
       this.dlgData.status = STATUS.DEFAULT;
-      this.dlgData.title = `Log Message Details`;
+      this.dlgData.title = `Log Message JSON`;
       this.codeBox.source = JSON.stringify(e.detail.row, null, 2);
       this.dlgData.show();
     }
