@@ -229,16 +229,16 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <h2>Checkboxes and switches</h2>
   <div class="strip-h">
-    <az-checkbox id="normalCheckbox" title="This is a checkbox"></az-checkbox>
-    <az-checkbox id="errorCheckbox" title="This is a checkbox" status="error"></az-checkbox>
-    <az-checkbox id="infoCheckbox" title="This is a checkbox" status="info"></az-checkbox>
-    <az-checkbox id="disabledCheckbox" title="Disabled checkbox" isdisabled></az-checkbox>
+    <az-checkbox id="normalCheckbox" title="This is a checkbox" titlePosition="mid-left"></az-checkbox>
+    <az-checkbox id="errorCheckbox" title="This is a checkbox" status="error" titlePosition="mid-left"></az-checkbox>
+    <az-checkbox id="infoCheckbox" title="This is a checkbox" status="info" titlePosition="mid-left"></az-checkbox>
+    <az-checkbox id="disabledCheckbox" title="Disabled checkbox" titlePosition="mid-left" isdisabled></az-checkbox>
   </div>
   <div class="strip-h">
-    <az-checkbox id="switch" title="Is this a switch?" itemType="switch"></az-checkbox>
-    <az-checkbox id="warnSwitch" title="This is a warning switch" itemType="switch" status="warning"></az-checkbox>
-    <az-checkbox id="okSwitch" title="This is an OK switch" itemType="switch" status="ok"></az-checkbox>
-    <az-checkbox id="disabledSwitch" title="This switch is disabled" itemType="switch" isdisabled></az-checkbox>
+    <az-checkbox id="switch" title="Is this a switch?" itemType="switch" titlePosition="mid-right"></az-checkbox>
+    <az-checkbox id="warnSwitch" title="This is a warning switch" itemType="switch" status="warning" titlePosition="mid-right"></az-checkbox>
+    <az-checkbox id="okSwitch" title="This is an OK switch" itemType="switch" status="ok" titlePosition="mid-right"></az-checkbox>
+    <az-checkbox id="disabledSwitch" title="This switch is disabled" itemType="switch" titlePosition="mid-right" isdisabled></az-checkbox>
   </div>
   <h3>Title Positioning</h3>
   <p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bot-left, bot-center, bot-right</strong>. The default titlePosition for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default titlePosition for text boxes should be <strong>top_left</strong>.</p>

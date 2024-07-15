@@ -36,7 +36,7 @@ export class TextField extends FieldPart{
   /** True if text input is <input type="text"> */
   get isInputText(){ return !this.isTextArea && !this.isPassword; }
 
-  renderPart(){
+  renderInput(){
     const clsRank     = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
 

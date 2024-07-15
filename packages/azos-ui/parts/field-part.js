@@ -28,7 +28,7 @@ export class FieldPart extends AzosPart{
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatus=`${parseStatus(this.status, true)}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
-    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-right"}`;
+    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
     let titleM='';
     if(this.titleMargin && (clsPosition==="mid-right" || clsPosition==="mid-left")){

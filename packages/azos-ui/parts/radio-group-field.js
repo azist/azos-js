@@ -1,13 +1,19 @@
 import { isOneOf } from 'azos/strings';
-import { html, parseRank, parseStatus } from '../ui.js';
+import { html, parseRank, parseStatus, parsePosition } from '../ui.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
-import { RadioOptionField } from './radio-option-field.js';
+import { AzosPart } from './part.js';
 
-export class RadioGroupField extends RadioOptionField{
+/* Can this work with the FieldPart? */
+
+export class RadioGroupField extends AzosPart{
 
   static properties = {
-    title:    {type: String},
-    itemType: {type: String}
+    /** Determines if this group contains radio buttons or switches */
+    itemType:      {type: String},
+    /** Title is the main prompt for the radio group */
+    title:         {type: String},
+    /** Determines how each radio item's label is positioned related to its radio button */
+    titlePosition: {type: String}
   };
 
   static styles = [baseStyles, radioStyles, switchStyles];
@@ -18,24 +24,30 @@ export class RadioGroupField extends RadioOptionField{
   get isRadio() { return !this.isSwitch;}
 
   /** True if the radio group has switches instead of radio buttons */
-  get isSwitch(){ return isOneOf(this.itemType, ["switch", "sw"]);}
+  get isSwitch(){  return isOneOf(this.itemType, ["switch", "sw"]);}
 
-
-  render(){
+  renderPart(){
     const clsRank =   `${parseRank(this.rank, true)}`;
     const clsStatus = `${parseStatus(this.status, true)}`;
+    const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
+    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-right"}`;
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
-    const optionList = html`${allOptions.map((option) => html`
-      ${option.renderRadioOption()}
+    const optionList = html`${allOptions.map((option, i) => html`
+      <div>
+        <label class="${clsPosition}" for="${this.id}_${i}">
+          <span>${option.innerText}</span>
+          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
+        </label>
+      </div>
     `)}`;
 
     return html`
-        <div class="${clsRank} ${clsStatus} ${clsDisable}">
-            <p>${this.title}</p>
-            ${optionList}
-        </div>
+      <div class="${clsRank} ${clsStatus} ${clsDisable}">
+        <p>${this.title}</p>
+        ${optionList}
+      </div>
     `;
   }
 }
