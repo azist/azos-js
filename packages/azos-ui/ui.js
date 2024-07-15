@@ -96,7 +96,7 @@ const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error"];
 export function parseStatus(v, isCss = false, clsSuffix = null){
   if (v===undefined || v===null) return isCss ? "" : STATUS.DEFAULT;
   clsSuffix = asString(clsSuffix);
-  v = v.toString();
+  v = v.toString().toLowerCase();
   if (isOneOf(v, ALL_STATUS_VALUES)) return `${v}${clsSuffix}`;
   return isCss ? "" : STATUS.DEFAULT;
 }
@@ -124,7 +124,7 @@ const ALL_POSITION_VALUES = [...Object.values(POSITION)];
  */
 export function parsePosition(v, isCss = false){
   if (v===undefined || v===null) return isCss ? "" : POSITION.DEFAULT;
-  v = v.toString();
+  v = v.toString().toLowerCase();
   if (isOneOf(v, ALL_POSITION_VALUES)) return `${v}`;
   return isCss ? "" : POSITION.DEFAULT;
 }
