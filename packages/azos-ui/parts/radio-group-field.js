@@ -1,14 +1,19 @@
 import { isOneOf } from 'azos/strings';
 import { html, parseRank, parseStatus, parsePosition } from '../ui.js';
-import { AzosPart } from './part.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
+import { AzosPart } from './part.js';
 
-export class RadioGroup extends AzosPart{
+/* Can this work with the FieldPart? */
+
+export class RadioGroupField extends AzosPart{
 
   static properties = {
-    title:    {type: String},
-    itemType: {type: String},
-    position: {type: String}
+    /** Determines if this group contains radio buttons or switches */
+    itemType:      {type: String},
+    /** Title is the main prompt for the radio group */
+    title:         {type: String},
+    /** Determines how each radio item's label is positioned related to its radio button */
+    titlePosition: {type: String}
   };
 
   static styles = [baseStyles, radioStyles, switchStyles];
@@ -21,13 +26,12 @@ export class RadioGroup extends AzosPart{
   /** True if the radio group has switches instead of radio buttons */
   get isSwitch(){  return isOneOf(this.itemType, ["switch", "sw"]);}
 
-
-  render(){
+  renderPart(){
     const clsRank =   `${parseRank(this.rank, true)}`;
     const clsStatus = `${parseStatus(this.status, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
-    const clsPosition = `${this.position ? parsePosition(this.position,true) : "mid-right"}`;
+    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-right"}`;
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
     const optionList = html`${allOptions.map((option, i) => html`
@@ -40,12 +44,12 @@ export class RadioGroup extends AzosPart{
     `)}`;
 
     return html`
-        <div class="${clsRank} ${clsStatus} ${clsDisable}">
-            <p>${this.title}</p>
-            ${optionList}
-        </div>
+      <div class="${clsRank} ${clsStatus} ${clsDisable}">
+        <p>${this.title}</p>
+        ${optionList}
+      </div>
     `;
   }
 }
 
-window.customElements.define("az-radio-group", RadioGroup);
+window.customElements.define("az-radio-group", RadioGroupField);
