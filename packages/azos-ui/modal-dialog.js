@@ -73,8 +73,8 @@ dialog::backdrop{
   background: var(--modal-title-bg);
   color: var(--modal-title-fg);
   margin: 0px;
-  padding: 0.25lh 1ch 0.25lh 1ch;
-  font-size: 1.4em;
+  padding: 0.4lh 1ch 0.5lh 1ch;
+  font-size: 1.2em;
   font-weight: bold;
   box-sizing: border-box;
   min-height: 20px;
@@ -86,7 +86,7 @@ dialog::backdrop{
 
 .dlg-title-close{
   float: right;
-  font-size: 2em;
+  font-size: 2.1em;
   font-weight: bold;
   color: var(--modal-title-fg);
   cursor: pointer;

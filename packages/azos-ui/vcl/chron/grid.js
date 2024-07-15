@@ -229,7 +229,7 @@ thead{
 
 
     return html`
-<tr class="msg-type-${msg.Type.toLowerCase()}" @dblclick="${this.showMsgJson(i)}">
+<tr class="msg-type-${msg.Type.toLowerCase()}" @dblclick="${this.showMsgJson}" data-idx="${i}">
   <td class="col-gdid">${shard}${msg.Gdid}</td>
   <td class="col-guid">${this.guid(msg.Guid)}</td>
   <td class="col-rel">${this.guid(msg.RelatedTo)}</td>
@@ -237,24 +237,41 @@ thead{
   <td class="col-utc">${msg.UTCTimeStamp}</td>
   ${(this.#showChannel ? `<td>${msg.App}</td> <td>${msg.Host}</td> <td>${msg.Channel}</td><td>${msg.Topic}</td>` : noContent)}
   <td>${msg.From} #${(msg.Source | 0).toString()}</td>
-  <td> <div class="text${msg.Text && msg.Text.indexOf && msg.Text.indexOf('\n') < 0 ? "" : "-pre"}${this.#showChannel ? noContent : " wide"}" @click="${this.showMsgText(i)}">${msg.Text}</div></td>
-  <td> <div class="snippet" @click="${this.showParams(i)}">${this.snippet(msg.Parameters)}</div></td>
-  <td class="col-error"> <div onclick="showError(${i})">${this.rootError(msg.ExceptionData)}</div></td>
+  <td> <div class="text${msg.Text && msg.Text.indexOf && msg.Text.indexOf('\n') < 0 ? "" : "-pre"}${this.#showChannel ? noContent : " wide"}" @click="${this.showMsgText}">${msg.Text}</div></td>
+  <td> <div class="snippet" @click="${this.showParams}">${this.snippet(msg.Parameters)}</div></td>
+  <td class="col-error"> <div @click="${this.showError}">${this.rootError(msg.ExceptionData)}</div></td>
 </tr>`;
   }
 
-  showMsgJson(){
-
+  getRow(e){
+    let idx = -1;
+    for(let n = e.target; n;){
+      idx = n.dataset.idx;
+      if (idx!==undefined) break;
+      n = n.parentNode;
+    }
+    return this.#data[idx];
   }
 
-  showMsgText(){
-
+  showMsgJson(e){
+    const row = this.getRow(e);
+    this.dispatchEvent(new CustomEvent("showRowData", {detail: {row: row, what: null}}));
   }
 
-  showParams(){
-
+  showMsgText(e){
+    const row = this.getRow(e);
+    this.dispatchEvent(new CustomEvent("showRowData", {detail: {row: row, what: "text"}}));
   }
 
+  showParams(e){
+    const row = this.getRow(e);
+    this.dispatchEvent(new CustomEvent("showRowData", {detail: {row: row, what: "pars"}}));
+  }
+
+  showError(e){
+    const row = this.getRow(e);
+    this.dispatchEvent(new CustomEvent("showRowData", {detail: {row: row, what: "error"}}));
+  }
 }
 
 window.customElements.define("az-sky-chronicle-grid", ChronicleGrid);
