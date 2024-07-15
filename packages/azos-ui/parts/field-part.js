@@ -1,5 +1,5 @@
-import { noContent } from "../ui";
-import { html, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { POSITION, noContent } from "../ui";
+import { html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 import { AzosPart } from "./part";
 
 export class FieldPart extends AzosPart{
@@ -18,10 +18,10 @@ export class FieldPart extends AzosPart{
      *  top-left, top-center, top-right, mid-left, mid-right, bot-left,
      *  bot-center, bot-right.
      */
-    titlePosition: {type: String},
+    titlePosition: {type: String, reflect: true, converter: { fromAttribute: (v) => parsePosition(v)}},
 
-    /** Starting input value */
-    value:         {type: String}
+    /** Input value */
+    value:         {type: String, reflect: true}
   }
 
   renderPart(){
@@ -30,17 +30,20 @@ export class FieldPart extends AzosPart{
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
     const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
-    let titleM='';
-    if(this.titleMargin && (clsPosition==="mid-right" || clsPosition==="mid-left")){
-      clsPosition==="mid-right" ? titleM=css`margin-left:${this.titleMargin}ch;` : titleM=css`margin-right:${this.titleMargin}ch;`;
+    let stlTitle = '';
+    if (this.titleMargin > 0){
+      if (this.titlePosition === POSITION.MIDDLE_LEFT) stlTitle = css`margin-right:${this.titleMargin}ch;`;
+      else if (this.titlePosition === POSITION.MIDDLE_RIGHT) stlTitle = css`margin-left:${this.titleMargin}ch;`;
     }
+
+    const msg = this.message ? html`<span>${this.message}</span>` : noContent;
 
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable}">
         <label class="${clsPosition}">
-          <span style="${titleM}">${this.title}</span>
-          ${this.message ? html`<br><span>${this.message}</span>` : ''}
+          <span style="${stlTitle}">${this.title}</span>
           ${this.renderInput()}
+          ${msg}
         </label>
       </div>
     `;
