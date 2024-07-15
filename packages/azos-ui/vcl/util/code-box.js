@@ -5,24 +5,30 @@ import { AzosElement, css, html, verbatimHtml, escHtml, parseRank, parseStatus }
 export class CodeBox extends AzosElement{
 
   static styles = css`
-  .r1 { font-size: var(--r1-fs); }
-  .r2 { font-size: var(--r2-fs); }
-  .r3 { font-size: var(--r3-fs); }
-  .r4 { font-size: var(--r4-fs); }
-  .r5 { font-size: var(--r5-fs); }
-  .r6 { font-size: var(--r6-fs); }
+  :host{ font-size: var(--vcl-codebox-fsize);}
+
+  .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl);}
+  .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-ctl);}
+  .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-ctl);}
+  .r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-ctl);}
+  .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-ctl);}
+  .r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl);}
 
   .codebox{
     font-family: var(--vcl-codebox-ffamily);
-    white-space: pre;
+    white-space: pre-wrap;
+    word-break: break-all;
     overflow: auto;
     color: var(--vcl-codebox-fg);
     background: var(--vcl-codebox-bg);
-    padding: 0.25lh 1ch;
+    padding: 0.5em;
+    max-width: inherit;
+    max-height: inherit;
+    margin: inherit;
   }
 
-  .code-key     { color: var(--vcl-codebox-hi-key); font-weight: bold; }  .code-key:hover{ filter: invert(1);  }
-  .code-string  { color: var(--vcl-codebox-hi-string); }
+  .code-key     { color: var(--vcl-codebox-hi-key); }
+  .code-string  { color: var(--vcl-codebox-hi-string); } .code-string:hover{  color: var(--vcl-codebox-hi-string-hover); transition: 0.5s; }
   .code-number  { color: var(--vcl-codebox-hi-number); }
   .code-boolean { color: var(--vcl-codebox-hi-boolean); }
   .code-null    { color: var(--vcl-codebox-hi-null); }
@@ -63,9 +69,9 @@ export class CodeBox extends AzosElement{
 
     if (isOneOf(this.highlight, ["js", "json"])){
       const hs = this.hiJson(src);
-      return html` <div class="${cls}" .disabled=${this.isDisabled}> ${verbatimHtml(hs)} </div>`;
+      return html` <div class="${cls}" .disabled=${this.isDisabled}>${verbatimHtml(hs)}</div>`;
     }
-   return html`<div class="${cls}" .disabled=${this.isDisabled}> ${src} </div>`;
+   return html`<div class="${cls}" .disabled=${this.isDisabled}>${src}</div>`;
   }
 
 }

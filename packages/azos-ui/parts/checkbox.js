@@ -10,7 +10,7 @@ export class Checkbox extends AzosPart{
     itemType:{type:String},
     position:{type:String}
   };
-  static styles=[baseStyles,checkStyles,switchStyles];
+  static styles=[baseStyles, checkStyles, switchStyles];
   constructor(){
     super();
     this.checked=false;
