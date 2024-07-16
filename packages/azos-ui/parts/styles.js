@@ -32,7 +32,7 @@ export const baseStyles = css`
 */
 .top-left,.top-center,.top-right,
 .mid-left,.mid-right,
-.bot-left,.bot-center,.bot-right { display:flex; }
+.bottom-left,.bottom-center,.bottom-right { display:flex; width: 100%; }
 
 .top-left,.top-center,.top-right { flex-direction:column; }
 .top-left > span                 { text-align:left; margin-bottom: .33em; }
@@ -45,15 +45,13 @@ export const baseStyles = css`
 .mid-right                       { flex-direction:row-reverse; align-items:center; justify-content:left; }
 .mid-right > span                { text-align:left; }
 
-.bot-left,.bot-center,.bot-right { flex-direction:column-reverse; }
-.bot-left > span                 { text-align:left; margin-top: .33em; }
-.bot-center > span               { text-align:center; margin-top: .33em; }
-.bot-right > span                { text-align:right; margin-top: .33em; }
+.bottom-left,.bottom-center,.bottom-right { flex-direction:column-reverse; }
+.bottom-left > span                 { text-align:left; margin-top: .33em; }
+.bottom-center > span               { text-align:center; margin-top: .33em; }
+.bottom-right > span                { text-align:right; margin-top: .33em; }
 
 @media screen and (max-width:500px){
   .mid-right,.mid-left{flex-direction:column;}
-  .mid-right > span{margin-left:0 !important; margin-bottom:.33em;}
-  .mid-left > span{margin-right:0 !important; margin-bottom:.33em; text-align:left;}
 }
 
 label > span{ font-size: .9em; }

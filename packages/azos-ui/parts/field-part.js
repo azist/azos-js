@@ -5,11 +5,14 @@ import { AzosPart } from "./part";
 export class FieldPart extends AzosPart{
 
   static properties = {
+    /** Set the width of this field as "%". Use this instead of minWidth and maxWidth. Must be 0 <= this.width <= 100 */
+    fieldWidth:         {type: Number},
+
     /** Maximum allowed width as "%" for this field. Cannot exceed 100. */
-    maxWidth:      {type: Number},
+    maxFieldWidth:      {type: Number},
 
     /** Minimum allowed width as "%" for this field. Cannot be less than zero. */
-    minWidth:      {type: Number},
+    minFieldWidth:      {type: Number},
 
     /** Validation (error) message */
     message:       {type: String},
@@ -27,30 +30,33 @@ export class FieldPart extends AzosPart{
     titleWidth:    {type: Number},
 
     /** Input value */
-    value:         {type: String, reflect: true},
-
-    /** Set the width of this field as "%". Use this instead of minWidth and maxWidth. Must be 0 <= this.width <= 100 */
-    width:         {type: Number}
+    value:         {type: String, reflect: true}
   }
 
   renderPart(){
-    const clsRank=`${parseRank(this.rank, true)}`;
-    const clsStatus=`${parseStatus(this.status, true)}`;
-    const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
+    const clsRank =     `${parseRank(this.rank, true)}`;
+    const clsStatus =   `${parseStatus(this.status, true)}`;
+    const clsDisable =  `${this.isDisabled ? "disabled" : ""}`;
     const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
+    /** Set the width of the input field label */
     let titleWidth = '';
-    if (this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT)
-      titleWidth = (0 <= this.titleWidth <= 100) ? css`width:${this.titleWidth}%;` : noContent;
+    if (this.titleWidth !== undefined) {
+      if (this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT)
+        if(0 <= this.titleWidth <= 100) titleWidth = css`width:${this.titleWidth}%;`;
+    }
 
-    const minWidth = (this.minWidth >= 0) ? css`min-width: ${this.minWidth}%;` : noContent;
-    const maxWidth = (this.maxWidth <= 100) ? css`max-width: ${this.maxWidth}%;` : noContent;
-    const width    = (0 <= this.width <= 100) ? css`width: ${this.width}%;` : noContent;
+    /** Set width for the entire input field (includes title, ui element, status message) */
+    let styleFieldWidth=css``;
+    if((this.fieldWidth !== undefined && this.minFieldWidth === undefined && this.maxFieldWidth === undefined) && 0 <= this.fieldWidth <= 100)
+      styleFieldWidth = css`width: ${this.fieldWidth}%;`;
+    if(this.minFieldWidth !== undefined && 0 <= this.minFieldWidth <= 100) styleFieldWidth += css`min-width: ${this.minFieldWidth}%;`;
+    if(this.maxFieldWidth !== undefined && 0 <= this.maxFieldWidth <= 100) styleFieldWidth += css`max-width: ${this.maxFieldWidth}%;`;
 
-    const msg = this.message ? html`<span class="msg">${this.message}</span>` : noContent;
+    const msg = this.message ? html`<span class="msg">${this.message}</span>` : '';
 
     return html`
-      <div class="${clsRank} ${clsStatus} ${clsDisable}" style="${minWidth} ${maxWidth} ${width}">
+      <div class="${clsRank} ${clsStatus} ${clsDisable}" style="${styleFieldWidth}">
         <label class="${clsPosition}">
           <span style="${titleWidth}">${this.title}</span>
           ${this.renderInput()}
