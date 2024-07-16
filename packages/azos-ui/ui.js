@@ -107,9 +107,9 @@ export const POSITION = Object.freeze({
   TOP_CENTER:    "top-center",
   TOP_RIGHT:     "top-right",
   MIDDLE_RIGHT:  "mid-right",
-  BOTTOM_RIGHT:  "bot-right",
-  BOTTOM_CENTER: "bot-center",
-  BOTTOM_LEFT:   "bot-left",
+  BOTTOM_RIGHT:  "bottom-right",
+  BOTTOM_CENTER: "bottom-center",
+  BOTTOM_LEFT:   "bottom-left",
   MIDDLE_LEFT:   "mid-left",
   TOP_LEFT:      "top-left"
 });

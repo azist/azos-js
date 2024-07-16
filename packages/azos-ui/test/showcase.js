@@ -243,7 +243,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-checkbox id="disabledSwitch" title="This switch is disabled" itemType="switch" titlePosition="mid-right" isdisabled></az-checkbox>
   </div>
   <h3>Title Positioning</h3>
-  <p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bot-left, bot-center, bot-right</strong>. The default titlePosition for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default titlePosition for text boxes should be <strong>top_left</strong>.</p>
+  <p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bottom-left, bottom-center, bottom-right</strong>. The default titlePosition for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default titlePosition for text boxes should be <strong>top_left</strong>.</p>
   <div class="strip-h">
     <az-checkbox id="topLeftSwitch" title="aAa" itemType="switch" titlePosition="top-left"></az-checkbox>
     <az-checkbox id="topCenterSwitch" title="aAa" itemType="switch" titlePosition="top-center"></az-checkbox>
@@ -254,9 +254,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-checkbox id="midRightSwitch" title="aAa" itemType="switch" titlePosition="mid-right"></az-checkbox>
   </div>
   <div class="strip-h">
-    <az-checkbox id="botLeftSwitch" title="aAa" itemType="switch" titlePosition="bot-left"></az-checkbox>
-    <az-checkbox id="botCenterSwitch" title="aAa" itemType="switch" titlePosition="bot-center"></az-checkbox>
-    <az-checkbox id="botRightSwitch" title="aAa" itemType="switch" titlePosition="bot-right"></az-checkbox>
+    <az-checkbox id="botLeftSwitch" title="aAa" itemType="switch" titlePosition="bottom-left"></az-checkbox>
+    <az-checkbox id="botCenterSwitch" title="aAa" itemType="switch" titlePosition="bottom-center"></az-checkbox>
+    <az-checkbox id="botRightSwitch" title="aAa" itemType="switch" titlePosition="bottom-right"></az-checkbox>
   </div>
 <h2>Text boxes</h2>
   <div class="strip-h">
@@ -266,10 +266,30 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-text-input id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text-input>
   </div>
   <hr>
-  <div style="border:1px dotted;padding:10px;"><az-text-input id="ignoreLabelMarginTextInput" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Top-left label. Ignoring labelMargin attribute." labelMargin="25"></az-text-input></div>
-  <div style="border:1px dotted;padding:10px;"><az-text-input id="testLabelMarginTextInput" title="labelMargin = 10. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Mid-left label. Applying labelMargin attribute." labelMargin="10" titlePosition="mid-left"></az-text-input></div>
-  <div style="border:1px dotted;padding:10px;"><az-text-input id="testLabelMarginTextInput" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Mid-right label. Applying labelMargin attribute." labelMargin="25" titlePosition="mid-right"></az-text-input></div>
-  <div style="border:1px dotted;padding:10px;"><az-text-input id="ignoreLabelMarginTextInputAgain" title="labelMargin = 25. Testing label margin with a long title. This is a very long title for a field you should use." placeholder="Bottom-right label. Ignoring labelMargin attribute." labelMargin="25" titlePosition="bot-right"></az-text-input></div>
+  <az-text-input
+    fieldWidth="85"
+    id="testTitleWidth1"
+    placeholder="Type something here&hellip;"
+    title="This is a mid-left field with fieldWidth at 85% of the container width and titleWidth at 75% of the fieldWidth."
+    titlePosition="mid-left"
+    titleWidth="75">
+  </az-text-input>
+  <az-text-input
+    fieldWidth="85"
+    id="testTitleWidth2"
+    placeholder="Type something here&hellip;"
+    title="This is a mid-right field with fieldWidth at 85% of the container width and titleWidth at 25% of the fieldWidth."
+    titlePosition="mid-right"
+    titleWidth="25">
+  </az-text-input>
+  <az-text-input
+    fieldWidth="50"
+    id="testTitleWidth3"
+    placeholder="Type something here&hellip;"
+    title="This is a bottom-center field with fieldWidth at 50% of the container width. titleWidth is ignored since this is not a &quot;mid&quot; position."
+    titlePosition="bottom-center"
+    titleWidth="25">
+  </az-text-input>
   <hr>
   <div class="strip-h">
     <az-text-input id="defaultTextInput" title="Top Left" placeholder="Type something here&hellip;"></az-text-input>
@@ -281,9 +301,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-text-input id="midRightTextInput" title="Middle Right" placeholder="Type something here&hellip;" titlePosition="mid-right"></az-text-input>
   </div>
   <div class="strip-h">
-    <az-text-input id="botLeftTextInput" title="Bottom Left" placeholder="Type something here&hellip;" titlePosition="bot-left"></az-text-input>
-    <az-text-input id="botCenterTextInput" title="Bottom Center" placeholder="Type something here&hellip;" titlePosition="bot-center"></az-text-input>
-    <az-text-input id="botRightTextInput" title="Bottom Right" placeholder="Type something here&hellip;" titlePosition="bot-right"></az-text-input>
+    <az-text-input id="botLeftTextInput" title="Bottom Left" placeholder="Type something here&hellip;" titlePosition="bottom-left"></az-text-input>
+    <az-text-input id="botCenterTextInput" title="Bottom Center" placeholder="Type something here&hellip;" titlePosition="bottom-center"></az-text-input>
+    <az-text-input id="botRightTextInput" title="Bottom Right" placeholder="Type something here&hellip;" titlePosition="bottom-right"></az-text-input>
   </div>
   <hr>
   <div class="strip-h">
@@ -345,6 +365,19 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-select-option value="finalValue">Last test option</az-select-option>
     </az-select>
     <az-select id="disabledSelect" title="This select is disabled" isDisabled>
+      <az-select-option>Select an option&hellip;</az-select-option>
+      <az-select-option value="valueOne">Selected first value</az-select-option>
+      <az-select-option value="secondValue">Select second option</az-select-option>
+      <az-select-option value="thirdOption">This is an option</az-select-option>
+      <az-select-option value="opt4">Option #4</az-select-option>
+      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
+      <az-select-option value="value6">Yet another option</az-select-option>
+      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
+      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
+      <az-select-option value="optionNine">Almost done</az-select-option>
+      <az-select-option value="finalValue">Last test option</az-select-option>
+    </az-select>
+    <az-select id="multiSelect" title="Choose one or more (CTRL+Click or CMD+Click to select multiple options). **NOT RECOMMENDED FOR MOBILE USE**" itemType="multiple">
       <az-select-option>Select an option&hellip;</az-select-option>
       <az-select-option value="valueOne">Selected first value</az-select-option>
       <az-select-option value="secondValue">Select second option</az-select-option>
