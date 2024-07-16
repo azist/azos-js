@@ -78,7 +78,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
 
 <az-spinner id="spinnerModal" scope="this" status="alert" timeout="5000" isModal></az-spinner>
-<az-spinner id="spinnerNonModal" scope="this" status="info" timeout="10000" ></az-spinner>
+<az-spinner id="spinnerNonModal" scope="this" status="info" timeout="10000" message="Dill helps to expel what you propel"></az-spinner>
 
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
@@ -98,11 +98,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <az-modal-dialog id="dlg2" scope="self" title="Code Box Snippet" status="info">
   <div slot="body">
-    <az-code-box highlight="js" source="">
-//this is my json object
+    <az-code-box highlight="js" source="">//this is my json object
 {
   "a": 1, "b": 2, "c": true,
-  d: ["string1", null, true, false, {"name": "string2", "salary": 100.67}]
+  d: ["string1", null, true, false, {"name": "string2", "salary": 100.67}],
+  "c": "string message",
+  "d": [{"a": -123.032, "b": +45}, false, null, null, "ok"]
 }
 </az-code-box> <br>
     <az-button @click="${this.onDlg2Close}" title="Close" style="float: right;"></az-button>
@@ -111,11 +112,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <h2> VCL / Codebox</h2>
 
-<az-code-box highlight="js" source="">
-//this is my json object
+<az-code-box highlight="js" source="">//this is my json object
 {
   "a": 1, "b": 2, "c": true,
-  d: ["string1", null, true, false, {"name": "string2", "salary": 100.67}]
+  d: ["string1", null, true, false, {"name": "string2", "salary": 100.67}],
+  "c": "string message",
+  "d": [{"a": -123.032, "b": +45}, false, null, null, "ok"]
 }
 </az-code-box>
 
