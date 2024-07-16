@@ -165,9 +165,10 @@ dialog:popover-open, dialog[open]{
 
     if (this.parentNode === null){
       document.body.appendChild(this);
-      this.update();//sync update dom build
       this.#isStandalone = true;
-    }
+      }
+
+    this.update();//sync update dom build
 
     const dlg = this.$("pop");
     this.#shownAsModal = this.isModal;
@@ -186,6 +187,8 @@ dialog:popover-open, dialog[open]{
     if (!this.#isShown) return false;
     this.#isShown = false;
     if (this.#tmr) clearTimeout(this.#tmr);
+
+    this.update();//sync update dom build
 
     const dlg = this.$("pop");
     if (this.#shownAsModal)
@@ -207,17 +210,9 @@ dialog:popover-open, dialog[open]{
 
     const msg = this.message ? html`<div class="msg">${this.message}</div>` : noContent;
 
-    return html`
-    <dialog id="pop" popover="manual" class="pop ${cls}">
-      <div class="ring">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-      ${msg}
-    </dialog>
-    `;
+    const body = this.#isShown ? html`<div class="ring">  <div></div>  <div></div>  <div></div>  <div></div> </div>${msg}` : noContent;
+
+    return html`<dialog id="pop" popover="manual" class="pop ${cls}" style="${this.#isShown ? "" : "display: none"}">${body}</dialog>`;
   }
 
 }
