@@ -73,6 +73,8 @@ dialog:popover-open, dialog[open]{
 @starting-style{dialog:popover-open, dialog[open]{opacity: 0;}}
 
 
+dialog:focus-visible, dialog:hover{ outline: none; }
+
 .ring,.ring div {  box-sizing: border-box; }
 
 .ring {
@@ -204,6 +206,12 @@ dialog:popover-open, dialog[open]{
     return true;
   }
 
+  #onKeyDown(e){
+    if (e.key === "Escape"){//prevent modal spinner close on ESCAPE
+      e.preventDefault();
+    }
+  }
+
   render(){
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
 
@@ -213,7 +221,7 @@ dialog:popover-open, dialog[open]{
 
     const body = this.#isShown ? html`<div class="ring">  <div></div>  <div></div>  <div></div>  <div></div> </div>${msg}` : noContent;
 
-    return html`<dialog id="pop" popover="manual" class="pop ${cls}" style="${this.#isShown ? "" : "display: none"}">${body}</dialog>`;
+    return html`<dialog id="pop" popover="manual" class="pop ${cls}" style="${this.#isShown ? "" : "display: none"}" @keydown="${this.#onKeyDown}">${body}</dialog>`;
   }
 
 }
