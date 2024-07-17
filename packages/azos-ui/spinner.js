@@ -52,7 +52,7 @@ dialog{
   display: block;
   border: none;
   border-radius: 1em;
-  background: rgba(from var(--s-default-fg) r g b / .25);
+  background: rgba(from var(--s-default-fg) r g b / .50);
   color:  var(--s-default-fg);
   overflow: hidden;
   padding: 1em;
