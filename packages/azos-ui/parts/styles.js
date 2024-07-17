@@ -338,5 +338,7 @@ export const textInputStyles=css`
     color: var(--ghost);
   }
 
+  .readonlyInput{ background: none; }
+
   select > option { padding:.5em .5em .35em .5em; }
 `;

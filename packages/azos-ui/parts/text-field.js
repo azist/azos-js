@@ -49,10 +49,9 @@ export class TextField extends FieldPart{
         inputWidth = css`width: 100%;`;
       }
     }
-
     let compArea = this.isTextArea ? html`
       <textarea
-        class="${clsRank} ${clsStatusBg}"
+        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="${this.id}"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
@@ -61,10 +60,11 @@ export class TextField extends FieldPart{
         value="${this.value}"
         style="${inputWidth}"
         .disabled=${this.isDisabled}
-        .required=${this.isRequired}></textarea>`
+        .required=${this.isRequired}
+        ?readonly=${this.isReadonly}></textarea>`
     : html`
       <input
-        class="${clsRank} ${clsStatusBg}"
+        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="${this.id}"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
@@ -73,7 +73,8 @@ export class TextField extends FieldPart{
         value="${this.value}"
         style="${inputWidth}"
         .disabled=${this.isDisabled}
-        .required=${this.isRequired}>
+        .required=${this.isRequired}
+        ?readonly=${this.isReadonly}>
       `;
 
     return compArea;

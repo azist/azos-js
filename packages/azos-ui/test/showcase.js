@@ -263,6 +263,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-text-input id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;"></az-text-input>
     <az-text-input id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text-input>
     <az-text-input id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text-input>
+    <az-text-input id="readOnlyInput" title="Read Only field" value="Read-only value" isReadonly></az-text-input>
     <az-text-input id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text-input>
     <az-text-input id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text-input>
   </div>
