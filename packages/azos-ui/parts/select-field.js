@@ -28,7 +28,7 @@ export class SelectField extends FieldPart{
     `)}`;
 
     return html`
-      <select class="${clsRank} ${clsStatusBg}" id="${this.id}" name="${this.id}" value="${this.value}" .disabled=${this.isDisabled} .multiple=${this.isMultiple}>
+      <select class="${clsRank} ${clsStatusBg}" id="${this.id}" name="${this.id}" value="${this.value}" .disabled=${this.isDisabled} .multiple=${this.isMultiple} .required=${this.isRequired}>
         ${optionList}
       </select>
     `;

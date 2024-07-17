@@ -53,15 +53,15 @@ export class FieldPart extends AzosPart{
     if(this.minFieldWidth !== undefined && 0 <= this.minFieldWidth <= 100) styleFieldWidth += css`min-width: ${this.minFieldWidth}%;`;
     if(this.maxFieldWidth !== undefined && 0 <= this.maxFieldWidth <= 100) styleFieldWidth += css`max-width: ${this.maxFieldWidth}%;`;
 
-    const msg = this.message ? html`<span class="msg">${this.message}</span>` : '';
+    const msg = this.message ? html`<p class="msg">${this.message}</p>` : '';
 
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable}" style="${styleFieldWidth}">
         <label class="${clsPosition}">
-          <span style="${titleWidth}">${this.title}</span>
+          <span class="${this.isRequired ? 'requiredTitle' : noContent}" style="${titleWidth}">${this.title}</span>
           ${this.renderInput()}
-          ${msg}
         </label>
+        ${msg}
       </div>
     `;
   }

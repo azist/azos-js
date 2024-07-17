@@ -60,8 +60,8 @@ export class TextField extends FieldPart{
         rows="${this.height ? this.height : "4"}"
         value="${this.value}"
         style="${inputWidth}"
-        .disabled=${this.isDisabled}>
-      </textarea>`
+        .disabled=${this.isDisabled}
+        .required=${this.isRequired}></textarea>`
     : html`
       <input
         class="${clsRank} ${clsStatusBg}"
@@ -72,7 +72,8 @@ export class TextField extends FieldPart{
         type="${this.isInputText ? "text" : "password"}"
         value="${this.value}"
         style="${inputWidth}"
-        .disabled=${this.isDisabled}>
+        .disabled=${this.isDisabled}
+        .required=${this.isRequired}>
       `;
 
     return compArea;

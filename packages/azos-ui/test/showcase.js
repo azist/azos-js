@@ -232,7 +232,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <h2>Checkboxes and switches</h2>
   <div class="strip-h">
     <az-checkbox id="normalCheckbox" title="This is a checkbox" titlePosition="mid-left"></az-checkbox>
-    <az-checkbox id="errorCheckbox" title="This is a checkbox" status="error" titlePosition="mid-left"></az-checkbox>
+    <az-checkbox id="errorCheckbox" title="Required checkbox!" status="error" titlePosition="mid-left" isRequired></az-checkbox>
     <az-checkbox id="infoCheckbox" title="This is a checkbox" status="info" titlePosition="mid-left"></az-checkbox>
     <az-checkbox id="disabledCheckbox" title="Disabled checkbox" titlePosition="mid-left" isdisabled></az-checkbox>
   </div>
@@ -243,7 +243,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-checkbox id="disabledSwitch" title="This switch is disabled" itemType="switch" titlePosition="mid-right" isdisabled></az-checkbox>
   </div>
   <h3>Title Positioning</h3>
-  <p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bottom-left, bottom-center, bottom-right</strong>. The default titlePosition for checkboxes, switches, and radio groups is <strong>middle_right</strong> (set in radio-group.js and checkbox.js). Default titlePosition for text boxes should be <strong>top_left</strong>.</p>
+  <p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bottom-left, bottom-center, bottom-right</strong>. The default titlePosition is <strong>top-left</strong>.</p>
   <div class="strip-h">
     <az-checkbox id="topLeftSwitch" title="aAa" itemType="switch" titlePosition="top-left"></az-checkbox>
     <az-checkbox id="topCenterSwitch" title="aAa" itemType="switch" titlePosition="top-center"></az-checkbox>
@@ -262,6 +262,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <div class="strip-h">
     <az-text-input id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;"></az-text-input>
     <az-text-input id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text-input>
+    <az-text-input id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text-input>
     <az-text-input id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text-input>
     <az-text-input id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text-input>
   </div>
@@ -285,6 +286,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <az-text-input
     fieldWidth="50"
     id="testTitleWidth3"
+    message="This is a message."
     placeholder="Type something here&hellip;"
     title="This is a bottom-center field with fieldWidth at 50% of the container width. titleWidth is ignored since this is not a &quot;mid&quot; position."
     titlePosition="bottom-center"
@@ -308,13 +310,20 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <hr>
   <div class="strip-h">
     <az-text-input id="rankOneInput" title="Rank Huge" placeholder="Type something here&hellip;" rank="1"></az-text-input>
-    <az-text-input id="rankTwoInput" title="Rank Large" placeholder="Type something here&hellip;" rank="2"></az-text-input>
+    <az-text-input id="rankTwoInput" title="Rank Large" placeholder="Type something here&hellip;" rank="2" message="Don&apos;t skip this required field" isRequired></az-text-input>
     <az-text-input id="rankThreeInput" title="Rank Default" placeholder="Type something here&hellip;"></az-text-input>
     <az-text-input id="rankFourInput" title="Rank Medium" placeholder="Type something here&hellip;" rank="4"></az-text-input>
     <az-text-input id="rankFiveInput" title="Rank Small" placeholder="Type something here&hellip;" rank="5"></az-text-input>
     <az-text-input id="rankSixInput" title="Rank Tiny" placeholder="Type something here&hellip;" rank="6"></az-text-input>
   </div>
   <hr>
+  <div class="strip-h">
+    <az-text-input id="okSimple" title="OK Status" placeholder="Type something here&hellip;" message="All good!" status="ok"></az-text-input>
+    <az-text-input id="infoSimple" title="Info Status" placeholder="Type something here&hellip;" message="Do your research" status="info"></az-text-input>
+    <az-text-input id="warningSimple" title="Warning Status" placeholder="Type something here&hellip;" message="Crap! You ran over a damn skunk!" status="warning"></az-text-input>
+    <az-text-input id="alertSimple" title="Alert Status" placeholder="Type something here&hellip;" message="Shit hit the fan!" status="alert"></az-text-input>
+    <az-text-input id="errorSimple" title="Error Status" placeholder="Type something here&hellip;" message="Now go clean it up" status="error"></az-text-input>
+  </div>
   <div class="strip-h">
     <az-text-input id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;" itemType="long"></az-text-input>
     <az-text-input id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" itemType="long" status="ok"></az-text-input>
@@ -351,7 +360,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-select-option value="optionNine">Almost done</az-select-option>
       <az-select-option value="finalValue">Last test option</az-select-option>
     </az-select>
-    <az-select id="alertSelect" title="Alert! Select something!" status="alert">
+    <az-select id="alertSelect" title="Alert! Select something!" status="alert" isRequired>
       <az-select-option>Select an option&hellip;</az-select-option>
       <az-select-option value="valueOne">Selected first value</az-select-option>
       <az-select-option value="secondValue">Select second option</az-select-option>
