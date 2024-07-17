@@ -60,15 +60,17 @@ label > span{ font-size: .9em; }
 
 export const buttonStyles = css`
 button{
+  font-family: inherit;
   font-weight: var(--ctl-button-fweight);
   font-style: var(--ctl-button-fstyle);
+  letter-spacing: var(--ctl-button-letter-spacing);
   border: var(--s-default-bor-ctl-btn);
   color:  var(--s-default-fg-ctl);
   background: var(--s-default-bg-ctl-btn);
 
   padding: 0.5lh 1ch 0.5lh 1ch;
   margin: 0.5lh 0.5ch 0.5lh 0.5ch;
-  min-width: 10ch;
+  min-width: 12ch;
   transition: 0.2s;
 
   user-select: none;

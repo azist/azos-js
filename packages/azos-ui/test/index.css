@@ -63,9 +63,13 @@ body {
   --s-default-fg-ctl: var(--ink);
   --s-default-bg-ctl: #fff;
   --s-default-bor-ctl: 1.2px solid #8a8a8a;
+  /*
   --s-default-bg-ctl-btn: linear-gradient(175deg, #e4e4e4 0%, #cecece 70%);
-  /*linear-gradient(175deg, #e4e4e4 0%, #cecece 45%);*/
   --s-default-bor-ctl-btn: 1px solid #c0c0c0;
+  */
+  --s-default-bg-ctl-btn: #d0d0d0;
+  --s-default-bor-ctl-btn: 1px solid #c4c4c4;
+
   --s-default-fw-ctl: bold;
 
   --s-ok-fg: #546454;
@@ -73,40 +77,62 @@ body {
   --s-ok-fg-ctl: #527452;
   --s-ok-bg-ctl: #d2ffd2;
   --s-ok-bor-ctl: 1.2px solid #558454;
+  /*
   --s-ok-bg-ctl-btn: linear-gradient(175deg, #e0f4e0 0%, #a0f9a0 70%);
   --s-ok-bor-ctl-btn: 1px solid #b8d8b8;
+  */
+  --s-ok-bg-ctl-btn: #a0f9a0;
+  --s-ok-bor-ctl-btn: 1px solid #90e490;
 
   --s-info-fg: #5a5a5a;
   --s-info-bg: #a0d8ff;
-  --s-info-fg-ctl: #4a6a8f;
+  --s-info-fg-ctl: #5276ba;
   --s-info-bg-ctl: #c0e8ff;
   --s-info-bor-ctl: 1.2px solid #7072aa;
+ /*
   --s-info-bg-ctl-btn: linear-gradient(175deg, #e0e0f0 0%, #a0d8ff 70%);
   --s-info-bor-ctl-btn: 1px solid #c4c4d8;
+*/
+--s-info-bg-ctl-btn: #b0dfff;
+--s-info-bor-ctl-btn: 1px solid #a0c8f0;
+
 
   --s-warn-fg: #6a6a40;
   --s-warn-bg: #f8f850;
   --s-warn-fg-ctl: #727220;
   --s-warn-bg-ctl: #fff8a0;
   --s-warn-bor-ctl: 1px solid #585830;
+  /*
   --s-warn-bg-ctl-btn: linear-gradient(175deg, #f8f8e0 0%, #f8f458 70%);
   --s-warn-bor-ctl-btn: 1px solid #d0d085;
+  */
+  --s-warn-bg-ctl-btn: #f2f268;
+  --s-warn-bor-ctl-btn: 1px solid #d8d848;
+
 
   --s-alert-fg: #e8daff;
   --s-alert-bg: #e040f0;
   --s-alert-fg-ctl: #8a508a;
   --s-alert-bg-ctl: #ffc0ff;
   --s-alert-bor-ctl: 1.2px solid #534064;
+ /*
   --s-alert-bg-ctl-btn: linear-gradient(175deg, #ffc8ff 0%, #f8a0f8 70%);
   --s-alert-bor-ctl-btn: 1px solid #c5c0e4;
+ */
+  --s-alert-bg-ctl-btn: #f8b0f8;
+  --s-alert-bor-ctl-btn: 1px solid #e890e8;
 
   --s-error-fg: #ffe0e0;
   --s-error-bg: #ff4720;
   --s-error-fg-ctl: #955050;
   --s-error-bg-ctl: #ffc0c0;
   --s-error-bor-ctl: 1.2px solid #a05012;
+  /*
   --s-error-bg-ctl-btn: linear-gradient(175deg, #f8d0f8 0%, #ffa0a0 70%);
   --s-error-bor-ctl-btn: 1px solid #f0b582;
+  */
+  --s-error-bg-ctl-btn: #ffa0a0;
+  --s-error-bor-ctl-btn: 1px solid #e59090;
 
 
   /* rank font sizes - MUST be in EM */
@@ -142,12 +168,13 @@ body {
   --modal-spin-backdrop-filter: grayscale(0.85) blur(1.0px);
 
   /* focus */
-  --focus-ctl-outline: 3px solid rgba(10, 128, 255, 0.55);
+  --focus-ctl-outline: 3px solid rgba(10, 140, 255, 0.55);
   --focus-ctl-box-shadow: none;
   /*0px 0px 8px rgba(10, 128, 255, .9);*/
 
-  --ctl-button-fweight: bold;
+  --ctl-button-fweight: 500;
   --ctl-button-fstyle: normal;
+  --ctl-button-letter-spacing: -0.025em;
 
   --vcl-codebox-bg: #342438;
   --vcl-codebox-fg: #a0a0a0;
