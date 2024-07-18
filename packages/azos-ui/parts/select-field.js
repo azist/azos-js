@@ -23,7 +23,7 @@ export class SelectField extends FieldPart{
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
 
     const allOptions = [...this.getElementsByTagName("az-select-option")];
-    const optionList = html`${allOptions.map((option, i) => html`
+    const optionList = html`${allOptions.map((option) => html`
       <option value="${option.getAttribute('value')}" .selected=${this.value!==undefined && this.value===option.getAttribute('value')}>${option.innerText}</option>
     `)}`;
 

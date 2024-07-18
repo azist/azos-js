@@ -5,6 +5,7 @@ import "../parts/check-field.js";
 import "../parts/radio-group-field.js";
 import "../parts/text-field.js";
 import "../parts/select-field.js";
+import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import { Spinner } from "../spinner.js";
 
@@ -400,6 +401,43 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-select-option value="optionNine">Almost done</az-select-option>
       <az-select-option value="finalValue">Last test option</az-select-option>
     </az-select>
+  </div>
+<h2>Sliders</h2>
+  <p>This az-slider renders as an &lt;input type="range"&gt; element. These are the available properties/attributes:</p>
+  <ol>
+    <li>General attributes: id, title, titlePosition, titleWidth, inputWidth rank, status, isDisabled, isRequired</li>
+    <li>rangeMin, rangeMax - slider's extremes</li>
+    <li>rangeStep - Interval that controls the slider's granularity. Default is 1.</li>
+    <li>value - if not defined, defaults to median of rangeMin & rangeMax</li>
+    <li>valueLabel - value's description</li>
+    <li>displayValue - Boolean treated as "isDisabled," "isRequired," or "isReadonly". Displays valueLabel followed by value.</li>
+    <li>orientation - determines if slider is horizontal or vertical</li>
+    <li>numTicks - Number of evenly-spaced tick marks displayed on the slider</li>
+  </ol>
+  <div class="strip-h">
+    <az-slider
+      id="basicSlider"
+      title="Basic Slider"
+      titlePosition="top-center"
+      orientation="horizontal"
+      rangeMin="0"
+      rangeMax="10"
+      rangeStep="1"
+      displayValue
+      valueLabel="Number of tomatoes: "
+    ></az-slider>
+    <az-slider
+      id="markedSlider"
+      title="Slider with labeled tick marks"
+      titlePosition="top-left"
+      orientation="horizontal"
+      rangeMin="0"
+      rangeMax="10"
+      numTicks="5"
+      displayValue
+      valueLabel="Number of tomatoes: "
+    >
+    </az-slider>
   </div>
 <h2> Various elements combined</h2>
 ..tbd

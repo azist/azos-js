@@ -342,3 +342,7 @@ export const textInputStyles=css`
 
   select > option { padding:.5em .5em .35em .5em; }
 `;
+
+export const sliderStyles=css`
+  /*Some styles for sliders go here*/
+`;
