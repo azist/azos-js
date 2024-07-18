@@ -53,9 +53,13 @@ export const baseStyles = css`
 @media screen and (max-width:500px){
   .mid-right,.mid-left{flex-direction:column;}
 }
-
-label > span{ font-size: .9em; }
-.msg { opacity: .8; }
+.msg { font-size: .85em; opacity: .8; margin: .33em; }
+.requiredTitle::after{
+  content:"\u{25C6}";
+  margin-left:5px;
+  font-size:.7em;
+  vertical-align:top;
+}
 `;
 
 export const buttonStyles = css`
@@ -115,11 +119,10 @@ export const checkStyles=css`
   }
   label{
     gap:0 .5em;
-    cursor:pointer;
     user-select:none;
   }
+  label > span{ font-weight: 500; }
   .check{
-    cursor:pointer;
     appearance:none;
     background-color:var(--s-default-bg-ctl);
     border: var(--s-default-bor-ctl);
@@ -175,12 +178,10 @@ export const switchStyles=css`
     background-color:unset !important;
   }
   label{
-    cursor:pointer;
     gap:0 .5em;
     user-select:none;
   }
   .switch{
-    cursor:pointer;
     appearance:none;
     position:relative;
     color:inherit;
@@ -245,7 +246,6 @@ export const radioStyles=css`
     background-color:unset !important;
   }
   label{
-    cursor:pointer;
     gap:0 .5em;
     user-select:none;
   }
@@ -253,8 +253,8 @@ export const radioStyles=css`
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
+  .radioPrompt{ font-weight: 500; }
   .radio{
-    cursor:pointer;
     appearance:none;
     border: var(--s-default-bor-ctl);
     border-radius:50%;
@@ -311,11 +311,10 @@ export const textInputStyles=css`
     gap:0 .5em;
     user-select:none;
   }
+  label > span{ font-weight: 500; }
   input[type=text],input[type=password],textarea,select{
     padding:.5em;
     border: var(--s-default-bor-ctl);
-    background: var(--s-default-bg-ctl);
-    color: var(--s-default-fg-ctl);
   }
   input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{
     outline: var(--focus-ctl-outline);
@@ -338,6 +337,8 @@ export const textInputStyles=css`
     background: none;
     color: var(--ghost);
   }
+
+  .readonlyInput{ background: none; }
 
   select > option { padding:.5em .5em .35em .5em; }
 `;
