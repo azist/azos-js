@@ -49,10 +49,9 @@ export class TextField extends FieldPart{
         inputWidth = css`width: 100%;`;
       }
     }
-
     let compArea = this.isTextArea ? html`
       <textarea
-        class="${clsRank} ${clsStatusBg}"
+        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="${this.id}"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
@@ -60,11 +59,12 @@ export class TextField extends FieldPart{
         rows="${this.height ? this.height : "4"}"
         value="${this.value}"
         style="${inputWidth}"
-        .disabled=${this.isDisabled}>
-      </textarea>`
+        .disabled=${this.isDisabled}
+        .required=${this.isRequired}
+        ?readonly=${this.isReadonly}></textarea>`
     : html`
       <input
-        class="${clsRank} ${clsStatusBg}"
+        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="${this.id}"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
@@ -72,7 +72,9 @@ export class TextField extends FieldPart{
         type="${this.isInputText ? "text" : "password"}"
         value="${this.value}"
         style="${inputWidth}"
-        .disabled=${this.isDisabled}>
+        .disabled=${this.isDisabled}
+        .required=${this.isRequired}
+        ?readonly=${this.isReadonly}>
       `;
 
     return compArea;

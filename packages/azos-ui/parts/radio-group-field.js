@@ -38,14 +38,14 @@ export class RadioGroupField extends AzosPart{
       <div>
         <label class="${clsPosition}" for="${this.id}_${i}">
           <span>${option.innerText}</span>
-          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled}>
+          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled} .required=${this.isRequired} ?readonly=${this.isReadonly}>
         </label>
       </div>
     `)}`;
 
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable}">
-        <p>${this.title}</p>
+        <p class="radioPrompt ${this.isRequired ? 'requiredTitle' : ''}">${this.title}</p>
         ${optionList}
       </div>
     `;
