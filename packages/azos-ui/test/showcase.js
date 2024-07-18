@@ -428,7 +428,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     ></az-slider>
     <az-slider
       id="markedSlider"
-      title="Slider with labeled tick marks"
+      title="Slider with tick marks"
       titlePosition="top-left"
       orientation="horizontal"
       rangeMin="0"

@@ -44,17 +44,13 @@ export class SliderField extends FieldPart{
     }
 
     const range=this.rangeMax - this.rangeMin;
-    function buildTicks(t, a, m){
-      if(t !== undefined && t > 0){
-        let marks='';
-        for(var i=0; i<=t; i++){
-          marks += `<option value="${(((a - m) / t) * i) + m}"></option>`;
-        }
-        return marks;
-      }
-    }
+    const tickArray=[];
+    for(var i=0; i<=this.numTicks; i++){ tickArray.push((((this.rangeMax - this.rangeMin) / this.numTicks) * i) + this.rangeMin); }
+    const ticks = html`${tickArray.map((tick) => html`
+      <option value="${tick}"></option>
+    `)}`;
 
-    const tickList = (this.numTicks !== undefined && this.numTicks > 0) ? html`<datalist class="sliderList" id="${this.id}_list">${buildTicks(this.numTicks, this.rangeMax, this.rangeMin)}</datalist>` : noContent ;
+    const tickList = (this.numTicks !== undefined && this.numTicks > 0) ? html`<datalist class="sliderList" id="${this.id}_list">${ticks}</datalist>` : noContent ;
 
     return html`
       <input
