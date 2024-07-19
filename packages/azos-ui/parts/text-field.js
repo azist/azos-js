@@ -40,15 +40,12 @@ export class TextField extends FieldPart{
     const clsRank     = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
 
-    /** Set the input field's width based on the titleWidth property */
-    let inputWidth = '';
-    if (this.titleWidth !== undefined) {
-      if(this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
-        if(0 <= this.titleWidth <= 100) inputWidth = css`width: ${100 - this.titleWidth}%;`
-      }else{
-        inputWidth = css`width: 100%;`;
-      }
+    /** Calculate the input field's width based on the titleWidth property */
+    let stlInputWidth = '';
+    if(this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
+      stlInputWidth = (this.titleWidth !== undefined) ? css`width: ${(80 - this.titleWidth)}%;` : css`width: 40%;`;
     }
+
     let compArea = this.isTextArea ? html`
       <textarea
         class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
@@ -58,7 +55,7 @@ export class TextField extends FieldPart{
         placeholder="${this.placeholder}"
         rows="${this.height ? this.height : "4"}"
         value="${this.value}"
-        style="${inputWidth}"
+        style="${stlInputWidth}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}></textarea>`
@@ -71,7 +68,7 @@ export class TextField extends FieldPart{
         placeholder="${this.placeholder}"
         type="${this.isInputText ? "text" : "password"}"
         value="${this.value}"
-        style="${inputWidth}"
+        style="${stlInputWidth}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}>
