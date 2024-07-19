@@ -39,10 +39,10 @@ export const baseStyles = css`
 .top-center > span               { text-align:center; margin-bottom: .33em; }
 .top-right > span                { text-align:right; margin-bottom: .33em; }
 
-.mid-left                        { flex-direction:row; align-items:center; justify-content:right;}
-.mid-left > span                 { text-align:right; }
+.mid-left                        { flex-direction:row; align-items:center; justify-content:space-between;}
+.mid-left > span                 { text-align:left; }
 
-.mid-right                       { flex-direction:row-reverse; align-items:center; justify-content:left; }
+.mid-right                       { flex-direction:row-reverse; align-items:center; justify-content:space-between; }
 .mid-right > span                { text-align:left; }
 
 .bottom-left,.bottom-center,.bottom-right { flex-direction:column-reverse; }
@@ -341,4 +341,8 @@ export const textInputStyles=css`
   .readonlyInput{ background: none; }
 
   select > option { padding:.5em .5em .35em .5em; }
+`;
+
+export const sliderStyles=css`
+  /*Some styles for sliders go here*/
 `;

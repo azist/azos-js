@@ -1,5 +1,5 @@
 import { isOneOf } from 'azos/strings';
-import { html, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { html, css, parseRank, parseStatus, POSITION, parsePosition } from '../ui.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
 import { AzosPart } from './part.js';
 
@@ -13,7 +13,11 @@ export class RadioGroupField extends AzosPart{
     /** Title is the main prompt for the radio group */
     title:         {type: String},
     /** Determines how each radio item's label is positioned related to its radio button */
-    titlePosition: {type: String}
+    titlePosition: {type: String},
+    /** Allowed width of field's title as "%" when titlePosition = mid-left | mid-right.
+     *  MUST BE BETWEEN 0 and 100 - otherwise defaults to 40.
+     */
+    titleWidth:    {type: Number}
   };
 
   static styles = [baseStyles, radioStyles, switchStyles];
@@ -31,13 +35,23 @@ export class RadioGroupField extends AzosPart{
     const clsStatus = `${parseStatus(this.status, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
-    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-right"}`;
+    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-left"}`;
+
+    /** Set the width of the input field label */
+    let stlTitleWidth = '';
+    if(clsPosition === 'mid-left' || this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
+      (this.titleWidth !== undefined)
+        ? (0 <= this.titleWidth <= 100)
+          ? stlTitleWidth = css`width: ${this.titleWidth}%;`
+          : stlTitleWidth = css`width: 80%;`
+        : stlTitleWidth = css`width: 80%;`;
+    }
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
     const optionList = html`${allOptions.map((option, i) => html`
       <div>
         <label class="${clsPosition}" for="${this.id}_${i}">
-          <span>${option.innerText}</span>
+          <span style="${stlTitleWidth}">${option.innerText}</span>
           <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled} .required=${this.isRequired} ?readonly=${this.isReadonly}>
         </label>
       </div>
