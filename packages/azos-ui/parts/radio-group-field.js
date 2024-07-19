@@ -1,5 +1,5 @@
 import { isOneOf } from 'azos/strings';
-import { html, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { html, css, parseRank, parseStatus, POSITION, parsePosition } from '../ui.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
 import { AzosPart } from './part.js';
 
@@ -35,16 +35,16 @@ export class RadioGroupField extends AzosPart{
     const clsStatus = `${parseStatus(this.status, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
-    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-right"}`;
+    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-left"}`;
 
     /** Set the width of the input field label */
     let stlTitleWidth = '';
-    if(this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
+    if(clsPosition === 'mid-left' || this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
       (this.titleWidth !== undefined)
         ? (0 <= this.titleWidth <= 100)
           ? stlTitleWidth = css`width: ${this.titleWidth}%;`
-          : stlTitleWidth = css`width: 40%;`
-        : stlTitleWidth = css`width: 40%;`;
+          : stlTitleWidth = css`width: 80%;`
+        : stlTitleWidth = css`width: 80%;`;
     }
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];

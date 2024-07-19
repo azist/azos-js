@@ -8,11 +8,6 @@ export class TextField extends FieldPart{
     /** Determines number of rows when textarea is rendered (default: 4 rows) */
     height: {type: Number},
 
-    /** Allowed width of input field as "%" when titlePosition = mid-left | mid-right.
-     *  MUST BE BETWEEN 0 and 100 & less than (100 - titleWidth) - otherwise defaults to 40.
-     */
-    inputWidth: {type: Number},
-
     /** Determines if this field is a single-line input, password, or
      *  textarea (multi-line block input) */
     itemType: {type:String},
@@ -45,18 +40,10 @@ export class TextField extends FieldPart{
     const clsRank     = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
 
-    /** Set the input field's width based on the titleWidth property */
+    /** Calculate the input field's width based on the titleWidth property */
     let stlInputWidth = '';
     if(this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
-      if(this.inputWidth !== undefined){
-        if(0 <= this.inputWidth <= 100){
-          stlInputWidth = (this.inputWidth < (100 - this.titleWidth)) ? css`width: ${this.inputWidth}%;` : css`width: ${(100 - this.titleWidth)}%;`;
-        }else{
-          stlInputWidth = (this.titleWidth !== undefined) ? css`width: ${(100 - this.titleWidth)}%;` : css`width: 40%;`;
-        }
-      }else{
-        stlInputWidth = (this.titleWidth !== undefined) ? css`width: ${(100 - this.titleWidth)}%;` : css`width: 40%;`;
-      }
+      stlInputWidth = (this.titleWidth !== undefined) ? css`width: ${(80 - this.titleWidth)}%;` : css`width: 40%;`;
     }
 
     let compArea = this.isTextArea ? html`

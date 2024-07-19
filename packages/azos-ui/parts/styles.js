@@ -40,7 +40,7 @@ export const baseStyles = css`
 .top-right > span                { text-align:right; margin-bottom: .33em; }
 
 .mid-left                        { flex-direction:row; align-items:center; justify-content:space-between;}
-.mid-left > span                 { text-align:right; }
+.mid-left > span                 { text-align:left; }
 
 .mid-right                       { flex-direction:row-reverse; align-items:center; justify-content:space-between; }
 .mid-right > span                { text-align:left; }

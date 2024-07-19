@@ -1,5 +1,5 @@
 import { isOneOf } from 'azos/strings';
-import { html, parseRank, parseStatus } from '../ui.js';
+import { html, parseRank, parseStatus, POSITION } from '../ui.js';
 import { FieldPart } from './field-part.js';
 import { baseStyles, textInputStyles } from './styles.js';
 

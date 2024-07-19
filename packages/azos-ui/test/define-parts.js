@@ -99,7 +99,6 @@ export class DefineParts extends AzosElement{
 
 <p>Properties / Attributes:</p>
 <ul>
-  <li>fieldWidth - If titlePosition is mid-left or mid-right, determines the width of the interactive field.</li>
   <li>Height - If itemType is long, defines how tall a textarea is in rows. Default: 4.</li>
   <li>ID - Unique identifier for data collecting and proper UI.</li>
   <li>isDisabled - If listed, disables the part, removing all interactivity.</li>
@@ -153,7 +152,6 @@ export class DefineParts extends AzosElement{
 
 <p>Properties / Attributes:</p>
 <ul>
-  <li>fieldWidth - If titlePosition is mid-left or mid-right, determines the width of the interactive field.</li>
   <li>ID - Unique identifier for data collecting and proper UI.</li>
   <li>isDisabled - If listed, disables the part, removing all interactivity.</li>
   <li>isMultiple - If listed, allows user to select multiple options. <strong>Not recommended for mobile use.</strong></li>
@@ -180,7 +178,6 @@ export class DefineParts extends AzosElement{
 <p>Properties / Attributes:</p>
 <ul>
   <li>displayValue - If listed, displays the current numerical value of the slider.</li>
-  <li>fieldWidth - If titlePosition is mid-left or mid-right, determines the width of the slider.</li>
   <li>ID - Unique identifier for data collecting and proper UI.</li>
   <li>isDisabled - If listed, disables the part, removing all interactivity.</li>
   <li>isRequired - For validation purposes. If listed, this part must have a value selected before the form can be submitted.</li>
