@@ -8,6 +8,11 @@ export class TextField extends FieldPart{
     /** Determines number of rows when textarea is rendered (default: 4 rows) */
     height: {type: Number},
 
+    /** Allowed width of input field as "%" when titlePosition = mid-left | mid-right.
+     *  MUST BE BETWEEN 0 and 100 & less than (100 - titleWidth) - otherwise defaults to 40.
+     */
+    inputWidth: {type: Number},
+
     /** Determines if this field is a single-line input, password, or
      *  textarea (multi-line block input) */
     itemType: {type:String},
@@ -41,14 +46,19 @@ export class TextField extends FieldPart{
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
 
     /** Set the input field's width based on the titleWidth property */
-    let inputWidth = '';
-    if (this.titleWidth !== undefined) {
-      if(this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
-        if(0 <= this.titleWidth <= 100) inputWidth = css`width: ${100 - this.titleWidth}%;`
+    let stlInputWidth = '';
+    if(this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
+      if(this.inputWidth !== undefined){
+        if(0 <= this.inputWidth <= 100){
+          stlInputWidth = (this.inputWidth < (100 - this.titleWidth)) ? css`width: ${this.inputWidth}%;` : css`width: ${(100 - this.titleWidth)}%;`;
+        }else{
+          stlInputWidth = (this.titleWidth !== undefined) ? css`width: ${(100 - this.titleWidth)}%;` : css`width: 40%;`;
+        }
       }else{
-        inputWidth = css`width: 100%;`;
+        stlInputWidth = (this.titleWidth !== undefined) ? css`width: ${(100 - this.titleWidth)}%;` : css`width: 40%;`;
       }
     }
+
     let compArea = this.isTextArea ? html`
       <textarea
         class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
@@ -58,7 +68,7 @@ export class TextField extends FieldPart{
         placeholder="${this.placeholder}"
         rows="${this.height ? this.height : "4"}"
         value="${this.value}"
-        style="${inputWidth}"
+        style="${stlInputWidth}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}></textarea>`
@@ -71,7 +81,7 @@ export class TextField extends FieldPart{
         placeholder="${this.placeholder}"
         type="${this.isInputText ? "text" : "password"}"
         value="${this.value}"
-        style="${inputWidth}"
+        style="${stlInputWidth}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}>
