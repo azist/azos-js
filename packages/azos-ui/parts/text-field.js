@@ -1,10 +1,13 @@
 import { isOneOf } from 'azos/strings';
-import { html, css, parseRank, parseStatus, noContent, POSITION } from '../ui.js';
-import { baseStyles, textInputStyles } from './styles.js';
+import { html, parseRank, parseStatus, noContent } from '../ui.js';
+import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
 
 export class TextField extends FieldPart{
   static properties={
+    /** Aligns input value left, center, or right. Default: left. */
+    alignValue: {type: String},
+
     /** Determines number of rows when textarea is rendered (default: 4 rows) */
     height: {type: Number},
 
@@ -23,7 +26,7 @@ export class TextField extends FieldPart{
     placeholder: {type: String}
   }
 
-  static styles=[baseStyles, textInputStyles];
+  static styles=[baseStyles, textFieldStyles];
 
   constructor(){ super(); }
 
@@ -36,39 +39,34 @@ export class TextField extends FieldPart{
   /** True if text input is <input type="text"> */
   get isInputText(){ return !this.isTextArea && !this.isPassword; }
 
+  /** True if alignValue is a valid value */
+  get isValidAlign(){ return isOneOf(this.alignValue, ["left", "center", "right"]); }
+
   renderInput(){
     const clsRank     = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
 
-    /** Calculate the input field's width based on the titleWidth property */
-    let stlInputWidth = '';
-    if(this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
-      stlInputWidth = (this.titleWidth !== undefined) ? css`width: ${(80 - this.titleWidth)}%;` : css`width: 40%;`;
-    }
-
     let compArea = this.isTextArea ? html`
       <textarea
-        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
+        class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="${this.id}"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
         placeholder="${this.placeholder}"
         rows="${this.height ? this.height : "4"}"
         value="${this.value}"
-        style="${stlInputWidth}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}></textarea>`
     : html`
       <input
-        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
+        class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="${this.id}"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
         placeholder="${this.placeholder}"
         type="${this.isInputText ? "text" : "password"}"
         value="${this.value}"
-        style="${stlInputWidth}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}>
@@ -78,4 +76,4 @@ export class TextField extends FieldPart{
   }
 }
 
-window.customElements.define("az-text-input", TextField);
+window.customElements.define("az-text-field", TextField);
