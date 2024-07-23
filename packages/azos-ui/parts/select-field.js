@@ -1,7 +1,7 @@
 import { isOneOf } from 'azos/strings';
 import { html, parseRank, parseStatus, POSITION } from '../ui.js';
 import { FieldPart } from './field-part.js';
-import { baseStyles, textInputStyles } from './styles.js';
+import { baseStyles, textFieldStyles } from './styles.js';
 
 export class SelectField extends FieldPart{
   static properties={
@@ -13,7 +13,7 @@ export class SelectField extends FieldPart{
     /** Determines if this field is a standard dropdown select or a multiple select */
     itemType: {type: String}
   }
-  static styles=[baseStyles, textInputStyles];
+  static styles=[baseStyles, textFieldStyles];
 
   constructor(){ super(); }
 

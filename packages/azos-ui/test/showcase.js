@@ -261,52 +261,52 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   </div>
 <h2>Text boxes</h2>
   <div class="strip-h">
-    <az-text-input id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;"></az-text-input>
-    <az-text-input id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text-input>
-    <az-text-input id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text-input>
-    <az-text-input id="readOnlyInput" title="Read Only field" value="Read-only value" isReadonly></az-text-input>
-    <az-text-input id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text-input>
-    <az-text-input id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text-input>
+    <az-text-field id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;"></az-text-field>
+    <az-text-field id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text-field>
+    <az-text-field id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text-field>
+    <az-text-field id="readOnlyInput" title="Read Only field" value="Read-only value" isReadonly></az-text-field>
+    <az-text-field id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text-field>
+    <az-text-field id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text-field>
   </div>
   <hr>
   <div class="strip-h">
-    <az-text-input id="defaultTextInput" title="Top Left" placeholder="Type something here&hellip;"></az-text-input>
-    <az-text-input id="topCenterTextInput" title="Top Center" placeholder="Type something here&hellip;" titlePosition="top-center"></az-text-input>
-    <az-text-input id="topRightTextInput" title="Top Right" placeholder="Type something here&hellip;" titlePosition="top-right"></az-text-input>
+    <az-text-field id="defaultTextInput" title="Top Left" placeholder="Type something here&hellip;"></az-text-field>
+    <az-text-field id="topCenterTextInput" title="Top Center" placeholder="Type something here&hellip;" titlePosition="top-center"></az-text-field>
+    <az-text-field id="topRightTextInput" title="Top Right" placeholder="Type something here&hellip;" titlePosition="top-right"></az-text-field>
   </div>
   <div class="strip-h">
-    <az-text-input id="midLeftTextInput" title="Middle Left" placeholder="Type something here&hellip;" titlePosition="mid-left"></az-text-input>
-    <az-text-input id="midRightTextInput" title="Middle Right" placeholder="Type something here&hellip;" titlePosition="mid-right"></az-text-input>
+    <az-text-field id="midLeftTextInput" title="Middle Left" placeholder="Type something here&hellip;" titlePosition="mid-left"></az-text-field>
+    <az-text-field id="midRightTextInput" title="Middle Right" placeholder="Type something here&hellip;" titlePosition="mid-right"></az-text-field>
   </div>
   <div class="strip-h">
-    <az-text-input id="botLeftTextInput" title="Bottom Left" placeholder="Type something here&hellip;" titlePosition="bottom-left"></az-text-input>
-    <az-text-input id="botCenterTextInput" title="Bottom Center" placeholder="Type something here&hellip;" titlePosition="bottom-center"></az-text-input>
-    <az-text-input id="botRightTextInput" title="Bottom Right" placeholder="Type something here&hellip;" titlePosition="bottom-right"></az-text-input>
-  </div>
-  <hr>
-  <div class="strip-h">
-    <az-text-input id="rankOneInput" title="Rank Huge" placeholder="Type something here&hellip;" rank="1"></az-text-input>
-    <az-text-input id="rankTwoInput" title="Rank Large" placeholder="Type something here&hellip;" rank="2" message="Don&apos;t skip this required field" isRequired></az-text-input>
-    <az-text-input id="rankThreeInput" title="Rank Default" placeholder="Type something here&hellip;"></az-text-input>
-    <az-text-input id="rankFourInput" title="Rank Medium" placeholder="Type something here&hellip;" rank="4"></az-text-input>
-    <az-text-input id="rankFiveInput" title="Rank Small" placeholder="Type something here&hellip;" rank="5"></az-text-input>
-    <az-text-input id="rankSixInput" title="Rank Tiny" placeholder="Type something here&hellip;" rank="6"></az-text-input>
+    <az-text-field id="botLeftTextInput" title="Bottom Left" placeholder="Type something here&hellip;" titlePosition="bottom-left"></az-text-field>
+    <az-text-field id="botCenterTextInput" title="Bottom Center" placeholder="Type something here&hellip;" titlePosition="bottom-center"></az-text-field>
+    <az-text-field id="botRightTextInput" title="Bottom Right" placeholder="Type something here&hellip;" titlePosition="bottom-right"></az-text-field>
   </div>
   <hr>
   <div class="strip-h">
-    <az-text-input id="okSimple" title="OK Status" placeholder="Type something here&hellip;" message="All good!" status="ok"></az-text-input>
-    <az-text-input id="infoSimple" title="Info Status" placeholder="Type something here&hellip;" message="Do your research" status="info"></az-text-input>
-    <az-text-input id="warningSimple" title="Warning Status" placeholder="Type something here&hellip;" message="Crap! You ran over a damn skunk!" status="warning"></az-text-input>
-    <az-text-input id="alertSimple" title="Alert Status" placeholder="Type something here&hellip;" message="Shit hit the fan!" status="alert"></az-text-input>
-    <az-text-input id="errorSimple" title="Error Status" placeholder="Type something here&hellip;" message="Now go clean it up" status="error"></az-text-input>
+    <az-text-field id="rankOneInput" title="Rank Huge" placeholder="Type something here&hellip;" rank="1"></az-text-field>
+    <az-text-field id="rankTwoInput" title="Rank Large" placeholder="Type something here&hellip;" rank="2" message="Don&apos;t skip this required field" isRequired></az-text-field>
+    <az-text-field id="rankThreeInput" title="Rank Default" placeholder="Type something here&hellip;"></az-text-field>
+    <az-text-field id="rankFourInput" title="Rank Medium" placeholder="Type something here&hellip;" rank="4"></az-text-field>
+    <az-text-field id="rankFiveInput" title="Rank Small" placeholder="Type something here&hellip;" rank="5"></az-text-field>
+    <az-text-field id="rankSixInput" title="Rank Tiny" placeholder="Type something here&hellip;" rank="6"></az-text-field>
+  </div>
+  <hr>
+  <div class="strip-h">
+    <az-text-field id="okSimple" title="OK Status" placeholder="Type something here&hellip;" message="All good!" status="ok"></az-text-field>
+    <az-text-field id="infoSimple" title="Info Status" placeholder="Type something here&hellip;" message="Do your research" status="info"></az-text-field>
+    <az-text-field id="warningSimple" title="Warning Status" placeholder="Type something here&hellip;" message="Crap! You ran over a damn skunk!" status="warning"></az-text-field>
+    <az-text-field id="alertSimple" title="Alert Status" placeholder="Type something here&hellip;" message="Shit hit the fan!" status="alert"></az-text-field>
+    <az-text-field id="errorSimple" title="Error Status" placeholder="Type something here&hellip;" message="Now go clean it up" status="error"></az-text-field>
   </div>
   <div class="strip-h">
-    <az-text-input id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;" itemType="long"></az-text-input>
-    <az-text-input id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" itemType="long" status="ok"></az-text-input>
-    <az-text-input id="infoTextArea" title="Info Status" placeholder="Type something here&hellip;" itemType="long" status="info"></az-text-input>
-    <az-text-input id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" itemType="long" status="warning"></az-text-input>
-    <az-text-input id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" itemType="long" status="alert"></az-text-input>
-    <az-text-input id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" itemType="long" status="error"></az-text-input>
+    <az-text-field id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;" itemType="long"></az-text-field>
+    <az-text-field id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" itemType="long" status="ok"></az-text-field>
+    <az-text-field id="infoTextArea" title="Info Status" placeholder="Type something here&hellip;" itemType="long" status="info"></az-text-field>
+    <az-text-field id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" itemType="long" status="warning"></az-text-field>
+    <az-text-field id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" itemType="long" status="alert"></az-text-field>
+    <az-text-field id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" itemType="long" status="error"></az-text-field>
   </div>
   <hr>
 <h2>Selects/Combos</h2>
