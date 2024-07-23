@@ -2,6 +2,10 @@
 import {css} from "../ui.js";
 
 export const baseStyles = css`
+.text-left   {text-align: left;}
+.text-center {text-align: center;}
+.text-right  {text-align: right;}
+
 .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl); }
 .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-ctl); }
 .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-ctl); }
@@ -299,7 +303,7 @@ export const radioStyles=css`
   .errorBg[class~="radio"] { background: var(--s-error-bg-ctl);  border: var(--s-error-bor-ctl);}
 `;
 
-export const textInputStyles=css`
+export const textFieldStyles=css`
   div{
     display:block;
     margin:10px;
@@ -313,8 +317,11 @@ export const textInputStyles=css`
   }
   label > span{ font-weight: 500; }
   input[type=text],input[type=password],textarea,select{
+    width: 100%;
+    box-sizing: border-box;
     padding:.5em;
     border: var(--s-default-bor-ctl);
+    background-color: var(--s-default-bg-ctl);
   }
   input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{
     outline: var(--focus-ctl-outline);
@@ -325,11 +332,11 @@ export const textInputStyles=css`
   textarea::placeholder{ color: var(--ghost); }
   textarea{font-family:inherit;}
 
-  .okBg      { color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl);}
-  .infoBg    { color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl);}
-  .warningBg { color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
-  .alertBg   { color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
-  .errorBg   { color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+  .okBg      { background-color: var(--s-ok-bg-ctl) !important;    color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl);}
+  .infoBg    { background-color: var(--s-info-bg-ctl) !important;  color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl);}
+  .warningBg { background-color: var(--s-warn-bg-ctl) !important;  color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
+  .alertBg   { background-color: var(--s-alert-bg-ctl) !important; color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
+  .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
 
   .disabled{ color: #b4b4b4; font-weight: 100; }
   input[type=text]:disabled,input[type=password]:disabled,textarea:disabled,select:disabled{
