@@ -338,7 +338,6 @@ export const sliderStyles=css`
 
   /*********** Baseline, reset styles ***********/
   input[type="range"] {
-    -webkit-appearance: none;
     appearance: none;
     background: transparent;
     width: 100%;
@@ -397,4 +396,30 @@ export const sliderStyles=css`
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
+
+  /******** status overrides ********/
+  input[type=range].okBg::-moz-range-track              { background-color: var(--s-ok-bg-ctl); border: var(--s-ok-bor-ctl); }
+  input[type=range].okBg::-webkit-slider-runnable-track { background-color: var(--s-ok-bg-ctl); border: var(--s-ok-bor-ctl); }
+  input[type=range].okBg::-moz-range-thumb              { background-color: var(--s-ok-fg-ctl); }
+  input[type=range].okBg::-webkit-slider-thumb          { background-color: var(--s-ok-fg-ctl); }
+
+  input[type=range].infoBg::-moz-range-track              { background-color: var(--s-info-bg-ctl); border: var(--s-info-bor-ctl); }
+  input[type=range].infoBg::-webkit-slider-runnable-track { background-color: var(--s-info-bg-ctl); border: var(--s-info-bor-ctl); }
+  input[type=range].infoBg::-moz-range-thumb              { background-color: var(--s-info-fg-ctl); }
+  input[type=range].infoBg::-webkit-slider-thumb          { background-color: var(--s-info-fg-ctl); }
+
+  input[type=range].warningBg::-moz-range-track              { background-color: var(--s-warn-bg-ctl); border: var(--s-warn-bor-ctl); }
+  input[type=range].warningBg::-webkit-slider-runnable-track { background-color: var(--s-warn-bg-ctl); border: var(--s-warn-bor-ctl); }
+  input[type=range].warningBg::-moz-range-thumb              { background-color: var(--s-warn-fg-ctl); }
+  input[type=range].warningBg::-webkit-slider-thumb          { background-color: var(--s-warn-fg-ctl); }
+
+  input[type=range].alertBg::-moz-range-track              { background-color: var(--s-alert-bg-ctl); border: var(--s-alert-bor-ctl); }
+  input[type=range].alertBg::-webkit-slider-runnable-track { background-color: var(--s-alert-bg-ctl); border: var(--s-alert-bor-ctl); }
+  input[type=range].alertBg::-moz-range-thumb              { background-color: var(--s-alert-fg-ctl); }
+  input[type=range].alertBg::-webkit-slider-thumb          { background-color: var(--s-alert-fg-ctl); }
+
+  input[type=range].errorBg::-moz-range-track              { background-color: var(--s-error-bg-ctl); border: var(--s-error-bor-ctl); }
+  input[type=range].errorBg::-webkit-slider-runnable-track { background-color: var(--s-error-bg-ctl); border: var(--s-error-bor-ctl); }
+  input[type=range].errorBg::-moz-range-thumb              { background-color: var(--s-error-fg-ctl); }
+  input[type=range].errorBg::-webkit-slider-thumb          { background-color: var(--s-error-fg-ctl); }
 `;

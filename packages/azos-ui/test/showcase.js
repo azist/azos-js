@@ -398,6 +398,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     rangeMax="10"
     rangeStep="1"
     numTicks="5"
+    status="alert"
     displayValue
     valueLabel="Number of tomatoes: "
   ></az-slider>
