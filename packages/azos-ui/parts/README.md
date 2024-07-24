@@ -111,10 +111,10 @@ The following shows all available Attributes/Properties for the Azos Parts.
 | -------- | ---- | ---------- | -------------- |
 | **contentWidth** | _Number_ | When `titlePosition` is `mid-left` or `mid-right`, defines the slider's. **Default: 40** | _number between 0 and 100_ |
 | **displayValue** | _Boolean_ | If listed, displays the slider's current value and value description. | _displayValue_ |
+| **Height** | _Number_ | When `orientation` is set to vertical, defines the slider's height in _em_ units. | _Number_ |
 | **ID** | _String_ | Unique identifier | _any_ |
 | **isDisabled** | _Boolean_ | If listed, disables the part, removing all interactivity | _isDisabled_ |
-| **numTicks** | _Number_ | Applies a number evenly-spaced tick marks to the slider | _Number_ |
-| **orientation** | _String_ | Defines whether the slider is horizontal or vertical. | _horizontal, vertical_ |
+| **orientation** | _String_ | Defines whether the slider is horizontal or vertical. | _[horizontal, h, long], [vertical, v, tall]_ |
 | **rangeMax** | _Number_ | The slider's maximum limit | _Number_ |
 | **rangeMin** | _Number_ | The slider's minimum limit | _Number_ |
 | **rangeStep** | _Number_ | Interval that controls the slider's granularity. **Default: 1** | _Number_ |

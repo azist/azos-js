@@ -64,6 +64,12 @@ export const baseStyles = css`
   font-size:.7em;
   vertical-align:top;
 }
+  .field{
+    display:block;
+    margin:10px;
+    border:none !important;
+    background-color:unset !important;
+  }
 `;
 
 export const buttonStyles = css`
@@ -115,12 +121,6 @@ button:disabled{
 }`;
 
 export const checkStyles=css`
-  div{
-    display:block;
-    margin:10px;
-    border:none !important;
-    background-color:unset !important;
-  }
   label{
     gap:0 .5em;
     user-select:none;
@@ -174,13 +174,6 @@ export const checkStyles=css`
 `;
 
 export const switchStyles=css`
-  div{
-    display:block;
-    margin:10px;
-    text-align:left;
-    border:none !important;
-    background-color:unset !important;
-  }
   label{
     gap:0 .5em;
     user-select:none;
@@ -242,13 +235,6 @@ export const switchStyles=css`
 `;
 
 export const radioStyles=css`
-  div{
-    display:block;
-    margin:10px;
-    text-align:left;
-    border:none !important;
-    background-color:unset !important;
-  }
   label{
     gap:0 .5em;
     user-select:none;
@@ -304,13 +290,6 @@ export const radioStyles=css`
 `;
 
 export const textFieldStyles=css`
-  div{
-    display:block;
-    margin:10px;
-    text-align:left;
-    border:none !important;
-    background-color:unset !important;
-  }
   label{
     gap:0 .5em;
     user-select:none;
@@ -332,11 +311,11 @@ export const textFieldStyles=css`
   textarea::placeholder{ color: var(--ghost); }
   textarea{font-family:inherit;}
 
-  .okBg      { background-color: var(--s-ok-bg-ctl) !important;    color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl);}
-  .infoBg    { background-color: var(--s-info-bg-ctl) !important;  color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl);}
-  .warningBg { background-color: var(--s-warn-bg-ctl) !important;  color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
-  .alertBg   { background-color: var(--s-alert-bg-ctl) !important; color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
-  .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+  .okBg      { background-color: var(--s-ok-bg-ctl) !important;    color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl) !important;}
+  .infoBg    { background-color: var(--s-info-bg-ctl) !important;  color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl) !important;}
+  .warningBg { background-color: var(--s-warn-bg-ctl) !important;  color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl) !important;}
+  .alertBg   { background-color: var(--s-alert-bg-ctl) !important; color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl) !important;}
+  .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl) !important;}
 
   .disabled{ color: #b4b4b4; font-weight: 100; }
   input[type=text]:disabled,input[type=password]:disabled,textarea:disabled,select:disabled{
@@ -351,5 +330,71 @@ export const textFieldStyles=css`
 `;
 
 export const sliderStyles=css`
-  /*Some styles for sliders go here*/
+  label{
+    gap:0 .5em;
+    user-select:none;
+  }
+  label > span{ font-weight: 500; }
+
+  /*********** Baseline, reset styles ***********/
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Removes default focus */
+  input[type="range"]:focus {
+    outline: none;
+  }
+
+  /******** Chrome, Safari, Opera and Edge Chromium styles ********/
+  /* slider track */
+  input[type="range"]::-webkit-slider-runnable-track {
+    border: var(--s-default-bor-ctl);
+    background-color: var(--s-default-bg-ctl);
+    border-radius: 0.5em;
+    height: 0.5em;
+  }
+
+  /* slider thumb */
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    margin-top: -.25em; /* Centers thumb on the track */
+    background-color: var(--s-default-fg-ctl);
+    border-radius: 50%;
+    height: 1em;
+    width: 1em;
+  }
+
+  input[type="range"]:focus::-webkit-slider-thumb {
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
+  }
+
+  /*********** Firefox styles ***********/
+  /* slider track */
+  input[type="range"]::-moz-range-track {
+    border: var(--s-default-bor-ctl);
+    background-color: var(--s-default-bg-ctl);
+    border-radius: 0.5em;
+    height: 0.5em;
+  }
+
+  /* slider thumb */
+  input[type="range"]::-moz-range-thumb {
+    background-color: var(--s-default-fg-ctl);
+    border: none; /*Removes extra border that FF applies*/
+    border-radius: 50%;
+    height: 1em;
+    width: 1em;
+  }
+
+  input[type="range"]:focus::-moz-range-thumb{
+    outline: var(--focus-ctl-outline);
+    box-shadow: var(--focus-ctl-box-shadow);
+  }
 `;

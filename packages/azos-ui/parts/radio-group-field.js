@@ -58,7 +58,7 @@ export class RadioGroupField extends AzosPart{
     `)}`;
 
     return html`
-      <div class="${clsRank} ${clsStatus} ${clsDisable}">
+      <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <p class="radioPrompt ${this.isRequired ? 'requiredTitle' : ''}">${this.title}</p>
         ${optionList}
       </div>
