@@ -390,31 +390,18 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <li>orientation - determines if slider is horizontal or vertical</li>
     <li>numTicks - Number of evenly-spaced tick marks displayed on the slider</li>
   </ol>
-  <div class="strip-h">
-    <az-slider
-      id="basicSlider"
-      title="Basic Slider"
-      titlePosition="top-center"
-      orientation="horizontal"
-      rangeMin="0"
-      rangeMax="10"
-      rangeStep="1"
-      displayValue
-      valueLabel="Number of tomatoes: "
-    ></az-slider>
-    <az-slider
-      id="markedSlider"
-      title="Slider with tick marks"
-      titlePosition="top-left"
-      orientation="horizontal"
-      rangeMin="0"
-      rangeMax="10"
-      numTicks="5"
-      displayValue
-      valueLabel="Number of tomatoes: "
-    >
-    </az-slider>
-  </div>
+  <br>
+  <az-slider
+    id="basicSlider"
+    title="Basic Slider"
+    rangeMin="0"
+    rangeMax="10"
+    rangeStep="1"
+    numTicks="5"
+    status="alert"
+    displayValue
+    valueLabel="Number of tomatoes: "
+  ></az-slider>
 <h2> Various elements combined</h2>
 ..tbd
 
