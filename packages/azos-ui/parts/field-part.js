@@ -67,7 +67,7 @@ export class FieldPart extends AzosPart{
     const msg = this.message ? html`<p class="msg">${this.message}</p>` : '';
 
     return html`
-      <div class="${clsRank} ${clsStatus} ${clsDisable}">
+      <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <label class="${clsPosition}">
           <span class="${this.isRequired ? 'requiredTitle' : noContent}" style="${stlTitleWidth}">${this.title}</span>
           ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput()} ${msg}</div>` : html`${this.renderInput()} ${msg}`}
