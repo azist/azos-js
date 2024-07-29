@@ -5,10 +5,8 @@
 </FILE_LICENSE>*/
 
 import {AzosElement, html} from '../ui.js';
-/////import {baseStyles, buttonStyles} from './styles.js';
 
 export class AzosPart extends AzosElement{
-  //////static styles=[baseStyles, buttonStyles];
 
   static properties = {
     /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see the reversed accessors below */

@@ -1,23 +1,15 @@
 import { isOneOf } from 'azos/strings';
 import { html, css, parseRank, parseStatus, POSITION, parsePosition } from '../ui.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
-import { AzosPart } from './part.js';
+import { FieldPart } from './field-part.js';
 
 /* Can this work with the FieldPart? */
 
-export class RadioGroupField extends AzosPart{
+export class RadioGroupField extends FieldPart{
 
   static properties = {
     /** Determines if this group contains radio buttons or switches */
     itemType:      {type: String},
-    /** Title is the main prompt for the radio group */
-    title:         {type: String},
-    /** Determines how each radio item's label is positioned related to its radio button */
-    titlePosition: {type: String},
-    /** Allowed width of field's title as "%" when titlePosition = mid-left | mid-right.
-     *  MUST BE BETWEEN 0 and 100 - otherwise defaults to 40.
-     */
-    titleWidth:    {type: Number}
   };
 
   static styles = [baseStyles, radioStyles, switchStyles];
@@ -29,6 +21,10 @@ export class RadioGroupField extends AzosPart{
 
   /** True if the radio group has switches instead of radio buttons */
   get isSwitch(){  return isOneOf(this.itemType, ["switch", "sw"]);}
+
+  /** Checkboxes and switches have pre-defined content layout */
+   get isPredefinedContentLayout(){ return true; }
+
 
   renderPart(){
     const clsRank =   `${parseRank(this.rank, true)}`;

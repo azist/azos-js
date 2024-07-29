@@ -22,6 +22,9 @@ export class CheckboxField extends FieldPart{
   /** True if this part has a switch instead of a checkbox */
   get isSwitch(){ return isOneOf(this.itemType, ["switch", "sw"]); }
 
+   /** Checkboxes and switches have pre-defined content layout */
+   get isPredefinedContentLayout(){ return true; }
+
   renderInput(){
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
