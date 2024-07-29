@@ -1,13 +1,50 @@
-import { isOneOf } from 'azos/strings';
 import { POSITION, noContent } from "../ui";
 import { html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 import { AzosPart } from "./part";
 
+
+function guardWidth(v, d){
+  v = (v ?? d) | 0;
+  return v < 0 ? 0: v > 100 ? 100 : v;
+}
+
+/** Default width of content box in INT percents */
+export const DEFAULT_CONTENT_WIDTH_PCT = 40;
+
+/** Default width of title in INT percents */
+export const DEFAULT_TITLE_WIDTH_PCT = 40;
+
+
 export class FieldPart extends AzosPart{
 
+  constructor(){
+    super();
+    this.contentWidth = DEFAULT_CONTENT_WIDTH_PCT;
+    this.titleWidth = DEFAULT_TITLE_WIDTH_PCT;
+    this.titlePosition = POSITION.TOP_LEFT;
+  }
+
+  #contentWidth;
+  get contentWidth() { return this.#contentWidth; }
+  set contentWidth(v) { this.#contentWidth = guardWidth(v, DEFAULT_CONTENT_WIDTH_PCT); }
+
+  #titleWidth;
+  get titleWidth() { return this.#titleWidth; }
+  set titleWidth(v) { this.#titleWidth = guardWidth(v, DEFAULT_TITLE_WIDTH_PCT); }
+
+  #titlePosition;
+  get titlePosition() { return this.#titlePosition; }
+  set titlePosition(v) { this.#titlePosition = parsePosition(v); }
+
+  #value;
+  get value(){ return this.#value; }
+  set value(v){
+    this.#value = v;
+  }
+
   static properties = {
-    /** Width of the content as "%" when isHorizontal=true. Only applies to text input field(s).
-     *  MUST BE BETWEEN 0 and 100 - otherwise defaults to 40.
+    /** Width of the content as "%" when `isHorizontal=true`. Only applies to fields with non-predefined content layout, such as text fields etc.
+     *  An integer number MUST BE BETWEEN 0 and 100 - otherwise the defaults are used.
     */
     contentWidth:  {type: Number},
 
@@ -21,19 +58,25 @@ export class FieldPart extends AzosPart{
      *  top-left, top-center, top-right, mid-left, mid-right, bot-left,
      *  bot-center, bot-right.
      */
-    titlePosition: {type: String, reflect: true, converter: { fromAttribute: (v) => parsePosition(v)}},
+    titlePosition: {type: String, reflect: true},
 
-    /** Allowed width of field's title as "%" when isHorizontal=true.
-     *  MUST BE BETWEEN 0 and 100 - otherwise defaults to 80 for "togglers", 40 for everything else.
-     */
+    /** Width of the title as "%" when `isHorizontal=true`.
+     *  An integer number MUST BE BETWEEN 0 and 100 - otherwise the defaults are used.
+    */
     titleWidth:    {type: Number},
 
-    /** Input value */
-    value:         {type: String, reflect: true}
+    /** The name of the field */
+    name:  {type: String, reflect: true},
+
+    /** The value of the field */
+    value: {type: Object}
   }
 
-  /** True if part is a checkbox, switch, or radio */
-  get isToggler(){ return isOneOf(this.tagName.toLowerCase(), ["az-checkbox", "az-radio-group"]); }
+
+
+  /** True for field parts which have a preset/pre-defined content area layout by design, for example:
+   *  checkboxes, switches, and radios have a pre-determined content area layout */
+  get isPredefinedContentLayout(){ return false; }
 
   /** True if part's title position is middle left or middle right (i.e. field has horizontal orientation) */
   get isHorizontal(){ return this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT; }
@@ -44,25 +87,13 @@ export class FieldPart extends AzosPart{
     const clsDisable =  `${this.isDisabled ? "disabled" : ""}`;
     const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
-    /** Set the field's title width */
-    let stlTitleWidth = '';
-    if(this.isHorizontal){
-      (this.titleWidth !== undefined)
-        ? (this.titleWidth >= 0 && this.titleWidth <= 100)
-          ? stlTitleWidth = css`width: ${this.titleWidth}%;`
-          : this.isToggler ? stlTitleWidth = css`width: 80%;` : stlTitleWidth = css`width: 40%`
-        : this.isToggler ? stlTitleWidth = css`width: 80%;` : stlTitleWidth = css`width: 40%`;
-    }
+    const isPreContent = this.isPredefinedContentLayout;
+    const isHorizon = this.isHorizontal;
 
-    /** Set the field's content width if field is not a toggler */
-    let stlContentWidth = '';
-    if(this.isHorizontal && !this.isToggler){
-      (this.contentWidth !== undefined)
-        ? (this.contentWidth >= 0 && this.contentWidth <= 100)
-          ? stlContentWidth = css`width: ${this.contentWidth}%;`
-          : stlContentWidth = css`width: 40%;`
-        : stlContentWidth = css`width: 40%;`;
-    }
+    //Set the field's title width
+    const stlTitleWidth = isHorizon ? css`width: ${this.titleWidth}%;` : null;
+    //Set the field's content width if field is not of a predefined layout
+    const stlContentWidth = isHorizon && !isPreContent ? css`width: ${this.contentWidth}%;` : null;
 
     const msg = this.message ? html`<p class="msg">${this.message}</p>` : '';
 
@@ -78,4 +109,11 @@ export class FieldPart extends AzosPart{
 
   /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField */
   renderInput(){ return noContent; }
+
+  /** Override to trigger `change` event dispatch after value changes DUE to user input */
+  inputChanged(){
+    const evt = new Event("change", {bubbles: true, cancelable: false});
+    this.dispatchEvent(evt);
+  }
+
 }

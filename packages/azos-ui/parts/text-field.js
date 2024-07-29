@@ -42,6 +42,12 @@ export class TextField extends FieldPart{
   /** True if alignValue is a valid value */
   get isValidAlign(){ return isOneOf(this.alignValue, ["left", "center", "right"]); }
 
+
+  #tbChange(e){
+    this.value = e.target.value;
+    this.inputChanged();
+  }
+
   renderInput(){
     const clsRank     = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
@@ -54,10 +60,12 @@ export class TextField extends FieldPart{
         minLength="${this.minChar ? this.minChar : noContent}"
         placeholder="${this.placeholder}"
         rows="${this.height ? this.height : "4"}"
-        value="${this.value}"
+        .value="${this.value ?? ""}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
-        ?readonly=${this.isReadonly}></textarea>`
+        ?readonly=${this.isReadonly}
+        @change="${this.#tbChange}"
+        ></textarea>`
     : html`
       <input
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
@@ -66,10 +74,12 @@ export class TextField extends FieldPart{
         minLength="${this.minChar ? this.minChar : noContent}"
         placeholder="${this.placeholder}"
         type="${this.isInputText ? "text" : "password"}"
-        value="${this.value}"
+        .value="${this.value ?? ""}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
-        ?readonly=${this.isReadonly}>
+        ?readonly=${this.isReadonly}
+        @change="${this.#tbChange}"
+        >
       `;
 
     return compArea;

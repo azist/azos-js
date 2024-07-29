@@ -134,17 +134,27 @@ export function parsePosition(v, isCss = false){
 export class AzosElement extends LitElement {
 
   static properties = {
-    status: { type: String, reflect: true,  converter: { fromAttribute: (v) => parseStatus(v) }  },
-    rank:   { type: Number, reflect: true,  converter: { fromAttribute: (v) => parseRank(v) }  },
+    status: { type: String, reflect: true },
+    rank:   { type: String, reflect: true },
     scope:  { type: String}
   };
 
   #arena = null;
   constructor() {
-     super();
-     this.status = null;
-     this.rank = RANK.NORMAL;
+    super();
+    this.status = null;
+    this.rank = RANK.NORMAL;
   }
+
+
+  #status;
+  get status(){ return this.#status;}
+  set status(v){ this.#status = parseStatus(v); }
+
+  #rank;
+  get rank(){ return this.#rank;}
+  set rank(v){ this.#rank = parseRank(v); }
+
 
   /** Returns {@link Arena} instance from the first (great/grand)parent element that defines arena ref
    * @returns {Arena}
