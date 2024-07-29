@@ -25,16 +25,22 @@ export class FieldPart extends AzosPart{
   }
 
   #contentWidth;
-  set contentWidth(v) { this.#contentWidth = guardWidth(v, DEFAULT_CONTENT_WIDTH_PCT); }
   get contentWidth() { return this.#contentWidth; }
+  set contentWidth(v) { this.#contentWidth = guardWidth(v, DEFAULT_CONTENT_WIDTH_PCT); }
 
   #titleWidth;
-  set titleWidth(v) { this.#titleWidth = guardWidth(v, DEFAULT_TITLE_WIDTH_PCT); }
   get titleWidth() { return this.#titleWidth; }
+  set titleWidth(v) { this.#titleWidth = guardWidth(v, DEFAULT_TITLE_WIDTH_PCT); }
 
   #titlePosition;
-  set titlePosition(v) { this.#titlePosition = parsePosition(v); }
   get titlePosition() { return this.#titlePosition; }
+  set titlePosition(v) { this.#titlePosition = parsePosition(v); }
+
+  #value;
+  get value(){ return this.#value; }
+  set value(v){
+    this.#value = v;
+  }
 
   static properties = {
     /** Width of the content as "%" when `isHorizontal=true`. Only applies to fields with non-predefined content layout, such as text fields etc.
@@ -59,8 +65,11 @@ export class FieldPart extends AzosPart{
     */
     titleWidth:    {type: Number},
 
-    /** Input value */
-    value:         {type: String, reflect: true}
+    /** The name of the field */
+    name:  {type: String, reflect: true},
+
+    /** The value of the field */
+    value: {type: Object}
   }
 
 
@@ -100,4 +109,11 @@ export class FieldPart extends AzosPart{
 
   /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField */
   renderInput(){ return noContent; }
+
+  /** Override to trigger `change` event dispatch after value changes DUE to user input */
+  inputChanged(){
+    const evt = new Event("change", {bubbles: true, cancelable: false});
+    this.dispatchEvent(evt);
+  }
+
 }
