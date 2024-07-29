@@ -58,7 +58,8 @@ export class Showcase extends AzosElement{
   onAutoSpinnerOpen(){ Spinner.show(null, 3000); }
 
   #onFieldChange(e){
-    console.log("Got change event from field: ",e.target.name, e.target.value);
+    console.log("Got change event from field: ", e.target.name, e.target.value);
+    this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
   }
 
 
@@ -87,11 +88,11 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <az-spinner id="spinnerModal" scope="this" status="alert" timeout="5000" isModal></az-spinner>
 <az-spinner id="spinnerNonModal" scope="this" status="info" timeout="10000" message="Dill helps to expel what you propel"></az-spinner>
 
-<az-text-field id="tbFirstName" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}"></az-text-field>
-<az-text-field id="tbLastName" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text-field>
+<az-text-field id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}"></az-text-field>
+<az-text-field id="tbLastName" scope="this" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text-field>
 
-<az-checkbox id="chkSmokes" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-checkbox>
-<az-checkbox id="chkDrinks" name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-checkbox>
+<az-checkbox id="chkSmokes" scope="this" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-checkbox>
+<az-checkbox id="chkDrinks"scope="this"  name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-checkbox>
 
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
