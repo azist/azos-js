@@ -16,11 +16,11 @@ export class TextField extends FieldPart{
     itemType: {type:String},
 
     /** If defined, field will not allow input to exceed this character length */
-    maxChar: {type: Number},
+    maxLength: {type: Number},
 
     /** If defined, minimum character length allowed for input
      *  (for validation use only) */
-    minChar: {type: Number},
+    minLength: {type: Number},
 
     /** Ghosted text that will be replaced by user input */
     placeholder: {type: String}
@@ -56,8 +56,8 @@ export class TextField extends FieldPart{
       <textarea
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="${this.id}"
-        maxLength="${this.maxChar ? this.maxChar : noContent}"
-        minLength="${this.minChar ? this.minChar : noContent}"
+        maxLength="${this.maxLength ? this.maxLength : noContent}"
+        minLength="${this.minLength ? this.minLength : noContent}"
         placeholder="${this.placeholder}"
         rows="${this.height ? this.height : "4"}"
         .value="${this.value ?? ""}"
@@ -78,8 +78,7 @@ export class TextField extends FieldPart{
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
-        @change="${this.#tbChange}"
-        >
+        @change="${this.#tbChange}" />
       `;
 
     return compArea;

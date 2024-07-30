@@ -166,82 +166,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <h2>Radios</h2>
 <p>A long-used form of placeholder text in design mockups and more, the standard use of dummy text has come under fire in recent years as web design grows (and the internet makes the spread of opinions much more efficient).</p>
-  <div class="strip-h">
-      <az-radio-group id="baseGroup" title="Group of radios (choose only 1)">
-        <az-radio-option>Option 1</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
 
-      <az-radio-group id="baseGroupOk" title="Radio Group OK" status="ok">
-        <az-radio-option>Option 1</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
+      <az-radio-group id="baseGroup" value="choiceOption" title="Group of radios (choose only 1)">
+        <az-radio-option title="Option 1" value="value0"></az-radio-option>
+        <az-radio-option title="Second Choice" value="anotherValue"></az-radio-option>
+        <az-radio-option title="Choice number 3" value="choiceOption"></az-radio-option>
       </az-radio-group>
-
-      <az-radio-group id="baseGroupInfo" title="Radio Group Info" status="info">
-        <az-radio-option>Option 1</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="disabledGroup" title="Group of radios with disabled choices" isDisabled>
-        <az-radio-option>isDisabled cannot be applied to an az-radio-option</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="midRightGroup" title="Group of radios with mid-right titlePosition and titleWidth=100" titlePosition="mid-right" titleWidth="100">
-        <az-radio-option>titlePosition attribute is applied to the AZRadioGroup</az-radio-option>
-        <az-radio-option>At this point, titlePosition attribute cannot be applied separately to individual options</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-  </div>
-
-
-  <div class="strip-h">
-      <az-radio-group id="switchGroup" title="Group of switch radios" itemType="switch">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupOK" title="Group of switch radios" itemType="switch" status="ok">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupInfo" title="Group of switch radios" itemType="switch" status="info">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-       <az-radio-group id="switchGroupWarning" title="Group of switch radios" itemType="switch" status="warning">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupAlert" title="Group of switch radios" itemType="switch" status="alert">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupError" title="Group of switch radios" itemType="switch" status="error">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="disabledSwitchGroup" title="Disabled Group of switches" itemType="switch" isDisabled>
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
- </div>
 
 <h2>Checkboxes and switches</h2>
   <div class="strip-h">
@@ -323,71 +253,18 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   </div>
   <hr>
 <h2>Selects/Combos</h2>
-  <div class="strip-h">
     <az-select id="defaultSelect" title="Select one of the following from the dropdown">
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="selectedSelect" title="Select with a predetermined value" value="eighthOption">
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="alertSelect" title="Alert! Select something!" status="alert" isRequired>
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="disabledSelect" title="This select is disabled" isDisabled>
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="multiSelect" title="Choose one or more (CTRL+Click or CMD+Click to select multiple options). **NOT RECOMMENDED FOR MOBILE USE**" itemType="multiple">
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
+      <az-select-option value="" title="Select an option&hellip;"></az-select-option>
+      <az-select-option value="valueOne" title="Selected first value"></az-select-option>
+      <az-select-option value="secondValue" title="Select second option"></az-select-option>
+      <az-select-option value="thirdOption" title="This is an option"></az-select-option>
+      <az-select-option value="opt4" title="Option #4"></az-select-option>
+      <az-select-option value="fifthValue" title="OPTION FIVE"></az-select-option>
+      <az-select-option value="value6" title="Yet another option"></az-select-option>
+      <az-select-option value="numberSeven" title="Are you losing count yet?"></az-select-option>
+      <az-select-option value="eighthOption" title="Maybe chose this one"></az-select-option>
+      <az-select-option value="optionNine" title="Almost done"></az-select-option>
+      <az-select-option value="finalValue" title="Last test option"></az-select-option>
     </az-select>
   </div>
   <hr>

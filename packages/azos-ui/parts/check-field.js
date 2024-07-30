@@ -36,14 +36,16 @@ export class CheckField extends FieldPart{
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
 
     return html`
-      <input type="checkbox" class="${this.isCheck ? "check" : "switch"} ${clsRank} ${clsStatusBg}"
-       id="${this.id}"
-       name="${this.id}"
-      .disabled=${this.isDisabled}
-      .required=${this.isRequired}
-      ?readonly=${this.isReadonly}
-      .checked=${this.value}
-      @change="${this.#chkChange}">
+      <input
+        type="checkbox"
+        class="${this.isCheck ? "check" : "switch"} ${clsRank} ${clsStatusBg}"
+        id="${this.id}"
+        name="${this.id}"
+        .disabled=${this.isDisabled}
+        .required=${this.isRequired}
+        ?readonly=${this.isReadonly}
+        .checked=${this.value}
+        @change="${this.#chkChange}" />
     `;
   }
 }

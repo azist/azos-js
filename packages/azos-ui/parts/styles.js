@@ -235,8 +235,13 @@ export const switchStyles=css`
 `;
 
 export const radioStyles=css`
+  li{
+    display:flex;
+    align-items:center;
+    margin-bottom:1em;
+  }
   label{
-    gap:0 .5em;
+    margin-left:1.5em;
     user-select:none;
   }
   .radio:focus{
@@ -301,6 +306,7 @@ export const textFieldStyles=css`
     padding:.5em;
     border: var(--s-default-bor-ctl);
     background-color: var(--s-default-bg-ctl);
+    color: var(--s-default-fg-ctl);
   }
   input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{
     outline: var(--focus-ctl-outline);
@@ -311,11 +317,11 @@ export const textFieldStyles=css`
   textarea::placeholder{ color: var(--ghost); }
   textarea{font-family:inherit;}
 
-  .okBg      { background-color: var(--s-ok-bg-ctl) !important;    color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl) !important;}
-  .infoBg    { background-color: var(--s-info-bg-ctl) !important;  color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl) !important;}
-  .warningBg { background-color: var(--s-warn-bg-ctl) !important;  color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl) !important;}
-  .alertBg   { background-color: var(--s-alert-bg-ctl) !important; color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl) !important;}
-  .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl) !important;}
+  .okBg      { background-color: var(--s-ok-bg-ctl) !important;    color: var(--s-ok-fg-ctl) !important;    border: var(--s-ok-bor-ctl) !important;}
+  .infoBg    { background-color: var(--s-info-bg-ctl) !important;  color: var(--s-info-fg-ctl) !important;  border: var(--s-info-bor-ctl) !important;}
+  .warningBg { background-color: var(--s-warn-bg-ctl) !important;  color: var(--s-warn-fg-ctl) !important;  border: var(--s-warn-bor-ctl) !important;}
+  .alertBg   { background-color: var(--s-alert-bg-ctl) !important; color: var(--s-alert-fg-ctl) !important; border: var(--s-alert-bor-ctl) !important;}
+  .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl) !important; border: var(--s-error-bor-ctl) !important;}
 
   .disabled{ color: #b4b4b4; font-weight: 100; }
   input[type=text]:disabled,input[type=password]:disabled,textarea:disabled,select:disabled{
