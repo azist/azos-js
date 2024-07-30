@@ -238,7 +238,7 @@ export const radioStyles=css`
   li{
     display:flex;
     align-items:center;
-    margin-bottom:1.5em;
+    margin-bottom:1em;
   }
   label{
     margin-left:1.5em;

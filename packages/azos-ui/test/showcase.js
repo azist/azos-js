@@ -253,71 +253,18 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   </div>
   <hr>
 <h2>Selects/Combos</h2>
-  <div class="strip-h">
     <az-select id="defaultSelect" title="Select one of the following from the dropdown">
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="selectedSelect" title="Select with a predetermined value" value="eighthOption">
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="alertSelect" title="Alert! Select something!" status="alert" isRequired>
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="disabledSelect" title="This select is disabled" isDisabled>
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
-    </az-select>
-    <az-select id="multiSelect" title="Choose one or more (CTRL+Click or CMD+Click to select multiple options). **NOT RECOMMENDED FOR MOBILE USE**" itemType="multiple">
-      <az-select-option>Select an option&hellip;</az-select-option>
-      <az-select-option value="valueOne">Selected first value</az-select-option>
-      <az-select-option value="secondValue">Select second option</az-select-option>
-      <az-select-option value="thirdOption">This is an option</az-select-option>
-      <az-select-option value="opt4">Option #4</az-select-option>
-      <az-select-option value="fifthValue">OPTION FIVE</az-select-option>
-      <az-select-option value="value6">Yet another option</az-select-option>
-      <az-select-option value="numberSeven">Are you losing count yet?</az-select-option>
-      <az-select-option value="eighthOption">Maybe chose this one</az-select-option>
-      <az-select-option value="optionNine">Almost done</az-select-option>
-      <az-select-option value="finalValue">Last test option</az-select-option>
+      <az-select-option value="" title="Select an option&hellip;"></az-select-option>
+      <az-select-option value="valueOne" title="Selected first value"></az-select-option>
+      <az-select-option value="secondValue" title="Select second option"></az-select-option>
+      <az-select-option value="thirdOption" title="This is an option"></az-select-option>
+      <az-select-option value="opt4" title="Option #4"></az-select-option>
+      <az-select-option value="fifthValue" title="OPTION FIVE"></az-select-option>
+      <az-select-option value="value6" title="Yet another option"></az-select-option>
+      <az-select-option value="numberSeven" title="Are you losing count yet?"></az-select-option>
+      <az-select-option value="eighthOption" title="Maybe chose this one"></az-select-option>
+      <az-select-option value="optionNine" title="Almost done"></az-select-option>
+      <az-select-option value="finalValue" title="Last test option"></az-select-option>
     </az-select>
   </div>
   <hr>

@@ -35,7 +35,7 @@ export class RadioGroupField extends FieldPart{
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
     const optionList = html`${allOptions.map((option, i) => html`
-      <li style="margin-bottom:2em;">
+      <li>
         <input
           type="radio"
           class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}"
