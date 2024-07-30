@@ -86,4 +86,4 @@ export class TextField extends FieldPart{
   }
 }
 
-window.customElements.define("az-text-field", TextField);
+window.customElements.define("az-text", TextField);

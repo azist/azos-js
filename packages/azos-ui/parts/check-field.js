@@ -4,7 +4,7 @@ import { FieldPart } from './field-part.js';
 import { baseStyles, checkStyles, switchStyles } from './styles.js';
 import { asBool } from 'azos/types';
 
-export class CheckboxField extends FieldPart{
+export class CheckField extends FieldPart{
   static properties = {
     itemType: {type: String}
   };
@@ -48,4 +48,4 @@ export class CheckboxField extends FieldPart{
   }
 }
 
-window.customElements.define("az-checkbox", CheckboxField);
+window.customElements.define("az-check", CheckField);

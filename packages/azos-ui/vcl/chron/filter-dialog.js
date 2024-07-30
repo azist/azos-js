@@ -8,6 +8,8 @@ import { html, css } from "../../ui";
 import { ModalDialog } from "../../modal-dialog";
 
 import "../../parts/button";
+import "../../parts/text-field";
+import "../../parts/check-field";
 
 export class ChronicleFilterDialog extends ModalDialog{
   constructor(){
@@ -17,7 +19,7 @@ export class ChronicleFilterDialog extends ModalDialog{
   static styles = [ModalDialog.styles, css`
 .strip-h{
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   margin: 0.5em 0em 0em 0em;
 }
 
@@ -27,43 +29,12 @@ form{
  min-width: 320px;
 }
 
-*{
- text-align: left;
+az-text, az-check{
+ display: block;
 }
 
-label{
-  margin: .5em;
-  border: none;
-  float: inline-start;
-  padding-top: .35em;
-  color: #828282;
-}
-
-input, select, textarea{
-  margin: .5em;
-  width: 38ch;
-  border: var(--s-default-bor-ctl);
-  border-radius: 4px;
-  padding: .45em;
-  background: var(--s-default-bg-ctl);
-  color: #424242;
-  float: inline-end;
-}
-
-input::placeholder{
-  color: var(--ghost);
-}
-
-textarea{
- width: 85%;
- resize: none;
-}
-
-.field-block{
-  display: block;
-  width: 100%;
-  clear: both;
-  box-sizing: border-box;
+az-check{
+  min-width: 12ch;
 }
 
 
@@ -110,27 +81,19 @@ textarea{
   renderBodyContent(){
     return html`
 <form id="frmFilter" autocomplete="off" onsubmit="return false">
-<div class="field-block">
-   <label for="fldGdid">Gdid</label>       <input type=text id="fldGdid" placeholder="0:0:0">
-</div>
-<div class="field-block">
-   <label for="fldId">Id</label>           <input type=text id="fldId" placeholder="guid:00000000-0000-0000-0000-000000000000" value="">
-</div>
-<div class="field-block">
-   <label for="fldRelId">RelId</label>     <input type=text id="fldRelId" placeholder="guid:00000000-0000-0000-0000-000000000000" value="">
-</div>
-<div class="field-block">
-   <label for="fldChannel">Channel</label> <input type=text id="fldChannel" placeholder="A(8)">
-</div>
-<div class="field-block">
-   <label for="fldApplication">Application</label> <input type=text id="fldApplication" placeholder="A(8)">
+
+  <az-text id="fldGdid" scope="this" title="Gdid" placeholder="0:0:0"></az-text>
+  <az-text id="fldId" scope="this" title="Id (guid)" placeholder="guid:00000000-0000-0000-0000-000000000000"></az-text>
+  <az-text id="fldRelId" scope="this" title="Related Id (guid)" placeholder="guid:00000000-0000-0000-0000-000000000000" status="info"></az-text>
+
+<div class="strip-h">
+  <az-text id="fldChannel" scope="this" title="Channel (atom)" placeholder="A(8)" style="width: 50%"></az-text>
+  <az-text id="fldApplication" scope="this" title="Application (atom)" placeholder="A(8)" style="width: 50%"></az-text>
 </div>
 
-<div class="field-block">
-   <label for="fldStartUtc">Start Utc</label>   <input type=text id="fldStartUtc" placeholder="ISO8601: YYYY-MM-DDThh:mm:ss.fffZ">
-</div>
-<div class="field-block">
-   <label for="fldEndUtc">End Utc</label>     <input type=text id="fldEndUtc" placeholder="ISO8601: YYYY-MM-DDThh:mm:ss.fffZ">
+<div class="strip-h">
+  <az-text id="fldStartUtc" scope="this" title="Start Utc" placeholder="YYYY-MM-DDThh:mm:ss.fffZ" style="width: 50%"></az-text>
+  <az-text id="fldEndUtc" scope="this" title="End Utc" placeholder="YYYY-MM-DDThh:mm:ss.fffZ" style="width: 50%"></az-text>
 </div>
 
 <div class="field-block">
@@ -235,19 +198,13 @@ textarea{
    <label for="fldAdvancedFilter">Advanced</label> <textarea id="fldAdvancedFilter" rows=4 placeholder="json expression"></textarea>
 </div>
 
-<div class="field-block">
-   <label for="chkFullGuids">Full Guids</label> <input type="checkbox" id="chkFullGuids" checked onclick="buildGrid(serverResponse.data)">
+<div class="strip-h">
+  <az-check id="chkFullGuids" scope="this" title="Full Guids" itemtype="switch" ></az-check>
+  <az-check id="chkChannel" scope="this" title="Channel" itemtype="switch" ></az-check>
+  <az-check id="chkAdims" scope="this" title="Archive dims" itemtype="switch" ></az-check>
+  <az-check id="chkShards" scope="this" title="Shards"itemtype="switch" ></az-check>
 </div>
-<div class="field-block">
-   <label for="chkChannel">Channel</label> <input type="checkbox"  id="chkChannel" checked onclick="buildGrid(serverResponse.data)">
-</div>
-<div class="field-block">
-   <label for="chkAdims">Archive dims</label> <input type="checkbox"  id="chkAdims" onclick="buildGrid(serverResponse.data)">
-</div>
-<div class="field-block">
-<label for="chkShards">Shards</label> <input type="checkbox"  id="chkShards" checked>
-</div>
-<div class="field-block"></div>
+
 </form>
 
 <div class="strip-h" style="float: right;">
