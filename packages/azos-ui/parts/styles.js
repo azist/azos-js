@@ -235,8 +235,13 @@ export const switchStyles=css`
 `;
 
 export const radioStyles=css`
+  li{
+    display:flex;
+    align-items:center;
+    margin-bottom:1.5em;
+  }
   label{
-    gap:0 .5em;
+    margin-left:1.5em;
     user-select:none;
   }
   .radio:focus{

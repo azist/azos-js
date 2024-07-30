@@ -166,82 +166,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <h2>Radios</h2>
 <p>A long-used form of placeholder text in design mockups and more, the standard use of dummy text has come under fire in recent years as web design grows (and the internet makes the spread of opinions much more efficient).</p>
-  <div class="strip-h">
-      <az-radio-group id="baseGroup" title="Group of radios (choose only 1)">
-        <az-radio-option>Option 1</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
 
-      <az-radio-group id="baseGroupOk" title="Radio Group OK" status="ok">
-        <az-radio-option>Option 1</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
+      <az-radio-group id="baseGroup" value="choiceOption" title="Group of radios (choose only 1)">
+        <az-radio-option title="Option 1" value="value0"></az-radio-option>
+        <az-radio-option title="Second Choice" value="anotherValue"></az-radio-option>
+        <az-radio-option title="Choice number 3" value="choiceOption"></az-radio-option>
       </az-radio-group>
-
-      <az-radio-group id="baseGroupInfo" title="Radio Group Info" status="info">
-        <az-radio-option>Option 1</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="disabledGroup" title="Group of radios with disabled choices" isDisabled>
-        <az-radio-option>isDisabled cannot be applied to an az-radio-option</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="midRightGroup" title="Group of radios with mid-right titlePosition and titleWidth=100" titlePosition="mid-right" titleWidth="100">
-        <az-radio-option>titlePosition attribute is applied to the AZRadioGroup</az-radio-option>
-        <az-radio-option>At this point, titlePosition attribute cannot be applied separately to individual options</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-  </div>
-
-
-  <div class="strip-h">
-      <az-radio-group id="switchGroup" title="Group of switch radios" itemType="switch">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupOK" title="Group of switch radios" itemType="switch" status="ok">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupInfo" title="Group of switch radios" itemType="switch" status="info">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-       <az-radio-group id="switchGroupWarning" title="Group of switch radios" itemType="switch" status="warning">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupAlert" title="Group of switch radios" itemType="switch" status="alert">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="switchGroupError" title="Group of switch radios" itemType="switch" status="error">
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
-
-      <az-radio-group id="disabledSwitchGroup" title="Disabled Group of switches" itemType="switch" isDisabled>
-        <az-radio-option>This should be a good switch</az-radio-option>
-        <az-radio-option>Second Choice</az-radio-option>
-        <az-radio-option>Choice number 3</az-radio-option>
-      </az-radio-group>
- </div>
 
 <h2>Checkboxes and switches</h2>
   <div class="strip-h">

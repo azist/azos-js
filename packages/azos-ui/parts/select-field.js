@@ -43,7 +43,11 @@ export class SelectField extends FieldPart{
 
     const allOptions = [...this.getElementsByTagName("az-select-option")];
     const optionList = html`${allOptions.map((option) => html`
-      <option value="${option.getAttribute('value')}" .selected=${this.value!==undefined && this.value===option.getAttribute('value')}>${option.innerText}</option>
+      <option
+        value="${option.getAttribute('value')}"
+        .selected=${this.value!==undefined && this.value===option.getAttribute('value')}>
+          ${option.innerText}
+      </option>
     `)}`;
 
     return html`

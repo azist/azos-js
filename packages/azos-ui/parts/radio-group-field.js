@@ -1,14 +1,12 @@
 import { isOneOf } from 'azos/strings';
-import { html, css, parseRank, parseStatus, POSITION, parsePosition } from '../ui.js';
+import { html, parseRank, parseStatus } from '../ui.js';
 import { baseStyles, radioStyles, switchStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
 
 /* Can this work with the FieldPart? */
 
 export class RadioGroupField extends FieldPart{
-
   static properties = {
-    /** Determines if this group contains radio buttons or switches */
     itemType:      {type: String},
   };
 
@@ -23,42 +21,37 @@ export class RadioGroupField extends FieldPart{
   get isSwitch(){  return isOneOf(this.itemType, ["switch", "sw"]);}
 
   /** Checkboxes and switches have pre-defined content layout */
-   get isPredefinedContentLayout(){ return true; }
+  get isPredefinedContentLayout(){ return true; }
+
+  #radioChange(e){
+    this.value = e.target.value;
+    this.inputChanged();
+  }
 
 
-  renderPart(){
+  renderInput(){
     const clsRank =   `${parseRank(this.rank, true)}`;
-    const clsStatus = `${parseStatus(this.status, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
-    const clsDisable = `${this.isDisabled ? "disabled" : ""}`;
-    const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "mid-left"}`;
-
-    /** Set the width of the input field label */
-    let stlTitleWidth = '';
-    if(clsPosition === 'mid-left' || this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT){
-      (this.titleWidth !== undefined)
-        ? (0 <= this.titleWidth <= 100)
-          ? stlTitleWidth = css`width: ${this.titleWidth}%;`
-          : stlTitleWidth = css`width: 80%;`
-        : stlTitleWidth = css`width: 80%;`;
-    }
 
     const allOptions = [...this.getElementsByTagName("az-radio-option")];
     const optionList = html`${allOptions.map((option, i) => html`
-      <div>
-        <label class="${clsPosition}" for="${this.id}_${i}">
-          <span style="${stlTitleWidth}">${option.innerText}</span>
-          <input type="radio" class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}" id="${this.id}_${i}" name="${this.id}" .disabled=${this.isDisabled} .required=${this.isRequired} ?readonly=${this.isReadonly}>
-        </label>
-      </div>
+      <li style="margin-bottom:2em;">
+        <input
+          type="radio"
+          class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}"
+          id="${this.id}_${i}"
+          name="${this.id}"
+          value="${option.getAttribute('value')}"
+          .disabled=${this.isDisabled}
+          .required=${this.isRequired}
+          ?readonly=${this.isReadonly}
+          @change="${this.#radioChange}"
+          ${option.getAttribute('value')===this.value ? 'checked' : ''} />
+        <label for="${this.id}_${i}">${option.title}</label>
+      </li>
     `)}`;
 
-    return html`
-      <div class="${clsRank} ${clsStatus} ${clsDisable} field">
-        <p class="radioPrompt ${this.isRequired ? 'requiredTitle' : ''}">${this.title}</p>
-        ${optionList}
-      </div>
-    `;
+    return html`<ul style="list-style:none;">${optionList}</ul>`;
   }
 }
 
