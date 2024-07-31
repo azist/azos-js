@@ -33,25 +33,33 @@ export class RadioGroupField extends FieldPart{
     const clsRank =   `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
 
-    const allOptions = [...this.getElementsByTagName("az-radio-option")];
-    const optionList = html`${allOptions.map((option, i) => html`
+    const allItems = [...this.getElementsByTagName("item")];
+    const v = this.value;
+
+    console.log("we have received:", v);
+
+    const itemList = html`${allItems.map((item, i) => {
+      const itv = item.getAttribute('value');
+      return  html`
       <li>
         <input
           type="radio"
           class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}"
           id="${this.id}_${i}"
           name="${this.id}"
-          value="${option.getAttribute('value')}"
+          value="${itv}"
           .disabled=${this.isDisabled}
           .required=${this.isRequired}
           ?readonly=${this.isReadonly}
           @change="${this.#radioChange}"
-          ${option.getAttribute('value')===this.value ? 'checked' : ''} />
-        <label for="${this.id}_${i}">${option.title}</label>
-      </li>
-    `)}`;
+          .checked=${itv===v}
+          />
 
-    return html`<ul style="list-style:none;">${optionList}</ul>`;
+        <label for="${this.id}_${i}">${item.title}</label>
+      </li>
+    `;})}`;
+
+    return html`<ul style="list-style: none;">${itemList}</ul>`;
   }
 }
 

@@ -88,7 +88,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <az-spinner id="spinnerModal" scope="this" status="alert" timeout="5000" isModal></az-spinner>
 <az-spinner id="spinnerNonModal" scope="this" status="info" timeout="10000" message="Dill helps to expel what you propel"></az-spinner>
 
-<az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}"></az-text>
+<az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="SHITTERESSS"></az-text>
 <az-text id="tbLastName" scope="this" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text>
 
 <az-check id="chkSmokes" scope="this" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-check>
@@ -168,9 +168,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <p>A long-used form of placeholder text in design mockups and more, the standard use of dummy text has come under fire in recent years as web design grows (and the internet makes the spread of opinions much more efficient).</p>
 
       <az-radio-group id="baseGroup" value="choiceOption" title="Group of radios (choose only 1)">
-        <az-radio-option title="Option 1" value="value0"></az-radio-option>
-        <az-radio-option title="Second Choice" value="anotherValue"></az-radio-option>
-        <az-radio-option title="Choice number 3" value="choiceOption"></az-radio-option>
+        <item title="Option 1" value="v1"></item>
+        <item title="Option 2" value="v2"></item>
+        <item title="Another" value="v3"></item>
       </az-radio-group>
 
 <h2>Checkboxes and switches</h2>

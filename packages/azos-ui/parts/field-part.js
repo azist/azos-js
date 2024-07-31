@@ -36,11 +36,11 @@ export class FieldPart extends AzosPart{
   get titlePosition() { return this.#titlePosition; }
   set titlePosition(v) { this.#titlePosition = parsePosition(v); }
 
-  #value;
-  get value(){ return this.#value; }
-  set value(v){
-    this.#value = v;
-  }
+  // #value;
+  // get value(){ return this.#value; }
+  // set value(v){
+  //   this.#value = v;
+  // }
 
   static properties = {
     /** Width of the content as "%" when `isHorizontal=true`. Only applies to fields with non-predefined content layout, such as text fields etc.
@@ -65,11 +65,11 @@ export class FieldPart extends AzosPart{
     */
     titleWidth:    {type: Number},
 
-    /** The name of the field */
+    /** The logical name of the field within its context (e.g.) */
     name:  {type: String, reflect: true},
 
     /** The value of the field */
-    value: {type: Object}
+    value: {type: Object, converter: { fromAttribute: (v) => v.toString()}}
   }
 
 
