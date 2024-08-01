@@ -15,6 +15,9 @@ export class CheckField extends FieldPart{
     super();
   }
 
+  /** check fields store boolean value only */
+  castValue(v){ return asBool(v); }
+
   /** True if this part has a checkbox instead of a switch */
   get isCheck(){ return !this.isSwitch;}
 
@@ -26,7 +29,7 @@ export class CheckField extends FieldPart{
 
 
   #chkChange(e){
-    this.value = asBool(e.target.checked);
+    this.value = e.target.checked;
     this.inputChanged();
   }
 
