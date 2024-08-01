@@ -28,15 +28,12 @@ export class RadioGroupField extends FieldPart{
     this.inputChanged();
   }
 
-
   renderInput(){
     const clsRank =   `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
 
     const allItems = [...this.getElementsByTagName("item")];
     const v = this.value;
-
-    console.log("we have received:", v);
 
     const itemList = html`${allItems.map((item, i) => {
       const itv = item.getAttribute('value');

@@ -36,16 +36,19 @@ export class FieldPart extends AzosPart{
   get titlePosition() { return this.#titlePosition; }
   set titlePosition(v) { this.#titlePosition = parsePosition(v); }
 
-  // #value;
-  // get value(){ return this.#value; }
-  // set value(v){
-  //   this.#value = v;
-  // }
+  #value;
+  get value(){ return this.#value; }
+  set value(v){
+    this.#value = this.castValue(v);
+  }
+
+  /** Override to type-cast/coerce/change value as required by your specific descendant
+   *  for example, this may restrict value to bool for logical fields */
+  castValue(v){ return v; }
 
   static properties = {
     /** Width of the content as "%" when `isHorizontal=true`. Only applies to fields with non-predefined content layout, such as text fields etc.
-     *  An integer number MUST BE BETWEEN 0 and 100 - otherwise the defaults are used.
-    */
+     *  An integer number MUST BE BETWEEN 0 and 100 - otherwise the defaults are used.  */
     contentWidth:  {type: Number},
 
     /** Validation (error) message */
@@ -56,8 +59,7 @@ export class FieldPart extends AzosPart{
 
     /** Field title position, oriented to input field. Valid positions:
      *  top-left, top-center, top-right, mid-left, mid-right, bot-left,
-     *  bot-center, bot-right.
-     */
+     *  bot-center, bot-right.  */
     titlePosition: {type: String, reflect: true},
 
     /** Width of the title as "%" when `isHorizontal=true`.
@@ -69,7 +71,7 @@ export class FieldPart extends AzosPart{
     name:  {type: String, reflect: true},
 
     /** The value of the field */
-    value: {type: Object, converter: { fromAttribute: (v) => v.toString()}}
+    value: {type: Object, converter: { fromAttribute: (v) => v?.toString()}}
   }
 
 
