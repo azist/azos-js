@@ -43,7 +43,7 @@ export class TextField extends FieldPart{
   get isValidAlign(){ return isOneOf(this.alignValue, ["left", "center", "right"]); }
 
 
-  ///// castValue(v){ return `xyz: ${v}`; }
+  //////castValue(v){ return `xyz: ${v}`; }
 
   #tbChange(e){
     this.value = e.target.value;
