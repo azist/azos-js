@@ -6,6 +6,9 @@
 
 import {AzosElement, html} from '../ui.js';
 
+/** AzosParts are primitives for building more complex components.
+ * They embody logical properties like `disabled`, `visible`, `absent`, `applicable`, `readonly`, and `required`
+ */
 export class AzosPart extends AzosElement{
 
   static properties = {
@@ -51,6 +54,7 @@ export class AzosPart extends AzosElement{
 
   //https://www.oddbird.net/2023/11/17/components/
   //https://frontendmasters.com/blog/light-dom-only/
+  /** Descendants should override `renderPart()` instead */
   render(){
     const stl = this.calcStyles();
     return stl ? html`<style>:host{ ${stl}}</style> ${this.renderPart()}` : this.renderPart();

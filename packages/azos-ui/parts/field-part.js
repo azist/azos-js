@@ -43,7 +43,12 @@ export class FieldPart extends AzosPart{
   }
 
   /** Override to type-cast/coerce/change value as required by your specific descendant
-   *  for example, this may restrict value to bool for logical fields */
+   *  for example, this may restrict value to bool for logical fields.
+   * This is called on value set, therefore a `.value` property may only store data as dictated  by this override,
+   * as there is no way to set `.value` bypassing this method
+   * @param {*} v - value to set
+   * @returns {T} value coerced to T as defined by the descendant implementation
+   * */
   castValue(v){ return v; }
 
   static properties = {
