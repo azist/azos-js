@@ -170,7 +170,8 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-radio-group id="baseGroup" value="choiceOption" title="Group of radios (choose only 1)">
         <item title="Option 1" value="v1"></item>
         <item title="Option 2" value="v2"></item>
-        <item title="Another" value="v3"></item>
+        <item title="Another"  value="v3"></item>
+        <item title="Snake Number Four"  value="v4"></item>
       </az-radio-group>
 
 <h2>Checkboxes and switches</h2>

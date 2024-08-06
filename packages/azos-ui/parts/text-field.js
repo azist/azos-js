@@ -43,7 +43,7 @@ export class TextField extends FieldPart{
   get isValidAlign(){ return isOneOf(this.alignValue, ["left", "center", "right"]); }
 
 
-  ///// castValue(v){ return `xyz: ${v}`; }
+  //////castValue(v){ return `xyz: ${v}`; }
 
   #tbChange(e){
     this.value = e.target.value;
@@ -52,7 +52,7 @@ export class TextField extends FieldPart{
 
   renderInput(){
     const clsRank     = `${parseRank(this.rank, true)}`;
-    const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
+    const clsStatusBg = `${parseStatus(this.effectiveStatus,true,"Bg")}`;
 
     let compArea = this.isTextArea ? html`
       <textarea

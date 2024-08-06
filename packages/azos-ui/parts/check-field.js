@@ -2,7 +2,7 @@ import { isOneOf } from 'azos/strings';
 import { html, parseRank, parseStatus } from '../ui.js';
 import { FieldPart } from './field-part.js';
 import { baseStyles, checkStyles, switchStyles } from './styles.js';
-import { asBool } from 'azos/types';
+import { asTriBool } from 'azos/types';
 
 export class CheckField extends FieldPart{
   static properties = {
@@ -16,7 +16,7 @@ export class CheckField extends FieldPart{
   }
 
   /** check fields store boolean value only */
-  castValue(v){ return asBool(v); }
+  castValue(v){ return asTriBool(v); }
 
   /** True if this part has a checkbox instead of a switch */
   get isCheck(){ return !this.isSwitch;}

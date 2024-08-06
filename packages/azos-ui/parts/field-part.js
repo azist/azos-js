@@ -1,4 +1,5 @@
-import { POSITION, noContent } from "../ui";
+import { asTypeMoniker, cast, asObject } from "azos/types";
+import { POSITION, STATUS, noContent } from "../ui";
 import { html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 import { AzosPart } from "./part";
 
@@ -36,15 +37,46 @@ export class FieldPart extends AzosPart{
   get titlePosition() { return this.#titlePosition; }
   set titlePosition(v) { this.#titlePosition = parsePosition(v); }
 
+  #dataType;
+  /** It is either `null | undefined` or contains a valid type moniker which is used to coerce the value
+   * upon its assignment
+   */
+  get dataType() { return this.#dataType; }
+  set dataType(v) { this.#dataType = v ? asTypeMoniker(v) : undefined; }
+
   #value;
   get value(){ return this.#value; }
   set value(v){
     this.#value = this.castValue(v);
   }
 
+  #error;
+  get error() { return this.#error; }
+  set error(v) { this.#error = asObject(v, true); }
+
+
+  get effectiveStatus(){ return this.#error ? STATUS.ERROR : this.status; }
+  get effectiveMessage(){ return this.#error ? "Invalid data": this.message; }
+
+
   /** Override to type-cast/coerce/change value as required by your specific descendant
-   *  for example, this may restrict value to bool for logical fields */
-  castValue(v){ return v; }
+   *  for example, this may restrict value to bool for logical fields.
+   * This is called on value set, therefore a `.value` property may only store data as dictated  by this override,
+   * as there is no way to set `.value` bypassing this method.
+   * The default implementation relies on `dataType` type moniker conversion
+   * @param {*} v - value to set
+   * @returns {T} value coerced to T as defined by `dataType` or the descendant implementation which might always convert to certain type (e.g. checkbox to bool)
+   * */
+  castValue(v){
+    const tp = this.#dataType;
+    try{
+      const result = tp ? cast(v, tp, true) : v;
+      this.error = null;
+      return result;
+    } catch(e){
+      this.error = e;
+    }
+  }
 
   static properties = {
     /** Width of the content as "%" when `isHorizontal=true`. Only applies to fields with non-predefined content layout, such as text fields etc.
@@ -70,8 +102,14 @@ export class FieldPart extends AzosPart{
     /** The logical name of the field within its context (e.g.) */
     name:  {type: String, reflect: true},
 
+    /** Type moniker which constrains the type of this field values */
+    dataType: {String},
+
     /** The value of the field */
-    value: {type: Object, converter: { fromAttribute: (v) => v?.toString()}}
+    value: {type: Object, converter: { fromAttribute: (v) => v?.toString()}},
+
+
+    error: {type: Object}
   }
 
 
@@ -85,7 +123,7 @@ export class FieldPart extends AzosPart{
 
   renderPart(){
     const clsRank =     `${parseRank(this.rank, true)}`;
-    const clsStatus =   `${parseStatus(this.status, true)}`;
+    const clsStatus =   `${parseStatus(this.effectiveStatus, true)}`;
     const clsDisable =  `${this.isDisabled ? "disabled" : ""}`;
     const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
@@ -97,7 +135,8 @@ export class FieldPart extends AzosPart{
     //Set the field's content width if field is not of a predefined layout
     const stlContentWidth = isHorizon && !isPreContent ? css`width: ${this.contentWidth}%;` : null;
 
-    const msg = this.message ? html`<p class="msg">${this.message}</p>` : '';
+    const em = this.effectiveMessage;
+    const msg = em ? html`<p class="msg">${em}</p>` : '';
 
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
