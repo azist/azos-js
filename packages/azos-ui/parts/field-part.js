@@ -106,7 +106,10 @@ export class FieldPart extends AzosPart{
     dataType: {String},
 
     /** The value of the field */
-    value: {type: Object, converter: { fromAttribute: (v) => v?.toString()}},
+    value: {type: Object,
+            converter: { fromAttribute: (v) => v?.toString()}
+            //hasChanged(newVal, oldVal) { return true; }
+           },
 
 
     error: {type: Object}
