@@ -52,7 +52,7 @@ export class TextField extends FieldPart{
 
   renderInput(){
     const clsRank     = `${parseRank(this.rank, true)}`;
-    const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
+    const clsStatusBg = `${parseStatus(this.effectiveStatus,true,"Bg")}`;
 
     let compArea = this.isTextArea ? html`
       <textarea
