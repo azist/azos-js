@@ -89,6 +89,13 @@ export class DisposableObject{
 }
 
 
+
+/**
+ * When implemented provides a friendly client-facing message for example for errors
+ */
+export const CLIENT_MESSAGE_PROP = Symbol("clientMessage");
+
+
 /** Provides uniform base for Azos.js exceptions */
 export class AzosError extends Error {
   #code;
@@ -112,6 +119,9 @@ export class AzosError extends Error {
     this.name = nm;
     this.cause = cause;
   }
+
+  /** Returns client-facing message, such as a validation message */
+  get [CLIENT_MESSAGE_PROP](){ return null; }
 
   /** Returns the name of the causing site - maps to "from" field in log chronicle */
   get from(){ return this.#from; }

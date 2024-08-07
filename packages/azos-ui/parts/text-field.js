@@ -45,14 +45,10 @@ export class TextField extends FieldPart{
 
   //////castValue(v){ return `xyz: ${v}`; }
 
-  #lastEnteredValue;
-
   #tbChange(e){
     const v = e.target.value;
-    this.#lastEnteredValue = v;
-    this.value = v;//this may cause validation error
+    this.value = v;//this may cause validation error but will set this.rawValue
     this.inputChanged();
-    this.requestUpdate();//<-- DKh is this needed?????
   }
 
   renderInput(){
@@ -60,15 +56,15 @@ export class TextField extends FieldPart{
     const clsStatusBg = `${parseStatus(this.effectiveStatus,true,"Bg")}`;
 
     let val = this.value;
-    if ((val === undefined || val === null) && this.error) val = this.#lastEnteredValue;
+    if ((val === undefined || val === null) && this.error) val = this.rawValue;
     val = asString(val) ?? "";
 
-console.info("Will render this value: " + describe(val));
+//console.info("Will render this value: " + describe(val));
 
     let compArea = this.isTextArea ? html`
       <textarea
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="${this.id}"
+        id="tbData"
         maxLength="${this.maxLength ? this.maxLength : noContent}"
         minLength="${this.minLength ? this.minLength : noContent}"
         placeholder="${this.placeholder}"
@@ -82,7 +78,7 @@ console.info("Will render this value: " + describe(val));
     : html`
       <input
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="${this.id}"
+        id="tbData"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
         placeholder="${this.placeholder}"
@@ -94,7 +90,7 @@ console.info("Will render this value: " + describe(val));
         @change="${this.#tbChange}" />
       `;
 
-    const tb = this.$(this.id);
+    const tb = this.$("tbData");
     if (tb) tb.value = val;
 
     return compArea;
