@@ -87,7 +87,9 @@ export class TextField extends FieldPart{
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
-        @change="${this.#tbChange}" />
+        @change="${this.#tbChange}"
+        autocomplete="off"
+      />
       `;
 
     const tb = this.$("tbData");
