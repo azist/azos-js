@@ -80,7 +80,9 @@ export class TextField extends FieldPart{
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
-        @change="${this.#tbChange}" />
+        @change="${this.#tbChange}"
+        autocomplete="off"
+      />
       `;
 
     return compArea;
