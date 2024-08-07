@@ -50,11 +50,29 @@ export class FieldPart extends AzosPart{
   get value(){ return this.#value; }
   set value(v){
     this.#rawValue = v;
+    this.#value = undefined;
+    this.requestUpdate();
     this.#value = this.castValue(v);
   }
 
+  setValueFromInput(v){
+    this.#rawValue = v;
+    this.requestUpdate();
+    try{
+      //prepare Input value here first
+
+      this.#value = undefined;
+      this.#value = this.castValue(v);
+      this.error = null;
+    }catch(e){
+      this.error = e;
+    }
+  }
+
+
+
   /** Returns last set value BEFORE any conversion or preprocessing which may have failed,
-   * therefore this returns raw value of the last set attempt
+   * therefore this returns raw value of the last field set attempt
    */
   get rawValue() { return this.#rawValue; }
 
@@ -84,13 +102,8 @@ export class FieldPart extends AzosPart{
    * */
   castValue(v){
     const tp = this.#dataType;
-    try{
-      const result = tp ? cast(v, tp, true) : v;
-      this.error = null;
-      return result;
-    } catch(e){
-      this.error = e;
-    }
+    const result = tp ? cast(v, tp, true) : v;
+    return result;
   }
 
   static properties = {

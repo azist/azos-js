@@ -47,7 +47,7 @@ export class TextField extends FieldPart{
 
   #tbChange(e){
     const v = e.target.value;
-    this.value = v;//this may cause validation error but will set this.rawValue
+    this.setValueFromInput(v);//this may cause validation error but will set this.rawValue
     this.inputChanged();
   }
 
