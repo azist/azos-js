@@ -1,4 +1,4 @@
-import { isOneOf } from 'azos/strings';
+import { isOneOf, asString, describe } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
@@ -46,7 +46,8 @@ export class TextField extends FieldPart{
   //////castValue(v){ return `xyz: ${v}`; }
 
   #tbChange(e){
-    this.value = e.target.value;
+    const v = e.target.value;
+    this.setValueFromInput(v);//this may cause validation error but will set this.rawValue
     this.inputChanged();
   }
 
@@ -54,15 +55,21 @@ export class TextField extends FieldPart{
     const clsRank     = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.effectiveStatus,true,"Bg")}`;
 
+    let val = this.value;
+    if ((val === undefined || val === null) && this.error) val = this.rawValue;
+    val = asString(val) ?? "";
+
+//console.info("Will render this value: " + describe(val));
+
     let compArea = this.isTextArea ? html`
       <textarea
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="${this.id}"
+        id="tbData"
         maxLength="${this.maxLength ? this.maxLength : noContent}"
         minLength="${this.minLength ? this.minLength : noContent}"
         placeholder="${this.placeholder}"
         rows="${this.height ? this.height : "4"}"
-        .value="${this.value ?? ""}"
+        .value="${val}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
@@ -71,17 +78,20 @@ export class TextField extends FieldPart{
     : html`
       <input
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="${this.id}"
+        id="tbData"
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
         placeholder="${this.placeholder}"
         type="${this.isInputText ? "text" : "password"}"
-        .value="${this.value ?? ""}"
+        .value="${val}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         @change="${this.#tbChange}" />
       `;
+
+    const tb = this.$("tbData");
+    if (tb) tb.value = val;
 
     return compArea;
   }

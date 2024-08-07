@@ -1,4 +1,5 @@
-import { asTypeMoniker, cast, asObject } from "azos/types";
+import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP } from "azos/types";
+import { dflt } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 import { AzosPart } from "./part";
@@ -45,10 +46,36 @@ export class FieldPart extends AzosPart{
   set dataType(v) { this.#dataType = v ? asTypeMoniker(v) : undefined; }
 
   #value;
+  #rawValue;
   get value(){ return this.#value; }
   set value(v){
+    this.#rawValue = v;
+    this.#value = undefined;
+    this.requestUpdate();
     this.#value = this.castValue(v);
   }
+
+  setValueFromInput(v){
+    this.#rawValue = v;
+    this.requestUpdate();
+    try{
+      //prepare Input value here first
+
+      this.#value = undefined;
+      this.#value = this.castValue(v);
+      this.error = null;
+    }catch(e){
+      this.error = e;
+    }
+  }
+
+
+
+  /** Returns last set value BEFORE any conversion or preprocessing which may have failed,
+   * therefore this returns raw value of the last field set attempt
+   */
+  get rawValue() { return this.#rawValue; }
+
 
   #error;
   get error() { return this.#error; }
@@ -56,7 +83,13 @@ export class FieldPart extends AzosPart{
 
 
   get effectiveStatus(){ return this.#error ? STATUS.ERROR : this.status; }
-  get effectiveMessage(){ return this.#error ? "Invalid data": this.message; }
+  get effectiveMessage(){
+    const e = this.#error;
+    if (e) {
+      const cm = e[CLIENT_MESSAGE_PROP] ?? e[CLIENT_MESSAGE_PROP.description];
+      return dflt(cm, "Invalid data");
+    } else return this.message;
+  }
 
 
   /** Override to type-cast/coerce/change value as required by your specific descendant
@@ -69,13 +102,8 @@ export class FieldPart extends AzosPart{
    * */
   castValue(v){
     const tp = this.#dataType;
-    try{
-      const result = tp ? cast(v, tp, true) : v;
-      this.error = null;
-      return result;
-    } catch(e){
-      this.error = e;
-    }
+    const result = tp ? cast(v, tp, true) : v;
+    return result;
   }
 
   static properties = {
@@ -106,7 +134,10 @@ export class FieldPart extends AzosPart{
     dataType: {String},
 
     /** The value of the field */
-    value: {type: Object, converter: { fromAttribute: (v) => v?.toString()}},
+    value: {type: Object,
+            converter: { fromAttribute: (v) => v?.toString()}
+            /////////////hasChanged(newVal, oldVal) { return true; }
+           },
 
 
     error: {type: Object}
