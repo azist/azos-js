@@ -108,7 +108,7 @@ export class FieldPart extends AzosPart{
     /** The value of the field */
     value: {type: Object,
             converter: { fromAttribute: (v) => v?.toString()}
-            //hasChanged(newVal, oldVal) { return true; }
+            /////////////hasChanged(newVal, oldVal) { return true; }
            },
 
 

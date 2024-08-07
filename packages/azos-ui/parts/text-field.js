@@ -52,7 +52,7 @@ export class TextField extends FieldPart{
     this.#lastEnteredValue = v;
     this.value = v;//this may cause validation error
     this.inputChanged();
-    this.requestUpdate();
+    this.requestUpdate();//<-- DKh is this needed?????
   }
 
   renderInput(){
@@ -61,7 +61,7 @@ export class TextField extends FieldPart{
 
     let val = this.value;
     if ((val === undefined || val === null) && this.error) val = this.#lastEnteredValue;
-    val = val ?? "";
+    val = asString(val) ?? "";
 
 console.info("Will render this value: " + describe(val));
 
@@ -93,6 +93,9 @@ console.info("Will render this value: " + describe(val));
         ?readonly=${this.isReadonly}
         @change="${this.#tbChange}" />
       `;
+
+    const tb = this.$(this.id);
+    if (tb) tb.value = val;
 
     return compArea;
   }
