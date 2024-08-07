@@ -235,14 +235,14 @@ export const switchStyles=css`
 `;
 
 export const radioStyles=css`
-  li{
+  .radio-item{
     display:flex;
-    align-items:center;
-    margin-bottom:1em;
+    align-items:baseline;
+    padding-bottom:.75em;
   }
-  label{
-    margin-left:1.5em;
-    user-select:none;
+  .radio-item-label{
+    padding-left:1.5em;
+    margin-left:0;
   }
   .radio:focus{
     outline: var(--focus-ctl-outline);
