@@ -6,7 +6,7 @@
 
 import * as aver from "azos/aver";
 import { isSubclassOf, AzosError, arrayDelete } from "azos/types";
-import { html, AzosElement } from "./ui.js";
+import { html, AzosElement, noContent } from "./ui.js";
 import { Application } from "azos/application.js";
 
 import { Command } from "./cmd.js";
@@ -14,6 +14,7 @@ import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
+import { isEmpty, isOneOf } from "azos/strings";
 
 /**
  * Defines a root UI element which displays the whole Azos app.
@@ -56,18 +57,29 @@ export class Arena extends AzosElement {
   static styles = ARENA_STYLES; //[ARENA_STYLES, css`p { color: blue }`];
 
   static properties = {
-    name: {type: String},
-    menu: {type: String}
+    name:  {type: String},
+    menu:  {type: String},
+    kiosk: {type: String}
   };
 
   #app;
   #applet = null;
   #appletTagName = null;
   #toolbar = [];
+
+  #kiosk;
+  get kiosk(){ return this.#kiosk; }
+  set kiosk(v){
+    this.#kiosk = v;
+    this.requestUpdate();
+    queueMicrotask(() => this.updateToolbar());
+  }
+
   constructor() {
     super();
     this.name = 'Arena';
     this.menu = "show";
+    this.kiosk = null;//not in kiosk mode
   }
 
   /** System internal, don't use */
@@ -98,6 +110,12 @@ export class Arena extends AzosElement {
     if (this.#applet !== null && this.#applet.dirty) return true;//applet has unsaved data
     return false;
   }
+
+
+  get isKiosk(){ return !isEmpty(this.kiosk); }
+  get isKioskWithToolbar() { return this.kiosk==="toolbar"; }
+  get isKioskWithoutToolbar() { return this.isKiosk && !this.isKioskWithToolbar; }
+
 
   firstUpdated(){
     this.updateToolbar();
@@ -143,7 +161,10 @@ export class Arena extends AzosElement {
   updateToolbar(){
     const app = this.#app;
     if (!app) return;
-    DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+    if (!this.isKiosk){
+      DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+    }
+    //TODO: in future we will add kiosk toolbar here
   }
 
 
@@ -191,8 +212,9 @@ export class Arena extends AzosElement {
    * Upon applet close arena automatically un-hides the footer.
    */
   hideFooter(h){
-    if (h) this.$("arenaFooter").style.display = "none";
-    else this.$("arenaFooter").style.display = "unset;";
+    const ftr = this.$("arenaFooter");
+    if (!ftr) return;
+    ftr.style.display =  h ? "none" : "unset";
   }
 
 
@@ -200,17 +222,17 @@ export class Arena extends AzosElement {
     const app = this.#app;
     if (!app) return "";
     //---------------------------
+    const kiosk = this.isKiosk;
+    const header = kiosk ? noContent : html`<header>${this.renderHeader(app)}</header>`;
+    const footer = kiosk ? noContent : html`<footer id="arenaFooter">${this.renderFooter(app)}</footer>`;
 
     return html`
-<header>
-${this.renderHeader(app)}
-</header>
+${header}
 <main>
 ${this.renderMain(app)}
 </main>
-<footer id="arenaFooter">
-${this.renderFooter(app)}
-</footer>`;
+${footer}
+`;
   }//render
 
   /** @param {Application} app  */
