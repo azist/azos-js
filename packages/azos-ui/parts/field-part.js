@@ -39,7 +39,9 @@ export class FieldPart extends AzosPart{
   set titlePosition(v) { this.#titlePosition = parsePosition(v); }
 
   #dataType;
-  /** It is either `null | undefined` or contains a valid type moniker which is used to coerce the value
+  /**
+   * Defines a type of data stored by this field.
+   * It is either `null | undefined` or contains a valid type moniker which is used to coerce the value
    * upon its assignment
    */
   get dataType() { return this.#dataType; }
@@ -47,7 +49,14 @@ export class FieldPart extends AzosPart{
 
   #value;
   #rawValue;
+  /** Gets field data value which is of {@link dataType} or undefined */
   get value(){ return this.#value; }
+
+  /**
+   * Sets field data value which will be type-cast in accordance with the specified {@link dataType}.
+   * If the cast fails the exception gets thrown, this behavior differs from  {@link setValueFromInput}
+   * which will capture cast exception as a field error
+   */
   set value(v){
     this.#rawValue = v;
     this.#value = undefined;
@@ -55,34 +64,70 @@ export class FieldPart extends AzosPart{
     this.#value = this.castValue(v);
   }
 
+  /**
+   * Sets the value as entered through the input/inputs, for example a value may contain extra formatting
+   * which needs to be stripped prior to assignment into data value
+   */
   setValueFromInput(v){
     this.#rawValue = v;
-    this.requestUpdate();
+    this.#value = undefined; //the value is `undefined` because error may be thrown at conversion below
+    this.requestUpdate();//async schedule update even if error gets thrown
     try{
-      //prepare Input value here first
-
-      this.#value = undefined;
-      this.#value = this.castValue(v);
-      this.error = null;
+      v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
+      this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
+      this.error = null; //reset an error if we did not throw above
     }catch(e){
       this.error = e;
     }
   }
 
+  /**
+   * Prepares a value obtained from a user input(s) into a value which can be set as field data value.
+   * For example, a blood pressure field may contain a single input for systolic and diastolic measurements,
+   * which are delimited by a slash `120/80`, however a {@link value} property stores an object with two fields, or
+   * an array with two integers. You would parse two values out of a single string into
+   * an object with two fields `{"systolic": 120, "diastolic": 80}` or an array (effectively a tuple) `[120, 80]`.
+   * The default implementation does not alter the supplied value returning it as-is.
+   * You do not call this method directly, call {@link setValueFromInput} which calls this method in a guarded way, so exceptions thrown by this method
+   * will be displayed by the field via an {@link error} property
+  */
+  prepareInputValue(v){ return v; }
 
 
-  /** Returns last set value BEFORE any conversion or preprocessing which may have failed,
-   * therefore this returns raw value of the last field set attempt
+
+  /**
+   * Returns a last set value BEFORE any conversion or value preparation which may have failed,
+   * therefore this returns a raw value of the last field set attempt
    */
   get rawValue() { return this.#rawValue; }
 
 
   #error;
+  /**
+   * Returns an error object if the field is in errored state, such as a validation error
+   */
   get error() { return this.#error; }
+
+  /**
+   * Sets an error object, such as an exception, which describes the error condition such as a validation error.
+   * The error details are to be kept in this object (e.g. a custom exception).
+   * You can also pass a string containing objects JSON which will be parsed as object
+   */
   set error(v) { this.#error = asObject(v, true); }
 
 
+  /**
+   * The effective status is "shadowed" by the error if one is set, or returns a regular parts' {@link status}.
+   * `render*` method implementations should use this method
+   * */
   get effectiveStatus(){ return this.#error ? STATUS.ERROR : this.status; }
+
+  /**
+   *  The effective message is "shadowed" by the error if one is set, or returns a regular parts' {@link message}.
+   * `render*` method implementations should use this method.
+   * When errors are present, the system uses {@link CLIENT_MESSAGE_PROP} protocol to get the client-centric message
+   * for user display. You can also pass an object with a `clientMessage` string key (not a symbol)
+   * */
   get effectiveMessage(){
     const e = this.#error;
     if (e) {
@@ -94,9 +139,9 @@ export class FieldPart extends AzosPart{
 
   /** Override to type-cast/coerce/change value as required by your specific descendant
    *  for example, this may restrict value to bool for logical fields.
-   * This is called on value set, therefore a `.value` property may only store data as dictated  by this override,
-   * as there is no way to set `.value` bypassing this method.
-   * The default implementation relies on `dataType` type moniker conversion
+   * This is called on value set, therefore a {@link value} property may only store data as dictated  by this override,
+   * as there is no way to set the value bypassing this method.
+   * The default implementation relies on `{@link dataType} type moniker conversion
    * @param {*} v - value to set
    * @returns {T} value coerced to T as defined by `dataType` or the descendant implementation which might always convert to certain type (e.g. checkbox to bool)
    * */
