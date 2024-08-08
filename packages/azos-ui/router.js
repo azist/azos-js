@@ -22,7 +22,7 @@ export class Router extends Module{
 
   //TODO: Need router methods which navigate menu
 
-  
+
 
 
   /** Calculates menu tree as of current state
