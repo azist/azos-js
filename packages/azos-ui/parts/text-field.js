@@ -1,4 +1,4 @@
-import { isOneOf, asString, describe } from 'azos/strings';
+import { isOneOf, asString } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
@@ -43,7 +43,6 @@ export class TextField extends FieldPart{
   get isValidAlign(){ return isOneOf(this.alignValue, ["left", "center", "right"]); }
 
 
-  //////castValue(v){ return `xyz: ${v}`; }
 
   #tbChange(e){
     const v = e.target.value;
