@@ -14,7 +14,7 @@ import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
-import { isEmpty, isOneOf } from "azos/strings";
+import { isEmpty } from "azos/strings";
 
 /**
  * Defines a root UI element which displays the whole Azos app.

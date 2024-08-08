@@ -5,11 +5,16 @@
   "description": "azos-js UI Package",
   "author": "Azist Group",
   "license": "MIT",
-  "contributors": [
+  "contributors":  [
     {
       "name": "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
       "email": "d@zhabis.com",
       "url": "http://zhabis.io"
+    },
+    {
+      "name": "John Paul Kosh aka Devpro",
+      "email": "devprohome@live.com",
+      "url": "https://github.com/JohnPKosh"
     }
   ],
   "repository": {
