@@ -130,6 +130,8 @@ export function renderMain(app, self, appletTagName){
 
   const appletHtml = appletTagName ? `<${appletTagName} id="elmActiveApplet"></${appletTagName}>` : `<slot name="applet-content"> </slot>`;
 
+  const clsMain = self.isKiosk ? "kiosk" : "";
+
   return html`
   <!--nav class="strip" id="navAreas">  THIS will be moved out into tab group control
     <div class="strip-btn strip-btn-selected">
@@ -146,7 +148,7 @@ export function renderMain(app, self, appletTagName){
     </div>
   </nav-->
 
-  <div class="applet-container" role="main" >
+  <div class="applet-container ${clsMain}" role="main" >
     ${verbatimHtml(appletHtml)}
   </div>
   `;

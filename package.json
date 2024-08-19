@@ -15,6 +15,11 @@
       "name": "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
       "email": "d@zhabis.com",
       "url": "http://zhabis.io"
+    },
+    {
+      "name": "John Paul Kosh aka Devpro",
+      "email": "devprohome@live.com",
+      "url": "https://github.com/JohnPKosh"
     }
   ],
   "repository": {
@@ -41,12 +46,11 @@
   "scripts": {
     "pack-local": "npm pack \"./packages/azos/\" --pack-destination=\"./out\" && npm pack \"./packages/azos-ui/\" --pack-destination=\"./out\"",
     "build": "parcel build \"packages/azos/index.js\"",
-    "--test1": "echo \"Error: no test specified\" && exit 1",
-    "--test2": "set NODE_PATH=\"src/azos/\" && mocha \"./src/test/**/*.js\"",
     "test": "node  packages/azos/test/app.mjs -- --filter",
-    "test-azos": "npm test -workspace=azos",
-    "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\"",
-    "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/test/index.htm\""
+    "--test-azos": "npm test -workspace=azos",
+    "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/test/index.htm\"",
+
+    "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\""
   },
   "devDependencies": {
     "eslint": "^8.50.0",

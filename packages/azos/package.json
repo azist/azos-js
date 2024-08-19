@@ -5,11 +5,18 @@
   "description": "azos-js Core Package",
   "author": "Azist Group",
   "license": "MIT",
-  "contributors":[{
-    "name":  "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
-    "email": "d@zhabis.com",
-    "url":   "http://zhabis.io"
-  }],
+  "contributors": [
+    {
+      "name": "Dmitriy Khmaladze aka Zhabis, Ximik, itadapter, Rogognil",
+      "email": "d@zhabis.com",
+      "url": "http://zhabis.io"
+    },
+    {
+      "name": "John Paul Kosh aka Devpro",
+      "email": "devprohome@live.com",
+      "url": "https://github.com/JohnPKosh"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/azist/azos-js.git"
@@ -20,14 +27,9 @@
     "./aver": "./aver.js"
   },
   "exports": { "./*": "./*.js" },
-
   "scripts": {
-
-    "test": "mocha \"./test/*-tests.js\"",
-    "test-match": "mocha \"./test/*-tests.js\" -g"
   },
 
   "dependencies":{
-
   }
 }

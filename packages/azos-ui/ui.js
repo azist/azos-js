@@ -226,5 +226,17 @@ export class AzosElement extends LitElement {
   }
 
 
+  /**
+     * Writes to log if current component effective level permits, returning guid of newly written message
+     * @param {string} type an enumerated type {@link log.LOG_TYPE}
+     * @param {string} text message text
+     * @param {Error} ex optional exception object
+     * @param {object | null} params optional parameters
+     * @param {string | null} rel optional relation guid
+     * @param {int | null} src optional int src line num
+     * @returns {guid | null} null if nothing was written or guid of the newly written message
+     */
+  writeLog(type, text, ex, params, rel, src){ return this.arena.writeLog(this, type, text, ex, params, rel, src); }
+
   render() { return html`>>AZOS ELEMENT<<`; }
 }

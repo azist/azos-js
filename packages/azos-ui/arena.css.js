@@ -203,6 +203,11 @@ main .applet-container{
   overflow: auto;
 }
 
+main .applet-container.kiosk{
+  padding: unset;
+  min-height: unset;
+}
+
 /*
 @media screen and (max-width: 420px) {
   main .applet-container{

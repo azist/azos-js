@@ -5,15 +5,17 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete } from "azos/types";
-import { html, AzosElement } from "./ui.js";
-import { Application } from "azos/application.js";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned } from "azos/types";
+import { html, AzosElement, noContent } from "./ui.js";
+import { Application } from "azos/application";
+import * as logging from "azos/log";
 
 import { Command } from "./cmd.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
+import { isEmpty } from "azos/strings";
 
 /**
  * Defines a root UI element which displays the whole Azos app.
@@ -56,18 +58,35 @@ export class Arena extends AzosElement {
   static styles = ARENA_STYLES; //[ARENA_STYLES, css`p { color: blue }`];
 
   static properties = {
-    name: {type: String},
-    menu: {type: String}
+    name:  {type: String},
+    menu:  {type: String},
+    kiosk: {type: String},
+    logLevel: {type: String}
   };
 
   #app;
   #applet = null;
   #appletTagName = null;
   #toolbar = [];
+
+  #kiosk;
+  get kiosk(){ return this.#kiosk; }
+  set kiosk(v){
+    this.#kiosk = v;
+    this.requestUpdate();
+    queueMicrotask(() => this.updateToolbar());
+  }
+
+
+  #logLevel;
+  get logLevel(){ return this.#logLevel; }
+  set logLevel(v){ this.#logLevel = logging.asMsgType(v); }
+
   constructor() {
     super();
     this.name = 'Arena';
     this.menu = "show";
+    this.kiosk = null;//not in kiosk mode
   }
 
   /** System internal, don't use */
@@ -98,6 +117,12 @@ export class Arena extends AzosElement {
     if (this.#applet !== null && this.#applet.dirty) return true;//applet has unsaved data
     return false;
   }
+
+
+  get isKiosk(){ return !isEmpty(this.kiosk); }
+  get isKioskWithToolbar() { return this.kiosk==="toolbar"; }
+  get isKioskWithoutToolbar() { return this.isKiosk && !this.isKioskWithToolbar; }
+
 
   firstUpdated(){
     this.updateToolbar();
@@ -143,7 +168,10 @@ export class Arena extends AzosElement {
   updateToolbar(){
     const app = this.#app;
     if (!app) return;
-    DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+    if (!this.isKiosk){
+      DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+    }
+    //TODO: in future we will add kiosk toolbar here
   }
 
 
@@ -191,8 +219,9 @@ export class Arena extends AzosElement {
    * Upon applet close arena automatically un-hides the footer.
    */
   hideFooter(h){
-    if (h) this.$("arenaFooter").style.display = "none";
-    else this.$("arenaFooter").style.display = "unset;";
+    const ftr = this.$("arenaFooter");
+    if (!ftr) return;
+    ftr.style.display =  h ? "none" : "unset";
   }
 
 
@@ -200,17 +229,17 @@ export class Arena extends AzosElement {
     const app = this.#app;
     if (!app) return "";
     //---------------------------
+    const kiosk = this.isKiosk;
+    const header = kiosk ? noContent : html`<header>${this.renderHeader(app)}</header>`;
+    const footer = kiosk ? noContent : html`<footer id="arenaFooter">${this.renderFooter(app)}</footer>`;
 
     return html`
-<header>
-${this.renderHeader(app)}
-</header>
+${header}
 <main>
 ${this.renderMain(app)}
 </main>
-<footer id="arenaFooter">
-${this.renderFooter(app)}
-</footer>`;
+${footer}
+`;
   }//render
 
   /** @param {Application} app  */
@@ -221,6 +250,40 @@ ${this.renderFooter(app)}
 
   /** @param {Application} app  */
   renderFooter(app){ return DEFAULT_HTML.renderFooter(app, this); }
+
+
+  /**
+     * Writes to log if current component effective level permits, returning guid of newly written message
+     * @param {string|function|object} from - specifies the name of the component which produces the log message
+     * @param {string} type an enumerated type {@link log.LOG_TYPE}
+     * @param {string} text message text
+     * @param {Error} ex optional exception object
+     * @param {object | null} params optional parameters
+     * @param {string | null} rel optional relation guid
+     * @param {int | null} src optional int src line num
+     * @returns {guid | null} null if nothing was written or guid of the newly written message
+     */
+  writeLog(from, type, text, ex, params, rel, src){
+    const ell = logging.getMsgTypeSeverity(this.logLevel);
+    if (logging.getMsgTypeSeverity(type) < ell) return null;
+    const app = this.#app;
+    if (!app) return;
+
+    if (!isAssigned(from)) from = this.constructor.name;
+    from = isFunction(from) ? from.name : isObject(from) ? from.constructor.name : from.toString();
+
+    const guid = app.log.write({
+      type: type,
+      topic: "ui",
+      from: from,
+      text: text,
+      params: params,
+      rel: rel ?? this.app.instanceId,
+      src: src,
+      exception: ex ?? null
+    });
+    return guid;
+  }
 
 }//Arena
 
