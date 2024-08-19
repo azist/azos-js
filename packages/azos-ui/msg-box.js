@@ -35,15 +35,24 @@ export class MsgBox extends ModalDialog{
 
 window.customElements.define("az-msgbox", MsgBox);
 
+/** Shows OK msg box */
+export function okMsg(title, message, rank = 3, pre = false)     { return showMsg("ok", title, message, rank, pre);     }
 
-export function ok(title, message, rank)     { return show("ok", title, message, rank);     }
-export function info(title, message, rank)   { return show("info", title, message, rank);   }
-export function warning(title, message, rank){ return show("warning", title, message, rank);}
-export function alert(title, message, rank)  { return show("alert", title, message, rank);  }
-export function error(title, message, rank)  { return show("error", title, message, rank);  }
+/** Shows Info msg box */
+export function infoMsg(title, message, rank = 3, pre = false)   { return showMsg("info", title, message, rank, pre);   }
+
+/** Shows Warning msg box */
+export function warningMsg(title, message, rank = 3, pre = false){ return showMsg("warning", title, message, rank, pre);}
+
+/** Shows Alert msg box */
+export function alertMsg(title, message, rank = 3, pre = false)  { return showMsg("alert", title, message, rank, pre);  }
+
+/** Shows Error msg box */
+export function errorMsg(title, message, rank = 3, pre = false)  { return showMsg("error", title, message, rank, pre);  }
 
 
-export async function show(status, title, message, rank = 3, pre = false){
+/** Shows a message box with the specified status, title, message, rank and pre option */
+export async function showMsg(status, title, message, rank = 3, pre = false){
   const box = new MsgBox();
   box.status = status;
   box.title = title;
