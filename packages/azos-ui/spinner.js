@@ -169,7 +169,7 @@ dialog:focus-visible, dialog:hover{ outline: none; }
     if (this.parentNode === null){
       document.body.appendChild(this);
       this.#isStandalone = true;
-      }
+    }
 
     this.update();//sync update dom build
 

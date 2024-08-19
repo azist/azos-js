@@ -5,9 +5,10 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete } from "azos/types";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned } from "azos/types";
 import { html, AzosElement, noContent } from "./ui.js";
-import { Application } from "azos/application.js";
+import { Application } from "azos/application";
+import * as logging from "azos/log";
 
 import { Command } from "./cmd.js";
 import { ARENA_STYLES } from "./arena.css.js";
@@ -59,7 +60,8 @@ export class Arena extends AzosElement {
   static properties = {
     name:  {type: String},
     menu:  {type: String},
-    kiosk: {type: String}
+    kiosk: {type: String},
+    logLevel: {type: String}
   };
 
   #app;
@@ -74,6 +76,11 @@ export class Arena extends AzosElement {
     this.requestUpdate();
     queueMicrotask(() => this.updateToolbar());
   }
+
+
+  #logLevel;
+  get logLevel(){ return this.#logLevel; }
+  set logLevel(v){ this.#logLevel = logging.asMsgType(v); }
 
   constructor() {
     super();
@@ -243,6 +250,40 @@ ${footer}
 
   /** @param {Application} app  */
   renderFooter(app){ return DEFAULT_HTML.renderFooter(app, this); }
+
+
+  /**
+     * Writes to log if current component effective level permits, returning guid of newly written message
+     * @param {string|function|object} from - specifies the name of the component which produces the log message
+     * @param {string} type an enumerated type {@link log.LOG_TYPE}
+     * @param {string} text message text
+     * @param {Error} ex optional exception object
+     * @param {object | null} params optional parameters
+     * @param {string | null} rel optional relation guid
+     * @param {int | null} src optional int src line num
+     * @returns {guid | null} null if nothing was written or guid of the newly written message
+     */
+  writeLog(from, type, text, ex, params, rel, src){
+    const ell = logging.getMsgTypeSeverity(this.logLevel);
+    if (logging.getMsgTypeSeverity(type) < ell) return null;
+    const app = this.#app;
+    if (!app) return;
+
+    if (!isAssigned(from)) from = this.constructor.name;
+    from = isFunction(from) ? from.name : isObject(from) ? from.constructor.name : from.toString();
+
+    const guid = app.log.write({
+      type: type,
+      topic: "ui",
+      from: from,
+      text: text,
+      params: params,
+      rel: rel ?? this.app.instanceId,
+      src: src,
+      exception: ex ?? null
+    });
+    return guid;
+  }
 
 }//Arena
 
