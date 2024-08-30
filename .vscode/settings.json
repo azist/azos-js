@@ -17,6 +17,7 @@
         "linq",
         "nsplit",
         "rasterizer",
+        "sindent",
         "sysvc",
         "tapplet",
         "thandler",

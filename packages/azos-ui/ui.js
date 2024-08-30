@@ -136,7 +136,7 @@ export class AzosElement extends LitElement {
   static properties = {
     status: { type: String, reflect: true },
     rank:   { type: String, reflect: true },
-    scope:  { type: String}
+    scope:  { type: String }
   };
 
   #arena = null;
