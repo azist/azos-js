@@ -84,12 +84,7 @@ export class Unit{
   }
 
   /** Determines if this unit should be included or excluded from a run. Returns true if it should be included */
-  _match(runner){
-    for(const one of this.#children){
-      if (one._match(runner)) return true;
-    }
-    return false;
-  }
+  _match(runner){ return runner.matchUnitOrCase(this); }
 
   /** Determines if this unit should or should not be skipped while running. It is similar to `_match()`
   however skipped units get printed out into runner as skipped */
@@ -179,7 +174,7 @@ export class Case{
   set timeoutMs(v) { this.#timeoutMs = v | 0; }
 
   /** Determines if this case should be included or excluded from a run. Returns true if it should be included */
-  _match(runner){ return runner.matchCase(this); }
+  _match(runner){ return runner.matchUnitOrCase(this); }
 
   /** Determines if this case should or should not be skipped while running. It is similar to `_match()`
   however skipped units get printed out into runner as skipped */
@@ -221,10 +216,12 @@ let argsCases = null;
 
 /**
  * Default implementation for process cmd args parsing `--filter "Unit1 Unit2 &caseX &caseY"`
- * @param {Case} cse case to filter
- * @returns true if the supplied case satisfies the logical filter set from via command line args
+ * @param {Unit | Case} uoc an instance of either a Unit or a Case to filter
+ * @returns true if the supplied instance of a Unit or a Case satisfies the logical filter set from a command line args line
  */
-export function cmdArgsCaseFilter(cse){
+export function cmdArgsCaseFilter(uoc){
+
+  //prep stage - parse process-wide args
   if (!argsParsed){
     argsParsed = true;
     if (typeof(process) === 'undefined') return true;//args not avail
@@ -244,12 +241,12 @@ export function cmdArgsCaseFilter(cse){
     }
   }
 
-  if (!cse) return false;
+  if (!uoc) return false;
 
   if (argsUnits !== null){
     let found = false;
     for(const pat of argsUnits){
-      if (cse.unit.name.indexOf(pat) >=0){
+      if ((uoc instanceof Unit ? uoc.name : uoc.unit.name).indexOf(pat) >= 0){
         found = true;
         break;
       }
@@ -257,10 +254,10 @@ export function cmdArgsCaseFilter(cse){
     if (!found) return false;
   }
 
-  if (argsCases !== null){
+  if (argsCases !== null && uoc instanceof Case){
     let found = false;
     for(const pat of argsCases){
-      if (cse.name.indexOf(pat) >=0){
+      if (uoc.name.indexOf(pat) >= 0){
         found = true;
         break;
       }
@@ -273,7 +270,7 @@ export function cmdArgsCaseFilter(cse){
 
 /**
  * Provides basic counts of success/errors and overridable `begin/end` style hooks
- * for units and cases. `matchCase` returns true for cases which will run.
+ * for units and cases. `matchUnitOrCase` returns true for units and cases which will run.
  */
 export class Runner{
   static #dflt = new Runner();
@@ -321,14 +318,13 @@ export class Runner{
   get elapsedMs(){ return this.#elapsedMs; }
 
   /**
-   * Returns true when the supplied case matches the conditions and should be executed.
-   * You can test for `cse.unit` property as well
-   * @param {Case} cse to match
+   * Returns true when the supplied Unit or Case matches the conditions and should be executed.
+   * @param {Unit | Case} uoc to match - Unit or Case
    * @returns {boolean} true when case should be ran
    */
-  matchCase(cse){
+  matchUnitOrCase(uoc){
     const f = this.#fCaseFilter;
-    if (f !== null) return f(cse);
+    if (f !== null) return f(uoc);
     return true;
   }
 
