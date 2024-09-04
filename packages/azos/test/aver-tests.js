@@ -37,7 +37,7 @@ unit("Aver", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isDefined(x);
-      }, "averment failure: isdefined");
+      }, "averment failure: isDefined");
     });
   });
 
@@ -74,14 +74,14 @@ unit("Aver", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isNotNull(x);
-      }, "averment failure: isnotnull");
+      }, "averment failure: isNotNull");
     });
 
     cs("fail null", function () {
       sut.throws(function () {
         let x = null;
         sut.isNotNull(x);
-      }, "averment failure: isnotnull");
+      }, "averment failure: isNotNull");
     });
   });
 
@@ -187,21 +187,21 @@ unit("Aver", function () {
       sut.throws(function () {
         let x = true;
         sut.isFalse(x);
-      }, "averment failure: isfalse");
+      }, "averment failure: isFalse");
     });
 
     cs("fail undefined", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isFalse(x);
-      }, "averment failure: isfalse");
+      }, "averment failure: isFalse");
     });
 
     cs("fail null", function () {
       sut.throws(function () {
         let x = null;
         sut.isFalse(x);
-      }, "averment failure: isfalse");
+      }, "averment failure: isFalse");
     });
   });
 
@@ -217,21 +217,21 @@ unit("Aver", function () {
       sut.throws(function () {
         let x = false;
         sut.isTrue(x);
-      }, "averment failure: istrue");
+      }, "averment failure: isTrue");
     });
 
     cs("fail undefined", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isTrue(x);
-      }, "averment failure: istrue");
+      }, "averment failure: isTrue");
     });
 
     cs("fail null", function () {
       sut.throws(function () {
         let x = null;
         sut.isTrue(x);
-      }, "averment failure: istrue");
+      }, "averment failure: isTrue");
     });
   });
 
@@ -272,19 +272,19 @@ unit("Aver", function () {
     cs("fail 1", function () {
       sut.throws(function () {
         sut.isBool(1);
-      }, "averment failure: isbool");
+      }, "averment failure: isBool");
     });
 
     cs("fail undefined", function () {
       sut.throws(function () {
         sut.isBool(undefined);
-      }, "averment failure: isbool");
+      }, "averment failure: isBool");
     });
 
     cs("fail null", function () {
       sut.throws(function () {
         sut.isBool(null);
-      }, "averment failure: isbool");
+      }, "averment failure: isBool");
     });
   });
 
