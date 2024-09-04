@@ -19,7 +19,7 @@ unit("Aver", function () {
     });
 
     cs("fail defined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = 2;
         sut.isUndefined(x);
       }, "averment failure: isundefined");
@@ -34,7 +34,7 @@ unit("Aver", function () {
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = undefined;
         sut.isDefined(x);
       }, "averment failure: isdefined");
@@ -49,14 +49,14 @@ unit("Aver", function () {
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = undefined;
         sut.isNull(x);
       }, "averment failure: isnull");
     });
 
     cs("fail non null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = {};
         sut.isNull(x);
       }, "averment failure: isnull");
@@ -71,14 +71,14 @@ unit("Aver", function () {
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = undefined;
         sut.isNotNull(x);
       }, "averment failure: isnotnull");
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = null;
         sut.isNotNull(x);
       }, "averment failure: isnotnull");
@@ -119,27 +119,27 @@ unit("Aver", function () {
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = null;
         sut.isObject(x);
       }, "averment failure: isobject");
     });
 
     cs("fail undefined1", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = undefined;
         sut.isObject(x);
       }, "averment failure: isobject");
     });
 
     cs("fail undefined2", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isObject();
       }, "averment failure: isobject");
     });
 
     cs("fail []", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = [];
         sut.isObject(x);
       }, "averment failure: isobject");
@@ -154,7 +154,7 @@ unit("Aver", function () {
     });
 
     cs("fail {}", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = {};
         sut.isArray(x);
       }, "averment failure: isarray");
@@ -164,12 +164,12 @@ unit("Aver", function () {
   unit("#isFunction()", function () {
 
     cs("pass function", function () {
-      let x = function(){ };
+      let x = function () { };
       sut.isFunction(x);
     });
 
     cs("fail {}", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = {};
         sut.isFunction(x);
       }, "averment failure: isfunction");
@@ -184,21 +184,21 @@ unit("Aver", function () {
     });
 
     cs("fail true", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = true;
         sut.isFalse(x);
       }, "averment failure: isfalse");
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = undefined;
         sut.isFalse(x);
       }, "averment failure: isfalse");
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = null;
         sut.isFalse(x);
       }, "averment failure: isfalse");
@@ -214,21 +214,21 @@ unit("Aver", function () {
     });
 
     cs("fail false", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = false;
         sut.isTrue(x);
       }, "averment failure: istrue");
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = undefined;
         sut.isTrue(x);
       }, "averment failure: istrue");
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         let x = null;
         sut.isTrue(x);
       }, "averment failure: istrue");
@@ -243,19 +243,19 @@ unit("Aver", function () {
     });
 
     cs("fail 1", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isString(1);
       }, "averment failure: isstring");
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isString(undefined);
       }, "averment failure: isstring");
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isString(null);
       }, "averment failure: isstring");
     });
@@ -266,23 +266,23 @@ unit("Aver", function () {
     cs("pass bool", function () {
       sut.isBool(true);
       sut.isBool(false);
-      sut.isBool(1===1);
+      sut.isBool(1 === 1);
     });
 
     cs("fail 1", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isBool(1);
       }, "averment failure: isbool");
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isBool(undefined);
       }, "averment failure: isbool");
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isBool(null);
       }, "averment failure: isbool");
     });
@@ -297,19 +297,19 @@ unit("Aver", function () {
     });
 
     cs("fail str", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isNumber("123");
       }, "averment failure: isnumber");
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isNumber(undefined);
       }, "averment failure: isnumber");
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isNumber(null);
       }, "averment failure: isnumber");
     });
@@ -318,23 +318,23 @@ unit("Aver", function () {
   unit("#isDate()", function () {
 
     cs("pass date", function () {
-      sut.isDate( new Date(1980, 1, 1));
+      sut.isDate(new Date(1980, 1, 1));
     });
 
     cs("fail str", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isDate("1/1/2001");
       }, "averment failure: isdate");
     });
 
     cs("fail undefined", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isDate(undefined);
       }, "averment failure: isdate");
     });
 
     cs("fail null", function () {
-      sut.throws(function(){
+      sut.throws(function () {
         sut.isDate(null);
       }, "averment failure: isdate");
     });
@@ -352,9 +352,9 @@ unit("Aver", function () {
     });
 
     cs("FALSE", function () {
-      sut.throws( function(){ sut.areEqual(1, "1"); } );
-      sut.throws( function(){ sut.areEqual(0, null); } );
-      sut.throws( function(){ sut.areEqual(undefined, null); } );
+      sut.throws(function () { sut.areEqual(1, "1"); });
+      sut.throws(function () { sut.areEqual(0, null); });
+      sut.throws(function () { sut.areEqual(undefined, null); });
     });
   });
 
@@ -370,9 +370,9 @@ unit("Aver", function () {
     });
 
     cs("FALSE", function () {
-      sut.throws( function(){ sut.areNotEqual(1, 1); } );
-      sut.throws( function(){ sut.areNotEqual(null, null); } );
-      sut.throws( function(){ sut.areNotEqual(undefined, undefined); } );
+      sut.throws(function () { sut.areNotEqual(1, 1); });
+      sut.throws(function () { sut.areNotEqual(null, null); });
+      sut.throws(function () { sut.areNotEqual(undefined, undefined); });
     });
   });
 
@@ -390,13 +390,13 @@ unit("Aver", function () {
     });
 
     cs("FALSE", function () {
-      sut.throws( function(){ sut.areEqual(1, "1"); } );
-      sut.throws( function(){ sut.areEqual(0, null); } );
-      sut.throws( function(){ sut.areEqual(undefined, null); } );
+      sut.throws(function () { sut.areEqual(1, "1"); });
+      sut.throws(function () { sut.areEqual(0, null); });
+      sut.throws(function () { sut.areEqual(undefined, null); });
 
-      sut.throws( function(){ sut.areEqualValues(new Date(124), new Date(1));  });
-      sut.throws( function(){ sut.areEqualValues(1, true);  });
-      sut.throws( function(){ sut.areEqualValues(1, "1");  });
+      sut.throws(function () { sut.areEqualValues(new Date(124), new Date(1)); });
+      sut.throws(function () { sut.areEqualValues(1, true); });
+      sut.throws(function () { sut.areEqualValues(1, "1"); });
     });
   });
 
@@ -408,11 +408,11 @@ unit("Aver", function () {
     });
 
     cs("FALSE", function () {
-      sut.throws( function(){ sut.isSubclassOf(null, null); }, "isSubclassOf" );
-      sut.throws( function(){ sut.isSubclassOf(undefined, undefined); }, "isSubclassOf" );
-      sut.throws( function(){ sut.isSubclassOf(true, null); }, "isSubclassOf");
-      sut.throws( function(){ sut.isSubclassOf(sut.MockBase, sut.MockBase); }, "isSubclassOf");
-      sut.throws( function(){ sut.isSubclassOf(Object, sut.MockBase); }, "isSubclassOf");
+      sut.throws(function () { sut.isSubclassOf(null, null); }, "isSubclassOf");
+      sut.throws(function () { sut.isSubclassOf(undefined, undefined); }, "isSubclassOf");
+      sut.throws(function () { sut.isSubclassOf(true, null); }, "isSubclassOf");
+      sut.throws(function () { sut.isSubclassOf(sut.MockBase, sut.MockBase); }, "isSubclassOf");
+      sut.throws(function () { sut.isSubclassOf(Object, sut.MockBase); }, "isSubclassOf");
     });
   });
 
@@ -423,11 +423,11 @@ unit("Aver", function () {
     });
 
     cs("FALSE", function () {
-      sut.throws( function(){ sut.isNotSubclassOf(null, null); }, "isNotSubclassOf" );
-      sut.throws( function(){ sut.isNotSubclassOf(undefined, undefined); }, "isNotSubclassOf" );
-      sut.throws( function(){ sut.isNotSubclassOf(true, null); }, "isNotSubclassOf");
-      sut.throws( function(){ sut.isNotSubclassOf(sut.MockA, sut.MockBase); }, "isNotSubclassOf");
-      sut.throws( function(){ sut.isNotSubclassOf(sut.MockBase, Object); }, "isNotSubclassOf");
+      sut.throws(function () { sut.isNotSubclassOf(null, null); }, "isNotSubclassOf");
+      sut.throws(function () { sut.isNotSubclassOf(undefined, undefined); }, "isNotSubclassOf");
+      sut.throws(function () { sut.isNotSubclassOf(true, null); }, "isNotSubclassOf");
+      sut.throws(function () { sut.isNotSubclassOf(sut.MockA, sut.MockBase); }, "isNotSubclassOf");
+      sut.throws(function () { sut.isNotSubclassOf(sut.MockBase, Object); }, "isNotSubclassOf");
     });
   });
 
@@ -442,9 +442,9 @@ unit("Aver", function () {
 
     cs("FALSE", function () {
       let obj = new sut.MockA(1, 2);
-      sut.throws( function(){ sut.isOf(obj, Array); }, "isOf" );
-      sut.throws( function(){ sut.isOf(null, null); }, "isOf" );
-      sut.throws( function(){ sut.isOf(undefined, undefined); }, "isOf");
+      sut.throws(function () { sut.isOf(obj, Array); }, "isOf");
+      sut.throws(function () { sut.isOf(null, null); }, "isOf");
+      sut.throws(function () { sut.isOf(undefined, undefined); }, "isOf");
     });
   });
 
@@ -459,10 +459,10 @@ unit("Aver", function () {
 
     cs("FALSE", function () {
       let obj = new sut.MockA(1, 2);
-      sut.throws( function(){ sut.isNotOf(obj, sut.MockBase); }, "isNotOf" );
-      sut.throws( function(){ sut.isNotOf(obj, sut.MockA); }, "isNotOf" );
-      sut.throws( function(){ sut.isNotOf(null, null); }, "isNotOf"  );
-      sut.throws( function(){ sut.isNotOf(undefined, undefined); }, "isNotOf" );
+      sut.throws(function () { sut.isNotOf(obj, sut.MockBase); }, "isNotOf");
+      sut.throws(function () { sut.isNotOf(obj, sut.MockA); }, "isNotOf");
+      sut.throws(function () { sut.isNotOf(null, null); }, "isNotOf");
+      sut.throws(function () { sut.isNotOf(undefined, undefined); }, "isNotOf");
     });
   });
 
@@ -478,10 +478,10 @@ unit("Aver", function () {
 
     cs("FALSE", function () {
       let obj = new sut.MockA(1, 2);
-      sut.throws( function(){ sut.isOfEither(obj, Array); }, "isOfEither" );
-      sut.throws( function(){ sut.isOfEither(obj, Date, Array, sut.MockB); }, "isOfEither" );
-      sut.throws( function(){ sut.isOfEither(null, null); }, "isOfEither" );
-      sut.throws( function(){ sut.isOfEither(undefined, undefined); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(obj, Array); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(obj, Date, Array, sut.MockB); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(null, null); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(undefined, undefined); }, "isOfEither");
     });
   });
 
@@ -489,8 +489,8 @@ unit("Aver", function () {
 
     cs("inherits", function () {
       let obj = new sut.MockA(3, 9);
-      sut.isOf(obj, sut.MockBase );
-      sut.isOf(obj, sut.MockA );
+      sut.isOf(obj, sut.MockBase);
+      sut.isOf(obj, sut.MockA);
 
       sut.areEqual(3, obj.a);
       sut.areEqual(9, obj.b);
