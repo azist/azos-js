@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 //import { describe, it } from "mocha";
-import { defineUnit as describe, defineCase as it } from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "azos/aver";
 import { ABSTRACT } from "azos/coreconsts";
 import * as conf from "azos/conf";
@@ -32,15 +32,15 @@ class NationWeather extends IWeather {
 }
 
 
-describe("Linker Additional Tests", function () {
+unit("Linker Additional Tests", function () {
 
-  describe("ModuleLinker", function () {
+  unit("ModuleLinker", function () {
 
     /**
      * When multiple services are registered under the same name (or name=null), use the first
      *  registered service.
      */
-    it("uses-first-registered-service", function () {
+    cs("uses-first-registered-service", function () {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({}).root;
 
@@ -64,7 +64,7 @@ describe("Linker Additional Tests", function () {
      * When multiple services are attempted to be registered under the same name, throws an
      *  exception giving developer advanced notice of an unlikely (unexpected) outcome.
      */
-    it("throws-when-registering-second-service", function () {
+    cs("throws-when-registering-second-service", function () {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({}).root;
 
@@ -73,8 +73,7 @@ describe("Linker Additional Tests", function () {
 
       aver.isTrue(linker.register(modLocal));
       aver.throws(() => linker.register(modNational), "register");
-
-    });
+    }, () => true);
 
   });
 
