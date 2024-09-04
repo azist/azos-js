@@ -16,14 +16,15 @@
         "intf",
         "LFROM",
         "linq",
-        "nums",
         "nsplit",
+        "nums",
         "rasterizer",
         "sindent",
         "sysvc",
         "tapplet",
         "thandler",
         "tparent",
-        "uini"
+        "uini",
+        "virt"
     ]
 }

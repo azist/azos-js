@@ -500,14 +500,14 @@ unit("Aver", function () {
     cs("virtual override function", function () {
       let a = new sut.MockA(3, 9);
 
-      let dscr = a.unit();
+      let dscr = a.describe();
       sut.areEqual("MockA(a: 3, b: 9)", dscr);
     });
 
     cs("virtual base function", function () {
       let a = new sut.MockB(3, 9);
 
-      let dscr = a.unit();
+      let dscr = a.describe();
       sut.areEqual("base(a: 3, b: 9)", dscr);
     });
 
