@@ -51,21 +51,22 @@ export class Atom {
     }
   }
 
-  static tryEncodeValueOrId(value) {
-    if (value === null) return { ok: true, value: Atom.ZERO };
+  static tryEncodeValueOrId(valueOrId) {
+    if (valueOrId === null) return { ok: true, value: Atom.ZERO };
 
-    value = trim(value);
+    valueOrId = trim(valueOrId);
 
-    if (value.startsWith("#")) {
-      value = value.substring(1);
+    if (valueOrId.startsWith("#")) {
+      valueOrId = valueOrId.substring(1);
 
       try {
-        const ul = BigInt(value);
+        const ul = BigInt(valueOrId);
         return { ok: true, value: new Atom(ul) };
       } catch (e) {
         return { ok: false, value: undefined };
       }
     }
+    return { ok: false, value: undefined };
   }
 
   static #isValidCharacter(c) {
