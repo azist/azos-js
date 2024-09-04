@@ -107,7 +107,7 @@ unit("Aver", function () {
   });
 
   unit(".isNonEmptyMinMaxString()", function () {
-    cs('', ()=>{throw UNIMPLEMENTED(".isNonEmptyMinMaxString() tests")});
+    cs('', () => { throw UNIMPLEMENTED(".isNonEmptyMinMaxString() tests") });
   });
 
   unit("#isObject()", function () {
@@ -545,9 +545,9 @@ unit("Aver", function () {
 
     cs("10", function () { sut.throws(() => sut.areArraysNotEquivalent(null, []), "areArraysNotEquivalent"); });
     cs("20", function () { sut.throws(() => sut.areArraysNotEquivalent([], []), "areArraysNotEquivalent"); });
-    cs("30", function () { sut.throws(() => sut.areArraysNotEquivalent([1], [1]), "areArraysNotEquivalent");  });
-    cs("40", function () { sut.throws(() => sut.areArraysNotEquivalent([true, 1], [true, 1]), "areArraysNotEquivalent");  });
-    cs("50", function () { sut.throws(() => sut.areArraysNotEquivalent(["aaa", 2], ["aaa", 2]), "areArraysNotEquivalent");  });
+    cs("30", function () { sut.throws(() => sut.areArraysNotEquivalent([1], [1]), "areArraysNotEquivalent"); });
+    cs("40", function () { sut.throws(() => sut.areArraysNotEquivalent([true, 1], [true, 1]), "areArraysNotEquivalent"); });
+    cs("50", function () { sut.throws(() => sut.areArraysNotEquivalent(["aaa", 2], ["aaa", 2]), "areArraysNotEquivalent"); });
   });
 
   unit("#areIterablesEquivalent()", function () {
