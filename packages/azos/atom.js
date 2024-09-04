@@ -86,15 +86,6 @@ export class Atom {
 
   get id() { return this.#id; }
 
-  constructor(id = 0n) {
-    if (isBigInt(id))
-      this.#id = id;
-    else if (isNumber(id))
-      this.#id = BigInt(id);
-    else
-      throw new AzosError("Should call encode()");
-  }
-
   get value() /*: string | null */ {
     if (this.isZero) return null;
 
@@ -163,6 +154,15 @@ export class Atom {
     }
 
     return length;
+  }
+
+  constructor(id = 0n) {
+    if (isBigInt(id))
+      this.#id = id;
+    else if (isNumber(id))
+      this.#id = BigInt(id);
+    else
+      throw new AzosError("Should call encode()");
   }
 
   equals(other) {
