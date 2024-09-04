@@ -13,6 +13,7 @@ import "./strings-tests.js";
 import "./linq-tests.js";
 import "./localization-tests.js";
 import "./conf-tests.js";
+import "./atom-tests.js";
 
 import "./app-mod-tests.js";
 import "./linker-tests.js";
