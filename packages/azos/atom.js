@@ -80,8 +80,6 @@ export class Atom {
       this.#id = BigInt(id);
     else
       throw new AzosError("Should call encode()");
-
-    this.#id = BigInt(id);
   }
 
   get value() /*: string | null */ {
