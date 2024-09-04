@@ -85,7 +85,33 @@ unit("Aver", function () {
     });
   });
 
-  describe("#isObject()", function() {
+  unit(".isNonEmptyString()", function () {
+
+    cs("pass-non-empty", function () {
+      let x = "a";
+      sut.isTrue(sut.isNonEmptyString(x));
+    });
+    cs("fail-with-non-string", function () {
+      let x = {};
+      sut.isFalse(sut.isNonEmptyString(x));
+    });
+    cs("fail-with-space", function () {
+      let x = " ";
+      sut.isFalse(sut.isNonEmptyString(x));
+    });
+    cs("fail-with-empty-string", function () {
+      let x = "";
+      sut.isFalse(sut.isNonEmptyString(x));
+    });
+  });
+
+  unit(".isNonEmptyMinMaxString()", function () {
+    cs("", function () {
+
+    });
+  });
+
+  unit("#isObject()", function () {
 
     cs("pass object", function () {
       let x = {};
