@@ -7,6 +7,7 @@
 //import { describe, it } from "mocha";
 import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as sut from "../aver.js";
+import { UNIMPLEMENTED } from "../coreconsts.js";
 
 
 unit("Aver", function () {
@@ -106,9 +107,7 @@ unit("Aver", function () {
   });
 
   unit(".isNonEmptyMinMaxString()", function () {
-    cs("", function () {
-
-    });
+    cs('', ()=>{throw UNIMPLEMENTED(".isNonEmptyMinMaxString() tests")});
   });
 
   unit("#isObject()", function () {
