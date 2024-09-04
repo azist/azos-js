@@ -7,7 +7,7 @@
 import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as aver from "../aver.js";
 import { Atom } from "../atom.js";
-import { ABSTRACT } from "../coreconsts.js";
+import { UNIMPLEMENTED } from "../coreconsts.js";
 
 describe("Atom", function () {
 
@@ -92,13 +92,13 @@ describe("Atom", function () {
 
   describe("TryEncode", function () {
     it("tries to encode", function () {
-      throw ABSTRACT("tryEncode()");
+      throw UNIMPLEMENTED("tryEncode()");
     })
   });
 
   describe("TryEncodeValueOrId", function () {
     it("tries to encode value as '#1234' or id", function () {
-      throw ABSTRACT("tryEncodeValueOrId()");
+      throw UNIMPLEMENTED("tryEncodeValueOrId()");
     })
   });
 
