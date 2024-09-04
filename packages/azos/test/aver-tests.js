@@ -515,7 +515,7 @@ unit("Aver", function () {
   });
 
 
-  unit("#areArraysEquivalent()", function () {
+  unit(".areArraysEquivalent()", function () {
 
     cs("()", function () { sut.throws(() => sut.areArraysEquivalent(), "areArraysEquivalent"); });
     cs("(undefined)", function () { sut.throws(() => sut.areArraysEquivalent(undefined), "areArraysEquivalent"); });
@@ -532,6 +532,24 @@ unit("Aver", function () {
     cs("40", function () { sut.throws(() => sut.areArraysEquivalent([1], [1, 2]), "areArraysEquivalent"); });
   });
 
+
+
+  unit(".areArraysNotEquivalent()", function () {
+
+    cs("()", function () { sut.throws(() => sut.areArraysNotEquivalent(), "areArraysNotEquivalent"); });
+    cs("(undefined)", function () { sut.throws(() => sut.areArraysNotEquivalent(undefined), "areArraysNotEquivalent"); });
+    cs("(null, null)", function () { sut.throws(() => sut.areArraysNotEquivalent(null, null), "areArraysNotEquivalent"); });
+
+    cs("1", function () { sut.areArraysNotEquivalent([1], [2]); });
+    cs("2", function () { sut.areArraysNotEquivalent([1, 2], [2, 1]); });
+    cs("3", function () { sut.areArraysNotEquivalent([1], [1, 2]); });
+
+    cs("10", function () { sut.throws(() => sut.areArraysNotEquivalent(null, []), "areArraysNotEquivalent"); });
+    cs("20", function () { sut.throws(() => sut.areArraysNotEquivalent([], []), "areArraysNotEquivalent"); });
+    cs("30", function () { sut.throws(() => sut.areArraysNotEquivalent([1], [1]), "areArraysNotEquivalent");  });
+    cs("40", function () { sut.throws(() => sut.areArraysNotEquivalent([true, 1], [true, 1]), "areArraysNotEquivalent");  });
+    cs("50", function () { sut.throws(() => sut.areArraysNotEquivalent(["aaa", 2], ["aaa", 2]), "areArraysNotEquivalent");  });
+  });
 
   unit("#areIterablesEquivalent()", function () {
 

@@ -423,6 +423,35 @@ export function areArraysEquivalent(a, b) {
   throw AVERMENT_FAILURE(`areArraysEquivalent(${dv(a)}, ${dv(b)})`);
 }
 
+
+/**
+ * Checks that both arguments are arrays of equal length running per-element areEqual()
+ * Notes: 1.) does not do deep comparison, 2.) arrays are not sorted
+ * @param {Array} a
+ * @param {Array} b
+ * @returns undefined if a and b are not same reference array or if each element is not strictly equal, or throws
+ *   if arrays are same reference or each element is strictly equal, throws if a and b are not both arrays
+ */
+export function areArraysNotEquivalent(a, b) {
+  if (types.isArray(a) && types.isArray(b)) {
+    if (a !== b) {
+      if (a.length === b.length) {
+        let alleq = true;
+        for (let i = 0; i < a.length; i++)
+          if (a[i] !== b[i]) {
+            alleq = false;
+            break;
+          }
+        if (!alleq) return;
+      } else {
+        return;
+      }
+    }
+  }
+
+  throw AVERMENT_FAILURE(`areArraysNotEquivalent(${dv(a)}, ${dv(b)})`);
+}
+
 /**
  * Checks that both arguments are iterable sequences of the same size and content using an optional equality comparer
  * @param {Iterable<*>} a First sequence
