@@ -90,19 +90,19 @@ unit("Aver", function () {
 
     cs("pass-non-empty", function () {
       let x = "a";
-      sut.isTrue(sut.isNonEmptyString(x));
+      sut.isTrue(sut.isNonEmptyString(x) === "a");
     });
     cs("fail-with-non-string", function () {
       let x = {};
-      sut.isFalse(sut.isNonEmptyString(x));
+      sut.throws(() => sut.isNonEmptyString(x));
     });
     cs("fail-with-space", function () {
       let x = " ";
-      sut.isFalse(sut.isNonEmptyString(x));
+      sut.throws(() => sut.isNonEmptyString(x));
     });
     cs("fail-with-empty-string", function () {
       let x = "";
-      sut.isFalse(sut.isNonEmptyString(x));
+      sut.throws(() => sut.isNonEmptyString(x));
     });
   });
 
