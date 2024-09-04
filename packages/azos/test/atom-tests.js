@@ -90,15 +90,45 @@ unit("Atom", function () {
   });
 
   unit("TryEncode", function () {
-    cs("tries to encode", function () {
-      throw UNIMPLEMENTED("tryEncode()");
-    })
+    cs("pass-when-valid-encode-value", function () {
+      const toEncode = "abcdefgh";
+      let encodedResponse = Atom.tryEncode(toEncode);
+      aver.isTrue(encodedResponse.ok);
+      aver.areEqualValues(encodedResponse.value.value, toEncode);
+    });
+    cs("fail-when-invalid-id", function () {
+      const toEncode = "tooLongMate";
+      let encodedResponse = Atom.tryEncode(toEncode);
+      aver.isFalse(encodedResponse.ok);
+      aver.isUndefined(encodedResponse.value);
+    });
   });
 
   unit("TryEncodeValueOrId", function () {
-    cs("tries to encode value as '#1234' or id", function () {
-      throw UNIMPLEMENTED("tryEncodeValueOrId()");
-    })
+    cs("pass-when-encode-value-null", function () {
+      const toEncode = null;
+      let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
+      aver.isTrue(encodedResponse.ok);
+      aver.areEqual(encodedResponse.value, Atom.ZERO);
+    });
+    cs("pass-when-valid-encode-value", function () {
+      const toEncode = "#12345678";
+      let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
+      aver.isTrue(encodedResponse.ok);
+      aver.areEqual(encodedResponse.value.id, 12345678n);
+    });
+    cs("fail-when-valid-encode-value", function () {
+      const toEncode = "#abcdefgh";
+      let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
+      aver.isFalse(encodedResponse.ok);
+      aver.isUndefined(encodedResponse.value);
+    });
+    cs("fail-when-invalid-encode-value", function () {
+      const toEncode = "abcdefgh";
+      let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
+      aver.isFalse(encodedResponse.ok);
+      aver.isUndefined(encodedResponse.value);
+    });
   });
 
   unit("Constructor", function () {
