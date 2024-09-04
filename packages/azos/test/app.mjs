@@ -16,6 +16,7 @@ import "./conf-tests.js";
 
 import "./app-mod-tests.js";
 import "./linker-tests.js";
+import "./linker-tests2.js";
 import "./app-log-tests.js";
 import "./security-tests.js";
 
