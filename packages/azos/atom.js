@@ -17,25 +17,30 @@ export class Atom {
 
     aver.isNonEmptyMinMaxString(value, 1, 8);
 
+    let id = undefined;
     for (let [k, v] of Atom.#sCache.entries()) {
       if (v === value) {
-        return k;
+        id = k;
+        break;
       }
     }
 
-    let ax = 0n;
-    for (let i = 0; i < value.length; i++) {
-      let c = value.charCodeAt(i);
+    if (id === undefined) {
+      let ax = 0n;
+      for (let i = 0; i < value.length; i++) {
+        let c = value.charCodeAt(i);
 
-      if (!Atom.#isValidCharacter(value[i]))
-        throw new AzosError(`Invalid character: ${value[i]} Atom.Encode(![0..9|A..Z|a..z|_|-])`);
+        if (!Atom.#isValidCharacter(value[i]))
+          throw new AzosError(`Invalid character: ${value[i]} Atom.Encode(![0..9|A..Z|a..z|_|-])`);
 
-      ax |= BigInt(c) << BigInt(i * 8);
+        ax |= BigInt(c) << BigInt(i * 8);
+      }
+
+      Atom.#sCache.set(ax, value);
+      id = ax;
     }
 
-    Atom.#sCache.set(ax, value);
-
-    return new Atom(ax);
+    return new Atom(id);
   }
 
   static tryEncode(value /*:string | null*/ = null) {
