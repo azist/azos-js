@@ -52,8 +52,6 @@ export class Atom {
         return { ok: false, value: undefined };
       }
     }
-
-    return Atom.tryEncode(value);
   }
 
   static #isValidCharacter(c) {
