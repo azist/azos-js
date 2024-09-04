@@ -57,8 +57,7 @@ unit("Atom", function () {
       const unsorted = [Atom.encode("3"), Atom.encode("2"), Atom.encode("1")];
       const sorted = unsorted.slice().sort((a, b) => a.compareTo(b));
 
-      // TODO: This test sucks. But it's quick and proves to sort properly
-      aver.throws(() => aver.areArraysEquivalent(unsorted, sorted), "Averment failure: areArraysEquivalent");
+      aver.areArraysNotEquivalent(unsorted, sorted);
     });
   });
 
