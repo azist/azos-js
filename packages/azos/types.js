@@ -210,6 +210,14 @@ export function arrayClear(array){
 }
 
 /**
+ * Returns true if the argument is BigInt
+ * @param {*} v
+ */
+export function isBigInt(v) {
+  return Object.prototype.toString.call(v) === "[object BigInt]";
+}
+
+/**
  * Returns true if the argument is a non null string
  * @param {*} v
  */
