@@ -70,7 +70,29 @@ export function isNotNull(a){
  */
 export function isNonEmptyString(a, from = undefined) {
   if (types.isNonEmptyString(a)) return a;
-  throw AVERMENT_FAILURE(`isNonEmptyString(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isNonEmptyString(${dv(a)})`, from);
+}
+
+/**
+ *
+ * @param {*} a
+ * @param {*} min
+ * @param {*} max
+ * @param {string | undefined} from optional clause in case of failure
+ * @returns
+ */
+export function isNonEmptyMinMaxString(a, min, max, from = undefined) {
+  isNonEmptyString(a, from);
+
+  min = types.asInt(min);
+  max = types.asInt(max);
+  isTrue(min < max, "min < max");
+
+  if (a.length < min || a.length > max) {
+    throw AVERMENT_FAILURE(`isNonEmptyMinMaxString(${dv(a)}, ${min}, ${max}})`, from);
+  }
+
+  return a;
 }
 
 /**
