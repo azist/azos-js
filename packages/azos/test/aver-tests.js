@@ -107,7 +107,26 @@ unit("Aver", function () {
   });
 
   unit(".isNonEmptyMinMaxString()", function () {
-    cs('', () => { throw UNIMPLEMENTED(".isNonEmptyMinMaxString() tests") });
+    cs('pass-when-within-range', function () {
+      const testString = "Hello!", min = 1, max = 10;
+      sut.isNonEmptyMinMaxString(testString, min, max);
+    });
+    cs('fail-with-non-int-min-max', function () {
+      const testString = "hi", min = "null", max = "null";
+      sut.throws(() => sut.isNonEmptyMinMaxString(testString, min, max), "Cast error");
+    });
+    cs('fail-min-not-less-than-max', function () {
+      const testString = "hi", min = 5, max = 1;
+      sut.throws(() => sut.isNonEmptyMinMaxString(testString, min, max), "min < max");
+    });
+    cs('fail-when-smaller-than-min', function () {
+      let testString = "a", min = 2, max = 5;
+      sut.throws(() => sut.isNonEmptyMinMaxString(testString, min, max), "isNonEmptyMinMaxString");
+    });
+    cs('fail-when-larger-than-max', function () {
+      const testString = "tooLong", min = 1, max = 2;
+      sut.throws(() => sut.isNonEmptyMinMaxString(testString, min, max), "isNonEmptyMinMaxString");
+    });
   });
 
   unit("#isObject()", function () {
