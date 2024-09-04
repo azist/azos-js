@@ -11,13 +11,15 @@ import * as linq  from "./linq.js";
 
 /**
  * Makes an AzosError() initialized with message
- * @param {string} m message
+ * @param {string} msg message
+ * @param {string} from a short method, clause, or trace point name
+ * @param {Error | object} cause the exception associated with this error
  */
-export function AVERMENT_FAILURE(m, cause = null){
-  return new types.AzosError(`Averment failure: ${m}}`, m, cause, 500);
+export function AVERMENT_FAILURE(msg, from, cause = null) {
+  return new types.AzosError(`Averment failure: ${msg}}`, from, cause, 500);
 }
 
-const dv = (v) => str.describe(v);//shortcut
+const dv = (v, ml = 16) => str.describe(v, ml); //shortcut
 
 
 /**
