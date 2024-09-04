@@ -4,16 +4,16 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { defineUnit as describe, defineCase as it } from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "../aver.js";
 import { Atom } from "../atom.js";
 import { UNIMPLEMENTED } from "../coreconsts.js";
 
-describe("Atom", function () {
+unit("Atom", function () {
 
-  describe("Equality", function () {
+  unit("Equality", function () {
 
-    it("uses `ZERO` constant appropriately", function () {
+    cs("uses `ZERO` constant appropriately", function () {
       const a = Atom.ZERO;
       const b = Atom.encode(0n);
 
@@ -21,7 +21,7 @@ describe("Atom", function () {
       aver.areEqualValues(a, b);
     });
 
-    it("new Atom(0) is own reference", function () {
+    cs("new Atom(0) is own reference", function () {
       const a = Atom.ZERO;
       const b = new Atom(0);
 
@@ -29,21 +29,21 @@ describe("Atom", function () {
       aver.areNotEqual(a, b);
     });
 
-    it("new id is always converted to BigInt for equality check via valueOf", function () {
+    cs("new id is always converted to BigInt for equality check via valueOf", function () {
       const a = new Atom(0);
       const b = new Atom(0n);
 
       aver.areEqualValues(a, b);
     });
 
-    it("equates 2 atoms that are encoded with the same value", function () {
+    cs("equates 2 atoms that are encoded with the same value", function () {
       const a = Atom.encode("12345678");
       const b = Atom.encode("12345678");
 
       aver.isTrue(a.equals(b));
     });
 
-    it("does not equate 2 atoms encoded with different values", function () {
+    cs("does not equate 2 atoms encoded with different values", function () {
       const a = Atom.encode("12345678");
       const b = Atom.encode("11111111");
 
@@ -51,9 +51,9 @@ describe("Atom", function () {
     });
   });
 
-  describe("Compares", function () {
+  unit("Compares", function () {
 
-    it("compareTo when sorting sorts appropriately (by 'BigInt' id)", function () {
+    cs("compareTo when sorting sorts appropriately (by 'BigInt' id)", function () {
       const unsorted = [Atom.encode("3"), Atom.encode("2"), Atom.encode("1")];
       const sorted = unsorted.slice().sort((a, b) => a.compareTo(b));
 
@@ -62,24 +62,24 @@ describe("Atom", function () {
     });
   });
 
-  describe("ToString", function () {
+  unit("ToString", function () {
 
-    it("converts the BigInt `id` back to string", function () {
+    cs("converts the BigInt `id` back to string", function () {
       const a = Atom.encode("abcDEF12");
 
       aver.areEqual(a.toString(), "abcDEF12");
     });
 
-    it("empty string when constructed with `null`", function () {
+    cs("empty string when constructed with `null`", function () {
       const a = Atom.encode(null);
 
       aver.areEqual(a.toString(), "");
     });
   });
 
-  describe("Encode", function () {
+  unit("Encode", function () {
 
-    it("converts id to BigInt", function () {
+    cs("converts id to BigInt", function () {
       const toEncode = "abcdefgh";
       const expectedId = 7523094288207667809n;
       const a = Atom.encode(toEncode);
@@ -90,26 +90,26 @@ describe("Atom", function () {
     });
   });
 
-  describe("TryEncode", function () {
-    it("tries to encode", function () {
+  unit("TryEncode", function () {
+    cs("tries to encode", function () {
       throw UNIMPLEMENTED("tryEncode()");
     })
   });
 
-  describe("TryEncodeValueOrId", function () {
-    it("tries to encode value as '#1234' or id", function () {
+  unit("TryEncodeValueOrId", function () {
+    cs("tries to encode value as '#1234' or id", function () {
       throw UNIMPLEMENTED("tryEncodeValueOrId()");
     })
   });
 
-  describe("Constructor", function () {
-    it("should throw when non-number or non-BigInt passed", function () {
+  unit("Constructor", function () {
+    cs("should throw when non-number or non-BigInt passed", function () {
       aver.throws(() => new Atom("12345678"), "should call encode");
     })
   });
 
-  describe("Length", function () {
-    it("Should count the number of characters encoded into the id", function () {
+  unit("Length", function () {
+    cs("Should count the number of characters encoded into the id", function () {
       let toEncode = "abcdefgh";
       const a = Atom.encode(toEncode);
 
