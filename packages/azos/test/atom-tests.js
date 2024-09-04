@@ -7,7 +7,6 @@
 import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "../aver.js";
 import { Atom } from "../atom.js";
-import { UNIMPLEMENTED } from "../coreconsts.js";
 
 unit("Atom", function () {
 

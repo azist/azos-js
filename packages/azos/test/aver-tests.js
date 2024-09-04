@@ -7,7 +7,6 @@
 //import { describe, it } from "mocha";
 import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as sut from "../aver.js";
-import { UNIMPLEMENTED } from "../coreconsts.js";
 
 
 unit("Aver", function () {
