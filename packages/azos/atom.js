@@ -17,6 +17,12 @@ export class Atom {
 
     aver.isNonEmptyMinMaxString(value, 1, 8);
 
+    for (let [k, v] of Atom.#sCache.entries()) {
+      if (v === value) {
+        return k;
+      }
+    }
+
     let ax = 0n;
     for (let i = 0; i < value.length; i++) {
       let c = value.charCodeAt(i);
@@ -26,6 +32,9 @@ export class Atom {
 
       ax |= BigInt(c) << BigInt(i * 8);
     }
+
+    Atom.#sCache.set(ax, value);
+
     return new Atom(ax);
   }
 
