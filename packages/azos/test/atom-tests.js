@@ -10,9 +10,9 @@ import { Atom } from "../atom.js";
 
 unit("Atom", function () {
 
-  unit("Equality", function () {
+  unit(".equals()", function () {
 
-    cs("uses `ZERO` constant appropriately", function () {
+    cs("pass-when-encoding-0n-against-ZERO", function () {
       const a = Atom.ZERO;
       const b = Atom.encode(0n);
 
@@ -20,7 +20,7 @@ unit("Atom", function () {
       aver.areEqualValues(a, b);
     });
 
-    cs("new Atom(0) is own reference", function () {
+    cs("pass-when-new-Atom(0)-is-own-reference", function () {
       const a = Atom.ZERO;
       const b = new Atom(0);
 
@@ -28,21 +28,21 @@ unit("Atom", function () {
       aver.areNotEqual(a, b);
     });
 
-    cs("new id is always converted to BigInt for equality check via valueOf", function () {
+    cs("pass-when-new-id-always-converted-to-BigInt", function () {
       const a = new Atom(0);
       const b = new Atom(0n);
 
       aver.areEqualValues(a, b);
     });
 
-    cs("equates 2 atoms that are encoded with the same value", function () {
+    cs("pass-when-2-atoms-encoded-with-same-value", function () {
       const a = Atom.encode("12345678");
       const b = Atom.encode("12345678");
 
       aver.isTrue(a.equals(b));
     });
 
-    cs("does not equate 2 atoms encoded with different values", function () {
+    cs("pass-when-2-atoms-encoded-with-different-values", function () {
       const a = Atom.encode("12345678");
       const b = Atom.encode("11111111");
 
@@ -50,34 +50,40 @@ unit("Atom", function () {
     });
   });
 
-  unit("Compares", function () {
+  unit(".compareTo()", function () {
 
-    cs("compareTo when sorting sorts appropriately (by 'BigInt' id)", function () {
-      const unsorted = [Atom.encode("3"), Atom.encode("2"), Atom.encode("1")];
+    cs("pass-when-sort-by-id", function () {
+      const one = Atom.encode("1");
+      const two = Atom.encode("2");
+      const three = Atom.encode("3");
+      const unsorted = [three, two, one];
       const sorted = unsorted.slice().sort((a, b) => a.compareTo(b));
 
       aver.areArraysNotEquivalent(unsorted, sorted);
+      aver.areEqual(sorted.indexOf(one), 0);
+      aver.areEqual(sorted.indexOf(two), 1);
+      aver.areEqual(sorted.indexOf(three), 2);
     });
   });
 
-  unit("ToString", function () {
+  unit(".toString()", function () {
 
-    cs("converts the BigInt `id` back to string", function () {
+    cs("pass-when-converts-id-back-to-string", function () {
       const a = Atom.encode("abcDEF12");
 
       aver.areEqual(a.toString(), "abcDEF12");
     });
 
-    cs("empty string when constructed with `null`", function () {
+    cs("pass-when-constructed-null-converts-to-empty-string", function () {
       const a = Atom.encode(null);
 
       aver.areEqual(a.toString(), "");
     });
   });
 
-  unit("Encode", function () {
+  unit(".encode()", function () {
 
-    cs("converts id to BigInt", function () {
+    cs("pass-when-encoded-string-matches-expected-id", function () {
       const toEncode = "abcdefgh";
       const expectedId = 7523094288207667809n;
       const a = Atom.encode(toEncode);
@@ -88,13 +94,15 @@ unit("Atom", function () {
     });
   });
 
-  unit("TryEncode", function () {
+  unit(".tryEncode()", function () {
+
     cs("pass-when-valid-encode-value", function () {
       const toEncode = "abcdefgh";
       let encodedResponse = Atom.tryEncode(toEncode);
       aver.isTrue(encodedResponse.ok);
       aver.areEqualValues(encodedResponse.value.value, toEncode);
     });
+
     cs("fail-when-invalid-id", function () {
       const toEncode = "tooLongMate";
       let encodedResponse = Atom.tryEncode(toEncode);
@@ -103,25 +111,29 @@ unit("Atom", function () {
     });
   });
 
-  unit("TryEncodeValueOrId", function () {
+  unit(".tryEncodeValueOrId()", function () {
+
     cs("pass-when-encode-value-null", function () {
       const toEncode = null;
       let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
       aver.isTrue(encodedResponse.ok);
       aver.areEqual(encodedResponse.value, Atom.ZERO);
     });
+
     cs("pass-when-valid-encode-value", function () {
       const toEncode = "#12345678";
       let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
       aver.isTrue(encodedResponse.ok);
       aver.areEqual(encodedResponse.value.id, 12345678n);
     });
+
     cs("fail-when-valid-encode-value", function () {
       const toEncode = "#abcdefgh";
       let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
       aver.isFalse(encodedResponse.ok);
       aver.isUndefined(encodedResponse.value);
     });
+
     cs("fail-when-invalid-encode-value", function () {
       const toEncode = "abcdefgh";
       let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
@@ -130,14 +142,16 @@ unit("Atom", function () {
     });
   });
 
-  unit("Constructor", function () {
-    cs("should throw when non-number or non-BigInt passed", function () {
+  unit("constructor()", function () {
+
+    cs("pass-throws-when-constructed-with-string", function () {
       aver.throws(() => new Atom("12345678"), "should call encode");
     })
   });
 
-  unit("Length", function () {
-    cs("Should count the number of characters encoded into the id", function () {
+  unit(".length", function () {
+
+    cs("pass-when-length-matches-encoded-character-count", function () {
       let toEncode = "abcdefgh";
       const a = Atom.encode(toEncode);
 
