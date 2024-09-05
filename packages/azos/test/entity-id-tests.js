@@ -5,21 +5,170 @@
 </FILE_LICENSE>*/
 
 import { defineUnit as unit, defineCase as cs } from "../run.js";
-import { UNIMPLEMENTED } from "../coreconsts.js";
+import * as aver from "../aver.js";
+import { Atom } from "../atom.js";
+import { EntityId } from "../entity-id.js";
 
 // eslint-disable-next-line no-unused-vars
 const VALID_ENTITY_IDS = {
-  ONE: "cust.eml@g8cust::kevin@example.com",
-  TWO: "sku@g8prod::0:8:12345", // default gdid
-  THREE: "cust.gdid@g8cust::0:8:12345",
-  FOUR: 'cust.json@g8cust::{"ok": true}',
+  EML_SCHEMA: "cust.eml@g8cust::kevin@example.com",
+  DEFAULT: "sku@g8prod::0:8:12345", // default gdid
+  GDID: "cust.gdid@g8cust::0:8:12345",
+  JSON: 'cust.json@g8cust::{"ok": true}',
 };
 
 unit("EntityId", function () {
 
-  unit("", function () {
-    cs("", function () {
-      throw UNIMPLEMENTED("no tests");
+  unit(".parse()", function () {
+
+    cs("pass-eml-schema", function () {
+      const entityId = EntityId.parse(VALID_ENTITY_IDS.EML_SCHEMA);
+
+      const expectedSystem = Atom.encode("g8cust");
+      const expectedType = Atom.encode("cust");
+      const expectedSchema = Atom.encode("eml");
+      const expectedAddress = "kevin@example.com";
+
+      aver.areEqualValues(entityId.system, expectedSystem);
+      aver.areEqualValues(entityId.type, expectedType);
+      aver.areEqualValues(entityId.schema, expectedSchema);
+      aver.areEqualValues(entityId.address, expectedAddress);
+    });
+
+    cs("pass-default-schema", function () {
+      const entityId = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
+
+      const expectedSystem = Atom.encode("g8prod");
+      const expectedType = Atom.encode("sku");
+      const expectedSchema = Atom.ZERO;
+      const expectedAddress = "0:8:12345";
+
+      aver.areEqualValues(entityId.system, expectedSystem);
+      aver.areEqualValues(entityId.type, expectedType);
+      aver.areEqualValues(entityId.schema, expectedSchema);
+      aver.areEqualValues(entityId.address, expectedAddress);
+    });
+
+    cs("pass-gdid-schema", function () {
+      const entityId = EntityId.parse(VALID_ENTITY_IDS.GDID);
+
+      const expectedSystem = Atom.encode("g8cust");
+      const expectedType = Atom.encode("cust");
+      const expectedSchema = Atom.encode("gdid");
+      const expectedAddress = "0:8:12345";
+
+      aver.areEqualValues(entityId.system, expectedSystem);
+      aver.areEqualValues(entityId.type, expectedType);
+      aver.areEqualValues(entityId.schema, expectedSchema);
+      aver.areEqualValues(entityId.address, expectedAddress);
+    });
+
+    cs("pass-json-schema", function () {
+      const entityId = EntityId.parse(VALID_ENTITY_IDS.JSON);
+
+      const expectedSystem = Atom.encode("g8cust");
+      const expectedType = Atom.encode("cust");
+      const expectedSchema = Atom.encode("json");
+      const expectedAddress = '{"ok": true}';
+
+      aver.areEqualValues(entityId.system, expectedSystem);
+      aver.areEqualValues(entityId.type, expectedType);
+      aver.areEqualValues(entityId.schema, expectedSchema);
+      aver.areEqualValues(entityId.address, expectedAddress);
+      aver.isTrue(entityId.isCompositeAddress);
+      aver.isTrue(entityId.compositeAddress.ok);
+    });
+  });
+
+  unit(".tryParse()", function () {
+
+    cs("pass-eml-schema", function () {
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.EML_SCHEMA);
+
+      const expectedSystem = Atom.encode("g8cust");
+      const expectedType = Atom.encode("cust");
+      const expectedSchema = Atom.encode("eml");
+      const expectedAddress = "kevin@example.com";
+
+      aver.isTrue(entityIdResponse.ok);
+      aver.areEqualValues(entityIdResponse.value.system, expectedSystem);
+      aver.areEqualValues(entityIdResponse.value.type, expectedType);
+      aver.areEqualValues(entityIdResponse.value.schema, expectedSchema);
+      aver.areEqualValues(entityIdResponse.value.address, expectedAddress);
+    });
+
+    cs("pass-default-schema", function () {
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.DEFAULT);
+
+      const expectedSystem = Atom.encode("g8prod");
+      const expectedType = Atom.encode("sku");
+      const expectedSchema = Atom.ZERO;
+      const expectedAddress = "0:8:12345";
+
+      aver.isTrue(entityIdResponse.ok);
+      aver.areEqualValues(entityIdResponse.value.system, expectedSystem);
+      aver.areEqualValues(entityIdResponse.value.type, expectedType);
+      aver.areEqualValues(entityIdResponse.value.schema, expectedSchema);
+      aver.areEqualValues(entityIdResponse.value.address, expectedAddress);
+    });
+
+    cs("pass-gdid-schema", function () {
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.GDID);
+
+      const expectedSystem = Atom.encode("g8cust");
+      const expectedType = Atom.encode("cust");
+      const expectedSchema = Atom.encode("gdid");
+      const expectedAddress = "0:8:12345";
+
+      aver.isTrue(entityIdResponse.ok);
+      aver.areEqualValues(entityIdResponse.value.system, expectedSystem);
+      aver.areEqualValues(entityIdResponse.value.type, expectedType);
+      aver.areEqualValues(entityIdResponse.value.schema, expectedSchema);
+      aver.areEqualValues(entityIdResponse.value.address, expectedAddress);
+    });
+
+    cs("pass-json-schema", function () {
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.JSON);
+
+      const expectedSystem = Atom.encode("g8cust");
+      const expectedType = Atom.encode("cust");
+      const expectedSchema = Atom.encode("json");
+      const expectedAddress = '{"ok": true}';
+
+      aver.isTrue(entityIdResponse.ok);
+      aver.areEqualValues(entityIdResponse.value.system, expectedSystem);
+      aver.areEqualValues(entityIdResponse.value.type, expectedType);
+      aver.areEqualValues(entityIdResponse.value.schema, expectedSchema);
+      aver.areEqualValues(entityIdResponse.value.address, expectedAddress);
+      aver.isTrue(entityIdResponse.value.isCompositeAddress);
+      aver.isTrue(entityIdResponse.value.compositeAddress.ok);
+    });
+  });
+
+  unit(".isEqual()", function () {
+
+    cs("pass-when-equal", function () {
+      const a = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
+      const b = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
+
+      aver.isTrue(a.equals(b));
+    });
+  });
+
+  unit(".compareTo()", function () {
+
+    cs("pass-when-sorted", function () {
+      const one = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
+      const two = EntityId.parse(VALID_ENTITY_IDS.EML_SCHEMA);
+      const three = EntityId.parse(VALID_ENTITY_IDS.JSON);
+      const unsorted = [three, two, one];
+
+      const sorted = unsorted.slice().sort((a, b) => a.compareTo(b));
+
+      aver.areArraysNotEquivalent(unsorted, sorted);
+      aver.areEqual(sorted.indexOf(one), 0);
+      aver.areEqual(sorted.indexOf(two), 1);
+      aver.areEqual(sorted.indexOf(three), 2);
     });
   });
 });
