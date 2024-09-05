@@ -131,9 +131,9 @@ export class EntityId {
 
   equals(other) {
     aver.isOf(other, EntityId);
-    return this.type === other.type &&
-      this.schema === other.schema &&
-      this.system === other.system &&
+    return this.type?.equals(other.type) &&
+      this.schema?.equals(other.schema) &&
+      this.system?.equals(other.system) &&
       this.address === other.address;
   }
 
