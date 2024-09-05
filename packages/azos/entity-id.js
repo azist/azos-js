@@ -28,7 +28,7 @@ export class EntityId {
 
     let sysIdx = value.indexOf(EntityId.SYS_PREFIX);
     if (sysIdx < 1 || sysIdx === value.length - EntityId.SYS_PREFIX.length) {
-      throw types.AzosError("Invalid system");
+      throw new types.AzosError("Invalid system");
     }
 
     let systemPart = value.substring(0, sysIdx);
@@ -36,14 +36,14 @@ export class EntityId {
     let type = undefined;
     let schema = undefined;
 
-    if (types.isNonEmptyString(address)) {
-      throw types.AzosError("Invalid address");
+    if (!types.isNonEmptyString(address)) {
+      throw new types.AzosError("Invalid address");
     }
 
     let typeIdx = systemPart.indexOf(EntityId.TYPE_PREFIX);
     if (typeIdx >= 0) {
       if (typeIdx === systemPart.length - 1) {
-        throw types.AzosError("Invalid type");
+        throw new types.AzosError("Invalid type");
       }
 
       let typePart = systemPart.substring(0, typeIdx);
