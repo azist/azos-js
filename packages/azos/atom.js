@@ -13,7 +13,7 @@ export class Atom {
   static ZERO = new Atom(0n);
 
   static encode(value /*:string | null */ = null) {
-    if (!value) return Atom.ZERO;
+    if (value === null) return Atom.ZERO;
 
     aver.isNonEmptyMinMaxString(value, 1, 8);
 
