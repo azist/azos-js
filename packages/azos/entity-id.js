@@ -33,8 +33,8 @@ export class EntityId {
 
     let systemPart = value.substring(0, sysIdx);
     let address = value.substring(sysIdx + EntityId.SYS_PREFIX.length);
-    let type = undefined;
-    let schema = undefined;
+    let typePart = undefined;
+    let schemaPart = undefined;
 
     if (!types.isNonEmptyString(address)) {
       throw new types.AzosError("Invalid address");
@@ -46,16 +46,25 @@ export class EntityId {
         throw new types.AzosError("Invalid type");
       }
 
-      let typePart = systemPart.substring(0, typeIdx);
+      typePart = systemPart.substring(0, typeIdx);
       systemPart = systemPart.substring(typeIdx + 1);
 
       const typeSchemaPart = typePart.split(EntityId.SCHEMA_DIV);
 
-      type = typeSchemaPart[0];
-      schema = typeSchemaPart[1] || null;
+      typePart = typeSchemaPart[0];
+      schemaPart = typeSchemaPart[1] || null;
     }
 
-    return new EntityId(systemPart, type, schema, address);
+    const system = Atom.tryEncode(systemPart);
+    if (!system.ok) throw new types.AzosError(`Unable to encode system atom ${systemPart}`);
+
+    const type = Atom.tryEncode(typePart);
+    if (!type.ok)  throw new types.AzosError(`Unable to encode type atom ${typePart}`);
+
+    const schema = Atom.tryEncode(schemaPart);
+    if (!schema.ok)  throw new types.AzosError(`Unable to encode schema atom ${schemaPart}`);
+
+    return new EntityId(system.value, type.value, schema.value, address);
   }
 
   /**
