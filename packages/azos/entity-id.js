@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Atom } from "./atom";
+import { Atom } from "./atom.js";
 import * as aver from "./aver.js";
-import * as types from "./types";
+import * as types from "./types.js";
 
 export class EntityId {
   static TYPE_PREFIX = '@';
