@@ -33,8 +33,8 @@ export class EntityId {
 
     let systemPart = value.substring(0, sysIdx);
     let address = value.substring(sysIdx + EntityId.SYS_PREFIX.length);
-    let typePart = undefined;
-    let schemaPart = undefined;
+    let typePart = null;
+    let schemaPart = null;
 
     if (!types.isNonEmptyString(address)) {
       throw new types.AzosError("Invalid address");
@@ -148,16 +148,15 @@ export class EntityId {
     else if (this.schema.id > other.schema.id) return 1;
     else if (this.address < other.address) return -1;
     else if (this.address > other.address) return 1;
-    else return 0; // but really, they're equal so this is essentially a noop.
+    else return 0; // essentially a noop as they are equal
   }
 
   valueOf() { return this.toString(); }
 
   toString() {
-    if (!this.isAssigned) return "";
-    if (this.type.isZero) return this.system + EntityId.SYS_PREFIX + this.address;
-    if (this.schema.isZero) return this.type + EntityId.TYPE_PREFIX + this.system + EntityId.SYS_PREFIX + this.address;
-    return this.type.toString() + EntityId.SCHEMA_DIV + EntityId.TYPE_PREFIX + this.system + EntityId.SYS_PREFIX + this.address;
+    if (this.type.isZero) return this.system.toString() + EntityId.SYS_PREFIX + this.address;
+    if (this.schema.isZero) return this.type.toString() + EntityId.TYPE_PREFIX + this.system.toString() + EntityId.SYS_PREFIX + this.address;
+    return this.type.toString() + EntityId.SCHEMA_DIV + this.schema.toString() + EntityId.TYPE_PREFIX + this.system.toString() + EntityId.SYS_PREFIX + this.address;
   }
 
   toJSON() {

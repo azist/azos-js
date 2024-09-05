@@ -10,11 +10,12 @@ import { Atom } from "../atom.js";
 import { EntityId } from "../entity-id.js";
 
 // eslint-disable-next-line no-unused-vars
-const VALID_ENTITY_IDS = {
+const VALID_ENTITY_URIS = {
+  MISSING_SCHEMA: "sku@g8prod::0:8:12345",
+  MISSING_TYPE_SCHEMA: "g8prod::0:8:12345",
   EML_SCHEMA: "cust.eml@g8cust::kevin@example.com",
-  DEFAULT: "sku@g8prod::0:8:12345", // default gdid
-  GDID: "cust.gdid@g8cust::0:8:12345",
-  JSON: 'cust.json@g8cust::{"ok": true}',
+  GDID_SCHEMA: "cust.gdid@g8cust::0:8:12345",
+  JSON_SCHEMA: 'cust.json@g8cust::{"ok": true}',
 };
 
 unit("EntityId", function () {
@@ -22,7 +23,7 @@ unit("EntityId", function () {
   unit(".parse()", function () {
 
     cs("pass-eml-schema", function () {
-      const entityId = EntityId.parse(VALID_ENTITY_IDS.EML_SCHEMA);
+      const entityId = EntityId.parse(VALID_ENTITY_URIS.EML_SCHEMA);
 
       const expectedSystem = Atom.encode("g8cust");
       const expectedType = Atom.encode("cust");
@@ -36,7 +37,7 @@ unit("EntityId", function () {
     });
 
     cs("pass-default-schema", function () {
-      const entityId = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
+      const entityId = EntityId.parse(VALID_ENTITY_URIS.MISSING_SCHEMA);
 
       const expectedSystem = Atom.encode("g8prod");
       const expectedType = Atom.encode("sku");
@@ -50,7 +51,7 @@ unit("EntityId", function () {
     });
 
     cs("pass-gdid-schema", function () {
-      const entityId = EntityId.parse(VALID_ENTITY_IDS.GDID);
+      const entityId = EntityId.parse(VALID_ENTITY_URIS.GDID_SCHEMA);
 
       const expectedSystem = Atom.encode("g8cust");
       const expectedType = Atom.encode("cust");
@@ -64,7 +65,7 @@ unit("EntityId", function () {
     });
 
     cs("pass-json-schema", function () {
-      const entityId = EntityId.parse(VALID_ENTITY_IDS.JSON);
+      const entityId = EntityId.parse(VALID_ENTITY_URIS.JSON_SCHEMA);
 
       const expectedSystem = Atom.encode("g8cust");
       const expectedType = Atom.encode("cust");
@@ -83,7 +84,7 @@ unit("EntityId", function () {
   unit(".tryParse()", function () {
 
     cs("pass-eml-schema", function () {
-      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.EML_SCHEMA);
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_URIS.EML_SCHEMA);
 
       const expectedSystem = Atom.encode("g8cust");
       const expectedType = Atom.encode("cust");
@@ -98,7 +99,7 @@ unit("EntityId", function () {
     });
 
     cs("pass-default-schema", function () {
-      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.DEFAULT);
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_URIS.MISSING_SCHEMA);
 
       const expectedSystem = Atom.encode("g8prod");
       const expectedType = Atom.encode("sku");
@@ -113,7 +114,7 @@ unit("EntityId", function () {
     });
 
     cs("pass-gdid-schema", function () {
-      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.GDID);
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_URIS.GDID_SCHEMA);
 
       const expectedSystem = Atom.encode("g8cust");
       const expectedType = Atom.encode("cust");
@@ -128,7 +129,7 @@ unit("EntityId", function () {
     });
 
     cs("pass-json-schema", function () {
-      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_IDS.JSON);
+      const entityIdResponse = EntityId.tryParse(VALID_ENTITY_URIS.JSON_SCHEMA);
 
       const expectedSystem = Atom.encode("g8cust");
       const expectedType = Atom.encode("cust");
@@ -148,8 +149,8 @@ unit("EntityId", function () {
   unit(".isEqual()", function () {
 
     cs("pass-when-equal", function () {
-      const a = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
-      const b = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
+      const a = EntityId.parse(VALID_ENTITY_URIS.MISSING_SCHEMA);
+      const b = EntityId.parse(VALID_ENTITY_URIS.MISSING_SCHEMA);
 
       aver.isTrue(a.equals(b));
     });
@@ -158,9 +159,9 @@ unit("EntityId", function () {
   unit(".compareTo()", function () {
 
     cs("pass-when-sorted", function () {
-      const one = EntityId.parse(VALID_ENTITY_IDS.DEFAULT);
-      const two = EntityId.parse(VALID_ENTITY_IDS.EML_SCHEMA);
-      const three = EntityId.parse(VALID_ENTITY_IDS.JSON);
+      const one = EntityId.parse(VALID_ENTITY_URIS.MISSING_SCHEMA);
+      const two = EntityId.parse(VALID_ENTITY_URIS.EML_SCHEMA);
+      const three = EntityId.parse(VALID_ENTITY_URIS.JSON_SCHEMA);
       const unsorted = [three, two, one];
 
       const sorted = unsorted.slice().sort((a, b) => a.compareTo(b));
@@ -169,6 +170,44 @@ unit("EntityId", function () {
       aver.areEqual(sorted.indexOf(one), 0);
       aver.areEqual(sorted.indexOf(two), 1);
       aver.areEqual(sorted.indexOf(three), 2);
+    });
+  });
+
+  unit(".toString()", function () {
+
+    cs("pass-when-matches-original-parse-value-type-is-0", function () {
+      const parseValue = VALID_ENTITY_URIS.MISSING_SCHEMA;
+      const entityId = EntityId.parse(parseValue);
+
+      aver.areEqual(entityId.toString(), parseValue);
+    });
+
+    cs("pass-when-matches-original-parse-value-schema-is-0", function () {
+      const parseValue = VALID_ENTITY_URIS.MISSING_TYPE_SCHEMA;
+      const entityId = EntityId.parse(parseValue);
+
+      aver.areEqual(entityId.toString(), parseValue);
+    });
+
+    cs("pass-when-matches-original-parse-value2", function () {
+      const parseValue = VALID_ENTITY_URIS.EML_SCHEMA;
+      const entityId = EntityId.parse(parseValue);
+
+      aver.areEqual(entityId.toString(), parseValue);
+    });
+
+    cs("pass-when-matches-original-parse-value3", function () {
+      const parseValue = VALID_ENTITY_URIS.GDID_SCHEMA;
+      const entityId = EntityId.parse(parseValue);
+
+      aver.areEqual(entityId.toString(), parseValue);
+    });
+
+    cs("pass-when-matches-original-parse-value4", function () {
+      const parseValue = VALID_ENTITY_URIS.JSON_SCHEMA;
+      const entityId = EntityId.parse(parseValue);
+
+      aver.areEqual(entityId.toString(), parseValue);
     });
   });
 });
