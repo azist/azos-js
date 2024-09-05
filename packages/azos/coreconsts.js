@@ -41,4 +41,6 @@ export const CONTENT_TYPE = Object.freeze({
 /** Creates an `Error` exception ready to be thrown indicating that operation is abstract and is not implemented */
 export function ABSTRACT(nm){ return new Error(`Method '${nm ?? UNDEFINED}' is abstract`); }
 
+/** Developer helper function: Creates an `Error` exception ready to be thrown indicating that the operation is not implemented */
+export function UNIMPLEMENTED(nm) {return new Error(`Method '${nm ?? UNDEFINED}' is unimplemented`);}
 

@@ -4,6 +4,17 @@ a
 ver. 0.0.1 20230923 DKh<br>rev. 20231122 DKh
 
 
+## Naming conventions
+
+### Runner/Unit Testing
+1. Unit name: (e.g., `.myMethod()`)
+  1. Should start with a dot and follows function name
+  2. Should match pascal casing unless it is a function-specific unit in which case
+2. Case name: (e.g., `my-case-01`)
+  1. Should be lowercase
+  2. Dashes should replace spaces
+  3. Decimal numbers allowed
+
 
 ## Testing
 

@@ -17,6 +17,7 @@ import * as sut from "azos/linker";
 
 class IWeather extends mod.Module{
   constructor(dir, cfg){ super(dir, cfg); }
+  // eslint-disable-next-line no-unused-vars
   getWeather(code){ throw ABSTRACT("IWeather.getWeather()"); }
 }
 

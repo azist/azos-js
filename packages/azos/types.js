@@ -31,7 +31,7 @@ export const ORDER_PROP = Symbol("order");
  * of entities which need to finalize their lifecycle (e.g. write a trailer to disk file).
  * The standard is aligned with the new "using" resource block, as it uses system symbol when available
  */
-export const DISPOSE_METHOD =  (typeof Symbol.dispose === 'undefined') ? Symbol("dispose") : Symbol.dispose;
+export const DISPOSE_METHOD = (typeof Symbol.dispose === 'undefined') ? Symbol("dispose") : Symbol.dispose;
 
 /**
  * When implemented, returns true if the object was already disposed.
@@ -51,7 +51,7 @@ export const DESTRUCTOR_METHOD = Symbol("destructor");
  * @param {*} v value to dispose (such as an object)
  * @returns true if disposable protocol was called, false if the entity does not support protocol
  */
-export function dispose(v){
+export function dispose(v) {
   if (v !== undefined && v !== null) {
     const dsp = v[DISPOSE_METHOD];
     if (dsp !== undefined) {
@@ -65,7 +65,7 @@ export function dispose(v){
 /**
  * Provides implementation base for disposable objects by implementing base system protocols
  */
-export class DisposableObject{
+export class DisposableObject {
   #disposed = false;
 
   /**
@@ -73,7 +73,7 @@ export class DisposableObject{
    * Does nothing if the object was already disposed.
    * Override {@link DESTRUCTOR_METHOD} instead
    */
-  [DISPOSE_METHOD](){
+  [DISPOSE_METHOD]() {
     if (this.#disposed) return;
     this.#disposed = true;
     this[DESTRUCTOR_METHOD]();
@@ -82,10 +82,10 @@ export class DisposableObject{
   /**
    * Override this method to perform custom actions on dispose
    */
-  [DESTRUCTOR_METHOD](){  }
+  [DESTRUCTOR_METHOD]() { }
 
   /** Returns true if the object was already disposed */
-  get [DISPOSED_PROP](){ return this.#disposed; }
+  get [DISPOSED_PROP]() { return this.#disposed; }
 }
 
 
@@ -108,7 +108,7 @@ export class AzosError extends Error {
    * @param {Error | object} cause
    * @param {int} code
    */
-  constructor(message, from = null, cause = null, code = 0){
+  constructor(message, from = null, cause = null, code = 0) {
     super(message);
     code |= 0;
     from = asString(from);
@@ -121,29 +121,29 @@ export class AzosError extends Error {
   }
 
   /** Returns client-facing message, such as a validation message */
-  get [CLIENT_MESSAGE_PROP](){ return null; }
+  get [CLIENT_MESSAGE_PROP]() { return null; }
 
   /** Returns the name of the causing site - maps to "from" field in log chronicle */
-  get from(){ return this.#from; }
+  get from() { return this.#from; }
 
   /** Returns status code, by convention HTTP status codes are used, e.g. 400, 500 etc. */
-  get code(){ return this.#code; }
+  get code() { return this.#code; }
 
   /** Override to change namespace which is returned from external status */
-  get ns(){ return "js"; }
+  get ns() { return "js"; }
 
-  toString(){ return `${this.name}: ${this.message}` }
+  toString() { return `${this.name}: ${this.message}` }
 
   /** Override to add details which are provided to callers via external status,
    * for example validation exception adds schema and field names so it can be structurally gotten
    * by the handler
    */
-  provideExternalStatus(){ return { ns: this.ns }; }
+  provideExternalStatus() { return { ns: this.ns }; }
 }
 
 /** Provides uniform base for Localization-related exceptions */
 export class LclError extends AzosError { //declared here to avoid circular reference between modules
-  constructor(message, from = null, cause = null){ super(message, from, cause, 518); }
+  constructor(message, from = null, cause = null) { super(message, from, cause, 518); }
 }
 
 
@@ -152,7 +152,7 @@ export class LclError extends AzosError { //declared here to avoid circular refe
  * Returns true if the argument is assigned - not undefined non-null value, even an empty string is assigned
  * @param {*} v value
  */
-export function isAssigned(v){
+export function isAssigned(v) {
   return v !== undefined && v !== null;//warning:  if (!v) is not the same test!
 }
 
@@ -161,7 +161,7 @@ export function isAssigned(v){
  * @param {*} obj object to test
  * @param {string|symbol} prop property to test
  */
-export function hown(obj, prop){
+export function hown(obj, prop) {
   // in 2023 a candidate for Object.hasOwn() which is not yet widely supported
   return obj ? hasOwnProperty.call(obj, prop) : false;
 }
@@ -172,7 +172,7 @@ export function hown(obj, prop){
  * Note: object.values() is not widely supported yet
  * @returns {[*]} Array of all object values
  */
-export function allObjectValues(o){
+export function allObjectValues(o) {
   if (!isAssigned(o)) return [];
   return Object.keys(o).map(k => o[k]);
 }
@@ -184,7 +184,7 @@ export function allObjectValues(o){
  * @param {*} elm element to delete
  * @returns {boolean} true if element was found and deleted
  */
-export function arrayDelete(array, elm){
+export function arrayDelete(array, elm) {
   const idx = array.indexOf(elm);
   if (idx === -1) return false;
   array.splice(idx, 1);
@@ -195,7 +195,7 @@ export function arrayDelete(array, elm){
  * Creates a shallow copy of the array.
  * Warning: this is an "unsafe" method as it does not do any args checks for speed
  */
-export function arrayCopy(array){
+export function arrayCopy(array) {
   return array.slice();
 }
 
@@ -204,16 +204,24 @@ export function arrayCopy(array){
  * Warning: this is an "unsafe" method as it does not do any args checks for speed
  * @param {Array} array to clear
  */
-export function arrayClear(array){
-  array.length=0;
+export function arrayClear(array) {
+  array.length = 0;
   return array;
+}
+
+/**
+ * Returns true if the argument is BigInt
+ * @param {*} v
+ */
+export function isBigInt(v) {
+  return Object.prototype.toString.call(v) === "[object BigInt]";
 }
 
 /**
  * Returns true if the argument is a non null string
  * @param {*} v
  */
-export function isString(v){
+export function isString(v) {
   return Object.prototype.toString.call(v) === "[object String]";
 }
 
@@ -221,7 +229,7 @@ export function isString(v){
  * Returns true if the argument is a non null date
  * @param {*} v
  */
-export function isDate(v){
+export function isDate(v) {
   return Object.prototype.toString.call(v) === "[object Date]";
 }
 
@@ -229,7 +237,7 @@ export function isDate(v){
  * Returns true when the passed parameter is an array, not a map or function
  * @param {*} v
  */
-export function isArray(v){
+export function isArray(v) {
   return Object.prototype.toString.call(v) === "[object Array]";
 }
 
@@ -237,7 +245,7 @@ export function isArray(v){
  * Returns true when the passed parameter is an object, not an array or function
  * @param {*} v
  */
-export function isObject(v){
+export function isObject(v) {
   return v === Object(v) && !isArray(v) && !isFunction(v);
 }
 
@@ -245,15 +253,15 @@ export function isObject(v){
  * Returns true when the passed parameter is an array, or object but not a function
  * @param {*} v
  */
-export function isObjectOrArray(v){
-  return  v === Object(v)  && !isFunction(v);
+export function isObjectOrArray(v) {
+  return v === Object(v) && !isFunction(v);
 }
 
 /**
  * Returns true when passed parameter is a function, not a map object or an array
  * @param {*} v
  */
-export function isFunction(v){
+export function isFunction(v) {
   const t = Object.prototype.toString.call(v);
   return t === "[object Function]" || t === "[object GeneratorFunction]" || t === "[object AsyncFunction]";
 }
@@ -262,15 +270,15 @@ export function isFunction(v){
  * Returns true when the passed parameter is a function, or object but not an array or primitive
  * @param {*} v
  */
-export function isObjectOrFunction(v){
-  return  v === Object(v)  && !isArray(v);
+export function isObjectOrFunction(v) {
+  return v === Object(v) && !isArray(v);
 }
 
 /**
  * Returns true when the passed value implements Iterable protocol
  * @param {*} v
  */
-export function isIterable(v){
+export function isIterable(v) {
   return isAssigned(v) && isFunction(v[Symbol.iterator]);
 }
 
@@ -279,26 +287,26 @@ export function isIterable(v){
  * Returns true if the argument is an int32 value
  * @param {*} v
  */
-export function isInt32(v){
+export function isInt32(v) {
   if (Number.isInteger) return Number.isInteger(v);
-  return v === (v|0);
+  return v === (v | 0);
 }
 
 /**
  * Returns true if the value is either integer number or a string representing an integer number
  * @param {int|string} v Value to check
  */
-export function isIntValue(v){
+export function isIntValue(v) {
   if (isNaN(v)) return false;
   let x = parseFloat(v);
-  return x === (x|0);
+  return x === (x | 0);
 }
 
 /**
  * Return true if the value is a Number
  * @param {*} v Value to check
  */
-export function isNumber(v){
+export function isNumber(v) {
   return Object.prototype.toString.call(v) === "[object Number]";
 }
 
@@ -306,7 +314,7 @@ export function isNumber(v){
  * Return true if the value is a boolean
  * @param {*} v Value to check
  */
-export function isBool(v){
+export function isBool(v) {
   return Object.prototype.toString.call(v) === "[object Boolean]";
 }
 
@@ -314,7 +322,7 @@ export function isBool(v){
  * Return true if the value is a symbol
  * @param {*} v Value to check
  */
-export function isSymbol(v){
+export function isSymbol(v) {
   return Object.prototype.toString.call(v) === "[object Symbol]";
 }
 
@@ -324,24 +332,24 @@ export function isSymbol(v){
  * Keep in mind that in JS typeof(new String|Date|Number|Boolean(x)) is object, not the actual type, hence this method :)
  * @param {*} v
  */
-export function describeTypeOf(v){
-  if(v === undefined) return CC.UNDEFINED;
-  if(v === null) return CC.NULL;
+export function describeTypeOf(v) {
+  if (v === undefined) return CC.UNDEFINED;
+  if (v === null) return CC.NULL;
 
   // typeof( Boolean(true)) === 'boolean'
   // typeof( new Boolean(true)) === 'object'
   // same for Date, Number, String, [] === object etc
 
 
-  if (isDate(v))     return "date";
+  if (isDate(v)) return "date";
   if (isFunction(v)) return "function";
-  if (isString(v))   return "string";
-  if (isArray(v))    return "array";
-  if (isNumber(v))   return "number";
-  if (isBool(v))     return "boolean";
-  if (isIterable(v)) return typeof(v)+"+Iterable";
+  if (isString(v)) return "string";
+  if (isArray(v)) return "array";
+  if (isNumber(v)) return "number";
+  if (isBool(v)) return "boolean";
+  if (isIterable(v)) return typeof (v) + "+Iterable";
 
-  return typeof(v);
+  return typeof (v);
 }
 
 /**
@@ -349,7 +357,7 @@ export function describeTypeOf(v){
  * @param {Object} obj object instance to get a class function from
  * @returns Constructor function of the object or null
  */
-export function classOf(obj){
+export function classOf(obj) {
   if (!isObject(obj)) return null;
   let result = obj.constructor;
   return result;
@@ -359,7 +367,7 @@ export function classOf(obj){
  * Returns the parent class (prototype) of the specified class (function) or null if the class is the top-most class
  * @param {function} cls class to get a parent of
  */
-export function parentOfClass(cls){
+export function parentOfClass(cls) {
   if (!isFunction(cls)) return null;
   let result = Object.getPrototypeOf(cls);
   return result.name === "" ? null : result;
@@ -371,7 +379,7 @@ export function parentOfClass(cls){
  * @param {Function} base base type
  * @returns {boolean} true when `t` is a subtype of `base`
  */
-export function isSubclassOf(t, base){
+export function isSubclassOf(t, base) {
   if (!isFunction(t) && !isFunction(base)) return false;
   return t.prototype instanceof base;
   // while(t!==null){
@@ -387,7 +395,7 @@ export function isSubclassOf(t, base){
  * @param {Object} ext An extension to mix into obj
  * @param {boolean} [keepExisting=false] True to keep existing props even if they are null
  */
-export function mixin(obj, ext, keepExisting = false){
+export function mixin(obj, ext, keepExisting = false) {
   if (!isAssigned(obj)) return null;
   if (!isAssigned(ext)) return obj;
 
@@ -422,7 +430,7 @@ export function mixin(obj, ext, keepExisting = false){
  * @param {Object|Array} org Optional origin of the chain, used by chain nav() calls
  * @returns {NavResult} Navigation result object
  */
-export function nav(obj, path, org){
+export function nav(obj, path, org) {
   let result = {
     orig: isAssigned(org) ? org : obj,
     root: obj,
@@ -435,13 +443,13 @@ export function nav(obj, path, org){
   if (!isAssigned(obj)) return result;
   if (!isAssigned(path)) return result;
 
-  if (isString(path)){
-    path = path.split(".").filter(s => s.length>0);
+  if (isString(path)) {
+    path = path.split(".").filter(s => s.length > 0);
   }
 
   result.full = false;
   result.value = obj;
-  for(let i in path){
+  for (let i in path) {
     if (!isObjectOrArray(result.value)) return result;
 
     let seg = path[i];
@@ -460,7 +468,7 @@ export function nav(obj, path, org){
  * Returns false only if an iterable was supplied and it yields at least one value, true in all other cases
  * @param {*} iterable Iterable object
  */
-export function isEmptyIterable(iterable){
+export function isEmptyIterable(iterable) {
   if (!isIterable(iterable)) return true;
   const iterator = iterable[Symbol.iterator]();
   return iterator.next().done === true;
@@ -472,41 +480,41 @@ export function isEmptyIterable(iterable){
  * @param {*} v Value
  * @param {boolean} canUndef True to preserve undefined
  */
-export function asString(v, canUndef = false){ return strings.asString(v, canUndef); }
+export function asString(v, canUndef = false) { return strings.asString(v, canUndef); }
 
 
 /**
  * Returns true if the argument is a non-empty value of a string type
  * @param {*} v value
  */
-export function isNonEmptyString(v){
+export function isNonEmptyString(v) {
   if (!isString(v)) return false;
   return !strings.isEmpty(v);
 }
 
 
 /** Character cases */
-export const CHAR_CASE = Object.freeze({ ASIS:  "asis", UPPER: "upper", LOWER: "lower", CAPS: "caps", CAPSNORM: "capsnorm"});
+export const CHAR_CASE = Object.freeze({ ASIS: "asis", UPPER: "upper", LOWER: "lower", CAPS: "caps", CAPSNORM: "capsnorm" });
 const ALL_CHAR_CASES = allObjectValues(CHAR_CASE);
 
 /** Data Entry field kinds */
 export const DATA_KIND = Object.freeze({
-  TEXT:          "text",
-  SCREENNAME:    "screenname",
-  COLOR:         "color",
-  DATE:          "date",
-  DATETIME:      "datetime",
+  TEXT: "text",
+  SCREENNAME: "screenname",
+  COLOR: "color",
+  DATE: "date",
+  DATETIME: "datetime",
   DATETIMELOCAL: "datetime-local",
-  EMAIL:   "email",
-  MONTH:   "month",
-  NUMBER:  "number",
-  RANGE:   "range",
-  SEARCH:  "search",
-  TEL:     "tel",
-  TIME:    "time",
-  URL:     "url",
-  WEEK:    "week",
-  MONEY:   "money"
+  EMAIL: "email",
+  MONTH: "month",
+  NUMBER: "number",
+  RANGE: "range",
+  SEARCH: "search",
+  TEL: "tel",
+  TIME: "time",
+  URL: "url",
+  WEEK: "week",
+  MONEY: "money"
 });
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
 
@@ -515,7 +523,7 @@ const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
  * @param {*} v value to convert
  * @returns {CHAR_CASE}
  */
-export function asCharCase(v){
+export function asCharCase(v) {
   v = strings.asString(v).toLowerCase();
   if (strings.isOneOf(v, ALL_CHAR_CASES, true)) return v;
   return CHAR_CASE.ASIS;
@@ -527,7 +535,7 @@ export function asCharCase(v){
  * @param {*} v value to convert
  * @returns {DATA_KIND}
  */
-export function asDataKind(v){
+export function asDataKind(v) {
   v = strings.asString(v).toLowerCase();
   if (strings.isOneOf(v, ALL_DATA_KINDS, true)) return v;
   return DATA_KIND.TEXT;
@@ -542,9 +550,9 @@ const TRUISMS = Object.freeze(["true", "t", "yes", "1", "ok"]);
  * Yields true only on (bool)true, 1, or ["true", "t", "yes", "1", "ok"]
  * @param {any} v object to test
  */
-export function asBool(v){
+export function asBool(v) {
   if (!v) return false;
-  if (v===true || v===1) return true;
+  if (v === true || v === 1) return true;
   if (isFunction(v[AS_BOOLEAN_FUN])) return v[AS_BOOLEAN_FUN]() === true;
   return strings.isOneOf(v, TRUISMS);
 }
@@ -555,14 +563,14 @@ export function asBool(v){
  * Yields true only on (bool)true, 1, or ["true", "t", "yes", "1", "ok"]. Undefined input is returned as-is
  * @param {any} v object to test
  */
-export function asTriBool(v){
-  if (v===undefined) return undefined;
+export function asTriBool(v) {
+  if (v === undefined) return undefined;
   if (!v) return false;
-  if (v===true || v===1) return true;
-  if (isFunction(v[AS_BOOLEAN_FUN])){
+  if (v === true || v === 1) return true;
+  if (isFunction(v[AS_BOOLEAN_FUN])) {
     const r = v[AS_BOOLEAN_FUN]();
-    if (r===undefined) return undefined;
-    return r===true;
+    if (r === undefined) return undefined;
+    return r === true;
   }
   return strings.isOneOf(v, TRUISMS);
 }
@@ -583,30 +591,30 @@ const CAST_ERROR = "Cast error: ";
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asInt(v, canUndef=false){
-  if (v===undefined) return canUndef ? undefined : 0;
-  if (v===null) return 0;
+export function asInt(v, canUndef = false) {
+  if (v === undefined) return canUndef ? undefined : 0;
+  if (v === null) return 0;
 
-  if (isFunction(v[AS_INTEGER_FUN])){
+  if (isFunction(v[AS_INTEGER_FUN])) {
     const r = v[AS_INTEGER_FUN]();
-    if (r===undefined) return canUndef ? undefined : 0;
-    if (r===null) return 0;
+    if (r === undefined) return canUndef ? undefined : 0;
+    if (r === null) return 0;
     return r | 0;
   }
 
-  if (isString(v)){
+  if (isString(v)) {
     const ov = v;
     v = strings.trim(v);
-    if (v.startsWith("0x")){
+    if (v.startsWith("0x")) {
       v = v.substring(2);
       v = (REXP_HEX.test(v)) ? parseInt(v, 16) : NaN;
-    } else if (v.startsWith("0b")){
+    } else if (v.startsWith("0b")) {
       v = v.substring(2);
       v = (REXP_BIN.test(v)) ? parseInt(v, 2) : NaN;
     } else {
       v = (REXP_NUMBER.test(v)) ? parseFloat(v) : NaN;
     }
-    if (isNaN(v)) throw new AzosError(CAST_ERROR+`asInt("${strings.describe(ov)}")`);
+    if (isNaN(v)) throw new AzosError(CAST_ERROR + `asInt("${strings.describe(ov)}")`);
   }
 
   return v | 0;
@@ -617,15 +625,15 @@ export function asInt(v, canUndef=false){
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asReal(v, canUndef=false){
-  if (v===undefined) return canUndef ? undefined : 0;
-  if (v===null) return 0;
+export function asReal(v, canUndef = false) {
+  if (v === undefined) return canUndef ? undefined : 0;
+  if (v === null) return 0;
 
-  if (isString(v)){
+  if (isString(v)) {
     const ov = v;
     v = strings.trim(v);
     v = (REXP_NUMBER.test(v)) ? parseFloat(v) : NaN;
-    if (isNaN(v)) throw new AzosError(CAST_ERROR+`asReal("${strings.describe(ov)}")`);
+    if (isNaN(v)) throw new AzosError(CAST_ERROR + `asReal("${strings.describe(ov)}")`);
   }
   return 1.0 * v;
 }
@@ -638,9 +646,9 @@ export const MONEY_MULT = 10000;
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asMoney(v, canUndef=false){
+export function asMoney(v, canUndef = false) {
   v = asReal(v, canUndef);
-  if (v===undefined) return undefined;
+  if (v === undefined) return undefined;
   return ((v * MONEY_MULT) | 0) / MONEY_MULT;
 }
 
@@ -649,19 +657,19 @@ export function asMoney(v, canUndef=false){
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asDate(v, canUndef=false){
-  if (v===undefined) return canUndef ? undefined : new Date(0);
-  if (v===null) return new Date(0);
+export function asDate(v, canUndef = false) {
+  if (v === undefined) return canUndef ? undefined : new Date(0);
+  if (v === null) return new Date(0);
   if (isDate(v)) return v;
 
   if (isIntValue(v)) return new Date(asInt(v));
 
-  if (isString(v)){
+  if (isString(v)) {
     const ts = Date.parse(v);
     if (!isNaN(ts)) return new Date(ts);
   }
 
-  throw new AzosError(CAST_ERROR+`asDate("${strings.describe(v)}")`);
+  throw new AzosError(CAST_ERROR + `asDate("${strings.describe(v)}")`);
 }
 
 /**
@@ -669,17 +677,17 @@ export function asDate(v, canUndef=false){
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asObject(v, canUndef=false){
-  if (v===undefined) return canUndef ? undefined : null;
-  if (v===null) return null;
+export function asObject(v, canUndef = false) {
+  if (v === undefined) return canUndef ? undefined : null;
+  if (v === null) return null;
   if (isObject(v)) return v;
 
-  try{
+  try {
     let obj = JSON.parse(asString(v));
-    if (!isObject(obj)) throw new AzosError(CAST_ERROR+`asObject("${strings.describe(v)}") -> not object`);
+    if (!isObject(obj)) throw new AzosError(CAST_ERROR + `asObject("${strings.describe(v)}") -> not object`);
     return obj;
-  }catch(e){
-    throw new AzosError(CAST_ERROR+`asObject("${strings.describe(v)}") -> ${e.message}`);
+  } catch (e) {
+    throw new AzosError(CAST_ERROR + `asObject("${strings.describe(v)}") -> ${e.message}`);
   }
 }
 
@@ -688,32 +696,32 @@ export function asObject(v, canUndef=false){
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asArray(v, canUndef=false){
-  if (v===undefined) return canUndef ? undefined : null;
-  if (v===null) return null;
+export function asArray(v, canUndef = false) {
+  if (v === undefined) return canUndef ? undefined : null;
+  if (v === null) return null;
   if (isArray(v)) return v;
   if (isIterable(v) && !isString(v)) return [...v];
 
-  try{
+  try {
     let arr = JSON.parse(asString(v));
-    if (!isArray(arr)) throw new AzosError(CAST_ERROR+`asArray("${strings.describe(v)}") -> not array`);
+    if (!isArray(arr)) throw new AzosError(CAST_ERROR + `asArray("${strings.describe(v)}") -> not array`);
     return arr;
-  }catch(e){
-    throw new AzosError(CAST_ERROR+`asArray("${strings.describe(v)}") -> ${e.message}`, "asArray()", e);
+  } catch (e) {
+    throw new AzosError(CAST_ERROR + `asArray("${strings.describe(v)}") -> ${e.message}`, "asArray()", e);
   }
 }
 
 
 /** Data Type Monikers */
 export const TYPE_MONIKER = Object.freeze({
-  STRING:   "str",
-  INT:      "int",
-  REAL:     "real",
-  MONEY:    "money",
-  BOOL:     "bool",
-  DATE:     "date",
-  OBJECT:   "object",
-  ARRAY:    "array"
+  STRING: "str",
+  INT: "int",
+  REAL: "real",
+  MONEY: "money",
+  BOOL: "bool",
+  DATE: "date",
+  OBJECT: "object",
+  ARRAY: "array"
 });
 const ALL_TYPE_MONIKERS = allObjectValues(TYPE_MONIKER);
 
@@ -722,7 +730,7 @@ const ALL_TYPE_MONIKERS = allObjectValues(TYPE_MONIKER);
  * @param {*} v string moniker
  * @returns {TYPE_MONIKER} .STRING as default
  */
-export function asTypeMoniker(v){
+export function asTypeMoniker(v) {
   v = strings.asString(v).toLowerCase();
   if (strings.isOneOf(v, ALL_TYPE_MONIKERS, true)) return v;
   return TYPE_MONIKER.STRING;
@@ -734,19 +742,19 @@ export function asTypeMoniker(v){
  * @param {TYPE_MONIKER} tmon type moniker
  * @param {boolean} [canUndef] true to allow undefined values
  */
-export function cast(v, tmon, canUndef=false){
-  if (arguments.length<2) throw new AzosError("cast(v, tmon) missing 2 req args");
+export function cast(v, tmon, canUndef = false) {
+  if (arguments.length < 2) throw new AzosError("cast(v, tmon) missing 2 req args");
   tmon = asTypeMoniker(tmon);
 
-  switch(tmon){
-    case TYPE_MONIKER.STRING:   return asString(v, canUndef);
-    case TYPE_MONIKER.INT:      return asInt(v, canUndef);
-    case TYPE_MONIKER.REAL:     return asReal(v, canUndef);
-    case TYPE_MONIKER.MONEY:    return asMoney(v, canUndef);
-    case TYPE_MONIKER.BOOL:     return canUndef ? asTriBool(v) : asBool(v);
-    case TYPE_MONIKER.DATE:     return asDate(v, canUndef);
-    case TYPE_MONIKER.OBJECT:   return asObject(v, canUndef);
-    case TYPE_MONIKER.ARRAY:    return asArray(v, canUndef);
+  switch (tmon) {
+    case TYPE_MONIKER.STRING: return asString(v, canUndef);
+    case TYPE_MONIKER.INT: return asInt(v, canUndef);
+    case TYPE_MONIKER.REAL: return asReal(v, canUndef);
+    case TYPE_MONIKER.MONEY: return asMoney(v, canUndef);
+    case TYPE_MONIKER.BOOL: return canUndef ? asTriBool(v) : asBool(v);
+    case TYPE_MONIKER.DATE: return asDate(v, canUndef);
+    case TYPE_MONIKER.OBJECT: return asObject(v, canUndef);
+    case TYPE_MONIKER.ARRAY: return asArray(v, canUndef);
     default: return asString(v, canUndef);
   }
 }
@@ -755,7 +763,7 @@ export function cast(v, tmon, canUndef=false){
 //crypto module is NOT loaded by default on node. Need async fallback.
 //On browser it is pre-loaded as-is
 //let cryptoModule = null;
-let cryptoModule = typeof(window) !== "undefined" ? window.crypto : null;
+let cryptoModule = typeof (window) !== "undefined" ? window.crypto : null;
 
 ////20231226 DKh commented because parcel browserifies this with 3.5 mb of polyfill which we do not need
 //// If you need to run this on node, we will figure it out in future using import vuia Data uri see:
@@ -771,24 +779,24 @@ let cryptoModule = typeof(window) !== "undefined" ? window.crypto : null;
  * based on crypto api facade
  * @param {int} cnt
  */
-export function getRndBytes(cnt = 16){
+export function getRndBytes(cnt = 16) {
   cnt = cnt | 0;
-  if (cnt <= 0) cnt =16;
+  if (cnt <= 0) cnt = 16;
   const buf = new Uint8Array(cnt);
-  if (cryptoModule !== null){
+  if (cryptoModule !== null) {
     cryptoModule.getRandomValues(buf);
   } else { //async fallback, use pseudo generation
     let s1 = performance.now() * 1000 | 0;
     let s2 = Date.now() | 0;
     let r = 0;
-    for(let i=0; i<cnt; i++){
-      if (r==0) r = Math.random() * 0xffffffff | 0;
+    for (let i = 0; i < cnt; i++) {
+      if (r == 0) r = Math.random() * 0xffffffff | 0;
       buf[i] = r & 0xff;
       r = r >>> 8;
-      if (s1>0){
+      if (s1 > 0) {
         buf[i] = buf[i] ^ (s1 & 0xff);
         s1 = s1 >>> 8;
-      } else if (s2>0){
+      } else if (s2 > 0) {
         buf[i] = buf[i] ^ (s2 & 0xff);
         s2 = s2 >>> 8;
       }
@@ -802,24 +810,24 @@ export function getRndBytes(cnt = 16){
  * Generates a new v4 random guid
  * @returns {string} guid representation
  */
-export function genGuid(){
+export function genGuid() {
   if (cryptoModule !== null && cryptoModule.randomUUID) return cryptoModule.randomUUID();
 
   let rnd = getRndBytes(16);
   rnd[6] = 0x40 | (rnd[6] & 0x0f);
-  rnd[8] = 0xc0 | (rnd[8] & 0x1f) |  (rnd[8] & 0x0f);//Msft 110x type
+  rnd[8] = 0xc0 | (rnd[8] & 0x1f) | (rnd[8] & 0x0f);//Msft 110x type
 
   const srnd = strings.bufToHex(rnd);
-  const guid = `${srnd.slice(0, 8)}-${srnd.slice(8,12)}-${srnd.slice(12,16)}-${srnd.slice(16,20)}-${srnd.slice(20)}`;
+  const guid = `${srnd.slice(0, 8)}-${srnd.slice(8, 12)}-${srnd.slice(12, 16)}-${srnd.slice(16, 20)}-${srnd.slice(20)}`;
   return guid;
 }
 
 /** Macro caps value at minimum. No type checks are done */
-export function atMin(v, min){ return v < min ? min : v; }
+export function atMin(v, min) { return v < min ? min : v; }
 /** Macro caps value at maximum. No type checks are done */
-export function atMax(v, max){ return v > max ? max : v; }
+export function atMax(v, max) { return v > max ? max : v; }
 /** Macro keeps value between min/max. No type checks are done */
-export function keepBetween(v, min, max){ return v > min ? (v > max ? max : v) : min; }
+export function keepBetween(v, min, max) { return v > min ? (v > max ? max : v) : min; }
 
 /**
  * Takes a value, coercing it to string, optionally passing-through an undefined value;
@@ -830,16 +838,16 @@ export function keepBetween(v, min, max){ return v > min ? (v > max ? max : v) :
  * @param {boolean?} canUndef true to pass `undefined` through as-is
  * @returns {string} uri
  */
-export function trimUri(uri, lsl = false, tsl = false, canUndef = false){
+export function trimUri(uri, lsl = false, tsl = false, canUndef = false) {
   uri = strings.asString(uri, canUndef);
   if (uri === undefined) return undefined;
   uri = uri.trim();
-  if (lsl){
+  if (lsl) {
     if (!uri.startsWith("/")) uri = "/" + uri;
   }
 
-  if (tsl){
-    if (!uri.endsWith("/")) uri =  uri + "/";
+  if (tsl) {
+    if (!uri.endsWith("/")) uri = uri + "/";
   }
 
   return uri;

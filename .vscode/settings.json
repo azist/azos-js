@@ -8,6 +8,7 @@
         "coreconsts",
         "ctor",
         "descr",
+        "dscr",
         "endregion",
         "fskip",
         "hdrs",
@@ -16,12 +17,14 @@
         "LFROM",
         "linq",
         "nsplit",
+        "nums",
         "rasterizer",
         "sindent",
         "sysvc",
         "tapplet",
         "thandler",
         "tparent",
-        "uini"
+        "uini",
+        "virt"
     ]
 }
