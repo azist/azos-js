@@ -290,6 +290,25 @@ export function areEqualValues(a, b) {
   throw AVERMENT_FAILURE(`areEqualValues(${dv(a)}, ${dv(b)})`);
 }
 
+/**
+ * Performs strict equality check on arguments using valueOf().
+ * Do not confuse with areNotEqual() which is based on ===; i.e. new Date(0) !== new Date(0)
+ *   because those are different references, so date values must be equated using areNotEqualValues(), not
+ *  areNotEquals() which would equate object references instead. Note: strings are handled as special case,
+ * and may be equated using either of the methods.
+ * @param {*} a
+ * @param {*} b
+ * @returns undefined if a and b are same reference, a and b are assigned same values, or throws
+ */
+export function areNotEqualValues(a, b) {
+  if (a !== b) {
+    if (types.isAssigned(a) && types.isAssigned(b))
+      if (a.valueOf() !== b.valueOf()) return;
+  }
+
+  throw AVERMENT_FAILURE(`areEqualValues(${dv(a)}, ${dv(b)})`);
+}
+
 
 /**
  * Expects that function throws a message optionally containing the msg
