@@ -28,6 +28,8 @@
         "thandler",
         "tparent",
         "uini",
-        "virt"
+        "virt",
+        "xffffn",
+        "xffn",
     ]
 }
