@@ -22,11 +22,10 @@ export class Atom {
     if (id === undefined) { // not yet cached
       let ax = 0n;
       for (let i = 0; i < value.length; i++) {
-        let c = value.charCodeAt(i);
-
         if (!Atom.#isValidCharacter(value[i]))
           throw new AzosError(`Invalid character: ${value[i]} Atom.Encode(![0..9|A..Z|a..z|_|-])`);
 
+        let c = value.charCodeAt(i);
         ax |= BigInt(c) << BigInt(i * 8);
       }
 
