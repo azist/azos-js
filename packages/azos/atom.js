@@ -66,7 +66,7 @@ export class Atom {
         return { ok: false, value: undefined };
       }
     }
-    return { ok: false, value: undefined };
+    return this.tryEncode(valueOrId);
   }
 
   static #isValidCharacter(c) {
