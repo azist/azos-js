@@ -89,26 +89,26 @@ export class Atom {
   get value() /*: string | null */ {
     if (this.isZero) return null;
 
-    const val = Atom.#sCache.get(this.#id);
-    if (val !== undefined) return val;
+    const val = Atom.#sCache.get(this.#id); // get value from id
+    if (val !== undefined) return val; // already cached
 
     let result = '';
     let ax = this.#id;
 
     for (let i = 0; i < 8; i++) {
       let c = ax & 0x0ffn;
-      if (c == 0n) break;
+      if (c === 0n) break;
 
       let char = String.fromCharCode(Number(c));
 
       if (!Atom.#isValidCharacter(char))
-        throw new AzosError(`Invalid character: ${c[i]} Atom.Decode(![0..9|A..Z|a..z|_|-])`);
+        throw new AzosError(`Invalid character: ${char} Atom.Decode(![0..9|A..Z|a..z|_|-])`);
 
       result += char;
       ax >>= 8n;
     }
 
-    Atom.#sCache.set(this.#id, result);
+    Atom.#sCache.set(this.#id, result); // cache it
 
     return result;
   }
