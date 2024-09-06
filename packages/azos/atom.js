@@ -13,34 +13,34 @@ export class Atom {
   static ZERO = new Atom(0n);
 
   static encode(value /*:string | null */ = null) {
-    if (!value) return Atom.ZERO;
+    if (value === null || value === 0n || value === 0) return Atom.ZERO;
 
     aver.isNonEmptyMinMaxString(value, 1, 8);
 
-    let id = undefined;
-    for (let [k, v] of Atom.#sCache.entries()) {
-      if (v === value) {
-        id = k;
-        break;
-      }
-    }
+    let id = Atom.#fetchIdFromCacheByValue(value);
 
-    if (id === undefined) {
+    if (id === undefined) { // not yet cached
       let ax = 0n;
       for (let i = 0; i < value.length; i++) {
-        let c = value.charCodeAt(i);
-
         if (!Atom.#isValidCharacter(value[i]))
           throw new AzosError(`Invalid character: ${value[i]} Atom.Encode(![0..9|A..Z|a..z|_|-])`);
 
+        let c = value.charCodeAt(i);
         ax |= BigInt(c) << BigInt(i * 8);
       }
 
-      Atom.#sCache.set(ax, value);
+      Atom.#sCache.set(ax, value); // cache it
       id = ax;
     }
 
     return new Atom(id);
+  }
+
+  static #fetchIdFromCacheByValue(value) {
+    for (let [k, v] of Atom.#sCache.entries()) { // get id from cached value
+      if (v === value) return k;
+    }
+    return undefined;
   }
 
   static tryEncode(value /*:string | null*/ = null) {
@@ -66,7 +66,7 @@ export class Atom {
         return { ok: false, value: undefined };
       }
     }
-    return { ok: false, value: undefined };
+    return this.tryEncode(valueOrId);
   }
 
   static #isValidCharacter(c) {
@@ -86,38 +86,29 @@ export class Atom {
 
   get id() { return this.#id; }
 
-  constructor(id = 0n) {
-    if (isBigInt(id))
-      this.#id = id;
-    else if (isNumber(id))
-      this.#id = BigInt(id);
-    else
-      throw new AzosError("Should call encode()");
-  }
-
   get value() /*: string | null */ {
     if (this.isZero) return null;
 
-    const val = Atom.#sCache.get(this.#id);
-    if (val !== undefined) return val;
+    const val = Atom.#sCache.get(this.#id); // get value from id
+    if (val !== undefined) return val; // already cached
 
     let result = '';
     let ax = this.#id;
 
     for (let i = 0; i < 8; i++) {
       let c = ax & 0x0ffn;
-      if (c == 0n) break;
+      if (c === 0n) break;
 
       let char = String.fromCharCode(Number(c));
 
       if (!Atom.#isValidCharacter(char))
-        throw new AzosError(`Invalid character: ${c[i]} Atom.Decode(![0..9|A..Z|a..z|_|-])`);
+        throw new AzosError(`Invalid character: ${char} Atom.Decode(![0..9|A..Z|a..z|_|-])`);
 
       result += char;
       ax >>= 8n;
     }
 
-    Atom.#sCache.set(this.#id, result);
+    Atom.#sCache.set(this.#id, result); // cache it
 
     return result;
   }
@@ -138,12 +129,14 @@ export class Atom {
     let ax = this.#id;
 
     for (let i = 0; i < 8; i++) {
-      let c = ax & 0xff;
-      if (c == 0) break;
+      let c = ax & 0x0ffn;
+      if (c === 0n) break;
 
-      if (!Atom.#isValidCharacter(c)) return false;
+      let char = String.fromCharCode(Number(c));
 
-      ax >>= 8;
+      if (!Atom.#isValidCharacter(char)) return false;
+
+      ax >>= 8n;
     }
 
     return true;
@@ -163,6 +156,15 @@ export class Atom {
     }
 
     return length;
+  }
+
+  constructor(id = 0n) {
+    if (isBigInt(id))
+      this.#id = id;
+    else if (isNumber(id))
+      this.#id = BigInt(id);
+    else
+      throw new AzosError("Should call encode()");
   }
 
   equals(other) {
@@ -186,17 +188,11 @@ export class Atom {
 
   /**
    * Called before toString
-   * @returns
+   * @returns value
    */
-  valueOf() {
-    return this.#id;
-  }
+  valueOf() { return this.value; }
 
-  toString() {
-    return this.value || '';
-  }
+  toString() { return this.value; }
 
-  toJSON() {
-    return this.value || '#0';
-  }
+  toJSON() { return this.value || '#0'; }
 }
