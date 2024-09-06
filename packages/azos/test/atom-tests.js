@@ -144,6 +144,18 @@ unit("Atom", function () {
 
   unit("constructor()", function () {
 
+    cs("zero", function () {
+      let atom = new Atom(0);
+      aver.isTrue(atom.isZero);
+      aver.areEqual(atom.id, 0n);
+    });
+
+    cs("zero-toString-value", function () {
+      let atom = new Atom(0);
+      aver.isNull(atom.toString());
+      aver.isNull(atom.value);
+    });
+
     cs("pass-throws-when-constructed-with-string", function () {
       aver.throws(() => new Atom("12345678"), "should call encode");
     })
