@@ -186,17 +186,11 @@ export class Atom {
 
   /**
    * Called before toString
-   * @returns
+   * @returns value
    */
-  valueOf() {
-    return this.#id;
-  }
+  valueOf() { return this.value; }
 
-  toString() {
-    return this.value || '';
-  }
+  toString() { return this.value; }
 
-  toJSON() {
-    return this.value || '#0';
-  }
+  toJSON() { return this.value || '#0'; }
 }
