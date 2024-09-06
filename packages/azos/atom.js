@@ -129,12 +129,14 @@ export class Atom {
     let ax = this.#id;
 
     for (let i = 0; i < 8; i++) {
-      let c = ax & 0xff;
-      if (c == 0) break;
+      let c = ax & 0x0ffn;
+      if (c === 0n) break;
 
-      if (!Atom.#isValidCharacter(c)) return false;
+      let char = String.fromCharCode(Number(c));
 
-      ax >>= 8;
+      if (!Atom.#isValidCharacter(char)) return false;
+
+      ax >>= 8n;
     }
 
     return true;

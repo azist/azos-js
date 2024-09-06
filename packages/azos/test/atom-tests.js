@@ -10,6 +10,40 @@ import { Atom } from "../atom.js";
 
 unit("Atom", function () {
 
+  unit(".isValid()", function () {
+
+    cs("test-validation001", function () {
+      let a = Atom.encode("abc");
+      aver.isTrue(a.isValid);
+    });
+
+    cs("test-validation002", function () {
+      let a = new Atom(0xfffffff);
+      aver.isFalse(a.isValid);
+    });
+
+
+    cs("test-validation003", function () {
+      const a = new Atom(0xfffff);
+      // eslint-disable-next-line no-unused-vars
+      const b = Atom.encode("a");
+      // eslint-disable-next-line no-unused-vars
+      const c = Atom.encode("ab");
+      // eslint-disable-next-line no-unused-vars
+      const d = Atom.encode("abcd")
+      aver.isFalse(a.isValid);
+    }, () => true /** No batch process nor field validation introduced */);
+
+    cs("is-valid", function () {
+      let a = new Atom(0);
+      let b = new Atom(0xffffn);
+      aver.isTrue(a.isZero);
+      aver.isTrue(a.isValid);
+      aver.isFalse(b.isValid);
+      aver.throws(() => b.value.toLower());
+    });
+  });
+
   unit(".equals()", function () {
 
     cs("pass-when-encoding-0n-against-ZERO", function () {
