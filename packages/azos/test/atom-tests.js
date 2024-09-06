@@ -102,6 +102,22 @@ unit("Atom", function () {
 
   unit(".toString()", function () {
 
+    cs("zero-toString-value", function () {
+      let atom = new Atom(0);
+      aver.isNull(atom.toString());
+      aver.isNull(atom.value);
+    });
+
+    cs("test-toString", function () {
+      let atom = new Atom(0x3041304130413041n);
+      aver.areEqual(atom.toString(), "A0A0A0A0");
+    });
+
+    cs("encode-toString", function () {
+      let atom = Atom.encode("ALEX");
+      aver.areEqual("ALEX", atom.toString());
+    });
+
     cs("pass-when-converts-id-back-to-string", function () {
       const a = Atom.encode("abcDEF12");
 
@@ -111,11 +127,31 @@ unit("Atom", function () {
     cs("pass-when-constructed-null-converts-to-empty-string", function () {
       const a = Atom.encode(null);
 
-      aver.areEqual(a.toString(), "");
+      aver.isNull(a.toString());
     });
   });
 
   unit(".encode()", function () {
+
+    cs("encode-decode", function () {
+      let a = Atom.encode("ALEX1234");
+      let b = new Atom(a.id);
+      aver.areEqualValues(a, b);
+      aver.areEqual("ALEX1234", b.value);
+    });
+
+    cs("encode-null", function () {
+      let a = Atom.encode(null);
+      aver.areEqualValues(a.id, 0n);
+      aver.isTrue(a.isZero);
+      aver.isNull(a.toString());
+    });
+
+    cs("error-empty", function () { aver.throws(() => Atom.encode("")); });
+
+    cs("error-toLong", function () { aver.throws(() => Atom.encode("123456789")); });
+
+    cs("error-nonAscii", function () { aver.throws(() => Atom.encode("ag²■")); });
 
     cs("pass-when-encoded-string-matches-expected-id", function () {
       const toEncode = "abcdefgh";
@@ -129,6 +165,16 @@ unit("Atom", function () {
   });
 
   unit(".tryEncode()", function () {
+
+    cs("try-encode", function () {
+      let a = Atom.tryEncode("abc");
+      aver.isTrue(a.ok);
+      aver.areEqual(a.value.value, "abc")
+
+      a = Atom.tryEncode("ab * c");
+      aver.isFalse(a.ok);
+      aver.isUndefined(a.value);
+    });
 
     cs("pass-when-valid-encode-value", function () {
       const toEncode = "abcdefgh";
@@ -146,6 +192,23 @@ unit("Atom", function () {
   });
 
   unit(".tryEncodeValueOrId()", function () {
+
+    cs("try-encode-value-or-id", function () {
+      let a = Atom.tryEncodeValueOrId("abc");
+      aver.isTrue(a.ok);
+      aver.areEqual(a.value.value, "abc");
+
+      a = Atom.tryEncodeValueOrId("ab * c");
+      aver.isFalse(a.ok);
+
+      a = Atom.tryEncodeValueOrId("#0x3031");
+      aver.isTrue(a.ok);
+      aver.areEqual(a.value.value, "10");
+
+      a = Atom.tryEncodeValueOrId("#12337");
+      aver.isTrue(a.ok);
+      aver.areEqual(a.value.value, "10");
+    });
 
     cs("pass-when-encode-value-null", function () {
       const toEncode = null;
@@ -171,8 +234,8 @@ unit("Atom", function () {
     cs("fail-when-invalid-encode-value", function () {
       const toEncode = "abcdefgh";
       let encodedResponse = Atom.tryEncodeValueOrId(toEncode);
-      aver.isFalse(encodedResponse.ok);
-      aver.isUndefined(encodedResponse.value);
+      aver.isTrue(encodedResponse.ok);
+      aver.areEqual(encodedResponse.value.value, toEncode);
     });
   });
 
@@ -184,11 +247,18 @@ unit("Atom", function () {
       aver.areEqual(atom.id, 0n);
     });
 
-    cs("zero-toString-value", function () {
-      let atom = new Atom(0);
-      aver.isNull(atom.toString());
-      aver.isNull(atom.value);
+    cs("zero-equality", function () {
+      const a = new Atom(0);
+      const b = new Atom(0n);
+      aver.areEqualValues(a, b);
     });
+
+    cs("zero-inequality", function () {
+      const a = new Atom(0);
+      const b = new Atom(1);
+
+      aver.areNotEqualValues(a, b);
+    }, () => true /** new Atom(1) fails because 1 is not a valid id */);
 
     cs("pass-throws-when-constructed-with-string", function () {
       aver.throws(() => new Atom("12345678"), "should call encode");
@@ -196,6 +266,45 @@ unit("Atom", function () {
   });
 
   unit(".length", function () {
+    cs("var-length", function () {
+      let a = Atom.encode("a");
+      let b = Atom.encode("ab");
+
+      aver.areEqual(0x61n, a.id);
+      aver.areEqual(0x6261n, b.id);
+    });
+
+    cs("test-length", function () {
+      aver.areEqual(0, new Atom().length);
+      aver.areEqual(0, new Atom(0).length);
+
+      let a = Atom.encode("a");
+      aver.areEqual(1, a.length);
+
+      a = Atom.encode("abc");
+      aver.areEqual(3, a.length);
+
+      a = Atom.encode("abcdef");
+      aver.areEqual(6, a.length);
+
+      a = Atom.encode("abc-def");
+      aver.areEqual(7, a.length);
+
+      a = Atom.encode("abc-def0");
+      aver.areEqual(8, a.length);
+
+      a = new Atom(0xFFFFFFFFFFFFFFFFn);
+      aver.areEqual(8, a.length);
+      aver.isFalse(a.isValid);
+
+      a = new Atom(0xFFn);
+      aver.areEqual(1, a.length);
+      aver.isFalse(a.isValid);
+
+      a = new Atom(0xFF0101n);
+      aver.areEqual(3, a.length);
+      aver.isFalse(a.isValid);
+    });
 
     cs("pass-when-length-matches-encoded-character-count", function () {
       let toEncode = "abcdefgh";
@@ -207,6 +316,24 @@ unit("Atom", function () {
       const b = Atom.encode(toEncode);
 
       aver.areEqual(b.length, toEncode.length);
+    });
+  });
+
+  unit(".value", function () {
+    cs("value-interning", function () {
+      let a = Atom.encode("abc");
+      let b = Atom.encode("abc");
+      let c = new Atom(b.id);
+
+      aver.areEqualValues(a, b);
+      aver.areEqualValues(a, c);
+
+      aver.areEqual("abc", a.value);
+      aver.areEqual("abc", b.value);
+      aver.areEqual("abc", c.value);
+
+      aver.areEqual(a.value, b.value);
+      aver.areEqual(a.value, c.value);
     });
   });
 });
