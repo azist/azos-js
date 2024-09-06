@@ -17,15 +17,9 @@ export class Atom {
 
     aver.isNonEmptyMinMaxString(value, 1, 8);
 
-    let id = undefined;
-    for (let [k, v] of Atom.#sCache.entries()) {
-      if (v === value) {
-        id = k;
-        break;
-      }
-    }
+    let id = Atom.#fetchIdFromCacheByValue(value);
 
-    if (id === undefined) {
+    if (id === undefined) { // not yet cached
       let ax = 0n;
       for (let i = 0; i < value.length; i++) {
         let c = value.charCodeAt(i);
@@ -36,7 +30,7 @@ export class Atom {
         ax |= BigInt(c) << BigInt(i * 8);
       }
 
-      Atom.#sCache.set(ax, value);
+      Atom.#sCache.set(ax, value); // cache it
       id = ax;
     }
 
