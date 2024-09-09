@@ -69,6 +69,12 @@ export class Atom {
       (c == '_' || c == '-');
   }
 
+  static #fetchIdFromCacheByValue(value) {
+    for (let [k, v] of Atom.#sCache.entries()) { // get id from cached value
+      if (v === value) return k;
+    }
+    return undefined;
+  }
 
 
   /**
