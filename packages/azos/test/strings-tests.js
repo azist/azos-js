@@ -32,6 +32,281 @@ describe("Strings", function () {
     it("false (\"---\\r\\n-------\"])", function () { aver.isFalse(sut.isEmpty("---\r\n-----")); });
   });
 
+  describe(".isNullOrWhiteSpace(str)", function () {
+    it("true ()", () => aver.isTrue(sut.isNullOrWhiteSpace()));
+    it("true (undefined)", () => aver.isTrue(sut.isNullOrWhiteSpace(undefined)));
+    it("true (null)", () => aver.isTrue(sut.isNullOrWhiteSpace(null)));
+    it("true ('')", () => aver.isTrue(sut.isNullOrWhiteSpace("")));
+    it("true (' ')", () => aver.isTrue(sut.isNullOrWhiteSpace(" ")));
+  });
+
+  describe(".charEqual()", function () {
+    it("true ('a','a', false)", () => aver.isTrue(sut.charEqual("a", "a", false)));
+    it("true ('a','a', true)", () => aver.isTrue(sut.charEqual("a", "a", true)));
+    it("true ('a','A', false)", () => aver.isTrue(sut.charEqual("a", "A", false)));
+    it("false ('a','A', true)", () => aver.isFalse(sut.charEqual("a", "A", true)));
+  });
+
+  describe(".matchPattern()", function () {
+    it("match-pattern1", function () {
+      const pattern = "s?me?addres?";
+      aver.isTrue(sut.matchPattern("some address", pattern));
+      aver.isTrue(sut.matchPattern("same-addresZ", pattern));
+
+      aver.isFalse(sut.matchPattern("sone address", pattern));
+      aver.isFalse(sut.matchPattern("sane-oddresZ", pattern));
+    });
+
+    it("match-pattern2", function () {
+      const pattern = "s?me?addres?";
+      aver.isTrue(sut.matchPattern("some address", pattern, undefined, undefined, true));
+
+      aver.isFalse(sut.matchPattern("same-addreZs", pattern, undefined, undefined, true));
+      aver.isFalse(sut.matchPattern("sone address", pattern, undefined, undefined, true));
+      aver.isFalse(sut.matchPattern("saMe-addrezs", pattern, undefined, undefined, true));
+    });
+
+    it("match-pattern3", function () {
+      const pattern = "some*";
+      aver.isTrue(sut.matchPattern("some address", pattern));
+      aver.isFalse(sut.matchPattern("sone address ", pattern));
+    });
+
+    it("match-pattern4", function () {
+      const pattern = "s?me*";
+      aver.isTrue(sut.matchPattern("some address", pattern));
+      aver.isFalse(sut.matchPattern("sone adzress", pattern));
+    });
+
+    it("match-pattern5", function () {
+      const pattern = "s?me*addre??";
+      aver.isTrue(sut.matchPattern("some address", pattern));
+      aver.isFalse(sut.matchPattern("some adzress", pattern));
+    });
+
+    it("match-pattern6", () => aver.isTrue(sut.matchPattern("same Address", "s?me*addre??")));
+
+    it("match-pattern7", function () {
+      const pattern = "s?me*addre??";
+      aver.isTrue(sut.matchPattern("same Addre??", pattern));
+      aver.isFalse(sut.matchPattern("same AddreZZ?", pattern));
+      aver.isFalse(sut.matchPattern("same AddreZ", pattern));
+    });
+
+    it("match-pattern8", function () {
+      const pattern = "*";
+      aver.isTrue(sut.matchPattern("same AddreZZ", pattern));
+      aver.isTrue(sut.matchPattern("    ", pattern));
+      aver.isTrue(sut.matchPattern(" ", pattern));
+      aver.isTrue(sut.matchPattern("", pattern));
+      aver.isTrue(sut.matchPattern(null, pattern));
+    });
+
+    it("match-pattern9", () => aver.isFalse(sut.matchPattern("same AddreZZ", "")));
+
+    it("match-pattern10", () => aver.isFalse(sut.matchPattern("same AddreZZ", "?")));
+
+    it("match-pattern11", function () {
+      const pattern = "????????????";
+      aver.isTrue(sut.matchPattern("same AddreZZ", pattern));
+      aver.isFalse(sut.matchPattern("same Addre", pattern));
+    });
+
+    it("match-pattern12", function () {
+      const pattern = "same*";
+      aver.isTrue(sut.matchPattern("same AddreZZ", pattern));
+      aver.isFalse(sut.matchPattern("some AddreZZ", pattern));
+    });
+
+    it("match-pattern13", function () {
+      const pattern1 = "*addre??";
+      const pattern2 = "*addre????";
+      aver.isTrue(sut.matchPattern("same AddreZZ", pattern1));
+      aver.isTrue(sut.matchPattern("good address", pattern1));
+      aver.isTrue(sut.matchPattern("new address-2", pattern2));
+
+      aver.isFalse(sut.matchPattern("same ApdreZZ", pattern1));
+      aver.isFalse(sut.matchPattern("good adress", pattern1));
+      aver.isFalse(sut.matchPattern("good adres", pattern1));
+      aver.isFalse(sut.matchPattern("new accress-2", pattern2));
+    });
+
+    it("match-pattern14", function () {
+      const pattern = "*address";
+      aver.isTrue(sut.matchPattern("same Address", pattern));
+      aver.isFalse(sut.matchPattern("same Address ok", pattern));
+    });
+
+    it("match-pattern15", function () {
+      const pattern = "*address";
+      aver.isTrue(sut.matchPattern("some same crazy address address Address", pattern));
+      aver.isFalse(sut.matchPattern("some same crazy address address Address", pattern, undefined, undefined, true));
+      aver.isFalse(sut.matchPattern("some same crazy address address!", pattern));
+    });
+
+    it("match-pattern16", function () {
+      const pattern = "*crazy*";
+      aver.isTrue(sut.matchPattern("some crazy address", pattern));
+      aver.isFalse(sut.matchPattern("some crizy address", pattern));
+      aver.isFalse(sut.matchPattern("some craizy address", pattern));
+    });
+
+    it("match-pattern16_2", function () {
+      const pattern = "*cr?zy*";
+      aver.isTrue(sut.matchPattern("some crazy address", pattern));
+      aver.isTrue(sut.matchPattern("some crizy address", pattern));
+      aver.isFalse(sut.matchPattern("some criizy address", pattern));
+      aver.isFalse(sut.matchPattern("some krazy address", pattern));
+    });
+
+    it("match-pattern16_3", () => aver.isFalse(sut.matchPattern("some crazy address", "*cr*zy")));
+
+    it("match-pattern17", () => aver.isTrue(sut.matchPattern("127.0.0.1", "127.0.*")));
+
+    it("match-pattern18", () => aver.isTrue(sut.matchPattern("https://some-site.com/?q=aaaa", "https://some-site.com*")));
+
+    it("match-pattern19", () => aver.isTrue(sut.matchPattern("140.70.81.139", "140.70.81.139")));
+
+    it("match-pattern20", function () {
+      const pattern = "140.70.*.139";
+      aver.isTrue(sut.matchPattern("140.70.81.139", pattern));
+      aver.isTrue(sut.matchPattern("140.70.1.139", pattern));
+      aver.isTrue(sut.matchPattern("140.70.17.139", pattern));
+      aver.isTrue(sut.matchPattern("140.70.123.139", pattern));
+
+      aver.isFalse(sut.matchPattern("141.70.81.139", pattern));
+      aver.isFalse(sut.matchPattern("140.71.1.139", pattern));
+      aver.isFalse(sut.matchPattern("140.70.17.13", pattern));
+      aver.isFalse(sut.matchPattern("140.70.123.137", pattern));
+    });
+
+    it("match-pattern21", function () {
+      const pattern = "*.70.81.139";
+      aver.isTrue(sut.matchPattern("140.70.81.139", pattern));
+      aver.isFalse(sut.matchPattern("140.70.99.139", pattern));
+    });
+
+    it("match-pattern22", function () {
+      const pattern = "140.70.81.*";
+      aver.isTrue(sut.matchPattern("140.70.81.139", pattern));
+      aver.isFalse(sut.matchPattern("140.70.99.139", pattern));
+    });
+
+    it("match-pattern23", function () {
+      const pattern1 = "140.*.81.*";
+      const pattern2 = "*.70.81.*";
+
+      aver.isTrue(sut.matchPattern("140.70.81.139", pattern1));
+      aver.isTrue(sut.matchPattern("140.80.81.139", pattern1));
+      aver.isTrue(sut.matchPattern("140.    80       .81.139", pattern1));
+      aver.isTrue(sut.matchPattern("140. 80 .81.99999", pattern1));
+
+      aver.isTrue(sut.matchPattern("1.70.81.1", pattern2));
+      aver.isFalse(sut.matchPattern("1.70.82.1", pattern2));
+    });
+
+    it("match-pattern24", function () {
+      const str = "Alex Boris";
+      aver.isTrue(sut.matchPattern(str, "*"));
+      aver.isTrue(sut.matchPattern(str, "Alex*"));
+      aver.isTrue(sut.matchPattern(str, "*Boris"));
+      aver.isTrue(sut.matchPattern(str, "*lex Bo*"));
+    });
+
+    it("match-pattern25", function () {
+      const str = "Alex Boris";
+      aver.isTrue(sut.matchPattern(str, "*"));
+      aver.isFalse(sut.matchPattern(str, "Axex*"));
+      aver.isFalse(sut.matchPattern(str, "*Bosir"));
+      aver.isFalse(sut.matchPattern(str, "*lxe Bo*"));
+    });
+
+    it("match-pattern26", function () {
+      const str = "Alex Boris";
+      aver.isTrue(sut.matchPattern(str, "*"));
+      aver.isFalse(sut.matchPattern(str, "alex*", undefined, undefined, true));
+      aver.isTrue(sut.matchPattern("Alex Boris", "Alex*", undefined, undefined, true));
+
+      aver.isFalse(sut.matchPattern(str, "*boris", undefined, undefined, true));
+      aver.isTrue(sut.matchPattern(str, "*Boris", undefined, undefined, true));
+    });
+
+    it("match-pattern27", function () {
+      const str = "Honda buick honda monda donda ford buick ford ford";
+      aver.isTrue(sut.matchPattern(str, "*ford"));
+      aver.isFalse(sut.matchPattern(str, "*honda"));
+      aver.isTrue(sut.matchPattern(str, "*honda*"));
+    });
+
+    it("match-pattern28", function () {
+      const str = "Honda buick honda monda donda ford buick ford fORd";
+      aver.isTrue(sut.matchPattern(str, "*ford"));
+      aver.isFalse(sut.matchPattern(str, "*ford", undefined, undefined, true));
+      aver.isTrue(sut.matchPattern(str, "*fORd", undefined, undefined, true));
+    });
+
+    it("match-pattern29", function () {
+      const str = "Honda buick honda monda donda ford buick ford fORd";
+      aver.isTrue(sut.matchPattern(str, "*buick*"));
+      aver.isFalse(sut.matchPattern(str, "*buick handa*", undefined, undefined, true));
+      aver.isTrue(sut.matchPattern(str, "*buick h?nda*", undefined, undefined, true));
+    });
+
+    it("match-pattern30", function () {
+      const str = "kikimora zhaba fly snake toad";
+      aver.isTrue(sut.matchPattern(str, "*?ly*"));
+      aver.isFalse(sut.matchPattern(str, "*?ly"));
+      aver.isTrue(sut.matchPattern(str, "*?ly*toad"));
+    });
+
+    it("match-pattern31", function () {
+      const str = "We shall overcome";
+      aver.isTrue(sut.matchPattern(str, "*****************"));
+      aver.isTrue(sut.matchPattern(str, "?????????????????"));
+      aver.isTrue(sut.matchPattern(str, "?*????????**?????"));
+      aver.isTrue(sut.matchPattern(str, "*?????????**????*"));
+
+      aver.isFalse(sut.matchPattern(str, "***x*************"));
+      aver.isFalse(sut.matchPattern(str, "?A???????????????"));
+      aver.isFalse(sut.matchPattern(str, "?*????-???**?????"));
+      aver.isFalse(sut.matchPattern(str, "*?????????**???? "));
+    });
+
+    it("match-pattern32", function () {
+      const str = "We shall overcome";
+      aver.isTrue(sut.matchPattern(str, "*********overcome"));
+      aver.isTrue(sut.matchPattern(str, "??????????v???o??"));
+      aver.isTrue(sut.matchPattern(str, "?e????????**??o??"));
+      aver.isTrue(sut.matchPattern(str, "We*???????**????*"));
+
+      aver.isFalse(sut.matchPattern(str, "*********ofercome"));
+      aver.isFalse(sut.matchPattern(str, "??????????A???o??"));
+      aver.isFalse(sut.matchPattern(str, "?e--??????**??o??"));
+      aver.isFalse(sut.matchPattern(str, "They*?????**????*"));
+    });
+
+    it("match-pattern33", function () {
+      const str = "We shall overcome";
+      aver.isTrue(sut.matchPattern(str, "*********overCOME", undefined, undefined, false));
+      aver.isFalse(sut.matchPattern(str, "*********overCOME", undefined, undefined, true));
+
+      aver.isTrue(sut.matchPattern(str, "@@@@@@@@@overcome", '@'));
+      aver.isTrue(sut.matchPattern(str, "@erco$$", '@', '$'));
+    });
+
+    it("match-pattern34", function () {
+      aver.isTrue(sut.matchPattern(null, null));
+      aver.isTrue(sut.matchPattern("", ""));
+
+      aver.isTrue(sut.matchPattern(null, ""));
+      aver.isTrue(sut.matchPattern("", null));
+
+      aver.isFalse(sut.matchPattern(" a ", null));
+      aver.isFalse(sut.matchPattern(null, " a "));
+    });
+
+  });
+
   describe("#truncate()", function () {
     it("'' ()", function () { aver.areEqual("", sut.truncate()); });
     it("'' undef", function () { aver.areEqual("", sut.truncate(undefined)); });
