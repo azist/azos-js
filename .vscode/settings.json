@@ -3,6 +3,7 @@
         "asof",
         "azist",
         "azos",
+        "BSON",
         "codebox",
         "condir",
         "coreconsts",
@@ -28,8 +29,10 @@
         "thandler",
         "tparent",
         "uini",
+        "ULEB",
         "virt",
+        "whitespaces",
         "xffffn",
-        "xffn",
+        "xffn"
     ]
 }
