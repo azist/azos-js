@@ -8,6 +8,16 @@ import { Atom } from "./atom.js";
 import * as aver from "./aver.js";
 import * as types from "./types.js";
 
+/**
+ * A tuple of (SYSTEM: Atom, TYPE: Atom, SCHEMA: Atom, ADDRESS: string) used for identification of entities in business systems.
+ *  The concept is somewhat similar to an "URI" in its intended purpose, as it identifies objects by an "Address"
+ *  string which is interpreted in a scope of "Type/Schema", which in turn is in the scope of a "System".
+ *  As a string, an EntityId is formatted like: `type.schema@system::address`, for example: `car.vin@dealer::1A8987339HBz0909W874`
+ *  vs `boat.license@dealer::I9973OD`. The system qualifier is required, but type (and schema) qualifier is optional, which denotes "default type"
+ *  for example: `dealer::I9973OD` is a valid EntityId pointing to a "dealer" system "car" type with "license" address schema by default.
+ *  The optional schema sub-qualifier defines the "schema" of addressing used per type, this way you can identify the same entity types within a system with
+ *  different addressing schemas
+ */
 export class EntityId {
   static TYPE_PREFIX = '@';
   static SCHEMA_DIV = '.';
@@ -104,7 +114,7 @@ export class EntityId {
 
   /**
    * If the address is composite, JSON parse it and gimme gimme
-   * @throws if not composite. Call `.isCompositeAddress()` first to forego throws.
+   * @throws if not composite. @see .isCompositeAddress() to forego throws.
    */
   get compositeAddress() {
     aver.isTrue(this.isCompositeAddress);
@@ -112,13 +122,13 @@ export class EntityId {
   }
 
   /**
-   * Construct an EntityId object
+   * Initializes an EntityId instance
    * @param {Atom} system required
    * @param {Atom} type optional
    * @param {Atom} schema
    * @param {string} address
    */
-  constructor(system/*:Atom*/, type/*:Atom*/ = Atom.ZERO, schema/*:Atom*/ = Atom.ZERO, address/*:string*/) {
+  constructor(system, type = Atom.ZERO, schema = Atom.ZERO, address) {
     this.#system = aver.isOf(system, Atom);
     if (this.#system.isZero) {
       throw aver.AzosError("Required sys.isZero");
