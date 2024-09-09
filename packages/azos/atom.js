@@ -36,13 +36,6 @@ export class Atom {
     return new Atom(id);
   }
 
-  static #fetchIdFromCacheByValue(value) {
-    for (let [k, v] of Atom.#sCache.entries()) { // get id from cached value
-      if (v === value) return k;
-    }
-    return undefined;
-  }
-
   static tryEncode(value /*:string | null*/ = null) {
     try {
       return { ok: true, value: Atom.encode(value) };
