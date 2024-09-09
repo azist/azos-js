@@ -97,6 +97,11 @@ export class EntityId {
   /** Address for entity per Type and System */
   get address() { return this.#address; }
 
+  /** Check if the address is a composite address - starts with '{', ends with '}' */
+  get isCompositeAddress() {
+    return this.address.startsWith("{") && this.address.endsWith("}");
+  }
+
   /**
    * If the address is composite, JSON parse it and gimme gimme
    * @throws if not composite. Call `.isCompositeAddress()` first to forego throws.
@@ -104,11 +109,6 @@ export class EntityId {
   get compositeAddress() {
     aver.isTrue(this.isCompositeAddress);
     return JSON.parse(this.address);
-  }
-
-  /** Check if the address is a composite address */
-  get isCompositeAddress() {
-    return this.address.startsWith("{") && this.address.endsWith("}");
   }
 
   /**
