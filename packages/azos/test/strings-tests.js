@@ -652,6 +652,23 @@ describe("Strings", function () {
     it("my.-name", function () { aver.isFalse(sut.isValidScreenName("my.-name")); });
   });
 
+  describe(".isCharLetterOrDigit()", function () {
+    it("true ('a')", () => aver.isTrue(sut.isCharLetterOrDigit('a')));
+    it("true ('1')", () => aver.isTrue(sut.isCharLetterOrDigit('1')));
+    it("true (1)", () => aver.isTrue(sut.isCharLetterOrDigit(1)));
+    it("true ('é')", () => aver.isTrue(sut.isCharLetterOrDigit('é')));
+    it("true ('ç')", () => aver.isTrue(sut.isCharLetterOrDigit('ç')));
+    it("true ('α')", () => aver.isTrue(sut.isCharLetterOrDigit('α')));
+    it("true ('٥')", () => aver.isTrue(sut.isCharLetterOrDigit('٥')));
+    it("true ('९')", () => aver.isTrue(sut.isCharLetterOrDigit('९')));
+    it("false (' ')", () => aver.isFalse(sut.isCharLetterOrDigit(' ')));
+    it("false ('$')", () => aver.isFalse(sut.isCharLetterOrDigit('$')));
+    it("false ('@')", () => aver.isFalse(sut.isCharLetterOrDigit('@')));
+    it("false ('\t')", () => aver.isFalse(sut.isCharLetterOrDigit('\t')));
+    it("false ('mo')", () => aver.isFalse(sut.isCharLetterOrDigit('mo')));
+    it("false ('m#')", () => aver.isFalse(sut.isCharLetterOrDigit('m#')));
+  });
+
   describe("#bufToHex()", function () {
 
     it("()", function () { aver.isNull(sut.bufToHex()); });

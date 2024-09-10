@@ -454,7 +454,7 @@ export function normalizeUSPhone(v) {
       }
     }
 
-    if (!charIsAZLetterOrDigit(chr)) continue;
+    if (!isCharLetterOrDigit(chr)) continue;
 
     if (isArea) area += chr;
     else {
@@ -486,6 +486,22 @@ export function normalizeUSPhone(v) {
   if (ext.length > 0) ext = "x" + ext;
 
   return "(" + area + ") " + number + ext;
+}
+
+/**
+ * This method mimics C# in matching English characters [a-zA-Z0-9], accented
+ *  and non-English characters [éçα], unicode digits [٥९], and ignores whitespace
+ *  and special characters [\s\t@$] after conversion `char.toString();`
+ * @param {string} char the character to test
+ * @returns true if char is a digit or a letter
+ */
+export function isCharLetterOrDigit(char) {
+  char = char.toString();
+  char = char.length ? char.trim() : char;
+  if (!char.length || char.length > 1) {
+    return false;
+  }
+  return /\p{L}|\p{N}/u.test(char);
 }
 
 const HEX_DIGITS = "0123456789abcdef";
