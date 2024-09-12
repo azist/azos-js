@@ -16,8 +16,8 @@ import "../vcl/util/code-box.js";
 import { Spinner } from "../spinner.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
-export class Showcase extends AzosElement{
-  constructor(){ super(); }
+export class Showcase extends AzosElement {
+  constructor() { super(); }
 
   static styles = css`
   .strip-h{
@@ -30,47 +30,47 @@ export class Showcase extends AzosElement{
   `;
 
 
-  onDlg1Open(){ this.dlg1.show(); }
-  onDlg1Close(){ this.dlg1.close(); }
-  onDlg2Open(){ this.dlg2.show(); }
-  onDlg2Close(){ this.dlg2.close(); }
+  onDlg1Open() { this.dlg1.show(); }
+  onDlg1Close() { this.dlg1.close(); }
+  onDlg2Open() { this.dlg2.show(); }
+  onDlg2Close() { this.dlg2.close(); }
 
-  async onSpinnerProcess(){
+  async onSpinnerProcess() {
     Spinner.exec(async sp => {
-     sp.message = `Prepping DB...`;
-     await new Promise(resolve => setTimeout(resolve, 1070));
-     sp.message = `Exec DDL 1 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 1500));
-     sp.message = `Exec DDL 2 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 890));
-     sp.message = `Exec DDL 3 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 1232));
-     sp.status = "error";
-     sp.message = `Recovering DDL error...`;
-     await new Promise(resolve => setTimeout(resolve, 2370));
-     sp.status = "warning";
-     sp.message = `Exec DDL 4 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 1870));
-     sp.message = `Exec DDL 5 of 5 ...`;
-     sp.status = "ok";
-     await new Promise(resolve => setTimeout(resolve, 2360));
+      sp.message = `Prepping DB...`;
+      await new Promise(resolve => setTimeout(resolve, 1070));
+      sp.message = `Exec DDL 1 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      sp.message = `Exec DDL 2 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 890));
+      sp.message = `Exec DDL 3 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1232));
+      sp.status = "error";
+      sp.message = `Recovering DDL error...`;
+      await new Promise(resolve => setTimeout(resolve, 2370));
+      sp.status = "warning";
+      sp.message = `Exec DDL 4 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1870));
+      sp.message = `Exec DDL 5 of 5 ...`;
+      sp.status = "ok";
+      await new Promise(resolve => setTimeout(resolve, 2360));
     });
   }
 
-  onModalSpinnerOpen(){ this.spinnerModal.show(); }
-  onNonModalSpinnerOpen(){ this.spinnerNonModal.show(); }
-  onNonModalSpinnerClose(){ this.spinnerNonModal.hide(); }
+  onModalSpinnerOpen() { this.spinnerModal.show(); }
+  onNonModalSpinnerOpen() { this.spinnerNonModal.show(); }
+  onNonModalSpinnerClose() { this.spinnerNonModal.hide(); }
 
-  onAutoSpinnerOpen(){ Spinner.show(null, 3000); }
+  onAutoSpinnerOpen() { Spinner.show(null, 3000); }
 
-  #onFieldChange(e){
+  #onFieldChange(e) {
     console.log("Got change event from field: ", e.target.name, e.target.value);
     this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
   }
 
 
 
-  render(){
+  render() {
     return html`
 
 <h1>Showcase of Azos Controls</h1>
