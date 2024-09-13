@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css } from "../ui";
+import { AzosElement, html, css, POSITION, RANK, STATUS } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/check-field.js";
@@ -14,6 +14,7 @@ import "../parts/select-field.js";
 import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import { Spinner } from "../spinner.js";
+import { Toast } from "../toast.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement {
@@ -68,7 +69,27 @@ export class Showcase extends AzosElement {
     this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
   }
 
+  toastCount = 0;
+  async toastMe(multiple = false) {
+    const toasts = multiple ? 20 : 1;
+    for (let i = 0; i < toasts; i++) {
+      temp(++this.toastCount);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
 
+    function temp(id) {
+      const randomRank = false;
+      const randomStatus = false;
+      const randomPosition = false;
+      const timeout = 1_000;
+
+      const rank = randomRank ? Math.floor(Math.random() * Object.keys(RANK).length) : RANK.DEFAULT;
+      const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
+      const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
+
+      Toast.toast(`Hello ${id}!`, timeout, rank, status, position);
+    }
+  }
 
   render() {
     return html`
@@ -79,6 +100,11 @@ export class Showcase extends AzosElement {
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
+
+<az-toast>Moo</az-toast>
+
+<az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
+<az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
 
 <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
 <az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
