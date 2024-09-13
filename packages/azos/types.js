@@ -4,7 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { Atom } from "./atom.js";
 import * as CC from "./coreconsts.js";
+import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
 
 
@@ -711,6 +713,31 @@ export function asArray(v, canUndef = false) {
   }
 }
 
+export function asAtom(v, canUndef = false) {
+  if (v === undefined) return canUndef ? undefined : null;
+  if (v === null) return null;
+  if (v instanceof Atom) return v;
+
+  try {
+    let atom = Atom.parse(v);
+    return atom;
+  } catch (e) {
+    throw new AzosError(CAST_ERROR + `asAtom("${strings.describe(v)}") -> ${e.message}`, "asAtom()", e);
+  }
+}
+
+export function asEntityId(v, canUndef = false) {
+  if (v === undefined) return canUndef ? undefined : null;
+  if (v === null) return null;
+  if (v instanceof EntityId) return v;
+
+  try {
+    let entityId = EntityId.parse(v);
+    return entityId;
+  } catch (e) {
+    throw new AzosError(CAST_ERROR + `asEntityId("${strings.describe(v)}") -> ${e.message}`, "asEntityId()", e);
+  }
+}
 
 /** Data Type Monikers */
 export const TYPE_MONIKER = Object.freeze({
@@ -721,7 +748,9 @@ export const TYPE_MONIKER = Object.freeze({
   BOOL: "bool",
   DATE: "date",
   OBJECT: "object",
-  ARRAY: "array"
+  ARRAY: "array",
+  ATOM: "atom",
+  ENTITY_ID: "entityId",
 });
 const ALL_TYPE_MONIKERS = allObjectValues(TYPE_MONIKER);
 
@@ -755,6 +784,8 @@ export function cast(v, tmon, canUndef = false) {
     case TYPE_MONIKER.DATE: return asDate(v, canUndef);
     case TYPE_MONIKER.OBJECT: return asObject(v, canUndef);
     case TYPE_MONIKER.ARRAY: return asArray(v, canUndef);
+    case TYPE_MONIKER.ATOM: return asAtom(v, canUndef);
+    case TYPE_MONIKER.ENTITY_ID: return asEntityId(v, canUndef);
     default: return asString(v, canUndef);
   }
 }
@@ -851,4 +882,19 @@ export function trimUri(uri, lsl = false, tsl = false, canUndef = false) {
   }
 
   return uri;
+}
+
+/**
+ * Sort the json object's keys in alphabetic order.
+ * @param {JSON} json the json object whose keys to sort
+ * @returns the json object with sorted keys
+ */
+export function sortJsonKeys(json) {
+  return Object.keys(json).sort().reduce(
+    (obj, key) => {
+      obj[key] = json[key];
+      return obj;
+    },
+    {}
+  );
 }

@@ -91,6 +91,84 @@ export function startsWith(str, seg, scase = false, idx = 0) {
   return str.startsWith(seg, idx);
 }
 
+/**
+ * Returns true if the supplied string matches a specified pattern that can contain multiple char span (*) wildcards and
+ *  multiple single-char (?) wildcards.
+ *
+ * @param {string|null} str the string to match
+ * @param {string|null} pattern the pattern to match
+ * @param {string|undefined} wc the wildcard for multiple characters (default: *)
+ * @param {string|undefined} wsc the wildcard for a single character (default: ?)
+ * @param {*} senseCase whether to consider case sensitivity (default: false)
+ * @returns  {boolean} true if the string matches the given pattern
+ */
+export function matchPattern(str, pattern, wc = '*', wsc = '?', senseCase = false) {
+
+  const snws = isNullOrWhiteSpace(str);
+  const pnws = isNullOrWhiteSpace(pattern);
+
+  // quick pattern match for "*" = match anything quickly
+  if (!pnws && pattern.length === 1 && pattern[0] === wc) return true;
+
+  if (snws && pnws) return true;
+  if (snws || pnws) return false;
+
+  let istr = 0;
+  let ipat = 0;
+
+  let pistr = str.length;
+  let pipat = pattern.length;
+
+  while (istr < str.length) {
+    for (; istr < str.length && ipat < pattern.length; istr++, ipat++) {
+      const pc = pattern[ipat];
+      if (pc === wc) { // '*' wildcard
+        if (ipat === pattern.length - 1) return true; // final char in pattern is *
+        pistr = istr;
+        pipat = ipat;
+        istr--;
+        continue;
+      }
+
+      if (pc === wsc) continue;
+      if (charEqual(pc, str[istr], senseCase)) continue;
+
+      ipat = pipat - 1; // same pattern
+      istr = pistr; // next char
+    }
+
+    // eat trailing ****
+    while (ipat < pattern.length && pattern[ipat] === wc) ipat++;
+    if (istr === str.length && ipat === pattern.length) return true;
+    ipat = pipat;
+    pistr++;
+    istr = pistr;
+  }
+  return false;
+}
+
+/**
+ * @param {string} str the string to check
+ * @returns true if str is null, undefined, empty string, or whitespace
+ */
+export function isNullOrWhiteSpace(str) {
+  if (str === null || str === undefined || str === "" || str.trim().length === 0) return true;
+  return false;
+}
+
+/**
+ * Determine if a and b are equal characters.
+ * @param {char} a
+ * @param {char} b
+ * @param {boolean} senseEqual true to strictly compare
+ */
+export function charEqual(a, b, senseEqual) {
+  if (senseEqual) {
+    return a === b;
+  }
+  return a?.toLowerCase() === b?.toLowerCase();
+}
+
 
 /**
  * Returns true if the string equals one of the strings in the list of values supplied either as an array or '|' or ';' separated string
@@ -376,7 +454,7 @@ export function normalizeUSPhone(v) {
       }
     }
 
-    if (!charIsAZLetterOrDigit(chr)) continue;
+    if (!isCharLetterOrDigit(chr)) continue;
 
     if (isArea) area += chr;
     else {
@@ -408,6 +486,22 @@ export function normalizeUSPhone(v) {
   if (ext.length > 0) ext = "x" + ext;
 
   return "(" + area + ") " + number + ext;
+}
+
+/**
+ * This method mimics C# in matching English characters [a-zA-Z0-9], accented
+ *  and non-English characters [éçα], unicode digits [٥९], and ignores whitespace
+ *  and special characters [\s\t@$] after conversion `char.toString();`
+ * @param {string} char the character to test
+ * @returns true if char is a digit or a letter
+ */
+export function isCharLetterOrDigit(char) {
+  char = char.toString();
+  char = char.length ? char.trim() : char;
+  if (!char.length || char.length > 1) {
+    return false;
+  }
+  return /\p{L}|\p{N}/u.test(char);
 }
 
 const HEX_DIGITS = "0123456789abcdef";
