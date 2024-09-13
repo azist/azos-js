@@ -69,6 +69,9 @@ body {
   */
   --s-default-bg-ctl-btn: #d0d0d0;
   --s-default-bor-ctl-btn: 1px solid #c4c4c4;
+  --s-default-fg-hcontrast: var(--paper);
+  --s-default-bg-hcontrast: var(--ink);
+  --s-default-bor-hcontrast: var(--ink);
 
   --s-default-fw-ctl: bold;
 
@@ -83,6 +86,10 @@ body {
   */
   --s-ok-bg-ctl-btn: #a0f9a0;
   --s-ok-bor-ctl-btn: 1px solid #90e490;
+  --s-ok-fg-hcontrast: #75e82f;
+  --s-ok-bg-hcontrast: #2f352f;
+  --s-ok-bor-hcontrast: #373e35;
+
 
   --s-info-fg: #5a5a5a;
   --s-info-bg: #a0d8ff;
@@ -95,6 +102,9 @@ body {
 */
 --s-info-bg-ctl-btn: #b0dfff;
 --s-info-bor-ctl-btn: 1px solid #a0c8f0;
+--s-info-fg-hcontrast: #3782f0;
+--s-info-bg-hcontrast: #2f2f51;
+--s-info-bor-hcontrast: #37375a;
 
 
   --s-warn-fg: #6a6a40;
@@ -108,6 +118,9 @@ body {
   */
   --s-warn-bg-ctl-btn: #f2f268;
   --s-warn-bor-ctl-btn: 1px solid #d8d848;
+  --s-warn-fg-hcontrast: #f2f268;
+  --s-warn-bg-hcontrast: #383a20;
+  --s-warn-bor-hcontrast: #404228;
 
 
   --s-alert-fg: #e8daff;
@@ -121,6 +134,10 @@ body {
  */
   --s-alert-bg-ctl-btn: #f8b0f8;
   --s-alert-bor-ctl-btn: 1px solid #e890e8;
+  --s-alert-fg-hcontrast: #f8b0f8;
+  --s-alert-bg-hcontrast: #3e2142;
+  --s-alert-bor-hcontrast: #462a4a;
+
 
   --s-error-fg: #ffe0e0;
   --s-error-bg: #ff4720;
@@ -133,7 +150,9 @@ body {
   */
   --s-error-bg-ctl-btn: #ffa0a0;
   --s-error-bor-ctl-btn: 1px solid #e59090;
-
+  --s-error-fg-hcontrast: #ffa0a0;
+  --s-error-bg-hcontrast: #3e2121;
+  --s-error-bor-hcontrast: #462a2a;
 
   /* rank font sizes - MUST be in EM */
   --r1-fs: 1.60em;
