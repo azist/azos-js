@@ -136,12 +136,11 @@ dialog:focus-visible, dialog:hover{ outline: none; }
 
   constructor() { super(); }
 
-  /** If not cleared, clear the timer */
+  /** Clear the timer */
   #clearTimer() {
-    if (this.#tmr) {
-      clearTimeout(this.#tmr);
-      this.#tmr = undefined;
-    }
+    if (!this.#tmr) return;
+    clearTimeout(this.#tmr);
+    this.#tmr = undefined;
   }
 
   /** If not already started, start a timer to destroy this toast */
