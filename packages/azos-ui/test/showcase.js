@@ -101,8 +101,6 @@ export class Showcase extends AzosElement {
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
 
-<az-toast>Moo</az-toast>
-
 <az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
 <az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
 
