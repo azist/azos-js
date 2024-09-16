@@ -488,6 +488,10 @@ export function normalizeUSPhone(v) {
   return "(" + area + ") " + number + ext;
 }
 
+/**
+ * @param {string} v the phone number to test
+ * @returns true if the phone number is valid
+ */
 export function isValidPhone(v) {
   if (isEmpty(v)) return false;
   if (v.length < 7) return false;
