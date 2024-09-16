@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css } from "../ui";
+import { AzosElement, html, css, POSITION, RANK, STATUS } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/check-field.js";
@@ -14,11 +14,12 @@ import "../parts/select-field.js";
 import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import { Spinner } from "../spinner.js";
+import { Toast } from "../toast.js";
 import "../vcl/time/timeline.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
-export class Showcase extends AzosElement{
-  constructor(){ super(); }
+export class Showcase extends AzosElement {
+  constructor() { super(); }
 
   static styles = css`
   .strip-h{
@@ -31,47 +32,67 @@ export class Showcase extends AzosElement{
   `;
 
 
-  onDlg1Open(){ this.dlg1.show(); }
-  onDlg1Close(){ this.dlg1.close(); }
-  onDlg2Open(){ this.dlg2.show(); }
-  onDlg2Close(){ this.dlg2.close(); }
+  onDlg1Open() { this.dlg1.show(); }
+  onDlg1Close() { this.dlg1.close(); }
+  onDlg2Open() { this.dlg2.show(); }
+  onDlg2Close() { this.dlg2.close(); }
 
-  async onSpinnerProcess(){
+  async onSpinnerProcess() {
     Spinner.exec(async sp => {
-     sp.message = `Prepping DB...`;
-     await new Promise(resolve => setTimeout(resolve, 1070));
-     sp.message = `Exec DDL 1 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 1500));
-     sp.message = `Exec DDL 2 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 890));
-     sp.message = `Exec DDL 3 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 1232));
-     sp.status = "error";
-     sp.message = `Recovering DDL error...`;
-     await new Promise(resolve => setTimeout(resolve, 2370));
-     sp.status = "warning";
-     sp.message = `Exec DDL 4 of 5 ...`;
-     await new Promise(resolve => setTimeout(resolve, 1870));
-     sp.message = `Exec DDL 5 of 5 ...`;
-     sp.status = "ok";
-     await new Promise(resolve => setTimeout(resolve, 2360));
+      sp.message = `Prepping DB...`;
+      await new Promise(resolve => setTimeout(resolve, 1070));
+      sp.message = `Exec DDL 1 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      sp.message = `Exec DDL 2 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 890));
+      sp.message = `Exec DDL 3 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1232));
+      sp.status = "error";
+      sp.message = `Recovering DDL error...`;
+      await new Promise(resolve => setTimeout(resolve, 2370));
+      sp.status = "warning";
+      sp.message = `Exec DDL 4 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1870));
+      sp.message = `Exec DDL 5 of 5 ...`;
+      sp.status = "ok";
+      await new Promise(resolve => setTimeout(resolve, 2360));
     });
   }
 
-  onModalSpinnerOpen(){ this.spinnerModal.show(); }
-  onNonModalSpinnerOpen(){ this.spinnerNonModal.show(); }
-  onNonModalSpinnerClose(){ this.spinnerNonModal.hide(); }
+  onModalSpinnerOpen() { this.spinnerModal.show(); }
+  onNonModalSpinnerOpen() { this.spinnerNonModal.show(); }
+  onNonModalSpinnerClose() { this.spinnerNonModal.hide(); }
 
-  onAutoSpinnerOpen(){ Spinner.show(null, 3000); }
+  onAutoSpinnerOpen() { Spinner.show(null, 3000); }
 
-  #onFieldChange(e){
+  #onFieldChange(e) {
     console.log("Got change event from field: ", e.target.name, e.target.value);
     this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
   }
 
+  toastCount = 0;
+  async toastMe(multiple = false) {
+    const toasts = multiple ? 20 : 1;
+    for (let i = 0; i < toasts; i++) {
+      temp(++this.toastCount);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
 
+    function temp(id) {
+      const randomRank = false;
+      const randomStatus = false;
+      const randomPosition = false;
+      const timeout = undefined; //1_000;
 
-  render(){
+      const rank = randomRank ? Math.floor(Math.random() * Object.keys(RANK).length) : RANK.DEFAULT;
+      const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
+      const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
+
+      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, timeout, rank, status, position);
+    }
+  }
+
+  render() {
     return html`
 
 <h1>Showcase of Azos Controls</h1>
@@ -80,6 +101,9 @@ export class Showcase extends AzosElement{
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
+
+<az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
+<az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
 
 <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
 <az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
