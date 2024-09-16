@@ -652,6 +652,21 @@ describe("Strings", function () {
     it("my.-name", function () { aver.isFalse(sut.isValidScreenName("my.-name")); });
   });
 
+  describe(".normalizeUSPhone()", function () {
+    it("normalize-phone-1", () => aver.areEqual(sut.normalizeUSPhone("5552224415"), "(555) 222-4415"));
+    it("normalize-phone-2", () => aver.areEqual(sut.normalizeUSPhone("2224415"), "(???) 222-4415"));
+    it("normalize-phone-3", () => aver.areEqual(sut.normalizeUSPhone("   +38 067 2148899   "), "+38 067 2148899"));
+    it("normalize-phone-4", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415"), "(555) 222-4415"));
+    it("normalize-phone-5", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415 EXT 2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-6", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415.2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-7", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415EXT.2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-8", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415 X 2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-9", () => aver.areEqual(sut.normalizeUSPhone("555.222.4415"), "(555) 222-4415"));
+    it("normalize-phone-10", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415"), "(555) 222-4415"));
+    it("normalize-phone-11", () => aver.areEqual(sut.normalizeUSPhone("5552224415ext123"), "(555) 222-4415x123"));
+    it("normalize-phone-12", () => aver.areEqual(sut.normalizeUSPhone("5552224415ext.123"), "(555) 222-4415x123"));
+  });
+
   describe(".isCharLetterOrDigit()", function () {
     it("true ('a')", () => aver.isTrue(sut.isCharLetterOrDigit('a')));
     it("true ('1')", () => aver.isTrue(sut.isCharLetterOrDigit('1')));
