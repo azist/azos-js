@@ -12,6 +12,7 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
 import "./showcase.js";
+import "../vcl/time/timeline.js";
 
 
 //import { APPLET_STYLES } from "./applet.css.js";
@@ -103,6 +104,11 @@ export class XyzApplet extends Applet {
     this.btnSave.isVisible = !this.btnSave.isVisible;
   }
 
+  async onClickTimeline(){
+    const dr = (await this.dlgTimeline.show()).modalResult;
+    console.info(`Showing ${dr} dialog`);
+  }
+
   async btnChronicleClick(){
     this.arena.appletOpen(ChronicleApplet);
   }
@@ -122,6 +128,9 @@ export class XyzApplet extends Applet {
      <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
      <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
      <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
+
+
+     <az-button id="btnTimeline" scope="this" title="Git yer fuchurr 4told!" status="info" @click="${this.onClickTimeline}"></az-button>
 
 
 
@@ -144,6 +153,21 @@ export class XyzApplet extends Applet {
        <button>Call Gurariy Hard!!</button>
 
      </xyz-dialog>
+
+     <az-modal-dialog status="error" id="dlgTimeline" scope="self" title="Timeline tester">
+      <div slot="body">
+        <az-timeline status="info" currentStepIndex="1">
+          <az-timeline-step title="start"></az-timeline-step>
+          <az-timeline-step title="outline"></az-timeline-step>
+          <az-timeline-step title="rough draft"></az-timeline-step>
+          <az-timeline-step title="proofread"></az-timeline-step>
+          <az-timeline-step title="revise"></az-timeline-step>
+          <az-timeline-step title="finalize"></az-timeline-step>
+          <az-timeline-step title="publish"></az-timeline-step>
+          <az-timeline-step title="finish"></az-timeline-step>
+        </az-timeline>
+      </div>
+     </az-modal-dialog>
 
      <az-test-showcase></az-test-showcase>
 

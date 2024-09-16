@@ -5,7 +5,7 @@ export class Timeline extends AzosElement{
 
   static properties={
     /** Identifies the current (active) step within this timeline's array */
-    currentStep: {type:Number}
+    currentStepIndex: {type:Number}
   }
 
   static styles=css`
@@ -14,8 +14,9 @@ export class Timeline extends AzosElement{
       color: var(--s-default-fg);
       display:flex;
       text-align:center;
-      padding:1em 7em;
+      padding:1em 3.5em;
       justify-content:space-between;
+      column-gap:1.25em;
     }
 
     .timeline-step{
@@ -24,6 +25,7 @@ export class Timeline extends AzosElement{
       transition:all ease .2s;
       border-radius:.5em;
       border:1px solid;
+      flex-grow:1;
     }
 
     .timeline-step:hover{
@@ -40,7 +42,7 @@ export class Timeline extends AzosElement{
 
     .timeline-step p{
       text-transform:uppercase;
-      margin-top:0;
+      margin-top:auto;
       margin-bottom:0;
       padding:.5em 1em;
       font-size:.8em;
@@ -81,10 +83,12 @@ export class Timeline extends AzosElement{
   `;
 
   #stepChange(e){
-    alert(`Current step before change is ${(this.currentStep+1)}`);
-    if(e.target.value!==this.currentStep){
-      this.currentStep = e.target.step;
-      alert(`Current step after change is ${(this.currentStep+1)}`);
+    const oldStep = this.currentStepIndex;
+    const newStep = parseInt(e.currentTarget.getAttribute('data-step'));
+    alert(`Current step BEFORE change is ${(oldStep+1)}`);
+    if(newStep!==oldStep){
+      this.currentStepIndex = newStep;
+      alert(`Current step AFTER change is ${(newStep+1)}`);
       this.stepChanged();
     }
   }
@@ -97,8 +101,8 @@ export class Timeline extends AzosElement{
     const stepList = html`${steps.map((step,i) =>
       //build individual step
       html`
-        <div class="timeline-step" value="${i}" @click="${this.#stepChange}">
-          <h3 class="${this.currentStep===i ? `rev${clsStatus}` : ''}">${(i+1)}</h3>
+        <div class="timeline-step" data-step="${i}" @click="${this.#stepChange}">
+          <h3 class="${this.currentStepIndex===i ? `rev${clsStatus}` : ''}">${(i+1)}</h3>
           <p class="rev${clsStatus}">${step.title}</p>
         </div>
       `
