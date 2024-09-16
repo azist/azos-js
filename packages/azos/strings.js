@@ -454,7 +454,7 @@ export function normalizeUSPhone(v) {
       }
     }
 
-    if (!isCharLetterOrDigit(chr)) continue;
+    if (!isMultilingualLetterOrDigit(chr)) continue;
 
     if (isArea) area += chr;
     else {
@@ -488,6 +488,103 @@ export function normalizeUSPhone(v) {
   return "(" + area + ") " + number + ext;
 }
 
+export function isValidPhone(v) {
+  if (isEmpty(v)) return false;
+  if (v.length < 7) return false;
+
+  let hasFirstParenthesis = false;
+  let hasSecondParenthesis = false;
+  let prevIsSpecial = false;
+  let area = false;
+  let inParenthesis = false;
+
+  for (let i = 0; i < v.length; i++) {
+    let c = v.charAt(i);
+
+    if (i === 0) {
+      if (c === ' ') return false;
+      if (c === '+') {
+        prevIsSpecial = true;
+        continue;
+      } else {
+        area = true;
+      }
+    }
+
+    if (i === v.length - 1 && !isLetterOrDigit(c)) return false;
+
+    if (c === '(') {
+      if (hasFirstParenthesis || hasSecondParenthesis || prevIsSpecial) return false;
+      hasFirstParenthesis = true;
+      inParenthesis = true;
+      continue;
+    }
+
+    if (c === ')') {
+      if (hasSecondParenthesis || prevIsSpecial) return false;
+      hasSecondParenthesis = true;
+      prevIsSpecial = true;
+      inParenthesis = false;
+      continue;
+    }
+
+    if (c === '-' || c === '.') {
+      if (prevIsSpecial || inParenthesis) return false;
+      prevIsSpecial = true;
+      continue;
+    }
+
+    if (c === ' ') {
+      if ((prevIsSpecial && v.charAt(i - 1) !== ')') || inParenthesis) return false;
+      prevIsSpecial = true;
+      continue;
+    }
+
+    if (area) {
+      for (let j = 0; j < 3 && i < v.length - 2; j++) {
+        c = v.charAt(i + j);
+        if (!isDigit(c)) return false;
+      }
+
+      if (inParenthesis && v.charAt(i + 3) !== ')') return false;
+      area = false;
+      i = i + 2;
+      continue;
+    }
+
+    if (!isLetterOrDigit(c)) return false;
+    prevIsSpecial = false;
+  }
+
+  if (inParenthesis || (hasSecondParenthesis && !hasFirstParenthesis)) return false;
+
+  return true;
+}
+
+/**
+ * @param {char} char the character to test
+ * @returns true if character is a digit [0-9]
+ */
+export function isDigit(char) {
+  return /^[0-9]$/.test(char);
+}
+
+/**
+ * @param {string} char the character to test
+ * @returns true if char is a letter [A-Za-z]
+ */
+export function isLetter(char) {
+  return /^[A-Za-z]$/.test(char);
+}
+
+/**
+ * @param {string} char the character to test
+ * @returns true if char is a letter [A-Za-z] or a digit [0-9]
+ */
+export function isLetterOrDigit(char) {
+  return isDigit(char) || isLetter(char);
+}
+
 /**
  * This method mimics C# in matching English characters [a-zA-Z0-9], accented
  *  and non-English characters [éçα], unicode digits [٥९], and ignores whitespace
@@ -495,7 +592,7 @@ export function normalizeUSPhone(v) {
  * @param {string} char the character to test
  * @returns true if char is a digit or a letter
  */
-export function isCharLetterOrDigit(char) {
+export function isMultilingualLetterOrDigit(char) {
   char = char.toString();
   char = char.length ? char.trim() : char;
   if (!char.length || char.length > 1) {
