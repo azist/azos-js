@@ -652,21 +652,144 @@ describe("Strings", function () {
     it("my.-name", function () { aver.isFalse(sut.isValidScreenName("my.-name")); });
   });
 
-  describe(".isCharLetterOrDigit()", function () {
-    it("true ('a')", () => aver.isTrue(sut.isCharLetterOrDigit('a')));
-    it("true ('1')", () => aver.isTrue(sut.isCharLetterOrDigit('1')));
-    it("true (1)", () => aver.isTrue(sut.isCharLetterOrDigit(1)));
-    it("true ('é')", () => aver.isTrue(sut.isCharLetterOrDigit('é')));
-    it("true ('ç')", () => aver.isTrue(sut.isCharLetterOrDigit('ç')));
-    it("true ('α')", () => aver.isTrue(sut.isCharLetterOrDigit('α')));
-    it("true ('٥')", () => aver.isTrue(sut.isCharLetterOrDigit('٥')));
-    it("true ('९')", () => aver.isTrue(sut.isCharLetterOrDigit('९')));
-    it("false (' ')", () => aver.isFalse(sut.isCharLetterOrDigit(' ')));
-    it("false ('$')", () => aver.isFalse(sut.isCharLetterOrDigit('$')));
-    it("false ('@')", () => aver.isFalse(sut.isCharLetterOrDigit('@')));
-    it("false ('\t')", () => aver.isFalse(sut.isCharLetterOrDigit('\t')));
-    it("false ('mo')", () => aver.isFalse(sut.isCharLetterOrDigit('mo')));
-    it("false ('m#')", () => aver.isFalse(sut.isCharLetterOrDigit('m#')));
+  describe(".normalizeUSPhone()", function () {
+    it("normalize-phone-1", () => aver.areEqual(sut.normalizeUSPhone("5552224415"), "(555) 222-4415"));
+    it("normalize-phone-2", () => aver.areEqual(sut.normalizeUSPhone("2224415"), "(???) 222-4415"));
+    it("normalize-phone-3", () => aver.areEqual(sut.normalizeUSPhone("   +38 067 2148899   "), "+38 067 2148899"));
+    it("normalize-phone-4", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415"), "(555) 222-4415"));
+    it("normalize-phone-5", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415 EXT 2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-6", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415.2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-7", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415EXT.2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-8", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415 X 2014"), "(555) 222-4415x2014"));
+    it("normalize-phone-9", () => aver.areEqual(sut.normalizeUSPhone("555.222.4415"), "(555) 222-4415"));
+    it("normalize-phone-10", () => aver.areEqual(sut.normalizeUSPhone("555-222-4415"), "(555) 222-4415"));
+    it("normalize-phone-11", () => aver.areEqual(sut.normalizeUSPhone("5552224415ext123"), "(555) 222-4415x123"));
+    it("normalize-phone-12", () => aver.areEqual(sut.normalizeUSPhone("5552224415ext.123"), "(555) 222-4415x123"));
+  });
+
+  describe(".isValidPhone()", function () {
+    it("valid-phones", function () {
+      const good = [
+        "(800) 234-2345x234",
+        "(800) 234-2345",
+        "800 2345678",
+        "800 234-4522",
+        "800.2345678",
+        "800.234.4522",
+        "800-234-2345",
+        "800-234-2345x234",
+        "8882344511",
+        "(888)2344511",
+        "(888)234-4511",
+        "(888)234.4511",
+        "(888) 2344511",
+        "(888) 234 4511",
+        "(900) 4megood",
+        "9004megood",
+        "+28937498723987498237",
+        "+8293 823098 82394",
+        "+3423-3423-234-34",
+        "+3423-3423-234x456",
+        "+1 900 4ME-GOOD"
+      ];
+
+      for (let i = 0; i < good.length; i++) {
+        aver.isTrue(sut.isValidPhone(good[i]), good[i]);
+      }
+    });
+
+    it("invalid-phones", function () {
+      const bad = [
+        "800",
+        "(800)",
+        "(8888)234-4511",
+        " (888)234-4511",
+        "(888)234-4511 ",
+        "(8-88)234-4511",
+        "+1423423 +23423",
+        ")800 23456777(",
+        "800)1234567",
+        "(216) 234(2345)",
+        "345#aaaaa",
+        "7567:242333",
+        "+800242--3333",
+        "+800242..3333",
+        "+800242-.3333",
+        "#800242.-3333",
+        "+800242.-3333",
+        "+(80 0)242.-3333",
+        "(800).2423333",
+        "(800)-2423333",
+        "(800)2423333.",
+        ".(800)2423333",
+        "-(800)2423333",
+        "((800))2423333",
+        "(800-)2423333",
+        "(.800)2423333",
+        "+(800)242-3333",
+        "(800)242. 3333",
+        "(800)242 - 3333",
+        "(800)242        COOL",
+        "(800)242 - 33 - 33"
+      ];
+
+      for (let i = 0; i < bad.length; i++) {
+        aver.isFalse(sut.isValidPhone(bad[i]), bad[i]);
+      }
+    });
+  });
+
+  describe(".isLetter()", function() {
+    it("true ('a')", () => aver.isTrue(sut.isLetter('a')));
+    it("false ('1')", () => aver.isFalse(sut.isLetter('1')));
+    it("false (1)", () => aver.isFalse(sut.isLetter(1)));
+    it("false (' ')", () => aver.isFalse(sut.isLetter(' ')));
+    it("false ('$')", () => aver.isFalse(sut.isLetter('$')));
+    it("false ('@')", () => aver.isFalse(sut.isLetter('@')));
+    it("false ('\t')", () => aver.isFalse(sut.isLetter('\t')));
+    it("false ('mo')", () => aver.isFalse(sut.isLetter('mo')));
+    it("false ('m#')", () => aver.isFalse(sut.isLetter('m#')));
+  });
+
+  describe(".isDigit()", function() {
+    it("false ('a')", () => aver.isFalse(sut.isDigit('a')));
+    it("true ('1')", () => aver.isTrue(sut.isDigit('1')));
+    it("true (1)", () => aver.isTrue(sut.isDigit(1)));
+    it("false (' ')", () => aver.isFalse(sut.isDigit(' ')));
+    it("false ('$')", () => aver.isFalse(sut.isDigit('$')));
+    it("false ('@')", () => aver.isFalse(sut.isDigit('@')));
+    it("false ('\t')", () => aver.isFalse(sut.isDigit('\t')));
+    it("false ('mo')", () => aver.isFalse(sut.isDigit('mo')));
+    it("false ('m#')", () => aver.isFalse(sut.isDigit('m#')));
+  });
+
+  describe(".isLetterOrDigit()", function () {
+    it("true ('a')", () => aver.isTrue(sut.isLetterOrDigit('a')));
+    it("true ('1')", () => aver.isTrue(sut.isLetterOrDigit('1')));
+    it("true (1)", () => aver.isTrue(sut.isLetterOrDigit(1)));
+    it("false (' ')", () => aver.isFalse(sut.isLetterOrDigit(' ')));
+    it("false ('$')", () => aver.isFalse(sut.isLetterOrDigit('$')));
+    it("false ('@')", () => aver.isFalse(sut.isLetterOrDigit('@')));
+    it("false ('\t')", () => aver.isFalse(sut.isLetterOrDigit('\t')));
+    it("false ('mo')", () => aver.isFalse(sut.isLetterOrDigit('mo')));
+    it("false ('m#')", () => aver.isFalse(sut.isLetterOrDigit('m#')));
+  });
+
+  describe(".isMultilingualLetterOrDigit()", function () {
+    it("true ('a')", () => aver.isTrue(sut.isMultilingualLetterOrDigit('a')));
+    it("true ('1')", () => aver.isTrue(sut.isMultilingualLetterOrDigit('1')));
+    it("true (1)", () => aver.isTrue(sut.isMultilingualLetterOrDigit(1)));
+    it("true ('é')", () => aver.isTrue(sut.isMultilingualLetterOrDigit('é')));
+    it("true ('ç')", () => aver.isTrue(sut.isMultilingualLetterOrDigit('ç')));
+    it("true ('α')", () => aver.isTrue(sut.isMultilingualLetterOrDigit('α')));
+    it("true ('٥')", () => aver.isTrue(sut.isMultilingualLetterOrDigit('٥')));
+    it("true ('९')", () => aver.isTrue(sut.isMultilingualLetterOrDigit('९')));
+    it("false (' ')", () => aver.isFalse(sut.isMultilingualLetterOrDigit(' ')));
+    it("false ('$')", () => aver.isFalse(sut.isMultilingualLetterOrDigit('$')));
+    it("false ('@')", () => aver.isFalse(sut.isMultilingualLetterOrDigit('@')));
+    it("false ('\t')", () => aver.isFalse(sut.isMultilingualLetterOrDigit('\t')));
+    it("false ('mo')", () => aver.isFalse(sut.isMultilingualLetterOrDigit('mo')));
+    it("false ('m#')", () => aver.isFalse(sut.isMultilingualLetterOrDigit('m#')));
   });
 
   describe("#bufToHex()", function () {

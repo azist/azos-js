@@ -6,6 +6,7 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
+import { matchPattern } from "./strings.js";
 
 
 /** Thrown for runner-related exceptions */
@@ -28,6 +29,7 @@ export class Unit {
   #id;
   #parent;
   #name;
+  #pathTo;
   #children = [];
   #skipFunction;
   constructor(parent, name, init = null, skipFunction = null) {
@@ -36,6 +38,12 @@ export class Unit {
     this.#id = `U${Unit.#idSeed.toString().padStart(4, "0")}`;
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
     this.#name = aver.isString(name);
+
+    if (this.#name === "*") {
+      this.#pathTo = undefined;
+    } else if (parent?.pathTo !== undefined) {
+      this.#pathTo = parent.pathTo + '/' + this.#name;
+    }
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     init = init !== null ? aver.isFunction(init) : null;
 
@@ -52,8 +60,15 @@ export class Unit {
    * You can use this as correlation key in runner etc.
    * */
   get id() { return this.#id; }
+
+  /** returns the parent unit */
   get parent() { return this.#parent; }
+
+  /** Returns logic name for this unit */
   get name() { return this.#name; }
+
+  /** returns hierarchical path for this unit */
+  get pathTo() { return this.#pathTo; }
 
   /** Optional f(runner, unit): bool */
   get skipFunction() { return this.#skipFunction; }
@@ -128,6 +143,7 @@ export class Case {
   #id;
   #unit;
   #name;
+  #pathTo;
   #body;
 
   #startMs = 0;
@@ -140,6 +156,12 @@ export class Case {
     this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
+
+    if (unit?.pathTo !== undefined) {
+      this.#pathTo = unit.pathTo + "/" + this.#name;
+    } else {
+      this.#pathTo = this.#name;
+    }
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     this.#body = aver.isFunction(body);
     this.#unit.register(this);
@@ -156,6 +178,9 @@ export class Case {
 
   /** Returns logical name of this case */
   get name() { return this.#name; }
+
+  /** Returns hierarchical path for this case */
+  get pathTo() { return this.#pathTo; }
 
   /** Returns a function body for case execution */
   get body() { return this.#body; }
@@ -215,11 +240,11 @@ let argsUnits = null;
 let argsCases = null;
 
 /**
- * Default implementation for process cmd args parsing `--filter "Unit1 Unit2 &caseX &caseY"`
+ * [Old] Default implementation for process cmd args parsing `--filter "Unit1 Unit2 &caseX &caseY"`
  * @param {Unit | Case} uoc an instance of either a Unit or a Case to filter
  * @returns true if the supplied instance of a Unit or a Case satisfies the logical filter set from a command line args line
  */
-export function cmdArgsCaseFilter(uoc) {
+export function cmdArgsCaseFilterOld(uoc) {
 
   //prep stage - parse process-wide args
   if (!argsParsed) {
@@ -267,6 +292,106 @@ export function cmdArgsCaseFilter(uoc) {
 
   return true;
 }
+
+/**
+ *
+ */
+class UnitCaseFilterByPath {
+  static doFilter = false;
+  static parsed = false;
+  static unitsYay = [];
+  static unitsNay = [];
+  static casesYay = [];
+  static casesNay = [];
+
+  static get hasUnitsYay() { return UnitCaseFilterByPath.unitsYay.length > 0 }
+  static get hasUnitsNay() { return UnitCaseFilterByPath.unitsNay.length > 0 }
+  static get hasCasesNay() { return UnitCaseFilterByPath.casesNay.length > 0 }
+  static get hasCasesYay() { return UnitCaseFilterByPath.casesYay.length > 0 }
+
+  static #parseArgs() {
+    UnitCaseFilterByPath.parsed = true;
+
+    if (typeof (process) === 'undefined') return true;
+
+    const idx = process.argv.indexOf('--filter');
+    if (idx > 0 && idx < process.argv.length - 1) {
+      const filterSegments = process.argv[idx + 1].split(" ")
+        .filter(segment => segment !== '');
+
+      UnitCaseFilterByPath.doFilter = true;
+      filterSegments.forEach(segment => () => {
+        let nayFilter = false;
+        if (segment.length === 1 && segment === "*") { // process "all" filter
+          this.casesYay.push(segment);
+          return; // next segment
+        }
+
+        if (segment.startsWith("~")) { // process not-logic
+          nayFilter = true;
+          segment = segment.substring(1);
+        }
+
+        if (segment.includes("&")) { // case filter
+          segment = segment.substring(1);
+          if (nayFilter) {
+            this.casesNay.push(segment);
+          } else {
+            this.casesYay.push(segment);
+          }
+        } else { // process unit filter
+          if (nayFilter) {
+            this.unitsNay.push(segment);
+          } else {
+            this.unitsYay.push(segment);
+          }
+        }
+      });
+    } else {
+      this.casesYay.push("*");
+    }
+  }
+
+  static filter(uoc) {
+    if (!UnitCaseFilterByPath.parsed) UnitCaseFilterByPath.#parseArgs();
+
+    if (UnitCaseFilterByPath.hasUnitsNay) {
+      for (let pattern of UnitCaseFilterByPath.unitsNay) {
+        if (matchPattern(uoc.pathTo, pattern)) {
+          return false;
+        }
+      }
+    }
+
+    if (UnitCaseFilterByPath.hasCasesNay) {
+      for (let pattern of UnitCaseFilterByPath.casesNay) {
+        if (matchPattern(uoc.pathTo, pattern)) {
+          return false;
+        }
+      }
+    }
+
+    if (UnitCaseFilterByPath.hasUnitsYay) {
+      for (let pattern of UnitCaseFilterByPath.unitsYay) {
+        if (matchPattern(uoc.pathTo, pattern)) {
+          return true;
+        }
+      }
+    }
+
+    if (UnitCaseFilterByPath.hasCasesYay) {
+      for (let pattern of UnitCaseFilterByPath.casesYay) {
+        if (matchPattern(uoc.pathTo, pattern)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+}
+
+export const cmdArgsCaseFilter = UnitCaseFilterByPath.filter.bind(UnitCaseFilterByPath);
 
 /**
  * Provides basic counts of success/errors and overridable `begin/end` style hooks
