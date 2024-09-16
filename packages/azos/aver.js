@@ -230,11 +230,12 @@ export function isSymbol(a) {
 /**
  * Performs strict test for false
  * @param {bool} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original bool if false or throws
  */
-export function isFalse(a) {
+export function isFalse(a, from = undefined) {
   if (a === false) return a;
-  throw AVERMENT_FAILURE(`isFalse(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isFalse(${dv(a)})`, from);
 }
 
 /**
