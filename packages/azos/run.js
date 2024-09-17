@@ -6,7 +6,7 @@
 
 import * as types from "./types.js";
 import * as aver from "./aver.js";
-import { matchPattern } from "./strings.js";
+import { isEmpty, matchPattern } from "./strings.js";
 
 
 /** Thrown for runner-related exceptions */
@@ -29,7 +29,9 @@ export class Unit {
   #id;
   #parent;
   #name;
-  #pathTo;
+
+  // This is the hierarchy to this unit plus this unit name
+  #path;
   #children = [];
   #skipFunction;
   constructor(parent, name, init = null, skipFunction = null) {
@@ -40,9 +42,9 @@ export class Unit {
     this.#name = aver.isString(name);
 
     if (this.#name === "*") {
-      this.#pathTo = undefined;
-    } else if (parent?.pathTo !== undefined) {
-      this.#pathTo = parent.pathTo + '/' + this.#name;
+      this.#path = "";
+    } else {
+      this.#path = `${parent.path}/${this.#name}`;
     }
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     init = init !== null ? aver.isFunction(init) : null;
@@ -67,8 +69,8 @@ export class Unit {
   /** Returns logic name for this unit */
   get name() { return this.#name; }
 
-  /** returns hierarchical path for this unit */
-  get pathTo() { return this.#pathTo; }
+  /** returns hierarchical path for this unit including its name */
+  get path() { return this.#path; }
 
   /** Optional f(runner, unit): bool */
   get skipFunction() { return this.#skipFunction; }
@@ -143,7 +145,8 @@ export class Case {
   #id;
   #unit;
   #name;
-  #pathTo;
+  // This is the hierarchy to this case
+  #path;
   #body;
 
   #startMs = 0;
@@ -156,12 +159,7 @@ export class Case {
     this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
-
-    if (unit?.pathTo !== undefined) {
-      this.#pathTo = unit.pathTo + "/" + this.#name;
-    } else {
-      this.#pathTo = this.#name;
-    }
+    this.#path = `${unit.path}/${this.#name}`;
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     this.#body = aver.isFunction(body);
     this.#unit.register(this);
@@ -180,7 +178,7 @@ export class Case {
   get name() { return this.#name; }
 
   /** Returns hierarchical path for this case */
-  get pathTo() { return this.#pathTo; }
+  get path() { return this.#path; }
 
   /** Returns a function body for case execution */
   get body() { return this.#body; }
@@ -296,102 +294,80 @@ export function cmdArgsCaseFilterOld(uoc) {
 /**
  *
  */
-class UnitCaseFilterByPath {
-  static doFilter = false;
-  static parsed = false;
-  static unitsYay = [];
-  static unitsNay = [];
-  static casesYay = [];
-  static casesNay = [];
+export const cmdArgsCaseFilter = (function () {
+  let unitNayFilters = undefined;
+  let unitYayFilters = undefined;
+  let caseNayFilters = undefined;
+  let caseYayFilters = undefined;
 
-  static get hasUnitsYay() { return UnitCaseFilterByPath.unitsYay.length > 0 }
-  static get hasUnitsNay() { return UnitCaseFilterByPath.unitsNay.length > 0 }
-  static get hasCasesNay() { return UnitCaseFilterByPath.casesNay.length > 0 }
-  static get hasCasesYay() { return UnitCaseFilterByPath.casesYay.length > 0 }
+  function ensureParsedArgs() {
+    if (unitNayFilters) return;
 
-  static #parseArgs() {
-    UnitCaseFilterByPath.parsed = true;
-
-    if (typeof (process) === 'undefined') return true;
+    unitNayFilters = [];
+    unitYayFilters = [];
+    caseNayFilters = [];
+    caseYayFilters = [];
 
     const idx = process.argv.indexOf('--filter');
-    if (idx > 0 && idx < process.argv.length - 1) {
-      const filterSegments = process.argv[idx + 1].split(" ")
-        .filter(segment => segment !== '');
-
-      UnitCaseFilterByPath.doFilter = true;
-      filterSegments.forEach(segment => () => {
-        let nayFilter = false;
-        if (segment.length === 1 && segment === "*") { // process "all" filter
-          this.casesYay.push(segment);
-          return; // next segment
-        }
-
-        if (segment.startsWith("~")) { // process not-logic
-          nayFilter = true;
-          segment = segment.substring(1);
-        }
-
-        if (segment.includes("&")) { // case filter
-          segment = segment.substring(1);
-          if (nayFilter) {
-            this.casesNay.push(segment);
-          } else {
-            this.casesYay.push(segment);
-          }
-        } else { // process unit filter
-          if (nayFilter) {
-            this.unitsNay.push(segment);
-          } else {
-            this.unitsYay.push(segment);
-          }
-        }
-      });
-    } else {
-      this.casesYay.push("*");
+    if (idx <= 0 || idx === process.argv.length - 1) {
+      return;
     }
+
+    const filterSegments = process.argv[idx + 1]
+      .split(" ")
+      .filter(segment => !isEmpty(segment));
+
+    filterSegments.forEach(segment => {
+      let yay = true;
+
+      if (segment.startsWith("~")) {
+        yay = false;
+        segment = segment.substring(1);
+      }
+
+      if (segment.startsWith("&")) {
+        (yay ? caseYayFilters : caseNayFilters).push(segment.substring(1));
+      } else {
+        (yay ? unitYayFilters : unitNayFilters).push(segment);
+      }
+
+    });
   }
 
-  static filter(uoc) {
-    if (!UnitCaseFilterByPath.parsed) UnitCaseFilterByPath.#parseArgs();
+  function yayNayMatching(uoc, nayFilters, yayFilters) {
 
-    if (UnitCaseFilterByPath.hasUnitsNay) {
-      for (let pattern of UnitCaseFilterByPath.unitsNay) {
-        if (matchPattern(uoc.pathTo, pattern)) {
-          return false;
-        }
+    if (nayFilters.length > 0) {
+      for (let filter of nayFilters) {
+        if (matchPattern(uoc.path, filter)) return false;
       }
     }
 
-    if (UnitCaseFilterByPath.hasCasesNay) {
-      for (let pattern of UnitCaseFilterByPath.casesNay) {
-        if (matchPattern(uoc.pathTo, pattern)) {
-          return false;
+    if (yayFilters.length > 0) {
+      let found = false;
+      for (let filter of yayFilters) {
+        if (matchPattern(uoc.path, filter)) {
+          found = true;
+          break;
         }
       }
+      if (!found) return false;
     }
 
-    if (UnitCaseFilterByPath.hasUnitsYay) {
-      for (let pattern of UnitCaseFilterByPath.unitsYay) {
-        if (matchPattern(uoc.pathTo, pattern)) {
-          return true;
-        }
-      }
-    }
-
-    if (UnitCaseFilterByPath.hasCasesYay) {
-      for (let pattern of UnitCaseFilterByPath.casesYay) {
-        if (matchPattern(uoc.pathTo, pattern)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return true;
   }
-}
 
-export const cmdArgsCaseFilter = UnitCaseFilterByPath.filter.bind(UnitCaseFilterByPath);
+  function filter(uoc) {
+    if (!uoc) return false;
+
+    ensureParsedArgs();
+
+    if (uoc instanceof Unit) return yayNayMatching(uoc, unitNayFilters, unitYayFilters);
+    else if (uoc instanceof Case) return yayNayMatching(uoc, caseNayFilters, caseYayFilters);
+    else return false;
+  }
+
+  return filter;
+}());
 
 /**
  * Provides basic counts of success/errors and overridable `begin/end` style hooks
