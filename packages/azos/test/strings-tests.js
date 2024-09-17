@@ -732,7 +732,7 @@ unit("Strings", function () {
     });
   });
 
-  unit(".isLetter()", function() {
+  unit(".isLetter()", function () {
     cs("true ('a')", () => aver.isTrue(sut.isLetter('a')));
     cs("false ('1')", () => aver.isFalse(sut.isLetter('1')));
     cs("false (1)", () => aver.isFalse(sut.isLetter(1)));
@@ -744,7 +744,7 @@ unit("Strings", function () {
     cs("false ('m#')", () => aver.isFalse(sut.isLetter('m#')));
   });
 
-  unit(".isDigit()", function() {
+  unit(".isDigit()", function () {
     cs("false ('a')", () => aver.isFalse(sut.isDigit('a')));
     cs("true ('1')", () => aver.isTrue(sut.isDigit('1')));
     cs("true (1)", () => aver.isTrue(sut.isDigit(1)));
