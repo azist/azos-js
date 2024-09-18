@@ -15,7 +15,6 @@ import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
-import "../vcl/time/timeline.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement {
@@ -330,18 +329,6 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <h2> Various elements combined</h2>
 ..tbd
 
-
-<h1>Timeline</h1>
-<az-timeline status="info" currentStep="1">
-  <az-timeline-step title="start"></az-timeline-step>
-  <az-timeline-step title="outline"></az-timeline-step>
-  <az-timeline-step title="rough draft"></az-timeline-step>
-  <az-timeline-step title="proofread"></az-timeline-step>
-  <az-timeline-step title="revise"></az-timeline-step>
-  <az-timeline-step title="finalize"></az-timeline-step>
-  <az-timeline-step title="publish"></az-timeline-step>
-  <az-timeline-step title="finish"></az-timeline-step>
-</az-timeline>
 
 `;
   }
