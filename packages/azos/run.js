@@ -351,17 +351,18 @@ export const cmdArgsCaseFilter = (function () {
     });
   }
 
-  function yayNayMatching(uoc, nayFilters, yayFilters) {
+  function yayNayMatching(what, nayFilters, yayFilters) {
+
     if (nayFilters.length > 0) {
       for (let filter of nayFilters) {
-        if (matchPattern(uoc.path, filter)) return false;
+        if (matchPattern(what, filter)) return false;
       }
     }
 
     if (yayFilters.length > 0) {
       let found = false;
       for (let filter of yayFilters) {
-        if (matchPattern(uoc.path, filter)) {
+        if (matchPattern(what, filter)) {
           found = true;
           break;
         }
@@ -377,8 +378,8 @@ export const cmdArgsCaseFilter = (function () {
 
     ensureParsedArgs();
 
-    if (uoc instanceof Unit) return yayNayMatching(uoc, unitNayFilters, unitYayFilters);
-    else if (uoc instanceof Case) return yayNayMatching(uoc, caseNayFilters, caseYayFilters);
+    if (uoc instanceof Unit) return yayNayMatching(uoc.path, unitNayFilters, unitYayFilters);
+    else if (uoc instanceof Case) return yayNayMatching(uoc.name, caseNayFilters, caseYayFilters);
     else return false;
   }
 
@@ -584,7 +585,7 @@ export function defineSuite(def) {
  * This parameter is pointing at the declaring parent unit or root unit
  * @param {string} name unit string name
  * @param {function} body unit init body function containing cases and/or child declarations
- * @param {function} fskip optional skip test function `f(runner, unit): bool`
+ * @param {function | undefined | null} fskip optional skip unit function `f(runner, unit): bool`
  * @returns {Unit} newly created unit or existing unit
  */
 export function defineUnit(name, body, fskip = null) {
@@ -604,10 +605,10 @@ export function defineUnit(name, body, fskip = null) {
  * `this` parameter is pointing at the declaring unit
  * @param {string} name case string
  * @param {function} body case execution body
- * @param {function} fskip optional skip test function `f(runner, cse): bool`
+ * @param {function | undefined | null} fskip optional skip case function `f(runner, cse): bool`
  * @returns {Case} newly created run case
  */
-export function defineCase(name, body, fskip) {
+export function defineCase(name, body, fskip = null) {
   const parent = this instanceof Unit ? this : current();
   return new Case(parent, name, body, fskip);
 }
