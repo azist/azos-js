@@ -719,7 +719,7 @@ export function asAtom(v, canUndef = false) {
   if (v instanceof Atom) return v;
 
   try {
-    let atom = Atom.parse(v);
+    let atom = Atom.encode(v);
     return atom;
   } catch (e) {
     throw new AzosError(CAST_ERROR + `asAtom("${strings.describe(v)}") -> ${e.message}`, "asAtom()", e);
@@ -750,7 +750,7 @@ export const TYPE_MONIKER = Object.freeze({
   OBJECT: "object",
   ARRAY: "array",
   ATOM: "atom",
-  ENTITY_ID: "entityId",
+  ENTITY_ID: "eid",
 });
 const ALL_TYPE_MONIKERS = allObjectValues(TYPE_MONIKER);
 
