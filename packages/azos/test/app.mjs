@@ -24,23 +24,27 @@ import "./security-tests.js";
 
 ////clearSuite();
 
-defineCase("runner.function", function(){
-  aver.areEqual(4, 2 + 2);
+defineUnit("RunnerSystemTests", function(){
+
+  defineCase("function", function(){
+    aver.areEqual(4, 2 + 2);
+  });
+
+  defineCase("arrow", () => aver.areEqual(5, 2 + 3));
+
+  defineCase("async-arrow-instant", async () => aver.areEqual(5, 2 + 3));
+  defineCase("async-arrow-delay", async () => await new Promise(r => setTimeout(r, 250)));
+
+  defineCase("promise-fun-instant", function(){ return Promise.resolve(123); } );
+  defineCase("promise-fun-delay", function(){ return new Promise(r => setTimeout(r, 250)); });
+
+  defineUnit("SkippedUnitWhichWillNeverRun", function(){
+    defineCase("never-run", function(){  });
+  }, () => true);
+
+  defineCase("this-case-will-be-skipped", function(){  }, () => true);
+
 });
-
-defineCase("runner.arrow", () => aver.areEqual(5, 2 + 3));
-
-defineCase("runner.asyncArrowInstant", async () => aver.areEqual(5, 2 + 3));
-defineCase("runner.asyncArrowDelay", async () => await new Promise(r => setTimeout(r, 100)));
-
-defineCase("runner.promiseFunctionInstant", function(){ return Promise.resolve(123); } );
-defineCase("runner.promiseFunctionDelay", function(){ return new Promise(r => setTimeout(r, 100)); });
-
-defineUnit("Runner.SkippedUnit", function(){
-  defineCase("nevrRun", function(){  });
-}, () => true);
-defineCase("runner.thisCaseWillBeSkipped", function(){  }, () => true);
-
 
 //run.defineSuite();
 const runner = new Runner(cmdArgsCaseFilter);
@@ -49,7 +53,7 @@ const runner = new Runner(cmdArgsCaseFilter);
 //top level module awaits can only be used in ES modules
 //////await suite().run(runner);
 //////process.exitCode = runner.countError;
-suite().run(runner)
+suite().runIfMatch(runner)
        .then(() => {
           runner.summarize();
           if (runner.countError > 0){

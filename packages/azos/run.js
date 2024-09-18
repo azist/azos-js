@@ -41,10 +41,10 @@ export class Unit {
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
     this.#name = aver.isString(name);
 
-    if (this.#name === "*") {
-      this.#path = "";
+    if (!this.#parent) {
+      this.#path = "/";
     } else {
-      this.#path = `${parent.path}/${this.#name}`;
+      this.#path = `${parent.parent ? parent.path : ""}/${this.#name}`;
     }
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     init = init !== null ? aver.isFunction(init) : null;
@@ -101,13 +101,30 @@ export class Unit {
   }
 
   /** Determines if this unit should be included or excluded from a run. Returns true if it should be included */
-  _match(runner) { return runner.matchUnitOrCase(this); }
+  _match(runner) {
+    if (runner.matchUnitOrCase(this)) return true;
+
+    for (const one of this.#children){
+      if (one instanceof Unit && one._match(runner)) return true;
+    }
+
+    return false;
+  }
 
   /** Determines if this unit should or should not be skipped while running. It is similar to `_match()`
   however skipped units get printed out into runner as skipped */
   _shouldSkip(runner) {
     return runner.shouldSkipUnit(this);
   }
+
+
+  /** Async method runs all child units/cases if this unit itself matches the filter */
+  async runIfMatch(runner) {
+    if (!runner) runner = Runner.default;
+    if (!this._match(runner)) return false;
+    return await this.run(runner);
+  }
+
 
   /** Async method runs all child units/cases */
   async run(runner) {
@@ -159,7 +176,7 @@ export class Case {
     this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
-    this.#path = `${unit.path}/${this.#name}`;
+    this.#path = `${unit.parent ? unit.path : ""}/${this.#name}`;
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     this.#body = aver.isFunction(body);
     this.#unit.register(this);
@@ -292,7 +309,7 @@ export function cmdArgsCaseFilterOld(uoc) {
 }
 
 /**
- *
+ * Unit or Case filter function based on parsed command args
  */
 export const cmdArgsCaseFilter = (function () {
   let unitNayFilters = undefined;
@@ -334,18 +351,18 @@ export const cmdArgsCaseFilter = (function () {
     });
   }
 
-  function yayNayMatching(uoc, nayFilters, yayFilters) {
+  function yayNayMatching(what, nayFilters, yayFilters) {
 
     if (nayFilters.length > 0) {
       for (let filter of nayFilters) {
-        if (matchPattern(uoc.path, filter)) return false;
+        if (matchPattern(what, filter)) return false;
       }
     }
 
     if (yayFilters.length > 0) {
       let found = false;
       for (let filter of yayFilters) {
-        if (matchPattern(uoc.path, filter)) {
+        if (matchPattern(what, filter)) {
           found = true;
           break;
         }
@@ -361,8 +378,8 @@ export const cmdArgsCaseFilter = (function () {
 
     ensureParsedArgs();
 
-    if (uoc instanceof Unit) return yayNayMatching(uoc, unitNayFilters, unitYayFilters);
-    else if (uoc instanceof Case) return yayNayMatching(uoc, caseNayFilters, caseYayFilters);
+    if (uoc instanceof Unit) return yayNayMatching(uoc.path, unitNayFilters, unitYayFilters);
+    else if (uoc instanceof Case) return yayNayMatching(uoc.name, caseNayFilters, caseYayFilters);
     else return false;
   }
 
@@ -463,7 +480,7 @@ export class Runner {
 
 
   beginUnit(unit) {
-    console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
+    console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m \`${unit.path}\` `);
     this.#countUnits++;
     this.#indent++;
     this.#sindent = "".padStart(this.#indent * 2, "  ") + "├─";
@@ -568,7 +585,7 @@ export function defineSuite(def) {
  * This parameter is pointing at the declaring parent unit or root unit
  * @param {string} name unit string name
  * @param {function} body unit init body function containing cases and/or child declarations
- * @param {function} fskip optional skip test function `f(runner, unit): bool`
+ * @param {function | undefined | null} fskip optional skip unit function `f(runner, unit): bool`
  * @returns {Unit} newly created unit or existing unit
  */
 export function defineUnit(name, body, fskip = null) {
@@ -588,10 +605,10 @@ export function defineUnit(name, body, fskip = null) {
  * `this` parameter is pointing at the declaring unit
  * @param {string} name case string
  * @param {function} body case execution body
- * @param {function} fskip optional skip test function `f(runner, cse): bool`
+ * @param {function | undefined | null} fskip optional skip case function `f(runner, cse): bool`
  * @returns {Case} newly created run case
  */
-export function defineCase(name, body, fskip) {
+export function defineCase(name, body, fskip = null) {
   const parent = this instanceof Unit ? this : current();
   return new Case(parent, name, body, fskip);
 }
