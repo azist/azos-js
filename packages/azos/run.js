@@ -41,10 +41,10 @@ export class Unit {
     this.#parent = parent !== null ? aver.isOf(parent, Unit) : null;
     this.#name = aver.isString(name);
 
-    if (this.#name === "*") {
-      this.#path = "";
+    if (!this.#parent) {
+      this.#path = "/";
     } else {
-      this.#path = `${parent.path}/${this.#name}`;
+      this.#path = `${parent.parent ? parent.path : ""}/${this.#name}`;
     }
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     init = init !== null ? aver.isFunction(init) : null;
@@ -101,13 +101,30 @@ export class Unit {
   }
 
   /** Determines if this unit should be included or excluded from a run. Returns true if it should be included */
-  _match(runner) { return runner.matchUnitOrCase(this); }
+  _match(runner) {
+    if (runner.matchUnitOrCase(this)) return true;
+
+    for (const one of this.#children){
+      if (one instanceof Unit && one._match(runner)) return true;
+    }
+
+    return false;
+  }
 
   /** Determines if this unit should or should not be skipped while running. It is similar to `_match()`
   however skipped units get printed out into runner as skipped */
   _shouldSkip(runner) {
     return runner.shouldSkipUnit(this);
   }
+
+
+  /** Async method runs all child units/cases if this unit itself matches the filter */
+  async runIfMatch(runner) {
+    if (!runner) runner = Runner.default;
+    if (!this._match(runner)) return false;
+    return await this.run(runner);
+  }
+
 
   /** Async method runs all child units/cases */
   async run(runner) {
@@ -159,7 +176,7 @@ export class Case {
     this.#id = `C${Case.#idSeed.toString().padStart(4, "0")}`;
     this.#unit = aver.isOf(unit, Unit);
     this.#name = aver.isString(name);
-    this.#path = `${unit.path}/${this.#name}`;
+    this.#path = `${unit.parent ? unit.path : ""}/${this.#name}`;
     this.#skipFunction = skipFunction !== null ? aver.isFunction(skipFunction) : null;
     this.#body = aver.isFunction(body);
     this.#unit.register(this);
@@ -292,7 +309,7 @@ export function cmdArgsCaseFilterOld(uoc) {
 }
 
 /**
- *
+ * Unit or Case filter function based on parsed command args
  */
 export const cmdArgsCaseFilter = (function () {
   let unitNayFilters = undefined;
@@ -335,7 +352,6 @@ export const cmdArgsCaseFilter = (function () {
   }
 
   function yayNayMatching(uoc, nayFilters, yayFilters) {
-
     if (nayFilters.length > 0) {
       for (let filter of nayFilters) {
         if (matchPattern(uoc.path, filter)) return false;
@@ -463,7 +479,7 @@ export class Runner {
 
 
   beginUnit(unit) {
-    console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m `);
+    console.log(`${this.#sindent}\x1b[100m\x1b[30m Unit \x1b[40m \x1b[97m${unit.id}::'${unit.name}'\x1b[90m \`${unit.path}\` `);
     this.#countUnits++;
     this.#indent++;
     this.#sindent = "".padStart(this.#indent * 2, "  ") + "├─";

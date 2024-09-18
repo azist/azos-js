@@ -49,7 +49,7 @@ const runner = new Runner(cmdArgsCaseFilter);
 //top level module awaits can only be used in ES modules
 //////await suite().run(runner);
 //////process.exitCode = runner.countError;
-suite().run(runner)
+suite().runIfMatch(runner)
        .then(() => {
           runner.summarize();
           if (runner.countError > 0){
