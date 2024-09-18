@@ -1,19 +1,20 @@
 # azos-js
 Provides Azos base types and services functionality for Java Script apps
-a
-ver. 0.0.1 20230923 DKh<br>rev. 20231122 DKh
+
+ver. 0.0.1 20230923 DKh<br>
+rev. 20240918 DKh + KDB
 
 
 ## Naming conventions
 
 ### Runner/Unit Testing
-1. Unit name: (e.g., `.myMethod()`)
-  1. Should start with a dot and follows function name
-  2. Should match pascal casing unless it is a function-specific unit in which case
+1. Unit name: (e.g.`Aver`, `Customer`, `.myMethod()`)
+   1. Should use `PascalCase` unless it is a function-specific unit in which case:
+   1. Should start with a dot and follows function name with the `()` at the end, example: `.bufToHex()`
 2. Case name: (e.g., `my-case-01`)
-  1. Should be lowercase
-  2. Dashes should replace spaces
-  3. Decimal numbers allowed
+   1. Should be lowercase
+   2. Dashes should replace spaces
+   3. Decimal numbers allowed
 
 
 ## Testing
@@ -32,17 +33,16 @@ You can run test using the following JS runtimes:
 # Test everything
 npm test
 
-# Test named unit
-npm run test AppModule
-npm run test "ModuleLinker AppModule"
-npm run test Module
+# Test named units
+# Use `~` to negate the pattern: `~*xyz` = NOT something which ends with `xyz`
+npm test "/Aver*"
+npm test "/Aver* /Types* ~null"
 
-# Test named cases
-npm run test "&as"
-npm run test "&runner &another"
+# Test named cases (may use multiple)
+npm test "*/UInt8Array  */bufToHex()/throws"
 
 # Test named cases under named units
-npm run test "Module &link"
+npm test "*/bufToHex()/throws"
 ```
 ### Test in Browser
 As `azos-js` is a purely ES6+ module-based project it is impossible to load test assets using `file://` protocol, hence you have to bundle and dev-serve your test suite using `Parcel`.
