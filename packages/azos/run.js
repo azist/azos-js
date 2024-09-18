@@ -102,10 +102,9 @@ export class Unit {
 
   /** Determines if this unit should be included or excluded from a run. Returns true if it should be included */
   _match(runner) {
-    if (runner.matchUnitOrCase(this)) return true;
 
     for (const one of this.#children){
-      if (one instanceof Unit && one._match(runner)) return true;
+      if (one._match(runner)) return true;
     }
 
     return false;
@@ -214,7 +213,7 @@ export class Case {
   set timeoutMs(v) { this.#timeoutMs = v | 0; }
 
   /** Determines if this case should be included or excluded from a run. Returns true if it should be included */
-  _match(runner) { return runner.matchUnitOrCase(this); }
+  _match(runner) { return runner.matchCase(this); }
 
   /** Determines if this case should or should not be skipped while running. It is similar to `_match()`
   however skipped units get printed out into runner as skipped */
@@ -312,16 +311,12 @@ export function cmdArgsCaseFilterOld(uoc) {
  * Unit or Case filter function based on parsed command args
  */
 export const cmdArgsCaseFilter = (function () {
-  let unitNayFilters = undefined;
-  let unitYayFilters = undefined;
   let caseNayFilters = undefined;
   let caseYayFilters = undefined;
 
   function ensureParsedArgs() {
-    if (unitNayFilters) return;
+    if (caseNayFilters) return;
 
-    unitNayFilters = [];
-    unitYayFilters = [];
     caseNayFilters = [];
     caseYayFilters = [];
 
@@ -342,12 +337,8 @@ export const cmdArgsCaseFilter = (function () {
         segment = segment.substring(1);
       }
 
-      if (segment.startsWith("&")) {
-        (yay ? caseYayFilters : caseNayFilters).push(segment.substring(1));
-      } else {
-        (yay ? unitYayFilters : unitNayFilters).push(segment);
-      }
-
+      const filters = yay ? caseYayFilters : caseNayFilters;
+      filters.push(segment);
     });
   }
 
@@ -373,13 +364,10 @@ export const cmdArgsCaseFilter = (function () {
     return true;
   }
 
-  function filter(uoc) {
-    if (!uoc) return false;
-
+  function filter(cse) {
+    if (!cse) return false;
     ensureParsedArgs();
-
-    if (uoc instanceof Unit) return yayNayMatching(uoc.path, unitNayFilters, unitYayFilters);
-    else if (uoc instanceof Case) return yayNayMatching(uoc.name, caseNayFilters, caseYayFilters);
+    if (cse instanceof Case) return yayNayMatching(cse.path, caseNayFilters, caseYayFilters);
     else return false;
   }
 
@@ -388,7 +376,7 @@ export const cmdArgsCaseFilter = (function () {
 
 /**
  * Provides basic counts of success/errors and overridable `begin/end` style hooks
- * for units and cases. `matchUnitOrCase` returns true for units and cases which will run.
+ * for units and cases. `matchCase` returns true for cases which will run per the supplied filter.
  */
 export class Runner {
   static #dflt = new Runner();
@@ -436,13 +424,13 @@ export class Runner {
   get elapsedMs() { return this.#elapsedMs; }
 
   /**
-   * Returns true when the supplied Unit or Case matches the conditions and should be executed.
-   * @param {Unit | Case} uoc to match - Unit or Case
+   * Returns true when the supplied case matches the conditions and should be executed.
+   * @param {Case} cse a case to match
    * @returns {boolean} true when case should be ran
    */
-  matchUnitOrCase(uoc) {
+  matchCase(cse) {
     const f = this.#fCaseFilter;
-    if (f !== null) return f(uoc);
+    if (f !== null) return f(cse);
     return true;
   }
 
