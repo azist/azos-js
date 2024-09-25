@@ -116,6 +116,17 @@ export function isArray(a) {
 }
 
 /**
+ * Performs strict test for array (not a primitive, object, or function)
+ * @param {*} a
+ * @returns null if undefined or null, original array after successful type check, or throws
+ */
+export function isArrayOrNull(a) {
+  if (a === undefined || a === null) return null;
+  if (types.isArray(a)) return a;
+  throw AVERMENT_FAILURE(`isArrayOrNull(${dv(a)})`);
+}
+
+/**
  * Performs strict test for object or array (not a primitive or function)
  * @param {*} a
  * @returns original object or array after successful type check or throws
