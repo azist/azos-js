@@ -13,6 +13,7 @@ import "../parts/button.js";
 import "./xyz-dialog.js";
 import "./showcase.js";
 import "../vcl/time/timeline.js";
+import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
 
 
 //import { APPLET_STYLES } from "./applet.css.js";
@@ -113,6 +114,10 @@ export class XyzApplet extends Applet {
     this.arena.appletOpen(ChronicleApplet);
   }
 
+  async btnAdlibClick(){
+    this.arena.appletOpen(AdlibApplet);
+  }
+
 
 
   render() {
@@ -125,6 +130,7 @@ export class XyzApplet extends Applet {
      <button @click="${this.onClick6}"> btnSave.isVisible </button>
 
      <az-button id="btnChronicle" scope="this" title="Chronicle" @click="${this.btnChronicleClick}"> </az-button>
+     <az-button id="btnAdlib" scope="this" title="Adlib" @click="${this.btnAdlibClick}"> </az-button>
      <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
      <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
      <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
