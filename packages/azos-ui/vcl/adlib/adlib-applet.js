@@ -5,14 +5,16 @@
 </FILE_LICENSE>*/
 
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
-import { html, STATUS } from "azos-ui/ui";
+import { html, POSITION, STATUS } from "azos-ui/ui";
 
 import { Applet } from "azos-ui/applet";
 import { Spinner } from "azos-ui/spinner";
 
+import { Toast } from "azos-ui/toast";
 import { TreeNode } from "../../parts/tree-node";
 import "../tree-view/tree-view";
-import "../tree-view/tree-node";
+
+const toast = Toast.toast.bind(Toast);
 
 /**  */
 export class AdlibApplet extends Applet {
@@ -36,52 +38,71 @@ export class AdlibApplet extends Applet {
   async #loadData() {
     Spinner.exec(async () => {
       const response = await this.#ref.svcAdlibClient.getSpaces();
-      console.dir(response);
-      const root = new TreeNode("/");
-
+      const root = this.treeView.createRootNode("root", null, null, null, null, { isRoot: true });
       const spacesData = response.data.data;
-      const spaceCollectionPromises = await Promise.allSettled(
-        spacesData.map(async spaceName => await this.#ref.svcAdlibClient.getCollections(spaceName))
-      );
-
-      spacesData
-        .map((spaceName, index) => {
-          const result = spaceCollectionPromises[index];
-          if (result.status === 'fulfilled') {
-            return {
-              success: true,
-              spaceName: spaceName,
-              collections: result.value.data.data,
-            };
-          } else {
-            return {
-              success: false,
-              error: result.reason.error
-            }
-          }
-        })
-        .filter(result => result.success)
-        .forEach(({ spaceName, collections }) => {
-          const node = new TreeNode(spaceName);
-          collections.map(collectionName => node.addChild(new TreeNode(collectionName)));
-          root.addChild(node);
-        });
-
-      this.treeView.root = root;
+      spacesData.forEach(spaceName => root.addChild(spaceName, null, null, null, null, { isSpace: true }));
+      this.requestUpdate();
     });
   }
 
+  async updateSpacesWithCollections(spacesData, root) {
+    const spaceCollectionPromises = await Promise.allSettled(
+      spacesData.map(async (spaceName) => await this.#ref.svcAdlibClient.getCollections(spaceName))
+    );
+
+    spacesData
+      .map((spaceName, index) => {
+        const result = spaceCollectionPromises[index];
+        if (result.status === 'fulfilled') {
+          return {
+            success: true,
+            spaceName: spaceName,
+            collections: result.value.data.data,
+          };
+        } else {
+          return {
+            success: false,
+            error: result.reason.error
+          };
+        }
+      })
+      .filter(result => result.success)
+      .forEach(({ spaceName, collections }) => {
+        const node = new TreeNode(spaceName);
+        root.addChild(node);
+        collections.map(collectionName => node.addChild(new TreeNode(collectionName)));
+      });
+  }
+
+  async onExpandNode(e) {
+    const node = e.detail.node;
+    if (node.isExpanded) {
+      if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
+        Spinner.exec(async () => {
+          const response = await this.#ref.svcAdlibClient.getCollections(node.caption);
+          const collectionsData = response.data.data;
+          collectionsData.forEach(collectionName => node.addChild(collectionName, null, null, null, null, { isCollection: true }));
+          this.treeView.expand(node);
+          node.data.areCollectionsLoaded = true;
+        });
+      } else if (node.data?.isCollection && !node.hasChildren) {
+        if (!node.data.areCollectionChildrenLoaded) {
+          node.data.areCollectionChildrenLoaded = true;
+          Spinner.exec(async () => {
+            await new Promise(r => setTimeout(r, 500));
+            toast(`There are no children for node '${node.caption}'.`, undefined, null, STATUS.INFO, POSITION.TOP_RIGHT);
+          });
+        }
+        this.treeView.hideChevron(node);
+      }
+    }
+  }
+
   render() {
-    // <az-sky-adlib-grid id="gridData" scope="this" @showRowData=${this.onShowRowData}>
-    // </az-sky-adlib-grid>
-    // <div>${this.collections}</div>
-    // <az-modal-dialog id="dlgData" scope="this" title="Collections" status="normal">
-    // <div slot="body">
-    //   <az-button @click="${this.onDlgDataClose}" title="Close" style="float: right;"></az-button>
-    // </div>
-    // </az-modal-dialog>
     return html`
-    <az-tree-view id="treeView" scope="this">
+    <az-tree-view id="treeView" scope="this"
+      @expandNode=${this.onExpandNode}
+      .doRenderRoot=${true}>
     </az-tree-view>
     `;
   }
@@ -89,7 +110,6 @@ export class AdlibApplet extends Applet {
   async onShowRowData(e) {
     if (!e.detail.what) {
       this.collections = (await this.#ref.svcAdlibClient.getCollections(e.detail.row)).data.data.join(', ');
-      console.dir(this.collections);
       this.dlgData.status = STATUS.DEFAULT;
       this.dlgData.title = `Collections for Space: ${e.detail.row}`;
       this.dlgData.show();

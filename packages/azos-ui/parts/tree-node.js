@@ -4,18 +4,18 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isArrayOrNull, isNonEmptyString, isOf } from "azos/aver";
+import { isNonEmptyString, isOf } from "azos/aver";
 
 export class TreeNode {
   #caption;
   #img;
+  #parent;
+  #children;
   #state;
   #checkable;
-  #parent;
   #path;
-  #indentLevel;
+  #chevronVisible = true;
 
-  #children;
   #expanded;
   #canCollapse;
   #canExpand;
@@ -37,14 +37,16 @@ export class TreeNode {
   set checkable(v) { this.#checkable = v; }
 
   get parent() { return this.#parent; }
-  set parent(v) { this.#parent = v; }
-
-  get indentLevel() { return this.#indentLevel; }
-  set indentLevel(v) { this.#indentLevel = v; }
+  set parent(v) {
+    this.#parent = v;
+    this.#updatePath();
+  }
 
   get children() { return this.#children; }
+  get hasChildren() { return this.#children.length > 0; }
 
   get expanded() { return this.#expanded; }
+  get isExpanded() { return this.#expanded; }
   set expanded(v) { this.expand(v); }
 
   // User-
@@ -52,48 +54,55 @@ export class TreeNode {
   get canExpand() { return this.#canExpand; }
 
   get data() { return this.#data; }
+  set data(v) { this.#data = v; }
+
+  get chevronVisible() { return this.#chevronVisible; }
+  set chevronVisible(v) { this.#chevronVisible = v; }
 
   get path() { return this.#path; }
 
-  constructor(caption, img, indentLevel, checkable = false, parent = null, collapsible = true, children = null, data = null) {
-    this.#caption = isNonEmptyString(caption);
-    this.#img = img;
-    this.#checkable = checkable;
-    this.#indentLevel = indentLevel;
-    this.#parent = parent;
-    this.#path = `${parent ? parent.path : ''}/${this.caption}`;
+  constructor(caption, img, parent = null, checkable = false, collapsible = true, expandable = true) {
+    this.caption = isNonEmptyString(caption);
+    this.img = img;
+    this.parent = parent;
+    this.#updatePath();
+    this.checkable = checkable;
 
     this.#canCollapse = collapsible;
-    this.#expanded = false;
-
-    this.#data = data;
-
-    isArrayOrNull(children);
-    if (children === null) this.#children = [];
-    else children.forEach(child => this.addChild(child));
+    this.#canExpand = expandable;
+    this.expanded = false;
+    this.#children = [];
   }
 
   toggleStatus() {
     if (!this.#checkable) return;
     this.state = !this.state;
-    // this.dispatchEvent(new CustomEvent("status", { node: this, isChecked: this.isChecked }));
   }
 
-  addChild(childNode) {
-    isOf(childNode, TreeNode);
-    childNode.parent = this;
+  addChild(caption, img, checkable = false, collapsible = true, expandable = true, data = null) {
+    const childNode = new TreeNode(caption, img, this, checkable, collapsible, expandable);
+    childNode.data = data;
     this.#children.push(childNode);
+    return childNode;
   }
 
   removeChild(childNode) {
     isOf(childNode, TreeNode);
     const removed = this.#children.splice(this.#children.indexOf(childNode), 1);
-    // TODO: Remove from DOM?
     removed.parent = null;
     return removed?.length >= 1;
   }
 
+  #updatePath() {
+    if (this.parent && this.parent.path !== "/") this.#path = `${this.parent.path}/${this.caption}`;
+    else if (this.caption === '/') this.#path = "/";
+    else this.#path = `/${this.caption}`;
+  }
+
   expand(b = true) { this.#expanded = b; }
   collapse() { this.expand(false); }
+
+  hideChevron() { this.#chevronVisible = false; }
+  showChevron() { this.#chevronVisible = true; }
 
 }
