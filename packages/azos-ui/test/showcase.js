@@ -13,6 +13,7 @@ import "../parts/text-field.js";
 import "../parts/select-field.js";
 import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
+import "../vcl/util/accordion.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 
@@ -326,6 +327,22 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     displayValue
     valueLabel="Number of tomatoes: "
   ></az-slider>
+
+  <az-accordion name="accordion" width="75%" align="center" activeItemIndex="2">
+    <az-accordion-item title="First accordion item">
+      <p>Eu culpa dolore adipisicing qui cillum duis incididunt consequat amet. <strong><em>Non ipsum nostrud</em></strong> culpa nulla quis dolor culpa commodo anim labore sit fugiat culpa minim. Adipisicing et qui ex cupidatat excepteur anim laborum eiusmod aute amet cupidatat et. Eiusmod qui eiusmod Lorem amet cupidatat esse aliqua ipsum ex laborum officia reprehenderit incididunt adipisicing. Sint quis cupidatat commodo aliquip mollit enim voluptate dolore consectetur.</p>
+      <h3>Irure minim qui esse dolor. Reprehenderit culpa minim reprehenderit Lorem exercitation cillum magna laboris. Ea in dolor ut ipsum officia commodo sit. Veniam ut nulla culpa veniam tempor duis aliquip in velit consequat incididunt enim reprehenderit.</h3>
+      <blockquote>Magna pariatur reprehenderit ullamco labore. Ullamco deserunt enim irure ex Lorem ex. Est proident nulla fugiat fugiat non incididunt dolore pariatur. Commodo do quis nulla elit non id in est esse est anim adipisicing id. Culpa eu fugiat qui et et. Culpa esse occaecat aliqua nostrud et cupidatat. Aute ipsum voluptate exercitation quis labore exercitation aliquip ad exercitation non irure.</blockquote>
+      <p>Laboris sint elit incididunt sit consectetur consectetur aliquip consequat nostrud eu nostrud ullamco ad. Aliquip laboris adipisicing Lorem quis occaecat reprehenderit. Nostrud voluptate sunt est commodo. Lorem eiusmod laboris non non.</p>
+    </az-accordion-item>
+    <az-accordion-item title="Item #2 going #2 all over the fkin place">
+      <h1 style="text-decoration:strikethrough;"><em>Tempor quis sit eu laborum velit enim irure velit quis.</em></h1>
+    </az-accordion-item>
+    <az-accordion-item title="Open when parent's activeItemIndex is 2">
+      <h3><em>It's-a me! Maaahhhhhreeeooo</em></h3>
+      <img src="https://shawntgray.com/preNov2023/img/img/180612.png" alt="mahrio" style="width:75%;" />
+    </az-accordion-item>
+  </az-accordion>
 <h2> Various elements combined</h2>
 ..tbd
 
