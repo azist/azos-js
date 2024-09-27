@@ -46,7 +46,7 @@ export class TreeView extends AzosElement {
   box-sizing: border-box;
 }
 
-.chevron.collapsed {
+.chevron.closed {
   transform: rotate(-45deg);
 }
 
@@ -86,27 +86,27 @@ export class TreeView extends AzosElement {
    * Construct the root node for this tree. A tree requires a root.
    * see {@link TreeNode}
    */
-  createRootNode(caption, img, parent = null, checkable = false, collapsible = true, expandable = true, data = null) {
+  createRootNode(caption, img, parent = null, canOpen = true, canClose = true, checkable = false, data = null) {
     if (this.root) return this.root;
-    this.root = new TreeNode(caption, img, parent, checkable, collapsible, expandable);
+    this.root = new TreeNode(caption, img, parent, canOpen, canClose, checkable);
     this.root.data = data;
     return this.root;
   }
 
-  collapse(node) { this.expand(node, false); }
-  expand(node, expanded = true) {
-    node.expanded = expanded;
+  close(node) { this.open(node, false); }
+  open(node, opened = true) {
+    node.opened = opened;
     this.requestUpdate();
   }
 
-  toggleExpand(node) {
-    this.expand(node, !node.expanded);
-    this.dispatchEvent(new CustomEvent("expandNode", { detail: { node, expanded: node.expanded } }));
+  toggleOpened(node) {
+    this.open(node, !node.opened);
+    this.dispatchEvent(new CustomEvent("openNode", { detail: { node } }));
   }
 
   hideChevron(node) {
     node.showChevron = false;
-    this.collapse(node);
+    this.close(node);
     this.requestUpdate();
   }
 
@@ -128,7 +128,7 @@ export class TreeView extends AzosElement {
   }
 
   renderChildren(node) {
-    if (node.expanded && node.children.length) {
+    if (node.opened && node.children.length) {
       return html`
       <div class="tree-node-children">
         ${node.children.map(child => this.renderNode(child))}
@@ -139,8 +139,8 @@ export class TreeView extends AzosElement {
 
   renderHeader(node) {
     return html`
-    <div class="tree-node-header" @dblclick="${() => this.toggleExpand(node)}">
-      <div class="tree-node-chevron" @click="${() => this.toggleExpand(node)}" style="${node.showChevron ? '' : 'visibility: hidden'}">
+    <div class="tree-node-header" @dblclick="${() => this.toggleOpened(node)}">
+      <div class="tree-node-chevron" @click="${() => this.toggleOpened(node)}" style="${node.showChevron ? '' : 'visibility: hidden'}">
         ${this.renderChevron(node)}
       </div>
       <div class="tree-node-icon">
@@ -153,8 +153,8 @@ export class TreeView extends AzosElement {
   `;
   }
 
-  renderIcon(node) { return html`${node.expanded ? '🗁' : '📁'}`; }
-  renderChevron(node) { return html`<div class="chevron ${node.expanded ? '' : "collapsed"}"></div>` }
+  renderIcon(node) { return html`${node.opened ? '🗁' : '📁'}`; }
+  renderChevron(node) { return html`<div class="chevron ${node.opened ? 'open' : "closed"}"></div>` }
   renderContent(node) { return html`${node.caption} <span class="path">${node.path}</span>`; }
 
 }

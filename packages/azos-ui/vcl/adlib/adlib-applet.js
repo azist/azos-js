@@ -11,7 +11,6 @@ import { Applet } from "azos-ui/applet";
 import { Spinner } from "azos-ui/spinner";
 
 import { Toast } from "azos-ui/toast";
-import { TreeNode } from "../../parts/tree-node";
 import "../tree-view/tree-view";
 
 const toast = Toast.toast.bind(Toast);
@@ -50,39 +49,26 @@ export class AdlibApplet extends Applet {
       spacesData.map(async (spaceName) => await this.#ref.svcAdlibClient.getCollections(spaceName))
     );
 
-    spacesData
-      .map((spaceName, index) => {
-        const result = spaceCollectionPromises[index];
-        if (result.status === 'fulfilled') {
-          return {
-            success: true,
-            spaceName: spaceName,
-            collections: result.value.data.data,
-          };
-        } else {
-          return {
-            success: false,
-            error: result.reason.error
-          };
-        }
-      })
-      .filter(result => result.success)
-      .forEach(({ spaceName, collections }) => {
-        const node = new TreeNode(spaceName);
-        root.addChild(node);
-        collections.map(collectionName => node.addChild(new TreeNode(collectionName)));
-      });
+    spacesData.forEach((spaceName, index) => {
+      const result = spaceCollectionPromises[index];
+      if (result.status === 'fulfilled') {
+        const node = root.addChild(spaceName);
+        result.value.data.data.map(collectionName => node.addChild(collectionName));
+      } else {
+        toast(result.reason.error, null, null, STATUS.ALERT, POSITION.TOP_RIGHT);
+      }
+    });
   }
 
-  async onExpandNode(e) {
+  async onOpenNode(e) {
     const node = e.detail.node;
-    if (node.isExpanded) {
+    if (node.isOpened) {
       if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
         Spinner.exec(async () => {
           const response = await this.#ref.svcAdlibClient.getCollections(node.caption);
           const collectionsData = response.data.data;
           collectionsData.forEach(collectionName => node.addChild(collectionName, null, null, null, null, { isCollection: true }));
-          this.treeView.expand(node);
+          this.treeView.open(node);
           node.data.areCollectionsLoaded = true;
         });
       } else if (node.data?.isCollection && !node.hasChildren) {
@@ -101,20 +87,10 @@ export class AdlibApplet extends Applet {
   render() {
     return html`
     <az-tree-view id="treeView" scope="this"
-      @expandNode=${this.onExpandNode}
+      @openNode=${this.onOpenNode}
       .doRenderRoot=${true}>
     </az-tree-view>
     `;
-  }
-
-  async onShowRowData(e) {
-    if (!e.detail.what) {
-      this.collections = (await this.#ref.svcAdlibClient.getCollections(e.detail.row)).data.data.join(', ');
-      this.dlgData.status = STATUS.DEFAULT;
-      this.dlgData.title = `Collections for Space: ${e.detail.row}`;
-      this.dlgData.show();
-      this.requestUpdate();
-    }
   }
 
 }

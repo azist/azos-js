@@ -16,9 +16,9 @@ export class TreeNode {
   #path;
   #chevronVisible = true;
 
-  #expanded;
-  #canCollapse;
-  #canExpand;
+  #opened;
+  #canClose;
+  #canOpen;
 
   #data;
 
@@ -28,9 +28,9 @@ export class TreeNode {
   get img() { return this.#img; }
   set img(v) { this.#img = v; }
 
-  get state() { return this.#state; }
+  get checked() { return this.#state; }
   get isChecked() { return !!this.#state; }
-  set state(v) { this.#state = v; }
+  set checked(v) { this.#state = v; }
 
   get checkable() { return this.#checkable; }
   get isCheckable() { return this.#checkable; }
@@ -45,13 +45,13 @@ export class TreeNode {
   get children() { return this.#children; }
   get hasChildren() { return this.#children.length > 0; }
 
-  get expanded() { return this.#expanded; }
-  get isExpanded() { return this.#expanded; }
-  set expanded(v) { this.expand(v); }
+  get opened() { return this.#opened; }
+  get isOpened() { return this.#opened; }
+  set opened(v) { this.open(v); }
 
   // User-
-  get canCollapse() { return this.#canCollapse; }
-  get canExpand() { return this.#canExpand; }
+  get canOpen() { return this.#canOpen; }
+  get canClose() { return this.#canClose; }
 
   get data() { return this.#data; }
   set data(v) { this.#data = v; }
@@ -61,26 +61,26 @@ export class TreeNode {
 
   get path() { return this.#path; }
 
-  constructor(caption, img, parent = null, checkable = false, collapsible = true, expandable = true) {
+  constructor(caption, img, parent = null, canOpen = true, canClose = true, checkable = false) {
     this.caption = isNonEmptyString(caption);
     this.img = img;
     this.parent = parent;
     this.#updatePath();
     this.checkable = checkable;
 
-    this.#canCollapse = collapsible;
-    this.#canExpand = expandable;
-    this.expanded = false;
+    this.#canClose = canClose;
+    this.#canOpen = canOpen;
+    this.opened = false;
     this.#children = [];
   }
 
-  toggleStatus() {
+  toggleChecked() {
     if (!this.#checkable) return;
-    this.state = !this.state;
+    this.checked = !this.checked;
   }
 
-  addChild(caption, img, checkable = false, collapsible = true, expandable = true, data = null) {
-    const childNode = new TreeNode(caption, img, this, checkable, collapsible, expandable);
+  addChild(caption, img, canOpen = true, canClose = true, checkable = false, data = null) {
+    const childNode = new TreeNode(caption, img, this, canOpen, canClose, checkable);
     childNode.data = data;
     this.#children.push(childNode);
     return childNode;
@@ -99,8 +99,8 @@ export class TreeNode {
     else this.#path = `/${this.caption}`;
   }
 
-  expand(b = true) { this.#expanded = b; }
-  collapse() { this.expand(false); }
+  open(b = true) { this.#opened = b; }
+  close() { this.open(false); }
 
   hideChevron() { this.#chevronVisible = false; }
   showChevron() { this.#chevronVisible = true; }
