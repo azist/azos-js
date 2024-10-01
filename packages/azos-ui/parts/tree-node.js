@@ -5,8 +5,10 @@
 </FILE_LICENSE>*/
 
 import { isNonEmptyString, isOf } from "azos/aver";
+import { genGuid } from "azos/types";
 
 export class TreeNode {
+  #guid;
   #caption;
   #img;
   #parent;
@@ -21,6 +23,8 @@ export class TreeNode {
   #canOpen;
 
   #data;
+
+  get guid() { return this.#guid; }
 
   get caption() { return this.#caption; }
   set caption(v) { this.#caption = v; }
@@ -47,6 +51,7 @@ export class TreeNode {
 
   get opened() { return this.#opened; }
   get isOpened() { return this.#opened; }
+  get isClosed() { return !this.isOpened; }
   set opened(v) { this.open(v); }
 
   // User-
@@ -62,6 +67,7 @@ export class TreeNode {
   get path() { return this.#path; }
 
   constructor(caption, img, parent = null, canOpen = true, canClose = true, checkable = false) {
+    this.#guid = genGuid();
     this.caption = isNonEmptyString(caption);
     this.img = img;
     this.parent = parent;

@@ -31,15 +31,18 @@ export class AdlibApplet extends Applet {
     this.arena.hideFooter(true);
     this.link(this.#ref);
     // this.arena.installToolbarCommands([]);
+  }
+
+  async firstUpdated() {
+    this.treeView.createRootNode("root", null, null, null, null);
     await this.#loadData();
   }
 
   async #loadData() {
     Spinner.exec(async () => {
       const response = await this.#ref.svcAdlibClient.getSpaces();
-      const root = this.treeView.createRootNode("root", null, null, null, null, { isRoot: true });
       const spacesData = response.data.data;
-      spacesData.forEach(spaceName => root.addChild(spaceName, null, null, null, null, { isSpace: true }));
+      spacesData.forEach(spaceName => this.treeView.root.addChild(spaceName, null, null, null, null, { isSpace: true }));
       this.requestUpdate();
     });
   }
@@ -62,13 +65,14 @@ export class AdlibApplet extends Applet {
 
   async onOpenNode(e) {
     const node = e.detail.node;
+    console.log('onOpenNode', e);
     if (node.isOpened) {
       if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
         Spinner.exec(async () => {
           const response = await this.#ref.svcAdlibClient.getCollections(node.caption);
           const collectionsData = response.data.data;
           collectionsData.forEach(collectionName => node.addChild(collectionName, null, null, null, null, { isCollection: true }));
-          this.treeView.open(node);
+          this.treeView.open(node, true, false);
           node.data.areCollectionsLoaded = true;
         });
       } else if (node.data?.isCollection && !node.hasChildren) {
@@ -84,8 +88,16 @@ export class AdlibApplet extends Applet {
     }
   }
 
+  async onNodeChecked(e) {
+    const node = e.detail.node;
+    console.log('onNodeChecked', e);
+    console.log(`Node is ${node.isChecked ? "" : "not"} checked`);
+  }
+
   render() {
     return html`
+    <input name="moo"></input>
+    <input name="moo2"></input>
     <az-tree-view id="treeView" scope="this"
       @openNode=${this.onOpenNode}
       .doRenderRoot=${true}>
