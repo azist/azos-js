@@ -242,6 +242,7 @@ export class TreeView extends AzosElement {
     return html`
     <div id="${node.guid}"
       class="tree-node-header"
+      @click=${() => this.focusNode(node)}
       @dblclick="${() => this.toggleOpen(node)}"
       tabindex="${this.nodeInFocus.guid === node.guid ? 0 : -1}">
       <div class="tree-node-chevron" @click="${() => this.toggleOpen(node)}" style="${node.showChevron ? '' : 'visibility: hidden'}">
