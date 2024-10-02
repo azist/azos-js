@@ -31,6 +31,11 @@ export class TreeView extends AzosElement {
   align-items: baseline;
 }
 
+.tree-node-header:focus {
+  outline: var(--focus-ctl-outline);
+  box-shadow: var(--focus-ctl-box-shadow);
+}
+
 .tree-node-header:hover {
   background-color: #ddd;
 }
@@ -131,33 +136,33 @@ export class TreeView extends AzosElement {
   }
 
   handleKeyDown(e) {
-    // const toast = msg => Toast.toast(msg, undefined, undefined, undefined, POSITION.TOP_RIGHT);
+    const toast = msg => Toast.toast(msg, undefined, undefined, undefined, POSITION.TOP_RIGHT);
     const { key } = e;
     switch (key) {
       case "ArrowUp":
         this.advanceFocusPrevious();
-        /*toast(key);*/break;
+        toast(key); break;
       case "ArrowDown":
         this.advanceFocus();
-        /*toast(key);*/break;
+        toast(key); break;
       case "ArrowLeft":
         if (this.nodeInFocus.hasChildren && this.nodeInFocus.isOpened) this.close(this.nodeInFocus);
         else if (this.nodeInFocus.parent) this.focusNode(this.nodeInFocus.parent);
-        /*toast(key);*/break;
+        toast(key); break;
       case "ArrowRight":
         this.open(this.nodeInFocus);
-        /*toast(key);*/break;
+        toast(key); break;
       case "Tab":
         e.preventDefault();
         this.advanceFocus(!e.shiftKey);
-        /*toast(key);*/break;
+        toast(key); break;
       case "Space":
         e.preventDefault();
         if (this.nodeInFocus.checkable) {
           this.nodeInFocus.toggleChecked();
           this.dispatchEvent(new CustomEvent("nodeChecked", { detail: { node: this.nodeInFocus } }));
         }
-        /*toast(key);*/break;
+        toast(key); break;
     }
   }
 
