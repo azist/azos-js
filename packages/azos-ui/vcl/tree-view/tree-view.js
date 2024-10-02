@@ -136,7 +136,7 @@ export class TreeView extends AzosElement {
   }
 
   handleKeyDown(e) {
-    const toast = msg => Toast.toast(msg, undefined, undefined, undefined, POSITION.TOP_RIGHT);
+    const toast = msg => Toast.toast(msg, 500, undefined, undefined, POSITION.TOP_RIGHT);
     const { key } = e;
     switch (key) {
       case "ArrowUp":
@@ -150,7 +150,8 @@ export class TreeView extends AzosElement {
         else if (this.nodeInFocus.parent) this.focusNode(this.nodeInFocus.parent);
         toast(key); break;
       case "ArrowRight":
-        this.open(this.nodeInFocus);
+        if (this.nodeInFocus.isClosed) this.open(this.nodeInFocus);
+        else if (this.nodeInFocus.hasChildren) this.advanceFocus(this.nodeInFocus.children[0]);
         toast(key); break;
       case "Tab":
         e.preventDefault();
