@@ -268,7 +268,7 @@ export class TreeView extends AzosElement {
     } else return '';
   }
 
-  renderIcon(node) { return html`${node.opened ? '🗁' : '📁'}`; }
+  renderIcon(node) { return html`${node.opened ? '📂' : '📁'}`; }
 
   renderChevron(node) { return html`<div class="chevron ${node.opened ? 'open' : "closed"}"></div>` }
 
