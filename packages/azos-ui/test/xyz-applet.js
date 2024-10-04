@@ -57,6 +57,8 @@ export class XyzApplet extends Applet {
 
   connectedCallback(){
     super.connectedCallback();
+    // FIXME: This automatically navs to Adlib page.
+    setTimeout(()=>this.btnAdlibClick(), 100);
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 

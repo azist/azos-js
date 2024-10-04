@@ -10,10 +10,9 @@ import { html, POSITION, STATUS } from "azos-ui/ui";
 import { Applet } from "azos-ui/applet";
 import { Spinner } from "azos-ui/spinner";
 
-import { Toast } from "azos-ui/toast";
+import { toast } from "azos-ui/toast";
 import "../tree-view/tree-view";
-
-const toast = Toast.toast.bind(Toast);
+import "azos-ui/parts/button";
 
 /**  */
 export class AdlibApplet extends Applet {
@@ -30,62 +29,54 @@ export class AdlibApplet extends Applet {
     super.connectedCallback();
     this.arena.hideFooter(true);
     this.link(this.#ref);
+    await this.#loadData();
+
     // this.arena.installToolbarCommands([]);
   }
 
-  async firstUpdated() {
-    this.treeView.createRootNode("root", null, null, null, null);
-    await this.#loadData();
-  }
+  // async firstUpdated() {
+  //   super.firstUpdated();
+  //   this.$("input2").tabindex = 0;
+  //   this.$("input2").focus();
+  // }
 
   async #loadData() {
     Spinner.exec(async () => {
       const response = await this.#ref.svcAdlibClient.getSpaces();
       const spacesData = response.data.data;
-      spacesData.forEach(spaceName => this.treeView.root.addChild(spaceName, null, null, null, null, { isSpace: true }));
-      this.requestUpdate();
+      const root = this.treeView.root;
+      spacesData.forEach(spaceName => root.addChild(spaceName, { data: { isSpace: true } }));
+      this.treeView.requestUpdate();
     });
   }
 
-  async updateSpacesWithCollections(spacesData, root) {
-    const spaceCollectionPromises = await Promise.allSettled(
-      spacesData.map(async (spaceName) => await this.#ref.svcAdlibClient.getCollections(spaceName))
-    );
-
-    spacesData.forEach((spaceName, index) => {
-      const result = spaceCollectionPromises[index];
-      if (result.status === 'fulfilled') {
-        const node = root.addChild(spaceName);
-        result.value.data.data.map(collectionName => node.addChild(collectionName));
-      } else {
-        toast(result.reason.error, null, null, STATUS.ALERT, POSITION.TOP_RIGHT);
-      }
-    });
-  }
-
-  async onOpenNode(e) {
+  async #onNodeUserAction(e) {
     const node = e.detail.node;
+    const action = e.detail.action;
+
     console.log('onOpenNode', e);
-    if (node.isOpened) {
+    if (action === "opened") {
       if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
+        node.data.areCollectionsLoaded = true;
         Spinner.exec(async () => {
-          const response = await this.#ref.svcAdlibClient.getCollections(node.caption);
+          const response = await this.#ref.svcAdlibClient.getCollections(node.title);
           const collectionsData = response.data.data;
-          collectionsData.forEach(collectionName => node.addChild(collectionName, null, null, null, null, { isCollection: true }));
-          this.treeView.open(node, true, false);
-          node.data.areCollectionsLoaded = true;
+          collectionsData.forEach(collectionName => node.addChild(collectionName, { data: { isCollection: true } }));
+          this.treeView.requestUpdate();
         });
       } else if (node.data?.isCollection && !node.hasChildren) {
         if (!node.data.areCollectionChildrenLoaded) {
           node.data.areCollectionChildrenLoaded = true;
-          Spinner.exec(async () => {
-            await new Promise(r => setTimeout(r, 500));
-            toast(`There are no children for node '${node.caption}'.`, undefined, null, STATUS.INFO, POSITION.TOP_RIGHT);
-          });
+          ["one", "two", "threE", "four", "finve", "six"].forEach(name => node.addChild(name, { data: { memberOfCPSU: Math.random() < 0.25 } }));
+          this.treeView.requestUpdate();
+          // Spinner.exec(async () => {
+          //   await new Promise(r => setTimeout(r, 500));
+          //   toast(`There are no children for node '${node.title}'.`, undefined, null, STATUS.INFO, POSITION.TOP_RIGHT);
+          // });
+          node.hideChevron();
         }
-        this.treeView.hideChevron(node);
       }
-    }
+    } else if (action === "closed") console.log(`Closed node: ${node.title}`);
   }
 
   async onNodeChecked(e) {
@@ -96,15 +87,14 @@ export class AdlibApplet extends Applet {
 
   render() {
     return html`
-    <input name="moo"></input>
-    <input name="moo2"></input>
-    <az-tree-view id="treeView" scope="this"
-      @openNode=${this.onOpenNode}
-      .doRenderRoot=${true}>
-    </az-tree-view>
-    `;
+      <input id=input1 tabindex=0>
+      <az-tree-view id="treeView" scope="this"
+        @nodeUserAction=${this.#onNodeUserAction}
+        .showRoot=${false}>
+      </az-tree-view>
+      `;
+    // @nodeOpenOrClose=${this.onOpenNode}
   }
-
 }
 
 window.customElements.define("az-sky-adlib-applet", AdlibApplet);

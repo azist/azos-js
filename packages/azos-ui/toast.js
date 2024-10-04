@@ -209,4 +209,9 @@ export class Toast extends AzosElement {
   }
 }
 
+/**
+ * Shortcut method to Toast.toast(...); {@link Toast.toast}.
+ */
+export const toast = Toast.toast.bind(Toast);
+
 window.customElements.define("az-toast", Toast);
