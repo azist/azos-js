@@ -23,12 +23,6 @@ export class Showcase extends AzosElement {
   constructor() { super(); }
 
   static styles = css`
-  .strip-h{
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0.5em 0em 1em 0em;
-  }
-
   p{ font-size: 1rem; }
   `;
 
@@ -102,10 +96,6 @@ export class Showcase extends AzosElement {
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
-
-<az-tabs activeTabIndex="0">
-  <az-tab-item title="Buttons">
-    <h2>az-button</h2>
     <p>@click action buttons</p>
     <az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
     <az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
@@ -120,6 +110,10 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
 
     <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
+
+<az-tabs activeTabIndex="0">
+  <az-tab-item title="Buttons">
+    <h2>az-button</h2>
 
     <p>Regular buttons of default status</p>
     <az-button title="Button 1"></az-button>
@@ -157,7 +151,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-check id="chkDrinks"scope="this"  name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-check>
   </az-tab-item>
 
-  <az-tab-item title="VCL / Codebox">
+  <az-tab-item title="VCL / Codebox" status="ok">
     <h2> VCL / Codebox</h2>
 
     <az-code-box highlight="js" source="">//this is my json object
@@ -181,7 +175,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </az-radio-group>
   </az-tab-item>
 
-  <az-tab-item title="Checkboxes &amp; Switches">
+  <az-tab-item title="Checkboxes &amp; Switches" status="info">
     <h2>Checkboxes and switches</h2>
     <div class="strip-h">
       <az-check id="normalCheckbox" title="This is a checkbox" titleWidth="60"></az-check>
@@ -265,7 +259,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </div>
   </az-tab-item>
 
-  <az-tab-item title="Select Field">
+  <az-tab-item title="Select Field" status="warning">
     <h2>Selects/Combos</h2>
     <az-select id="defaultSelect" title="Select one of the following from the dropdown">
       <az-select-option value="" title="Select an option&hellip;"></az-select-option>
@@ -282,7 +276,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </az-select>
   </az-tab-item>
 
-  <az-tab-item title="Sliders (WIP)">
+  <az-tab-item title="Sliders (WIP)" status="error">
     <h2>Sliders</h2>
     <p>This az-slider renders as an &lt;input type="range"&gt; element. These are the available properties/attributes:</p>
     <ol>
