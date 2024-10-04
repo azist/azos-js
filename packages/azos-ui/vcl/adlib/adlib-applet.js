@@ -61,18 +61,16 @@ export class AdlibApplet extends Applet {
         Spinner.exec(async () => {
           const response = await this.#ref.svcAdlibClient.getCollections(node.title);
           const collectionsData = response.data.data;
-          collectionsData.forEach(collectionName => node.addChild(collectionName, { data: { isCollection: true } }));
+          collectionsData.forEach(collectionName => node.addChild(collectionName, { data: { isCollection: true, yesOrNo: Math.random() < 0.25 } }));
           this.treeView.requestUpdate();
         });
-      } else if (node.data?.isCollection && !node.hasChildren) {
-        if (!node.data.areCollectionChildrenLoaded) {
+      } else if (!node.hasChildren) {
+        if (node.data?.isCollection && !node.data.areCollectionChildrenLoaded) {
           node.data.areCollectionChildrenLoaded = true;
-          ["one", "two", "threE", "four", "finve", "six"].forEach(name => node.addChild(name, { data: { memberOfCPSU: Math.random() < 0.25 } }));
-          this.treeView.requestUpdate();
-          // Spinner.exec(async () => {
-          //   await new Promise(r => setTimeout(r, 500));
-          //   toast(`There are no children for node '${node.title}'.`, undefined, null, STATUS.INFO, POSITION.TOP_RIGHT);
-          // });
+          Spinner.exec(async () => {
+            await new Promise(r => setTimeout(r, 500));
+            toast(`There are no children for node '${node.title}'.`, undefined, null, STATUS.INFO, POSITION.TOP_RIGHT);
+          });
           node.hideChevron();
         }
       }

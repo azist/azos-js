@@ -96,9 +96,18 @@ export class TreeView extends AzosElement {
     this.#nodeInFocus = node;
   }
 
+  #showRoot;
+  /**
+   * @param {boolean} v
+   */
+  set showRoot(v) {
+    this.#showRoot = v;
+    this.root.isVisible = v;
+  }
+
   constructor() {
     super();
-    this.root = this._createNode(null, "/", { nodeVisible: this.showRoot }); // default for rendering's sake
+    this.root = this._createNode(null, "/"); // default for rendering's sake
   }
 
   /**
@@ -145,13 +154,20 @@ export class TreeView extends AzosElement {
   }
 
   #onNodeToggleOpen(node) {
-    if (node.isOpened) {
-      node.close();
-      this._dispatchNodeUserActionEvent(node, { action: "closed" });
-    } else {
-      node.open();
-      this._dispatchNodeUserActionEvent(node, { action: "opened" });
-    }
+    if (node.isOpened)
+      this.#close(node);
+    else
+      this.#open(node);
+  }
+
+  #close(node) {
+    node.close();
+    this._dispatchNodeUserActionEvent(node, { action: "closed" });
+  }
+
+  #open(node) {
+    node.open();
+    this._dispatchNodeUserActionEvent(node, { action: "opened" });
   }
 
   #onKeyDown(e) {
@@ -165,11 +181,11 @@ export class TreeView extends AzosElement {
         this.#advanceFocus();
         toast(key); break;
       case "ArrowLeft":
-        if (this.nodeInFocus.hasChildren && this.nodeInFocus.isOpened) this.nodeInFocus.close();
-        else if (this.nodeInFocus.parent) this.#focusNode(this.nodeInFocus.parent);
+        if (this.nodeInFocus.hasChildren && this.nodeInFocus.isOpened) this.#close(this.nodeInFocus);
+        else if (this.nodeInFocus.parent && this.nodeInFocus.parent.isVisible) this.#focusNode(this.nodeInFocus.parent);
         toast(key); break;
       case "ArrowRight":
-        if (this.nodeInFocus.isClosed) this.nodeInFocus.open();
+        if (this.nodeInFocus.isClosed) this.#open(this.nodeInFocus);
         else if (this.nodeInFocus.hasChildren) this.#advanceFocus(this.nodeInFocus.children[0]);
         toast(key); break;
       case "Tab":
@@ -246,7 +262,7 @@ export class TreeView extends AzosElement {
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     const h = html`
     <ul id="tv${this.id}" scope="this" role="tree" class="${cls} tree-view" @keydown="${this.#onKeyDown}" tabindex=0 @focus="${this.#onTreeFocus}">
-      ${this.showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
+      ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
     </ul>`;
     return h;
   }
@@ -274,7 +290,7 @@ export class TreeView extends AzosElement {
       @dblclick="${() => this.#onNodeToggleOpen(node)}"
       tabindex="${this.nodeInFocus?.id === node.id ? 0 : -1}"
       >
-      <div class="tree-node-chevron" @click="${() => this.#onNodeToggleOpen(node)}" style="${node.showChevron ? '' : 'visibility: hidden'}">
+      <div class="tree-node-chevron" @click="${() => this.#onNodeToggleOpen(node)}" style="${node.chevronVisible ? '' : 'visibility: hidden'}">
         ${this.renderChevron(node)}
       </div>
       <div class="tree-node-icon">
@@ -301,7 +317,7 @@ export class TreeView extends AzosElement {
 
   renderChevron(node) { return html`<div class="chevron ${node.isOpened ? 'open' : "closed"}"></div>` }
 
-  renderContent(node) { return html`${node.title} ${node.data.memberOfCPSU ? "yes" : "no"} <span class="path">${node.displayPath}</span>`; }
+  renderContent(node) { return html`${node.title} ${"yesOrNo" in node.data ? node.data.yesOrNo ? "[yes]" : "[no]" : ""} <span class="path">${node.displayPath}</span>`; }
 
 }
 
