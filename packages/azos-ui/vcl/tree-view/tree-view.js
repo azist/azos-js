@@ -107,6 +107,7 @@ export class TreeView extends AzosElement {
 
   constructor() {
     super();
+    this.treeViewId = ++TreeView.#idSeed;
     this.root = this._createNode(null, "/"); // default for rendering's sake
   }
 
@@ -263,7 +264,7 @@ export class TreeView extends AzosElement {
     if (!this.root) return html`<div>No tree data to display.</div>`;
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     const h = html`
-    <ul id="tv${this.id}" scope="this" role="tree" class="${cls} tree-view" @keydown="${this.#onKeyDown}" tabindex=0 @focus="${this.#onTreeFocus}">
+    <ul id="tv${this.treeViewId}" scope="this" role="tree" class="${cls} tree-view" @keydown="${this.#onKeyDown}" tabindex=0 @focus="${this.#onTreeFocus}">
       ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
     </ul>`;
     return h;
