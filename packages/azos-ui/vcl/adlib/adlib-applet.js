@@ -77,7 +77,7 @@ export class AdlibApplet extends Applet {
     } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
   }
 
-  async onNodeChecked(e) {
+  async #onNodeChecked(e) {
     const node = e.detail.node;
     console.log('onNodeChecked', e);
     console.log(`Node is ${node.isChecked ? "" : "not"} checked`);
@@ -90,6 +90,7 @@ export class AdlibApplet extends Applet {
         @nodeUserAction=${this.#onNodeUserAction}
         .showRoot=${false}>
       </az-tree-view>
+      <input id=input2 tabindex=0>
       `;
     // @nodeOpenOrClose=${this.onOpenNode}
   }

@@ -132,12 +132,62 @@ export class TreeView extends AzosElement {
     this.dispatchEvent(new CustomEvent("nodeUserAction", { detail: { node, ...eArgs } }));
   }
 
-  #getChangeEventType(changeType) {
-    if (changeType === "added" || changeType === "removed") return "nodeAddRemove";
-    else if (changeType === "opened" || changeType === "closed") return "nodeOpenClose";
-    else if (changeType === "updated") return "nodeUpdated";
-    else if (changeType === "checked") return "nodeChecked";
-    return "nodeChanged";
+  /**
+   * Retrieve all nodes--or return a single node by {@link filterNodeId}--within {@link root}
+   * @param {string} filterNodeId the element id ("tn{@link TreeNode.id}") by which to filter
+   * @param {*} root default {@link this.root}, the node from which to being collecting nodes
+   * @returns all nodes from all sub-nodes from {@link root}
+   */
+  #getAllVisibleNodes(filterNodeId, root = this.root) {
+    const nodes = [];
+    traverseNode(root);
+    return filterNodeId ? (nodes.length ? nodes[0] : null) : nodes;
+
+    function traverseNode(node) {
+      if (filterNodeId) {
+        if (node.id === filterNodeId) {
+          nodes.push(node);
+          return true;
+        }
+      } else if (node.isVisible) nodes.push(node);
+      if ((node.isRoot || (node.isVisible && node.isOpened)) && node.hasChildren) node.children.some(traverseNode);
+    }
+  }
+
+  #close(node) {
+    node.close();
+    this._dispatchNodeUserActionEvent(node, { action: "closed" });
+  }
+
+  #open(node) {
+    node.open();
+    this._dispatchNodeUserActionEvent(node, { action: "opened" });
+  }
+
+  /** Advance focus to the previous element. */
+  #advanceFocusPrevious() { this.#advanceFocus(false); }
+
+  /**
+   * Default: advance focus to next element
+   * @param {boolean} next false to move focus to the previous element
+   */
+  #advanceFocus(next = true) {
+    const nodes = this.#getAllVisibleNodes();
+    const nodeInFocusIndex = nodes.findIndex(node => node.id === this.nodeInFocus?.id);
+    if (nodeInFocusIndex === -1) {
+      this.#focusNode(nodes[0]);
+      return;
+    }
+
+    let newNodeInFocus = null;
+    if (next) {
+      if (nodeInFocusIndex === (nodes.length - 1)) newNodeInFocus = nodes[0];
+      else newNodeInFocus = nodes[nodeInFocusIndex + 1];
+    } else {
+      if (nodeInFocusIndex === 0) newNodeInFocus = nodes[nodes.length - 1];
+      else newNodeInFocus = nodes[nodeInFocusIndex - 1];
+    }
+    if (newNodeInFocus) this.#focusNode(newNodeInFocus, this.nodeInFocus);
   }
 
   /**
@@ -160,16 +210,6 @@ export class TreeView extends AzosElement {
       this.#open(node);
   }
 
-  #close(node) {
-    node.close();
-    this._dispatchNodeUserActionEvent(node, { action: "closed" });
-  }
-
-  #open(node) {
-    node.open();
-    this._dispatchNodeUserActionEvent(node, { action: "opened" });
-  }
-
   #onKeyDown(e) {
     const toast = msg => Toast.toast(msg, { timeout: 500, position: POSITION.TOP_RIGHT });
     const { key } = e;
@@ -182,7 +222,9 @@ export class TreeView extends AzosElement {
         toast(key); break;
       case "ArrowLeft":
         if (this.nodeInFocus.hasChildren && this.nodeInFocus.isOpened) this.#close(this.nodeInFocus);
-        else if (this.nodeInFocus.parent && this.nodeInFocus.parent.isVisible) this.#focusNode(this.nodeInFocus.parent);
+        else if (this.nodeInFocus.parent)
+          if (this.nodeInFocus.parent.isVisible) this.#focusNode(this.nodeInFocus.parent);
+          else this.#focusNode(this.nodeInFocus.parent.children[0]);
         toast(key); break;
       case "ArrowRight":
         if (this.nodeInFocus.isClosed) this.#open(this.nodeInFocus);
@@ -203,58 +245,18 @@ export class TreeView extends AzosElement {
   }
 
   #onTreeFocus(e) {
-    console.log('onTreeFocus', e);
-    if (this.nodeInFocus) return;
-    this.$(e.target.id).tabindex = -1;
-    this.#focusNode(this.getAllVisibleNodes()[0]);
-  }
-
-  /** Advance focus to the previous element. */
-  #advanceFocusPrevious() { this.#advanceFocus(false); }
-
-  /**
-   * Default: advance focus to next element
-   * @param {boolean} next false to move focus to the previous element
-   */
-  #advanceFocus(next = true) {
-    const nodes = this.getAllVisibleNodes();
-    const nodeInFocusIndex = nodes.findIndex(node => node.id === this.nodeInFocus?.id);
-    if (nodeInFocusIndex === -1) {
-      this.#focusNode(nodes[0]);
+    console.log('onTreeFocus()', e, this.nextElementSibling.focus());
+    if (this.nodeInFocus) {
+      this.#focusNode(this.nodeInFocus);
       return;
     }
-
-    let newNodeInFocus = null;
-    if (next) {
-      if (nodeInFocusIndex === (nodes.length - 1)) newNodeInFocus = nodes[0];
-      else newNodeInFocus = nodes[nodeInFocusIndex + 1];
-    } else {
-      if (nodeInFocusIndex === 0) newNodeInFocus = nodes[nodes.length - 1];
-      else newNodeInFocus = nodes[nodeInFocusIndex - 1];
-    }
-    if (newNodeInFocus) this.#focusNode(newNodeInFocus, this.nodeInFocus);
+    this.$(e.target.id).tabindex = -1;
+    this.#focusNode(this.#getAllVisibleNodes()[0]);
   }
 
-  /**
-   * Retrieve all nodes--or return a single node by {@link filterNodeId}--within {@link root}
-   * @param {string} filterNodeId the element id ("tn{@link TreeNode.id}") by which to filter
-   * @param {*} root default {@link this.root}, the node from which to being collecting nodes
-   * @returns all nodes from all sub-nodes from {@link root}
-   */
-  getAllVisibleNodes(filterNodeId, root = this.root) {
-    const nodes = [];
-    traverseNode(root);
-    return filterNodeId ? (nodes.length ? nodes[0] : null) : nodes;
-
-    function traverseNode(node) {
-      if (filterNodeId) {
-        if (node.id === filterNodeId) {
-          nodes.push(node);
-          return true;
-        }
-      } else if (node.isVisible) nodes.push(node);
-      if ((node.isRoot || (node.isVisible && node.isOpened)) && node.hasChildren) node.children.some(traverseNode);
-    }
+  #onTreeFocusOut(e) {
+    console.log('onTreeFocusOut()', e);
+    this.$(e.target.id).tabindex = 0;
   }
 
   render() {
