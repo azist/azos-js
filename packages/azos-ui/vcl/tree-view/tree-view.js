@@ -5,8 +5,7 @@
 </FILE_LICENSE>*/
 
 import { TreeNode } from "./tree-node";
-import { Toast } from "../../toast";
-import { AzosElement, css, html, parseRank, parseStatus, POSITION } from "../../ui";
+import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
 import { isOf, isTrue } from "azos/aver";
 import { baseStyles } from "../../parts/styles";
 
@@ -216,36 +215,35 @@ export class TreeView extends AzosElement {
   }
 
   #onKeyDown(e) {
-    const toast = msg => Toast.toast(msg, { timeout: 500, position: POSITION.TOP_RIGHT });
     const { key } = e;
     switch (key) {
       case "ArrowUp":
         this.#advanceFocusPrevious();
-        toast(key); break;
+        break;
       case "ArrowDown":
         this.#advanceFocus();
-        toast(key); break;
+        break;
       case "ArrowLeft":
         if (this.nodeInFocus.hasChildren && this.nodeInFocus.isOpened) this.#close(this.nodeInFocus);
         else if (this.nodeInFocus.parent)
           if (this.nodeInFocus.parent.isVisible) this.#focusNode(this.nodeInFocus.parent);
           else this.#focusNode(this.nodeInFocus.parent.children[0]);
-        toast(key); break;
+        break;
       case "ArrowRight":
         if (this.nodeInFocus.isClosed) this.#open(this.nodeInFocus);
         else if (this.nodeInFocus.hasChildren) this.#advanceFocus(this.nodeInFocus.children[0]);
-        toast(key); break;
+        break;
       case "Tab":
         e.preventDefault();
         this.#advanceFocus(!e.shiftKey);
-        toast(key); break;
+        break;
       case "Space":
         e.preventDefault();
         if (this.nodeInFocus.checkable) {
           this.nodeInFocus.toggleChecked();
           this.dispatchEvent(new CustomEvent("nodeChecked", { detail: { node: this.nodeInFocus } }));
         }
-        toast(key); break;
+        break;
     }
   }
 
