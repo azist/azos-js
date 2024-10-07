@@ -171,7 +171,7 @@ export class TreeView extends AzosElement {
   }
 
   #onKeyDown(e) {
-    const toast = msg => Toast.toast(msg, 500, undefined, undefined, POSITION.TOP_RIGHT);
+    const toast = msg => Toast.toast(msg, { timeout: 500, position: POSITION.TOP_RIGHT });
     const { key } = e;
     switch (key) {
       case "ArrowUp":

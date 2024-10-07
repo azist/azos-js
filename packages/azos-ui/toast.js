@@ -6,6 +6,7 @@
 
 import { genGuid } from "azos/types";
 import { AzosElement, html, css, STATUS, RANK, POSITION, parseRank, parseStatus } from "./ui.js";
+import { isString } from "azos/aver";
 
 /**
  * Toasts are popover AzosElement messages that self-destruct after a timeout period (default 10s).
@@ -82,10 +83,16 @@ export class Toast extends AzosElement {
    * @param {POSITION} position The position for where to display on the screen
    * @returns The constructed toast added to Toast.#instances
    */
-  static toast(msg = null, timeout = undefined, rank = RANK.NORMAL, status = STATUS.DEFAULT, position = POSITION.DEFAULT) {
+  static toast(msg = null, options = { timeout: Number, rank: RANK, status: STATUS, position: POSITION }) {
+    isString(msg);
     const toast = new Toast();
+
     // 1s + 180ms per word
-    timeout = timeout === undefined ? 1_000 + (msg.split(' ').length) * 180 : timeout;
+    const timeout = options.timeout ?? 1_000 + (msg.split(' ').length) * 180;
+    const rank = options.rank ?? RANK.NORMAL;
+    const status = options.status ?? STATUS.DEFAULT;
+    const position = options.position ?? POSITION.DEFAULT;
+
     toast.#message = msg;
     toast.#timeout = timeout;
     toast.#rank = rank;

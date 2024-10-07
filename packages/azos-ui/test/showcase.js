@@ -87,7 +87,7 @@ export class Showcase extends AzosElement {
       const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
       const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
 
-      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, timeout, rank, status, position);
+      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, {timeout, rank, status, position});
     }
   }
 

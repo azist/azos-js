@@ -69,12 +69,12 @@ export class AdlibApplet extends Applet {
           node.data.areCollectionChildrenLoaded = true;
           Spinner.exec(async () => {
             await new Promise(r => setTimeout(r, 500));
-            toast(`There are no children for node '${node.title}'.`, undefined, null, STATUS.INFO, POSITION.TOP_RIGHT);
+            toast(`There are no children for node '${node.title}'.`, { status: STATUS.INFO, position: POSITION.TOP_RIGHT });
           });
           node.hideChevron();
         }
       }
-    } else if (action === "closed") console.log(`Closed node: ${node.title}`);
+    } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
   }
 
   async onNodeChecked(e) {
