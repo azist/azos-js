@@ -182,10 +182,14 @@ export class TreeView extends AzosElement {
 
     let newNodeInFocus = null;
     if (next) {
-      if (nodeInFocusIndex === (nodes.length - 1)) newNodeInFocus = nodes[0];
+      if (nodeInFocusIndex === (nodes.length - 1))
+        if (this.nextElementSibling) this.nextElementSibling.focus();
+        else newNodeInFocus = nodes[0];
       else newNodeInFocus = nodes[nodeInFocusIndex + 1];
     } else {
-      if (nodeInFocusIndex === 0) newNodeInFocus = nodes[nodes.length - 1];
+      if (nodeInFocusIndex === 0)
+        if (this.previousElementSibling) this.previousElementSibling.focus();
+        else newNodeInFocus = nodes[nodes.length - 1];
       else newNodeInFocus = nodes[nodeInFocusIndex - 1];
     }
     if (newNodeInFocus) this.#focusNode(newNodeInFocus, this.nodeInFocus);
@@ -246,7 +250,6 @@ export class TreeView extends AzosElement {
   }
 
   #onTreeFocus(e) {
-    console.log('onTreeFocus()', e, this.nextElementSibling.focus());
     if (this.nodeInFocus) {
       this.#focusNode(this.nodeInFocus);
       return;
