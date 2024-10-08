@@ -27,6 +27,17 @@ export const NAME_PROP = Symbol("name");
 export const ORDER_PROP = Symbol("order");
 
 /**
+ * Establishes a "IDirty" protocol - an entity that needs to be saved before disposal
+ */
+export const DIRTY_PROP = Symbol("dirty");
+
+/**
+ * Establishes a "closeQuery" - part of the IDirty protocol. Determines if an entity can be logically disposed
+ *  such as a file view can be closed if there are no changes to be saved.
+ */
+export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
+
+/**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -
  * is capable of being deterministically finalized aka "disposed".
  * The concept has NOTHING TO DO with the GC, and deals with logical pairing of construction/destruction

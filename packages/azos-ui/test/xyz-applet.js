@@ -14,6 +14,7 @@ import "./xyz-dialog.js";
 import "./showcase.js";
 import "../vcl/time/timeline.js";
 import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
+import { CLOSE_QUERY_METHOD } from "azos/types";
 
 
 //import { APPLET_STYLES } from "./applet.css.js";
@@ -62,7 +63,7 @@ export class XyzApplet extends Applet {
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 
-  async closeQuery(){
+  async [CLOSE_QUERY_METHOD](){
     return true;//await confirm("We will close the form. Yes/no?")
   }
 

@@ -7,25 +7,25 @@
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { AzosElement } from "./ui.js";
 
-//import { APPLET_STYLES } from "./applet.css.js";
-//import * as DEFAULT_HTML from "./applet.htm.js";
-
 /**
- * Defines a root UI element which represents an Applet - a part of application.
- * Applets run inside of arenas.
- * Applets expose "Areas" which show in arena sidebars
+ * A higher order component which represents a grouping of user interface elements which are
+ *  logically connected.
+ *  e.g., "Address block" containing street1, street2, city, state, zip.
  */
-export class Applet extends AzosElement {
+export class Block extends AzosElement {
+
+  /**
+   * Reactive properties
+   */
+  static properties = {
+    title: { type: String },
+    description: { type: String }
+  };
 
   constructor() {
     super();
+    this.title = this.constructor.name;
   }
-
-  /** Returns the name of the applet displayed in the Arena title bar */
-  get title() { return this.constructor.name; }
-
-  /** Returns short description */
-  get description() { return ""; }
 
   /** Override to return true when this app has unsaved data */
   get [DIRTY_PROP]() { return false; }
@@ -35,6 +35,6 @@ export class Applet extends AzosElement {
    * The method is called by arena before evicting this applet and replacing it with a new one.
    * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
    */
-  [CLOSE_QUERY_METHOD](){ return !this[DIRTY_PROP]; }
+  [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
 }//Applet

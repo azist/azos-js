@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned } from "azos/types";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD } from "azos/types";
 import { html, AzosElement, noContent } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
@@ -110,13 +110,18 @@ export class Arena extends AzosElement {
   get applet(){ return this.#applet; }
 
   /** Returns true when the arena state is considered "unsaved" and this should prevent browser window close
-   * The default implementation returns true when there are any dialogs open or applet is activ e and it is `dirty`
+   * The default implementation returns true when there are any dialogs open or applet is active and it is `dirty`
   */
-  get dirty(){
+  get [DIRTY_PROP](){
     if (ModalDialog.topmost !== null) return true;//there are open pending modals
-    if (this.#applet !== null && this.#applet.dirty) return true;//applet has unsaved data
+    if (this.#applet !== null && this.#applet[DIRTY_PROP]) return true;//applet has unsaved data
     return false;
   }
+
+  /**
+   * A convenient shortcut for the "DIRTY_PROP" symbol
+   */
+  get dirty() {return this[DIRTY_PROP]; }
 
 
   get isKiosk(){ return !isEmpty(this.kiosk); }
@@ -204,7 +209,7 @@ export class Arena extends AzosElement {
   */
   async appletClose(force = false){
     if (!this.#applet) return true;
-    const canClose = force ? true : await this.#applet.closeQuery();
+    const canClose = force ? true : await this.#applet[CLOSE_QUERY_METHOD]();
     if (!canClose) return false;
     this.uninstallToolbarCommands([...this.#toolbar]);
     this.#applet = null;
