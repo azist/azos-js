@@ -1,7 +1,7 @@
 import { isOf } from "azos/aver";
 import { TabView } from "./tab-view";
 import { Block } from "../../block";
-import { html, verbatimHtml } from "../../ui";
+import { html } from "../../ui";
 
 import "../../parts/button";
 export class Tab extends Block {
@@ -14,6 +14,11 @@ export class Tab extends Block {
 
   constructor() {
     super();
+  }
+
+  requestUpdate(...args) {
+    super.requestUpdate.call(this, ...args);
+    this.tabView?.requestUpdate();
   }
 
   connectedCallback() {

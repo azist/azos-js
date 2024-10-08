@@ -18,6 +18,7 @@ import "../vcl/tabs/tab-view.js";
 import "../vcl/util/tabs.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
+import { Tab } from "../vcl/tabs/tab.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement {
@@ -25,6 +26,10 @@ export class Showcase extends AzosElement {
 
   static styles = css`
   p{ font-size: 1rem; }
+  az-tab-view {
+    display: block;
+    width: 50%;
+  }
   `;
 
 
@@ -84,27 +89,30 @@ export class Showcase extends AzosElement {
       const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
       const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
 
-      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, {timeout, rank, status, position});
+      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, { timeout, rank, status, position });
     }
   }
 
-  #testMe(e) {
-    alert(`clicked: ${e.target.constructor.name}`);
+  #id = 0;
+  #addMoreTab(e) {
+    this.tabView.addTab(Tab, `Tab${++this.#id}`, `${this.#id}`);
   }
 
   render() {
     const showcase = this;
     return html`
-<az-tab-view>
-  <az-tab title="Spritzer">
+<az-tab-view id="tabView" scope="this">
+  <az-tab title="Data Grid" status="default">
     <div slot="body">
-      hello, this is a test of the emergency <br/>
-      <az-button @click=${this.#testMe} title="Open..."></az-button>
+      <az-button @click=${this.#addMoreTab} title="Open..."></az-button>
       <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
       <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
     </div>
   </az-tab>
-  <az-tab title="Beetlejuice">
+  <az-tab title="Details" status="alert">
+    <az-button @click="${this.#addMoreTab}" title="Debbify" status="info" slot="body"></az-button>
+  </az-tab>
+  <az-tab title="Advanced" status="error">
     <div slot="body">
       <az-button @click=${this.onDlg1Open} title="Open..."></az-button>
       <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
