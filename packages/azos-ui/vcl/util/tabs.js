@@ -19,7 +19,7 @@ export class Tabs extends AzosElement {
 
   .tabNav{
     display:flex;
-    align-items:center;
+    align-items:baseline;
     overflow:hidden;
     user-select: none;
     -webkit-user-select: none;
@@ -28,37 +28,39 @@ export class Tabs extends AzosElement {
     background-color:var(--paper);
     color:var(--ink);
     border:none;
-    padding:1em .5em;
+    padding:1em .5em .25em .5em;
     cursor:pointer;
-    font-size:.75em;
   }
   .tabBtns{
     overflow-x:auto;
     white-space:nowrap;
     scroll-behavior:smooth;
+    display:inline-flex;
   }
   .tabBtns::-webkit-scrollbar{display:none;}
   .tabBtn{
     display:inline-block;
     cursor:pointer;
-    font-size:.75em;
     padding:.5em 1em;
-    margin:0 -.35em 0 0;
     background-color:var(--paper);
     color:var(--ink);
     border:none;
-    border-bottom:1px solid var(--ink);
     border-radius:.5em .5em 0 0;
-    filter:brightness(.75);
-    transition:filter .2s;
+    filter:brightness(.93);
+    transition:all .2s;
+    border-top:3px solid #58585850;
+    border-left:1px solid #58585850;
+    border-right:1px solid #58585850;
   }
   .tabBtn:hover{
-    filter:brightness(.85);
+    filter:brightness(.95);
   }
   .tabBtn.active{
+    font-size:1.25em;
     filter:brightness(1);
-    border:1px solid var(--ink);
-    border-bottom:none;
+    border-top:3px solid;
+    border-left:1px solid;
+    border-right:1px solid;
   }
   .tabContent{
     padding:6px 12px;
@@ -69,11 +71,11 @@ export class Tabs extends AzosElement {
     to{opacity:1;}
   }
 
-  .tab-ok      { background: var(--s-ok-bg-ctl-btn);     color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl-btn);}
-  .tab-info    { background: var(--s-info-bg-ctl-btn);   color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl-btn);}
-  .tab-warning { background: var(--s-warn-bg-ctl-btn);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl-btn);}
-  .tab-alert   { background: var(--s-alert-bg-ctl-btn);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl-btn);}
-  .tab-error   { background: var(--s-error-bg-ctl-btn);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl-btn);}
+  .tab-ok      { color: var(--s-ok-fg-ctl);  border-color: #a0f9a0;}
+  .tab-info    { color: var(--s-info-fg-ctl); border-color: #a0d8ff;}
+  .tab-warning { color: var(--s-warn-fg-ctl); border-color: #f8f850;}
+  .tab-alert   { color: var(--s-alert-fg-ctl); border-color: #e040f0;}
+  .tab-error   { color: var(--s-error-fg-ctl); border-color: #ff4720;}
   `;
 
   static properties = {
@@ -88,6 +90,23 @@ export class Tabs extends AzosElement {
   }
 
   #openTab(e) {
+    const btn = e.currentTarget.getBoundingClientRect();
+    const tabBtns = this.shadowRoot.querySelectorAll('.tabBtns')[0];
+    const tabBtnsBounds = tabBtns.getBoundingClientRect();
+    if (btn.left < tabBtnsBounds.left) {
+      tabBtns.scrollBy({
+        top: 0,
+        left: btn.width * -1,
+        behavior: 'smooth'
+      });
+    }
+    if (btn.right > tabBtnsBounds.right) {
+      tabBtns.scrollBy({
+        top: 0,
+        left: btn.width,
+        behavior: 'smooth'
+      })
+    }
     const oldTab = this.activeTabIndex;
     const newTab = parseInt(e.currentTarget.getAttribute('data-tab-btn'));
     if (newTab !== oldTab) {
@@ -111,10 +130,9 @@ export class Tabs extends AzosElement {
   }
   render() {
     const clsRank = `${parseRank(this.rank, true)}`;
-    const clsStatus = `${parseStatus(this.status, true)}`;
     const allItems = [...this.getElementsByTagName("az-tab-item")];
     const tabList = html`${allItems.map((item, i) => html`
-      <div class="tabBtn tab-${parseStatus(item.getAttribute('status'), true)} ${(parseInt(this.activeTabIndex) === i) ? 'active' : ''}" data-tab-btn="${i}" @click="${this.#openTab}">${item.title}</div>
+      <div class="tabBtn tab-${parseStatus(item.getAttribute('status'), true)} ${(parseInt(this.activeTabIndex) === i) ? 'active' : ''}" data-tab-btn="${i}" tabindex="0" @click="${this.#openTab}">${item.title}</div>
     `)}`;
     const tabContentList = html`${allItems.map((item, i) => html`
       <div class="tabContent" style="display:${(parseInt(this.activeTabIndex) === i) ? 'block' : 'none'};">${verbatimHtml(item.innerHTML)}</div>
