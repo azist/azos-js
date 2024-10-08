@@ -26,41 +26,35 @@ export class TabView extends AzosElement {
   cursor: pointer;
 }
 
-.tab.selected {
-  border-bottom: 1px solid white;
+.tab.active {
+  border-bottom: 1px solid var(--paper);
 }
 `;
-
-  get tabs() {
-    return [...this.children].filter(child => child instanceof Tab);
-  }
 
   constructor() {
     super();
   }
 
+  get tabs() {
+    return [...this.children].filter(child => child instanceof Tab);
+  }
+
+  #activeTab;
+  get activeTab() { return this.#activeTab; }
+
   connectedCallback() {
     super.connectedCallback();
-    this.unselectAllTabs();
-    this.tabs[0].selected = true;
-    this.tabs[0].slot = "body";
+    this.#activeTab = this.tabs[0];
+    this.#activeTab.slot = "body";
   }
 
   #onTabClick(e) {
+    this.tabs.forEach(tab => tab.slot = null);
     const tabIndex = e.target.dataset.index;
-    console.dir(tabIndex);
-    this.unselectAllTabs();
     const tab = this.tabs[tabIndex];
-    tab.selected = true;
-    tab.slot = "body";
+    this.#activeTab = tab;
+    this.#activeTab.slot = "body";
     this.requestUpdate();
-  }
-
-  unselectAllTabs() {
-    this.tabs.forEach(tab => {
-      tab.selected = false;
-      tab.slot = null;
-    });
   }
 
   render() {
@@ -71,9 +65,11 @@ export class TabView extends AzosElement {
     console.dir(this.tabs);
     return html`
 <div class="tab-container" @click="${this.#onTabClick}">
-  ${this.tabs.map((tab, index) => html`
-    <div class="tab ${tab.selected ? "selected" : ""}" data-index="${index}">${tab.title}</div>
-  `)}
+  ${this.tabs.map((tab, index) => {
+      const cls = tab.active ? "active" : "";
+      return html`
+      <div class="tab ${cls}" data-index="${index}">${tab.title}</div>
+    `})}
 </div>
     `;
   }

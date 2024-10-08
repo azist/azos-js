@@ -88,20 +88,31 @@ export class Showcase extends AzosElement {
     }
   }
 
+  #testMe(e) {
+    alert(`clicked: ${e.target.constructor.name}`);
+  }
+
   render() {
     const showcase = this;
     return html`
 <az-tab-view>
   <az-tab title="Spritzer">
-  <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
-  <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
+    <div slot="body">
+      hello, this is a test of the emergency <br/>
+      <az-button @click=${this.#testMe} title="Open..."></az-button>
+      <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
+      <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
+    </div>
   </az-tab>
   <az-tab title="Beetlejuice">
-    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
-    <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
-    <p>Litora sodales fermentum potenti malesuada viverra volutpat libero cubilia primis. Facilisi convallis iaculis lectus dignissim tempus ornare; molestie aenean. Suscipit vivamus adipiscing dui pretium finibus elit dignissim. Aliquet molestie magnis velit volutpat fringilla a odio fames. Purus vehicula tortor id habitant odio. Ante ligula condimentum felis; curabitur praesent risus urna montes felis. Vulputate aptent aliquam laoreet, eleifend rutrum dui. Praesent tortor scelerisque viverra pharetra potenti pharetra vestibulum a accumsan. Nisl eros leo quam ultricies hac. Iaculis sagittis commodo nisi amet dis gravida ut mollis nibh.</p>
-    <p>Amet vivamus primis convallis nullam etiam ultrices orci ridiculus sit. Lectus sociosqu elit, vel nascetur senectus facilisis mauris. Inceptos rutrum aliquet quis bibendum sit lacinia. Blandit lacinia curae rhoncus in luctus posuere. Nec erat inceptos nisi ex torquent lectus suspendisse fermentum pellentesque. Dolor amet orci felis ligula quisque bibendum lectus. Nisi quam mollis risus nulla lacinia turpis rhoncus sollicitudin. Ridiculus sodales suspendisse mauris mi aptent ante mattis.</p>
-    <p>Magnis libero nec arcu enim; sit diam. Amet porta integer adipiscing auctor tortor velit. Cursus tortor convallis inceptos leo pretium praesent torquent maximus? Nibh aliquet libero sapien ac; mus habitant orci erat. Metus dignissim mus arcu velit habitant sollicitudin. Eu potenti curabitur mi tincidunt ad tristique pellentesque integer. Sapien pulvinar at sollicitudin porta taciti non malesuada integer. Efficitur ac nisl taciti; ante maximus netus magnis accumsan. Duis montes risus pharetra; potenti nisl risus. Tristique cubilia dapibus nullam a cubilia.</p>
+    <div slot="body">
+      <az-button @click=${this.onDlg1Open} title="Open..."></az-button>
+      <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
+      <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
+      <p>Litora sodales fermentum potenti malesuada viverra volutpat libero cubilia primis. Facilisi convallis iaculis lectus dignissim tempus ornare; molestie aenean. Suscipit vivamus adipiscing dui pretium finibus elit dignissim. Aliquet molestie magnis velit volutpat fringilla a odio fames. Purus vehicula tortor id habitant odio. Ante ligula condimentum felis; curabitur praesent risus urna montes felis. Vulputate aptent aliquam laoreet, eleifend rutrum dui. Praesent tortor scelerisque viverra pharetra potenti pharetra vestibulum a accumsan. Nisl eros leo quam ultricies hac. Iaculis sagittis commodo nisi amet dis gravida ut mollis nibh.</p>
+      <p>Amet vivamus primis convallis nullam etiam ultrices orci ridiculus sit. Lectus sociosqu elit, vel nascetur senectus facilisis mauris. Inceptos rutrum aliquet quis bibendum sit lacinia. Blandit lacinia curae rhoncus in luctus posuere. Nec erat inceptos nisi ex torquent lectus suspendisse fermentum pellentesque. Dolor amet orci felis ligula quisque bibendum lectus. Nisi quam mollis risus nulla lacinia turpis rhoncus sollicitudin. Ridiculus sodales suspendisse mauris mi aptent ante mattis.</p>
+      <p>Magnis libero nec arcu enim; sit diam. Amet porta integer adipiscing auctor tortor velit. Cursus tortor convallis inceptos leo pretium praesent torquent maximus? Nibh aliquet libero sapien ac; mus habitant orci erat. Metus dignissim mus arcu velit habitant sollicitudin. Eu potenti curabitur mi tincidunt ad tristique pellentesque integer. Sapien pulvinar at sollicitudin porta taciti non malesuada integer. Efficitur ac nisl taciti; ante maximus netus magnis accumsan. Duis montes risus pharetra; potenti nisl risus. Tristique cubilia dapibus nullam a cubilia.</p>
+    </div>
   </az-tab>
 </az-tab-view>
 

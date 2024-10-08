@@ -1,12 +1,16 @@
 import { isOf } from "azos/aver";
 import { TabView } from "./tab-view";
 import { Block } from "../../block";
-import { verbatimHtml } from "../../ui";
+import { html, verbatimHtml } from "../../ui";
 
+import "../../parts/button";
 export class Tab extends Block {
   static properties = {
-    selected: { type: Boolean },
+    active: { type: Boolean, reflect: true },
   };
+
+  get active() { return this === this.tabView.activeTab; }
+  get tabView() { return this.parentNode; }
 
   constructor() {
     super();
@@ -17,7 +21,14 @@ export class Tab extends Block {
     isOf(this.parentNode, TabView);
   }
 
-  render() {
-    return verbatimHtml(this.innerHTML);
+  onClick() {
+    alert("Hello!");
   }
+
+  render() {
+    // return html`${this.innerHTML}`;
+    return html`<slot name="body"></slot>`;
+  }
+
+
 }
