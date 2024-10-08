@@ -138,7 +138,6 @@ export class XyzApplet extends Applet {
      <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
      <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
 
-
      <az-button id="btnTimeline" scope="this" title="Git yer fuchurr 4told!" status="info" @click="${this.onClickTimeline}"></az-button>
 
 
