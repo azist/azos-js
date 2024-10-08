@@ -89,6 +89,7 @@ export class Showcase extends AzosElement {
   }
 
   render() {
+    const showcase = this;
     return html`
 <az-tab-view>
   <az-tab title="Spritzer">
@@ -124,10 +125,14 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
 
     <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
+<div style="margin-top:100px">&nbsp;</div>
+
 
 <az-tabs activeTabIndex="0">
   <az-tab-item title="Buttons">
     <h2>az-button</h2>
+
+    <az-button @click="${showcase.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
 
     <p>Regular buttons of default status</p>
     <az-button title="Button 1"></az-button>
