@@ -3,6 +3,7 @@ import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
+import { ModalDialog } from "../../modal-dialog";
 
 export class TabView extends AzosElement {
   static #idSeed = 0;
@@ -55,12 +56,16 @@ export class TabView extends AzosElement {
   pointer-events: none;
 }
 
+.tab-btn.active .close-ind {
+  pointer-events: auto;
+}
+
 .tab-btn.active .active-tab-title {
   font-size: 1.25em;
 }
 
 .tab-btn {
-  transition: font-size 0.1s;
+  position: relative;
   display: flex;
   align-items: center;
   padding: 0.3em 1em;
@@ -74,6 +79,7 @@ export class TabView extends AzosElement {
   border-top: 3px solid var(--my-color);
   border-left: 1px solid var(--my-color);
   border-right: 1px solid var(--my-color);
+  transition: font-size 0.1s;
 }
 
 .tab-btn span {
@@ -88,6 +94,14 @@ export class TabView extends AzosElement {
 .dirty-ind {
   font-weight: bold;
   padding-left: 0.25em;
+}
+
+.close-ind {
+  position: absolute;
+  padding: 5px;
+  padding-top: 0;
+  top: 0;
+  right: 0;
 }
 
 .tab-btn:not(.dirty) .dirty-ind {display: none;}
@@ -243,6 +257,15 @@ export class TabView extends AzosElement {
     }
   }
 
+  #onCloseTabClick(e, tab) {
+    e.stopPropagation();
+    const sure = confirm("Are you sure?");
+    if (!sure) return;
+    if (tab.active && (!this.unselectActiveTab())) return;
+    this.removeChild(tab);
+    this.requestUpdate();
+  }
+
   updated() {
     const tabMenuWidth = this.shadowRoot.querySelector('.tab-btn-container').offsetWidth;
     const scrollBtns = this.shadowRoot.querySelectorAll('.scroll-btn');
@@ -273,8 +296,8 @@ export class TabView extends AzosElement {
 <div class="tab-nav">
   <button class="scroll-btn" @click="${this.#onScrollLeft}">&lt;</button>
   <div class="tab-btn-container">
-  <div class="tab-btn-container-inner ${cls}">
-    ${this.tabs.map(tab => {
+    <div class="tab-btn-container-inner ${cls}">
+      ${this.tabs.map(tab => {
       const cls = [
         tab.active ? "active" : "",
         tab.hidden ? "hidden" : "",
@@ -290,12 +313,13 @@ export class TabView extends AzosElement {
       ].filter(item => item !== "").join(";");
 
       return html`
-        <div class="${cls}" @click="${(e) => this.#onTabClick(e, tab)}" style="${stl}">
-          <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
-          <span class="dirty-ind">·</span>
-        </div>
-      `})}
-  </div>
+          <div class="${cls}" @click="${(e) => this.#onTabClick(e, tab)}" style="${stl}">
+            <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
+            <span class="dirty-ind">·</span>
+            <div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>
+          </div>
+        `})}
+    </div>
   </div>
   <button class="scroll-btn" @click="${this.#onScrollRight}">&gt;</button>
 </div>

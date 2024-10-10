@@ -5,6 +5,7 @@ import { TabView } from "./tab-view";
 
 import { asBool } from "azos/types";
 import "../../parts/button";
+
 export class Tab extends Block {
   static properties = {
     active: { type: Boolean, reflect: true },
