@@ -35,6 +35,6 @@ export class Block extends AzosElement {
    * The method is called by arena before evicting this applet and replacing it with a new one.
    * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
    */
-  [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
+  async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
 }//Applet
