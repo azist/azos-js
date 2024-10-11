@@ -117,7 +117,7 @@ export class Showcase extends AzosElement {
   <az-button style="display:none;" @click=${this.#moveLeft4x} title="Move left 4x"></az-button>
   <az-button style="display:none;" @click=${this.#showHide} title="Show/Hide"></az-button>
 </div>
-<az-tab-view id="tabView" scope="this">
+<az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}">
   <az-tab title="Data Grid" status="default" minWidth="10" maxWidth="15">
     <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
     <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>

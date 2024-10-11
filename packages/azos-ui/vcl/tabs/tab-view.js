@@ -2,7 +2,7 @@ import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/ave
 import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
-import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
+import { arrayDelete, CLOSE_QUERY_METHOD, DIRTY_PROP, DISPOSE_METHOD } from "azos/types";
 
 export class TabView extends AzosElement {
   static #idSeed = 0;
@@ -256,13 +256,26 @@ export class TabView extends AzosElement {
     }
   }
 
-  #onCloseTabClick(e, tab) {
-    e.stopPropagation();
-    const sure = confirm("Are you sure?");
-    if (!sure) return;
-    if (tab.active && (!this.unselectActiveTab())) return;
+  /**
+   * Emits "closing" if !force, "closed" if closed.
+   * @param {boolean} force true to bypass dirty checks, etc
+   * @returns true if tab closed
+   */
+  async closeTab(tab, force = false) {
+    if (!force) {
+      if (!await tab[CLOSE_QUERY_METHOD]()) return false;
+      this.dispatchEvent(new CustomEvent("tabClosing", { detail: { tab }, cancelable: true, bubbles: true }));
+    }
+    if (tab.active && !this.unselectActiveTab()) return false;
+    this.dispatchEvent(new CustomEvent("tabClosed", { detail: { tab }, cancelable: false, bubbles: true }));
     this.removeChild(tab);
+    // TODO: needed? if (removed) tab[DISPOSE_METHOD]();
     this.requestUpdate();
+  }
+
+  async #onCloseTabClick(e, tab) {
+    e.stopPropagation();
+    await this.closeTab(tab);
   }
 
   updated() {

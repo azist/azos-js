@@ -3,7 +3,7 @@ import { Block } from "../../block";
 import { html } from "../../ui";
 import { TabView } from "./tab-view";
 
-import { asBool } from "azos/types";
+import { asBool, CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import "../../parts/button";
 
 export class Tab extends Block {
@@ -27,6 +27,14 @@ export class Tab extends Block {
       this.#hidden = true;
     }
     tabView?.requestUpdate();
+  }
+
+  #dirty = Math.random() < 0.5;
+  get [DIRTY_PROP]() { return this.#dirty; }
+
+  async [CLOSE_QUERY_METHOD]() {
+    if (this[DIRTY_PROP]) return confirm("Are you sure?");
+    return true;
   }
 
   get active() { return this === this.tabView.activeTab; }
@@ -103,8 +111,6 @@ export class Tab extends Block {
 
   get tabView() { return this.parentNode; }
 
-  // get [DIRTY_PROP]() { return true; }
-
   constructor() { super(); }
 
   requestUpdate(...args) {
@@ -119,6 +125,9 @@ export class Tab extends Block {
 
   /** Within the tabView, makes this tab active. */
   activate() { this.tabView.activeTab = this; }
+
+  /** Within the tabView, closes this tab and discards it. */
+  async close(force = false) { return this.tabView.closeTab(this, force); }
 
   /** @param {number} stepCount negative for left, positive for right */
   move(stepCount) {

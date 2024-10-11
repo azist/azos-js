@@ -116,9 +116,7 @@ export class TreeNode extends DisposableObject {
   removeChild(childNode) {
     isOf(childNode, TreeNode);
     const removed = arrayDelete(this.#children, childNode);
-    if (removed) {
-      childNode[DISPOSE_METHOD]();
-    }
+    if (removed) childNode[DISPOSE_METHOD]();
     return removed;
   }
 
