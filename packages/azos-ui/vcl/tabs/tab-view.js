@@ -3,7 +3,6 @@ import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
-import { ModalDialog } from "../../modal-dialog";
 
 export class TabView extends AzosElement {
   static #idSeed = 0;
@@ -218,7 +217,7 @@ export class TabView extends AzosElement {
     return tab;
   }
 
-  #onScrollLeft(e) {
+  #onScrollLeft() {
     this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
       top: 0,
       left: -150,
@@ -226,7 +225,7 @@ export class TabView extends AzosElement {
     });
   }
 
-  #onScrollRight(e) {
+  #onScrollRight() {
     this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
       top: 0,
       left: 150,

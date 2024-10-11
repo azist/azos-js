@@ -92,7 +92,7 @@ export class Showcase extends AzosElement {
   }
 
   #id = 0;
-  #addMoreTab(e) {
+  #addMoreTab() {
     const before = this.tabView.activeTab.nextVisibleTab;
 
     this.tabView.addTab(Tab, `Tab${++this.#id}`, `${this.#id}`, before);
