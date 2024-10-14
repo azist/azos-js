@@ -2,9 +2,10 @@ import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/ave
 import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
-import { arrayDelete, CLOSE_QUERY_METHOD, DIRTY_PROP, DISPOSE_METHOD } from "azos/types";
+import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 
 export class TabView extends AzosElement {
+
   static #idSeed = 0;
   static styles = css`
 :host {
@@ -130,8 +131,6 @@ export class TabView extends AzosElement {
     defaultMaxTabWidth: { type: Number },
   }
 
-  constructor() { super(); }
-
   get [DIRTY_PROP]() { return this.tabs.some(one => one[DIRTY_PROP]); }
   async [CLOSE_QUERY_METHOD]() {
     for (let one of this.tabs) {
@@ -147,8 +146,7 @@ export class TabView extends AzosElement {
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
   set activeTab(v) {
-    isOf(v, Tab);
-    isTrue(v.tabView === this);
+    isTrue(isOf(v, Tab).tabView === this);
     if (this.#activeTab === v) return;
     const evt = new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true });
     this.dispatchEvent(evt);
@@ -159,6 +157,8 @@ export class TabView extends AzosElement {
     this.requestUpdate();
     this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
   }
+
+  constructor() { super(); }
 
   /**
    * @returns true if tab was unselected
@@ -206,12 +206,8 @@ export class TabView extends AzosElement {
     tab.id = id ?? `tab-${++TabView.#idSeed}`;
     tab.title = dflt(title, tTab.name);
 
-    if (beforeTab) {
-      isTrue(beforeTab.tabView === this);
-      this.insertBefore(tab, beforeTab);
-    } else {
-      this.appendChild(tab);
-    }
+    if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
+    this.insertBefore(tab, beforeTab);
 
     this.requestUpdate();
     return tab;
@@ -238,22 +234,20 @@ export class TabView extends AzosElement {
     const btnBounds = e.currentTarget.getBoundingClientRect();
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
     const tabContainerBounds = tabContainer.getBoundingClientRect();
-    console.log(btnBounds, tabContainerBounds);
 
-    if (btnBounds.left < tabContainerBounds.left) {
+    if (btnBounds.left < tabContainerBounds.left)
       tabContainer.scrollBy({
         top: 0,
         left: btnBounds.width * -1,
         behavior: 'smooth'
       });
-    }
-    if (btnBounds.right > tabContainerBounds.right) {
+    else if (btnBounds.right > tabContainerBounds.right)
       tabContainer.scrollBy({
         top: 0,
         left: btnBounds.width,
         behavior: 'smooth'
-      })
-    }
+      });
+
   }
 
   /**
@@ -279,18 +273,12 @@ export class TabView extends AzosElement {
   }
 
   updated() {
-    const tabMenuWidth = this.shadowRoot.querySelector('.tab-btn-container').offsetWidth;
+    const tabContainerWidth = this.shadowRoot.querySelector('.tab-btn-container').offsetWidth;
     const scrollBtns = this.shadowRoot.querySelectorAll('.scroll-btn');
     const tabBtns = this.shadowRoot.querySelectorAll('.tab-btn');
     let tabBtnsTotalWidth = 0;
-    if (tabBtns.length !== 0) {
-      tabBtns.forEach((tab) => {
-        tabBtnsTotalWidth = tabBtnsTotalWidth + tab.offsetWidth;
-      });
-    }
-    scrollBtns.forEach((btn) => {
-      (tabBtnsTotalWidth > tabMenuWidth) ? btn.style.display = 'block' : btn.style.display = 'none';
-    });
+    if (tabBtns.length !== 0) tabBtns.forEach((tab) => tabBtnsTotalWidth += tab.offsetWidth);
+    scrollBtns.forEach((btn) => btn.style.display = tabBtnsTotalWidth > tabContainerWidth ? 'block' : 'none');
   }
 
   render() {
