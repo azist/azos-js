@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "Adlib",
         "asof",
         "azist",
         "azos",
@@ -10,6 +11,7 @@
         "ctor",
         "cust",
         "descr",
+        "dflt",
         "dscr",
         "endregion",
         "fskip",
@@ -35,6 +37,7 @@
         "tapplet",
         "thandler",
         "tparent",
+        "treeitem",
         "uini",
         "ULEB",
         "virt",

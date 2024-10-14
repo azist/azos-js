@@ -7,7 +7,8 @@ import { ConLog } from "azos/ilog";
 import { dispose } from "azos/types";
 import { Module } from "azos/modules";
 import { XyzApplet } from "./xyz-applet.js";
-import { ChronicleClient } from "azos/sysvc/chron/chron-client.js";
+import { ChronicleClient } from "azos/sysvc/chron/chron-client";
+import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 
 
 class MyLogic extends Module{
@@ -55,12 +56,10 @@ const cfgApp = {
   description: "Test '$(name)' application",
   modules: [
     {name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET},
+    {name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET},
     {name: "log", type: ConLog},
     {name: "logic", type: MyLogic},
-    {
-      name: "router", type: Router,
-      menu: { root: [...appMenu] }
-    },
+    {name: "router", type: Router, menu: { root: [...appMenu] }},
   ]
 };
 

@@ -38,7 +38,7 @@ export const domCreateRef = lit_create_ref;
 export const renderInto = lit_render;
 
 
-const HTML_TAGS = {'&': '&amp;', '<': '&lt;', '>': '&gt;' };
+const HTML_TAGS = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
 function rtg(tag) { return HTML_TAGS[tag] || tag; }
 
 /** Escapes HTML tags like: & < > */
@@ -47,13 +47,13 @@ export function escHtml(str) { return str === undefined || str == null || !(str.
 
 /** Ranks define the "importance"/size of the element. 1 is the biggest/highest rank aka 'RANK.HUGE', 6 is the smallest aka 'RANK.TINY' */
 export const RANK = Object.freeze({
-  UNDEFINED:   0,
-  HUGE:        1,
-  LARGE:       2,
-  NORMAL:      3,
-  MEDIUM:      4,
-  SMALL:       5,
-  TINY:        6
+  UNDEFINED: 0,
+  HUGE: 1,
+  LARGE: 2,
+  NORMAL: 3,
+  MEDIUM: 4,
+  SMALL: 5,
+  TINY: 6
 });
 const ALL_RANK_NAMES = ["undefined", "huge", "large", "normal", "medium", "small", "tiny"];
 
@@ -64,24 +64,24 @@ const ALL_RANK_NAMES = ["undefined", "huge", "large", "normal", "medium", "small
  * @param {String|null} [clsSuffix=null] when set, adds a trailer to CSS class name
  * @returns {Number} an integer specified 0..6. O denotes "UNDEFINED"
  */
-export function parseRank(v, isCss = false, clsSuffix = null){
-  if (v===undefined || v===null || v===0) return isCss ? "" : RANK.UNDEFINED;
+export function parseRank(v, isCss = false, clsSuffix = null) {
+  if (v === undefined || v === null || v === 0) return isCss ? "" : RANK.UNDEFINED;
   clsSuffix = asString(clsSuffix);
   if (v > 0 && v <= 6) return isCss ? `r${v | 0}${clsSuffix}` : v | 0;
   const sv = v.toString().toLowerCase();
   const i = ALL_RANK_NAMES.indexOf(sv);
-  if (i>0) return isCss ? `r${i}${clsSuffix}` : i;
+  if (i > 0) return isCss ? `r${i}${clsSuffix}` : i;
   return isCss ? "" : RANK.UNDEFINED;
 }
 
 /** System statuses assign logical conditions for elements, e.g.: `ok/info/warning/alert/error` */
 export const STATUS = Object.freeze({
-  DEFAULT:   "default",
-  OK:        "ok",
-  INFO:      "info",
-  WARNING:   "warning",
-  ALERT:     "alert",
-  ERROR:     "error"
+  DEFAULT: "default",
+  OK: "ok",
+  INFO: "info",
+  WARNING: "warning",
+  ALERT: "alert",
+  ERROR: "error"
 });
 const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error"];
 
@@ -93,8 +93,8 @@ const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error"];
  * @param {String|null} [clsSuffix=null] when you need to add a trailing part to the css class name
  * @returns {String} one of members of `STATUS` enum
  */
-export function parseStatus(v, isCss = false, clsSuffix = null){
-  if (v===undefined || v===null) return isCss ? "" : STATUS.DEFAULT;
+export function parseStatus(v, isCss = false, clsSuffix = null) {
+  if (v === undefined || v === null) return isCss ? "" : STATUS.DEFAULT;
   clsSuffix = asString(clsSuffix);
   v = v.toString().toLowerCase();
   if (isOneOf(v, ALL_STATUS_VALUES)) return `${v}${clsSuffix}`;
@@ -103,15 +103,15 @@ export function parseStatus(v, isCss = false, clsSuffix = null){
 
 /** Directional positioning for how label text appears in relation to input element (e.g. text input field, checkbox, radio button, etc.) */
 export const POSITION = Object.freeze({
-  DEFAULT:       "default",
-  TOP_CENTER:    "top-center",
-  TOP_RIGHT:     "top-right",
-  MIDDLE_RIGHT:  "mid-right",
-  BOTTOM_RIGHT:  "bottom-right",
+  DEFAULT: "default",
+  TOP_CENTER: "top-center",
+  TOP_RIGHT: "top-right",
+  MIDDLE_RIGHT: "mid-right",
+  BOTTOM_RIGHT: "bottom-right",
   BOTTOM_CENTER: "bottom-center",
-  BOTTOM_LEFT:   "bottom-left",
-  MIDDLE_LEFT:   "mid-left",
-  TOP_LEFT:      "top-left"
+  BOTTOM_LEFT: "bottom-left",
+  MIDDLE_LEFT: "mid-left",
+  TOP_LEFT: "top-left"
 });
 const ALL_POSITION_VALUES = [...Object.values(POSITION)];
 
@@ -122,8 +122,8 @@ const ALL_POSITION_VALUES = [...Object.values(POSITION)];
  * NOTE: "DEFAULT" must be later redefined as "TOP_LEFT" for text input field classes and "MIDDLE_RIGHT" for boolean input field classes (i.e. checkbox, radio, etc.)
  * @returns {String} one of members of `POSITION` enum
  */
-export function parsePosition(v, isCss = false){
-  if (v===undefined || v===null) return isCss ? "" : POSITION.DEFAULT;
+export function parsePosition(v, isCss = false) {
+  if (v === undefined || v === null) return isCss ? "" : POSITION.DEFAULT;
   v = v.toString().toLowerCase();
   if (isOneOf(v, ALL_POSITION_VALUES)) return `${v}`;
   return isCss ? "" : POSITION.DEFAULT;
@@ -135,8 +135,8 @@ export class AzosElement extends LitElement {
 
   static properties = {
     status: { type: String, reflect: true },
-    rank:   { type: String, reflect: true },
-    scope:  { type: String }
+    rank: { type: String, reflect: true },
+    scope: { type: String }
   };
 
   #arena = null;
@@ -148,24 +148,24 @@ export class AzosElement extends LitElement {
 
 
   #status;
-  get status(){ return this.#status;}
-  set status(v){ this.#status = parseStatus(v); }
+  get status() { return this.#status; }
+  set status(v) { this.#status = parseStatus(v); }
 
   #rank;
-  get rank(){ return this.#rank;}
-  set rank(v){ this.#rank = parseRank(v); }
+  get rank() { return this.#rank; }
+  set rank(v) { this.#rank = parseRank(v); }
 
 
   /** Returns {@link Arena} instance from the first (great/grand)parent element that defines arena ref
    * @returns {Arena}
   */
-  get arena(){
-    if (this.#arena === null){
+  get arena() {
+    if (this.#arena === null) {
       let n = this.parentNode;
-      while(typeof n.arena === 'undefined'){
-        n =  (n.parentNode ?? n.host);
+      while (typeof n.arena === 'undefined') {
+        n = (n.parentNode ?? n.host);
       }
-      this.#arena =  n.arena;
+      this.#arena = n.arena;
     }
     return this.#arena;
   }
@@ -175,13 +175,13 @@ export class AzosElement extends LitElement {
 
   /** When `scope` property is set, returns an element which is pointed at by id, unless scope is set to either of: `self`|`this`|`host` in which
    *  case the hosting parent is used. Null if scoping element is not found */
-  getScopeContext(){
+  getScopeContext() {
     const scope = this.scope;
     if (!scope) return null;
     if (isOneOf(scope, ["win", "window"])) return window;
     if (isOneOf(scope, ["this", "host", "self"])) {
       let result = this;
-      while(result){
+      while (result) {
         if (result.host) return result.host;
         result = result.parentNode;
       }
@@ -190,20 +190,20 @@ export class AzosElement extends LitElement {
     return document.getElementById(scope);//or null
   }
 
-  connectedCallback(){
+  connectedCallback() {
     super.connectedCallback();
     const ctx = this.getScopeContext();
     if (ctx && this.id) ctx[this.id] = this;
   }
 
-  disconnectedCallback(){
+  disconnectedCallback() {
     const ctx = this.getScopeContext();
     if (ctx && this.id) delete ctx[this.id];
     super.disconnectedCallback();
   }
 
   /** Returns an element by id of the renderRoot */
-  $(id){ return this.renderRoot.getElementById(id); }
+  $(id) { return this.renderRoot.getElementById(id); }
 
   /** An alias for `link(app.moduleLinker, map, nsplit)`.
    * This function is typically called after component has mounted in `connectedCallback()`.
@@ -219,7 +219,7 @@ export class AzosElement extends LitElement {
    * @param {string} [nsplit="_"] optional split string for name, for example: "logger_main" will link with named object instance "main". The default is '_'. Pass null to disable named dependencies
    * @returns The original map which was passed-in, having its entries linked
   */
-  link(map, nsplit){
+  link(map, nsplit) {
     const arn = this.arena;
     if (!arn) throw new AzosError("Arena is null. You need to call this function after component is mounted", "AzosElement.link(map)");
     linkModule(arn.app.moduleLinker, map, nsplit);
@@ -236,7 +236,7 @@ export class AzosElement extends LitElement {
      * @param {int | null} src optional int src line num
      * @returns {guid | null} null if nothing was written or guid of the newly written message
      */
-  writeLog(type, text, ex, params, rel, src){ return this.arena.writeLog(this, type, text, ex, params, rel, src); }
+  writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(this, type, text, ex, params, rel, src); }
 
   render() { return html`>>AZOS ELEMENT<<`; }
 }

@@ -4,7 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { genGuid } from "azos/types";
 import { AzosElement, html, css, STATUS, RANK, POSITION, parseRank, parseStatus } from "./ui.js";
+import { isString } from "azos/aver";
 
 /**
  * Toasts are popover AzosElement messages that self-destruct after a timeout period (default 10s).
@@ -12,7 +14,7 @@ import { AzosElement, html, css, STATUS, RANK, POSITION, parseRank, parseStatus 
 export class Toast extends AzosElement {
 
   static styles = css`
-dialog{
+.popover{
   display: block;
   border: 1px solid var(--s-default-bor-hcontrast);
   border-radius: 0.25em;
@@ -24,22 +26,17 @@ dialog{
   opacity: 0;
 }
 
-dialog.modal::backdrop{
-  background: var(--modal-spin-backdrop-bg);
-  backdrop-filter: var(--modal-spin-backdrop-filter);
-}
-
-dialog:popover-open, dialog[open]{
+.popover:popover-open, .popover[open]{
   opacity: 1;
   transition: 0.2s ease-in;
   inset: unset;
   margin: 0.5em;
 }
 
-@starting-style{dialog:popover-open, dialog[open]{opacity: 0;}}
+@starting-style{.popover:popover-open, .popover[open]{opacity: 0;}}
 
 
-dialog:focus-visible, dialog:hover{ outline: none; }
+.popover:focus-visible, .popover:hover{ outline: none; }
 
 .r1 { font-size: var(--r1-fs); }
 .r2 { font-size: var(--r2-fs); }
@@ -86,10 +83,16 @@ dialog:focus-visible, dialog:hover{ outline: none; }
    * @param {POSITION} position The position for where to display on the screen
    * @returns The constructed toast added to Toast.#instances
    */
-  static toast(msg = null, timeout = undefined, rank = RANK.NORMAL, status = STATUS.DEFAULT, position = POSITION.DEFAULT) {
+  static toast(msg = null, options = { timeout: Number, rank: RANK, status: STATUS, position: POSITION }) {
+    isString(msg);
     const toast = new Toast();
+
     // 1s + 180ms per word
-    timeout = timeout === undefined ? 1_000 + (msg.split(' ').length) * 180 : timeout;
+    const timeout = options.timeout ?? 1_000 + (msg.split(' ').length) * 180;
+    const rank = options.rank ?? RANK.NORMAL;
+    const status = options.status ?? STATUS.DEFAULT;
+    const position = options.position ?? POSITION.DEFAULT;
+
     toast.#message = msg;
     toast.#timeout = timeout;
     toast.#rank = rank;
@@ -104,6 +107,7 @@ dialog:focus-visible, dialog:hover{ outline: none; }
     return toast;
   }
 
+  #guid = null;
   #tmr = null;
   #isShown = false;
   #message = null;
@@ -138,7 +142,12 @@ dialog:focus-visible, dialog:hover{ outline: none; }
     }
   }
 
-  constructor() { super(); }
+  get guid() { return this.#guid; }
+
+  constructor() {
+    super();
+    this.#guid = genGuid();
+  }
 
   // Clear the timer
   #clearTimer() {
@@ -155,7 +164,7 @@ dialog:focus-visible, dialog:hover{ outline: none; }
 
   // Hide/Show popover element. Helper to reset z-index of visible toasts.
   #toggle() {
-    const t = this.$("toast");
+    const t = this.$(this.guid);
 
     // Hide on DOM
     t.hidePopover();
@@ -175,7 +184,7 @@ dialog:focus-visible, dialog:hover{ outline: none; }
     this.update();
 
     // Show on DOM
-    this.$("toast").showPopover();
+    this.$(this.guid).showPopover();
     this.#isShown = true;
   }
 
@@ -185,7 +194,7 @@ dialog:focus-visible, dialog:hover{ outline: none; }
     this.#clearTimer();
 
     // Hide from DOM
-    this.$("toast").hidePopover();
+    this.$(this.guid).hidePopover();
     this.#isShown = false;
 
     // Remove from DOM
@@ -203,8 +212,13 @@ dialog:focus-visible, dialog:hover{ outline: none; }
     const rankStyle = parseRank(this.#rank, true);
     const statusStyle = parseStatus(this.#status, true);
     const positionStyle = this.#positionStyles;
-    return html`<dialog id=toast popover=manual class="${rankStyle} ${statusStyle}" style="${positionStyle}">${this.#message}</dialog>`;
+    return html`<div id=${this.guid} popover=manual role=status class="popover ${rankStyle} ${statusStyle}" style="${positionStyle}">${this.#message}</div>`;
   }
 }
+
+/**
+ * Shortcut method to Toast.toast(...); {@link Toast.toast}.
+ */
+export const toast = Toast.toast.bind(Toast);
 
 window.customElements.define("az-toast", Toast);

@@ -27,6 +27,17 @@ export const NAME_PROP = Symbol("name");
 export const ORDER_PROP = Symbol("order");
 
 /**
+ * Establishes a "IDirty" protocol - an entity that needs to be saved before disposal
+ */
+export const DIRTY_PROP = Symbol("dirty");
+
+/**
+ * Establishes a "closeQuery" - part of the IDirty protocol. Determines if an entity can be logically disposed
+ *  such as a file view can be closed if there are no changes to be saved.
+ */
+export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
+
+/**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -
  * is capable of being deterministically finalized aka "disposed".
  * The concept has NOTHING TO DO with the GC, and deals with logical pairing of construction/destruction
@@ -520,6 +531,14 @@ export const DATA_KIND = Object.freeze({
 });
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
 
+export const FORM_MODE = Object.freeze({
+  UNSPECIFIED: "Unspecified",
+  INSERT: "Insert",
+  UPDATE: "Update",
+  DELETE: "Delete",
+});
+//const ALL_FORM_MODES = allObjectValues(FORM_MODE);
+
 /**
  * Converts value to CHAR_CASE coercing it to lowercase string if needed
  * @param {*} v value to convert
@@ -542,6 +561,27 @@ export function asDataKind(v) {
   if (strings.isOneOf(v, ALL_DATA_KINDS, true)) return v;
   return DATA_KIND.TEXT;
 }
+
+export function getFormMode(f) {
+  isObject(f);
+
+  // function parseFormMode(str) {
+  //   return FORM_MODE[str]
+  // }
+  let mode = f["mode"]?.toLowerCase(); // TODO: parseFormMode(f["mode"])
+  switch (mode) {
+    case FORM_MODE.INSERT.toLowerCase(): return FORM_MODE.INSERT;
+    case FORM_MODE.UPDATE.toLocaleLowerCase(): return FORM_MODE.UPDATE;
+    case FORM_MODE.DELETE.toLowerCase(): return FORM_MODE.DELETE;
+    default: return FORM_MODE.UNSPECIFIED;
+  }
+}
+
+export function isInsertForm(f) { return getFormMode(f) === FORM_MODE.INSERT; }
+
+export function isUpdateForm(f) { return getFormMode(f) === FORM_MODE.UPDATE; }
+
+export function isDeleteForm(f) { return getFormMode(f) === FORM_MODE.DELETE; }
 
 
 export const AS_BOOLEAN_FUN = Symbol("asBoolean");

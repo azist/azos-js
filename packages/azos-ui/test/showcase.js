@@ -14,9 +14,11 @@ import "../parts/select-field.js";
 import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import "../vcl/util/accordion.js";
+import "../vcl/tabs/tab-view.js";
 import "../vcl/util/tabs.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
+import { Tab } from "../vcl/tabs/tab.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement {
@@ -24,6 +26,8 @@ export class Showcase extends AzosElement {
 
   static styles = css`
   p{ font-size: 1rem; }
+  az-tab-view {
+  }
   `;
 
 
@@ -83,13 +87,54 @@ export class Showcase extends AzosElement {
       const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
       const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
 
-      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, timeout, rank, status, position);
+      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, { timeout, rank, status, position });
     }
   }
+
+  #id = 0;
+  #addMoreTab() {
+    const before = this.tabView.activeTab.nextVisibleTab;
+
+    this.tabView.addTab(Tab, `Tab${++this.#id}`, `${this.#id}`, before);
+  }
+
+  #moveRightOnce() { (this.manMe || this.tabView.activeTab).move(1); }
+  #moveRight2x() { (this.manMe || this.tabView.activeTab).move(2); }
+  #moveRight4x() { (this.manMe || this.tabView.activeTab).move(4); }
+  #moveLeftOnce() { (this.manMe || this.tabView.activeTab).move(-1); }
+  #moveLeft4x() { (this.manMe || this.tabView.activeTab).move(-4); }
+  #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
 
   render() {
     const showcase = this;
     return html`
+<div>
+  <az-button @click=${this.#addMoreTab} title="Add more..."></az-button>
+  <az-button style="display:none;" @click=${this.#moveRightOnce} title="Move right once"></az-button>
+  <az-button style="display:none;" @click=${this.#moveRight2x} title="Move right 2x"></az-button>
+  <az-button style="display:none;" @click=${this.#moveRight4x} title="Move right 4x"></az-button>
+  <az-button style="display:none;" @click=${this.#moveLeftOnce} title="Move left once"></az-button>
+  <az-button style="display:none;" @click=${this.#moveLeft4x} title="Move left 4x"></az-button>
+  <az-button style="display:none;" @click=${this.#showHide} title="Show/Hide"></az-button>
+</div>
+<az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}">
+  <az-tab title="Data Grid" status="default" minWidth="10" maxWidth="15">
+    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
+    <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
+  </az-tab>
+  <az-tab title="Manipulate Me!">I don't have any contents, really...</az-tab>
+  <az-tab title="Details" status="alert">
+    <az-button @click="${() => alert("Debbify all the things!")}" title="Debbify" status="info"></az-button>
+  </az-tab>
+  <az-tab title="Advanced" status="error">
+    <az-button @click=${this.onDlg1Open} title="Open..."></az-button>
+    <p>Litora sodales fermentum potenti malesuada viverra volutpat libero cubilia primis. Facilisi convallis iaculis lectus dignissim tempus ornare; molestie aenean. Suscipit vivamus adipiscing dui pretium finibus elit dignissim. Aliquet molestie magnis velit volutpat fringilla a odio fames. Purus vehicula tortor id habitant odio. Ante ligula condimentum felis; curabitur praesent risus urna montes felis. Vulputate aptent aliquam laoreet, eleifend rutrum dui. Praesent tortor scelerisque viverra pharetra potenti pharetra vestibulum a accumsan. Nisl eros leo quam ultricies hac. Iaculis sagittis commodo nisi amet dis gravida ut mollis nibh.</p>
+    <p>Amet vivamus primis convallis nullam etiam ultrices orci ridiculus sit. Lectus sociosqu elit, vel nascetur senectus facilisis mauris. Inceptos rutrum aliquet quis bibendum sit lacinia. Blandit lacinia curae rhoncus in luctus posuere. Nec erat inceptos nisi ex torquent lectus suspendisse fermentum pellentesque. Dolor amet orci felis ligula quisque bibendum lectus. Nisi quam mollis risus nulla lacinia turpis rhoncus sollicitudin. Ridiculus sodales suspendisse mauris mi aptent ante mattis.</p>
+    <p>Magnis libero nec arcu enim; sit diam. Amet porta integer adipiscing auctor tortor velit. Cursus tortor convallis inceptos leo pretium praesent torquent maximus? Nibh aliquet libero sapien ac; mus habitant orci erat. Metus dignissim mus arcu velit habitant sollicitudin. Eu potenti curabitur mi tincidunt ad tristique pellentesque integer. Sapien pulvinar at sollicitudin porta taciti non malesuada integer. Efficitur ac nisl taciti; ante maximus netus magnis accumsan. Duis montes risus pharetra; potenti nisl risus. Tristique cubilia dapibus nullam a cubilia.</p>
+    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
+    <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
+  </az-tab>
+</az-tab-view>
 
 <h1>Showcase of Azos Controls</h1>
 

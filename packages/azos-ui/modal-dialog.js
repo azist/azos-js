@@ -4,6 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { CLOSE_QUERY_METHOD } from "azos/types";
 import { AzosElement, html, css, parseRank, parseStatus } from "./ui.js";
 
 
@@ -180,7 +181,7 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   async close(){
     if (this.#shownPromise === null) return true;
     const dlg = this.#getDlgElm();
-    const canClose = await this.closeQuery();
+    const canClose = await this[CLOSE_QUERY_METHOD]();
     if (!canClose) return false;
     dlg.close();
     return true;
@@ -192,7 +193,7 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
    * The method is called by the close/flow. By default returns true to always allow close
    * @returns {Promise<boolean> | boolean} Returns "true" (or Promise(true)) to allow close, false to prevent it
   */
-  closeQuery(){ return true; }
+  [CLOSE_QUERY_METHOD](){ return true; }
 
   #onDialogClose(){
     ModalDialog.#instances.pop();

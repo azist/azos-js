@@ -1,3 +1,4 @@
+import { CLOSE_QUERY_METHOD } from "azos/types";
 import { ModalDialog } from "../modal-dialog";
 import {html, verbatimHtml} from "../ui";
 
@@ -36,7 +37,7 @@ export class XyzDialog extends ModalDialog{
     </div>  `;
   }
 
-  closeQuery(){
+  [CLOSE_QUERY_METHOD](){
     return confirm("Hook you hard? and close");
     //return false;//prevent close
   }

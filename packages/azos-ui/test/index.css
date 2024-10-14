@@ -54,6 +54,8 @@ body {
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
   /* ink is primary text color on paper */
   --paper: #f0f0f0;
+  --paper2: #e4e4e4;
+  --paper3: #d8d8d8;
   --ink: #585858;
   --ghost: rgba(0, 0, 0, .2);
 
@@ -62,7 +64,8 @@ body {
   --s-default-bg: #c0c0c0;
   --s-default-fg-ctl: var(--ink);
   --s-default-bg-ctl: #fdfdfd;
-  --s-default-bor-ctl: 1.2px solid #c4c4c4;
+  --s-default-bor-color-ctl: #c4c4c4;
+  --s-default-bor-ctl: 1.2px solid var(--s-default-bor-color-ctl);
   /*
   --s-default-bg-ctl-btn: linear-gradient(175deg, #e4e4e4 0%, #cecece 70%);
   --s-default-bor-ctl-btn: 1px solid #c0c0c0;
@@ -79,7 +82,8 @@ body {
   --s-ok-bg: #75f487;
   --s-ok-fg-ctl: #527452;
   --s-ok-bg-ctl: #d2ffd2;
-  --s-ok-bor-ctl: 1.2px solid #a5e474;
+  --s-ok-bor-color-ctl: #a5e474;
+  --s-ok-bor-ctl: 1.2px solid var(--s-ok-bor-color-ctl);
   /*
   --s-ok-bg-ctl-btn: linear-gradient(175deg, #e0f4e0 0%, #a0f9a0 70%);
   --s-ok-bor-ctl-btn: 1px solid #b8d8b8;
@@ -95,7 +99,8 @@ body {
   --s-info-bg: #a0d8ff;
   --s-info-fg-ctl: #5276ba;
   --s-info-bg-ctl: #c0e8ff;
-  --s-info-bor-ctl: 1.2px solid #90d2f5;
+  --s-info-bor-color-ctl: #90d2f5;
+  --s-info-bor-ctl: 1.2px solid var(--s-info-bor-color-ctl);
  /*
   --s-info-bg-ctl-btn: linear-gradient(175deg, #e0e0f0 0%, #a0d8ff 70%);
   --s-info-bor-ctl-btn: 1px solid #c4c4d8;
@@ -111,7 +116,8 @@ body {
   --s-warn-bg: #f8f850;
   --s-warn-fg-ctl: #727220;
   --s-warn-bg-ctl: #fff8a0;
-  --s-warn-bor-ctl: 1px solid #d8d850;
+  --s-warn-bor-color-ctl: #d8d850;
+  --s-warn-bor-ctl: 1px solid var(--s-warn-bor-color-ctl);
   /*
   --s-warn-bg-ctl-btn: linear-gradient(175deg, #f8f8e0 0%, #f8f458 70%);
   --s-warn-bor-ctl-btn: 1px solid #d0d085;
@@ -127,7 +133,8 @@ body {
   --s-alert-bg: #e040f0;
   --s-alert-fg-ctl: #8a508a;
   --s-alert-bg-ctl: #ffc0ff;
-  --s-alert-bor-ctl: 1.2px solid #e8a2e8;
+  --s-alert-bor-color-ctl: #e8a2e8;
+  --s-alert-bor-ctl: 1.2px solid var(--s-alert-bor-color-ctl);
  /*
   --s-alert-bg-ctl-btn: linear-gradient(175deg, #ffc8ff 0%, #f8a0f8 70%);
   --s-alert-bor-ctl-btn: 1px solid #c5c0e4;
@@ -143,7 +150,8 @@ body {
   --s-error-bg: #ff4720;
   --s-error-fg-ctl: #955050;
   --s-error-bg-ctl: #ffc0c0;
-  --s-error-bor-ctl: 1.2px solid #f89052;
+  --s-error-bor-color-ctl: #f89052;
+  --s-error-bor-ctl: 1.2px solid var(--s-error-bor-color-ctl);
   /*
   --s-error-bg-ctl-btn: linear-gradient(175deg, #f8d0f8 0%, #ffa0a0 70%);
   --s-error-bor-ctl-btn: 1px solid #f0b582;
