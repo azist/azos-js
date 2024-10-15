@@ -15,7 +15,6 @@ import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import "../vcl/util/accordion.js";
 import "../vcl/tabs/tab-view.js";
-import "../vcl/util/tabs.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
@@ -98,69 +97,31 @@ export class Showcase extends AzosElement {
     this.tabView.addTab(Tab, `Tab${++this.#id}`, `${this.#id}`, before);
   }
 
-  #moveRightOnce() { (this.manMe || this.tabView.activeTab).move(1); }
-  #moveRight2x() { (this.manMe || this.tabView.activeTab).move(2); }
-  #moveRight4x() { (this.manMe || this.tabView.activeTab).move(4); }
-  #moveLeftOnce() { (this.manMe || this.tabView.activeTab).move(-1); }
-  #moveLeft4x() { (this.manMe || this.tabView.activeTab).move(-4); }
+  #move(steps) { (this.manMe || this.tabView.activeTab).move(steps); }
   #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
 
   render() {
     const showcase = this;
     return html`
-<div>
-  <az-button @click=${this.#addMoreTab} title="Add more..."></az-button>
-  <az-button style="display:none;" @click=${this.#moveRightOnce} title="Move right once"></az-button>
-  <az-button style="display:none;" @click=${this.#moveRight2x} title="Move right 2x"></az-button>
-  <az-button style="display:none;" @click=${this.#moveRight4x} title="Move right 4x"></az-button>
-  <az-button style="display:none;" @click=${this.#moveLeftOnce} title="Move left once"></az-button>
-  <az-button style="display:none;" @click=${this.#moveLeft4x} title="Move left 4x"></az-button>
-  <az-button style="display:none;" @click=${this.#showHide} title="Show/Hide"></az-button>
-</div>
-<az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}">
-  <az-tab title="Data Grid" status="default" minWidth="10" maxWidth="15">
-    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
-    <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
-  </az-tab>
-  <az-tab title="Manipulate Me!">I don't have any contents, really...</az-tab>
-  <az-tab title="Details" status="alert">
-    <az-button @click="${() => alert("Debbify all the things!")}" title="Debbify" status="info"></az-button>
-  </az-tab>
-  <az-tab title="Advanced" status="error">
-    <az-button @click=${this.onDlg1Open} title="Open..."></az-button>
-    <p>Litora sodales fermentum potenti malesuada viverra volutpat libero cubilia primis. Facilisi convallis iaculis lectus dignissim tempus ornare; molestie aenean. Suscipit vivamus adipiscing dui pretium finibus elit dignissim. Aliquet molestie magnis velit volutpat fringilla a odio fames. Purus vehicula tortor id habitant odio. Ante ligula condimentum felis; curabitur praesent risus urna montes felis. Vulputate aptent aliquam laoreet, eleifend rutrum dui. Praesent tortor scelerisque viverra pharetra potenti pharetra vestibulum a accumsan. Nisl eros leo quam ultricies hac. Iaculis sagittis commodo nisi amet dis gravida ut mollis nibh.</p>
-    <p>Amet vivamus primis convallis nullam etiam ultrices orci ridiculus sit. Lectus sociosqu elit, vel nascetur senectus facilisis mauris. Inceptos rutrum aliquet quis bibendum sit lacinia. Blandit lacinia curae rhoncus in luctus posuere. Nec erat inceptos nisi ex torquent lectus suspendisse fermentum pellentesque. Dolor amet orci felis ligula quisque bibendum lectus. Nisi quam mollis risus nulla lacinia turpis rhoncus sollicitudin. Ridiculus sodales suspendisse mauris mi aptent ante mattis.</p>
-    <p>Magnis libero nec arcu enim; sit diam. Amet porta integer adipiscing auctor tortor velit. Cursus tortor convallis inceptos leo pretium praesent torquent maximus? Nibh aliquet libero sapien ac; mus habitant orci erat. Metus dignissim mus arcu velit habitant sollicitudin. Eu potenti curabitur mi tincidunt ad tristique pellentesque integer. Sapien pulvinar at sollicitudin porta taciti non malesuada integer. Efficitur ac nisl taciti; ante maximus netus magnis accumsan. Duis montes risus pharetra; potenti nisl risus. Tristique cubilia dapibus nullam a cubilia.</p>
-    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dictum platea dapibus a ut in feugiat mi neque. Pellentesque aenean proin aptent euismod penatibus est accumsan. Cursus pellentesque curabitur feugiat; luctus adipiscing torquent erat gravida hac. Risus finibus malesuada laoreet, lectus neque mus donec. Fermentum dignissim feugiat eu; conubia scelerisque curae at.</p>
-    <p>Lacinia rhoncus pharetra iaculis; primis congue nullam nisi. Porttitor curae varius eleifend platea nulla duis penatibus maximus. Nunc in mollis praesent libero tellus porttitor consequat molestie. In phasellus mattis magnis vehicula curae. Velit dui finibus quam adipiscing id neque. Condimentum sodales eget tempus adipiscing faucibus vitae. Per urna imperdiet habitasse rhoncus habitant mollis. Cubilia orci eu maecenas montes eros eleifend praesent magnis.</p>
-  </az-tab>
-</az-tab-view>
-
 <h1>Showcase of Azos Controls</h1>
-
-<h2>Modal dialog</h2>
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
-    <p>@click action buttons</p>
-    <az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
-    <az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
 
-    <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
-    <az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
-
-    <az-button @click="${this.onModalSpinnerOpen}" title="Open Modal Spinner..." status="alert"></az-button>
-    <az-button @click="${this.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
-
-    <az-button @click="${this.onNonModalSpinnerOpen}" title="Open NM Spinner..." status="info"></az-button>
-    <az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
-
-    <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
-<div style="margin-top:100px">&nbsp;</div>
-
-
-<az-tabs activeTabIndex="0">
-  <az-tab-item title="Buttons">
+<div style="display:flex;align-items:center;">
+  <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
+  <az-button @click=${this.#addMoreTab} title="Add more..."></az-button>
+</div>
+<div style="display:flex;align-items:center;">
+  <strong>Move Active Tab Left</strong>
+  <az-button @click=${() => this.#move(-1)} title="1x"></az-button>
+  <az-button @click=${() => this.#move(-2)} title="2x"></az-button>
+  <strong>Right</strong>
+  <az-button @click=${() => this.#move(1)} title="1x"></az-button>
+  <az-button @click=${() => this.#move(2)} title="2x"></az-button>
+</div>
+<az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}">
+  <az-tab title="Buttons">
     <h2>az-button</h2>
 
     <az-button @click="${showcase.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
@@ -186,10 +147,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-button title="Warning" status="warning" isdisabled></az-button>
     <az-button title="Alert" status="alert" isdisabled></az-button>
     <az-button title="Error" status="error" isdisabled></az-button>
+  </az-tab>
 
-  </az-tab-item>
-
-  <az-tab-item title="Input Test">
+  <az-tab title="Input Test">
     <h2>Testing @change with az-text and az-check</h2>
 
     <az-text id="tbNasa" scope="window" name="Nasa" title="Nasa Experimentation" placeholder="Hatch diameter inches" @change="${this.#onFieldChange}" datatype="int" value="10"></az-text>
@@ -199,9 +159,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
     <az-check id="chkSmokes" scope="this" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-check>
     <az-check id="chkDrinks"scope="this"  name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-check>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="VCL / Codebox" status="ok">
+  <az-tab title="VCL / Codebox" status="ok">
     <h2> VCL / Codebox</h2>
 
     <az-code-box highlight="js" source="">//this is my json object
@@ -212,9 +172,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       "d": [{"a": -123.032, "b": +45}, false, null, null, "ok"]
     }
     </az-code-box>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Radios">
+  <az-tab title="Radios">
     <h2>Radios</h2>
     <p>A long-used form of placeholder text in design mockups and more, the standard use of dummy text has come under fire in recent years as web design grows (and the internet makes the spread of opinions much more efficient).</p>
     <az-radio-group id="baseGroup" value="choiceOption" title="Group of radios (choose only 1)">
@@ -223,9 +183,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <item title="Another"  value="v3"></item>
       <item title="Snake Number Four"  value="v4"></item>
     </az-radio-group>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Checkboxes &amp; Switches" status="info">
+  <az-tab title="Checkboxes &amp; Switches" status="info">
     <h2>Checkboxes and switches</h2>
     <div class="strip-h">
       <az-check id="normalCheckbox" title="This is a checkbox" titleWidth="60"></az-check>
@@ -255,9 +215,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-check id="botCenterSwitch" title="aAa" itemType="switch" titlePosition="bottom-center"></az-check>
       <az-check id="botRightSwitch" title="aAa" itemType="switch" titlePosition="bottom-right"></az-check>
     </div>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Text Fields">
+  <az-tab title="Text Fields">
     <h2>Text boxes</h2>
     <div class="strip-h">
       <az-text id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;"></az-text>
@@ -307,9 +267,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-text id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" itemType="long" status="alert"></az-text>
       <az-text id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" itemType="long" status="error"></az-text>
     </div>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Select Field" status="warning">
+  <az-tab title="Select Field" status="warning">
     <h2>Selects/Combos</h2>
     <az-select id="defaultSelect" title="Select one of the following from the dropdown">
       <az-select-option value="" title="Select an option&hellip;"></az-select-option>
@@ -324,9 +284,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <az-select-option value="optionNine" title="Almost done"></az-select-option>
       <az-select-option value="finalValue" title="Last test option"></az-select-option>
     </az-select>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Sliders (WIP)" status="error">
+  <az-tab title="Sliders (WIP)" status="error">
     <h2>Sliders</h2>
     <p>This az-slider renders as an &lt;input type="range"&gt; element. These are the available properties/attributes:</p>
     <ol>
@@ -351,9 +311,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       displayValue
       valueLabel="Number of tomatoes: "
     ></az-slider>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Accordion">
+  <az-tab title="Accordion">
     <az-accordion name="accordion" width="75%" align="center" activeItemIndex="2">
       <az-accordion-item title="First accordion item">
         <p>Eu culpa dolore adipisicing qui cillum duis incididunt consequat amet. <strong><em>Non ipsum nostrud</em></strong> culpa nulla quis dolor culpa commodo anim labore sit fugiat culpa minim. Adipisicing et qui ex cupidatat excepteur anim laborum eiusmod aute amet cupidatat et. Eiusmod qui eiusmod Lorem amet cupidatat esse aliqua ipsum ex laborum officia reprehenderit incididunt adipisicing. Sint quis cupidatat commodo aliquip mollit enim voluptate dolore consectetur.</p>
@@ -369,24 +329,43 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
         <img src="https://shawntgray.com/preNov2023/img/img/180612.png" alt="mahrio" style="width:75%;" />
       </az-accordion-item>
     </az-accordion>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Tab 1">
+  <az-tab title="Modal Dialogs">
+    <p>@click action buttons</p>
+    <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
+    <az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
+
+    <az-button @click="${this.onModalSpinnerOpen}" title="Open Modal Spinner..." status="alert"></az-button>
+    <az-button @click="${this.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
+
+    <az-button @click="${this.onNonModalSpinnerOpen}" title="Open NM Spinner..." status="info"></az-button>
+    <az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
+
+    <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
+  </az-tab>
+
+  <az-tab title="Toasts">
+    <az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
+    <az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
+  </az-tab>
+
+  <az-tab title="Tab 1">
     <p>Eu culpa dolore adipisicing qui cillum duis incididunt consequat amet. <strong><em>Non ipsum nostrud</em></strong> culpa nulla quis dolor culpa commodo anim labore sit fugiat culpa minim. Adipisicing et qui ex cupidatat excepteur anim laborum eiusmod aute amet cupidatat et. Eiusmod qui eiusmod Lorem amet cupidatat esse aliqua ipsum ex laborum officia reprehenderit incididunt adipisicing. Sint quis cupidatat commodo aliquip mollit enim voluptate dolore consectetur.</p>
     <h3>Irure minim qui esse dolor. Reprehenderit culpa minim reprehenderit Lorem exercitation cillum magna laboris. Ea in dolor ut ipsum officia commodo sit. Veniam ut nulla culpa veniam tempor duis aliquip in velit consequat incididunt enim reprehenderit.</h3>
     <blockquote>Magna pariatur reprehenderit ullamco labore. Ullamco deserunt enim irure ex Lorem ex. Est proident nulla fugiat fugiat non incididunt dolore pariatur. Commodo do quis nulla elit non id in est esse est anim adipisicing id. Culpa eu fugiat qui et et. Culpa esse occaecat aliqua nostrud et cupidatat. Aute ipsum voluptate exercitation quis labore exercitation aliquip ad exercitation non irure.</blockquote>
     <p>Laboris sint elit incididunt sit consectetur consectetur aliquip consequat nostrud eu nostrud ullamco ad. Aliquip laboris adipisicing Lorem quis occaecat reprehenderit. Nostrud voluptate sunt est commodo. Lorem eiusmod laboris non non.</p>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="Second Tab">
+  <az-tab title="Second Tab">
     <h1 style="text-decoration:strikethrough;"><em>Tempor quis sit eu laborum velit enim irure velit quis.</em></h1>
-  </az-tab-item>
+  </az-tab>
 
-  <az-tab-item title="This is a very long title, yes a long long title that is still going on. Is this long enough?">
+  <az-tab title="This is a very long title, yes a long long title that is still going on. Is this long enough?">
     <img src="https://shawntgray.com/preNov2023/img/img/180613.jpg" alt="Yahshee" />
-  </az-tab-item>
+  </az-tab>
 
-</az-tabs>
+</az-tab-view>
 
 
 

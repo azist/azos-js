@@ -39,6 +39,7 @@ export class TabView extends AzosElement {
 
 .tab-btn-container {
   overflow: hidden;
+  white-space: nowrap;
   width: 100%;
   scroll-behavior: smooth;
 }
@@ -50,18 +51,23 @@ export class TabView extends AzosElement {
 
 .tab-btn.active {
   border-bottom-color: black;
-  margin-bottom: -2px;
-  padding-top: 0.3em;
   background-color: var(--paper);
   pointer-events: none;
 }
 
-.tab-btn.active .close-ind {
-  pointer-events: auto;
+.tab-btn.active:after {
+  content: '';
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--paper);
+  position: absolute;
+  top: 100%;
+  left: 0;
 }
 
-.tab-btn.active .active-tab-title {
-  font-size: 1.25em;
+.tab-btn.active .close-ind {
+  pointer-events: auto;
 }
 
 .tab-btn {
@@ -80,10 +86,6 @@ export class TabView extends AzosElement {
   border-left: 1px solid var(--my-color);
   border-right: 1px solid var(--my-color);
   transition: font-size 0.1s;
-}
-
-.tab-btn span {
-  transition: all 0.2s, margin-bottom 1ms;
 }
 
 .tab-btn:not(.active):not(.hidden):hover {
@@ -174,12 +176,14 @@ export class TabView extends AzosElement {
     return true;
   }
 
-  moveTabAtIndex(idx, newIdx) {
-    // FIXME: Validate indices
-    const before = newIdx === null ? null : this.tabs[newIdx];
-    const child = this.tabs[idx];
-    this.insertBefore(child, before);
+  async moveTab(tab, beforeTab) {
+    isTrue(isOf(tab, Tab).tabView === this);
+    isOfOrNull(beforeTab, Tab);
+    if (beforeTab) isTrue(beforeTab.tabView === this);
+    this.insertBefore(tab, beforeTab);
     this.requestUpdate();
+    await this.updateComplete;
+    if (tab.active) this.#scrollTabBtnIntoView(tab);
   }
 
   connectedCallback() {
@@ -216,7 +220,7 @@ export class TabView extends AzosElement {
   #onScrollLeft() {
     this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
       top: 0,
-      left: -150,
+      left: -300,
       behavior: 'smooth'
     });
   }
@@ -224,30 +228,39 @@ export class TabView extends AzosElement {
   #onScrollRight() {
     this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
       top: 0,
-      left: 150,
+      left: 300,
       behavior: 'smooth'
     });
   }
 
   #onTabClick(e, tab) {
     tab.activate();
-    const btnBounds = e.currentTarget.getBoundingClientRect();
+    this.#scrollTabBtnIntoView(tab);
+  }
+
+  #scrollTabBtnIntoView(tab) {
+    isOf(tab, Tab);
+    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.id}`);
+    const btnBounds = tabBtn.getBoundingClientRect();
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
     const tabContainerBounds = tabContainer.getBoundingClientRect();
 
-    if (btnBounds.left < tabContainerBounds.left)
-      tabContainer.scrollBy({
-        top: 0,
-        left: btnBounds.width * -1,
-        behavior: 'smooth'
-      });
-    else if (btnBounds.right > tabContainerBounds.right)
-      tabContainer.scrollBy({
-        top: 0,
-        left: btnBounds.width,
-        behavior: 'smooth'
-      });
 
+    let left;
+    if (btnBounds.left < tabContainerBounds.left) {
+      const previousBtn = tabBtn.previousElementSibling;
+      const previousBtnBounds = previousBtn?.getBoundingClientRect() || null;
+      left = btnBounds.left - tabContainerBounds.left - (previousBtnBounds ? previousBtnBounds.width / 1.5 : 20);
+    } else if (btnBounds.right > tabContainerBounds.right) {
+      const nextBtn = tabBtn.nextElementSibling;
+      const nextBtnBounds = nextBtn?.getBoundingClientRect() || null;
+      left = btnBounds.right - tabContainerBounds.right + (nextBtnBounds ? nextBtnBounds.width / 1.5 : 20);
+    }
+    tabContainer.scrollBy({
+      top: 0,
+      left,
+      behavior: 'smooth'
+    });
   }
 
   /**
@@ -313,7 +326,7 @@ export class TabView extends AzosElement {
       ].filter(item => item !== "").join(";");
 
       return html`
-          <div class="${cls}" @click="${(e) => this.#onTabClick(e, tab)}" style="${stl}">
+          <div id="tabBtn${tab.id}" class="${cls}" @click="${(e) => this.#onTabClick(e, tab)}" style="${stl}">
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
             <div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>
