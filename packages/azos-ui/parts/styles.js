@@ -54,8 +54,8 @@ export const baseStyles = css`
 .bottom-center > span               { text-align:center; margin-top: .33em; }
 .bottom-right > span                { text-align:right; margin-top: .33em; }
 
-@media screen and (max-width:500px){
-  .mid-right,.mid-left{flex-direction:column;}
+@media screen and (max-width: 360px){
+  .mid-right, .mid-left{ flex-direction: column; }
 }
 .msg { font-size: .85em; opacity: .8; margin: .33em; }
 .requiredTitle::after{
