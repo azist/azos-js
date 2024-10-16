@@ -121,7 +121,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <az-button @click=${() => this.#move(2)} title="2x"></az-button>
 </div>
 <az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
-  <az-tab title="Buttons">
+  <az-tab title="Buttons" .canClose="${false}">
     <h2>az-button</h2>
 
     <az-button @click="${showcase.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>

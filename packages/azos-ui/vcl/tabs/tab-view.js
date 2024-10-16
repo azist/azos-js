@@ -428,7 +428,7 @@ export class TabView extends AzosElement {
             >
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
-            <div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>
+            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : ''}
           </div>
         `})}
     </div>

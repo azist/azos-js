@@ -13,6 +13,7 @@ export class Tab extends Block {
     hidden: { type: Boolean, reflect: true },
     minWidth: { type: Number },
     maxWidth: { type: Number },
+    canClose: { type: Boolean },
   };
 
   #id;
@@ -35,6 +36,10 @@ export class Tab extends Block {
 
   #dirty = Math.random() < 0.5;
   get [DIRTY_PROP]() { return this.#dirty; }
+
+  #canClose = true;
+  get canClose() { return this.#canClose; }
+  set canClose(v) { this.#canClose = v; }
 
   async [CLOSE_QUERY_METHOD]() {
     if (this[DIRTY_PROP]) return confirm("Are you sure?");
