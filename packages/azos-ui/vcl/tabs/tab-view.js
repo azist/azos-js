@@ -115,6 +115,10 @@ export class TabView extends AzosElement {
   filter: brightness(1.05);
 }
 
+.tab-icon {
+  margin-right: 0.3em;
+}
+
 .dirty-ind {
   font-weight: bold;
   padding-left: 0.25em;
@@ -426,6 +430,7 @@ export class TabView extends AzosElement {
             @dragstart="${e => this.#onDragStart(e, index)}"
             @dragend="${this.#onDragEnd}"
             >
+            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : ''}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
             ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : ''}

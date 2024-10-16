@@ -14,6 +14,7 @@ export class Tab extends Block {
     minWidth: { type: Number },
     maxWidth: { type: Number },
     canClose: { type: Boolean },
+    iconPath: { type: String, default: "" },
   };
 
   #id;
