@@ -52,7 +52,6 @@ export class TabView extends AzosElement {
 .tab-btn.active {
   border-bottom-color: black;
   background-color: var(--paper);
-  pointer-events: none;
 }
 
 .tab-btn.active:after {
@@ -68,6 +67,29 @@ export class TabView extends AzosElement {
 
 .tab-btn.active .close-ind {
   pointer-events: auto;
+}
+
+.tab-btn.dragging {
+  opacity: 0.5;
+}
+
+.tab-btn.drop-zone:before {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 5px;
+  height: 80%;
+  background-color: var(--s-info-bor-color-ctl);
+  bottom: 0;
+  opacity: 1;
+}
+
+.tab-btn.drop-zone.left:before {
+  left: -5px;
+}
+
+.tab-btn.drop-zone.right:before {
+  right: -5px;
 }
 
 .tab-btn {
@@ -131,6 +153,7 @@ export class TabView extends AzosElement {
   static properties = {
     defaultMinTabWidth: { type: Number },
     defaultMaxTabWidth: { type: Number },
+    isDraggable: { type: Boolean },
   }
 
   get [DIRTY_PROP]() { return this.tabs.some(one => one[DIRTY_PROP]); }
@@ -141,6 +164,7 @@ export class TabView extends AzosElement {
     return true;
   }
 
+  get tabBtns() { return Array.from(this.shadowRoot.querySelectorAll(".tab-btn")) }
   get tabs() { return [...this.children].filter(child => child instanceof Tab); }
   get visibleTabs() { return [...this.children].filter(child => child.hidden !== true); }
 
@@ -161,61 +185,6 @@ export class TabView extends AzosElement {
   }
 
   constructor() { super(); }
-
-  /**
-   * @returns true if tab was unselected
-   */
-  unselectActiveTab() {
-    const ogTab = this.#activeTab;
-    let newTab = ogTab.nextTab;
-
-    if (!newTab) newTab = ogTab.previousTab;
-    if (!newTab) return false;
-
-    this.activeTab = newTab;
-    return true;
-  }
-
-  async moveTab(tab, beforeTab) {
-    isTrue(isOf(tab, Tab).tabView === this);
-    isOfOrNull(beforeTab, Tab);
-    if (beforeTab) isTrue(beforeTab.tabView === this);
-    this.insertBefore(tab, beforeTab);
-    this.requestUpdate();
-    await this.updateComplete;
-    if (tab.active) this.#scrollTabBtnIntoView(tab);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    if (this.tabs.length) {
-      this.#activeTab = this.tabs[0];
-      this.#activeTab.slot = "body";
-    }
-  }
-
-  /**
-   * @param {Tab} tTab the tab class
-   * @param {string} title
-   * @param {string|null} id
-   * @param {Tab|null} beforeTab
-   */
-  addTab(tTab, title, id = null, beforeTab = null) {
-    tTab === Tab || isSubclassOf(tTab, Tab);
-    isOfOrNull(beforeTab, Tab);
-    isStringOrNull(title);
-    isStringOrNull(id);
-
-    const tab = new tTab();
-    tab.id = id ?? `tab-${++TabView.#idSeed}`;
-    tab.title = dflt(title, tTab.name);
-
-    if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
-    this.insertBefore(tab, beforeTab);
-
-    this.requestUpdate();
-    return tab;
-  }
 
   #onScrollLeft() {
     this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
@@ -245,7 +214,6 @@ export class TabView extends AzosElement {
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
     const tabContainerBounds = tabContainer.getBoundingClientRect();
 
-
     let left;
     if (btnBounds.left < tabContainerBounds.left) {
       const previousBtn = tabBtn.previousElementSibling;
@@ -261,6 +229,126 @@ export class TabView extends AzosElement {
       left,
       behavior: 'smooth'
     });
+  }
+
+  async #onCloseTabClick(e, tab) {
+    e.stopPropagation();
+    await this.closeTab(tab);
+  }
+  #draggedTabIndex = null;
+  #onDragStart(event, tabIndex) {
+    this.#draggedTabIndex = tabIndex;
+    const targetTab = event.target;
+    targetTab.classList.add("dragging");
+  }
+
+  #onDragEnd(event) {
+    this.#draggedTabIndex = null;
+    event.target.classList.remove("dragging");
+  }
+
+  #onDragOver(event) {
+    console.log('drag over');
+    event.preventDefault(); // necessary to allow drop
+    const tabIndex = this.#findClosestTabIndex(event.clientX);
+    this.#highlightDropZone(tabIndex);
+  }
+
+  #onDragDrop(event) {
+    console.log('drag drop');
+    event.preventDefault();
+
+    const tabIndex = this.#findClosestTabIndex(event.clientX, true);
+    this.insertBefore(this.visibleTabs[this.#draggedTabIndex], this.visibleTabs[tabIndex]);
+    this.#removeHighlight();
+    this.requestUpdate();
+  }
+
+  #findClosestTabIndex(mouseX, doLog = false) {
+    const tabBtns = this.tabBtns;
+    let closestTabIndex = null;
+    let closestDistance = Infinity, lastDistance = Infinity;
+    tabBtns.some((tabBtn, index) => {
+      const rect = tabBtn.getBoundingClientRect();
+      const tabCenter = rect.left + rect.width / 2;
+
+      const distance = mouseX - tabCenter;
+
+      if (doLog) console.log(mouseX, rect, tabCenter, distance);
+
+      if (Math.abs(distance) < Math.abs(closestDistance)) {
+        closestDistance = distance;
+        closestTabIndex = index;
+      } else if (Math.abs(distance) > Math.abs(lastDistance)) // getting further away
+        return true;
+      lastDistance = distance;
+    });
+    if (closestDistance > 0)
+      if (closestTabIndex < tabBtns.length - 1) closestTabIndex++;
+      else if (closestTabIndex === tabBtns.length - 1) closestTabIndex = null;
+    if (closestTabIndex > tabBtns.length - 1) closestTabIndex = null;
+    return closestTabIndex;
+  }
+
+  #highlightDropZone(tabIndex) {
+    this.#removeHighlight();
+    if (tabIndex === null)
+      this.tabBtns[this.tabBtns.length - 1].classList.add("drop-zone", "right");
+    else
+      this.tabBtns[tabIndex].classList.add("drop-zone", "left");
+  }
+
+  #removeHighlight() { this.tabBtns.forEach(tab => tab.classList.remove("drop-zone", "left", "right")); }
+
+  /**
+   * @returns true if tab was unselected
+   */
+  unselectActiveTab() {
+    const ogTab = this.#activeTab;
+    let newTab = ogTab.nextTab;
+
+    if (!newTab) newTab = ogTab.previousTab;
+    if (!newTab) return false;
+
+    this.activeTab = newTab;
+    return true;
+  }
+
+  /**
+   * @param {Tab} tab the tab to move
+   * @param {Tab|null} beforeTab the tab to insertBefore, null for "append"
+   */
+  async moveTab(tab, beforeTab) {
+    isTrue(isOf(tab, Tab).tabView === this);
+    isOfOrNull(beforeTab, Tab);
+    if (beforeTab) isTrue(beforeTab.tabView === this);
+    this.insertBefore(tab, beforeTab);
+    this.requestUpdate();
+    await this.updateComplete;
+    if (tab.active) this.#scrollTabBtnIntoView(tab);
+  }
+
+  /**
+   * @param {Tab} tTab the tab class
+   * @param {string} title
+   * @param {string|null} id
+   * @param {Tab|null} beforeTab
+   */
+  addTab(tTab, title, beforeTab = null) {
+    tTab === Tab || isSubclassOf(tTab, Tab);
+    isOfOrNull(beforeTab, Tab);
+    isStringOrNull(title);
+    // isStringOrNull(id);
+
+    const tab = new tTab();
+    // tab.id = id ?? `tab-${++TabView.#idSeed}`;
+    tab.title = dflt(title, tTab.name);
+
+    if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
+    this.insertBefore(tab, beforeTab);
+
+    this.requestUpdate();
+    return tab;
   }
 
   /**
@@ -280,9 +368,12 @@ export class TabView extends AzosElement {
     this.requestUpdate();
   }
 
-  async #onCloseTabClick(e, tab) {
-    e.stopPropagation();
-    await this.closeTab(tab);
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.tabs.length) {
+      this.#activeTab = this.tabs[0];
+      this.#activeTab.slot = "body";
+    }
   }
 
   updated() {
@@ -309,8 +400,11 @@ export class TabView extends AzosElement {
 <div class="tab-nav">
   <button class="scroll-btn" @click="${this.#onScrollLeft}">&lt;</button>
   <div class="tab-btn-container">
-    <div class="tab-btn-container-inner ${cls}">
-      ${this.tabs.map(tab => {
+    <div class="tab-btn-container-inner ${cls}"
+      @dragover="${(e) => this.#onDragOver(e)}"
+      @drop="${e => this.#onDragDrop(e)}"
+    >
+      ${this.tabs.map((tab, index) => {
       const cls = [
         tab.active ? "active" : "",
         tab.hidden ? "hidden" : "",
@@ -326,7 +420,12 @@ export class TabView extends AzosElement {
       ].filter(item => item !== "").join(";");
 
       return html`
-          <div id="tabBtn${tab.id}" class="${cls}" @click="${(e) => this.#onTabClick(e, tab)}" style="${stl}">
+          <div id="tabBtn${tab.id}" class="${cls}" style="${stl}"
+            @click="${e => this.#onTabClick(e, tab)}"
+            draggable="${this.isDraggable}"
+            @dragstart="${e => this.#onDragStart(e, index)}"
+            @dragend="${this.#onDragEnd}"
+            >
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
             <div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>

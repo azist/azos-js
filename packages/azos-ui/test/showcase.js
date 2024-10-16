@@ -94,7 +94,7 @@ export class Showcase extends AzosElement {
   #addMoreTab() {
     const before = this.tabView.activeTab.nextVisibleTab;
 
-    this.tabView.addTab(Tab, `Tab${++this.#id}`, `${this.#id}`, before);
+    this.tabView.addTab(Tab, `Tab${++this.#id}`, before);
   }
 
   #move(steps) { (this.manMe || this.tabView.activeTab).move(steps); }
@@ -120,7 +120,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <az-button @click=${() => this.#move(1)} title="1x"></az-button>
   <az-button @click=${() => this.#move(2)} title="2x"></az-button>
 </div>
-<az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}">
+<az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
   <az-tab title="Buttons">
     <h2>az-button</h2>
 
