@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isObject, isOf, isOfOrNull, isStringOrNull } from "azos/aver";
+import { isObject, isOf, isOfOrNull, isStringOrNull, isTrue } from "azos/aver";
 import { arrayDelete, DESTRUCTOR_METHOD, DisposableObject, DISPOSE_METHOD } from "azos/types";
 import { TreeView } from "./tree-view";
 
@@ -114,7 +114,7 @@ export class TreeNode extends DisposableObject {
   }
 
   removeChild(childNode) {
-    isOf(childNode, TreeNode);
+    isTrue(isOf(childNode, TreeNode).treeNode === this);
     const removed = arrayDelete(this.#children, childNode);
     if (removed) childNode[DISPOSE_METHOD]();
     return removed;

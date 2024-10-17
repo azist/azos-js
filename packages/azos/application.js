@@ -160,7 +160,7 @@ export class Application extends types.DisposableObject{
   /** Returns environment name @return {string}*/
   get envName(){ return this.#envName; }
 
-  /** Returns application short name string @return {boolean}*/
+  /** Returns application isTest boolean @return {boolean}*/
   get isTest(){ return this.#isTest; }
 
   /** Returns application instance GUID string assigned at start @return {string}*/

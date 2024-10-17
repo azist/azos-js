@@ -7,12 +7,18 @@ import { asBool, CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import "../../parts/button";
 
 export class Tab extends Block {
+  static #idSeed = 0;
   static properties = {
     active: { type: Boolean, reflect: true },
     hidden: { type: Boolean, reflect: true },
     minWidth: { type: Number },
     maxWidth: { type: Number },
+    canClose: { type: Boolean },
+    iconPath: { type: String, default: "" },
   };
+
+  #id;
+  get id() { return this.#id; }
 
   #hidden = false;
   get hidden() { return this.#hidden; }
@@ -32,6 +38,10 @@ export class Tab extends Block {
   #dirty = Math.random() < 0.5;
   get [DIRTY_PROP]() { return this.#dirty; }
 
+  #canClose = true;
+  get canClose() { return this.#canClose; }
+  set canClose(v) { this.#canClose = v; }
+
   async [CLOSE_QUERY_METHOD]() {
     if (this[DIRTY_PROP]) return confirm("Are you sure?");
     return true;
@@ -47,7 +57,6 @@ export class Tab extends Block {
   get nextVisibleTab() { return this.#getNextSibling(true); }
 
   #getNextSibling(visibleOnly = true) {
-    //FIXME:WIP
     const tabView = this.tabView;
     const totalTabs = tabView.tabs.length;
     const idx = this.order;
@@ -60,18 +69,10 @@ export class Tab extends Block {
       if (visibleOnly && t.hidden === true) continue;
       return t;
     }
-
-    for (let i = 0; i < idx; i++) {
-      t = this.tabView.tabs[i];
-      if (visibleOnly && t.hidden === true) continue;
-      return t;
-    }
-
     return null;
   }
 
   #getPreviousSibling(visibleOnly = true) {
-    //TODO:WIP
     const tabView = this.tabView;
     const totalTabs = tabView.tabs.length;
     const idx = this.order;
@@ -84,34 +85,15 @@ export class Tab extends Block {
       if (visibleOnly && t.hidden === true) continue;
       return t;
     }
-
-    for (let i = totalTabs - 1; i > idx; i--) {
-      t = this.tabView.tabs[i];
-      if (visibleOnly && t.hidden === true) continue;
-      return t;
-    }
-
     return null;
-
-    // for (let i = 1; i < totalTabs; i++) {
-    //   if (next)
-    //     index = idx + i;
-    //   else
-    //     index = idx - i + totalTabs;
-
-    //   index %= totalTabs;
-    //   console.log(index);
-
-    //   t = tabView.tabs[index];
-    //   if (visibleOnly && t.hidden === true) continue;
-
-    //   return t;
-    // }
   }
 
   get tabView() { return this.parentNode; }
 
-  constructor() { super(); }
+  constructor() {
+    super();
+    this.#id = ++Tab.#idSeed;
+  }
 
   requestUpdate(...args) {
     super.requestUpdate.call(this, ...args);
@@ -130,24 +112,27 @@ export class Tab extends Block {
   async close(force = false) { return this.tabView.closeTab(this, force); }
 
   /** @param {number} stepCount negative for left, positive for right */
-  move(stepCount) {
-    // FIXME: WIP
-    if (stepCount === 0) return; // don't move
-    let t = this; // starting element
-    let newIdx;
-    if (stepCount < 0) { // move left
-      stepCount = Math.abs(stepCount);
-      while (stepCount-- > 0) t = t.previousVisibleTab;
-      newIdx = t.order;
-      if (newIdx >= this.tabView.tabs.length - 1) newIdx = null;
-    } else { // move right
-      while (stepCount-- > 0) t = t.nextVisibleTab;
-      newIdx = t.order;
-      if (newIdx > this.tabView.tabs.length - 1) newIdx = null;
-      if (newIdx !== 0) newIdx += 1;
-      if (newIdx > this.tabView.tabs.length - 1) newIdx = null;
+  move(stepCount, visibleOnly = true) {
+    if (stepCount === 0) return;
+
+    const tabs = visibleOnly ? this.tabView.visibleTabs : this.tabView.tabs;
+    const currentIndex = this.order;
+    const count = tabs.length;
+
+    let newIndex = currentIndex + stepCount;
+
+    if (newIndex < 0) return;
+    if (newIndex > count - 1) return;
+
+    let beforeTab;
+    if (newIndex === count - 1) beforeTab = null;
+    else if (newIndex === 0) beforeTab = tabs[0];
+    else {
+      if (stepCount < 0 && newIndex !== 0) newIndex -= 1
+      beforeTab = tabs[newIndex].nextElementSibling;
     }
-    this.tabView.moveTabAtIndex(this.order, newIdx);
+
+    this.tabView.moveTab(this, beforeTab);
   }
 
   render() { return html`<slot></slot>`; }

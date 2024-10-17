@@ -256,11 +256,6 @@ export class TreeView extends AzosElement {
     this.#focusNode(this.#getAllVisibleNodes()[0]);
   }
 
-  #onTreeFocusOut(e) {
-    console.log('onTreeFocusOut()', e);
-    this.$(e.target.id).tabindex = 0;
-  }
-
   render() {
     if (!this.root) return html`<div>No tree data to display.</div>`;
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;

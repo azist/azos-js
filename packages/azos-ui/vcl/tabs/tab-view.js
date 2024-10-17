@@ -2,9 +2,10 @@ import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/ave
 import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
-import { arrayDelete, CLOSE_QUERY_METHOD, DIRTY_PROP, DISPOSE_METHOD } from "azos/types";
+import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 
 export class TabView extends AzosElement {
+
   static #idSeed = 0;
   static styles = css`
 :host {
@@ -15,14 +16,34 @@ export class TabView extends AzosElement {
 
 .tab-nav {
   display: flex;
-  align-items: baseline;
   max-width: 100vw;
 }
 
 .tab-nav .scroll-btn {
-  border: none;
-  padding: 1em .5em;
   cursor: pointer;
+  border: var(--s-default-bor-ctl-btn);
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  position: relative;
+}
+.tab-nav .scroll-btn:after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: calc(50% - 4px);
+  left: 7px;
+  border: 5px solid transparent;
+}
+.tab-nav .scroll-btn.right:after {
+  border-right: 0;
+  border-left-color: black;
+}
+.tab-nav .scroll-btn.left:after {
+  border-left: 0;
+  border-right-color: black;
 }
 
 .tab-view {
@@ -38,6 +59,7 @@ export class TabView extends AzosElement {
 
 .tab-btn-container {
   overflow: hidden;
+  white-space: nowrap;
   width: 100%;
   scroll-behavior: smooth;
 }
@@ -49,18 +71,45 @@ export class TabView extends AzosElement {
 
 .tab-btn.active {
   border-bottom-color: black;
-  margin-bottom: -2px;
-  padding-top: 0.3em;
   background-color: var(--paper);
-  pointer-events: none;
+}
+
+.tab-btn.active:after {
+  content: '';
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--paper);
+  position: absolute;
+  top: 100%;
+  left: 0;
 }
 
 .tab-btn.active .close-ind {
   pointer-events: auto;
 }
 
-.tab-btn.active .active-tab-title {
-  font-size: 1.25em;
+.tab-btn.dragging {
+  opacity: 0.5;
+}
+
+.tab-btn.drop-zone:before {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 5px;
+  height: 80%;
+  background-color: var(--s-info-bor-color-ctl);
+  bottom: 0;
+  opacity: 1;
+}
+
+.tab-btn.drop-zone.left:before {
+  left: -5px;
+}
+
+.tab-btn.drop-zone.right:before {
+  right: -5px;
 }
 
 .tab-btn {
@@ -81,13 +130,13 @@ export class TabView extends AzosElement {
   transition: font-size 0.1s;
 }
 
-.tab-btn span {
-  transition: all 0.2s, margin-bottom 1ms;
-}
-
 .tab-btn:not(.active):not(.hidden):hover {
   cursor: pointer;
   filter: brightness(1.05);
+}
+
+.tab-icon {
+  margin-right: 0.3em;
 }
 
 .dirty-ind {
@@ -128,9 +177,10 @@ export class TabView extends AzosElement {
   static properties = {
     defaultMinTabWidth: { type: Number },
     defaultMaxTabWidth: { type: Number },
+    isDraggable: { type: Boolean },
   }
 
-  constructor() { super(); }
+  #draggedTabIndex = null;
 
   get [DIRTY_PROP]() { return this.tabs.some(one => one[DIRTY_PROP]); }
   async [CLOSE_QUERY_METHOD]() {
@@ -140,6 +190,7 @@ export class TabView extends AzosElement {
     return true;
   }
 
+  get tabBtns() { return Array.from(this.shadowRoot.querySelectorAll(".tab-btn")) }
   get tabs() { return [...this.children].filter(child => child instanceof Tab); }
   get visibleTabs() { return [...this.children].filter(child => child.hidden !== true); }
 
@@ -147,8 +198,7 @@ export class TabView extends AzosElement {
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
   set activeTab(v) {
-    isOf(v, Tab);
-    isTrue(v.tabView === this);
+    isTrue(isOf(v, Tab).tabView === this);
     if (this.#activeTab === v) return;
     const evt = new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true });
     this.dispatchEvent(evt);
@@ -159,6 +209,116 @@ export class TabView extends AzosElement {
     this.requestUpdate();
     this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
   }
+
+  constructor() { super(); }
+
+  async #onScrollTabContainer(scrollToTheRight) {
+    const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
+    tabContainer.scrollBy({
+      top: 0,
+      left: (tabContainer.clientWidth - 100) * (scrollToTheRight ? 1 : -1),
+      behavior: 'smooth'
+    });
+    this.requestUpdate();
+  }
+
+  #onTabClick(e, tab) {
+    tab.activate();
+    this.#scrollTabBtnIntoView(tab);
+  }
+
+  #scrollTabBtnIntoView(tab) {
+    isOf(tab, Tab);
+    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.id}`);
+    const btnBounds = tabBtn.getBoundingClientRect();
+    const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
+    const tabContainerBounds = tabContainer.getBoundingClientRect();
+
+    let left;
+    if (btnBounds.left < tabContainerBounds.left) {
+      const previousBtn = tabBtn.previousElementSibling;
+      const previousBtnBounds = previousBtn?.getBoundingClientRect() || null;
+      left = btnBounds.left - tabContainerBounds.left - (previousBtnBounds ? previousBtnBounds.width / 1.5 : 20);
+    } else if (btnBounds.right > tabContainerBounds.right) {
+      const nextBtn = tabBtn.nextElementSibling;
+      const nextBtnBounds = nextBtn?.getBoundingClientRect() || null;
+      left = btnBounds.right - tabContainerBounds.right + (nextBtnBounds ? nextBtnBounds.width / 1.5 : 20);
+    }
+    tabContainer.scrollBy({
+      top: 0,
+      left,
+      behavior: 'smooth'
+    });
+  }
+
+  async #onCloseTabClick(e, tab) {
+    e.stopPropagation();
+    await this.closeTab(tab);
+  }
+
+  #onDragStart(event, tabIndex) {
+    this.#draggedTabIndex = tabIndex;
+    const targetTab = event.target;
+    targetTab.classList.add("dragging");
+  }
+
+  #onDragEnd(event) {
+    this.#draggedTabIndex = null;
+    event.target.classList.remove("dragging");
+  }
+
+  #onDragOver(event) {
+    console.log('drag over');
+    event.preventDefault(); // necessary to allow drop
+    const tabIndex = this.#findClosestTabIndex(event.clientX);
+    this.#highlightDropZone(tabIndex);
+  }
+
+  #onDragDrop(event) {
+    console.log('drag drop');
+    event.preventDefault();
+
+    const tabIndex = this.#findClosestTabIndex(event.clientX, true);
+    this.insertBefore(this.visibleTabs[this.#draggedTabIndex], this.visibleTabs[tabIndex]);
+    this.#removeHighlight();
+    this.requestUpdate();
+  }
+
+  #findClosestTabIndex(mouseX, doLog = false) {
+    const tabBtns = this.tabBtns;
+    let closestTabIndex = null;
+    let closestDistance = Infinity, lastDistance = Infinity;
+    tabBtns.some((tabBtn, index) => {
+      const rect = tabBtn.getBoundingClientRect();
+      const tabCenter = rect.left + rect.width / 2;
+
+      const distance = mouseX - tabCenter;
+
+      if (doLog) console.log(mouseX, rect, tabCenter, distance);
+
+      if (Math.abs(distance) < Math.abs(closestDistance)) {
+        closestDistance = distance;
+        closestTabIndex = index;
+      } else if (Math.abs(distance) > Math.abs(lastDistance)) // getting further away
+        return true;
+      lastDistance = distance;
+    });
+    if (closestDistance > 0)
+      if (closestTabIndex < tabBtns.length - 1) closestTabIndex++;
+      else if (closestTabIndex === tabBtns.length - 1) closestTabIndex = null;
+    if (closestTabIndex > tabBtns.length - 1) closestTabIndex = null;
+    return closestTabIndex;
+  }
+
+  #highlightDropZone(tabIndex) {
+    this.#removeHighlight();
+    if (tabIndex === null)
+      this.tabBtns[this.tabBtns.length - 1].classList.add("drop-zone", "right");
+    else
+      this.tabBtns[tabIndex].classList.add("drop-zone", "left");
+  }
+
+  #removeHighlight() { this.tabBtns.forEach(tab => tab.classList.remove("drop-zone", "left", "right")); }
 
   /**
    * @returns true if tab was unselected
@@ -174,20 +334,18 @@ export class TabView extends AzosElement {
     return true;
   }
 
-  moveTabAtIndex(idx, newIdx) {
-    // FIXME: Validate indices
-    const before = newIdx === null ? null : this.tabs[newIdx];
-    const child = this.tabs[idx];
-    this.insertBefore(child, before);
+  /**
+   * @param {Tab} tab the tab to move
+   * @param {Tab|null} beforeTab the tab to insertBefore, null for "append"
+   */
+  async moveTab(tab, beforeTab) {
+    isTrue(isOf(tab, Tab).tabView === this);
+    isOfOrNull(beforeTab, Tab);
+    if (beforeTab) isTrue(beforeTab.tabView === this);
+    this.insertBefore(tab, beforeTab);
     this.requestUpdate();
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    if (this.tabs.length) {
-      this.#activeTab = this.tabs[0];
-      this.#activeTab.slot = "body";
-    }
+    await this.updateComplete;
+    if (tab.active) this.#scrollTabBtnIntoView(tab);
   }
 
   /**
@@ -196,64 +354,20 @@ export class TabView extends AzosElement {
    * @param {string|null} id
    * @param {Tab|null} beforeTab
    */
-  addTab(tTab, title, id = null, beforeTab = null) {
+  addTab(tTab, title, beforeTab = null) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
     isStringOrNull(title);
-    isStringOrNull(id);
+    // isStringOrNull(id);
 
     const tab = new tTab();
-    tab.id = id ?? `tab-${++TabView.#idSeed}`;
     tab.title = dflt(title, tTab.name);
 
-    if (beforeTab) {
-      isTrue(beforeTab.tabView === this);
-      this.insertBefore(tab, beforeTab);
-    } else {
-      this.appendChild(tab);
-    }
+    if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
+    this.insertBefore(tab, beforeTab);
 
     this.requestUpdate();
     return tab;
-  }
-
-  #onScrollLeft() {
-    this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
-      top: 0,
-      left: -150,
-      behavior: 'smooth'
-    });
-  }
-
-  #onScrollRight() {
-    this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
-      top: 0,
-      left: 150,
-      behavior: 'smooth'
-    });
-  }
-
-  #onTabClick(e, tab) {
-    tab.activate();
-    const btnBounds = e.currentTarget.getBoundingClientRect();
-    const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
-    const tabContainerBounds = tabContainer.getBoundingClientRect();
-    console.log(btnBounds, tabContainerBounds);
-
-    if (btnBounds.left < tabContainerBounds.left) {
-      tabContainer.scrollBy({
-        top: 0,
-        left: btnBounds.width * -1,
-        behavior: 'smooth'
-      });
-    }
-    if (btnBounds.right > tabContainerBounds.right) {
-      tabContainer.scrollBy({
-        top: 0,
-        left: btnBounds.width,
-        behavior: 'smooth'
-      })
-    }
   }
 
   /**
@@ -273,24 +387,21 @@ export class TabView extends AzosElement {
     this.requestUpdate();
   }
 
-  async #onCloseTabClick(e, tab) {
-    e.stopPropagation();
-    await this.closeTab(tab);
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.tabs.length) {
+      this.#activeTab = this.tabs[0];
+      this.#activeTab.slot = "body";
+    }
   }
 
   updated() {
-    const tabMenuWidth = this.shadowRoot.querySelector('.tab-btn-container').offsetWidth;
+    const tabContainerWidth = this.shadowRoot.querySelector('.tab-btn-container').offsetWidth;
     const scrollBtns = this.shadowRoot.querySelectorAll('.scroll-btn');
     const tabBtns = this.shadowRoot.querySelectorAll('.tab-btn');
     let tabBtnsTotalWidth = 0;
-    if (tabBtns.length !== 0) {
-      tabBtns.forEach((tab) => {
-        tabBtnsTotalWidth = tabBtnsTotalWidth + tab.offsetWidth;
-      });
-    }
-    scrollBtns.forEach((btn) => {
-      (tabBtnsTotalWidth > tabMenuWidth) ? btn.style.display = 'block' : btn.style.display = 'none';
-    });
+    if (tabBtns.length !== 0) tabBtns.forEach((tab) => tabBtnsTotalWidth += tab.offsetWidth);
+    scrollBtns.forEach((btn) => btn.style.display = tabBtnsTotalWidth > tabContainerWidth ? 'block' : 'none');
   }
 
   render() {
@@ -306,10 +417,13 @@ export class TabView extends AzosElement {
     const cls = `${parseStatus(this.#activeTab.status, true, '-tab-btn-container')}`;
     return html`
 <div class="tab-nav">
-  <button class="scroll-btn" @click="${this.#onScrollLeft}">&lt;</button>
+  <button class="scroll-btn left" @click="${() => this.#onScrollTabContainer(false)}"></button>
   <div class="tab-btn-container">
-    <div class="tab-btn-container-inner ${cls}">
-      ${this.tabs.map(tab => {
+    <div class="tab-btn-container-inner ${cls}"
+      @dragover="${(e) => this.#onDragOver(e)}"
+      @drop="${e => this.#onDragDrop(e)}"
+    >
+      ${this.tabs.map((tab, index) => {
       const cls = [
         tab.active ? "active" : "",
         tab.hidden ? "hidden" : "",
@@ -325,15 +439,21 @@ export class TabView extends AzosElement {
       ].filter(item => item !== "").join(";");
 
       return html`
-          <div class="${cls}" @click="${(e) => this.#onTabClick(e, tab)}" style="${stl}">
+          <div id="tabBtn${tab.id}" class="${cls}" style="${stl}"
+            @click="${e => this.#onTabClick(e, tab)}"
+            draggable="${this.isDraggable}"
+            @dragstart="${e => this.#onDragStart(e, index)}"
+            @dragend="${this.#onDragEnd}"
+            >
+            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : ''}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
-            <div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>
+            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : ''}
           </div>
         `})}
     </div>
   </div>
-  <button class="scroll-btn" @click="${this.#onScrollRight}">&gt;</button>
+  <button class="scroll-btn right" @click="${() => this.#onScrollTabContainer(true)}"></button>
 </div>
     `;
   }
