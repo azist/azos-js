@@ -16,14 +16,34 @@ export class TabView extends AzosElement {
 
 .tab-nav {
   display: flex;
-  align-items: baseline;
   max-width: 100vw;
 }
 
 .tab-nav .scroll-btn {
-  border: none;
-  padding: 1em .5em;
   cursor: pointer;
+  border: var(--s-default-bor-ctl-btn);
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  position: relative;
+}
+.tab-nav .scroll-btn:after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: calc(50% - 4px);
+  left: 7px;
+  border: 5px solid transparent;
+}
+.tab-nav .scroll-btn.right:after {
+  border-right: 0;
+  border-left-color: black;
+}
+.tab-nav .scroll-btn.left:after {
+  border-left: 0;
+  border-right-color: black;
 }
 
 .tab-view {
@@ -160,6 +180,8 @@ export class TabView extends AzosElement {
     isDraggable: { type: Boolean },
   }
 
+  #draggedTabIndex = null;
+
   get [DIRTY_PROP]() { return this.tabs.some(one => one[DIRTY_PROP]); }
   async [CLOSE_QUERY_METHOD]() {
     for (let one of this.tabs) {
@@ -190,20 +212,14 @@ export class TabView extends AzosElement {
 
   constructor() { super(); }
 
-  #onScrollLeft() {
-    this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
+  async #onScrollTabContainer(scrollToTheRight) {
+    const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
+    tabContainer.scrollBy({
       top: 0,
-      left: -300,
+      left: (tabContainer.clientWidth - 100) * (scrollToTheRight ? 1 : -1),
       behavior: 'smooth'
     });
-  }
-
-  #onScrollRight() {
-    this.shadowRoot.querySelectorAll('.tab-btn-container')[0].scrollBy({
-      top: 0,
-      left: 300,
-      behavior: 'smooth'
-    });
+    this.requestUpdate();
   }
 
   #onTabClick(e, tab) {
@@ -239,7 +255,7 @@ export class TabView extends AzosElement {
     e.stopPropagation();
     await this.closeTab(tab);
   }
-  #draggedTabIndex = null;
+
   #onDragStart(event, tabIndex) {
     this.#draggedTabIndex = tabIndex;
     const targetTab = event.target;
@@ -345,7 +361,6 @@ export class TabView extends AzosElement {
     // isStringOrNull(id);
 
     const tab = new tTab();
-    // tab.id = id ?? `tab-${++TabView.#idSeed}`;
     tab.title = dflt(title, tTab.name);
 
     if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
@@ -402,7 +417,7 @@ export class TabView extends AzosElement {
     const cls = `${parseStatus(this.#activeTab.status, true, '-tab-btn-container')}`;
     return html`
 <div class="tab-nav">
-  <button class="scroll-btn" @click="${this.#onScrollLeft}">&lt;</button>
+  <button class="scroll-btn left" @click="${() => this.#onScrollTabContainer(false)}"></button>
   <div class="tab-btn-container">
     <div class="tab-btn-container-inner ${cls}"
       @dragover="${(e) => this.#onDragOver(e)}"
@@ -438,7 +453,7 @@ export class TabView extends AzosElement {
         `})}
     </div>
   </div>
-  <button class="scroll-btn" @click="${this.#onScrollRight}">&gt;</button>
+  <button class="scroll-btn right" @click="${() => this.#onScrollTabContainer(true)}"></button>
 </div>
     `;
   }
