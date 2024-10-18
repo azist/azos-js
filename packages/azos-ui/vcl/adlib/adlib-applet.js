@@ -4,15 +4,21 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { html, POSITION, STATUS } from "azos-ui/ui";
 
 import { Applet } from "azos-ui/applet";
 import { Spinner } from "azos-ui/spinner";
 
-import { toast } from "azos-ui/toast";
-import "../tree-view/tree-view";
 import "azos-ui/parts/button";
+import { toast } from "azos-ui/toast";
+import "azos-ui/vcl/tree-view/tree-view";
+import { Tab } from "azos-ui/vcl/tabs/tab";
+
+import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
+import "azos-ui/vcl/adlib/filter-dialog";
+import "azos-ui/vcl/adlib/context-dialog";
+import { prompt } from "./ok-cancel-modal";
+import { AdlibWorkTab } from "./adlib-work-tab";
 
 /**  */
 export class AdlibApplet extends Applet {
@@ -29,25 +35,9 @@ export class AdlibApplet extends Applet {
     super.connectedCallback();
     this.arena.hideFooter(true);
     this.link(this.#ref);
-    await this.#loadData();
+    // await this.#loadData();
 
     // this.arena.installToolbarCommands([]);
-  }
-
-  // async firstUpdated() {
-  //   super.firstUpdated();
-  //   this.$("input2").tabindex = 0;
-  //   this.$("input2").focus();
-  // }
-
-  async #loadData() {
-    Spinner.exec(async () => {
-      const response = await this.#ref.svcAdlibClient.getSpaces();
-      const spacesData = response.data.data;
-      const root = this.treeView.root;
-      spacesData.forEach(spaceName => root.addChild(spaceName, { data: { isSpace: true } }));
-      this.treeView.requestUpdate();
-    });
   }
 
   async #onNodeUserAction(e) {
@@ -77,22 +67,29 @@ export class AdlibApplet extends Applet {
     } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
   }
 
-  async #onNodeChecked(e) {
-    const node = e.detail.node;
-    console.log('onNodeChecked', e);
-    console.log(`Node is ${node.isChecked ? "" : "not"} checked`);
+  async #onAddTabToLeft(e) {
+    e.preventDefault();
+    // const collectionName = (await this.contextSelector.show()).modalResult;
+    // if (!collectionName) return;
+    // await this.#loadData(collectionName);
+    const collectionName = "Things";
+    this.tabView.addTab(AdlibWorkTab, `${collectionName}`);
   }
 
   render() {
     return html`
-      <input id=input1 tabindex=0>
-      <az-tree-view id="treeView" scope="this"
-        @nodeUserAction=${this.#onNodeUserAction}
-        .showRoot=${false}>
-      </az-tree-view>
-      <input id=input2 tabindex=0>
+      <az-sky-adlib-ctx-selector-dialog id="contextSelector" scope="this" title="Select a context"></az-sky-adlib-ctx-selector-dialog>
+      <az-sky-adlib-filter-dialog id="filterDialog" scope="this" title="Construct a filter"></az-sky-adlib-filter-dialog>
+      <az-button @click=${this.#onAddTabToLeft} title="New Query"></az-button>
+      <az-tab-view id="tabView" scope="this">
+      </az-tab-view>
       `;
-    // @nodeOpenOrClose=${this.onOpenNode}
+    // <input id=input1 tabindex=0>
+    // <az-tree-view id="treeView" scope="this"
+    //   @nodeUserAction=${this.#onNodeUserAction}
+    //   .showRoot=${false}>
+    // </az-tree-view>
+    // <input id=input2 tabindex=0>
   }
 }
 

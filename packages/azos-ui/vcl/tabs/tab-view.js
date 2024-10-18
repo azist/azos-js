@@ -396,6 +396,7 @@ export class TabView extends AzosElement {
   }
 
   updated() {
+    if (!this.tabs.length) return;
     const tabContainerWidth = this.shadowRoot.querySelector('.tab-btn-container').offsetWidth;
     const scrollBtns = this.shadowRoot.querySelectorAll('.scroll-btn');
     const tabBtns = this.shadowRoot.querySelectorAll('.tab-btn');
@@ -407,7 +408,7 @@ export class TabView extends AzosElement {
   render() {
     return html`
     <div class="tab-view">
-    ${this.renderTabs()}
+    ${this.tabs.length ? this.renderTabs() : ''}
     ${this.renderBody()}
     </div>
     `;
