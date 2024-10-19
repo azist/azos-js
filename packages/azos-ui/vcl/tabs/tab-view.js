@@ -198,7 +198,8 @@ export class TabView extends AzosElement {
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
   set activeTab(v) {
-    isTrue(isOf(v, Tab).tabView === this);
+    isOf(v, Tab) || isSubclassOf(v, Tab);
+    isTrue(v.tabView === this);
     if (this.#activeTab === v) return;
     const evt = new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true });
     this.dispatchEvent(evt);
@@ -351,20 +352,19 @@ export class TabView extends AzosElement {
   /**
    * @param {Tab} tTab the tab class
    * @param {string} title
-   * @param {string|null} id
    * @param {Tab|null} beforeTab
    */
   addTab(tTab, title, beforeTab = null) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
     isStringOrNull(title);
-    // isStringOrNull(id);
 
     const tab = new tTab();
     tab.title = dflt(title, tTab.name);
 
     if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
     this.insertBefore(tab, beforeTab);
+    if (!this.#activeTab) this.#activeTab = tab;
 
     this.requestUpdate();
     return tab;
