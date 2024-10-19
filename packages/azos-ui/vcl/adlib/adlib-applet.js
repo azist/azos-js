@@ -12,12 +12,11 @@ import { Spinner } from "azos-ui/spinner";
 import "azos-ui/parts/button";
 import { toast } from "azos-ui/toast";
 import "azos-ui/vcl/tree-view/tree-view";
-import { Tab } from "azos-ui/vcl/tabs/tab";
+import "azos-ui/vcl/tabs/tab-view";
 
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import "azos-ui/vcl/adlib/filter-dialog";
 import "azos-ui/vcl/adlib/context-dialog";
-import { prompt } from "./ok-cancel-modal";
 import { AdlibWorkTab } from "./adlib-work-tab";
 
 /**  */
@@ -69,10 +68,9 @@ export class AdlibApplet extends Applet {
 
   async #onAddTabToLeft(e) {
     e.preventDefault();
-    // const collectionName = (await this.contextSelector.show()).modalResult;
-    // if (!collectionName) return;
+    const collectionName = (await this.contextSelector.show()).modalResult;
+    if (!collectionName) return;
     // await this.#loadData(collectionName);
-    const collectionName = "Things";
     this.tabView.addTab(AdlibWorkTab, `${collectionName}`);
   }
 

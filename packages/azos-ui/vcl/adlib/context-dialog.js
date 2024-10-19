@@ -12,6 +12,7 @@ import "../../parts/text-field";
 import "../../parts/check-field";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { Spinner } from "../../spinner";
+import { deferredPromise } from "azos/types";
 
 export class AdlibTabContextSelectorDialog extends ModalDialog {
   static styles = [ModalDialog.styles, css`
@@ -27,6 +28,7 @@ export class AdlibTabContextSelectorDialog extends ModalDialog {
   };
 
   #selectedContext;
+  #isVisible = false;
 
   constructor() { super(); }
 
@@ -41,24 +43,48 @@ export class AdlibTabContextSelectorDialog extends ModalDialog {
   }
 
   async show() {
+    let dataLoaded = !!this.#spacesData;
+    if (!dataLoaded) await this.#loadData();
+
+    this.#isVisible = true;
+    this.requestUpdate();
+    await this.updateComplete;
+
+    if (!dataLoaded) {
+      const root = this.treeView.root;
+      this.#spacesData.forEach(spaceName => root.addChild(spaceName, { data: { isSpace: true } }));
+    }
+    this.treeView.requestUpdate();
     await super.show();
-    await this.#loadData();
   }
 
-  async #loadData() {
-    Spinner.exec(async () => {
-      const response = await this.#ref.svcAdlibClient.getSpaces();
-      const spacesData = response.data.data;
-      const root = this.treeView.root;
-      spacesData.forEach(spaceName => root.addChild(spaceName, { data: { isSpace: true } }));
-      this.treeView.requestUpdate();
-      await new Promise(res => setTimeout(res, 30000));
-    });
+  async close() {
+    this.#isVisible = false;
+    await super.close();
   }
+
+  #spacesData = null;
+  async #loadData() {
+    if (this.#spacesData) return this.#spacesData;
+    const { promise, resolve } = deferredPromise();
+    Spinner.exec(async () => {
+      const spacesResponse = await this.#ref.svcAdlibClient.getSpaces();
+      this.#spacesData = spacesResponse.data.data;
+      resolve(this.#spacesData);
+    });
+    return promise;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.link(this.#ref);
+  }
+
+  render() { return this.#isVisible ? super.render() : html``; }
 
   renderBodyContent() {
     return html`
-<az-tree-view id=treeView scope=this></az-tree-view>
+<az-tree-view id="treeView" scope="this"></az-tree-view>
 
 <div class="strip-h" style="float: right;">
   <az-button id="btnApply" scope="this" title="&#8623; Apply" @click="${this.#btnApplyClick}" status="ok"> </az-button>

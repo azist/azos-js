@@ -16,3 +16,5 @@ export class AdlibWorkTab extends Tab {
   constructor() { super(); }
 
 }
+
+window.customElements.define("az-adlib-work-tab", AdlibWorkTab);
