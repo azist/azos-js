@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html, css } from "../../ui";
+import { html, css, POSITION } from "../../ui";
 import { ModalDialog } from "../../modal-dialog";
 
 import "../../parts/button";
@@ -13,13 +13,25 @@ import "../../parts/check-field";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { Spinner } from "../../spinner";
 import { deferredPromise } from "azos/types";
+import { toast } from "../../toast";
 
 export class AdlibTabContextSelectorDialog extends ModalDialog {
   static styles = [ModalDialog.styles, css`
-.strip-h{
+.strip-h {
   display: flex;
   flex-wrap: wrap;
   margin: 0.5em 0em 0em 0em;
+}
+
+.dlg-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+az-tree-view {
+  max-height: 75%;
+  overflow: auto;
 }
   `];
 
@@ -55,12 +67,12 @@ export class AdlibTabContextSelectorDialog extends ModalDialog {
       this.#spacesData.forEach(spaceName => root.addChild(spaceName, { data: { isSpace: true } }));
     }
     this.treeView.requestUpdate();
-    await super.show();
+    return await super.show();
   }
 
   async close() {
-    this.#isVisible = false;
     await super.close();
+    this.#isVisible = false;
   }
 
   #spacesData = null;
@@ -75,6 +87,32 @@ export class AdlibTabContextSelectorDialog extends ModalDialog {
     return promise;
   }
 
+  async #onNodeUserAction(e) {
+    const node = e.detail.node;
+    const action = e.detail.action;
+    if (action === "opened") {
+      if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
+        node.data.areCollectionsLoaded = true;
+        Spinner.exec(async () => {
+          const response = await this.#ref.svcAdlibClient.getCollections(node.title);
+          const collectionsData = response.data.data;
+          collectionsData.forEach(collectionName => node.addChild(collectionName, {
+            canClose: false,
+            canOpen: false,
+            data: {
+              isCollection: true,
+            }
+          }));
+          this.treeView.requestUpdate();
+        });
+      }
+    } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
+    else if (action === "focusChanged") {
+      this.#selectedContext = node.title;
+      console.log('onFocusChanged', e);
+    }
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.link(this.#ref);
@@ -84,9 +122,11 @@ export class AdlibTabContextSelectorDialog extends ModalDialog {
 
   renderBodyContent() {
     return html`
-<az-tree-view id="treeView" scope="this"></az-tree-view>
+<az-tree-view id="treeView" scope="this"
+  class="tree-view"
+  @nodeUserAction=${this.#onNodeUserAction}></az-tree-view>
 
-<div class="strip-h" style="float: right;">
+<div class="strip-h">
   <az-button id="btnApply" scope="this" title="&#8623; Apply" @click="${this.#btnApplyClick}" status="ok"> </az-button>
   <az-button id="btnCancel" scope="this" title="Cancel" @click="${this.#btnCancelClick}"> </az-button>
 </div>
