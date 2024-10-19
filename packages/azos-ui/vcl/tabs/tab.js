@@ -3,7 +3,7 @@ import { Block } from "../../block";
 import { html } from "../../ui";
 import { TabView } from "./tab-view";
 
-import { asBool, CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
+import { asBool } from "azos/types";
 import "../../parts/button";
 
 export class Tab extends Block {
@@ -35,17 +35,9 @@ export class Tab extends Block {
     tabView?.requestUpdate();
   }
 
-  #dirty = Math.random() < 0.5;
-  get [DIRTY_PROP]() { return this.#dirty; }
-
   #canClose = true;
   get canClose() { return this.#canClose; }
   set canClose(v) { this.#canClose = v; }
-
-  async [CLOSE_QUERY_METHOD]() {
-    if (this[DIRTY_PROP]) return confirm("Are you sure?");
-    return true;
-  }
 
   get active() { return this === this.tabView.activeTab; }
   get order() { return this.tabView.tabs.findIndex(tab => tab === this); }
