@@ -17,12 +17,12 @@ export class OkCancelModal extends ModalDialog {
     okCancelPrompt: String(),
   };
 
-  constructor(okCancelPrompt, options = { title: String | null, okBtnTitle: String | null, cancelBtnTitle: String | null }) {
+  constructor(okCancelPrompt, { title, okBtnTitle, cancelBtnTitle } = {}) {
     super();
-    this.okBtnTitle = dflt(options.okBtnTitle, "Ok");
-    this.cancelBtnTitle = dflt(options.cancelBtnTitle, "Cancel");
-    this.title = dflt(options.title, "Confirm");
-    this.okCancelPrompt = dflt(options.okCancelPrompt, "Are you sure?");
+    this.title = dflt(title, "Confirm");
+    this.okBtnTitle = dflt(okBtnTitle, "Ok");
+    this.cancelBtnTitle = dflt(cancelBtnTitle, "Cancel");
+    this.okCancelPrompt = dflt(okCancelPrompt, "Are you sure?");
   }
 
   static styles = [ModalDialog.styles, css`
@@ -55,8 +55,8 @@ export class OkCancelModal extends ModalDialog {
 
 }
 
-export async function prompt(okCancelPrompt, options = { title: String, okBtnTitle: String, cancelBtnTitle: String }) {
-  const modal = new OkCancelModal(okCancelPrompt, options);
+export async function prompt(okCancelPrompt, { title, okBtnTitle, cancelBtnTitle } = {}) {
+  const modal = new OkCancelModal(okCancelPrompt, { title, okBtnTitle, cancelBtnTitle });
   document.body.appendChild(modal);
   modal.update();
   try {
