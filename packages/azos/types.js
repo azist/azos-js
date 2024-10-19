@@ -893,6 +893,13 @@ export function genGuid() {
   return guid;
 }
 
+/** @returns a deferred promise capable of being destructured rather than wrapping code in a Promise executor fn. */
+export function deferredPromise() {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => [resolve, reject] = [res, rej]);
+  return { promise, resolve, reject };
+}
+
 /** Macro caps value at minimum. No type checks are done */
 export function atMin(v, min) { return v < min ? min : v; }
 /** Macro caps value at maximum. No type checks are done */
