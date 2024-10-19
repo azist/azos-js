@@ -64,7 +64,10 @@ az-tree-view {
 
     if (!dataLoaded) {
       const root = this.treeView.root;
-      this.#spacesData.forEach(spaceName => root.addChild(spaceName, { data: { isSpace: true } }));
+      this.#spacesData.forEach(name => root.addChild(name, {
+        iconPath: "https://www.shareicon.net/download/2015/12/28/218240_network.ico",
+        data: { type: "space", },
+      }));
     }
     this.treeView.requestUpdate();
     return await super.show();
@@ -91,25 +94,24 @@ az-tree-view {
     const node = e.detail.node;
     const action = e.detail.action;
     if (action === "opened") {
-      if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
+      if (node.data?.type === "space" && !node.data.areCollectionsLoaded) {
         node.data.areCollectionsLoaded = true;
         Spinner.exec(async () => {
           const response = await this.#ref.svcAdlibClient.getCollections(node.title);
-          const collectionsData = response.data.data;
-          collectionsData.forEach(collectionName => node.addChild(collectionName, {
+          const cData = response.data.data;
+          cData.forEach(name => node.addChild(name, {
             canClose: false,
             canOpen: false,
-            data: {
-              isCollection: true,
-            }
+            iconPath: "https://www.shareicon.net/download/2015/03/16/7846_database.ico",
+            data: { type: "collection" }
           }));
           this.treeView.requestUpdate();
         });
       }
     } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
     else if (action === "focusChanged") {
-      this.#selectedContext = node.title;
-      console.log('onFocusChanged', e);
+      this.#selectedContext = { name: node.title, type: node.data.type };
+      // console.log('onFocusChanged', e);
     }
   }
 
