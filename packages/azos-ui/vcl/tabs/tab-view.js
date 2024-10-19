@@ -269,23 +269,21 @@ export class TabView extends AzosElement {
   }
 
   #onDragOver(event) {
-    console.log('drag over');
     event.preventDefault(); // necessary to allow drop
     const tabIndex = this.#findClosestTabIndex(event.clientX);
     this.#highlightDropZone(tabIndex);
   }
 
   #onDragDrop(event) {
-    console.log('drag drop');
     event.preventDefault();
 
-    const tabIndex = this.#findClosestTabIndex(event.clientX, true);
+    const tabIndex = this.#findClosestTabIndex(event.clientX);
     this.insertBefore(this.visibleTabs[this.#draggedTabIndex], this.visibleTabs[tabIndex]);
     this.#removeHighlight();
     this.requestUpdate();
   }
 
-  #findClosestTabIndex(mouseX, doLog = false) {
+  #findClosestTabIndex(mouseX) {
     const tabBtns = this.tabBtns;
     let closestTabIndex = null;
     let closestDistance = Infinity, lastDistance = Infinity;
@@ -294,8 +292,6 @@ export class TabView extends AzosElement {
       const tabCenter = rect.left + rect.width / 2;
 
       const distance = mouseX - tabCenter;
-
-      if (doLog) console.log(mouseX, rect, tabCenter, distance);
 
       if (Math.abs(distance) < Math.abs(closestDistance)) {
         closestDistance = distance;
@@ -354,7 +350,7 @@ export class TabView extends AzosElement {
    * @param {string} title
    * @param {Tab|null} beforeTab
    */
-  addTab(tTab, title, beforeTab = null) {
+  addTab(tTab, title, beforeTab = null, makeActive = true) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
     isStringOrNull(title);
@@ -364,7 +360,7 @@ export class TabView extends AzosElement {
 
     if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
     this.insertBefore(tab, beforeTab);
-    if (!this.#activeTab) this.#activeTab = tab;
+    if (!this.#activeTab || makeActive) tab.activate();
 
     this.requestUpdate();
     return tab;

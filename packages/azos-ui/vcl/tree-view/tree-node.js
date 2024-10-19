@@ -13,7 +13,7 @@ export class TreeNode extends DisposableObject {
 
   #id;
   #title;
-  #img;
+  #iconPath;
   #parent;
   #treeView;
   #children;
@@ -33,8 +33,8 @@ export class TreeNode extends DisposableObject {
   get title() { return this.#title; }
   set title(v) { this.#title = v; }
 
-  get img() { return this.#img; }
-  set img(v) { this.#img = v; }
+  get iconPath() { return this.#iconPath; }
+  set iconPath(v) { this.#iconPath = v; }
 
   get checked() { return this.#state; }
   get isChecked() { return !!this.#state; }
@@ -77,14 +77,14 @@ export class TreeNode extends DisposableObject {
 
   get isRoot() { return this.#parent === null; }
 
-  constructor(treeView, parent, title, { img, checkable, canClose, canOpen, nodeVisible, data } = {}) {
+  constructor(treeView, parent, title, { iconPath, checkable, canClose, canOpen, nodeVisible, data } = {}) {
     super();
     this.#treeView = isOf(treeView, TreeView);
     this.#parent = isOfOrNull(parent, TreeNode);
 
-    this.#id = ++TreeNode.#idSeed;
+    this.#id = TreeNode.#idSeed++;
     this.#title = isStringOrNull(title);
-    this.#img = img ?? null;
+    this.#iconPath = iconPath ?? null;
     this.#checkable = checkable ?? false;
     this.#nodeVisible = nodeVisible ?? true;
 

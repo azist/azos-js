@@ -20,6 +20,10 @@ export class Tab extends Block {
   #id;
   get id() { return this.#id; }
 
+  #iconPath;
+  get iconPath() { return this.#iconPath; }
+  set iconPath(v) { this.#iconPath = v; }
+
   #hidden = false;
   get hidden() { return this.#hidden; }
   set hidden(v) {

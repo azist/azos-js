@@ -106,8 +106,9 @@ export class TreeView extends AzosElement {
 
   constructor() {
     super();
-    this.treeViewId = ++TreeView.#idSeed;
+    this.treeViewId = TreeView.#idSeed++;
     this.root = this._createNode(null, "/"); // default for rendering's sake
+    this.showRoot = false;
   }
 
   /**
@@ -249,13 +250,16 @@ export class TreeView extends AzosElement {
     }
   }
 
-  #onTreeFocus(e) {
+  async #onTreeFocus(e) {
+    await this.updateComplete;
     if (this.nodeInFocus) {
       this.#focusNode(this.nodeInFocus);
       return;
     }
-    this.$(e.target.id).tabindex = -1;
-    this.#focusNode(this.#getAllVisibleNodes()[0]);
+    if (e.target) this.$(e.target.id).tabindex = -1;
+    const visibleNodes = this.#getAllVisibleNodes();
+    if (!visibleNodes) return;
+    this.#focusNode(visibleNodes[0]);
   }
 
   render() {
@@ -314,7 +318,10 @@ export class TreeView extends AzosElement {
     } else return '';
   }
 
-  renderIcon(node) { return html`${node.isOpened ? '📂' : '📁'}`; }
+  renderIcon(node) {
+    if (node.iconPath) return html`<img src="${node.iconPath}"/>`;
+    return html`${node.isOpened ? '📂' : '📁'}`;
+  }
 
   renderChevron(node) { return html`<div class="chevron ${node.isOpened ? 'open' : "closed"}"></div>` }
 
