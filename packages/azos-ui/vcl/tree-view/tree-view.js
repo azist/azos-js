@@ -204,10 +204,12 @@ export class TreeView extends AzosElement {
     const nodeElement = this.$(`tn${node.id}`);
     nodeElement.tabindex = 0;
     nodeElement.focus();
+    this._dispatchNodeUserActionEvent(node, { action: "focusChanged" });
     if (previousNode) this.$(`tn${previousNode.id}`).tabindex = -1;
   }
 
   #onNodeToggleOpen(node) {
+    if (!node.canOpen) return;
     if (node.isOpened)
       this.#close(node);
     else
@@ -289,7 +291,7 @@ export class TreeView extends AzosElement {
       @dblclick="${() => this.#onNodeToggleOpen(node)}"
       tabindex="${this.nodeInFocus?.id === node.id ? 0 : -1}"
       >
-      <div class="tree-node-chevron" @click="${() => this.#onNodeToggleOpen(node)}" style="${node.chevronVisible ? '' : 'visibility: hidden'}">
+      <div class="tree-node-chevron" @click="${() => this.#onNodeToggleOpen(node)}" style="${node.canOpen && node.chevronVisible ? '' : 'visibility: hidden'}">
         ${this.renderChevron(node)}
       </div>
       <div class="tree-node-icon">
