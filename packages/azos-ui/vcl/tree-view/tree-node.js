@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isObject, isOf, isOfOrNull, isStringOrNull, isTrue } from "azos/aver";
+import { isOf, isOfOrNull, isStringOrNull, isTrue } from "azos/aver";
 import { arrayDelete, DESTRUCTOR_METHOD, DisposableObject, DISPOSE_METHOD } from "azos/types";
 import { TreeView } from "./tree-view";
 
@@ -77,21 +77,20 @@ export class TreeNode extends DisposableObject {
 
   get isRoot() { return this.#parent === null; }
 
-  constructor(treeView, parent, title, options = { img: null, checkable: false, canClose: true, canOpen: true, nodeVisible: true, data: {} }) {
+  constructor(treeView, parent, title, { img, checkable, canClose, canOpen, nodeVisible, data } = {}) {
     super();
-    isObject(options);
     this.#treeView = isOf(treeView, TreeView);
     this.#parent = isOfOrNull(parent, TreeNode);
 
     this.#id = ++TreeNode.#idSeed;
     this.#title = isStringOrNull(title);
-    this.#img = options.img ?? null;
-    this.#checkable = options.checkable ?? false;
-    this.#nodeVisible = options.nodeVisible ?? true;
+    this.#img = img ?? null;
+    this.#checkable = checkable ?? false;
+    this.#nodeVisible = nodeVisible ?? true;
 
-    this.#canClose = options.canClose ?? true;
-    this.#canOpen = options.canOpen ?? true;
-    this.#data = options.data ?? {};
+    this.#canClose = canClose ?? true;
+    this.#canOpen = canOpen ?? true;
+    this.#data = data ?? {};
     this.#opened = false;
     this.#children = [];
   }
