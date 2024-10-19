@@ -4,13 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html, POSITION, STATUS } from "azos-ui/ui";
+import { html } from "azos-ui/ui";
 
 import { Applet } from "azos-ui/applet";
-import { Spinner } from "azos-ui/spinner";
 
 import "azos-ui/parts/button";
-import { toast } from "azos-ui/toast";
 import "azos-ui/vcl/tree-view/tree-view";
 import "azos-ui/vcl/tabs/tab-view";
 
@@ -39,36 +37,11 @@ export class AdlibApplet extends Applet {
     // this.arena.installToolbarCommands([]);
   }
 
-  async #onNodeUserAction(e) {
-    const node = e.detail.node;
-    const action = e.detail.action;
-
-    console.log('onOpenNode', e);
-    if (action === "opened") {
-      if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
-        node.data.areCollectionsLoaded = true;
-        Spinner.exec(async () => {
-          const response = await this.#ref.svcAdlibClient.getCollections(node.title);
-          const collectionsData = response.data.data;
-          collectionsData.forEach(collectionName => node.addChild(collectionName, { data: { isCollection: true, yesOrNo: Math.random() < 0.25 } }));
-          this.treeView.requestUpdate();
-        });
-      } else if (!node.hasChildren) {
-        if (node.data?.isCollection && !node.data.areCollectionChildrenLoaded) {
-          node.data.areCollectionChildrenLoaded = true;
-          Spinner.exec(async () => {
-            await new Promise(r => setTimeout(r, 500));
-            toast(`There are no children for node '${node.title}'.`, { status: STATUS.INFO, position: POSITION.TOP_RIGHT });
-          });
-          node.hideChevron();
-        }
-      }
-    } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
-  }
-
   async #onAddTabToLeft(e) {
     e.preventDefault();
-    const collectionName = (await this.contextSelector.show()).modalResult;
+    const modal = await this.contextSelector.show();
+    const collectionName = modal.modalResult;
+    console.log(collectionName);
     if (!collectionName) return;
     // await this.#loadData(collectionName);
     this.tabView.addTab(AdlibWorkTab, `${collectionName}`);
