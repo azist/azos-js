@@ -15,7 +15,8 @@ import "azos-ui/vcl/tabs/tab-view";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import "azos-ui/vcl/adlib/filter-dialog";
 import "azos-ui/vcl/adlib/context-dialog";
-import { AdlibWorkTab } from "./adlib-work-tab";
+import { AdlibCollectionTab } from "./adlib-collection-tab";
+import { AdlibSpaceTab } from "./adlib-space-tab";
 
 /**  */
 export class AdlibApplet extends Applet {
@@ -40,11 +41,12 @@ export class AdlibApplet extends Applet {
   async #onAddTabToLeft(e) {
     e.preventDefault();
     const modal = await this.contextSelector.show();
-    const collectionName = modal.modalResult;
-    console.log(collectionName);
-    if (!collectionName) return;
-    // await this.#loadData(collectionName);
-    this.tabView.addTab(AdlibWorkTab, `${collectionName}`);
+    const {name, type} = modal.modalResult;
+    if (!modal.modalResult) return;
+    if (type === "space")
+      this.tabView.addTab(AdlibSpaceTab, `${name}`, null, true);
+    else if (type === "collection")
+      this.tabView.addTab(AdlibCollectionTab, `${name}`, null, true);
   }
 
   render() {
@@ -52,7 +54,9 @@ export class AdlibApplet extends Applet {
       <az-sky-adlib-ctx-selector-dialog id="contextSelector" scope="this" title="Select a context"></az-sky-adlib-ctx-selector-dialog>
       <az-sky-adlib-filter-dialog id="filterDialog" scope="this" title="Construct a filter"></az-sky-adlib-filter-dialog>
       <az-button @click=${this.#onAddTabToLeft} title="New Query"></az-button>
-      <az-tab-view id="tabView" scope="this">
+      <az-tab-view id="tabView" scope="this" .isDraggable="${true}">
+        <az-adlib-collection-tab></az-adlib-collection-tab>
+        <az-adlib-space-tab></az-adlib-space-tab>
       </az-tab-view>
       `;
     // <input id=input1 tabindex=0>
