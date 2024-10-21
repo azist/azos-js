@@ -35,6 +35,7 @@ export const CONTENT_TYPE = Object.freeze({
   TEXT_HTML: "text/html",
   IMG_JPEG: "image/jpeg",
   IMG_PNG: "image/png",
+  IMG_SVG: "image/svg+xml",
   BINARY: "application/octet-stream"
 });
 
