@@ -106,8 +106,9 @@ export class TreeView extends AzosElement {
 
   constructor() {
     super();
-    this.treeViewId = ++TreeView.#idSeed;
+    this.treeViewId = TreeView.#idSeed++;
     this.root = this._createNode(null, "/"); // default for rendering's sake
+    this.showRoot = false;
   }
 
   /**
@@ -204,10 +205,12 @@ export class TreeView extends AzosElement {
     const nodeElement = this.$(`tn${node.id}`);
     nodeElement.tabindex = 0;
     nodeElement.focus();
+    this._dispatchNodeUserActionEvent(node, { action: "focusChanged" });
     if (previousNode) this.$(`tn${previousNode.id}`).tabindex = -1;
   }
 
   #onNodeToggleOpen(node) {
+    if (!node.canOpen) return;
     if (node.isOpened)
       this.#close(node);
     else
@@ -247,13 +250,16 @@ export class TreeView extends AzosElement {
     }
   }
 
-  #onTreeFocus(e) {
+  async #onTreeFocus(e) {
+    await this.updateComplete;
     if (this.nodeInFocus) {
       this.#focusNode(this.nodeInFocus);
       return;
     }
-    this.$(e.target.id).tabindex = -1;
-    this.#focusNode(this.#getAllVisibleNodes()[0]);
+    if (e.target) this.$(e.target.id).tabindex = -1;
+    const visibleNodes = this.#getAllVisibleNodes();
+    if (!visibleNodes) return;
+    this.#focusNode(visibleNodes[0]);
   }
 
   render() {
@@ -289,7 +295,7 @@ export class TreeView extends AzosElement {
       @dblclick="${() => this.#onNodeToggleOpen(node)}"
       tabindex="${this.nodeInFocus?.id === node.id ? 0 : -1}"
       >
-      <div class="tree-node-chevron" @click="${() => this.#onNodeToggleOpen(node)}" style="${node.chevronVisible ? '' : 'visibility: hidden'}">
+      <div class="tree-node-chevron" @click="${() => this.#onNodeToggleOpen(node)}" style="${node.canOpen && node.chevronVisible ? '' : 'visibility: hidden'}">
         ${this.renderChevron(node)}
       </div>
       <div class="tree-node-icon">
@@ -312,7 +318,10 @@ export class TreeView extends AzosElement {
     } else return '';
   }
 
-  renderIcon(node) { return html`${node.isOpened ? '📂' : '📁'}`; }
+  renderIcon(node) {
+    if (node.iconPath) return html`<img src="${node.iconPath}"/>`;
+    return html`${node.isOpened ? '📂' : '📁'}`;
+  }
 
   renderChevron(node) { return html`<div class="chevron ${node.isOpened ? 'open' : "closed"}"></div>` }
 

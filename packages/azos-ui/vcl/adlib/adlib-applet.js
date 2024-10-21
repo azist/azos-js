@@ -4,15 +4,19 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
-import { html, POSITION, STATUS } from "azos-ui/ui";
+import { html } from "azos-ui/ui";
 
 import { Applet } from "azos-ui/applet";
-import { Spinner } from "azos-ui/spinner";
 
-import { toast } from "azos-ui/toast";
-import "../tree-view/tree-view";
 import "azos-ui/parts/button";
+import "azos-ui/vcl/tree-view/tree-view";
+import "azos-ui/vcl/tabs/tab-view";
+
+import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
+import "azos-ui/vcl/adlib/filter-dialog";
+import "azos-ui/vcl/adlib/context-dialog";
+import { AdlibCollectionTab } from "./adlib-collection-tab";
+import { AdlibSpaceTab } from "./adlib-space-tab";
 
 /**  */
 export class AdlibApplet extends Applet {
@@ -29,70 +33,38 @@ export class AdlibApplet extends Applet {
     super.connectedCallback();
     this.arena.hideFooter(true);
     this.link(this.#ref);
-    await this.#loadData();
+    // await this.#loadData();
 
     // this.arena.installToolbarCommands([]);
   }
 
-  // async firstUpdated() {
-  //   super.firstUpdated();
-  //   this.$("input2").tabindex = 0;
-  //   this.$("input2").focus();
-  // }
-
-  async #loadData() {
-    Spinner.exec(async () => {
-      const response = await this.#ref.svcAdlibClient.getSpaces();
-      const spacesData = response.data.data;
-      const root = this.treeView.root;
-      spacesData.forEach(spaceName => root.addChild(spaceName, { data: { isSpace: true } }));
-      this.treeView.requestUpdate();
-    });
-  }
-
-  async #onNodeUserAction(e) {
-    const node = e.detail.node;
-    const action = e.detail.action;
-
-    console.log('onOpenNode', e);
-    if (action === "opened") {
-      if (node.data?.isSpace && !node.data.areCollectionsLoaded) {
-        node.data.areCollectionsLoaded = true;
-        Spinner.exec(async () => {
-          const response = await this.#ref.svcAdlibClient.getCollections(node.title);
-          const collectionsData = response.data.data;
-          collectionsData.forEach(collectionName => node.addChild(collectionName, { data: { isCollection: true, yesOrNo: Math.random() < 0.25 } }));
-          this.treeView.requestUpdate();
-        });
-      } else if (!node.hasChildren) {
-        if (node.data?.isCollection && !node.data.areCollectionChildrenLoaded) {
-          node.data.areCollectionChildrenLoaded = true;
-          Spinner.exec(async () => {
-            await new Promise(r => setTimeout(r, 500));
-            toast(`There are no children for node '${node.title}'.`, { status: STATUS.INFO, position: POSITION.TOP_RIGHT });
-          });
-          node.hideChevron();
-        }
-      }
-    } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
-  }
-
-  async #onNodeChecked(e) {
-    const node = e.detail.node;
-    console.log('onNodeChecked', e);
-    console.log(`Node is ${node.isChecked ? "" : "not"} checked`);
+  async #onAddTabToLeft(e) {
+    e.preventDefault();
+    const modal = await this.contextSelector.show();
+    const {name, type} = modal.modalResult;
+    if (!modal.modalResult) return;
+    if (type === "space")
+      this.tabView.addTab(AdlibSpaceTab, `${name}`, null, true);
+    else if (type === "collection")
+      this.tabView.addTab(AdlibCollectionTab, `${name}`, null, true);
   }
 
   render() {
     return html`
-      <input id=input1 tabindex=0>
-      <az-tree-view id="treeView" scope="this"
-        @nodeUserAction=${this.#onNodeUserAction}
-        .showRoot=${false}>
-      </az-tree-view>
-      <input id=input2 tabindex=0>
+      <az-sky-adlib-ctx-selector-dialog id="contextSelector" scope="this" title="Select a context"></az-sky-adlib-ctx-selector-dialog>
+      <az-sky-adlib-filter-dialog id="filterDialog" scope="this" title="Construct a filter"></az-sky-adlib-filter-dialog>
+      <az-button @click=${this.#onAddTabToLeft} title="New Query"></az-button>
+      <az-tab-view id="tabView" scope="this" .isDraggable="${true}">
+        <az-adlib-collection-tab></az-adlib-collection-tab>
+        <az-adlib-space-tab></az-adlib-space-tab>
+      </az-tab-view>
       `;
-    // @nodeOpenOrClose=${this.onOpenNode}
+    // <input id=input1 tabindex=0>
+    // <az-tree-view id="treeView" scope="this"
+    //   @nodeUserAction=${this.#onNodeUserAction}
+    //   .showRoot=${false}>
+    // </az-tree-view>
+    // <input id=input2 tabindex=0>
   }
 }
 
