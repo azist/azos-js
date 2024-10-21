@@ -42,7 +42,7 @@ export class Spinner extends AzosElement {
   static async exec(fAction, msg = null, rank = RANK.NORMAL, status = STATUS.DEFAULT){
     isFunction(fAction);
     const spinner = Spinner.showModal(msg, -1, rank, status);
-    try     { await fAction(spinner); }
+    try     { return await fAction(spinner); }
     finally { spinner.hide(); }
   }
 
