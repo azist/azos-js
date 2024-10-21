@@ -78,14 +78,8 @@ az-tree-view {
 
   #spacesData = null;
   async #loadData() {
-    if (this.#spacesData) return this.#spacesData;
-    const { promise, resolve } = deferredPromise();
-    Spinner.exec(async () => {
-      const spacesResponse = await this.#ref.svcAdlibClient.getSpaces();
-      this.#spacesData = spacesResponse.data.data;
-      resolve(this.#spacesData);
-    });
-    return promise;
+    if (!this.#spacesData) this.spacesData = await Spinner.exec(async () => (await this.#ref.svcAdlibClient.getSpaces()).data.data);
+    return this.#spacesData;
   }
 
   async #onNodeUserAction(e) {
@@ -94,23 +88,17 @@ az-tree-view {
     if (action === "opened") {
       if (node.data?.type === "space" && !node.data.areCollectionsLoaded) {
         node.data.areCollectionsLoaded = true;
-        Spinner.exec(async () => {
-          const response = await this.#ref.svcAdlibClient.getCollections(node.title);
-          const cData = response.data.data;
-          cData.forEach(name => node.addChild(name, {
+        Spinner.exec(async () => (await this.#ref.svcAdlibClient.getCollections(node.title)).data.data)
+          .forEach(name => node.addChild(name, {
             canClose: false,
             canOpen: false,
             iconPath: "https://www.shareicon.net/download/2015/03/16/7846_database.ico",
             data: { type: "collection" }
           }));
-          this.treeView.requestUpdate();
-        });
+        this.treeView.requestUpdate();
       }
-    } else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
-    else if (action === "focusChanged") {
-      this.#selectedContext = { name: node.title, type: node.data.type };
-      // console.log('onFocusChanged', e);
-    }
+      //}else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
+    } else if (action === "focusChanged") this.#selectedContext = { name: node.title, type: node.data.type };
   }
 
   connectedCallback() {
