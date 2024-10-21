@@ -37,7 +37,12 @@ export class Spinner extends AzosElement {
 
   /**
    * Asynchronously executes an action `fAction` showing a modal (blocking) spinner before the invocation and
-   * ensuring that the spinner is hidden right after the invocation even if an error is thrown
+   * ensuring that the spinner is hidden right after the invocation even if an error is thrown.
+   * @param {function} fAction required function body to invoke in a shown spinner scope
+   * @param {RANK|string} rank optional spinner rank (size)
+   * @param {STATUS|string} status optional spinner status (color)
+   * @param {string|null} msg optional message to attach to spinner
+   * @returns {any|undefined} Optionally, returns a value returned by `fAction` body (or undefined)
    */
   static async exec(fAction, msg = null, rank = RANK.NORMAL, status = STATUS.DEFAULT){
     isFunction(fAction);
