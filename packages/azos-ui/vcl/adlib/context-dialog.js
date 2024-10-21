@@ -78,7 +78,7 @@ az-tree-view {
 
   #spacesData = null;
   async #loadData() {
-    if (!this.#spacesData) this.spacesData = await Spinner.exec(async () => (await this.#ref.svcAdlibClient.getSpaces()).data.data);
+    if (!this.#spacesData) this.#spacesData = await Spinner.exec(async () => (await this.#ref.svcAdlibClient.getSpaces()).data.data);
     return this.#spacesData;
   }
 
@@ -88,7 +88,7 @@ az-tree-view {
     if (action === "opened") {
       if (node.data?.type === "space" && !node.data.areCollectionsLoaded) {
         node.data.areCollectionsLoaded = true;
-        Spinner.exec(async () => (await this.#ref.svcAdlibClient.getCollections(node.title)).data.data)
+        (await Spinner.exec(async () => (await this.#ref.svcAdlibClient.getCollections(node.title)).data.data))
           .forEach(name => node.addChild(name, {
             canClose: false,
             canOpen: false,
