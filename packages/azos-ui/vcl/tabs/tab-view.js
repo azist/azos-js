@@ -12,7 +12,6 @@ import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 
 export class TabView extends AzosElement {
 
-  static #idSeed = 0;
   static styles = css`
 :host {
   --my-color: #989898;

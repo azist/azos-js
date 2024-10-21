@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html, css, POSITION } from "../../ui";
+import { html, css } from "../../ui";
 import { ModalDialog } from "../../modal-dialog";
 
 import "../../parts/button";
@@ -12,8 +12,6 @@ import "../../parts/text-field";
 import "../../parts/check-field";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { Spinner } from "../../spinner";
-import { deferredPromise } from "azos/types";
-import { toast } from "../../toast";
 
 export class AdlibTabContextSelectorDialog extends ModalDialog {
   static styles = [ModalDialog.styles, css`
