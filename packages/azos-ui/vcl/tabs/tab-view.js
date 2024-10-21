@@ -1,3 +1,9 @@
+/*<FILE_LICENSE>
+ * Azos (A to Z Application Operating System) Framework
+ * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
+ * See the LICENSE file in the project root for more information.
+</FILE_LICENSE>*/
+
 import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/aver";
 import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
@@ -6,7 +12,6 @@ import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 
 export class TabView extends AzosElement {
 
-  static #idSeed = 0;
   static styles = css`
 :host {
   --my-color: #989898;

@@ -4,17 +4,17 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html, css } from "../../ui";
-import { ModalDialog } from "../../modal-dialog";
+import { html, css } from "./ui";
+import { ModalDialog } from "./modal-dialog";
 
-import "../../parts/button";
+import "./parts/button";
 import { dflt } from "azos/strings";
 
 export class OkCancelModal extends ModalDialog {
   static properties = {
-    okBtnTitle: String(),
-    cancelBtnTitle: String(),
-    okCancelPrompt: String(),
+    okBtnTitle: { type: String },
+    cancelBtnTitle: { type: String },
+    okCancelPrompt: { type: String },
   };
 
   constructor(okCancelPrompt, { title, okBtnTitle, cancelBtnTitle } = {}) {
