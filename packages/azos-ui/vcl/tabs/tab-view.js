@@ -307,7 +307,10 @@ export class TabView extends AzosElement {
     return closestTabIndex;
   }
 
+  #lastTabIndex;
   #highlightDropZone(tabIndex) {
+    if (this.#lastTabIndex === tabIndex) return;
+    this.#lastTabIndex = tabIndex;
     this.#removeHighlight();
     if (tabIndex === null)
       this.tabBtns[this.tabBtns.length - 1].classList.add("drop-zone", "right");
