@@ -6,7 +6,7 @@
 
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { Tab } from "../tabs/tab";
-import { prompt } from "./ok-cancel-modal";
+import { prompt } from "../../ok-cancel-modal";
 
 
 export class AdlibSpaceTab extends Tab {

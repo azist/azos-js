@@ -6,7 +6,7 @@
 
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { Tab } from "../tabs/tab";
-import { prompt } from "./ok-cancel-modal";
+import { prompt } from "../../ok-cancel-modal";
 import { css, html } from "../../ui";
 
 
@@ -16,8 +16,6 @@ export class AdlibCollectionTab extends Tab {
 .container {
   margin: 1em;
 }
-
-
   `;
 
   #dirty = Math.random() < 0.5;
