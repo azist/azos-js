@@ -155,6 +155,12 @@ export class TreeView extends AzosElement {
     }
   }
 
+  closeAllNodes() {
+    const visibleNodes = this.#getAllVisibleNodes();
+    this.#focusNode(visibleNodes[0], this.nodeInFocus);
+    visibleNodes.forEach(node => node.close());
+  }
+
   #close(node) {
     node.close();
     this._dispatchNodeUserActionEvent(node, { action: "closed" });

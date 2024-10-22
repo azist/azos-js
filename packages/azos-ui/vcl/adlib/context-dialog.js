@@ -85,6 +85,7 @@ az-tree-view::part(tree) {
 
   async close() {
     await super.close();
+    this.treeView.closeAllNodes();
     this.#isVisible = false;
   }
 

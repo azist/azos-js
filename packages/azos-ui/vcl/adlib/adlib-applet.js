@@ -38,8 +38,8 @@ export class AdlibApplet extends Applet {
   async #onAddTabToLeft(e) {
     e.preventDefault();
     const modal = await this.contextSelector.show();
-    const {name, type} = modal.modalResult;
     if (!modal.modalResult) return;
+    const { name, type } = modal.modalResult;
     if (type === "space")
       this.tabView.addTab(AdlibSpaceTab, `${name}`, null, true);
     else if (type === "collection")
