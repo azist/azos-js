@@ -15,6 +15,11 @@ import { Spinner } from "../../spinner";
 
 export class AdlibTabContextSelectorDialog extends ModalDialog {
   static styles = [ModalDialog.styles, css`
+dialog {
+    width: 100vw;
+    max-width: 300px;
+}
+
 .strip-h {
   display: flex;
   flex-wrap: wrap;
@@ -30,6 +35,13 @@ export class AdlibTabContextSelectorDialog extends ModalDialog {
 az-tree-view {
   max-height: 75%;
   overflow: auto;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+az-tree-view::part(tree) {
+    padding: 0.2em;
+    margin: 0;
 }
   `];
 
