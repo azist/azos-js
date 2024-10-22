@@ -33,9 +33,6 @@ export class AdlibApplet extends Applet {
     super.connectedCallback();
     this.arena.hideFooter(true);
     this.link(this.#ref);
-    // await this.#loadData();
-
-    // this.arena.installToolbarCommands([]);
   }
 
   async #onAddTabToLeft(e) {
@@ -59,12 +56,6 @@ export class AdlibApplet extends Applet {
         <az-adlib-space-tab></az-adlib-space-tab>
       </az-tab-view>
       `;
-    // <input id=input1 tabindex=0>
-    // <az-tree-view id="treeView" scope="this"
-    //   @nodeUserAction=${this.#onNodeUserAction}
-    //   .showRoot=${false}>
-    // </az-tree-view>
-    // <input id=input2 tabindex=0>
   }
 }
 
