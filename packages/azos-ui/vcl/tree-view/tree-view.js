@@ -176,7 +176,7 @@ export class TreeView extends AzosElement {
     const nodes = this.#getAllVisibleNodes();
     const nodeInFocusIndex = nodes.findIndex(node => node.id === this.nodeInFocus?.id);
     if (nodeInFocusIndex === -1) {
-      this.#focusNode(nodes[0]);
+      if (nodes.length > 0) this.#focusNode(nodes[0]);
       return;
     }
 
@@ -266,7 +266,7 @@ export class TreeView extends AzosElement {
     if (!this.root) return html`<div>No tree data to display.</div>`;
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     const h = html`
-    <ul id="tv${this.treeViewId}" scope="this" role="tree" class="${cls} tree-view" @keydown="${this.#onKeyDown}" tabindex=0 @focus="${this.#onTreeFocus}">
+    <ul id="tv${this.treeViewId}" scope="this" part="tree" role="tree" class="${cls} tree-view" @keydown="${this.#onKeyDown}" tabindex=0 @focus="${this.#onTreeFocus}">
       ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
     </ul>`;
     return h;
