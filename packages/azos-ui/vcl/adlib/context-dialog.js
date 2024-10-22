@@ -14,7 +14,13 @@ import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { Spinner } from "../../spinner";
 
 export class AdlibTabContextSelectorDialog extends ModalDialog {
+
   static styles = [ModalDialog.styles, css`
+dialog {
+    width: 100vw;
+    max-width: 300px;
+}
+
 .strip-h {
   display: flex;
   flex-wrap: wrap;
@@ -30,6 +36,13 @@ export class AdlibTabContextSelectorDialog extends ModalDialog {
 az-tree-view {
   max-height: 75%;
   overflow: auto;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+az-tree-view::part(tree) {
+    padding: 0.2em;
+    margin: 0;
 }
   `];
 
@@ -73,6 +86,7 @@ az-tree-view {
 
   async close() {
     await super.close();
+    this.treeView.closeAllNodes();
     this.#isVisible = false;
   }
 
@@ -98,7 +112,16 @@ az-tree-view {
         this.treeView.requestUpdate();
       }
       //}else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
-    } else if (action === "focusChanged") this.#selectedContext = { name: node.title, type: node.data.type };
+    } else if (action === "focusChanged") {
+      let space = null, collection = null;
+      if (node.data.type === "collection") {
+        collection = node.title;
+        space = node.parent.title;
+      } else if (node.data.type === "space") {
+        space = node.title;
+      }
+      this.#selectedContext = { space, collection, type: node.data.type };
+    }
   }
 
   connectedCallback() {
