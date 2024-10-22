@@ -14,6 +14,7 @@ import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { Spinner } from "../../spinner";
 
 export class AdlibTabContextSelectorDialog extends ModalDialog {
+
   static styles = [ModalDialog.styles, css`
 dialog {
     width: 100vw;
@@ -111,7 +112,16 @@ az-tree-view::part(tree) {
         this.treeView.requestUpdate();
       }
       //}else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
-    } else if (action === "focusChanged") this.#selectedContext = { name: node.title, type: node.data.type };
+    } else if (action === "focusChanged") {
+      let space = null, collection = null;
+      if (node.data.type === "collection") {
+        collection = node.title;
+        space = node.parent.title;
+      } else if (node.data.type === "space") {
+        space = node.title;
+      }
+      this.#selectedContext = { space, collection, type: node.data.type };
+    }
   }
 
   connectedCallback() {

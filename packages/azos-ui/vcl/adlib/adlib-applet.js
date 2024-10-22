@@ -39,21 +39,47 @@ export class AdlibApplet extends Applet {
     e.preventDefault();
     const modal = await this.contextSelector.show();
     if (!modal.modalResult) return;
-    const { name, type } = modal.modalResult;
+    const { space, collection, type } = modal.modalResult;
+    this.addTab(type, space, collection);
+  }
+
+  addTab(type, space, collection) {
+    let tab;
     if (type === "space")
-      this.tabView.addTab(AdlibSpaceTab, `${name}`, null, true);
+      tab = this.tabView.addTab(AdlibSpaceTab, `${space}`, null, true);
     else if (type === "collection")
-      this.tabView.addTab(AdlibCollectionTab, `${name}`, null, true);
+      tab = this.tabView.addTab(AdlibCollectionTab, `${collection}`, null, true);
+    tab.context = { space, collection };
+  }
+
+  #onAddCollectionFilter() {
+    let activeTab = this.tabView.activeTab;
+    if (!activeTab) {
+      this.addTab("collection", "g8formf", "temptest");
+      activeTab = this.tabView.activeTab;
+    }
+    const space = activeTab.context.space;
+    const collection = activeTab.context.collection;
+
+    activeTab.filterText = JSON.stringify({
+      filter: {
+        space,
+        collection,
+        "fetchtags": true,
+        "fetchcontent": true,
+        "pagingStartIndex": 0,
+        "pagingCount": 20
+      }
+    }, null, 4);
   }
 
   render() {
     return html`
       <az-sky-adlib-ctx-selector-dialog id="contextSelector" scope="this" title="Select a context"></az-sky-adlib-ctx-selector-dialog>
-      <az-sky-adlib-filter-dialog id="filterDialog" scope="this" title="Construct a filter"></az-sky-adlib-filter-dialog>
-      <az-button @click=${this.#onAddTabToLeft} title="New Query"></az-button>
+      <az-sky-adlib-filter-dialog id="filterDialog" scope="this" title="Construct filter"></az-sky-adlib-filter-dialog>
+      <az-button title="New Query" @click="${this.#onAddTabToLeft}"></az-button>
+      <az-button title="Add collection filter to active (or new) tab" @click="${this.#onAddCollectionFilter}"></az-button>
       <az-tab-view id="tabView" scope="this" .isDraggable="${true}">
-        <az-adlib-collection-tab></az-adlib-collection-tab>
-        <az-adlib-space-tab></az-adlib-space-tab>
       </az-tab-view>
       `;
   }
