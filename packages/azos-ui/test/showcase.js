@@ -18,6 +18,7 @@ import "../vcl/tabs/tab-view.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
+import { popupMenu } from "../popup-menu.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement {
@@ -98,6 +99,10 @@ export class Showcase extends AzosElement {
   #move(steps) { (this.manMe || this.tabView.activeTab).move(steps); }
   #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
 
+  #onPopup() {
+    popupMenu({});
+  }
+
   render() {
     const showcase = this;
 
@@ -106,6 +111,7 @@ export class Showcase extends AzosElement {
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
+<az-button @click="${this.#onPopup}" title="Show the Popup Menu" status="ok"></az-button><br/>
 
 <div style="display:flex;align-items:center;">
   <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
@@ -343,7 +349,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
     <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
 
-    <az-menu-sg></az-menu-sg>
+
 
   </az-tab>
 
