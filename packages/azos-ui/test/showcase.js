@@ -25,29 +25,6 @@ export class Showcase extends AzosElement {
 
   static styles = css`
   p{ font-size: 1rem; }
-
-  /* Temp styles for context menu - MOVE TO COMPONENT (somehow) */
-  .contextMenu{
-    display:block;
-    position:absolute;
-    background-color:white;
-    border:1px solid #ccc;
-    box-shadow:2px 2px 10px rgba(0,0,0,.2);
-    z-index:1000;
-  }
-  .contextMenu ul{
-    list-style:none;
-    padding:0;
-    margin:0;
-  }
-  .contextMenu ul li{
-    padding:10px 20px;
-    cursor:pointer;
-  }
-  .contextMenu ul li:hover{
-    background-color:#f0f0f0;
-  }
-  /* END Temp Styles */
   `;
 
 
