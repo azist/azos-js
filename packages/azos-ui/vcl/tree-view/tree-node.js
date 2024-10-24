@@ -77,7 +77,7 @@ export class TreeNode extends DisposableObject {
 
   get isRoot() { return this.#parent === null; }
 
-  constructor(treeView, parent, title, { iconPath, checkable, canClose, canOpen, nodeVisible, data } = {}) {
+  constructor(treeView, parent, title, { iconPath, checkable, canClose, canOpen, nodeVisible, opened, data } = {}) {
     super();
     this.#treeView = isOf(treeView, TreeView);
     this.#parent = isOfOrNull(parent, TreeNode);
@@ -91,7 +91,7 @@ export class TreeNode extends DisposableObject {
     this.#canClose = canClose ?? true;
     this.#canOpen = canOpen ?? true;
     this.#data = data ?? {};
-    this.#opened = false;
+    this.#opened = opened ?? false;
     this.#children = [];
   }
 
