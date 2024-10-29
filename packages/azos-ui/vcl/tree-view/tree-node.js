@@ -21,6 +21,7 @@ export class TreeNode extends DisposableObject {
   #checkable;
   #nodeVisible = true;
   #chevronVisible = true;
+  #showPath = true;
 
   #opened;
   #canClose;
@@ -68,6 +69,9 @@ export class TreeNode extends DisposableObject {
   get chevronVisible() { return this.#chevronVisible; }
   set chevronVisible(v) { this.#chevronVisible = v; }
 
+  get showPath() { return this.#showPath; }
+  set showPath(v) { this.#showPath = v; }
+
   get displayPath() {
     if (this.parent && this.parent.displayPath !== "/")
       return `${this.parent.displayPath}/${this.title}`;
@@ -77,7 +81,7 @@ export class TreeNode extends DisposableObject {
 
   get isRoot() { return this.#parent === null; }
 
-  constructor(treeView, parent, title, { iconPath, checkable, canClose, canOpen, nodeVisible, data } = {}) {
+  constructor(treeView, parent, title, { iconPath, checkable, canClose, canOpen, nodeVisible, opened, showPath, data } = {}) {
     super();
     this.#treeView = isOf(treeView, TreeView);
     this.#parent = isOfOrNull(parent, TreeNode);
@@ -91,12 +95,13 @@ export class TreeNode extends DisposableObject {
     this.#canClose = canClose ?? true;
     this.#canOpen = canOpen ?? true;
     this.#data = data ?? {};
-    this.#opened = false;
+    this.#opened = opened ?? false;
+    this.#showPath = showPath ?? true;
     this.#children = [];
   }
 
   [DESTRUCTOR_METHOD]() {
-    this.parent.removeChildNode(this);
+    this.parent.removeChild(this);
     this.#parent = null;
     this.#treeView = null;
   }
@@ -113,10 +118,19 @@ export class TreeNode extends DisposableObject {
   }
 
   removeChild(childNode) {
-    isTrue(isOf(childNode, TreeNode).treeNode === this);
+    isTrue(isOf(childNode, TreeNode).parent === this);
     const removed = arrayDelete(this.#children, childNode);
     if (removed) childNode[DISPOSE_METHOD]();
     return removed;
+  }
+
+  removeAllChildren() {
+    let child;
+    for (let i = this.#children.length - 1; i >= 0; i--) {//let child of this.#children) {
+      child = this.#children[i];
+      if (child.hasChildren) child.removeAllChildren();
+      this.removeChild(child);
+    }
   }
 
   close() {
