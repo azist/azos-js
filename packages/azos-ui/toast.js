@@ -83,15 +83,15 @@ export class Toast extends AzosElement {
    * @param {POSITION} position The position for where to display on the screen
    * @returns The constructed toast added to Toast.#instances
    */
-  static toast(msg = null, options = { timeout: Number, rank: RANK, status: STATUS, position: POSITION }) {
+  static toast(msg = null, { timeout, rank, status, position } = {}) {
     isString(msg);
     const toast = new Toast();
 
     // 1s + 180ms per word
-    const timeout = options.timeout ?? 1_000 + (msg.split(' ').length) * 180;
-    const rank = options.rank ?? RANK.NORMAL;
-    const status = options.status ?? STATUS.DEFAULT;
-    const position = options.position ?? POSITION.DEFAULT;
+    timeout = timeout ?? 1_000 + (msg.split(' ').length) * 180;
+    rank = rank ?? RANK.NORMAL;
+    status = status ?? STATUS.DEFAULT;
+    position = position ?? POSITION.DEFAULT;
 
     toast.#message = msg;
     toast.#timeout = timeout;

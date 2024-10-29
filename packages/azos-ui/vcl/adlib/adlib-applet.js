@@ -35,6 +35,10 @@ export class AdlibApplet extends Applet {
     this.link(this.#ref);
   }
 
+  async firstUpdated() {
+    // FIXME: Check for other tabs and add them
+  }
+
   async #onAddTabToLeft(e) {
     e.preventDefault();
     const modal = await this.contextSelector.show();
@@ -61,7 +65,7 @@ export class AdlibApplet extends Applet {
     const space = activeTab.context.space;
     const collection = activeTab.context.collection;
 
-    activeTab.filterText = JSON.stringify({
+    activeTab.filter = {
       filter: {
         space,
         collection,
@@ -70,7 +74,7 @@ export class AdlibApplet extends Applet {
         "pagingStartIndex": 0,
         "pagingCount": 20
       }
-    }, null, 4);
+    };
   }
 
   render() {

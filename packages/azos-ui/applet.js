@@ -24,6 +24,9 @@ export class Applet extends AzosElement {
   /** Returns the name of the applet displayed in the Arena title bar */
   get title() { return this.constructor.name; }
 
+  /** Returns the prefix used for local storage key names */
+  get localStoragePrefix() { return `${this.arena.app.id}::${this.constructor.name}`; }
+
   /** Returns short description */
   get description() { return ""; }
 
