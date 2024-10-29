@@ -45,5 +45,6 @@
         "whitespaces",
         "xffffn",
         "xffn"
-    ]
+    ],
+    "files.eol": "\n"
 }
