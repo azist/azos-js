@@ -99,8 +99,8 @@ export class Showcase extends AzosElement {
   #move(steps) { (this.manMe || this.tabView.activeTab).move(steps); }
   #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
 
-  #onPopup() {
-    popupMenu({});
+  #btnPopupMenuClick() {
+    popupMenu({}, this.btnPopupMenu);
   }
 
   render() {
@@ -111,7 +111,7 @@ export class Showcase extends AzosElement {
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
-<az-button @click="${this.#onPopup}" title="Show the Popup Menu" status="ok"></az-button><br/>
+<az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button><br/>
 
 <div style="display:flex;align-items:center;">
   <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
