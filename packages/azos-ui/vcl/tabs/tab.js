@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOf } from "azos/aver";
-import { Block } from "../../block";
+import { Block } from "../../blocks";
 import { html } from "../../ui";
 import { TabView } from "./tab-view";
 

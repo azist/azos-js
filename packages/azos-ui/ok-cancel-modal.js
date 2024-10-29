@@ -9,20 +9,35 @@ import { ModalDialog } from "./modal-dialog";
 
 import "./parts/button";
 import { dflt } from "azos/strings";
+import { isStringOrNull } from "azos/aver";
 
 export class OkCancelModal extends ModalDialog {
+
   static properties = {
     okBtnTitle: { type: String },
     cancelBtnTitle: { type: String },
     okCancelPrompt: { type: String },
+    doPromptUserInput: { type: Boolean },
+    inputCurrentValue: { type: String },
+    inputTitle: { type: String },
   };
 
-  constructor(okCancelPrompt, { title, okBtnTitle, cancelBtnTitle } = {}) {
+  /**
+   *
+   * @param {String|false} okCancelPrompt The question to present to the user (dflt: "Are you sure?", when null; false, hides message)
+   * @param {Object} modalOptions title=modal title (dflt: "Confirm"), ok=btn title (dflt: "Ok"), cancel=btn title (dflt: "Cancel")
+   * @param {Object} inputOptions doPromptUserInput=produces `<az-text value='currentValue' (dflt: null) title='inputTitle' (dflt: null)></az-text>`
+   */
+  constructor(okCancelPrompt, { title, ok, cancel } = {}, { doPromptUserInput, currentValue, inputTitle } = {}) {
     super();
     this.title = dflt(title, "Confirm");
-    this.okBtnTitle = dflt(okBtnTitle, "Ok");
-    this.cancelBtnTitle = dflt(cancelBtnTitle, "Cancel");
-    this.okCancelPrompt = dflt(okCancelPrompt, "Are you sure?");
+    this.okBtnTitle = dflt(ok, "Ok");
+    this.cancelBtnTitle = dflt(cancel, "Cancel");
+    this.okCancelPrompt = okCancelPrompt === false ? null : dflt(okCancelPrompt, "Are you sure?");
+    this.doPromptUserInput = !!doPromptUserInput ?? false;
+    this.inputValue = dflt(isStringOrNull(currentValue), null);
+    this.inputTitle = dflt(isStringOrNull(inputTitle), null);
+    this.modalResult = { response: false };
   }
 
   static styles = [ModalDialog.styles, css`
@@ -32,22 +47,27 @@ export class OkCancelModal extends ModalDialog {
 }
   `];
 
-  #onCancelClick() {
-    this.modalResult = false;
-    this.close();
-  }
-
   #onOkClick() {
-    this.modalResult = true;
+    this.modalResult = {
+      response: true,
+      value: this.answer?.value,
+    };
     this.close();
   }
 
   renderBodyContent() {
     return html`
-<p class="strip-h">${this.okCancelPrompt}</p>
+${this.okCancelPrompt ? html`
+<p class="strip-h">${this.okCancelPrompt}</p>`
+        : html``}
 
+${this.doPromptUserInput ? html`
 <div class="strip-h">
-  <az-button title="${this.cancelBtnTitle}" @click="${this.#onCancelClick}"> </az-button>
+  <az-text id="answer" scope="this" title="${this.inputTitle}" value="${this.inputValue}"> </az-text>
+</div>`
+        : html``}
+<div class="strip-h">
+  <az-button title="${this.cancelBtnTitle}" @click="${this.close}"> </az-button>
   <az-button title="${this.okBtnTitle}" @click="${this.#onOkClick}" status="ok"> </az-button>
 </div>
     `;
@@ -55,8 +75,15 @@ export class OkCancelModal extends ModalDialog {
 
 }
 
-export async function prompt(okCancelPrompt, { title, okBtnTitle, cancelBtnTitle } = {}) {
-  const modal = new OkCancelModal(okCancelPrompt, { title, okBtnTitle, cancelBtnTitle });
+/**
+ *
+ * @param {String|null} okCancelPrompt The string for to prompt the user
+ * @param {Object} modalOptions override title, ok, and cancel titles
+ * @param {Object} inputOptions do prompt for user input, value will be added to modalResult
+ * @returns
+ */
+export async function prompt(okCancelPrompt, { title, ok, cancel } = {}, { doPromptUserInput, currentValue, title: inputTitle } = {}) {
+  const modal = new OkCancelModal(okCancelPrompt, { title, ok, cancel }, { doPromptUserInput, currentValue, inputTitle });
   document.body.appendChild(modal);
   modal.update();
   try {

@@ -139,7 +139,7 @@ export class TreeView extends AzosElement {
    * @param {*} root default {@link this.root}, the node from which to being collecting nodes
    * @returns all nodes from all sub-nodes from {@link root}
    */
-  #getAllVisibleNodes(filterNodeId, root = this.root) {
+  getAllVisibleNodes(filterNodeId, root = this.root) {
     const nodes = [];
     traverseNode(root);
     return filterNodeId ? (nodes.length ? nodes[0] : null) : nodes;
@@ -156,9 +156,17 @@ export class TreeView extends AzosElement {
   }
 
   closeAllNodes() {
-    const visibleNodes = this.#getAllVisibleNodes();
-    this.#focusNode(visibleNodes[0], this.nodeInFocus);
+    const visibleNodes = this.getAllVisibleNodes();
+    this.#focusNode(visibleNodes[0], this.nodeInFocus, false);
     visibleNodes.forEach(node => node.close());
+    this.requestUpdate();
+  }
+
+  removeAllNodes() {
+    if (!this.root.hasChildren) return;
+    this.nodeInFocus = this.root;
+    this.root.removeAllChildren();
+    this.requestUpdate();
   }
 
   #close(node) {
@@ -179,7 +187,7 @@ export class TreeView extends AzosElement {
    * @param {boolean} next false to move focus to the previous element
    */
   #advanceFocus(next = true) {
-    const nodes = this.#getAllVisibleNodes();
+    const nodes = this.getAllVisibleNodes();
     const nodeInFocusIndex = nodes.findIndex(node => node.id === this.nodeInFocus?.id);
     if (nodeInFocusIndex === -1) {
       if (nodes.length > 0) this.#focusNode(nodes[0]);
@@ -205,14 +213,15 @@ export class TreeView extends AzosElement {
    * Manage the focus of prior and upcoming node focus.
    * @param {TreeNode} node the {@link TreeNode} to nav to
    * @param {TreeNode} previousNode the previous {@link TreeNode} to nav from
+   * @param {boolean} emitEvent true to emit event `focusChanged`, default: true
    */
-  #focusNode(node, previousNode = null) {
+  #focusNode(node, previousNode = null, emitEvent = true) {
     this.nodeInFocus = node;
     const nodeElement = this.$(`tn${node.id}`);
     nodeElement.tabindex = 0;
     nodeElement.focus();
-    this._dispatchNodeUserActionEvent(node, { action: "focusChanged" });
-    if (previousNode) this.$(`tn${previousNode.id}`).tabindex = -1;
+    if (emitEvent) this._dispatchNodeUserActionEvent(node, { action: "focusChanged" });
+    if (previousNode?.isVisible) this.$(`tn${previousNode.id}`).tabindex = -1;
   }
 
   #onNodeToggleOpen(node) {
@@ -223,22 +232,36 @@ export class TreeView extends AzosElement {
       this.#open(node);
   }
 
+  #onChevronClicked(e, node) {
+    e.stopPropagation();
+    this.#onNodeToggleOpen(node);
+  }
+
+  #onNodeClicked(node) {
+    this.#focusNode(node, null);
+    this._dispatchNodeUserActionEvent(node, { action: "clicked" });
+  }
+
   #onKeyDown(e) {
     const { key } = e;
     switch (key) {
       case "ArrowUp":
+        e.preventDefault();
         this.#advanceFocusPrevious();
         break;
       case "ArrowDown":
+        e.preventDefault();
         this.#advanceFocus();
         break;
       case "ArrowLeft":
+        e.preventDefault();
         if (this.nodeInFocus.hasChildren && this.nodeInFocus.isOpened) this.#close(this.nodeInFocus);
         else if (this.nodeInFocus.parent)
           if (this.nodeInFocus.parent.isVisible) this.#focusNode(this.nodeInFocus.parent);
           else this.#focusNode(this.nodeInFocus.parent.children[0]);
         break;
       case "ArrowRight":
+        e.preventDefault();
         if (this.nodeInFocus.isClosed) this.#open(this.nodeInFocus);
         else if (this.nodeInFocus.hasChildren) this.#advanceFocus(this.nodeInFocus.children[0]);
         break;
@@ -263,7 +286,7 @@ export class TreeView extends AzosElement {
       return;
     }
     if (e.target) this.$(e.target.id).tabindex = -1;
-    const visibleNodes = this.#getAllVisibleNodes();
+    const visibleNodes = this.getAllVisibleNodes();
     if (!visibleNodes) return;
     this.#focusNode(visibleNodes[0]);
   }
@@ -297,11 +320,11 @@ export class TreeView extends AzosElement {
     return html`
     <div id="tn${node.id}"
       class="tree-node-header"
-      @click=${() => this.#focusNode(node)}
-      @dblclick="${() => this.#onNodeToggleOpen(node)}"
+      @click=${() => this.#onNodeClicked(node)}
+      @dblclick="${(e) => this.#onNodeToggleOpen(e, node)}"
       tabindex="${this.nodeInFocus?.id === node.id ? 0 : -1}"
       >
-      <div class="tree-node-chevron" @click="${() => this.#onNodeToggleOpen(node)}" style="${node.canOpen && node.chevronVisible ? '' : 'visibility: hidden'}">
+      <div class="tree-node-chevron" @click="${(e) => this.#onChevronClicked(e, node)}" style="${node.canOpen && node.chevronVisible ? '' : 'visibility: hidden'}">
         ${this.renderChevron(node)}
       </div>
       <div class="tree-node-icon">
@@ -331,7 +354,7 @@ export class TreeView extends AzosElement {
 
   renderChevron(node) { return html`<div class="chevron ${node.isOpened ? 'open' : "closed"}"></div>` }
 
-  renderContent(node) { return html`${node.title} ${"yesOrNo" in node.data ? node.data.yesOrNo ? "[yes]" : "[no]" : ""} <span class="path">${node.displayPath}</span>`; }
+  renderContent(node) { return html`${node.title} ${node.showPath ? html`<span class="path">${node.displayPath}</span>` : ``}`; }
 
 }
 

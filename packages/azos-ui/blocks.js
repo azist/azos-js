@@ -9,8 +9,10 @@ import { AzosElement } from "./ui.js";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
- *  logically connected.
- *  e.g., "Address block" containing street1, street2, city, state, zip.
+ *  logically connected. e.g., "Address block" containing `street1`, `street2`, `city`, `state`, `zip`.
+ * Blocks allow component composition: Block descendants may be re-used in a variety of interfaces,
+ * such as popup modals, or be sub-blocks of other blocks or applets.
+ *  A special derivation branch based on {@link Form} class represent a logically completed data-bound forms.
  */
 export class Block extends AzosElement {
 
@@ -37,4 +39,20 @@ export class Block extends AzosElement {
    */
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
-}//Applet
+}//Block
+
+/**
+ * A higher order {@link Block} which represents a data view/entry form.
+ * Forms may have service/backend logic association and provide data models context -
+ * this makes forms more specific than blocks as forms provide data schema via metadata for contained detail fields
+ * and/or sub-blocks (which in turn may have child fields and/or sub-blocks etc.)
+ */
+export class Form extends Block {
+
+  constructor() { super(); }
+
+  //TODO: this is where we will set Model context
+  //get model(){}
+  //set model(){}
+
+}//Form
