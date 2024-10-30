@@ -18,6 +18,7 @@ import "../vcl/tabs/tab-view.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
+import { popupMenu } from "../popup-menu.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends AzosElement {
@@ -25,8 +26,6 @@ export class Showcase extends AzosElement {
 
   static styles = css`
   p{ font-size: 1rem; }
-  az-tab-view {
-  }
   `;
 
 
@@ -100,13 +99,44 @@ export class Showcase extends AzosElement {
   #move(steps) { (this.manMe || this.tabView.activeTab).move(steps); }
   #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
 
+  #btnPopupMenuClick() {
+    popupMenu({
+      /* {
+        title:   Dima,
+        rank:    3,
+        status:  default,
+        subMenu: none
+      },{
+        title:   Shawn,
+        rank:    2,
+        status:  ok,
+        subMenu: secondMenu
+      },{
+        title:   Kevin,
+        rank:    3,
+        status:  default,
+        subMenu: none
+      },{
+        title:   Shitstain Steven,
+        rank:    3,
+        status:  default,
+        subMenu: none
+      } */
+    }, this.btnPopupMenu);
+  }
+
   render() {
     const showcase = this;
+
     return html`
 <h1>Showcase of Azos Controls</h1>
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
+<az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button>
+<az-button id="btnPopupMenu2" scope="this" @click="${() => { popupMenu({}, this.btnPopupMenu2, 'top-right') }}" title="Menu via inline @click" status="info"></az-button>
+
+<br/>
 
 <div style="display:flex;align-items:center;">
   <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
@@ -343,6 +373,9 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
 
     <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
+
+
+
   </az-tab>
 
   <az-tab title="Toasts">
@@ -400,8 +433,6 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-button @click="${this.onDlg2Close}" title="Close" style="float: right;"></az-button>
   </div>
 </az-modal-dialog>
-
-
 `;
   }
 }
