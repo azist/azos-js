@@ -45,7 +45,7 @@ export class PopupMenu extends AzosElement {
     .item:hover{
       filter: brightness(.85);
     }
-    .item[popovertarget]::after{
+    .hasSubMenu::after{
       content:">";
       margin-left:1ch;
       font-weight:bold;
@@ -67,11 +67,11 @@ export class PopupMenu extends AzosElement {
     .r5 { font-size: var(--r5-fs); }
     .r6 { font-size: var(--r6-fs); }
 
-    .ok { background: var(--s-ok-bg-ctl); color: var(--s-ok-fg-ctl); border-color: var(--s-ok-bor-ctl); }
-    .info { background: var(--s-info-bg-ctl); color: var(--s-info-fg-ctl); border-color: var(--s-info-bor-ctl); }
-    .warning { background: var(--s-warn-bg-ctl); color: var(--s-warn-fg-ctl); border-color: var(--s-warn-bor-ctl); }
-    .alert { background: var(--s-alert-bg-ctl); color: var(--s-alert-fg-ctl); border-color: var(--s-alert-bor-ctl); }
-    .error { background: var(--s-error-bg-ctl); color: var(--s-error-fg-ctl); border-color: var(--s-error-bor-ctl); }
+    .ok { background: var(--s-ok-bg-ctl); color: var(--s-ok-fg-ctl); }
+    .info { background: var(--s-info-bg-ctl); color: var(--s-info-fg-ctl); }
+    .warning { background: var(--s-warn-bg-ctl); color: var(--s-warn-fg-ctl); }
+    .alert { background: var(--s-alert-bg-ctl); color: var(--s-alert-fg-ctl); }
+    .error { background: var(--s-error-bg-ctl); color: var(--s-error-fg-ctl); }
   `;
 
   static #instances = [];
@@ -80,23 +80,26 @@ export class PopupMenu extends AzosElement {
   static get instances() { return [...PopupMenu.#instances] }
 
   /**
-   * Construct a new menu message to display on the screen with the given styling
-   *  around RANK, STATUS, and POSITION.
-   * NOTE: menus do not understand rich content.
+   * Construct a new context menu to display on the screen.
+   * RANK and STATUS should be tied to individual items instead of the whole menu.
+   * POSITION is tied to the anchor positioning and should react to edges of the viewport.
+   * NOTE: Menus do not understand rich content.
    * @param {object} menu The message to display in the menu
-   * @param {number} timeout The length of time to display the menu (default: undefined)
-   * @param {RANK} rank The rank
-   * @param {STATUS} status The status
-   * @param {POSITION} position The position for where to display on the screen
+   * @param {string} anchor The DOM element that anchors the menu
    * @returns The constructed menu added to menu.#instances
    */
-  static popupMenu(menu, anchor, rank, status) {
+  static popupMenu(menu, anchor, position, rank, status) {
     isObject(menu);
+    /* menu is object of objects that follow the pattern:
+    { title, rank, status, submenu: none|submenu name } */
     const popupMenu = new PopupMenu(anchor ?? document.body);
 
     popupMenu.#menu = menu;
     popupMenu.#rank = rank ?? RANK.NORMAL;
     popupMenu.#status = status ?? STATUS.DEFAULT;
+
+    popupMenu.#position = position ?? POSITION.DEFAULT;
+    console.log(popupMenu.#position);
 
     PopupMenu.#instances.push(popupMenu);
     popupMenu.#show();
@@ -104,13 +107,40 @@ export class PopupMenu extends AzosElement {
     return popupMenu;
   }
 
-  #guid = null;
   #anchor = null;
-  #tmr = null;
+  #guid = null;
   #isShown = false;
   #menu = null;
+  #position = null;
   #rank = null;
   #status = null;
+  #tmr = null;
+
+  get #positionStyles() {
+    // Need to define position AFTER menu is rendered USING menu.getBoundingClientRect()
+    const anchorPos = this.#anchor.getBoundingClientRect();
+    switch (this.#position) {
+      case POSITION.TOP_LEFT:
+        return `top: ${anchorPos.top - anchorPos.height}px; left: ${anchorPos.left}px;`;
+      case POSITION.TOP_CENTER:
+        return `top: ${anchorPos.top - anchorPos.height}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
+      case POSITION.TOP_RIGHT:
+        return `top: ${anchorPos.top - anchorPos.height}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+      case POSITION.MIDDLE_LEFT:
+        return `top: ${anchorPos.top}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
+      case POSITION.MIDDLE_RIGHT:
+        return `top: ${anchorPos.top}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+      case POSITION.BOTTOM_LEFT:
+        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${anchorPos.left}px;`;
+      case POSITION.BOTTOM_CENTER:
+        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
+      case POSITION.BOTTOM_RIGHT:
+        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+      case POSITION.DEFAULT: //fall-through
+      default:
+        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+    }
+  }
 
   get guid() { return this.#guid; }
 
@@ -147,29 +177,34 @@ export class PopupMenu extends AzosElement {
     this.#isShown = true;
   }
 
-  /** Draw the menu message */
-  render() {
-    console.log(`rank is ${this.#rank}; status is ${this.#status}`);
+  firstUpdated() {
+    const builtMenu = this.shadowRoot.querySelector(`#${this.guid}`);
+    if (builtMenu) {
+      console.table(builtMenu.id);
+    }
+  }
 
+  /** Draw the menu */
+  render() {
     const rankStyle = parseRank(this.#rank, true);
     const statusStyle = parseStatus(this.#status, true);
 
-    const anchorPos = this.#anchor.getBoundingClientRect();
-    const topPos = anchorPos.top;
-    const leftPos = anchorPos.left + (anchorPos.width * .75);
-
-    console.log(`isRectInViewport? ${isRectInViewport(this.#anchor)}`);
-
-    return html`<div id=${this.guid} popover=auto role=status class="popover" style="top: ${topPos}px; left: ${leftPos}px;">
+    return html`<div id=${this.guid} popover=auto class="popover" style="${this.#positionStyles}">
       <button class="item ${rankStyle} ${statusStyle}">Dima</button>
-      <button class="item ${rankStyle} ${statusStyle}" popovertarget="submenu">Shawn</button>
+      <button
+        id="btnPopupSubmenu"
+        scope="this"
+        class="item hasSubMenu ${rankStyle} ${statusStyle}"
+        @click="${() => { popupMenu({}, this.btnPopupSubmenu) }}">
+          Shawn
+      </button>
       <button class="item ${rankStyle} ${statusStyle}">Kevin</button>
       <hr class="divider" />
       <button class="item ${rankStyle} ${statusStyle}">Shitstain Steven</button>
-      <div id="submenu" popover="auto"><h1 style="color:red;">Oh holy crap!</h1></div>
     </div>`;
   }
 }
+// <div id="submenu" popover="auto"><h1 style="color:red;">Oh holy crap!</h1></div>
 
 /**
  * Shortcut method to PopupMenu.popupMenu(...); {@link PopupMenu.popupMenu}.

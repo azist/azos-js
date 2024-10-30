@@ -100,7 +100,29 @@ export class Showcase extends AzosElement {
   #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
 
   #btnPopupMenuClick() {
-    popupMenu({}, this.btnPopupMenu);
+    popupMenu({
+      /* {
+        title:   Dima,
+        rank:    3,
+        status:  default,
+        subMenu: none
+      },{
+        title:   Shawn,
+        rank:    2,
+        status:  ok,
+        subMenu: secondMenu
+      },{
+        title:   Kevin,
+        rank:    3,
+        status:  default,
+        subMenu: none
+      },{
+        title:   Shitstain Steven,
+        rank:    3,
+        status:  default,
+        subMenu: none
+      } */
+    }, this.btnPopupMenu);
   }
 
   render() {
@@ -111,7 +133,10 @@ export class Showcase extends AzosElement {
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
-<az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button><br/>
+<az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button>
+<az-button id="btnPopupMenu2" scope="this" @click="${() => { popupMenu({}, this.btnPopupMenu2, 'top-right') }}" title="Menu via inline @click" status="info"></az-button>
+
+<br/>
 
 <div style="display:flex;align-items:center;">
   <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
