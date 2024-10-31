@@ -119,17 +119,18 @@ export class PopupMenu extends AzosElement {
   get #positionStyles() {
     // Need to define position AFTER menu is rendered USING menu.getBoundingClientRect()
     const anchorPos = this.#anchor.getBoundingClientRect();
+    const menuHeight = (1.66 * 16) * 4.5; //converts em to px
     switch (this.#position) {
       case POSITION.TOP_LEFT:
-        return `top: ${anchorPos.top - anchorPos.height}px; left: ${anchorPos.left}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + menuHeight)}px; left: ${anchorPos.left}px;`;
       case POSITION.TOP_CENTER:
-        return `top: ${anchorPos.top - anchorPos.height}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + menuHeight)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
       case POSITION.TOP_RIGHT:
-        return `top: ${anchorPos.top - anchorPos.height}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + menuHeight)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
       case POSITION.MIDDLE_LEFT:
-        return `top: ${anchorPos.top}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
+        return `top: ${anchorPos.top - (menuHeight * .5)}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
       case POSITION.MIDDLE_RIGHT:
-        return `top: ${anchorPos.top}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+        return `top: ${anchorPos.top - (menuHeight * .5)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
       case POSITION.BOTTOM_LEFT:
         return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${anchorPos.left}px;`;
       case POSITION.BOTTOM_CENTER:
@@ -150,18 +151,6 @@ export class PopupMenu extends AzosElement {
     this.#anchor = anchor;
   }
 
-  // Clear the timer
-  #clearTimer() {
-    if (!this.#tmr) return;
-    clearTimeout(this.#tmr);
-    this.#tmr = undefined;
-  }
-
-  // If not already started, start a timer to destroy this menu
-  #play() {
-    return;
-  }
-
   // Add element to dom and show
   #show() {
     if (this.#isShown) return false;
@@ -175,13 +164,6 @@ export class PopupMenu extends AzosElement {
     // Show on DOM
     this.$(this.guid).showPopover();
     this.#isShown = true;
-  }
-
-  firstUpdated() {
-    const builtMenu = this.shadowRoot.querySelector(`#${this.guid}`);
-    if (builtMenu) {
-      console.table(builtMenu.id);
-    }
   }
 
   /** Draw the menu */
