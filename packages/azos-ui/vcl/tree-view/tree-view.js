@@ -157,6 +157,7 @@ export class TreeView extends AzosElement {
 
   closeAllNodes() {
     const visibleNodes = this.getAllVisibleNodes();
+    if (visibleNodes.length === 0) return;
     this.#focusNode(visibleNodes[0], this.nodeInFocus, false);
     visibleNodes.forEach(node => node.close());
     this.requestUpdate();
@@ -239,7 +240,12 @@ export class TreeView extends AzosElement {
 
   #onNodeClicked(node) {
     this.#focusNode(node, null);
-    this._dispatchNodeUserActionEvent(node, { action: "clicked" });
+    this._dispatchNodeUserActionEvent(node, { action: "click" });
+  }
+
+  #onDoubleClick(e, node) {
+    this.#onNodeToggleOpen(e, node);
+    this._dispatchNodeUserActionEvent(node, { action: "dblclick" });
   }
 
   #onKeyDown(e) {
@@ -321,7 +327,7 @@ export class TreeView extends AzosElement {
     <div id="tn${node.id}"
       class="tree-node-header"
       @click=${() => this.#onNodeClicked(node)}
-      @dblclick="${(e) => this.#onNodeToggleOpen(e, node)}"
+      @dblclick="${(e) => this.#onDoubleClick(e, node)}"
       tabindex="${this.nodeInFocus?.id === node.id ? 0 : -1}"
       >
       <div class="tree-node-chevron" @click="${(e) => this.#onChevronClicked(e, node)}" style="${node.canOpen && node.chevronVisible ? '' : 'visibility: hidden'}">

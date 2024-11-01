@@ -56,7 +56,23 @@ export class AdlibCollectionTab extends Tab {
 
   get #filterText() { return this.filter ? JSON.stringify(this.filter, null, 2) : ''; }
 
-  #dirty = true;
+  #filter = null;
+  get filter() { return this.#filter; }
+  set filter(v) {
+    this.#filter = v;
+    this.#dirty = true;
+    this.requestUpdate();
+  }
+
+  #context = null;
+  get context() { return this.#context; }
+  set context(v) {
+    this.#context = v;
+    this.#dirty = true;
+    this.requestUpdate();
+  }
+
+  #dirty = false;
   get [DIRTY_PROP]() { return this.#dirty; }
   async [CLOSE_QUERY_METHOD]() {
     if (this.#isStored) {
@@ -114,7 +130,7 @@ export class AdlibCollectionTab extends Tab {
     const { node, action } = e.detail;
     let { value } = node.data;
 
-    if (action === "clicked") {
+    if (action === "dblclick") {
       if (node.hasChildren) value = JSON.stringify(value);
       await writeToClipboard(value);
       toast(`Copied!`);

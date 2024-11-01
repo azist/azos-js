@@ -113,14 +113,16 @@ az-tree-view::part(tree) {
       }
       //}else if (action === "closed") toast(`Closed node: ${node.title}`, { position: POSITION.TOP_RIGHT });
     } else if (action === "focusChanged") {
-      let space = null, collection = null;
-      if (node.data.type === "collection") {
-        collection = node.title;
-        space = node.parent.title;
-      } else if (node.data.type === "space") {
-        space = node.title;
-      }
+      if (node.data.type === "space") return;
+      const collection = node.title;
+      const space = node.parent.title;
       this.#selectedContext = { space, collection, type: node.data.type };
+    } else if (action === "dblclick") {
+      if (node.data.type === "space") return;
+      const collection = node.title;
+      const space = node.parent.title;
+      this.#selectedContext = { space, collection, type: node.data.type };
+      this.#btnApplyClick();
     }
   }
 

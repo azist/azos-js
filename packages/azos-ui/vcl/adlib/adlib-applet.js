@@ -17,6 +17,8 @@ import "azos-ui/vcl/adlib/filter-dialog";
 import "azos-ui/vcl/adlib/context-dialog";
 import { AdlibCollectionTab } from "./adlib-collection-tab";
 import { AdlibSpaceTab } from "./adlib-space-tab";
+import { IStorage } from "azos/storage";
+import { matchPattern } from "azos/strings";
 
 /**  */
 export class AdlibApplet extends Applet {
@@ -25,18 +27,39 @@ export class AdlibApplet extends Applet {
     svcAdlibClient: AdlibClient,
   };
 
-  collections;
+  #storage = null;
+  get #hasStorage() { return !!this.#storage; }
+  get #isStored() { return !!this.#storedValue; }
+  get #storedValue() { return this.#storage === null ? null : this.#storage.getItem(this.#storageKey); }
+  get #storageKey() { return `${this.arena.applet.localStoragePrefix}.${this.constructor.name}.${this.title}` }
 
+  collections;
   get title() { return "Adlib Viewer"; }
 
   async connectedCallback() {
     super.connectedCallback();
     this.arena.hideFooter(true);
     this.link(this.#ref);
+    this.#storage = this.arena.app.moduleLinker.tryResolve(IStorage);
   }
 
   async firstUpdated() {
-    // FIXME: Check for other tabs and add them
+    let matches = [];
+    for (let i = 0; i < this.#storage.length; i++) {
+      const key = this.#storage.key(i);
+      let match = matchPattern(key, this.localStoragePrefix + "*");
+      if (match) matches.push({ key, value: JSON.parse(this.#storage.getItem(key)) });
+    }
+    matches.forEach(({ key, value }) => {
+      const parts = key.split('.');
+      const clzName = parts[parts.length - 2];
+      const title = parts[parts.length - 1];
+      const { context, filterText } = value;
+      const found = [AdlibCollectionTab, AdlibSpaceTab].find(cls => cls.name === clzName);
+      const tab = this.tabView.addTab(found, title);
+      tab.context = context;
+      tab.filter = filterText;
+    });
   }
 
   async #onAddTabToLeft(e) {
@@ -49,9 +72,7 @@ export class AdlibApplet extends Applet {
 
   addTab(type, space, collection) {
     let tab;
-    if (type === "space")
-      tab = this.tabView.addTab(AdlibSpaceTab, `${space}`, null, true);
-    else if (type === "collection")
+    if (type === "collection")
       tab = this.tabView.addTab(AdlibCollectionTab, `${collection}`, null, true);
     tab.context = { space, collection };
   }
