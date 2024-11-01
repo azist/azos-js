@@ -183,6 +183,7 @@ export class TabView extends AzosElement {
     defaultMinTabWidth: { type: Number },
     defaultMaxTabWidth: { type: Number },
     isDraggable: { type: Boolean },
+    allowCloseAll: { type: Boolean }
   }
 
   #draggedTabIndex = null;
@@ -203,7 +204,12 @@ export class TabView extends AzosElement {
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
   set activeTab(v) {
-    isOf(v, Tab) || isSubclassOf(v, Tab);
+    if (v === null) {
+      this.#activeTab = null;
+      this.requestUpdate();
+      return;
+    }
+    isTrue(v instanceof Tab);
     isTrue(v.tabView === this);
     if (this.#activeTab === v) return;
     const evt = new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true });
@@ -216,7 +222,10 @@ export class TabView extends AzosElement {
     this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
   }
 
-  constructor() { super(); }
+  constructor() {
+    super();
+    this.allowCloseAll = false;
+  }
 
   async #onScrollTabContainer(scrollToTheRight) {
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
@@ -333,7 +342,7 @@ export class TabView extends AzosElement {
     let newTab = ogTab.nextTab;
 
     if (!newTab) newTab = ogTab.previousTab;
-    if (!newTab) return false;
+    if (!this.allowCloseAll && !newTab) return false;
 
     this.activeTab = newTab;
     return true;

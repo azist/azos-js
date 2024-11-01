@@ -79,6 +79,7 @@ export class TextField extends FieldPart {
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         @change="${this.#tbChange}"
+        part="field"
         ></textarea>`
       : html`
       <input
@@ -93,6 +94,7 @@ export class TextField extends FieldPart {
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         @change="${this.#tbChange}"
+        part="field"
         autocomplete="off"
       />
       `;

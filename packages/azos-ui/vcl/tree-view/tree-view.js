@@ -291,7 +291,7 @@ export class TreeView extends AzosElement {
       this.#focusNode(this.nodeInFocus);
       return;
     }
-    if (e.target) this.$(e.target.id).tabindex = -1;
+    if (e.target?.id) this.$(e.target.id).tabindex = -1;
     const visibleNodes = this.getAllVisibleNodes();
     if (!visibleNodes) return;
     this.#focusNode(visibleNodes[0]);
