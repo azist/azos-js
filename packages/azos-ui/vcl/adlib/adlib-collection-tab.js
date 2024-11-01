@@ -25,6 +25,11 @@ export class AdlibCollectionTab extends Tab {
   height: 100%;
 }
 
+az-text::part(field) {
+  min-width: 95vw;
+  min-height: 25ch;
+}
+
 #resultsPanel {
   display: flex;
   flex-direction: row;
@@ -200,10 +205,10 @@ export class AdlibCollectionTab extends Tab {
   <form @submit="${this.#onExecuteClick}" name="CollectionForm">
     <az-text id="filterElm" scope="this" itemtype="multiline" @input="${this.#filterTextChanged}" value="${this.#filterText}" rank="4"></az-text>
 
-    <az-button title="Execute" status="ok" type="submit" @click="${this.#onExecuteClick}"></az-button>
-    <az-button id="btnSave" scope="this" title="Save" type="button" @click="${this.#onSaveClick}"></az-button>
-    <az-button title="Close All Nodes" type="button" @click="${this.#onCloseAllNodes}"></az-button>
-    <az-button title="Clear Results" status="error" type="button" @click="${this.#onClearAll}"></az-button>
+    <az-button title="Execute" status="ok" type="submit" @click="${this.#onExecuteClick}" rank="medium"></az-button>
+    <az-button id="btnSave" scope="this" title="Save" type="button" @click="${this.#onSaveClick}" rank="medium"></az-button>
+    <az-button title="Close All Nodes" type="button" @click="${this.#onCloseAllNodes}" rank="medium"></az-button>
+    <az-button title="Clear Results" status="error" type="button" @click="${this.#onClearAll}" rank="medium"></az-button>
   </form>
 
   <div id="resultsPanel">

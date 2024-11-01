@@ -19,6 +19,7 @@ import { AdlibCollectionTab } from "./adlib-collection-tab";
 import { AdlibSpaceTab } from "./adlib-space-tab";
 import { IStorage } from "azos/storage";
 import { matchPattern } from "azos/strings";
+import { Command } from "../../cmd";
 
 /**  */
 export class AdlibApplet extends Applet {
@@ -36,16 +37,38 @@ export class AdlibApplet extends Applet {
   collections;
   get title() { return "Adlib Viewer"; }
 
+  #cmdNewQuery = new Command(this, {
+    uri: "Adlib.NewQuery",
+    title: "New Query",
+    icon: `<svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+            <rect width="6" height="28" x="11" y="0" fill="white"/>
+            <rect width="28" height="6" x="0" y="11" fill="white"/>
+          </svg>`,
+    handler: (e) => this.#onAddTabToLeft(e)
+  });
+
+  #cmdPrefillQuery = new Command(this, {
+    uri: "Adlib.PrefillQuery",
+    title: "Add collection filter to active (or new) tab",
+    icon: `<svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 20.5V25h4.5l13.3-13.3-4.5-4.5L3 20.5zM24.7 8.3c.4-.4.4-1 0-1.4l-3.6-3.6c-.4-.4-1-.4-1.4 0L17 5.6l4.5 4.5 3.2-3.3z" fill="white"/>
+            <rect x="18" y="18" width="2" height="8" fill="white"/>
+            <rect x="15" y="21" width="8" height="2" fill="white"/>
+          </svg>`,
+    handler: (e) => this.#onAddCollectionFilter(e)
+  });
+
   async connectedCallback() {
     super.connectedCallback();
     this.arena.hideFooter(true);
     this.link(this.#ref);
     this.#storage = this.arena.app.moduleLinker.tryResolve(IStorage);
+    this.arena.installToolbarCommands([this.#cmdPrefillQuery, this.#cmdNewQuery]);
   }
 
   async firstUpdated() {
     let matches = [];
-    for (let i = 0; i < this.#storage.length; i++) {
+    for (let i = 0; i < this.#storage?.length; i++) {
       const key = this.#storage.key(i);
       let match = matchPattern(key, this.localStoragePrefix + "*");
       if (match) matches.push({ key, value: JSON.parse(this.#storage.getItem(key)) });
@@ -62,8 +85,7 @@ export class AdlibApplet extends Applet {
     });
   }
 
-  async #onAddTabToLeft(e) {
-    e.preventDefault();
+  async #onAddTabToLeft() {
     const modal = await this.contextSelector.show();
     if (!modal.modalResult) return;
     const { space, collection, type } = modal.modalResult;
@@ -102,9 +124,7 @@ export class AdlibApplet extends Applet {
     return html`
       <az-sky-adlib-ctx-selector-dialog id="contextSelector" scope="this" title="Select a context"></az-sky-adlib-ctx-selector-dialog>
       <az-sky-adlib-filter-dialog id="filterDialog" scope="this" title="Construct filter"></az-sky-adlib-filter-dialog>
-      <az-button title="New Query" @click="${this.#onAddTabToLeft}"></az-button>
-      <az-button title="Add collection filter to active (or new) tab" @click="${this.#onAddCollectionFilter}"></az-button>
-      <az-tab-view id="tabView" scope="this" .isDraggable="${true}">
+      <az-tab-view id="tabView" scope="this" .isDraggable="${true}" .allowCloseAll="${true}">
       </az-tab-view>
       `;
   }
