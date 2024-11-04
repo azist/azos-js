@@ -8,7 +8,7 @@ import { isNonEmptyString, isOf } from "../aver.js";
 import { ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
 import { dflt } from "../strings.js";
-import { Module } from "./modules.js";
+import { Module } from "../modules.js";
 
 
 export class ImageRegistry extends Module {
@@ -18,17 +18,20 @@ export class ImageRegistry extends Module {
 
   constructor(app, cfg) {
     super(app, cfg);
-    this.#map = Map();
 
-    isOf(cfg, ConfigNode);
+    this.#map = new Map();
+
+    cfg = cfg.get("icons", "images", "imgs");
+
+    if (!cfg) return;
     for (const cfgRec of cfg.getChildren(false)) {
       const uri = isNonEmptyString(cfgRec.getString("uri"));
-      const rec = makeNew(ImageRecord, cfgRec);
+      const rec = makeNew(ImageRecord, cfgRec, null, ImageRecord);
       this.register(uri, rec);
     }
   }
 
-  resolve(uri, format, isoLang = null, theme = null, media = null) {
+  resolve(uri, format, { isoLang, theme, media } = {}) {
     isNonEmptyString(uri);
     isNonEmptyString(format);
     isoLang = dflt(isoLang, "eng");
@@ -60,7 +63,7 @@ export class ImageRegistry extends Module {
     let bucket = this.#map.get(uri);
     if (!bucket) {
       bucket = [];
-      this.#map.put(bucket);
+      this.#map.set(uri, bucket);
     }
     bucket.push(iRec);
   }
@@ -93,7 +96,7 @@ export class ImageRecord {
     this.#media = cfg.getString(["media", "m"], null);
 
     this.#contentType = cfg.getString(["contentType", "ctp"], CONTENT_TYPE.IMG_SVG);
-    this.#content = cfg.get(["content", "img", "image"]);
+    this.#content = cfg.getString(["content", "img", "image", "c"]);
 
     if (this.#media) this.#score += 1_000;
     if (this.#isoLang) this.#score += 100;
