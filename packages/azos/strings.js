@@ -308,6 +308,17 @@ export function format(v, args, localizer = null) {
   return v.replace(REXP_FORMAT, fmap);
 }
 
+export function formatDate(dte) {
+  const pad = num=>num.toString().padStart(2, '0');
+  const year = dte.getFullYear();
+  const month = pad(dte.getMonth() + 1); // JavaScript months are 0-indexed
+  const day = pad(dte.getDate());
+  const hours = pad(dte.getHours());
+  const minutes = pad(dte.getMinutes());
+  const seconds = pad(dte.getSeconds());
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 /**
  * Returns true if the value represents a valid email address.
  * 2014 Note: for now we only accept latin, diacritics, greek and cyryllic chars for emails.

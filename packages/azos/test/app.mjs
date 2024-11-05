@@ -19,6 +19,7 @@ import "./entity-id-tests.js";
 import "./app-mod-tests.js";
 import "./linker-tests.js";
 import "./linker-tests2.js";
+import "./img-registry-tests.js";
 import "./app-log-tests.js";
 import "./security-tests.js";
 
