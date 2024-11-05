@@ -14,7 +14,6 @@ import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
 import { asMsgType, LOG_TYPE } from "./log.js";
 import { ILog, ConLog } from "./ilog.js";
-import { ImageRegistry } from "./bcl/img-registry.js";
 
 /** Provides uniform base for App chassis related exceptions */
 export class AppError extends types.AzosError {
@@ -74,7 +73,6 @@ export class Application extends types.DisposableObject{
   #session;
   #localizer;
   #moduleLinker;
-  #imgRegistry;
   #dfltLog;
   #logLevel;
 
@@ -110,7 +108,6 @@ export class Application extends types.DisposableObject{
     this._loadModules(this.#moduleLinker, root.get("modules", "module", "mods", "mod"));
     if (this.#moduleLinker.tryResolve(ILog)===null) this.#moduleLinker.register(this.#dfltLog);
     this._modulesAfterLoad();
-    this.#imgRegistry = new ImageRegistry(this, root);
 
     if (Application.#instance !== null){
       Application.#instances.push(Application.#instance);
@@ -191,8 +188,6 @@ export class Application extends types.DisposableObject{
                  .orderBy((a, b) => a[types.ORDER_PROP] < b[types.ORDER_PROP] ? -1 : 1);
     return mods.toArray();
   }
-
-  get imgRegistry() { return this.#imgRegistry; }
 
   /**
    * Returns an app log or default console log if app was not init with log
