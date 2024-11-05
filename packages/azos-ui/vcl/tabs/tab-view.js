@@ -72,6 +72,8 @@ export class TabView extends AzosElement {
 .tab-body {
   display: block;
   width: 100%;
+  padding: 1em;
+  box-sizing: border-box;
 }
 
 .tab-btn.active {
@@ -372,11 +374,17 @@ export class TabView extends AzosElement {
     isOfOrNull(beforeTab, Tab);
     isStringOrNull(title);
 
-    const tab = new tTab();
-    tab.title = dflt(title, tTab.name);
+    const existing = this.visibleTabs.filter(tab => tab.title === title)[0];
 
-    if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
-    this.insertBefore(tab, beforeTab);
+    let tab;
+    if (existing) tab = existing;
+    else {
+      tab = new tTab();
+      tab.title = dflt(title, tTab.name);
+      if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
+      this.insertBefore(tab, beforeTab);
+    }
+
     if (!this.#activeTab || makeActive) tab.activate();
 
     this.requestUpdate();
