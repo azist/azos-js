@@ -86,6 +86,9 @@ export class PopupMenu extends AzosElement {
    * NOTE: Menus do not understand rich content.
    * @param {object} menu The message to display in the menu
    * @param {string} anchor The DOM element that anchors the menu
+   * @param {POSITION} position Defines where the menu appears in relation to its anchor
+   * @param {RANK} rank Rank of the menu - CHANGE THIS TO APPLY TO EACH INDIVIDUAL MENU ITEM
+   * @param {STATUS} status Menu's status - CHANGE THIS TO APPLY TO EACH INDIVIDUAL MENU ITEM
    * @returns The constructed menu added to menu.#instances
    */
   static popupMenu(menu, anchor, position, rank, status) {
@@ -114,7 +117,6 @@ export class PopupMenu extends AzosElement {
   #position = null;
   #rank = null;
   #status = null;
-  #tmr = null;
 
   get #positionStyles() {
     // Need to define position AFTER menu is rendered USING menu.getBoundingClientRect()
@@ -143,6 +145,8 @@ export class PopupMenu extends AzosElement {
     }
   }
 
+  //Connected Callback to get menu after it is built?
+
   get guid() { return this.#guid; }
 
   constructor(anchor) {
@@ -164,6 +168,12 @@ export class PopupMenu extends AzosElement {
     // Show on DOM
     this.$(this.guid).showPopover();
     this.#isShown = true;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    console.log(`${this.firstChild.id} added to the DOM`);
+    // Any setup that requires the component to be in the DOM
   }
 
   /** Draw the menu */

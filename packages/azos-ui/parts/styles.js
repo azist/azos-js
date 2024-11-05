@@ -1,5 +1,5 @@
 
-import {css} from "../ui.js";
+import { css } from "../ui.js";
 
 export const baseStyles = css`
 .text-left   {text-align: left;}
@@ -120,7 +120,7 @@ button:disabled{
   transform: none;
 }`;
 
-export const checkStyles=css`
+export const checkStyles = css`
   label{
     gap:0 .5em;
     user-select:none;
@@ -173,7 +173,7 @@ export const checkStyles=css`
   .errorBg[class~="check"]::before { background-color:none; color: var(--s-error-fg-ctl); }
 `;
 
-export const switchStyles=css`
+export const switchStyles = css`
   label{
     gap:0 .5em;
     user-select:none;
@@ -234,7 +234,7 @@ export const switchStyles=css`
   .errorBg[class~="switch"] { background: var(--s-error-bg-ctl); border: var(--s-error-bor-ctl);}
 `;
 
-export const radioStyles=css`
+export const radioStyles = css`
   .radio-item{
     display:flex;
     align-items:baseline;
@@ -294,13 +294,13 @@ export const radioStyles=css`
   .errorBg[class~="radio"] { background: var(--s-error-bg-ctl);  border: var(--s-error-bor-ctl);}
 `;
 
-export const textFieldStyles=css`
+export const textFieldStyles = css`
   label{
     gap:0 .5em;
     user-select:none;
   }
   label > span{ font-weight: 500; }
-  input[type=text],input[type=password],textarea,select{
+  input[type=text],input[type=password],input[type=date],textarea,select{
     width: 100%;
     box-sizing: border-box;
     padding:.5em;
@@ -308,12 +308,13 @@ export const textFieldStyles=css`
     background-color: var(--s-default-bg-ctl);
     color: var(--s-default-fg-ctl);
   }
-  input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{
+  input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,textarea:focus,select:focus{
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
   input[type=text]::placeholder,
   input[type=password]::placeholder,
+  input[type=date]::placeholder,
   textarea::placeholder{ color: var(--ghost); }
   textarea{font-family:inherit;}
 
@@ -324,7 +325,7 @@ export const textFieldStyles=css`
   .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl) !important; border: var(--s-error-bor-ctl) !important;}
 
   .disabled{ color: #b4b4b4; font-weight: 100; }
-  input[type=text]:disabled,input[type=password]:disabled,textarea:disabled,select:disabled{
+  input[type=text]:disabled,input[type=password]:disabled,input[type=date]:disabled,textarea:disabled,select:disabled{
     border: 1px solid var(--ghost);
     background: none;
     color: var(--ghost);
@@ -335,7 +336,7 @@ export const textFieldStyles=css`
   select > option { padding:.5em .5em .35em .5em; }
 `;
 
-export const sliderStyles=css`
+export const sliderStyles = css`
   label{
     gap:0 .5em;
     user-select:none;
