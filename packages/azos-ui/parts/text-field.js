@@ -42,8 +42,11 @@ export class TextField extends FieldPart {
   /** True if text input is <input type="password"> */
   get isPassword() { return isOneOf(this.itemType, ["password", "pass", "pw", "masked"]); }
 
+  /** True if text input is <input type="date"> */
+  get isDate() { return isOneOf(this.itemType, ["date", "calendar", "day", "month", "year"]); }
+
   /** True if text input is <input type="text"> */
-  get isInputText() { return !this.isTextArea && !this.isPassword; }
+  get isInputText() { return !this.isTextArea && !this.isPassword && !this.isDate; }
 
   /** True if alignValue is a valid value */
   get isValidAlign() { return isOneOf(this.alignValue, ["left", "center", "right"]); }
@@ -88,7 +91,7 @@ export class TextField extends FieldPart {
         maxLength="${this.maxChar ? this.maxChar : noContent}"
         minLength="${this.minChar ? this.minChar : noContent}"
         placeholder="${this.placeholder}"
-        type="${this.isInputText ? "text" : "password"}"
+        type="${this.isInputText ? "text" : this.isPassword ? "password" : "date"}"
         .value="${val}"
         .disabled=${this.isDisabled}
         .required=${this.isRequired}
