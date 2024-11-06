@@ -11,6 +11,7 @@ import { ChronicleApplet } from "../vcl/chron/chron-applet.js";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
+import "./showcase.js";
 import "./showcase2.js";
 import "../vcl/time/timeline.js";
 import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
@@ -148,8 +149,9 @@ export class XyzApplet extends Applet {
         h2{margin: 4px;}
       </style>
       <div slot="body">
-        <az-test-showcase-2></az-test-showcase-2>
-        Long line
+      <az-test-showcase-2></az-test-showcase-2>
+      <az-test-showcase></az-test-showcase>
+      Long line
         <button @click="${this.onClick5}"> HOOK HARD!!! </button>
         <h2>This is header two</h2>
       </div>
@@ -214,6 +216,7 @@ export class XyzApplet extends Applet {
      </az-modal-dialog>
 
      <az-test-showcase-2></az-test-showcase-2>
+     <az-test-showcase></az-test-showcase>
 
     `;
   }//render
