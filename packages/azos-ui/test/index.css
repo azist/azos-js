@@ -197,7 +197,9 @@ body {
   --modal-spin-backdrop-filter: grayscale(0.85) blur(1.0px);
 
   /* focus */
-  --focus-ctl-outline: 3px solid rgba(10, 140, 255, 0.55);
+  --focus-ctl-selected-color: rgba(85, 190, 255, 0.35);
+  --focus-ctl-background-color: rgba(10, 140, 255, 0.55);
+  --focus-ctl-outline: 3px solid var(--focus-ctl-background-color);
   --focus-ctl-box-shadow: none;
   /*0px 0px 8px rgba(10, 128, 255, .9);*/
 
