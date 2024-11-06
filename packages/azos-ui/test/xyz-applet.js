@@ -11,7 +11,7 @@ import { ChronicleApplet } from "../vcl/chron/chron-applet.js";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
-import "./showcase.js";
+import "./showcase2.js";
 import "../vcl/time/timeline.js";
 import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
 import { CLOSE_QUERY_METHOD } from "azos/types";
@@ -29,7 +29,7 @@ export class XyzApplet extends Applet {
   static styles = [css`:host{ display: block; padding: 1ch 2ch; }`];
 
   static properties = {
-    name: {type: String},
+    name: { type: String },
   };
 
   constructor() {
@@ -41,7 +41,7 @@ export class XyzApplet extends Applet {
     uri: "Test.Cmd1",
     //active: false,
     title: "About",
-    handler: function(){ alert("Command 1 activated"); }
+    handler: function () { alert("Command 1 activated"); }
   });
 
   #cmdHelp = new Command(this, {
@@ -53,25 +53,25 @@ export class XyzApplet extends Applet {
             <path d="M10 9H14L10 13H14" stroke-linejoin="round"/>
             <path d="M7.5 19C8.15503 20.7478 9.92246 22 12 22C14.0775 22 15.845 20.7478 16.5 19" />
           </svg>`,
-    handler: function(){ alert("Command 2 activated"); }
+    handler: function () { alert("Command 2 activated"); }
   });
 
-  connectedCallback(){
+  connectedCallback() {
     super.connectedCallback();
     // FIXME: This automatically navs to Adlib page.
     // setTimeout(()=>this.btnAdlibClick(), 100);
     this.arena.installToolbarCommands([this.#cmdAbout, this.#cmdHelp]);
   }
 
-  async [CLOSE_QUERY_METHOD](){
+  async [CLOSE_QUERY_METHOD]() {
     return true;//await confirm("We will close the form. Yes/no?")
   }
 
 
   #x = 0;
-  get title(){ return `XYZ Applet / x = ${this.#x}`}
+  get title() { return `XYZ Applet / x = ${this.#x}` }
 
-  onClick1(){
+  onClick1() {
     //alert("Ura!!!");
     //this.arena.name+="a";
     this.#x++;
@@ -81,43 +81,43 @@ export class XyzApplet extends Applet {
     this.arena.updateToolbar();
   }
 
-  onClick2(){
+  onClick2() {
     this.arena.uninstallToolbarCommands([this.#cmdHelp]);
   }
 
-  onClick3(){
+  onClick3() {
     this.arena.appletClose();
   }
 
-  async onClick4(){
+  async onClick4() {
     //const dlgTest1 = this.dlgTest1;// this.shadowRoot.getElementById("dlgTest1");
     const dr = (await this.dlgTest1.show()).modalResult;
     console.info("Dialog result is: " + dr);
   }
 
-  async onClick5(){
+  async onClick5() {
     const dlgXyz = this.shadowRoot.getElementById("dlgXyz");
     const dr = (await dlgXyz.show()).modalResult;
     console.info("Small Dialog result is: " + dr);
   }
 
-  async onClick6(){
+  async onClick6() {
     //this.$("btnSave").isHidden = !this.$("btnSave").isHidden;
     //this.$("btnSave").isVisible = !this.$("btnSave").isVisible;
     //console.dir(this);
     this.btnSave.isVisible = !this.btnSave.isVisible;
   }
 
-  async onClickTimeline(){
+  async onClickTimeline() {
     const dr = (await this.dlgTimeline.show()).modalResult;
     console.info(`Showing ${dr} dialog`);
   }
 
-  async btnChronicleClick(){
+  async btnChronicleClick() {
     this.arena.appletOpen(ChronicleApplet);
   }
 
-  async btnAdlibClick(){
+  async btnAdlibClick() {
     this.arena.appletOpen(AdlibApplet);
   }
 
@@ -148,7 +148,7 @@ export class XyzApplet extends Applet {
         h2{margin: 4px;}
       </style>
       <div slot="body">
-        <az-test-showcase></az-test-showcase>
+        <az-test-showcase-2></az-test-showcase-2>
         Long line
         <button @click="${this.onClick5}"> HOOK HARD!!! </button>
         <h2>This is header two</h2>
@@ -213,7 +213,7 @@ export class XyzApplet extends Applet {
       </div>
      </az-modal-dialog>
 
-     <az-test-showcase></az-test-showcase>
+     <az-test-showcase-2></az-test-showcase-2>
 
     `;
   }//render
