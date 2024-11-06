@@ -100,29 +100,44 @@ export class Showcase extends AzosElement {
   #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
 
   #btnPopupMenuClick() {
-    popupMenu({
-      /* {
-        title:   Dima,
-        rank:    3,
-        status:  default,
-        subMenu: none
-      },{
-        title:   Shawn,
-        rank:    2,
-        status:  ok,
-        subMenu: secondMenu
-      },{
-        title:   Kevin,
-        rank:    3,
-        status:  default,
-        subMenu: none
-      },{
-        title:   Shitstain Steven,
-        rank:    3,
-        status:  default,
-        subMenu: none
-      } */
-    }, this.btnPopupMenu);
+    popupMenu([
+      {
+        title: "Dima",
+        rank: 3,
+        status: "default"
+      }, {
+        title: "Shawn",
+        rank: 2,
+        status: "ok",
+        subMenu: [
+          {
+            title: "Dima",
+            rank: 3,
+            status: "default"
+          }, {
+            title: "Shawn",
+            rank: 2,
+            status: "ok"
+          }, {
+            title: "Kevin",
+            rank: 3,
+            status: "default"
+          }, {
+            title: "Shitstain Steven",
+            rank: 3,
+            status: "default"
+          }
+        ]
+      }, {
+        title: "Kevin",
+        rank: 3,
+        status: "default"
+      }, {
+        title: "Shitstain Steven",
+        rank: 3,
+        status: "default"
+      }
+    ], this.btnPopupMenu, "mid-right");
   }
 
   render() {
@@ -134,7 +149,6 @@ export class Showcase extends AzosElement {
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
 <az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button>
-<az-button id="btnPopupMenu2" scope="this" @click="${() => { popupMenu({}, this.btnPopupMenu2, 'top-right') }}" title="Menu via inline @click" status="info"></az-button>
 
 <br/>
 

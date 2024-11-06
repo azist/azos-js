@@ -6,7 +6,7 @@
 
 import { genGuid } from "azos/types";
 import { AzosElement, html, css, STATUS, RANK, POSITION, parseRank, parseStatus, isRectInViewport } from "./ui.js";
-import { isObject } from "azos/aver";
+import { isObjectOrArray } from "azos/aver";
 
 export class PopupMenu extends AzosElement {
 
@@ -87,19 +87,16 @@ export class PopupMenu extends AzosElement {
    * @param {object} menu The message to display in the menu
    * @param {string} anchor The DOM element that anchors the menu
    * @param {POSITION} position Defines where the menu appears in relation to its anchor
-   * @param {RANK} rank Rank of the menu - CHANGE THIS TO APPLY TO EACH INDIVIDUAL MENU ITEM
-   * @param {STATUS} status Menu's status - CHANGE THIS TO APPLY TO EACH INDIVIDUAL MENU ITEM
    * @returns The constructed menu added to menu.#instances
    */
-  static popupMenu(menu, anchor, position, rank, status) {
-    isObject(menu);
+  static popupMenu(menu, anchor, position) {
+    isObjectOrArray(menu);
     /* menu is object of objects that follow the pattern:
-    { title, rank, status, submenu: none|submenu name } */
+    { title, rank, status, submenu: none|submenu array } */
+
     const popupMenu = new PopupMenu(anchor ?? document.body);
 
     popupMenu.#menu = menu;
-    popupMenu.#rank = rank ?? RANK.NORMAL;
-    popupMenu.#status = status ?? STATUS.DEFAULT;
 
     popupMenu.#position = position ?? POSITION.DEFAULT;
     console.log(popupMenu.#position);
@@ -115,24 +112,48 @@ export class PopupMenu extends AzosElement {
   #isShown = false;
   #menu = null;
   #position = null;
-  #rank = null;
-  #status = null;
 
   get #positionStyles() {
-    // Need to define position AFTER menu is rendered USING menu.getBoundingClientRect()
     const anchorPos = this.#anchor.getBoundingClientRect();
-    const menuHeight = (1.66 * 16) * 4.5; //converts em to px
+    let heightOfItems = 0;
+    this.#menu.forEach((item) => {
+      let curRank = parseRank(item.rank, true);
+      //convert em to px when 1em = 16px
+      switch (curRank) {
+        case "r1":
+          heightOfItems += (2.26 * 16);
+          break;
+        case "r2":
+          heightOfItems += (2.06 * 16);
+          break;
+        case "r3":
+          heightOfItems += (1.66 * 16);
+          break;
+        case "r4":
+          heightOfItems += (1.51 * 16);
+          break;
+        case "r5":
+          heightOfItems += (1.31 * 16);
+          break;
+        case "r6":
+          heightOfItems += (1.16 * 16);
+          break;
+        default:
+          heightOfItems += (1.66 * 16);
+      }
+    });
+    console.log(heightOfItems);
     switch (this.#position) {
       case POSITION.TOP_LEFT:
-        return `top: ${anchorPos.top - (anchorPos.height + menuHeight)}px; left: ${anchorPos.left}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${anchorPos.left}px;`;
       case POSITION.TOP_CENTER:
-        return `top: ${anchorPos.top - (anchorPos.height + menuHeight)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
       case POSITION.TOP_RIGHT:
-        return `top: ${anchorPos.top - (anchorPos.height + menuHeight)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
       case POSITION.MIDDLE_LEFT:
-        return `top: ${anchorPos.top - (menuHeight * .5)}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
+        return `top: ${anchorPos.top - (heightOfItems * .5)}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
       case POSITION.MIDDLE_RIGHT:
-        return `top: ${anchorPos.top - (menuHeight * .5)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+        return `top: ${anchorPos.top - (heightOfItems * .5)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
       case POSITION.BOTTOM_LEFT:
         return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${anchorPos.left}px;`;
       case POSITION.BOTTOM_CENTER:
@@ -170,34 +191,24 @@ export class PopupMenu extends AzosElement {
     this.#isShown = true;
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    console.log(`${this.firstChild.id} added to the DOM`);
-    // Any setup that requires the component to be in the DOM
-  }
-
-  /** Draw the menu */
+  // Draw the menu
   render() {
-    const rankStyle = parseRank(this.#rank, true);
-    const statusStyle = parseStatus(this.#status, true);
-
     return html`<div id=${this.guid} popover=auto class="popover" style="${this.#positionStyles}">
-      <button class="item ${rankStyle} ${statusStyle}">Dima</button>
-      <button
-        id="btnPopupSubmenu"
-        scope="this"
-        class="item hasSubMenu ${rankStyle} ${statusStyle}"
-        @click="${() => { popupMenu({}, this.btnPopupSubmenu) }}">
-          Shawn
-      </button>
-      <button class="item ${rankStyle} ${statusStyle}">Kevin</button>
-      <hr class="divider" />
-      <button class="item ${rankStyle} ${statusStyle}">Shitstain Steven</button>
+      ${this.#menu.map((item) => html`
+        <button class="item ${parseRank(item.rank, true)} ${parseStatus(item.status, true)}">
+          ${item.title}
+        </button>
+      `)}
     </div>`;
   }
 }
-// <div id="submenu" popover="auto"><h1 style="color:red;">Oh holy crap!</h1></div>
-
+/* <button
+  id="btnPopupSubmenu"
+  scope="this"
+  class="item hasSubMenu ${rankStyle} ${statusStyle}"
+  @click="${() => { popupMenu({}, this.btnPopupSubmenu) }}">
+    Shawn
+</button> */
 /**
  * Shortcut method to PopupMenu.popupMenu(...); {@link PopupMenu.popupMenu}.
  */
