@@ -57,6 +57,8 @@ body {
   --paper2: #e4e4e4;
   --paper3: #d8d8d8;
   --ink: #585858;
+  --ink2: #858585;
+  --ink3: #a2a2a2;
   --ghost: rgba(0, 0, 0, .2);
 
   /* statuses */
