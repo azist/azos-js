@@ -72,7 +72,6 @@ export class TabView extends AzosElement {
 .tab-body {
   display: block;
   width: 100%;
-  padding: 1em;
   box-sizing: border-box;
 }
 

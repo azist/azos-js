@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "azos-ui/ui";
+import { css, html } from "azos-ui/ui";
 
 import { Applet } from "azos-ui/applet";
 
@@ -23,6 +23,10 @@ import { Command } from "../../cmd";
 
 /**  */
 export class AdlibApplet extends Applet {
+
+  static styles = css`
+:host {display: block; padding: 1em;}
+  `;
 
   #ref = {
     svcAdlibClient: AdlibClient,
