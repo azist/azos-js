@@ -13,6 +13,7 @@ export class TreeView extends AzosElement {
 
   static #idSeed = 0;
   static styles = [baseStyles, css`
+:host { display: block; }
 .tree-view {
   user-select: none;
 }

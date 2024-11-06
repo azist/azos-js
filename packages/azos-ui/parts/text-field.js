@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOneOf, asString } from 'azos/strings';
-import { html, parseRank, parseStatus, noContent } from '../ui.js';
+import { html, parseRank, parseStatus, noContent, css } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
 
@@ -32,7 +32,7 @@ export class TextField extends FieldPart {
     placeholder: { type: String }
   }
 
-  static styles = [baseStyles, textFieldStyles];
+  static styles = [baseStyles, textFieldStyles, css`:host { display: inline-block; }`];
 
   constructor() { super(); }
 

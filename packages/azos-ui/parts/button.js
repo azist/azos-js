@@ -5,13 +5,13 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html, parseRank, parseStatus } from '../ui.js';
+import { css, html, parseRank, parseStatus } from '../ui.js';
 import { AzosPart } from './part.js';
 import { baseStyles, buttonStyles } from './styles.js';
 
 /** Defines a simple button exposed as `az-button` tag */
 export class Button extends AzosPart {
-  static styles = [baseStyles, buttonStyles];
+  static styles = [baseStyles, buttonStyles, css`:host { display: inline-block; margin: 0.25em; }`];
 
   static properties = {
     title: { type: String },

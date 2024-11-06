@@ -11,7 +11,7 @@ import { AzosElement, css, html, verbatimHtml, escHtml, parseRank, parseStatus }
 export class CodeBox extends AzosElement{
 
   static styles = css`
-  :host{ font-size: var(--vcl-codebox-fsize);}
+  :host{ font-size: var(--vcl-codebox-fsize); display: block; }
 
   .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl);}
   .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-ctl);}

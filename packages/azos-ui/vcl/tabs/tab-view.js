@@ -13,6 +13,7 @@ import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 export class TabView extends AzosElement {
 
   static styles = css`
+:host { display: block; }
 .hidden { display: none !important; }
 
 .tab-nav {

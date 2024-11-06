@@ -20,27 +20,38 @@ import { IStorage } from "azos/storage";
 export class AdlibCollectionTab extends Tab {
 
   static styles = css`
-.container {
-  margin: 1em;
-  height: 100%;
+:host {
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
 }
 
 az-text::part(field) {
-  min-width: 95vw;
+  resize: vertical;
+  min-width: 97vw;
   min-height: 25ch;
 }
 
+form {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+form .actions {
+  margin-top: 0.5em;
+}
+
 #resultsPanel {
-  display: flex;
-  flex-direction: row;
   overflow: hidden;
 }
 
 #resultsPanel > * {
-  width: 50vw;
   height: 100%;
   max-height: 500px;
   overflow-y: scroll;
+}
+
+az-code-box {
+  padding-top: 0.5em;
 }
   `;
 
@@ -201,23 +212,26 @@ az-text::part(field) {
 
   render() {
     return html`
-<div class="container">
-  <form @submit="${this.#onExecuteClick}" name="CollectionForm">
-    <az-text id="filterElm" scope="this" itemtype="multiline" @input="${this.#filterTextChanged}" value="${this.#filterText}" rank="4"></az-text>
+<form @submit="${this.#onExecuteClick}" name="CollectionForm">
+  <az-text id="filterElm" scope="this" title="Filter" itemType="multiline" @input="${this.#filterTextChanged}" value="${this.#filterText}" rank="4"></az-text>
 
+  <div class="actions">
     <az-button title="Execute" status="ok" type="submit" @click="${this.#onExecuteClick}" rank="medium"></az-button>
     <az-button id="btnSave" scope="this" title="Save" type="button" @click="${this.#onSaveClick}" rank="medium"></az-button>
     <az-button title="Close All Nodes" type="button" @click="${this.#onCloseAllNodes}" rank="medium"></az-button>
     <az-button title="Clear Results" status="error" type="button" @click="${this.#onClearAll}" rank="medium"></az-button>
-  </form>
-
-  <div id="resultsPanel">
-    <div><az-tree-view id="resultsTree" scope="this" @nodeUserAction=${this.#onNodeUserAction}></az-tree-view></div>
-    <div><az-code-box id="resultsCodeBox" scope="this" highlight="json" rank="4" ></az-code-box></div>
   </div>
-</div>
+</form>
+
+<az-tab-view id="resultsPanel" scope="this" .isModern=${true}>
+  <az-tab title="Code Box" .canClose=${false}>
+    <az-code-box id="resultsCodeBox" scope="this" highlight="json" rank="4" ></az-code-box>
+  </az-tab>
+  <az-tab title="Tree" .canClose=${false}>
+    <az-tree-view id="resultsTree" scope="this" @nodeUserAction=${this.#onNodeUserAction}></az-tree-view>
+  </az-tab>
+</az-tab-view>
   `;
-    // <az-grid-view></az-grid-view>
   }
 
 }
