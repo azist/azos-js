@@ -81,7 +81,22 @@ export class TabView extends AzosElement {
   background-color: var(--paper);
 }
 
-.tab-btn.active:after {
+.modern .tab-btn-container-inner {
+  border-bottom: none;
+}
+
+.modern .tab-btn {
+  border: none;
+  border-bottom: 1px solid;
+  background: none;
+}
+
+.modern .tab-btn.active {
+  border-bottom: 3px solid;
+  font-weight: bold;
+}
+
+.tab-btn.active::after {
   content: '';
   display: block;
   height: 2px;
@@ -90,6 +105,10 @@ export class TabView extends AzosElement {
   position: absolute;
   top: 100%;
   left: 0;
+}
+
+.modern .tab-btn.active::after {
+  display: none;
 }
 
 .tab-btn.active .close-ind {
@@ -185,7 +204,8 @@ export class TabView extends AzosElement {
     defaultMinTabWidth: { type: Number },
     defaultMaxTabWidth: { type: Number },
     isDraggable: { type: Boolean },
-    allowCloseAll: { type: Boolean }
+    allowCloseAll: { type: Boolean },
+    isModern: { type: Boolean },
   }
 
   #draggedTabIndex = null;
@@ -428,7 +448,7 @@ export class TabView extends AzosElement {
 
   render() {
     return html`
-    <div class="tab-view">
+    <div class="tab-view ${this.isModern ? 'modern' : ''}">
     ${this.tabs.length ? this.renderTabs() : ''}
     ${this.renderBody()}
     </div>
