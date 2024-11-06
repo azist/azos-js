@@ -150,7 +150,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <az-button @click=${() => this.#move(1)} title="1x"></az-button>
   <az-button @click=${() => this.#move(2)} title="2x"></az-button>
 </div>
-<az-tab-view id="tabView" scope="this" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
+<az-tab-view id="tabView" scope="this" isModern="${true}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
   <az-tab title="Buttons" .canClose="${false}" iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico">
     <h2>az-button</h2>
 
