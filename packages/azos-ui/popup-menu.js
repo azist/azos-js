@@ -112,48 +112,48 @@ export class PopupMenu extends AzosElement {
   #isShown = false;
   #menu = null;
   #position = null;
-  #heightOfItems = null
 
   get #positionStyles() {
     const anchorPos = this.#anchor.getBoundingClientRect();
-    this.#heightOfItems = 0;
+    let heightOfItems = 0;
     this.#menu.forEach((item) => {
       let curRank = parseRank(item.rank, true);
       //convert em to px when 1em = 16px
       switch (curRank) {
         case "r1":
-          this.#heightOfItems += (2.26 * 16);
+          heightOfItems += (2.26 * 16);
           break;
         case "r2":
-          this.#heightOfItems += (2.06 * 16);
+          heightOfItems += (2.06 * 16);
           break;
         case "r3":
-          this.#heightOfItems += (1.66 * 16);
+          heightOfItems += (1.66 * 16);
           break;
         case "r4":
-          this.#heightOfItems += (1.51 * 16);
+          heightOfItems += (1.51 * 16);
           break;
         case "r5":
-          this.#heightOfItems += (1.31 * 16);
+          heightOfItems += (1.31 * 16);
           break;
         case "r6":
-          this.#heightOfItems += (1.16 * 16);
+          heightOfItems += (1.16 * 16);
           break;
         default:
-          this.#heightOfItems += (1.66 * 16);
+          heightOfItems += (1.66 * 16);
       }
     });
+    console.log(heightOfItems);
     switch (this.#position) {
       case POSITION.TOP_LEFT:
-        return `top: ${anchorPos.top - (anchorPos.height + this.#heightOfItems)}px; left: ${anchorPos.left}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${anchorPos.left}px;`;
       case POSITION.TOP_CENTER:
-        return `top: ${anchorPos.top - (anchorPos.height + this.#heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
       case POSITION.TOP_RIGHT:
-        return `top: ${anchorPos.top - (anchorPos.height + this.#heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
       case POSITION.MIDDLE_LEFT:
-        return `top: ${anchorPos.top - (this.#heightOfItems * .5)}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
+        return `top: ${anchorPos.top - (heightOfItems * .5)}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
       case POSITION.MIDDLE_RIGHT:
-        return `top: ${anchorPos.top - (this.#heightOfItems * .5)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+        return `top: ${anchorPos.top - (heightOfItems * .5)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
       case POSITION.BOTTOM_LEFT:
         return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${anchorPos.left}px;`;
       case POSITION.BOTTOM_CENTER:
