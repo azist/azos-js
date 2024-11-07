@@ -15,6 +15,7 @@ import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import "../vcl/util/accordion.js";
 import "../vcl/tabs/tab-view.js";
+import "../vcl/time/scheduler.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
@@ -151,6 +152,8 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button>
 
 <br/>
+
+<az-weekly-scheduler></az-weekly-scheduler>
 
 <div style="display:flex;align-items:center;">
   <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
