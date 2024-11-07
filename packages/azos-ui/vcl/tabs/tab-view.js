@@ -13,10 +13,7 @@ import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 export class TabView extends AzosElement {
 
   static styles = css`
-:host {
-  --my-color: #989898;
-}
-
+:host { display: block; }
 .hidden { display: none !important; }
 
 .tab-nav {
@@ -32,6 +29,7 @@ export class TabView extends AzosElement {
   padding-right: 10px;
   position: relative;
 }
+
 .tab-nav .scroll-btn:after {
   content: '';
   display: inline-block;
@@ -42,25 +40,27 @@ export class TabView extends AzosElement {
   left: 7px;
   border: 5px solid transparent;
 }
+
 .tab-nav .scroll-btn.right:after {
   border-right: 0;
   border-left-color: black;
 }
+
 .tab-nav .scroll-btn.left:after {
   border-left: 0;
   border-right-color: black;
 }
 
-.tab-view {
-  display: block;
-}
+.tab-view { display: block; }
 
 .tab-btn-container-inner {
   display: inline-flex;
   padding-left: 2ch;
   padding-right: 2ch;
-  border-bottom: 2px solid var(--my-color);
+  border-bottom: 2px solid var(--ink2);
 }
+
+.tab-btn-container-inner.modern { padding: 0; }
 
 .tab-btn-container {
   overflow: hidden;
@@ -72,7 +72,6 @@ export class TabView extends AzosElement {
 .tab-body {
   display: block;
   width: 100%;
-  padding: 1em;
   box-sizing: border-box;
 }
 
@@ -107,17 +106,9 @@ export class TabView extends AzosElement {
   left: 0;
 }
 
-.modern .tab-btn.active::after {
-  display: none;
-}
-
-.tab-btn.active .close-ind {
-  pointer-events: auto;
-}
-
-.tab-btn.dragging {
-  opacity: 0.5;
-}
+.modern .tab-btn.active::after { display: none; }
+.tab-btn.active .close-ind { pointer-events: auto; }
+.tab-btn.dragging { opacity: 0.5; }
 
 .tab-btn.drop-zone:before {
   content: '';
@@ -130,13 +121,8 @@ export class TabView extends AzosElement {
   opacity: 1;
 }
 
-.tab-btn.drop-zone.left:before {
-  left: -5px;
-}
-
-.tab-btn.drop-zone.right:before {
-  right: -5px;
-}
+.tab-btn.drop-zone.left:before { left: -5px;}
+.tab-btn.drop-zone.right:before { right: -5px; }
 
 .tab-btn {
   position: relative;
@@ -150,9 +136,9 @@ export class TabView extends AzosElement {
   color: var(--ink);
   border-radius: 0.4em 0.4em 0 0;
   user-select: none;
-  border-top: 3px solid var(--my-color);
-  border-left: 1px solid var(--my-color);
-  border-right: 1px solid var(--my-color);
+  border-top: 3px solid var(--ink2);
+  border-left: 1px solid var(--ink2);
+  border-right: 1px solid var(--ink2);
   transition: font-size 0.1s;
 }
 
@@ -161,9 +147,7 @@ export class TabView extends AzosElement {
   filter: brightness(1.05);
 }
 
-.tab-icon {
-  margin-right: 0.3em;
-}
+.tab-icon { margin-right: 0.3em; }
 
 .dirty-ind {
   font-weight: bold;

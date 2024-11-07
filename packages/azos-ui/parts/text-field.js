@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOneOf, asString } from 'azos/strings';
-import { html, parseRank, parseStatus, noContent } from '../ui.js';
+import { html, parseRank, parseStatus, noContent, css } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
 
@@ -29,10 +29,12 @@ export class TextField extends FieldPart {
     minLength: { type: Number },
 
     /** Ghosted text that will be replaced by user input */
-    placeholder: { type: String }
+    placeholder: { type: String },
+
+    resize: { type: String },
   }
 
-  static styles = [baseStyles, textFieldStyles];
+  static styles = [baseStyles, textFieldStyles, css`:host { display: inline-block; overflow: clip; }`];
 
   constructor() { super(); }
 
@@ -83,6 +85,7 @@ export class TextField extends FieldPart {
         ?readonly=${this.isReadonly}
         @change="${this.#tbChange}"
         part="field"
+        style="resize: ${this.resize}"
         ></textarea>`
       : html`
       <input

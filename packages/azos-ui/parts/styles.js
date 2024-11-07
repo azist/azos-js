@@ -81,8 +81,8 @@ button{
   color:  var(--s-default-fg-ctl);
   background: var(--s-default-bg-ctl-btn);
 
-  padding: .3em .5em;
-  min-width: 12ch;
+  padding: .3em 2ch;
+  min-width: 8ch;
   transition: 0.2s;
 
   user-select: none;
@@ -308,10 +308,12 @@ export const textFieldStyles = css`
   input[type=text],input[type=password],input[type=date],textarea,select{
     width: 100%;
     box-sizing: border-box;
-    padding:.5em;
+    padding: 0.3em 0.35em;
     border: var(--s-default-bor-ctl);
     background-color: var(--s-default-bg-ctl);
     color: var(--s-default-fg-ctl);
+    line-height: 1.3em;
+    font-size: 1em;
   }
   input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,textarea:focus,select:focus{
     outline: var(--focus-ctl-outline);

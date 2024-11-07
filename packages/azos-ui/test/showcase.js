@@ -15,6 +15,7 @@ import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import "../vcl/util/accordion.js";
 import "../vcl/tabs/tab-view.js";
+import "../vcl/time/scheduler.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
@@ -152,6 +153,8 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <br/>
 
+<az-weekly-scheduler></az-weekly-scheduler>
+
 <div style="display:flex;align-items:center;">
   <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
   <az-button @click=${this.#addMoreTab} title="Add more..."></az-button>
@@ -164,8 +167,11 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <az-button @click=${() => this.#move(1)} title="1x"></az-button>
   <az-button @click=${() => this.#move(2)} title="2x"></az-button>
 </div>
+
+
+
 <az-tab-view id="tabView" scope="this" isModern="${true}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
-  <az-tab title="Buttons" .canClose="${false}" iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico">
+  <az-tab .canClose="${false}" title="Buttons" iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico">
     <h2>az-button</h2>
 
     <az-button @click="${showcase.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
@@ -193,7 +199,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-button title="Error" status="error" isdisabled></az-button>
   </az-tab>
 
-  <az-tab title="Input Test">
+  <az-tab .canClose="${false}" title="Input Test">
     <h2>Testing @change with az-text and az-check</h2>
 
     <az-text id="tbNasa" scope="window" name="Nasa" title="Nasa Experimentation" placeholder="Hatch diameter inches" @change="${this.#onFieldChange}" datatype="int" value="10"></az-text>
@@ -207,7 +213,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-check id="chkDrinks"scope="this"  name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-check>
   </az-tab>
 
-  <az-tab title="VCL / Codebox" status="ok">
+  <az-tab .canClose="${false}" title="VCL / Codebox" status="ok">
     <h2> VCL / Codebox</h2>
 
     <az-code-box highlight="js" source="">//this is my json object
@@ -220,7 +226,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </az-code-box>
   </az-tab>
 
-  <az-tab title="Radios">
+  <az-tab .canClose="${false}" title="Radios">
     <h2>Radios</h2>
     <p>A long-used form of placeholder text in design mockups and more, the standard use of dummy text has come under fire in recent years as web design grows (and the internet makes the spread of opinions much more efficient).</p>
     <az-radio-group id="baseGroup" value="choiceOption" title="Group of radios (choose only 1)">
@@ -231,7 +237,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </az-radio-group>
   </az-tab>
 
-  <az-tab title="Checkboxes &amp; Switches" status="info">
+  <az-tab .canClose="${false}" title="Checkboxes &amp; Switches" status="info">
     <h2>Checkboxes and switches</h2>
     <div class="strip-h">
       <az-check id="normalCheckbox" title="This is a checkbox" titleWidth="60"></az-check>
@@ -263,7 +269,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </div>
   </az-tab>
 
-  <az-tab title="Text Fields">
+  <az-tab .canClose="${false}" title="Text Fields">
     <h2>Text boxes</h2>
     <div class="strip-h">
       <az-text id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;" titlePosition="mid-left" titleWidth="25" contentWidth="75"></az-text>
@@ -315,7 +321,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </div>
   </az-tab>
 
-  <az-tab title="Select Field" status="warning">
+  <az-tab .canClose="${false}" title="Select Field" status="warning">
     <h2>Selects/Combos</h2>
     <az-select id="defaultSelect" title="Select one of the following from the dropdown">
       <az-select-option value="" title="Select an option&hellip;"></az-select-option>
@@ -332,7 +338,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </az-select>
   </az-tab>
 
-  <az-tab title="Sliders (WIP)" status="error">
+  <az-tab .canClose="${false}" title="Sliders (WIP)" status="error">
     <h2>Sliders</h2>
     <p>This az-slider renders as an &lt;input type="range"&gt; element. These are the available properties/attributes:</p>
     <ol>
@@ -359,7 +365,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     ></az-slider>
   </az-tab>
 
-  <az-tab title="Accordion">
+  <az-tab .canClose="${false}" title="Accordion">
     <az-accordion name="accordion" width="75%" align="center" activeItemIndex="2">
       <az-accordion-item title="First accordion item">
         <p>Eu culpa dolore adipisicing qui cillum duis incididunt consequat amet. <strong><em>Non ipsum nostrud</em></strong> culpa nulla quis dolor culpa commodo anim labore sit fugiat culpa minim. Adipisicing et qui ex cupidatat excepteur anim laborum eiusmod aute amet cupidatat et. Eiusmod qui eiusmod Lorem amet cupidatat esse aliqua ipsum ex laborum officia reprehenderit incididunt adipisicing. Sint quis cupidatat commodo aliquip mollit enim voluptate dolore consectetur.</p>
@@ -377,7 +383,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     </az-accordion>
   </az-tab>
 
-  <az-tab title="Modal Dialogs">
+  <az-tab .canClose="${false}" title="Modal Dialogs">
     <p>@click action buttons</p>
     <az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
     <az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
@@ -394,7 +400,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
   </az-tab>
 
-  <az-tab title="Toasts">
+  <az-tab .canClose="${false}" title="Toasts">
     <az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
     <az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
   </az-tab>
