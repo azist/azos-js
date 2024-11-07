@@ -19,7 +19,7 @@ export class SelectField extends FieldPart{
     /** Determines if this field is a standard dropdown select or a multiple select */
     itemType: {type: String}
   }
-  static styles=[baseStyles, textFieldStyles];//, css`:host { display: inline-block; }`];
+  static styles=[baseStyles, textFieldStyles, css`:host { display: inline-block; }`];
 
   constructor(){ super(); }
 

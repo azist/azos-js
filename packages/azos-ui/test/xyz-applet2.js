@@ -31,11 +31,16 @@ xaz-button {
   border:1px solid red;
 }
 
+xaz-text {
+  border: 1px solid red;
+}
+
 .h-strip {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1.00em;
+  gap: 1em;
+  flex-wrap: wrap;
 }
 
   `];
@@ -61,7 +66,7 @@ xaz-button {
   <az-button id="btn3" title="Press me hardest" @click="${this.#onPressMe}"></az-button>
 </div>
 
-<br/><br/>
+<br><br>
 
 <div class="h-strip">
   <az-button id="btn4" title="Huge" @click="${this.#onPressMe}" rank="huge"></az-button>
@@ -72,13 +77,55 @@ xaz-button {
   <az-button id="btn9" title="Tiny" @click="${this.#onPressMe}" rank="tiny"></az-button>
 </div>
 
-<br/><br/>
+<br><br>
 
 <div class="h-strip">
   <az-button id="btn10" title="Ok" @click="${this.#onPressMe}" status="ok"></az-button>
   <az-button id="btn11" title="Cancel" @click="${this.#onPressMe}" status="error"></az-button>
   <az-button id="btn12" title="Error Details..." @click="${this.#onPressMe}" status="alert"></az-button>
 </div>
+
+<br><hr><br>
+
+<div class="h-strip">
+  <az-text id="text1" title="Name" value="Borland" style="width: 70ch"></az-text>
+  <az-text id="text2" title="Zip Code" value="48911"></az-text>
+</div>
+
+<br><br>
+
+<div class="h-strip">
+  <az-text id="text3" title="Huge" value="W_i\`@." rank="huge"></az-text>
+  <az-text id="text4" title="Large" value="W_i\`@." rank="large"></az-text>
+  <az-text id="text5" title="Normal" value="W_i\`@." rank="normal"></az-text>
+  <az-text id="text6" title="Medium" value="W_i\`@." rank="medium"></az-text>
+  <az-text id="text7" title="Small" value="W_i\`@." rank="small"></az-text>
+  <az-text id="text8" title="Tiny" value="W_i\`@." rank="tiny"></az-text>
+</div>
+
+<br><br>
+
+<div class="h-strip">
+  <az-text id="text9" title="Huge" value="W_i\`@." rank="huge" message="Field value is required"></az-text>
+  <az-text id="text10" title="Large" value="W_i\`@." rank="large" message="Field value is required"></az-text>
+  <az-text id="text11" title="Normal" value="W_i\`@." rank="normal" message="Field value is required"></az-text>
+  <az-text id="text12" title="Medium" value="W_i\`@." rank="medium" message="Field value is required"></az-text>
+  <az-text id="text13" title="Small" value="W_i\`@." rank="small" message="Field value is required"></az-text>
+  <az-text id="text14" title="Tiny" value="W_i\`@." rank="tiny" message="Field value is required"></az-text>
+</div>
+
+<br><hr><br>
+
+<div class="h-strip">
+  <az-text id="text15" itemType="multiline" resize="none" title="Huge" value="W_i\`@." rank="huge" message="Field value is required"></az-text>
+  <az-text id="text16" itemType="multiline" resize="horizontal" title="Large" value="W_i\`@." rank="large" message="Field value is required"></az-text>
+  <az-text id="text17" itemType="multiline" resize="vertical" title="Normal" value="W_i\`@." rank="normal" message="Field value is required"></az-text>
+  <az-text id="text18" itemType="multiline" title="Medium" value="W_i\`@." rank="medium" message="Field value is required"></az-text>
+  <az-text id="text19" itemType="multiline" title="Small" value="W_i\`@." rank="small" message="Field value is required"></az-text>
+  <az-text id="text20" itemType="multiline" title="Tiny" value="W_i\`@." rank="tiny" message="Field value is required"></az-text>
+</div>
+
+<az-text id="text16" resize="none" style="width: 50vw;" itemType="multiline" title="Large" value="W_i\`@." rank="large" message="Field value is required"></az-text>
 
     `;
   }//render
