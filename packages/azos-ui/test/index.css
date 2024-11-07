@@ -166,11 +166,11 @@ body {
 
   /* rank font sizes - MUST be in EM */
   --r1-fs: 1.60em;
-  --r2-fs: 1.40em;
+  --r2-fs: 1.30em;
   --r3-fs: 1em;
   --r4-fs: 0.85em;
-  --r5-fs: 0.65em;
-  --r6-fs: 0.5em;
+  --r5-fs: 0.70em;
+  --r6-fs: 0.65em;
 
   /* rank border radius for window-level objects/containers */
   --r1-brad-win: 10px;
@@ -181,9 +181,9 @@ body {
   --r6-brad-win: 2px;
 
   /* rank border radius for smaller parts */
-  --r1-brad-ctl: 0.5em;
-  --r2-brad-ctl: 0.42em;
-  --r3-brad-ctl: 0.4em;
+  --r1-brad-ctl: 0.3em;
+  --r2-brad-ctl: 0.3em;
+  --r3-brad-ctl: 0.3em;
   --r4-brad-ctl: 0.3em;
   --r5-brad-ctl: 0.2em;
   --r6-brad-ctl: 1px;

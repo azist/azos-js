@@ -11,7 +11,7 @@ import { baseStyles, buttonStyles } from './styles.js';
 
 /** Defines a simple button exposed as `az-button` tag */
 export class Button extends AzosPart {
-  static styles = [baseStyles, buttonStyles, css`:host { display: inline-block; margin: 0.25em; }`];
+  static styles = [baseStyles, buttonStyles, css`:host { display: inline-block; }`];
 
   static properties = {
     title: { type: String },

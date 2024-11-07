@@ -81,8 +81,8 @@ button{
   color:  var(--s-default-fg-ctl);
   background: var(--s-default-bg-ctl-btn);
 
-  padding: .3em .5em;
-  min-width: 12ch;
+  padding: .3em 2ch;
+  min-width: 8ch;
   transition: 0.2s;
 
   user-select: none;
