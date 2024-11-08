@@ -324,17 +324,17 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
   <az-tab .canClose="${false}" title="Select Field" status="warning">
     <h2>Selects/Combos</h2>
     <az-select id="defaultSelect" title="Select one of the following from the dropdown">
-      <az-select-option value="" title="Select an option&hellip;"></az-select-option>
-      <az-select-option value="valueOne" title="Selected first value"></az-select-option>
-      <az-select-option value="secondValue" title="Select second option"></az-select-option>
-      <az-select-option value="thirdOption" title="This is an option"></az-select-option>
-      <az-select-option value="opt4" title="Option #4"></az-select-option>
-      <az-select-option value="fifthValue" title="OPTION FIVE"></az-select-option>
-      <az-select-option value="value6" title="Yet another option"></az-select-option>
-      <az-select-option value="numberSeven" title="Are you losing count yet?"></az-select-option>
-      <az-select-option value="eighthOption" title="Maybe chose this one"></az-select-option>
-      <az-select-option value="optionNine" title="Almost done"></az-select-option>
-      <az-select-option value="finalValue" title="Last test option"></az-select-option>
+      <option value="" title="Select an option&hellip;"></option>
+      <option value="valueOne" title="Selected first value"></option>
+      <option value="secondValue" title="Select second option"></option>
+      <option value="thirdOption" title="This is an option"></option>
+      <option value="opt4" title="Option #4"></option>
+      <option value="fifthValue" title="OPTION FIVE"></option>
+      <option value="value6" title="Yet another option"></option>
+      <option value="numberSeven" title="Are you losing count yet?"></option>
+      <option value="eighthOption" title="Maybe chose this one"></option>
+      <option value="optionNine" title="Almost done"></option>
+      <option value="finalValue" title="Last test option"></option>
     </az-select>
   </az-tab>
 

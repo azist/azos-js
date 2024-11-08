@@ -31,6 +31,8 @@ export class TextField extends FieldPart {
     /** Ghosted text that will be replaced by user input */
     placeholder: { type: String },
 
+    /** Defines resize attribute for textarea
+     * (none | both | horizontal | vertical | block | inline) */
     resize: { type: String },
   }
 

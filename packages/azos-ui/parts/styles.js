@@ -242,11 +242,11 @@ export const switchStyles = css`
 export const radioStyles = css`
   .radio-item{
     display:flex;
-    align-items:baseline;
+    align-items:center;
     padding-bottom:.75em;
   }
   .radio-item-label{
-    padding-left:1.5em;
+    padding-left:.25em;
     margin-left:0;
   }
   .radio:focus{
@@ -340,7 +340,7 @@ export const textFieldStyles = css`
 
   .readonlyInput{ background: none; }
 
-  select > option { padding:.5em .5em .35em .5em; }
+  select > option { padding: 0.3em 0.35em; }
 `;
 
 export const sliderStyles = css`
