@@ -9,19 +9,20 @@ import { Module } from "azos/modules";
 import { XyzApplet } from "./xyz-applet.js";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
+import { XyzApplet2 } from "./xyz-applet2.js";
 
 
-class MyLogic extends Module{
+class MyLogic extends Module {
   #tmr;
-  constructor(dir, cfg){
+  constructor(dir, cfg) {
     super(dir, cfg);
   }
 
-  _appAfterLoad(){
+  _appAfterLoad() {
     this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 25_000);
   }
 
-  _appBeforeCleanup(){
+  _appBeforeCleanup() {
     clearInterval(this.#tmr);
   }
 }
@@ -42,12 +43,16 @@ const appMenu = [
     nodes: [
     ]
   },
-  {uri: "setup", caption: "Data Setup", nodes: [
-    {uri: "codes", caption: "Codes and Classifications", nodes: [
-      {uri: "facility", caption: "Facility Master", handler: {type: XyzApplet, a: 1, b: true}, icon: "<svg></svg>"},
-      {uri: "postal", caption: "Postal Codes", handler: {type: XyzApplet, x: -5, b: "ok"}, icon: "<svg></svg>"},
-    ]}
-  ]}
+  {
+    uri: "setup", caption: "Data Setup", nodes: [
+      {
+        uri: "codes", caption: "Codes and Classifications", nodes: [
+          { uri: "facility", caption: "Facility Master", handler: { type: XyzApplet, a: 1, b: true }, icon: "<svg></svg>" },
+          { uri: "postal", caption: "Postal Codes", handler: { type: XyzApplet, x: -5, b: "ok" }, icon: "<svg></svg>" },
+        ]
+      }
+    ]
+  }
 ];
 
 const cfgApp = {
@@ -55,11 +60,11 @@ const cfgApp = {
   name: "$(id)",
   description: "Test '$(name)' application",
   modules: [
-    {name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET},
-    {name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET},
-    {name: "log", type: ConLog},
-    {name: "logic", type: MyLogic},
-    {name: "router", type: Router, menu: { root: [...appMenu] }},
+    { name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET },
+    { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
+    { name: "log", type: ConLog },
+    { name: "logic", type: MyLogic },
+    { name: "router", type: Router, menu: { root: [...appMenu] } },
   ]
 };
 
@@ -68,17 +73,17 @@ window.AZOS_APP = app;//for debugging
 console.info(`App instance ${app.instanceId} assigned into 'window.AZOS_APP' for debugging`);
 app.session.boot(window.XYZ_USER_OBJECT_INIT);
 
-app.log.write({type: LOG_TYPE.DEBUG, text: "Launching arena..."});
+app.log.write({ type: LOG_TYPE.DEBUG, text: "Launching arena..." });
 const arena = Arena.launch(app)[0];
 window.ARENA = arena;
-arena.appletOpen(XyzApplet);
-app.log.write({type: LOG_TYPE.DEBUG, text: "...arena launched"});
+arena.appletOpen(XyzApplet2);
+app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 
 // Handle UNLOADING/CLOSING of tab/window
 //https://developer.chrome.com/docs/web-platform/page-lifecycle-api
 window.addEventListener("beforeunload", (evt) => {
-  if (arena.dirty){
+  if (arena.dirty) {
     evt.preventDefault();
     evt.returnValue = true;
     return;
