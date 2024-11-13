@@ -214,6 +214,7 @@ export class FieldPart extends AzosPart{
 
     //Set the field's title width
     const stlTitleWidth = isHorizon ? css`width: ${this.titleWidth}%;` : null;
+    const stlTitleHidden = this.title ? null : css`display:none`;
     //Set the field's content width if field is not of a predefined layout
     const stlContentWidth = isHorizon && !isPreContent ? css`width: ${this.contentWidth}%;` : null;
 
@@ -223,7 +224,7 @@ export class FieldPart extends AzosPart{
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <label class="${clsPosition}">
-          <span class="${this.isRequired ? 'requiredTitle' : noContent}" style="${stlTitleWidth}">${this.title}</span>
+          <span class="${this.isRequired ? 'requiredTitle' : noContent}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title}</span>
           ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput()} ${msg}</div>` : html`${this.renderInput()} ${msg}`}
         </label>
       </div>

@@ -41,30 +41,42 @@ export class WeeklyScheduler extends AzosElement {
 
   static styles = css`
 :host { display: block; margin-top: 1em; margin-bottom: 1em; }
+az-select {
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+}
 
 .header {
   display: flex;
   align-items: end;
   justify-content: center;
+  margin-bottom: 0.5em;
 }
 
-.header az-select {
-// display:block;
-}
-
-.week-days {
+.days {
   display: flex;
-  align-items: middle;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.week-days .day {
+.day-column {
   display: flex;
-  align-items: middle;
   flex-direction: column;
+  width: 100%;
 }
 
-.week-days .day > div { text-align: center; }
+.day-column .day-label {
+  width: 100%;
+  text-align: center;
+}
 
+.day-column .time-slot {
+  display: block;
+}
+
+:not(.legend) .time-slot:hover {
+  background-color: #ccc;
+}
 
 .r1 { font-size: var(--r1-fs);}
 .r2 { font-size: var(--r2-fs);}
@@ -95,6 +107,7 @@ export class WeeklyScheduler extends AzosElement {
     selectedSlot: { type: Object },
   }
 
+  #monthOptions = Object.values(MONTHS_OF_YEAR).map(monthIndex => html`<az-select-option value="${monthIndex}" title="${ALL_MONTH_NAMES[monthIndex]}"></az-select-option>`);
   #selectedAppointment = null;
 
   constructor() {
@@ -115,83 +128,55 @@ export class WeeklyScheduler extends AzosElement {
     startOfWeek.setDate(startOfWeek.getDate() - dayDifference);
     startOfWeek.setHours(0, 0, 0, 0);
 
-    console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek, );
+    console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
 
     return startOfWeek;
   }
 
   #getAvailableSlots() { return []; }
 
-
   connectedCallback() {
     super.connectedCallback();
   }
 
-  #monthOptions = Object.values(MONTHS_OF_YEAR).map(monthIndex => html`<az-select-option value="${monthIndex}" title="${ALL_MONTH_NAMES[monthIndex]}"></az-select-option>`);
+  #handlePreviousWeek() { }
+  #handleMonthChange() { }
+  #handleNextWeek() { }
 
-  render() {
-    return html`
-<div class="scheduler">
-  ${this.renderHeader()}
-  ${this.renderWeekDays()}
-  ${this.renderTimeSlots()}
-</div>
-    `;
-  }
-
-  renderHeader() {
-    return html`
-<div class="header">
-  <az-button title="Previous" @click="${this.handlePreviousWeek}"></az-button>
-  <az-select id="monthSelector" scope="this" @change="${this.handleMonthChange}" value="${this.selectedMonth}">
-    ${this.#monthOptions}
-  </az-select>
-  <az-button title="Next" @click="${this.handleNextWeek}"></az-button>
-</div>
-    `;
-  }
-
-  renderWeekDays() {
-    const daysHtml = [];
-
-    // loop through week start + showNumDays
-    for (let i = 0; i < this.showNumDays; i++) {
-      // Create a new date for each day in the week
+  get #daysView() {
+    return Array.from({ length: this.showNumDays }).map((_, i) => {
       const currentDate = new Date(this.currentWeekStart);
       currentDate.setDate(this.currentWeekStart.getDate() + i);
 
-      // Get the day name and date in a user-friendly format
-      const dayName = currentDate.toLocaleDateString(undefined, { weekday: 'short' });  // e.g., "Mon"
-      const dateNumber = currentDate.getDate();  // e.g., "1" for Oct 1
-
-      // Add the day to the daysHtml array
-      daysHtml.push(html`
-        <div class="day">
-          <div class="day-name">${dayName}</div>
-          <div class="day-date">${dateNumber}</div>
-        </div>
-      `);
-    }
-
-    // Return all days wrapped in a container
-    return html`
-      <div class="week-days">
-        ${daysHtml}
-      </div>
-    `;
+      const name = currentDate.toLocaleDateString(undefined, { weekday: 'short' });
+      const number = currentDate.getDate();
+      return [name, number];
+    });
   }
 
-  renderTimeSlots() {
-    return html`
-<div class="time-slots">
-  ${this.availableSlots.map(slot => html`
-    <div class="time-slot ${slot.available ? 'available' : 'unavailable'}"
-          @click="${() => this.handleSlotSelect(slot)}">
-      ${slot.date} ${slot.time}
-    </div>
-  `)}
-</div>
-    `;
+  startTime = '09:00';
+  endTime = '17:00';
+  incrementMinutes = 30;
+  get timeSlotsView() {
+
+    const slots = [];
+    let [startHour, startMinute] = this.startTime.split(':').map(Number);
+    let [endHour, endMinute] = this.endTime.split(':').map(Number);
+
+    let currentHour = startHour;
+    let currentMinute = startMinute;
+
+    while (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute)) {
+      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      slots.push(timeString);
+
+      currentMinute += this.incrementMinutes;
+      if (currentMinute >= 60) {
+        currentMinute -= 60;
+        currentHour += 1;
+      }
+    }
+    return slots;
   }
 
   handleSlotSelect(slot) {
@@ -200,7 +185,56 @@ export class WeeklyScheduler extends AzosElement {
     }
   }
 
-}
+  render() {
+    return html`
+<div class="scheduler">
+  ${this.renderHeader()}
+  ${this.renderTimeSlots()}
+</div>
+    `;
+  }
 
+  renderHeader() {
+    return html`
+<div class="header">
+  <az-button title="Previous" @click="${this.#handlePreviousWeek}"></az-button>
+  <az-select id="monthSelector" scope="this" @change="${this.#handleMonthChange}" value="${this.selectedMonth}">${this.#monthOptions}</az-select>
+  <az-button title="Next" @click="${this.#handleNextWeek}"></az-button>
+</div>
+    `;
+  }
+
+  renderTimeSlots() {
+    return html`
+    <div class="days">
+      <div class="day-column legend">
+        <div class="day-label">
+          <div class="day-name">&nbsp;</div>
+          <div class="day-date">&nbsp;</div>
+        </div>
+        ${this.timeSlotsView.map(time => html`
+        <div class="time-label">${time}</div>
+        `)}
+      </div>
+      ${this.#daysView.map(([name, number]) => html`
+      <div class="day-column">
+        <div class="day-label">
+          <div class="day-name">${name}</div>
+          <div class="day-date">${number}</div>
+        </div>
+        ${this.timeSlotsView.map(time => html`
+        <div class="time-slot" data-time="${time}" data-day="${number}"
+          @mouseover="${() => this.handleSlotHover(number, time)}"
+          @mouseout="${() => this.handleSlotHoverOut()}">
+          &nbsp;
+        </div>
+        `)}
+      </div>
+      `)}
+    </div>
+    `;
+  }
+
+}
 
 window.customElements.define("az-weekly-scheduler", WeeklyScheduler);
