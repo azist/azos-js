@@ -4,6 +4,43 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+
+/*
+  SVG Stock Images provided by
+
+  GOOGLE FONTS Project https://fonts.google.com/icons
+  under Apache 2.0 License https://www.apache.org/licenses/LICENSE-2.0.html
+
+Copyright 2024 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/*
+ Image source settings
+ =====================
+
+ Google Fonts
+    https://fonts.google.com/icons?icon.set=Material+Symbols&selected=Material+Symbols+Outlined:close:FILL@0;wght@200;GRAD@0;opsz@24&icon.size=24&icon.color=%23e8eaed&icon.style=Sharp
+
+ Google Fonts Icon Parameters:
+    Weight: 200
+    Grade: 0
+    Optical Size: 24
+    Style: Material Symbols (New), Sharp
+*/
+
+
 import { isNonEmptyString, isOf } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";

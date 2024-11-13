@@ -59,3 +59,11 @@ npm run test-bro
 # http://localhost:1234
 npm run ui
 ```
+
+## Attributions
+
+Portions of this work are based on other open source projects, each having their respective licenses:
+
+- Stock icon images provided by Google Fonts/Material Design Icons https://fonts.google.com/icons under Apache 2.0 License https://github.com/google/material-design-icons/blob/master/LICENSE
+- Parcel Bundler https://parceljs.org/ MIT License https://github.com/parcel-bundler/parcel/blob/v2/LICENSE
+- The project build uses Node.js v.18+ https://github.com/nodejs/node/blob/main/LICENSE
