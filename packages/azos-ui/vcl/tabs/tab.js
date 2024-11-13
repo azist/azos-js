@@ -99,7 +99,7 @@ export class Tab extends Block {
 
   requestUpdate(...args) {
     super.requestUpdate.call(this, ...args);
-    this.tabView?.requestUpdate();
+    if (this.tabView?.requestUpdate) this.tabView.requestUpdate();
   }
 
   connectedCallback() {
