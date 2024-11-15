@@ -93,8 +93,8 @@ export class TextField extends FieldPart {
       <input
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="tbData"
-        maxLength="${this.maxChar ? this.maxChar : noContent}"
-        minLength="${this.minChar ? this.minChar : noContent}"
+        maxLength="${this.maxLength ? this.maxLength : noContent}"
+        minLength="${this.minLength ? this.minLength : noContent}"
         placeholder="${this.placeholder}"
         type="${this.isInputText ? "text" : this.isPassword ? "password" : "date"}"
         .value="${val}"
