@@ -1381,5 +1381,31 @@ describe("Types", function() {
 
   });//MinMaxBetween
 
+  describe("TimeSpanBetween", function () {
+    it("hoursBetween()", function () {
+      const a = new Date(2024, 10, 15, 10, 0, 0, 0);
+      const b = new Date(2024, 10, 15, 15, 0, 0, 0);
+      aver.areEqual(sut.hoursBetween(a, b), 5);
+      aver.areEqual(sut.hoursBetween(b, a), -5);
+      aver.areEqual(sut.hoursBetweenAbs(b, a), 5);
+    });
+
+    it("minutesBetween()", function () {
+      const a = new Date(2024, 10, 15, 10, 0, 0, 0);
+      const b = new Date(2024, 10, 15, 10, 5, 0, 0);
+      aver.areEqual(sut.minutesBetween(a, b), 5);
+      aver.areEqual(sut.minutesBetween(b, a), -5);
+      aver.areEqual(sut.minutesBetweenAbs(b, a), 5);
+    });
+
+    it("secondsBetween()", function () {
+      const a = new Date(2024, 10, 15, 10, 0, 0, 0);
+      const b = new Date(2024, 10, 15, 10, 0, 5, 0);
+      aver.areEqual(sut.secondsBetween(a, b), 5);
+      aver.areEqual(sut.secondsBetween(b, a), -5);
+      aver.areEqual(sut.secondsBetweenAbs(b, a), 5);
+    });
+  });
+
 
 });

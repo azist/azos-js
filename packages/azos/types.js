@@ -9,6 +9,8 @@ import * as CC from "./coreconsts.js";
 import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
 
+import {isDate as aver_isDate} from "./aver.js";
+
 
 /**
  * Establishes a "director" protocol - an entity which implements such property returns it's director -
@@ -945,3 +947,12 @@ export function sortJsonKeys(json) {
     {}
   );
 }
+
+export function hoursBetween(date1, date2) { return minutesBetween(date1, date2) / 60; }
+export function hoursBetweenAbs(date1, date2) { return minutesBetweenAbs(date1, date2) / 60; }
+
+export function minutesBetween(date1, date2) { return secondsBetween(date1, date2) / 60; }
+export function minutesBetweenAbs(date1, date2) { return secondsBetweenAbs(date1, date2) / 60; }
+
+export function secondsBetween(date1, date2) { return (aver_isDate(date2) - aver_isDate(date1)) / 1000; }
+export function secondsBetweenAbs(date1, date2) { return Math.abs(aver_isDate(date2) - aver_isDate(date1)) / 1000; }
