@@ -173,63 +173,6 @@ export const STOCK_IMAGES = Object.freeze([
   },
 ]);
 
-/** Library of GDI brand logos as SVG icons */
-export const GDI_BRANDS = Object.freeze([
-  {
-    uri: "brand-gdi",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-patio",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-stanek",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-hcc",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-apex",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-uwd",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-tba",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-champ",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-yhic",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-kd",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-hpa",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-leafguard",
-    f: "svg",
-    c: ``
-  }, {
-    uri: "brand-englert",
-    f: "svg",
-    c: ``
-  },
-]);
-
 /** Library of Common Material Icons (filled standard style) */
 export const ICONS = Object.freeze([
   {
