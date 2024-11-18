@@ -137,6 +137,6 @@ export class Tab extends Block {
     this.tabView.moveTab(this, beforeTab);
   }
 
-  render() { return html`<slot></slot>`; }
+  renderControl() { return html`<slot></slot>`; }
 
 }

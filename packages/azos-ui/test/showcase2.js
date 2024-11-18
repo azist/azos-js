@@ -4,11 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, css, html } from "../ui";
+import { Control, css, html } from "../ui";
 import "../parts/button.js";
 import "../parts/text-field.js";
 
-export class Showcase2 extends AzosElement {
+export class Showcase2 extends Control {
   constructor() { super(); }
 
   static styles = css`
@@ -23,7 +23,7 @@ export class Showcase2 extends AzosElement {
     }
   `;
 
-  render() {
+  renderControl() {
     const showcase = this;
     return html`
       <div class="row">

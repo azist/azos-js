@@ -5,12 +5,12 @@
 </FILE_LICENSE>*/
 
 import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/aver";
-import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 
-export class TabView extends AzosElement {
+export class TabView extends Control {
 
   static styles = css`
 :host { display: block; }
@@ -430,7 +430,7 @@ export class TabView extends AzosElement {
     scrollBtns.forEach((btn) => btn.style.display = tabBtnsTotalWidth > tabContainerWidth ? 'block' : 'none');
   }
 
-  render() {
+  renderControl() {
     return html`
     <div class="tab-view ${this.isModern ? 'modern' : ''}">
     ${this.tabs.length ? this.renderTabs() : ''}

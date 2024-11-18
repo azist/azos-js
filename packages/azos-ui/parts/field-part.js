@@ -7,8 +7,7 @@
 import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP } from "azos/types";
 import { dflt } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
-import { html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
-import { AzosPart } from "./part";
+import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
 
 function guardWidth(v, d){
@@ -23,7 +22,7 @@ export const DEFAULT_CONTENT_WIDTH_PCT = 40;
 export const DEFAULT_TITLE_WIDTH_PCT = 40;
 
 
-export class FieldPart extends AzosPart{
+export class FieldPart extends Part{
 
   constructor(){
     super();
@@ -191,7 +190,9 @@ export class FieldPart extends AzosPart{
            },
 
 
-    error: {type: Object}
+    error: {type: Object},
+
+    isRequired:  {type: Boolean, reflect: true}
   }
 
 

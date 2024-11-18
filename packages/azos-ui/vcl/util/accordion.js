@@ -4,10 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, css, html, verbatimHtml, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, verbatimHtml, parseRank, parseStatus } from "../../ui";
 
 /** Provides code display functionality with optional syntax highlighting */
-export class Accordion extends AzosElement {
+export class Accordion extends Control {
 
   static styles = css`
   .r1 { font-size: var(--r1-fs);}
@@ -70,7 +70,7 @@ export class Accordion extends AzosElement {
     super();
   }
 
-  render() {
+  renderControl() {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatus = `${parseStatus(this.status, true)}`;
     const allItems = [...this.getElementsByTagName("az-accordion-item")];

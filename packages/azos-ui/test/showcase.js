@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css, POSITION, RANK, STATUS } from "../ui";
+import { Control, html, css, POSITION, RANK, STATUS } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/check-field.js";
@@ -22,7 +22,7 @@ import { Tab } from "../vcl/tabs/tab.js";
 import { popupMenu } from "../popup-menu.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
-export class Showcase extends AzosElement {
+export class Showcase extends Control {
   constructor() { super(); }
 
   static styles = css`
@@ -141,7 +141,7 @@ export class Showcase extends AzosElement {
     ], this.btnPopupMenu, "mid-right");
   }
 
-  render() {
+  renderControl() {
     const showcase = this;
 
     return html`

@@ -4,10 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css, noContent } from "azos-ui/ui";
+import { Control, html, css, noContent } from "azos-ui/ui";
 import { asBool } from "azos/types";
 
-export class ChronicleGrid extends AzosElement{
+export class ChronicleGrid extends Control{
   constructor(){ super(); }
 
   static styles = css`
@@ -159,7 +159,7 @@ thead{
   }
 
 
-  render(){
+  renderControl(){
     return html`
   <table id="grid">
    <thead id="gridHead">

@@ -7,12 +7,9 @@
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { AzosElement } from "./ui.js";
 
-//import { APPLET_STYLES } from "./applet.css.js";
-//import * as DEFAULT_HTML from "./applet.htm.js";
-
 /**
  * Defines a root UI element which represents an Applet - a part of application.
- * Applets run inside of arenas as a root element for building complex UI screens such as data entry forms
+ * Applets run inside of arenas as a root element for building complex UI screens such as data view/entry forms
  */
 export class Applet extends AzosElement {
 
