@@ -46,5 +46,11 @@
         "xffffn",
         "xffn"
     ],
-    "files.eol": "\n"
+    "files.eol": "\n",
+    "workbench.tree.indent": 20,
+    "workbench.tree.renderIndentGuides": "always",
+    "editor.mouseWheelZoom": true,
+    "workbench.colorCustomizations": {
+      "tree.indentGuidesStroke": "#729292"
+    }
 }
