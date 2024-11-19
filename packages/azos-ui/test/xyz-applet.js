@@ -12,7 +12,6 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
 import "./showcase.js";
-import "./showcase2.js";
 import "../vcl/time/timeline.js";
 import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
 import { CLOSE_QUERY_METHOD } from "azos/types";
@@ -125,25 +124,31 @@ export class XyzApplet extends Applet {
 
 
   render() {
-    return html` applet
-     <button @click="${this.onClick1}"> Click me </button>
-     <button @click="${this.onClick2}"> Click me </button>
-     <button @click="${this.onClick3}"> Close This Applet </button>
-     <button @click="${this.onClick4}"> Open Dialog Box </button>
-     <button @click="${this.onClick5}"> Did you wash your hands? </button>
-     <button @click="${this.onClick6}"> btnSave.isVisible </button>
+    return html`
 
-     <az-button id="btnChronicle" scope="this" title="Chronicle" @click="${this.btnChronicleClick}"> </az-button>
-     <az-button id="btnAdlib" scope="this" title="Adlib" @click="${this.btnAdlibClick}"> </az-button>
-     <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
-     <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
-     <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
+     <div style="display: flex;">
+      <h2>Navigate to:</h2>
+      <az-button id="btnChronicle" scope="this" title="Chronicle" @click="${this.btnChronicleClick}"> </az-button>
+      <az-button id="btnAdlib" scope="this" title="Adlib" @click="${this.btnAdlibClick}"> </az-button>
+      <az-button id="btnTimeline" scope="this" title="Timeline" status="info" @click="${this.onClickTimeline}"></az-button>
+     </div>
 
-     <az-button id="btnTimeline" scope="this" title="Git yer fuchurr 4told!" status="info" @click="${this.onClickTimeline}"></az-button>
+     <div style="display: flex;">
+      <h2>Applet controls:</h2>
 
+      <button @click="${this.onClick1}"> Click me </button>
+      <button @click="${this.onClick2}"> Click me </button>
+      <button @click="${this.onClick3}"> Close This Applet </button>
+      <button @click="${this.onClick4}"> Open Dialog Box </button>
+      <button @click="${this.onClick5}"> Did you wash your hands? </button>
+      <button @click="${this.onClick6}"> btnSave.isVisible </button>
 
+      <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
+      <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
+      <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
+    </div>
 
-     <az-modal-dialog id="dlgTest1" scope="self" title="My Dialog Box for Users" rank="normal" status="info">
+    <az-modal-dialog id="dlgTest1" scope="self" title="My Dialog Box for Users" rank="normal" status="info">
       <style>
         h1{margin: 6px;}
         h2{margin: 4px;}
@@ -215,7 +220,6 @@ export class XyzApplet extends Applet {
       </div>
      </az-modal-dialog>
 
-     <az-test-showcase-2></az-test-showcase-2>
      <az-test-showcase></az-test-showcase>
 
     `;

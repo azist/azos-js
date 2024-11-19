@@ -14,17 +14,12 @@ export class TreeView extends Control {
   static #idSeed = 0;
   static styles = [baseStyles, css`
 :host { display: block; }
-.tree-view {
-  user-select: none;
-}
+
+.tree-view { user-select: none; }
 
 .tree-view, .tree-node-children {
   list-style: none;
   padding-left: 1em;
-}
-
-.tree-node {
-
 }
 
 .tree-node-header {

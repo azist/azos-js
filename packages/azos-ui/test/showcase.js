@@ -20,6 +20,7 @@ import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
 import { popupMenu } from "../popup-menu.js";
+import { isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
@@ -141,6 +142,29 @@ export class Showcase extends Control {
     ], this.btnPopupMenu, "mid-right");
   }
 
+  async firstUpdated() {
+    //FIXME: Surely there's a way to await this.treeView in order to add
+    await new Promise(r => setTimeout(r, 500));
+    populateTree([{ key1: "value" }, { key2: { childKey1: true, childKey2: 5 } }, { key3: [{ childKey3: false, childKey4: 85 }] }], this.treeView.root);
+    this.treeView.requestUpdate();
+    function populateTree(results, root) {
+      results.forEach((result, index) => createChild(`${index + 1}`, result, root));
+
+      function createChild(key, value, parent) {
+        const objectOrArray = isObjectOrArray(value);
+        const options = {
+          canOpen: objectOrArray ? true : false,
+          opened: objectOrArray ? true : false,
+          showPath: false,
+          data: { key, value, parent },
+        };
+        const title = key + (objectOrArray ? (isObject(value) ? " {}" : " []") : `: ${value}`);
+        const node = parent.addChild(title, options);
+        if (isObjectOrArray(value)) Object.entries(value).forEach(([k, v]) => createChild(k, v, node));
+      }
+    }
+  }
+
   renderControl() {
     const showcase = this;
 
@@ -149,17 +173,12 @@ export class Showcase extends Control {
 <p>
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
-<az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button>
-
-<br/>
-
-<az-weekly-scheduler></az-weekly-scheduler>
 
 <div style="display:flex;align-items:center;">
-  <az-button style="display:unset;" @click=${this.#showHide} title="Show/Hide"></az-button>
+  <h2>Tab View Controls:</h2>
+  <az-button @click=${this.#showHide} title="Show/Hide"></az-button>
   <az-button @click=${this.#addMoreTab} title="Add more..."></az-button>
-</div>
-<div style="display:flex;align-items:center;">
+
   <strong>Move Active Tab Left</strong>
   <az-button @click=${() => this.#move(-1)} title="1x"></az-button>
   <az-button @click=${() => this.#move(-2)} title="2x"></az-button>
@@ -169,8 +188,37 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 </div>
 
 
+<az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
+  <az-tab .canClose="${false}" title="Scheduler - WIP" iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico">
+    <az-weekly-scheduler></az-weekly-scheduler>
+  </az-tab>
 
-<az-tab-view id="tabView" scope="this" isModern="${true}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
+  <az-tab .canClose="${false}" title="Popup Menu - WIP">
+    <az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button>
+  </az-tab>
+
+  <az-tab .canClose="${false}" title="Accordion - WIP">
+    <az-accordion name="accordion" width="75%" align="center" activeItemIndex="0">
+      <az-accordion-item title="First accordion item">
+        <p>Eu culpa dolore adipisicing qui cillum duis incididunt consequat amet. <strong><em>Non ipsum nostrud</em></strong> culpa nulla quis dolor culpa commodo anim labore sit fugiat culpa minim. Adipisicing et qui ex cupidatat excepteur anim laborum eiusmod aute amet cupidatat et. Eiusmod qui eiusmod Lorem amet cupidatat esse aliqua ipsum ex laborum officia reprehenderit incididunt adipisicing. Sint quis cupidatat commodo aliquip mollit enim voluptate dolore consectetur.</p>
+        <h3>Irure minim qui esse dolor. Reprehenderit culpa minim reprehenderit Lorem exercitation cillum magna laboris. Ea in dolor ut ipsum officia commodo sit. Veniam ut nulla culpa veniam tempor duis aliquip in velit consequat incididunt enim reprehenderit.</h3>
+        <blockquote>Magna pariatur reprehenderit ullamco labore. Ullamco deserunt enim irure ex Lorem ex. Est proident nulla fugiat fugiat non incididunt dolore pariatur. Commodo do quis nulla elit non id in est esse est anim adipisicing id. Culpa eu fugiat qui et et. Culpa esse occaecat aliqua nostrud et cupidatat. Aute ipsum voluptate exercitation quis labore exercitation aliquip ad exercitation non irure.</blockquote>
+        <p>Laboris sint elit incididunt sit consectetur consectetur aliquip consequat nostrud eu nostrud ullamco ad. Aliquip laboris adipisicing Lorem quis occaecat reprehenderit. Nostrud voluptate sunt est commodo. Lorem eiusmod laboris non non.</p>
+      </az-accordion-item>
+      <az-accordion-item title="Item #2 going #2 all over the fkin place">
+        <h1 style="text-decoration:strikethrough;"><em>Tempor quis sit eu laborum velit enim irure velit quis.</em></h1>
+      </az-accordion-item>
+      <az-accordion-item title="Open when parent's activeItemIndex is 2">
+        <h3><em>It's-a me! Maaahhhhhreeeooo</em></h3>
+        <img src="https://shawntgray.com/preNov2023/img/img/180612.png" alt="mahrio" style="width:75%;" />
+      </az-accordion-item>
+    </az-accordion>
+  </az-tab>
+
+  <az-tab .canClose="${false}" title="Tree View">
+    <az-tree-view id="treeView" scope="this"></az-tree-view>
+  </az-tab>
+
   <az-tab .canClose="${false}" title="Buttons" iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico">
     <h2>az-button</h2>
 
@@ -352,35 +400,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       <li>numTicks - Number of evenly-spaced tick marks displayed on the slider</li>
     </ol>
     <br>
-    <az-slider
-      id="basicSlider"
-      title="Basic Slider"
-      rangeMin="0"
-      rangeMax="10"
-      rangeStep="1"
-      numTicks="5"
-      status="alert"
-      displayValue
-      valueLabel="Number of tomatoes: "
-    ></az-slider>
-  </az-tab>
-
-  <az-tab .canClose="${false}" title="Accordion">
-    <az-accordion name="accordion" width="75%" align="center" activeItemIndex="2">
-      <az-accordion-item title="First accordion item">
-        <p>Eu culpa dolore adipisicing qui cillum duis incididunt consequat amet. <strong><em>Non ipsum nostrud</em></strong> culpa nulla quis dolor culpa commodo anim labore sit fugiat culpa minim. Adipisicing et qui ex cupidatat excepteur anim laborum eiusmod aute amet cupidatat et. Eiusmod qui eiusmod Lorem amet cupidatat esse aliqua ipsum ex laborum officia reprehenderit incididunt adipisicing. Sint quis cupidatat commodo aliquip mollit enim voluptate dolore consectetur.</p>
-        <h3>Irure minim qui esse dolor. Reprehenderit culpa minim reprehenderit Lorem exercitation cillum magna laboris. Ea in dolor ut ipsum officia commodo sit. Veniam ut nulla culpa veniam tempor duis aliquip in velit consequat incididunt enim reprehenderit.</h3>
-        <blockquote>Magna pariatur reprehenderit ullamco labore. Ullamco deserunt enim irure ex Lorem ex. Est proident nulla fugiat fugiat non incididunt dolore pariatur. Commodo do quis nulla elit non id in est esse est anim adipisicing id. Culpa eu fugiat qui et et. Culpa esse occaecat aliqua nostrud et cupidatat. Aute ipsum voluptate exercitation quis labore exercitation aliquip ad exercitation non irure.</blockquote>
-        <p>Laboris sint elit incididunt sit consectetur consectetur aliquip consequat nostrud eu nostrud ullamco ad. Aliquip laboris adipisicing Lorem quis occaecat reprehenderit. Nostrud voluptate sunt est commodo. Lorem eiusmod laboris non non.</p>
-      </az-accordion-item>
-      <az-accordion-item title="Item #2 going #2 all over the fkin place">
-        <h1 style="text-decoration:strikethrough;"><em>Tempor quis sit eu laborum velit enim irure velit quis.</em></h1>
-      </az-accordion-item>
-      <az-accordion-item title="Open when parent's activeItemIndex is 2">
-        <h3><em>It's-a me! Maaahhhhhreeeooo</em></h3>
-        <img src="https://shawntgray.com/preNov2023/img/img/180612.png" alt="mahrio" style="width:75%;" />
-      </az-accordion-item>
-    </az-accordion>
+    <az-slider id="basicSlider" title="Basic Slider" rangeMin="0" rangeMax="10" rangeStep="1" numTicks="5" status="alert" displayValue valueLabel="Number of tomatoes: "></az-slider>
   </az-tab>
 
   <az-tab .canClose="${false}" title="Modal Dialogs">
@@ -395,31 +415,12 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
     <az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
 
     <az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
-
-
-
   </az-tab>
 
   <az-tab .canClose="${false}" title="Toasts">
     <az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
     <az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
   </az-tab>
-
-  <az-tab title="Tab 1">
-    <p>Eu culpa dolore adipisicing qui cillum duis incididunt consequat amet. <strong><em>Non ipsum nostrud</em></strong> culpa nulla quis dolor culpa commodo anim labore sit fugiat culpa minim. Adipisicing et qui ex cupidatat excepteur anim laborum eiusmod aute amet cupidatat et. Eiusmod qui eiusmod Lorem amet cupidatat esse aliqua ipsum ex laborum officia reprehenderit incididunt adipisicing. Sint quis cupidatat commodo aliquip mollit enim voluptate dolore consectetur.</p>
-    <h3>Irure minim qui esse dolor. Reprehenderit culpa minim reprehenderit Lorem exercitation cillum magna laboris. Ea in dolor ut ipsum officia commodo sit. Veniam ut nulla culpa veniam tempor duis aliquip in velit consequat incididunt enim reprehenderit.</h3>
-    <blockquote>Magna pariatur reprehenderit ullamco labore. Ullamco deserunt enim irure ex Lorem ex. Est proident nulla fugiat fugiat non incididunt dolore pariatur. Commodo do quis nulla elit non id in est esse est anim adipisicing id. Culpa eu fugiat qui et et. Culpa esse occaecat aliqua nostrud et cupidatat. Aute ipsum voluptate exercitation quis labore exercitation aliquip ad exercitation non irure.</blockquote>
-    <p>Laboris sint elit incididunt sit consectetur consectetur aliquip consequat nostrud eu nostrud ullamco ad. Aliquip laboris adipisicing Lorem quis occaecat reprehenderit. Nostrud voluptate sunt est commodo. Lorem eiusmod laboris non non.</p>
-  </az-tab>
-
-  <az-tab title="Second Tab">
-    <h1 style="text-decoration:strikethrough;"><em>Tempor quis sit eu laborum velit enim irure velit quis.</em></h1>
-  </az-tab>
-
-  <az-tab title="This is a very long title, yes a long long title that is still going on. Is this long enough?">
-    <img src="https://shawntgray.com/preNov2023/img/img/180613.jpg" alt="Yahshee" />
-  </az-tab>
-
 </az-tab-view>
 
 
