@@ -20,6 +20,7 @@ export class Block extends Control {
    * Reactive properties
    */
   static properties = {
+    ...Control.properties,
     title: { type: String },
     description: { type: String }
   };

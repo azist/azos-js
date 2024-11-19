@@ -260,6 +260,7 @@ export function isRectInViewport(rect) {
 export class Control extends AzosElement{
 
   static properties = {
+    ...AzosElement.properties,
     /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see the reversed accessors below */
     isDisabled:  {type: Boolean, reflect: true},
     isNa:        {type: Boolean, reflect: true},

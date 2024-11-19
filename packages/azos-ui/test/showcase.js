@@ -99,7 +99,8 @@ export class Showcase extends Control {
   }
 
   #move(steps) { (this.manMe || this.tabView.activeTab).move(steps); }
-  #showHide() { (this.manMe || this.tabView.activeTab).hidden = !(this.manMe || this.tabView.activeTab).hidden; }
+  #showHide() { (this.manMe || this.tabView.activeTab).isAbsent = !(this.manMe || this.tabView.activeTab).isAbsent; }
+  #visibleInvisible() { (this.manMe || this.tabView.activeTab).isHidden = !(this.manMe || this.tabView.activeTab).isHidden; }
 
   #btnPopupMenuClick() {
     popupMenu([
@@ -177,9 +178,10 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 <div style="display:flex;align-items:center;">
   <h2>Tab View Controls:</h2>
   <az-button @click=${this.#showHide} title="Show/Hide"></az-button>
+  <az-button @click=${this.#visibleInvisible} title="In/Visible"></az-button>
   <az-button @click=${this.#addMoreTab} title="Add more..."></az-button>
 
-  <strong>Move Active Tab Left</strong>
+  <strong>Active Tab Left</strong>
   <az-button @click=${() => this.#move(-1)} title="1x"></az-button>
   <az-button @click=${() => this.#move(-2)} title="2x"></az-button>
   <strong>Right</strong>
