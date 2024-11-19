@@ -16,7 +16,6 @@ export class Tab extends Block {
   static #idSeed = 0;
 
   static properties = {
-    ...Block.properties,
     active: { type: Boolean, reflect: true },
     minWidth: { type: Number },
     maxWidth: { type: Number },

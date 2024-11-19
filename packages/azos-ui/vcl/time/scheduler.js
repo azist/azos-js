@@ -128,7 +128,7 @@ az-select {
     startOfWeek.setDate(startOfWeek.getDate() - dayDifference);
     startOfWeek.setHours(0, 0, 0, 0);
 
-    console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
+    // console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
 
     return startOfWeek;
   }
@@ -184,6 +184,9 @@ az-select {
       this.selectedSlot = slot;
     }
   }
+
+  handleSlotHover(number, time) { }
+  handleSlotHoverOut() { }
 
   renderControl() {
     return html`
