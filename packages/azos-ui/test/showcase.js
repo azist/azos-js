@@ -24,84 +24,29 @@ import { isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
-  constructor() { super(); }
-
   static styles = css`
 p{ font-size: 1rem; }
 .strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap: 1ch; }
 .strip-h az-button{ margin:0; }
   `;
 
-
-  onDlg1Open() { this.dlg1.show(); }
-  onDlg1Close() { this.dlg1.close(); }
-  onDlg2Open() { this.dlg2.show(); }
-  onDlg2Close() { this.dlg2.close(); }
-
-  async onSpinnerProcess() {
-    Spinner.exec(async sp => {
-      sp.message = `Prepping DB...`;
-      await new Promise(resolve => setTimeout(resolve, 1070));
-      sp.message = `Exec DDL 1 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      sp.message = `Exec DDL 2 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 890));
-      sp.message = `Exec DDL 3 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 1232));
-      sp.status = "error";
-      sp.message = `Recovering DDL error...`;
-      await new Promise(resolve => setTimeout(resolve, 2370));
-      sp.status = "warning";
-      sp.message = `Exec DDL 4 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 1870));
-      sp.message = `Exec DDL 5 of 5 ...`;
-      sp.status = "ok";
-      await new Promise(resolve => setTimeout(resolve, 2360));
-    });
-  }
-
-  onModalSpinnerOpen() { this.spinnerModal.show(); }
-  onNonModalSpinnerOpen() { this.spinnerNonModal.show(); }
-  onNonModalSpinnerClose() { this.spinnerNonModal.hide(); }
-
-  onAutoSpinnerOpen() { Spinner.show(null, 3000); }
-
-  #onFieldChange(e) {
-    console.log("Got change event from field: ", e.target.name, e.target.value);
-    this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
-  }
-
   toastCount = 0;
-  async toastMe(multiple = false) {
-    const toasts = multiple ? 20 : 1;
-    for (let i = 0; i < toasts; i++) {
-      temp(++this.toastCount);
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
-    function temp(id) {
-      const randomRank = false;
-      const randomStatus = false;
-      const randomPosition = false;
-      const timeout = undefined; //1_000;
-
-      const rank = randomRank ? Math.floor(Math.random() * Object.keys(RANK).length) : RANK.DEFAULT;
-      const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
-      const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
-
-      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, { timeout, rank, status, position });
-    }
-  }
-
   #id = 0;
-  #addNewTab() {
-    const before = this.tabView.activeTab.nextVisibleTab;
-    this.tabView.addTab(Tab, `Tab ${++this.#id}`, before);
-  }
+  #showUsingTabs = false;
+  #readyForToC = false;
+  #returnToToC = html`<br> <a href="#Menu" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Go to Menu</a> `;
+  constructor() { super(); }
 
-  #showHide() { this.tabView.tabs[0].isAbsent = !this.tabView.tabs[0].isAbsent; }
-  #visibleInvisible() { this.tabView.tabs[0].isHidden = !this.tabView.tabs[0].isHidden; }
-  #move(steps) { this.tabView.activeTab.move(steps); }
+  #btnDlg1Open() { this.dlg1.show(); }
+  #btnDlg1Close() { this.dlg1.close(); }
+  #btnDlg2Open() { this.dlg2.show(); }
+  #btnDlg2Close() { this.dlg2.close(); }
+  #btnIsHidden() { this.btnSave.isHidden = !this.btnSave.isHidden; }
+  #btnIsAbsent() { this.btnSave.isAbsent = !this.btnSave.isAbsent; }
+  #btnModalSpinnerOpen() { this.spinnerModal.show(); }
+  #btnNonModalSpinnerOpen() { this.spinnerNonModal.show(); }
+  #btnNonModalSpinnerClose() { this.spinnerNonModal.hide(); }
+  #btnAutoSpinnerOpen() { Spinner.show(null, 3000); }
 
   #btnPopupMenuClick() {
     popupMenu([
@@ -144,12 +89,70 @@ p{ font-size: 1rem; }
     ], this.btnPopupMenu, "mid-right");
   }
 
-  async firstUpdated() {
-    //FIXME: Surely there's a way to await this.treeView in order to add
-    await new Promise(r => setTimeout(r, 250));
-    this.#readyForToC = true;
-    this.requestUpdate();
-    this.#populateTree();
+  #btnShowHideTab() { this.tabView.tabs[0].isAbsent = !this.tabView.tabs[0].isAbsent; }
+  #btnToggleTabVisibility() { this.tabView.tabs[0].isHidden = !this.tabView.tabs[0].isHidden; }
+  #btnMoveTab(steps) { this.tabView.activeTab.move(steps); }
+
+  #btnAddNewTab() {
+    const before = this.tabView.activeTab.nextVisibleTab;
+    this.tabView.addTab(Tab, `Tab ${++this.#id}`, before);
+  }
+
+  #btnScrollSectionIntoView(e, scrollToId) {
+    e.preventDefault();
+    const target = this.shadowRoot.getElementById(scrollToId);
+    if (!target) return;
+    const headerHeight = 50;
+    const targetTop = target.getBoundingClientRect().top - headerHeight;
+    window.scrollTo({ top: targetTop, behavior: "smooth" });
+  }
+
+  async #btnSpinnerProcess() {
+    await Spinner.exec(async sp => {
+      sp.message = `Prepping DB...`;
+      await new Promise(resolve => setTimeout(resolve, 1070));
+      sp.message = `Exec DDL 1 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      sp.message = `Exec DDL 2 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 890));
+      sp.message = `Exec DDL 3 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1232));
+      sp.status = "error";
+      sp.message = `Recovering DDL error...`;
+      await new Promise(resolve => setTimeout(resolve, 2370));
+      sp.status = "warning";
+      sp.message = `Exec DDL 4 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1870));
+      sp.message = `Exec DDL 5 of 5 ...`;
+      sp.status = "ok";
+      await new Promise(resolve => setTimeout(resolve, 2360));
+    });
+  }
+
+  async #btnToastMe(multiple = false) {
+    const toasts = multiple ? 20 : 1;
+    for (let i = 0; i < toasts; i++) {
+      temp(++this.toastCount);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    function temp(id) {
+      const randomRank = false;
+      const randomStatus = false;
+      const randomPosition = false;
+      const timeout = undefined; //1_000;
+
+      const rank = randomRank ? Math.floor(Math.random() * Object.keys(RANK).length) : RANK.DEFAULT;
+      const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
+      const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
+
+      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, { timeout, rank, status, position });
+    }
+  }
+
+  #onFieldChange(e) {
+    console.log("Got change event from field: ", e.target.name, e.target.value);
+    this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
   }
 
   #populateTree(results, root) {
@@ -173,16 +176,7 @@ p{ font-size: 1rem; }
     }
   }
 
-  async btnIsHidden() {
-    this.btnSave.isHidden = !this.btnSave.isHidden;
-  }
-
-  async btnIsAbsent() {
-    this.btnSave.isAbsent = !this.btnSave.isAbsent;
-  }
-
-  #showUsingTabs = false;
-  async updateUsingTabs(e) {
+  async #updateUsingTabs(e) {
     const showUsingTabs = e.target.value;
     this.#readyForToC = false;
     this.#showUsingTabs = showUsingTabs;
@@ -195,13 +189,11 @@ p{ font-size: 1rem; }
     this.requestUpdate();
   }
 
-  scrollSectionIntoView(e, scrollToId) {
-    e.preventDefault();
-    const target = this.shadowRoot.getElementById(scrollToId);
-    if (!target) return;
-    const headerHeight = 50;
-    const targetTop = target.getBoundingClientRect().top - headerHeight;
-    window.scrollTo({ top: targetTop, behavior: "smooth" });
+  async firstUpdated() {
+    this.#populateTree();
+    await this.updateComplete;
+    this.#readyForToC = true;
+    this.requestUpdate();
   }
 
   renderControl() {
@@ -211,20 +203,20 @@ p{ font-size: 1rem; }
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
 
-<az-check title="Show Using Tabs" @change="${this.updateUsingTabs}" titleWidth="85" titlePosition="mid-right"></az-check>
+<az-check title="Show Using Tabs" @change="${this.#updateUsingTabs}" titleWidth="85" titlePosition="mid-right"></az-check>
 ${this.#showUsingTabs ? html`
 <div class="strip-h">
   <h3>Tab View Controls:</h3>
-  <az-button @click=${this.#showHide} title="Show/Hide" rank="small"></az-button>
-  <az-button @click=${this.#visibleInvisible} title="In/Visible" rank="small"></az-button>
-  <az-button @click=${this.#addNewTab} title="Add more..." rank="small"></az-button>
+  <az-button @click=${this.#btnShowHideTab} title="Show/Hide" rank="small"></az-button>
+  <az-button @click=${this.#btnToggleTabVisibility} title="In/Visible" rank="small"></az-button>
+  <az-button @click=${this.#btnAddNewTab} title="Add more..." rank="small"></az-button>
 
   <h4>Active Tab Left</h4>
-  <az-button @click=${() => this.#move(-1)} title="1x" rank="small"></az-button>
-  <az-button @click=${() => this.#move(-2)} title="2x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(-1)} title="1x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(-2)} title="2x" rank="small"></az-button>
   <h4>Right</h4>
-  <az-button @click=${() => this.#move(1)} title="1x" rank="small"></az-button>
-  <az-button @click=${() => this.#move(2)} title="2x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(1)} title="1x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(2)} title="2x" rank="small"></az-button>
 </div>
 
 <az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
@@ -279,7 +271,7 @@ ${this.#readyForToC ? this.renderToC() : noContent}
      and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident,
      sometimes on purpose (injected humour and the like). Yes
     </p>
-    <az-button @click="${this.onDlg1Close}" title="Close" style="float: right;"></az-button>
+    <az-button @click="${this.#btnDlg1Close}" title="Close" style="float: right;"></az-button>
   </div>
 </az-modal-dialog>
 
@@ -294,17 +286,15 @@ ${this.#readyForToC ? this.renderToC() : noContent}
       }
     </az-code-box>
     <br>
-    <az-button @click="${this.onDlg2Close}" title="Close" style="float: right;"></az-button>
+    <az-button @click="${this.#btnDlg2Close}" title="Close" style="float: right;"></az-button>
   </div>
 </az-modal-dialog>
 `;
   }
 
-  #readyForToC = false;
-  #returnToToC = html`<br> <a href="#Menu" @click="${e => this.scrollSectionIntoView(e, "ToC")}">Go to Menu</a> `;
   renderToC() {
     const contentNodes = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
-    return html`<ol>${contentNodes.map(child => html`<li> <a href="" @click="${e => this.scrollSectionIntoView(e, child.id)}"> ${child.id} </a></li>`)}</ol>`;
+    return html`<ol>${contentNodes.map(child => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, child.id)}"> ${child.id} </a></li>`)}</ol>`;
   }
 
   renderSchedulerContent() {
@@ -353,15 +343,15 @@ ${this.#readyForToC ? this.renderToC() : noContent}
 <h2>Buttons</h2>
 
 <div class="strip-h">
-  <div><button @click="${this.btnIsHidden}"> btnSave.isHidden </button></div>
-  <div><button @click="${this.btnIsAbsent}"> btnSave.isAbsent </button></div>
+  <div><button @click="${this.#btnIsHidden}"> btnSave.isHidden </button></div>
+  <div><button @click="${this.#btnIsAbsent}"> btnSave.isAbsent </button></div>
 
   <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
   <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
   <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
 </div>
 
-<az-button @click="${this.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
+<az-button @click="${this.#btnSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
 
 <h4>Regular buttons of default status</h4>
 <az-button title="Button 1"></az-button>
@@ -665,24 +655,24 @@ ${this.#readyForToC ? this.renderToC() : noContent}
   renderModalDialogContent() {
     return html`
 <h2>Modal Dialogs</h2>
-<az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
-<az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
+<az-button @click="${this.#btnDlg1Open}" title="Open..."></az-button>
+<az-button @click="${this.#btnDlg2Open}" title="Open Code..." status="info"></az-button>
 
-<az-button @click="${this.onModalSpinnerOpen}" title="Open Modal Spinner..." status="alert"></az-button>
-<az-button @click="${this.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
+<az-button @click="${this.#btnModalSpinnerOpen}" title="Open Modal Spinner..." status="alert"></az-button>
+<az-button @click="${this.#btnSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
 
-<az-button @click="${this.onNonModalSpinnerOpen}" title="Open NM Spinner..." status="info"></az-button>
-<az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
+<az-button @click="${this.#btnNonModalSpinnerOpen}" title="Open NM Spinner..." status="info"></az-button>
+<az-button @click="${this.#btnNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
 
-<az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
+<az-button @click="${this.#btnAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
     `;
   }
 
   renderToastContent() {
     return html`
 <h2>Toasts</h2>
-<az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
-<az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
+<az-button @click="${() => this.#btnToastMe(false)}" title="Toast Me..."></az-button>
+<az-button @click="${() => this.#btnToastMe(true)}" title="Toast Me Many..."></az-button>
     `;
   }
 }
