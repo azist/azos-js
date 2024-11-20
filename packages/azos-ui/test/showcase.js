@@ -28,8 +28,8 @@ export class Showcase extends Control {
 
   static styles = css`
 p{ font-size: 1rem; }
-.controls{ display:flex;align-items:center; gap: 1ch; }
-.controls az-button{ margin:0; }
+.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap: 1ch; }
+.strip-h az-button{ margin:0; }
   `;
 
 
@@ -149,25 +149,27 @@ p{ font-size: 1rem; }
     await new Promise(r => setTimeout(r, 250));
     this.#readyForToC = true;
     this.requestUpdate();
+    this.#populateTree();
+  }
 
-    populateTree([{ key1: "value" }, { key2: { childKey1: true, childKey2: 5 } }, { key3: [{ childKey3: false, childKey4: 85 }] }], this.treeView.root);
+  #populateTree(results, root) {
+    if (!results) results = [{ key1: "value" }, { key2: { childKey1: true, childKey2: 5 } }, { key3: [{ childKey3: false, childKey4: 85 }] }];
+    if (!root) root = this.treeView.root;
+
+    results.forEach((result, index) => createChild(`${index + 1}`, result, root));
     this.treeView.requestUpdate();
 
-    function populateTree(results, root) {
-      results.forEach((result, index) => createChild(`${index + 1}`, result, root));
-
-      function createChild(key, value, parent) {
-        const objectOrArray = isObjectOrArray(value);
-        const options = {
-          canOpen: objectOrArray ? true : false,
-          opened: objectOrArray ? true : false,
-          showPath: false,
-          data: { key, value, parent },
-        };
-        const title = key + (objectOrArray ? (isObject(value) ? " {}" : " []") : `: ${value}`);
-        const node = parent.addChild(title, options);
-        if (isObjectOrArray(value)) Object.entries(value).forEach(([k, v]) => createChild(k, v, node));
-      }
+    function createChild(key, value, parent) {
+      const objectOrArray = isObjectOrArray(value);
+      const options = {
+        canOpen: objectOrArray ? true : false,
+        opened: objectOrArray ? true : false,
+        showPath: false,
+        data: { key, value, parent },
+      };
+      const title = key + (objectOrArray ? (isObject(value) ? " {}" : " []") : `: ${value}`);
+      const node = parent.addChild(title, options);
+      if (isObjectOrArray(value)) Object.entries(value).forEach(([k, v]) => createChild(k, v, node));
     }
   }
 
@@ -180,8 +182,16 @@ p{ font-size: 1rem; }
   }
 
   #showUsingTabs = false;
-  updateUsingTabs(e) {
-    this.#showUsingTabs = !!e.target.value;
+  async updateUsingTabs(e) {
+    const showUsingTabs = e.target.value;
+    this.#readyForToC = false;
+    this.#showUsingTabs = showUsingTabs;
+
+    this.requestUpdate();
+    await this.updateComplete;
+
+    this.#populateTree();
+    this.#readyForToC = !showUsingTabs;
     this.requestUpdate();
   }
 
@@ -203,7 +213,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
 <az-check title="Show Using Tabs" @change="${this.updateUsingTabs}" titleWidth="85" titlePosition="mid-right"></az-check>
 ${this.#showUsingTabs ? html`
-<div class="controls">
+<div class="strip-h">
   <h3>Tab View Controls:</h3>
   <az-button @click=${this.#showHide} title="Show/Hide" rank="small"></az-button>
   <az-button @click=${this.#visibleInvisible} title="In/Visible" rank="small"></az-button>
@@ -227,16 +237,14 @@ ${this.#showUsingTabs ? html`
   <az-tab title="Input Test" .canClose=${false}> ${this.renderInputContent()} </az-tab>
   <az-tab title="VCL / Codebox" .canClose=${false} status="ok"> ${this.renderCodeboxContent()} </az-tab>
   <az-tab title="Radios" .canClose=${false}> ${this.renderRadiosContent()} </az-tab>
-  <az-tab title="Checkboxes" .canClose=${false} status="info"> ${this.renderCheckboxContent()} </az-tab>
   <az-tab title="Switches" .canClose=${false} status="info"> ${this.renderSwitchContent()} </az-tab>
+  <az-tab title="Checkboxes" .canClose=${false} status="info"> ${this.renderCheckboxContent()} </az-tab>
   <az-tab title="Text Fields" .canClose=${false}> ${this.renderTextFieldContent()} </az-tab>
   <az-tab title="Select Field" .canClose=${false} status="warning"> ${this.renderSelectFieldContent()} </az-tab>
   <az-tab title="Modal Dialogs" .canClose=${false}> ${this.renderModalDialogContent()} </az-tab>
   <az-tab title="Toasts" .canClose=${false}> ${this.renderToastContent()} </az-tab>
 </az-tab-view>
-
   ` : html`
-
 <h1 id="ToC">Table of Contents</h1>
 ${this.#readyForToC ? this.renderToC() : noContent}
 <div id="Content">
@@ -249,8 +257,8 @@ ${this.#readyForToC ? this.renderToC() : noContent}
   <div id="InputContent"> ${this.renderInputContent()} ${this.#returnToToC} </div>
   <div id="CodeboxContent"> ${this.renderCodeboxContent()} ${this.#returnToToC} </div>
   <div id="RadiosContent"> ${this.renderRadiosContent()} ${this.#returnToToC} </div>
-  <div id="CheckboxContent"> ${this.renderCheckboxContent()} ${this.#returnToToC} </div>
   <div id="SwitchContent"> ${this.renderSwitchContent()} ${this.#returnToToC} </div>
+  <div id="CheckboxContent"> ${this.renderCheckboxContent()} ${this.#returnToToC} </div>
   <div id="TextFieldContent"> ${this.renderTextFieldContent()} ${this.#returnToToC} </div>
   <div id="SelectFieldContent"> ${this.renderSelectFieldContent()} ${this.#returnToToC} </div>
   <div id="ModalDialogContent"> ${this.renderModalDialogContent()} ${this.#returnToToC} </div>
@@ -344,7 +352,7 @@ ${this.#readyForToC ? this.renderToC() : noContent}
     return html`
 <h2>Buttons</h2>
 
-<div class="controls">
+<div class="strip-h">
   <div><button @click="${this.btnIsHidden}"> btnSave.isHidden </button></div>
   <div><button @click="${this.btnIsAbsent}"> btnSave.isAbsent </button></div>
 
@@ -431,44 +439,135 @@ ${this.#readyForToC ? this.renderToC() : noContent}
     `;
   }
 
-  renderCheckboxContent() {
+  renderSwitchContent() {
     return html`
-<h2>Checkboxes</h2>
-<div class="strip-h">
-  <az-check id="normalCheckbox" title="This is a checkbox" titleWidth="60"></az-check>
-  <az-check id="errorCheckbox" title="Required checkbox!" status="error" titlePosition="mid-left" isRequired></az-check>
-  <az-check id="infoCheckbox" title="This is a checkbox" status="info" titlePosition="mid-left"></az-check>
-  <az-check id="disabledCheckbox" title="Disabled checkbox" titlePosition="mid-left" isdisabled></az-check>
+<h2>Switches</h2>
+
+<h3>Statuses</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check itemType="switch" title="Default" titlePosition="mid-right" status="default"></az-check>
+  <az-check itemType="switch" title="Ok" titlePosition="mid-right" status="ok"></az-check>
+  <az-check itemType="switch" title="Info" titlePosition="mid-right" status="info"></az-check>
+  <az-check itemType="switch" title="Warning" titlePosition="mid-right" status="warning"></az-check>
+  <az-check itemType="switch" title="Alert" titlePosition="mid-right" status="alert"></az-check>
+  <az-check itemType="switch" title="Error" titlePosition="mid-right" status="error"></az-check>
+</div>
+
+<h3>Ranks</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check itemType="switch" title="Tiny" titlePosition="mid-right" rank="tiny"></az-check>
+  <az-check itemType="switch" title="Small" titlePosition="mid-right" rank="small"></az-check>
+  <az-check itemType="switch" title="Medium" titlePosition="mid-right" rank="medium"></az-check>
+  <az-check itemType="switch" title="Normal" titlePosition="mid-right" rank="normal"></az-check>
+  <az-check itemType="switch" title="Large" titlePosition="mid-right" rank="large"></az-check>
+  <az-check itemType="switch" title="Huge" titlePosition="mid-right" rank="huge"></az-check>
+</div>
+
+<h3>Title Positioning</h3>
+<p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bottom-left, bottom-center, bottom-right</strong>. The default titlePosition is <strong>top-left</strong>.</p>
+<div class="strip-h" style="gap: 4em;">
+  <div>
+    <h4>Not Required</h4>
+    <div class="strip-h">
+      <az-check itemType="switch" title="The Top Left"></az-check>
+      <az-check itemType="switch" title="The Top Center" titlePosition="top-center"></az-check>
+      <az-check itemType="switch" title="The Top Right" titlePosition="top-right"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check itemType="switch" title="Middle Left" titlePosition="mid-left" titleWidth="75"></az-check>
+      <az-check itemType="switch" title="Middle Right" titlePosition="mid-right" titleWidth="75"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check itemType="switch" title="Bottom Left" titlePosition="bottom-left"></az-check>
+      <az-check itemType="switch" title="Bottom Center" titlePosition="bottom-center"></az-check>
+      <az-check itemType="switch" title="Bottom Right" titlePosition="bottom-right"></az-check>
+    </div>
+  </div>
+  <div>
+    <h4>Required</h4>
+    <div class="strip-h">
+      <az-check itemType="switch" isRequired title="The Top Left"></az-check>
+      <az-check itemType="switch" isRequired title="The Top Center" titlePosition="top-center"></az-check>
+      <az-check itemType="switch" isRequired title="The Top Right" titlePosition="top-right"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check itemType="switch" isRequired title="Middle Left" titlePosition="mid-left" titleWidth="75"></az-check>
+      <az-check itemType="switch" isRequired title="Middle Right" titlePosition="mid-right" titleWidth="75"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check itemType="switch" isRequired title="Bottom Left" titlePosition="bottom-left"></az-check>
+      <az-check itemType="switch" isRequired title="Bottom Center" titlePosition="bottom-center"></az-check>
+      <az-check itemType="switch" isRequired title="Bottom Right" titlePosition="bottom-right"></az-check>
+    </div>
+  </div>
 </div>
     `;
   }
 
-  renderSwitchContent() {
+  renderCheckboxContent() {
     return html`
-<h2>Switches</h2>
-<div class="strip-h">
-  <az-check id="switch" title="Is this a switch?" itemType="switch" titlePosition="mid-right"></az-check>
-  <az-check id="warnSwitch" title="This is a warning switch" itemType="switch" status="warning" titlePosition="mid-right"></az-check>
-  <az-check id="okSwitch" title="This is an OK switch" itemType="switch" status="ok" titlePosition="mid-right"></az-check>
-  <az-check id="disabledSwitch" title="This switch is disabled" itemType="switch" titlePosition="mid-right" isdisabled></az-check>
+<h2>Checkboxes</h2>
+
+<h3>Statuses</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check title="Default" titlePosition="mid-right" status="default"></az-check>
+  <az-check title="Ok" titlePosition="mid-right" status="ok"></az-check>
+  <az-check title="Info" titlePosition="mid-right" status="info"></az-check>
+  <az-check title="Warning" titlePosition="mid-right" status="warning"></az-check>
+  <az-check title="Alert" titlePosition="mid-right" status="alert"></az-check>
+  <az-check title="Error" titlePosition="mid-right" status="error"></az-check>
 </div>
+
+<h3>Ranks</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check title="Tiny" titlePosition="mid-right" rank="tiny"></az-check>
+  <az-check title="Small" titlePosition="mid-right" rank="small"></az-check>
+  <az-check title="Medium" titlePosition="mid-right" rank="medium"></az-check>
+  <az-check title="Normal" titlePosition="mid-right" rank="normal"></az-check>
+  <az-check title="Large" titlePosition="mid-right" rank="large"></az-check>
+  <az-check title="Huge" titlePosition="mid-right" rank="huge"></az-check>
+</div>
+
 <h3>Title Positioning</h3>
 <p>Clockwise, the following titlePositions are: <strong>top-left, top-center, top-right, mid-left, mid-right, bottom-left, bottom-center, bottom-right</strong>. The default titlePosition is <strong>top-left</strong>.</p>
-<div class="strip-h">
-  <az-check id="topLeftSwitch" title="aAa" itemType="switch" titlePosition="top-left"></az-check>
-  <az-check id="topCenterSwitch" title="aAa" itemType="switch" titlePosition="top-center"></az-check>
-  <az-check id="topRightSwitch" title="aAa" itemType="switch" titlePosition="top-right"></az-check>
+
+<div class="strip-h" style="gap: 4em;">
+  <div>
+    <h4>Not Required</h4>
+    <div class="strip-h">
+      <az-check title="The Top Left"></az-check>
+      <az-check title="The Top Center" titlePosition="top-center"></az-check>
+      <az-check title="The Top Right" titlePosition="top-right"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check title="Middle Left" titlePosition="mid-left" titleWidth="75"></az-check>
+      <az-check title="Middle Right" titlePosition="mid-right" titleWidth="75"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check title="Bottom Left" titlePosition="bottom-left"></az-check>
+      <az-check title="Bottom Center" titlePosition="bottom-center"></az-check>
+      <az-check title="Bottom Right" titlePosition="bottom-right"></az-check>
+    </div>
+  </div>
+  <div>
+    <h4>Required</h4>
+    <div class="strip-h">
+      <az-check title="The Top Left" isRequired></az-check>
+      <az-check title="The Top Center" isRequired titlePosition="top-center"></az-check>
+      <az-check title="The Top Right" isRequired titlePosition="top-right"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check title="Middle Left" isRequired titlePosition="mid-left" titleWidth="75"></az-check>
+      <az-check title="Middle Right" isRequired titlePosition="mid-right" titleWidth="75"></az-check>
+    </div>
+    <div class="strip-h">
+      <az-check title="Bottom Left" isRequired titlePosition="bottom-left"></az-check>
+      <az-check title="Bottom Center" isRequired titlePosition="bottom-center"></az-check>
+      <az-check title="Bottom Right" isRequired titlePosition="bottom-right"></az-check>
+    </div>
+  </div>
 </div>
-<div class="strip-h">
-  <az-check id="midLeftSwitch" title="aAa" itemType="switch" titlePosition="mid-left" titleWidth="25"></az-check>
-  <az-check id="midRightSwitch" title="aAa" itemType="switch" titlePosition="mid-right" titleWidth="25"></az-check>
-</div>
-<div class="strip-h">
-  <az-check id="botLeftSwitch" title="aAa" itemType="switch" titlePosition="bottom-left"></az-check>
-  <az-check id="botCenterSwitch" title="aAa" itemType="switch" titlePosition="bottom-center"></az-check>
-  <az-check id="botRightSwitch" title="aAa" itemType="switch" titlePosition="bottom-right"></az-check>
-</div>
-    `;
+`;
   }
 
   renderTextFieldContent() {
@@ -581,6 +680,7 @@ ${this.#readyForToC ? this.renderToC() : noContent}
 
   renderToastContent() {
     return html`
+<h2>Toasts</h2>
 <az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
 <az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
     `;

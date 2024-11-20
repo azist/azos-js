@@ -39,6 +39,11 @@ export const baseStyles = css`
 .mid-left,.mid-right,
 .bottom-left,.bottom-center,.bottom-right { display:flex; width: 100%; }
 
+.top-right { align-items: flex-end; }
+.top-center { align-items: center; }
+.bottom-right { align-items: flex-end; }
+.bottom-center { align-items: center; }
+
 .top-left,.top-center,.top-right { flex-direction:column; }
 .top-left > span                 { text-align:left; margin-bottom: .33em; }
 .top-center > span               { text-align:center; margin-bottom: .33em; }
