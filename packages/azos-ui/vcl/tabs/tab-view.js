@@ -5,16 +5,15 @@
 </FILE_LICENSE>*/
 
 import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/aver";
-import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, parseRank, parseStatus } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 
-export class TabView extends AzosElement {
+export class TabView extends Control {
 
   static styles = css`
-:host { display: block; }
-.hidden { display: none !important; }
+:host { display: block; margin-top: 1.0em }
 
 .tab-nav {
   display: flex;
@@ -142,7 +141,7 @@ export class TabView extends AzosElement {
   transition: font-size 0.1s;
 }
 
-.tab-btn:not(.active):not(.hidden):hover {
+.tab-btn:not(.active):not(.isAbsent):hover {
   cursor: pointer;
   filter: brightness(1.05);
 }
@@ -204,7 +203,7 @@ export class TabView extends AzosElement {
 
   get tabBtns() { return Array.from(this.shadowRoot.querySelectorAll(".tab-btn")) }
   get tabs() { return [...this.children].filter(child => child instanceof Tab); }
-  get visibleTabs() { return [...this.children].filter(child => child.hidden !== true); }
+  get visibleTabs() { return [...this.children].filter(child => (child.isAbsent || child.isHidden) !== true); }
 
   #activeTab;
   /** @returns an active tab or undefined */
@@ -221,7 +220,7 @@ export class TabView extends AzosElement {
     const evt = new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true });
     this.dispatchEvent(evt);
     if (evt.canceled) return;
-    this.tabs.forEach(one => one.slot = undefined);
+    this.tabs.forEach(one => one.slot = null);
     this.#activeTab = v;
     this.#activeTab.slot = "body";
     this.requestUpdate();
@@ -430,7 +429,7 @@ export class TabView extends AzosElement {
     scrollBtns.forEach((btn) => btn.style.display = tabBtnsTotalWidth > tabContainerWidth ? 'block' : 'none');
   }
 
-  render() {
+  renderControl() {
     return html`
     <div class="tab-view ${this.isModern ? 'modern' : ''}">
     ${this.tabs.length ? this.renderTabs() : ''}
@@ -452,7 +451,6 @@ export class TabView extends AzosElement {
       ${this.tabs.map((tab, index) => {
       const cls = [
         tab.active ? "active" : "",
-        tab.hidden ? "hidden" : "",
         tab[DIRTY_PROP] ? "dirty" : "",
         parseRank(tab.rank, true),
         parseStatus(tab.status, true, '-tab-btn'),
@@ -462,6 +460,7 @@ export class TabView extends AzosElement {
       const stl = [
         tab.minWidth ? `min-width: ${tab.minWidth}ch` : (this.defaultMinTabWidth ? `min-width: ${this.defaultMinTabWidth}ch` : ``),
         tab.maxWidth ? `max-width: ${tab.maxWidth}ch` : (this.defaultMaxTabWidth ? `max-width: ${this.defaultMaxTabWidth}ch` : ``),
+        tab.calcStyles(),
       ].filter(item => item !== "").join(";");
 
       return html`

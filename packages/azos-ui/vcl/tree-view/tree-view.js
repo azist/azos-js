@@ -5,26 +5,21 @@
 </FILE_LICENSE>*/
 
 import { TreeNode } from "./tree-node";
-import { AzosElement, css, html, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, parseRank, parseStatus } from "../../ui";
 import { isOf, isTrue } from "azos/aver";
 import { baseStyles } from "../../parts/styles";
 
-export class TreeView extends AzosElement {
+export class TreeView extends Control {
 
   static #idSeed = 0;
   static styles = [baseStyles, css`
 :host { display: block; }
-.tree-view {
-  user-select: none;
-}
+
+.tree-view { user-select: none; }
 
 .tree-view, .tree-node-children {
   list-style: none;
   padding-left: 1em;
-}
-
-.tree-node {
-
 }
 
 .tree-node-header {
@@ -298,7 +293,7 @@ export class TreeView extends AzosElement {
     this.#focusNode(visibleNodes[0]);
   }
 
-  render() {
+  renderControl() {
     if (!this.root) return html`<div>No tree data to display.</div>`;
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     const h = html`

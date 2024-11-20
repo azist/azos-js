@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, css, html } from "../../ui";
+import { Control, css, html } from "../../ui";
 import "../../parts/button";
 import "../../parts/select-field";
 
@@ -37,7 +37,7 @@ export const MONTHS_OF_YEAR = Object.freeze({
 });
 const ALL_MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export class WeeklyScheduler extends AzosElement {
+export class WeeklyScheduler extends Control {
 
   static styles = css`
 :host { display: block; margin-top: 1em; margin-bottom: 1em; }
@@ -128,7 +128,7 @@ az-select {
     startOfWeek.setDate(startOfWeek.getDate() - dayDifference);
     startOfWeek.setHours(0, 0, 0, 0);
 
-    console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
+    // console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
 
     return startOfWeek;
   }
@@ -185,7 +185,10 @@ az-select {
     }
   }
 
-  render() {
+  handleSlotHover(number, time) { }
+  handleSlotHoverOut() { }
+
+  renderControl() {
     return html`
 <div class="scheduler">
   ${this.renderHeader()}

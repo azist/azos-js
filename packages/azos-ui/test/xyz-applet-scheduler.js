@@ -9,8 +9,6 @@ import { Applet } from "../applet.js";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
-import "./showcase.js";
-import "./showcase2.js";
 import "../vcl/time/timeline.js";
 import { toast } from "../toast.js";
 

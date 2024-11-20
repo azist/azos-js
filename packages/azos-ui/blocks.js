@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
-import { AzosElement } from "./ui.js";
+import { Control } from "./ui.js";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
@@ -14,7 +14,7 @@ import { AzosElement } from "./ui.js";
  * such as popup modals, or be sub-blocks of other blocks or applets.
  *  A special derivation branch based on {@link Form} class represent a logically completed data-bound forms.
  */
-export class Block extends AzosElement {
+export class Block extends Control {
 
   /**
    * Reactive properties

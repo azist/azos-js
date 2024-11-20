@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { AzosElement, html, css, parseStatus, parseRank } from "../../ui";
+import { Control, html, css, parseStatus, parseRank } from "../../ui";
 
-export class Timeline extends AzosElement{
+export class Timeline extends Control{
   constructor(){ super(); }
 
   static properties={
@@ -99,7 +99,7 @@ export class Timeline extends AzosElement{
     }
   }
 
-  render(){
+  renderControl(){
     const clsStatus=`${parseStatus(this.status,true)}`;
     const clsRank= `${parseRank(this.rank,true)}`;
 
