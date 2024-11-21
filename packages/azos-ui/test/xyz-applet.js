@@ -35,6 +35,7 @@ export class XyzApplet extends Applet {
 
   static properties = {
     name: { type: String },
+    showcaseTabbed: { type: Boolean },
   };
 
   constructor() {
@@ -210,7 +211,7 @@ export class XyzApplet extends Applet {
       </div>
      </az-modal-dialog>
 
-     <az-test-showcase></az-test-showcase>
+     <az-test-showcase .showTabbed=${this.showcaseTabbed}></az-test-showcase>
 
     `;
   }//render

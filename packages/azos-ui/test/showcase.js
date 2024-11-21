@@ -30,14 +30,24 @@ export class Showcase extends Control {
   };
 
   static styles = css`
+:host{ display:block; }
 p{ font-size: 1rem; }
-.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap: 1ch; }
+.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap:1ch; }
 .strip-h az-button{ margin:0; }
+#ToC, #Content > div{ scroll-margin-top: 50px; }
   `;
+
+  #showTabbed = false;
+  get showTabbed() { return this.#showTabbed; }
+  set showTabbed(v) {
+    this.#showTabbed = v;
+    this.requestUpdate();
+    setTimeout(() => this.#showcaseSetup(), 100);
+  }
+
 
   toastCount = 0;
   #id = 0;
-  #showUsingTabs = false;
   constructor() {
     super();
     this.tocSections = [];
@@ -108,9 +118,10 @@ p{ font-size: 1rem; }
     e.preventDefault();
     const target = this.shadowRoot.getElementById(scrollToId);
     if (!target) return;
-    const headerHeight = 50;
-    const targetTop = target.getBoundingClientRect().top - headerHeight;
-    window.scrollTo({ top: targetTop, behavior: "smooth" });
+    target.scrollIntoView({ behavior: "smooth" });
+    // const headerHeight = 50;
+    // const targetTop = target.getBoundingClientRect().top - headerHeight;
+    // window.scrollTo({ top: targetTop, behavior: "smooth" });
   }
 
   async #btnSpinnerProcess() {
@@ -165,6 +176,9 @@ p{ font-size: 1rem; }
     if (!results) results = [{ key1: "value" }, { key2: { childKey1: true, childKey2: 5 } }, { key3: [{ childKey3: false, childKey4: 85 }] }];
     if (!root) root = this.treeView.root;
 
+    if (this.treeView.initiated) return;
+    this.treeView.initiated = true;
+
     results.forEach((result, index) => createChild(`${index + 1}`, result, root));
     this.treeView.requestUpdate();
 
@@ -184,10 +198,7 @@ p{ font-size: 1rem; }
 
   /** "Show Using Tabs" toggle switch */
   async #updateUsingTabs(e) {
-    this.#showUsingTabs = asBool(e.target.value);
-    this.requestUpdate();
-    await this.updateComplete;
-    queueMicrotask(() => this.#showcaseSetup());
+    this.showTabbed = asBool(e.target.value);
   }
 
   async firstUpdated() {
@@ -198,8 +209,8 @@ p{ font-size: 1rem; }
   /** Setup instructions for firstUpdated and toggling `Show Using Tabs` */
   #showcaseSetup() {
     this.#populateTree();
-    if (!this.#showUsingTabs) {
-      const returnToToC = html`<div style="padding-top:0.5em;"><a href="#Menu" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Return to Menu</a></div>`;
+    if (!this.showTabbed) {
+      const returnToToC = html`<div style="padding-top:0.5em;"><a href="" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Return to Menu</a></div>`;
 
       const sections = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
       this.tocSections = sections.map(section => ({ id: section.id, label: section.id.replace("Content", " Content") }));
@@ -215,8 +226,8 @@ p{ font-size: 1rem; }
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
 
-<az-check title="Show Using Tabs" @change="${this.#updateUsingTabs}" titleWidth="85" titlePosition="mid-right"></az-check>
-${this.#showUsingTabs ? html`
+<az-check title="Show Using Tabs" @change="${this.#updateUsingTabs}" titleWidth="85" titlePosition="mid-right" value="${this.showTabbed}"></az-check>
+${this.showTabbed ? html`
 <div class="strip-h">
   <h3>Tab View Controls:</h3>
   <az-button @click=${this.#btnShowHideTab} title="Show/Hide" rank="small"></az-button>
@@ -251,7 +262,7 @@ ${this.#showUsingTabs ? html`
   ` : html`
 <h1 id="ToC">Table of Contents</h1>
 <ol>
-  ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.id} </a></li>`)}
+  ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}
 </ol>
 <div id="Content">
   <div id="SchedulerContent"> ${this.renderSchedulerContent()} </div>
