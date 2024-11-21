@@ -262,7 +262,7 @@ ${this.showTabbed ? html`
   ` : html`
 <h1 id="ToC">Table of Contents</h1>
 <ol>
-  ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.id} </a></li>`)}
+  ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}
 </ol>
 <div id="Content">
   <div id="SchedulerContent"> ${this.renderSchedulerContent()} </div>
