@@ -21,7 +21,7 @@ import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
 import { popupMenu } from "../popup-menu.js";
-import { AS_BOOLEAN_FUN, asBool, isObject, isObjectOrArray } from "azos/types";
+import { asBool, isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
