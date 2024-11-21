@@ -83,6 +83,7 @@ export function renderHeader(app, self){
       <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
       <ul>
         <li><a href="/">Visual Control Showcase</a></li>
+        <li><a href="/1.app">Visual Control Showcase Tabbed</a></li>
         <li><a href="/3.app">Simple Control Showcase</a></li>
         <li><a href="/4.app">Scheduling Control - WIP</a></li>
       </ul>
