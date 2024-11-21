@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Control, html, css, POSITION, RANK, STATUS, noContent } from "../ui";
+import { Control, html, css, POSITION, RANK, STATUS, renderInto } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/check-field.js";
@@ -24,6 +24,10 @@ import { isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
+  static properties = {
+    sections: { type: Array }
+  };
+
   static styles = css`
 p{ font-size: 1rem; }
 .strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap: 1ch; }
@@ -33,9 +37,10 @@ p{ font-size: 1rem; }
   toastCount = 0;
   #id = 0;
   #showUsingTabs = false;
-  #readyForToC = false;
-  #returnToToC = html`<br> <a href="#Menu" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Go to Menu</a> `;
-  constructor() { super(); }
+  constructor() {
+    super();
+    this.sections = [];
+  }
 
   #btnDlg1Open() { this.dlg1.show(); }
   #btnDlg1Close() { this.dlg1.close(); }
@@ -176,23 +181,27 @@ p{ font-size: 1rem; }
     }
   }
 
+  /** "Show Using Tabs" toggle switch */
   async #updateUsingTabs(e) {
-    const showUsingTabs = e.target.value;
-    this.#readyForToC = false;
-    this.#showUsingTabs = showUsingTabs;
-
+    this.#showUsingTabs = !!e.target.value;
     this.requestUpdate();
     await this.updateComplete;
-
-    this.#populateTree();
-    this.#readyForToC = !showUsingTabs;
-    this.requestUpdate();
+    this.#showcaseSetup();
   }
 
   async firstUpdated() {
+    super.firstUpdated();
+    this.sections = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
+    this.sections.map(section => ({ id: section.id, label: section.id.replace("Content", " Content") }));
+
+    this.#showcaseSetup();
+  }
+
+  /** Setup instructions for firstUpdated and toggling `Show Using Tabs` */
+  #showcaseSetup() {
     this.#populateTree();
-    await this.updateComplete;
-    this.#readyForToC = true;
+    const returnToToC = html`<div style="padding-top:0.5em;"><a href="#Menu" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Return to Menu</a></div>`;
+    this.sections.forEach(section => renderInto(returnToToC, section));
     this.requestUpdate();
   }
 
@@ -238,23 +247,25 @@ ${this.#showUsingTabs ? html`
 </az-tab-view>
   ` : html`
 <h1 id="ToC">Table of Contents</h1>
-${this.#readyForToC ? this.renderToC() : noContent}
+<ol>
+  ${this.sections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.id} </a></li>`)}
+</ol>
 <div id="Content">
-  <div id="SchedulerContent"> ${this.renderSchedulerContent()} ${this.#returnToToC} </div>
-  <div id="PopupMenuContent"> ${this.renderPopupMenuContent()} ${this.#returnToToC} </div>
-  <div id="AccordionContent"> ${this.renderAccordionContent()} ${this.#returnToToC} </div>
-  <div id="SliderContent"> ${this.renderSliderContent()} ${this.#returnToToC} </div>
-  <div id="TreeViewContent"> ${this.renderTreeViewContent()} ${this.#returnToToC} </div>
-  <div id="ButtonContent"> ${this.renderButtonContent()} ${this.#returnToToC} </div>
-  <div id="InputContent"> ${this.renderInputContent()} ${this.#returnToToC} </div>
-  <div id="CodeboxContent"> ${this.renderCodeboxContent()} ${this.#returnToToC} </div>
-  <div id="RadiosContent"> ${this.renderRadiosContent()} ${this.#returnToToC} </div>
-  <div id="SwitchContent"> ${this.renderSwitchContent()} ${this.#returnToToC} </div>
-  <div id="CheckboxContent"> ${this.renderCheckboxContent()} ${this.#returnToToC} </div>
-  <div id="TextFieldContent"> ${this.renderTextFieldContent()} ${this.#returnToToC} </div>
-  <div id="SelectFieldContent"> ${this.renderSelectFieldContent()} ${this.#returnToToC} </div>
-  <div id="ModalDialogContent"> ${this.renderModalDialogContent()} ${this.#returnToToC} </div>
-  <div id="ToastContent"> ${this.renderToastContent()} ${this.#returnToToC} </div>
+  <div id="SchedulerContent"> ${this.renderSchedulerContent()} </div>
+  <div id="PopupMenuContent"> ${this.renderPopupMenuContent()} </div>
+  <div id="AccordionContent"> ${this.renderAccordionContent()} </div>
+  <div id="SliderContent"> ${this.renderSliderContent()} </div>
+  <div id="TreeViewContent"> ${this.renderTreeViewContent()} </div>
+  <div id="ButtonContent"> ${this.renderButtonContent()} </div>
+  <div id="InputContent"> ${this.renderInputContent()} </div>
+  <div id="CodeboxContent"> ${this.renderCodeboxContent()} </div>
+  <div id="RadiosContent"> ${this.renderRadiosContent()} </div>
+  <div id="SwitchContent"> ${this.renderSwitchContent()} </div>
+  <div id="CheckboxContent"> ${this.renderCheckboxContent()} </div>
+  <div id="TextFieldContent"> ${this.renderTextFieldContent()} </div>
+  <div id="SelectFieldContent"> ${this.renderSelectFieldContent()} </div>
+  <div id="ModalDialogContent"> ${this.renderModalDialogContent()} </div>
+  <div id="ToastContent"> ${this.renderToastContent()} </div>
 </div>
   `}
 
