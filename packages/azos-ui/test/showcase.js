@@ -21,12 +21,12 @@ import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
 import { popupMenu } from "../popup-menu.js";
-import { isObject, isObjectOrArray } from "azos/types";
+import { asBool, isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
   static properties = {
-    sections: { type: Array }
+    tocSections: { type: Array }
   };
 
   static styles = css`
@@ -40,7 +40,7 @@ p{ font-size: 1rem; }
   #showUsingTabs = false;
   constructor() {
     super();
-    this.sections = [];
+    this.tocSections = [];
   }
 
   #btnDlg1Open() { this.dlg1.show(); }
@@ -184,25 +184,27 @@ p{ font-size: 1rem; }
 
   /** "Show Using Tabs" toggle switch */
   async #updateUsingTabs(e) {
-    this.#showUsingTabs = !!e.target.value;
+    this.#showUsingTabs = asBool(e.target.value);
     this.requestUpdate();
     await this.updateComplete;
-    this.#showcaseSetup();
+    queueMicrotask(() => this.#showcaseSetup());
   }
 
   async firstUpdated() {
     super.firstUpdated();
-    this.sections = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
-    this.sections.map(section => ({ id: section.id, label: section.id.replace("Content", " Content") }));
-
-    this.#showcaseSetup();
+    queueMicrotask(() => this.#showcaseSetup());
   }
 
   /** Setup instructions for firstUpdated and toggling `Show Using Tabs` */
   #showcaseSetup() {
     this.#populateTree();
-    const returnToToC = html`<div style="padding-top:0.5em;"><a href="#Menu" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Return to Menu</a></div>`;
-    this.sections.forEach(section => renderInto(returnToToC, section));
+    if (!this.#showUsingTabs) {
+      const returnToToC = html`<div style="padding-top:0.5em;"><a href="#Menu" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Return to Menu</a></div>`;
+
+      const sections = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
+      this.tocSections = sections.map(section => ({ id: section.id, label: section.id.replace("Content", " Content") }));
+      sections.forEach(section => renderInto(returnToToC, section));
+    }
     this.requestUpdate();
   }
 
@@ -249,7 +251,7 @@ ${this.#showUsingTabs ? html`
   ` : html`
 <h1 id="ToC">Table of Contents</h1>
 <ol>
-  ${this.sections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.id} </a></li>`)}
+  ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.id} </a></li>`)}
 </ol>
 <div id="Content">
   <div id="SchedulerContent"> ${this.renderSchedulerContent()} </div>
@@ -302,11 +304,6 @@ ${this.#showUsingTabs ? html`
   </div>
 </az-modal-dialog>
 `;
-  }
-
-  renderToC() {
-    const contentNodes = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
-    return html`<ol>${contentNodes.map(child => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, child.id)}"> ${child.id} </a></li>`)}</ol>`;
   }
 
   renderSchedulerContent() {
