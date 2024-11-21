@@ -36,7 +36,7 @@ export class TextField extends FieldPart {
     resize: { type: String },
   }
 
-  static styles = [baseStyles, textFieldStyles, css`:host { display: inline-block; overflow: clip; }`];
+  static styles = [baseStyles, textFieldStyles];
 
   constructor() { super(); }
 

@@ -82,10 +82,9 @@ export function renderHeader(app, self){
     <nav class="side-menu" id="navMenu">
       <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
       <ul>
-        <li><a href="1.app">Applet 1</a></li>
-        <li><a href="another.app">Another Applet </a></li>
-        <li><a href="settings.app">Settings </a></li>
-        <li><a href="x.app" >Menu Item X  </a></li>
+        <li><a href="/">Visual Control Showcase</a></li>
+        <li><a href="/3.app">Simple Control Showcase</a></li>
+        <li><a href="/4.app">Scheduling Control - WIP</a></li>
       </ul>
     </nav>
 

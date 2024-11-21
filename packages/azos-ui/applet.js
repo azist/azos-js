@@ -7,13 +7,9 @@
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { AzosElement } from "./ui.js";
 
-//import { APPLET_STYLES } from "./applet.css.js";
-//import * as DEFAULT_HTML from "./applet.htm.js";
-
 /**
  * Defines a root UI element which represents an Applet - a part of application.
- * Applets run inside of arenas.
- * Applets expose "Areas" which show in arena sidebars
+ * Applets run inside of arenas as a root element for building complex UI screens such as data view/entry forms
  */
 export class Applet extends AzosElement {
 
@@ -30,7 +26,7 @@ export class Applet extends AzosElement {
   /** Returns short description */
   get description() { return ""; }
 
-  /** Override to return true when this app has unsaved data */
+  /** Override to return true when this applet has unsaved data */
   get [DIRTY_PROP]() { return false; }
 
   /** Override to prompt the user on Close, e.g. if your Applet is "dirty"/contains unsaved changes

@@ -5,10 +5,10 @@
 </FILE_LICENSE>*/
 
 import { isOneOf } from "azos/strings";
-import { AzosElement, css, html, verbatimHtml, escHtml, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, verbatimHtml, escHtml, parseRank, parseStatus } from "../../ui";
 
 /** Provides code display functionality with optional syntax highlighting */
-export class CodeBox extends AzosElement{
+export class CodeBox extends Control{
 
   static styles = css`
   :host{ font-size: var(--vcl-codebox-fsize); display: block; }
@@ -70,7 +70,7 @@ export class CodeBox extends AzosElement{
     });
   }
 
-  render(){
+  renderControl(){
     const src = this.source ? this.source : this.innerHTML;
     let cls = `codebox ${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
 

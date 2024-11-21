@@ -2,6 +2,7 @@
 import { css } from "../ui.js";
 
 export const baseStyles = css`
+:host{ display:inline-block;margin:0.2em 0.25em; }
 .text-left   {text-align: left;}
 .text-center {text-align: center;}
 .text-right  {text-align: right;}
@@ -37,6 +38,11 @@ export const baseStyles = css`
 .top-left,.top-center,.top-right,
 .mid-left,.mid-right,
 .bottom-left,.bottom-center,.bottom-right { display:flex; width: 100%; }
+
+.top-right { align-items: flex-end; }
+.top-center { align-items: center; }
+.bottom-right { align-items: flex-end; }
+.bottom-center { align-items: center; }
 
 .top-left,.top-center,.top-right { flex-direction:column; }
 .top-left > span                 { text-align:left; margin-bottom: .33em; }
@@ -80,11 +86,9 @@ button{
   border: var(--s-default-bor-ctl-btn);
   color:  var(--s-default-fg-ctl);
   background: var(--s-default-bg-ctl-btn);
-
   padding: .3em 2ch;
   min-width: 8ch;
   transition: 0.2s;
-
   user-select: none;
   -webkit-user-select: none;
 }
@@ -123,7 +127,8 @@ button:disabled{
 .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-ctl); }
 .r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-ctl); }
 .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-ctl); }
-.r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl); }`;
+.r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl); }
+`;
 
 export const checkStyles = css`
   label{

@@ -14,13 +14,14 @@ import "../../parts/button";
 
 export class Tab extends Block {
   static #idSeed = 0;
+
   static properties = {
     active: { type: Boolean, reflect: true },
-    hidden: { type: Boolean, reflect: true },
     minWidth: { type: Number },
     maxWidth: { type: Number },
     canClose: { type: Boolean },
-    iconPath: { type: String, default: "" },
+    iconPath: { type: String },
+    slot: { type: String, reflect: true },
   };
 
   #id;
@@ -30,20 +31,21 @@ export class Tab extends Block {
   get iconPath() { return this.#iconPath; }
   set iconPath(v) { this.#iconPath = v; }
 
-  #hidden = false;
-  get hidden() { return this.#hidden; }
-  set hidden(v) {
+  #isAbsent = false;
+  get isAbsent() { return this.#isAbsent; }
+  set isAbsent(v) {
     v = asBool(v);
-    if (this.#hidden === v) return;
+    if (this.#isAbsent === v) return;
     const tabView = this.tabView;
     if (!v) {
-      this.#hidden = false;
+      this.#isAbsent = false;
     } else {
       if (this.active && !(tabView?.unselectActiveTab())) return;
-      this.#hidden = true;
+      this.#isAbsent = true;
     }
     tabView?.requestUpdate();
   }
+
 
   #canClose = true;
   get canClose() { return this.#canClose; }
@@ -68,7 +70,7 @@ export class Tab extends Block {
     let t;
     for (let i = idx + 1; i < totalTabs; i++) {
       t = this.tabView.tabs[i];
-      if (visibleOnly && t.hidden === true) continue;
+      if (visibleOnly && t.isAbsent === true) continue;
       return t;
     }
     return null;
@@ -84,7 +86,7 @@ export class Tab extends Block {
     let t;
     for (let i = idx - 1; i >= 0; i--) {
       t = this.tabView.tabs[i];
-      if (visibleOnly && t.hidden === true) continue;
+      if (visibleOnly && t.isAbsent === true) continue;
       return t;
     }
     return null;
@@ -137,6 +139,6 @@ export class Tab extends Block {
     this.tabView.moveTab(this, beforeTab);
   }
 
-  render() { return html`<slot></slot>`; }
+  renderControl() { return html`<slot></slot>`; }
 
 }

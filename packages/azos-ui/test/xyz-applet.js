@@ -12,7 +12,6 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
 import "./showcase.js";
-import "./showcase2.js";
 import "../vcl/time/timeline.js";
 import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
 import { CLOSE_QUERY_METHOD } from "azos/types";
@@ -27,7 +26,12 @@ import { CLOSE_QUERY_METHOD } from "azos/types";
  */
 export class XyzApplet extends Applet {
 
-  static styles = [css`:host{ display: block; padding: 1ch 2ch; }`];
+  static styles = css`
+:host{ display: block; padding: 1ch 2ch; }
+
+.controls{ display: flex; align-items:center; gap: 1ch; }
+.controls az-button{ margin:0; }
+  `;
 
   static properties = {
     name: { type: String },
@@ -72,9 +76,7 @@ export class XyzApplet extends Applet {
   #x = 0;
   get title() { return `XYZ Applet / x = ${this.#x}` }
 
-  onClick1() {
-    //alert("Ura!!!");
-    //this.arena.name+="a";
+  btnUpdateArenaValues() {
     this.#x++;
     this.arena.requestUpdate();
 
@@ -82,31 +84,23 @@ export class XyzApplet extends Applet {
     this.arena.updateToolbar();
   }
 
-  onClick2() {
-    this.arena.uninstallToolbarCommands([this.#cmdHelp]);
+  btnToggleToolbarCommandInstalled() {
+    this.arena.installToolbarCommands([this.#cmdHelp]);
   }
 
-  onClick3() {
+  btnCloseApplet() {
     this.arena.appletClose();
   }
 
-  async onClick4() {
-    //const dlgTest1 = this.dlgTest1;// this.shadowRoot.getElementById("dlgTest1");
+  async btnShowAdhocModal() {
     const dr = (await this.dlgTest1.show()).modalResult;
     console.info("Dialog result is: " + dr);
   }
 
-  async onClick5() {
+  async btnShowMarkupModal() {
     const dlgXyz = this.shadowRoot.getElementById("dlgXyz");
     const dr = (await dlgXyz.show()).modalResult;
     console.info("Small Dialog result is: " + dr);
-  }
-
-  async onClick6() {
-    //this.$("btnSave").isHidden = !this.$("btnSave").isHidden;
-    //this.$("btnSave").isVisible = !this.$("btnSave").isVisible;
-    //console.dir(this);
-    this.btnSave.isVisible = !this.btnSave.isVisible;
   }
 
   async onClickTimeline() {
@@ -125,25 +119,26 @@ export class XyzApplet extends Applet {
 
 
   render() {
-    return html` applet
-     <button @click="${this.onClick1}"> Click me </button>
-     <button @click="${this.onClick2}"> Click me </button>
-     <button @click="${this.onClick3}"> Close This Applet </button>
-     <button @click="${this.onClick4}"> Open Dialog Box </button>
-     <button @click="${this.onClick5}"> Did you wash your hands? </button>
-     <button @click="${this.onClick6}"> btnSave.isVisible </button>
+    return html`
 
-     <az-button id="btnChronicle" scope="this" title="Chronicle" @click="${this.btnChronicleClick}"> </az-button>
-     <az-button id="btnAdlib" scope="this" title="Adlib" @click="${this.btnAdlibClick}"> </az-button>
-     <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
-     <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
-     <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
+     <div class="controls">
+      <h3>Navigate to:</h3>
+      <az-button id="btnChronicle" scope="this" title="Chronicle" @click="${this.btnChronicleClick}"> </az-button>
+      <az-button id="btnAdlib" scope="this" title="Adlib" @click="${this.btnAdlibClick}"> </az-button>
+      <az-button id="btnTimeline" scope="this" title="Timeline" status="info" @click="${this.onClickTimeline}"></az-button>
+     </div>
 
-     <az-button id="btnTimeline" scope="this" title="Git yer fuchurr 4told!" status="info" @click="${this.onClickTimeline}"></az-button>
+     <div class="controls">
+      <h3>Applet controls:</h3>
 
+      <div><button @click="${this.btnUpdateArenaValues}"> Change Arena Values </button></div>
+      <div><button @click="${this.btnToggleToolbarCommandInstalled}"> Toggle Toolbar Command </button></div>
+      <div><button @click="${this.btnCloseApplet}"> Close XYZ Applet </button></div>
+      <div><button @click="${this.btnShowAdhocModal}"> Open Adhoc Modal </button></div>
+      <div><button @click="${this.btnShowMarkupModal}"> Open Modal in Markup </button></div>
+    </div>
 
-
-     <az-modal-dialog id="dlgTest1" scope="self" title="My Dialog Box for Users" rank="normal" status="info">
+    <az-modal-dialog id="dlgTest1" scope="self" title="My Dialog Box for Users" rank="normal" status="info">
       <style>
         h1{margin: 6px;}
         h2{margin: 4px;}
@@ -152,7 +147,7 @@ export class XyzApplet extends Applet {
       <az-test-showcase-2></az-test-showcase-2>
       <az-test-showcase></az-test-showcase>
       Long line
-        <button @click="${this.onClick5}"> HOOK HARD!!! </button>
+        <button @click="${this.btnShowMarkupModal}"> HOOK HARD!!! </button>
         <h2>This is header two</h2>
       </div>
      </az-modal-dialog>
@@ -215,7 +210,6 @@ export class XyzApplet extends Applet {
       </div>
      </az-modal-dialog>
 
-     <az-test-showcase-2></az-test-showcase-2>
      <az-test-showcase></az-test-showcase>
 
     `;

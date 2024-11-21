@@ -6,10 +6,11 @@ import { ConLog } from "azos/ilog";
 
 import { dispose } from "azos/types";
 import { Module } from "azos/modules";
-import { XyzApplet } from "./xyz-applet.js";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
+import { XyzApplet } from "./xyz-applet.js";
 import { XyzApplet2 } from "./xyz-applet2.js";
+import { XyzAppletScheduler } from "./xyz-applet-scheduler.js";
 
 
 class MyLogic extends Module {
@@ -76,8 +77,21 @@ app.session.boot(window.XYZ_USER_OBJECT_INIT);
 app.log.write({ type: LOG_TYPE.DEBUG, text: "Launching arena..." });
 const arena = Arena.launch(app)[0];
 window.ARENA = arena;
-arena.appletOpen(XyzApplet2);
+arena.appletOpen(XyzApplet);
 app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
+
+switch (location.pathname) {
+  case "/3.app":
+    arena.appletOpen(XyzApplet2);
+    break;
+  case "/4.app":
+    arena.appletOpen(XyzAppletScheduler);
+    break;
+  case "/": // pass-thru
+  default:
+    arena.appletOpen(XyzApplet);
+    break;
+}
 
 
 // Handle UNLOADING/CLOSING of tab/window

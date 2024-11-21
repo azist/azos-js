@@ -253,3 +253,76 @@ export function isRectInViewport(rect) {
 
   return true;
 }
+
+/** Controls are components with interact-ability properties like
+ *  `disabled`, `visible`, `absent`, `applicable`, and `readonly`
+ */
+export class Control extends AzosElement{
+
+  static properties = {
+    /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see the reversed accessors below */
+    isDisabled:  {type: Boolean, reflect: true},
+    isNa:        {type: Boolean, reflect: true},
+    isHidden:    {type: Boolean, reflect: true},
+    isAbsent:    {type: Boolean, reflect: true},
+    isReadonly:  {type: Boolean, reflect: true}
+  };
+
+  constructor(){ super(); }
+
+  /** Programmatic accessor with reversed meaning for `isDisabled` */
+  get isEnabled() { return !this.isDisabled; }
+
+  /** Programmatic accessor with reversed meaning for `isDisabled` */
+  set isEnabled(v) { this.isDisabled = !v; }
+
+  /** Programmatic accessor with reversed meaning for `isNa` */
+  get isApplicable() { return !this.isNa; }
+
+  /** Programmatic accessor with reversed meaning for `isNa` */
+  set isApplicable(v) { this.isNa = !v; }
+
+  /** Programmatic accessor with reversed meaning for `isHidden` */
+  get isVisible() { return !this.isHidden; }
+
+  /** Programmatic accessor with reversed meaning for `isHidden` */
+  set isVisible(v) { this.isHidden = !v; }
+
+
+  /** Override to calculate styles based on current state, the dflt implementation emits css for invisible and non-displayed items.
+   * The styles are applied to root element being rendered via a `style` which overrides the default classes
+   */
+  calcStyles(){
+    let stl = "";
+    if (this.isHidden) stl += "visibility:hidden!important;";
+    if (this.isAbsent) stl += "display:none!important;";
+    return stl;
+  }
+
+  //https://www.oddbird.net/2023/11/17/components/
+  //https://frontendmasters.com/blog/light-dom-only/
+  /** Descendants should override `renderControl()` instead */
+  render(){
+    const stl = this.calcStyles();
+    return stl ? html`<style>:host{ ${stl}}</style> ${this.renderControl()}` : this.renderControl();
+  }
+
+  /** Override to render your specific control */
+  renderControl(){ return "***NO CONTROL***"; }
+}
+
+
+/** AzosParts are primitives akin to "widgets" for building more complex UI components.
+ * Buttons, textboxes, radios, checks, sliders et.al are all parts
+ */
+export class Part extends Control{
+  constructor(){ super(); }
+
+  /** Descendants should override `renderPart()` instead */
+  renderControl(){
+    return this.renderPart();
+  }
+
+  /** Override to render your specific part */
+  renderPart(){ return "***NO PART***"; }
+}
