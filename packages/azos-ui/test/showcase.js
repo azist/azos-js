@@ -15,6 +15,7 @@ import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import "../vcl/util/accordion.js";
 import "../vcl/tabs/tab-view.js";
+import "../vcl/tree-view/tree-view.js";
 import "../vcl/time/scheduler.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
