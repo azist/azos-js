@@ -32,7 +32,7 @@ export class Showcase extends Control {
   static styles = css`
 :host{ display:block; }
 p{ font-size: 1rem; }
-.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap:1ch; }
+.strip-h{ display:flex;flex-wrap:wrap;align-items:center;margin-bottom:0.5em;gap:1ch; }
 .strip-h az-button{ margin:0; }
 #ToC, #Content > div{ scroll-margin-top: 50px; }
   `;
@@ -242,7 +242,7 @@ ${this.showTabbed ? html`
   <az-button @click=${() => this.#btnMoveTab(2)} title="2x" rank="small"></az-button>
 </div>
 
-<az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
+<az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}" style="width:45vw;">
   <az-tab title="Scheduler (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSchedulerContent()} </az-tab>
   <az-tab title="Popup Menu (WIP)" .canClose=${false}> ${this.renderPopupMenuContent()} </az-tab>
   <az-tab title="Accordion (WIP)" .canClose=${false}> ${this.renderAccordionContent()} </az-tab>

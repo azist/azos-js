@@ -6,7 +6,7 @@
 
 import { isOf } from "azos/aver";
 import { Block } from "../../blocks";
-import { html } from "../../ui";
+import { css, html } from "../../ui";
 import { TabView } from "./tab-view";
 
 import { asBool } from "azos/types";
@@ -14,6 +14,13 @@ import "../../parts/button";
 
 export class Tab extends Block {
   static #idSeed = 0;
+
+  static styles = css`
+    ::slotted([style*="display: flex"]){
+      flex-wrap: wrap;
+      overflow: hidden;
+    }
+  `;
 
   static properties = {
     active: { type: Boolean, reflect: true },

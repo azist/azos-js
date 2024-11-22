@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/aver";
-import { Control, css, html, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
@@ -469,13 +469,14 @@ export class TabView extends Control {
             draggable="${this.isDraggable}"
             @dragstart="${e => this.#onDragStart(e, index)}"
             @dragend="${this.#onDragEnd}"
-            >
-            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : ''}
+          >
+            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
-            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : ''}
+            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : noContent}
           </div>
-        `})}
+        `}
+    )}
     </div>
   </div>
   <button class="scroll-btn right" @click="${() => this.#onScrollTabContainer(true)}"></button>
