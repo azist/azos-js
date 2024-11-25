@@ -15,13 +15,6 @@ import "../../parts/button";
 export class Tab extends Block {
   static #idSeed = 0;
 
-  static styles = css`
-    ::slotted([style*="display: flex"]){
-      flex-wrap: wrap;
-      overflow: hidden;
-    }
-  `;
-
   static properties = {
     active: { type: Boolean, reflect: true },
     minWidth: { type: Number },

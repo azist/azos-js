@@ -288,7 +288,6 @@ ${this.showTabbed ? html`
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
   <div slot="body">
-    <style>p{width: 60vw; min-width: 300px; text-align: left;}</style>
     <p>
      It is a long established fact that <strong>a reader will be distracted</strong> by the readable content of a page when looking at its layout.
      The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here',
