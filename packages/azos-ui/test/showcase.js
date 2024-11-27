@@ -17,6 +17,7 @@ import "../vcl/util/accordion.js";
 import "../vcl/tabs/tab-view.js";
 import "../vcl/tree-view/tree-view.js";
 import "../vcl/time/scheduler.js";
+import "../vcl/slides/slide-deck.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
@@ -243,7 +244,8 @@ ${this.showTabbed ? html`
 </div>
 
 <az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
-  <az-tab title="Scheduler (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSchedulerContent()} </az-tab>
+  <az-tab title="Slide Deck (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSlideDeckContent()} </az-tab>
+  <az-tab title="Scheduler (WIP)" .canClose=${false}> ${this.renderSchedulerContent()} </az-tab>
   <az-tab title="Popup Menu (WIP)" .canClose=${false}> ${this.renderPopupMenuContent()} </az-tab>
   <az-tab title="Accordion (WIP)" .canClose=${false}> ${this.renderAccordionContent()} </az-tab>
   <az-tab title="Sliders (WIP)" .canClose=${false} status="error"> ${this.renderSliderContent()} </az-tab>
@@ -265,6 +267,7 @@ ${this.showTabbed ? html`
   ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}
 </ol>
 <div id="Content">
+  <div id="SlideDeckContent"> ${this.renderSlideDeckContent()} </div>
   <div id="SchedulerContent"> ${this.renderSchedulerContent()} </div>
   <div id="PopupMenuContent"> ${this.renderPopupMenuContent()} </div>
   <div id="AccordionContent"> ${this.renderAccordionContent()} </div>
@@ -315,6 +318,16 @@ ${this.showTabbed ? html`
   </div>
 </az-modal-dialog>
 `;
+  }
+
+  renderSlideDeckContent() {
+    return html`
+<h2>Slide Deck</h2>
+<az-slide-deck timeout="${60_000}">
+  <az-slide>Here's a slide</az-slide>
+  <az-slide>Here's a another slide</az-slide>
+</az-slide-deck>
+    `;
   }
 
   renderSchedulerContent() {
