@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Control, html, css, POSITION, RANK, STATUS, noContent } from "../ui";
+import { Control, html, css, POSITION, RANK, STATUS, renderInto } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/check-field.js";
@@ -15,93 +15,55 @@ import "../parts/slider-field.js";
 import "../vcl/util/code-box.js";
 import "../vcl/util/accordion.js";
 import "../vcl/tabs/tab-view.js";
+import "../vcl/tree-view/tree-view.js";
 import "../vcl/time/scheduler.js";
+import "../vcl/slides/slide-deck.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
 import { popupMenu } from "../popup-menu.js";
-import { isObject, isObjectOrArray } from "azos/types";
+import { asBool, isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
-  constructor() { super(); }
+  static properties = {
+    tocSections: { type: Array }
+  };
 
   static styles = css`
+:host{ display:block; }
 p{ font-size: 1rem; }
-.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap: 1ch; }
+.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap:1ch; }
 .strip-h az-button{ margin:0; }
+#ToC, #Content > div{ scroll-margin-top: 50px; }
   `;
 
-
-  onDlg1Open() { this.dlg1.show(); }
-  onDlg1Close() { this.dlg1.close(); }
-  onDlg2Open() { this.dlg2.show(); }
-  onDlg2Close() { this.dlg2.close(); }
-
-  async onSpinnerProcess() {
-    Spinner.exec(async sp => {
-      sp.message = `Prepping DB...`;
-      await new Promise(resolve => setTimeout(resolve, 1070));
-      sp.message = `Exec DDL 1 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      sp.message = `Exec DDL 2 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 890));
-      sp.message = `Exec DDL 3 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 1232));
-      sp.status = "error";
-      sp.message = `Recovering DDL error...`;
-      await new Promise(resolve => setTimeout(resolve, 2370));
-      sp.status = "warning";
-      sp.message = `Exec DDL 4 of 5 ...`;
-      await new Promise(resolve => setTimeout(resolve, 1870));
-      sp.message = `Exec DDL 5 of 5 ...`;
-      sp.status = "ok";
-      await new Promise(resolve => setTimeout(resolve, 2360));
-    });
+  #showTabbed = false;
+  get showTabbed() { return this.#showTabbed; }
+  set showTabbed(v) {
+    this.#showTabbed = v;
+    this.requestUpdate();
+    setTimeout(() => this.#showcaseSetup(), 100);
   }
 
-  onModalSpinnerOpen() { this.spinnerModal.show(); }
-  onNonModalSpinnerOpen() { this.spinnerNonModal.show(); }
-  onNonModalSpinnerClose() { this.spinnerNonModal.hide(); }
-
-  onAutoSpinnerOpen() { Spinner.show(null, 3000); }
-
-  #onFieldChange(e) {
-    console.log("Got change event from field: ", e.target.name, e.target.value);
-    this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
-  }
 
   toastCount = 0;
-  async toastMe(multiple = false) {
-    const toasts = multiple ? 20 : 1;
-    for (let i = 0; i < toasts; i++) {
-      temp(++this.toastCount);
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
-    function temp(id) {
-      const randomRank = false;
-      const randomStatus = false;
-      const randomPosition = false;
-      const timeout = undefined; //1_000;
-
-      const rank = randomRank ? Math.floor(Math.random() * Object.keys(RANK).length) : RANK.DEFAULT;
-      const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
-      const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
-
-      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, { timeout, rank, status, position });
-    }
-  }
-
   #id = 0;
-  #addNewTab() {
-    const before = this.tabView.activeTab.nextVisibleTab;
-    this.tabView.addTab(Tab, `Tab ${++this.#id}`, before);
+  constructor() {
+    super();
+    this.tocSections = [];
   }
 
-  #showHide() { this.tabView.tabs[0].isAbsent = !this.tabView.tabs[0].isAbsent; }
-  #visibleInvisible() { this.tabView.tabs[0].isHidden = !this.tabView.tabs[0].isHidden; }
-  #move(steps) { this.tabView.activeTab.move(steps); }
+  #btnDlg1Open() { this.dlg1.show(); }
+  #btnDlg1Close() { this.dlg1.close(); }
+  #btnDlg2Open() { this.dlg2.show(); }
+  #btnDlg2Close() { this.dlg2.close(); }
+  #btnIsHidden() { this.btnSave.isHidden = !this.btnSave.isHidden; }
+  #btnIsAbsent() { this.btnSave.isAbsent = !this.btnSave.isAbsent; }
+  #btnModalSpinnerOpen() { this.spinnerModal.show(); }
+  #btnNonModalSpinnerOpen() { this.spinnerNonModal.show(); }
+  #btnNonModalSpinnerClose() { this.spinnerNonModal.hide(); }
+  #btnAutoSpinnerOpen() { Spinner.show(null, 3000); }
 
   #btnPopupMenuClick() {
     popupMenu([
@@ -144,17 +106,79 @@ p{ font-size: 1rem; }
     ], this.btnPopupMenu, "mid-right");
   }
 
-  async firstUpdated() {
-    //FIXME: Surely there's a way to await this.treeView in order to add
-    await new Promise(r => setTimeout(r, 250));
-    this.#readyForToC = true;
-    this.requestUpdate();
-    this.#populateTree();
+  #btnShowHideTab() { this.tabView.tabs[0].isAbsent = !this.tabView.tabs[0].isAbsent; }
+  #btnToggleTabVisibility() { this.tabView.tabs[0].isHidden = !this.tabView.tabs[0].isHidden; }
+  #btnMoveTab(steps) { this.tabView.activeTab.move(steps); }
+
+  #btnAddNewTab() {
+    const before = this.tabView.activeTab.nextVisibleTab;
+    this.tabView.addTab(Tab, `Tab ${++this.#id}`, before);
+  }
+
+  #btnScrollSectionIntoView(e, scrollToId) {
+    e.preventDefault();
+    const target = this.shadowRoot.getElementById(scrollToId);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth" });
+    // const headerHeight = 50;
+    // const targetTop = target.getBoundingClientRect().top - headerHeight;
+    // window.scrollTo({ top: targetTop, behavior: "smooth" });
+  }
+
+  async #btnSpinnerProcess() {
+    await Spinner.exec(async sp => {
+      sp.message = `Prepping DB...`;
+      await new Promise(resolve => setTimeout(resolve, 1070));
+      sp.message = `Exec DDL 1 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      sp.message = `Exec DDL 2 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 890));
+      sp.message = `Exec DDL 3 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1232));
+      sp.status = "error";
+      sp.message = `Recovering DDL error...`;
+      await new Promise(resolve => setTimeout(resolve, 2370));
+      sp.status = "warning";
+      sp.message = `Exec DDL 4 of 5 ...`;
+      await new Promise(resolve => setTimeout(resolve, 1870));
+      sp.message = `Exec DDL 5 of 5 ...`;
+      sp.status = "ok";
+      await new Promise(resolve => setTimeout(resolve, 2360));
+    });
+  }
+
+  async #btnToastMe(multiple = false) {
+    const toasts = multiple ? 20 : 1;
+    for (let i = 0; i < toasts; i++) {
+      temp(++this.toastCount);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    function temp(id) {
+      const randomRank = false;
+      const randomStatus = false;
+      const randomPosition = false;
+      const timeout = undefined; //1_000;
+
+      const rank = randomRank ? Math.floor(Math.random() * Object.keys(RANK).length) : RANK.DEFAULT;
+      const status = randomStatus ? ["ok", "info", "warning", "alert", "error"][Math.floor(Math.random() * Object.keys(STATUS).length)] : STATUS.DEFAULT;
+      const position = randomPosition ? [...Object.values(POSITION)][Math.floor(Math.random() * Object.keys(POSITION).length)] : POSITION.DEFAULT;
+
+      Toast.toast(`Your file 'c:\\windows\\junk\\text${id}.txt' has been saved!`, { timeout, rank, status, position });
+    }
+  }
+
+  #onFieldChange(e) {
+    console.log("Got change event from field: ", e.target.name, e.target.value);
+    this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
   }
 
   #populateTree(results, root) {
     if (!results) results = [{ key1: "value" }, { key2: { childKey1: true, childKey2: 5 } }, { key3: [{ childKey3: false, childKey4: 85 }] }];
     if (!root) root = this.treeView.root;
+
+    if (this.treeView.initiated) return;
+    this.treeView.initiated = true;
 
     results.forEach((result, index) => createChild(`${index + 1}`, result, root));
     this.treeView.requestUpdate();
@@ -173,35 +197,27 @@ p{ font-size: 1rem; }
     }
   }
 
-  async btnIsHidden() {
-    this.btnSave.isHidden = !this.btnSave.isHidden;
+  /** "Show Using Tabs" toggle switch */
+  async #updateUsingTabs(e) {
+    this.showTabbed = asBool(e.target.value);
   }
 
-  async btnIsAbsent() {
-    this.btnSave.isAbsent = !this.btnSave.isAbsent;
+  async firstUpdated() {
+    super.firstUpdated();
+    queueMicrotask(() => this.#showcaseSetup());
   }
 
-  #showUsingTabs = false;
-  async updateUsingTabs(e) {
-    const showUsingTabs = e.target.value;
-    this.#readyForToC = false;
-    this.#showUsingTabs = showUsingTabs;
-
-    this.requestUpdate();
-    await this.updateComplete;
-
+  /** Setup instructions for firstUpdated and toggling `Show Using Tabs` */
+  #showcaseSetup() {
     this.#populateTree();
-    this.#readyForToC = !showUsingTabs;
-    this.requestUpdate();
-  }
+    if (!this.showTabbed) {
+      const returnToToC = html`<div style="padding-top:0.5em;"><a href="" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Return to Menu</a></div>`;
 
-  scrollSectionIntoView(e, scrollToId) {
-    e.preventDefault();
-    const target = this.shadowRoot.getElementById(scrollToId);
-    if (!target) return;
-    const headerHeight = 50;
-    const targetTop = target.getBoundingClientRect().top - headerHeight;
-    window.scrollTo({ top: targetTop, behavior: "smooth" });
+      const sections = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
+      this.tocSections = sections.map(section => ({ id: section.id, label: section.id.replace("Content", " Content") }));
+      sections.forEach(section => renderInto(returnToToC, section));
+    }
+    this.requestUpdate();
   }
 
   renderControl() {
@@ -211,24 +227,25 @@ p{ font-size: 1rem; }
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
 
-<az-check title="Show Using Tabs" @change="${this.updateUsingTabs}" titleWidth="85" titlePosition="mid-right"></az-check>
-${this.#showUsingTabs ? html`
+<az-check title="Show Using Tabs" @change="${this.#updateUsingTabs}" titleWidth="85" titlePosition="mid-right" value="${this.showTabbed}"></az-check>
+${this.showTabbed ? html`
 <div class="strip-h">
   <h3>Tab View Controls:</h3>
-  <az-button @click=${this.#showHide} title="Show/Hide" rank="small"></az-button>
-  <az-button @click=${this.#visibleInvisible} title="In/Visible" rank="small"></az-button>
-  <az-button @click=${this.#addNewTab} title="Add more..." rank="small"></az-button>
+  <az-button @click=${this.#btnShowHideTab} title="Show/Hide" rank="small"></az-button>
+  <az-button @click=${this.#btnToggleTabVisibility} title="In/Visible" rank="small"></az-button>
+  <az-button @click=${this.#btnAddNewTab} title="Add more..." rank="small"></az-button>
 
   <h4>Active Tab Left</h4>
-  <az-button @click=${() => this.#move(-1)} title="1x" rank="small"></az-button>
-  <az-button @click=${() => this.#move(-2)} title="2x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(-1)} title="1x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(-2)} title="2x" rank="small"></az-button>
   <h4>Right</h4>
-  <az-button @click=${() => this.#move(1)} title="1x" rank="small"></az-button>
-  <az-button @click=${() => this.#move(2)} title="2x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(1)} title="1x" rank="small"></az-button>
+  <az-button @click=${() => this.#btnMoveTab(2)} title="2x" rank="small"></az-button>
 </div>
 
 <az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
-  <az-tab title="Scheduler (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSchedulerContent()} </az-tab>
+  <az-tab title="Slide Deck (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSlideDeckContent()} </az-tab>
+  <az-tab title="Scheduler (WIP)" .canClose=${false}> ${this.renderSchedulerContent()} </az-tab>
   <az-tab title="Popup Menu (WIP)" .canClose=${false}> ${this.renderPopupMenuContent()} </az-tab>
   <az-tab title="Accordion (WIP)" .canClose=${false}> ${this.renderAccordionContent()} </az-tab>
   <az-tab title="Sliders (WIP)" .canClose=${false} status="error"> ${this.renderSliderContent()} </az-tab>
@@ -246,23 +263,26 @@ ${this.#showUsingTabs ? html`
 </az-tab-view>
   ` : html`
 <h1 id="ToC">Table of Contents</h1>
-${this.#readyForToC ? this.renderToC() : noContent}
+<ol>
+  ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}
+</ol>
 <div id="Content">
-  <div id="SchedulerContent"> ${this.renderSchedulerContent()} ${this.#returnToToC} </div>
-  <div id="PopupMenuContent"> ${this.renderPopupMenuContent()} ${this.#returnToToC} </div>
-  <div id="AccordionContent"> ${this.renderAccordionContent()} ${this.#returnToToC} </div>
-  <div id="SliderContent"> ${this.renderSliderContent()} ${this.#returnToToC} </div>
-  <div id="TreeViewContent"> ${this.renderTreeViewContent()} ${this.#returnToToC} </div>
-  <div id="ButtonContent"> ${this.renderButtonContent()} ${this.#returnToToC} </div>
-  <div id="InputContent"> ${this.renderInputContent()} ${this.#returnToToC} </div>
-  <div id="CodeboxContent"> ${this.renderCodeboxContent()} ${this.#returnToToC} </div>
-  <div id="RadiosContent"> ${this.renderRadiosContent()} ${this.#returnToToC} </div>
-  <div id="SwitchContent"> ${this.renderSwitchContent()} ${this.#returnToToC} </div>
-  <div id="CheckboxContent"> ${this.renderCheckboxContent()} ${this.#returnToToC} </div>
-  <div id="TextFieldContent"> ${this.renderTextFieldContent()} ${this.#returnToToC} </div>
-  <div id="SelectFieldContent"> ${this.renderSelectFieldContent()} ${this.#returnToToC} </div>
-  <div id="ModalDialogContent"> ${this.renderModalDialogContent()} ${this.#returnToToC} </div>
-  <div id="ToastContent"> ${this.renderToastContent()} ${this.#returnToToC} </div>
+  <div id="SlideDeckContent"> ${this.renderSlideDeckContent()} </div>
+  <div id="SchedulerContent"> ${this.renderSchedulerContent()} </div>
+  <div id="PopupMenuContent"> ${this.renderPopupMenuContent()} </div>
+  <div id="AccordionContent"> ${this.renderAccordionContent()} </div>
+  <div id="SliderContent"> ${this.renderSliderContent()} </div>
+  <div id="TreeViewContent"> ${this.renderTreeViewContent()} </div>
+  <div id="ButtonContent"> ${this.renderButtonContent()} </div>
+  <div id="InputContent"> ${this.renderInputContent()} </div>
+  <div id="CodeboxContent"> ${this.renderCodeboxContent()} </div>
+  <div id="RadiosContent"> ${this.renderRadiosContent()} </div>
+  <div id="SwitchContent"> ${this.renderSwitchContent()} </div>
+  <div id="CheckboxContent"> ${this.renderCheckboxContent()} </div>
+  <div id="TextFieldContent"> ${this.renderTextFieldContent()} </div>
+  <div id="SelectFieldContent"> ${this.renderSelectFieldContent()} </div>
+  <div id="ModalDialogContent"> ${this.renderModalDialogContent()} </div>
+  <div id="ToastContent"> ${this.renderToastContent()} </div>
 </div>
   `}
 
@@ -279,7 +299,7 @@ ${this.#readyForToC ? this.renderToC() : noContent}
      and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident,
      sometimes on purpose (injected humour and the like). Yes
     </p>
-    <az-button @click="${this.onDlg1Close}" title="Close" style="float: right;"></az-button>
+    <az-button @click="${this.#btnDlg1Close}" title="Close" style="float: right;"></az-button>
   </div>
 </az-modal-dialog>
 
@@ -294,17 +314,20 @@ ${this.#readyForToC ? this.renderToC() : noContent}
       }
     </az-code-box>
     <br>
-    <az-button @click="${this.onDlg2Close}" title="Close" style="float: right;"></az-button>
+    <az-button @click="${this.#btnDlg2Close}" title="Close" style="float: right;"></az-button>
   </div>
 </az-modal-dialog>
 `;
   }
 
-  #readyForToC = false;
-  #returnToToC = html`<br> <a href="#Menu" @click="${e => this.scrollSectionIntoView(e, "ToC")}">Go to Menu</a> `;
-  renderToC() {
-    const contentNodes = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
-    return html`<ol>${contentNodes.map(child => html`<li> <a href="" @click="${e => this.scrollSectionIntoView(e, child.id)}"> ${child.id} </a></li>`)}</ol>`;
+  renderSlideDeckContent() {
+    return html`
+<h2>Slide Deck</h2>
+<az-slide-deck timeout="${60_000}">
+  <az-slide>Here's a slide</az-slide>
+  <az-slide>Here's a another slide</az-slide>
+</az-slide-deck>
+    `;
   }
 
   renderSchedulerContent() {
@@ -353,15 +376,15 @@ ${this.#readyForToC ? this.renderToC() : noContent}
 <h2>Buttons</h2>
 
 <div class="strip-h">
-  <div><button @click="${this.btnIsHidden}"> btnSave.isHidden </button></div>
-  <div><button @click="${this.btnIsAbsent}"> btnSave.isAbsent </button></div>
+  <div><button @click="${this.#btnIsHidden}"> btnSave.isHidden </button></div>
+  <div><button @click="${this.#btnIsAbsent}"> btnSave.isAbsent </button></div>
 
   <az-button id="btnSave"    scope="this" title="Save" status="ok"> </az-button>
   <az-button id="btnCancel"  scope="this" title="Cancel" status="warning"> </az-button>
   <az-button id="btnDetails" scope="this" title="Details..."> </az-button>
 </div>
 
-<az-button @click="${this.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
+<az-button @click="${this.#btnSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
 
 <h4>Regular buttons of default status</h4>
 <az-button title="Button 1"></az-button>
@@ -665,24 +688,24 @@ ${this.#readyForToC ? this.renderToC() : noContent}
   renderModalDialogContent() {
     return html`
 <h2>Modal Dialogs</h2>
-<az-button @click="${this.onDlg1Open}" title="Open..."></az-button>
-<az-button @click="${this.onDlg2Open}" title="Open Code..." status="info"></az-button>
+<az-button @click="${this.#btnDlg1Open}" title="Open..."></az-button>
+<az-button @click="${this.#btnDlg2Open}" title="Open Code..." status="info"></az-button>
 
-<az-button @click="${this.onModalSpinnerOpen}" title="Open Modal Spinner..." status="alert"></az-button>
-<az-button @click="${this.onSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
+<az-button @click="${this.#btnModalSpinnerOpen}" title="Open Modal Spinner..." status="alert"></az-button>
+<az-button @click="${this.#btnSpinnerProcess}" title="Run Spinner Process..." status="info"></az-button>
 
-<az-button @click="${this.onNonModalSpinnerOpen}" title="Open NM Spinner..." status="info"></az-button>
-<az-button @click="${this.onNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
+<az-button @click="${this.#btnNonModalSpinnerOpen}" title="Open NM Spinner..." status="info"></az-button>
+<az-button @click="${this.#btnNonModalSpinnerClose}" title="Close NM Spinner..." status="info"></az-button>
 
-<az-button @click="${this.onAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
+<az-button @click="${this.#btnAutoSpinnerOpen}" title="Auto Spinner..." status="info"></az-button>
     `;
   }
 
   renderToastContent() {
     return html`
 <h2>Toasts</h2>
-<az-button @click="${() => this.toastMe(false)}" title="Toast Me..."></az-button>
-<az-button @click="${() => this.toastMe(true)}" title="Toast Me Many..."></az-button>
+<az-button @click="${() => this.#btnToastMe(false)}" title="Toast Me..."></az-button>
+<az-button @click="${() => this.#btnToastMe(true)}" title="Toast Me Many..."></az-button>
     `;
   }
 }

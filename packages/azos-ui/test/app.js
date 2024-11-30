@@ -77,10 +77,15 @@ app.session.boot(window.XYZ_USER_OBJECT_INIT);
 app.log.write({ type: LOG_TYPE.DEBUG, text: "Launching arena..." });
 const arena = Arena.launch(app)[0];
 window.ARENA = arena;
-arena.appletOpen(XyzApplet);
 app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 switch (location.pathname) {
+  case "/1.app":
+    arena.appletOpen(XyzApplet)
+      .then(() => {
+        arena.applet.showcaseTabbed = true;
+      });
+    break;
   case "/3.app":
     arena.appletOpen(XyzApplet2);
     break;
