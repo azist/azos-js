@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { makeNew, config, ConfigNode } from "azos/conf";
+import { makeNew, config, ConfigNode, GET_CONFIG_VERBATIM_VALUE } from "azos/conf";
 import { html, verbatimHtml } from "./ui.js";
 
 /** Define a keyboard shortcut */
@@ -103,6 +103,9 @@ export class Command {
 
   }
 
+  //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
+  [GET_CONFIG_VERBATIM_VALUE](){ return this; }
+
   get ctx(){ return this.#ctx; }
 
   /** Globally (cross-applet) unique URI of the command. The convention is to use this pattern `Applet/Area/Ns/Cmd` */
@@ -173,6 +176,29 @@ export class Command {
  3. A divider, which is a "---" string, double divider "===" string
 
 
-Functional style builder:
- menuBuilder(cfg, ctx, fdetailCallback...)
+Functional style builder, which visits cfgNode and invokes callbacks to build the actual menu:
+ menuLevelBuilder(cfg, ctx, fDetailCallback...)
+
+ MenuCommand(........children)
+
+ const menu = Iterable<Command|string>();
+
+ const menu = [
+   new MenuCommand(ctx, [
+      cmdFileOpen,
+      "----",
+      cmdFileSave,
+      cmdSaveAs
+    ]),
+    new Command(ctx, { condifg}})
+ ];
+
+1. add config Symbol[ProvideConfigVerbatimValue]()
+ so now we can use commands directly in config like so:  {a: [cmd1, cmd2]} without converting them to sections, we dont need [new Verbatim(cmd1),...] anymore
+
+2. add MenuCommand(ctx, cfg) .Items: [] array of Command | string
+
+3. Menu rendered, takes:  buildMenu(anchor, menu); menu: ITerable<ommand|string>)
+
+
 */
