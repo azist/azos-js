@@ -165,3 +165,14 @@ export class Command {
   }
 
 }
+
+/*
+ MenuItem is based on ConfigSection, has Children (sub menus):
+ 1. An Command reference allocated elsewhere
+ 2. A ConfigNode which is cfg for Command factory
+ 3. A divider, which is a "---" string, double divider "===" string
+
+
+Functional style builder:
+ menuBuilder(cfg, ctx, fdetailCallback...)
+*/
