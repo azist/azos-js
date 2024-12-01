@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isString } from "azos/strings";
+import { isString } from "azos/types";
 import { makeNew, config, ConfigNode, GET_CONFIG_VERBATIM_VALUE } from "azos/conf";
 import { html, verbatimHtml } from "./ui.js";
 
