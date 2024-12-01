@@ -37,6 +37,14 @@ export class ConfigError extends types.AzosError {
 */
 export function config(content){ return new Configuration(content); }
 
+
+/**
+ * Establishes a verbatim value protocol for config value consumption.
+ * If a complex value (e.g. a custom object) implements this protocol, then instead
+ * of turning it into a ConfigNode, the system will return the provided value as-is.
+ */
+export const GET_CONFIG_VERBATIM_VALUE = Symbol("getConfigVerbatimValue");
+
 /**
  * Wraps a complex value in config nodes as a verbatim one - without turning objects
  * into config sections and arrays into collection ConfigNodes.
@@ -46,6 +54,7 @@ export function config(content){ return new Configuration(content); }
  */
 export class Verbatim{
   #value;
+  [GET_CONFIG_VERBATIM_VALUE](){ return this.#value; }
   constructor(v){ this.#value = v;}
   get value(){ return this.#value;}
 }
@@ -110,20 +119,29 @@ export class ConfigNode{
         if (key.indexOf('/') >= 0 || key.indexOf('#') >= 0)
           throw new ConfigError(`Config node names may not contain '/' or '#' characters: "${key}", under parent "${this.path}"`, "ConfigNode.ctor()");
         const kv = val[key];
-        if (types.isObjectOrArray(kv) && !(kv instanceof Date) && !(kv instanceof Verbatim))
+
+        let vp = types.isAssigned(kv) ? kv[GET_CONFIG_VERBATIM_VALUE] : null;
+        if (!types.isFunction(vp)) vp = null;
+
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date) && !vp)
           map[key] = new ConfigNode(cfg, this, key, kv);
         else
-          map[key] = kv instanceof Verbatim ? kv.value : kv;
+          map[key] = vp ? vp.call(kv) : kv;
       }
       this.#value = map;
     } else if (types.isArray(val)) {
       const arr = [];
       for(var i=0; i < val.length; i++){
         const kv = val[i];
-        if (types.isObjectOrArray(kv) && !(kv instanceof Date) && !(kv instanceof Verbatim))
+
+        let vp = types.isAssigned(kv) ? kv[GET_CONFIG_VERBATIM_VALUE] : null;
+        if (!types.isFunction(vp)) vp = null;
+
+
+        if (types.isObjectOrArray(kv) && !(kv instanceof Date) && !vp)
           arr.push(new ConfigNode(cfg, this, `#${i}`, kv));
         else
-          arr.push(kv instanceof Verbatim ? kv.value : kv);
+          arr.push(vp ? vp.call(kv) : kv);
       }
       this.#value = arr;
     } else {

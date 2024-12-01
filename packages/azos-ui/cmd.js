@@ -5,7 +5,8 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { makeNew, config, ConfigNode } from "azos/conf";
+import { isString } from "azos/types";
+import { makeNew, config, ConfigNode, GET_CONFIG_VERBATIM_VALUE } from "azos/conf";
 import { html, verbatimHtml } from "./ui.js";
 
 /** Define a keyboard shortcut */
@@ -25,6 +26,9 @@ export class KeyboardShortcut {
     this.#key   = cfg.getString("key", "");
     this.#title = cfg.getString("title", "");
   }
+
+   //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
+   [GET_CONFIG_VERBATIM_VALUE](){ return this; }
 
   get ctl()  { return this.#ctl; }
   get alt()  { return this.#alt; }
@@ -83,7 +87,11 @@ export class Command {
     if (!(cfg instanceof ConfigNode)){
       cfg = config(cfg).root;
     }
+    this._ctor(cfg);
+  }
 
+  /** Protected constructor method not to be called by public callers */
+  _ctor(cfg){
     this.#kind = cfg.getString("kind", null);
     this.#uri = cfg.getString("uri", null);
     this.#title = cfg.getString("title", null);
@@ -95,13 +103,16 @@ export class Command {
     this.#readonly = cfg.getBool("readonly", false);
 
     const nsh = cfg.get("shortcut");
-    if (nsh instanceof ConfigNode){
-      this.#shortcut = makeNew(KeyboardShortcut, nsh, null, KeyboardShortcut);
-    } else this.#shortcut = null;
+    if (nsh instanceof ConfigNode) this.#shortcut = makeNew(KeyboardShortcut, nsh, null, KeyboardShortcut);
+    else if (nsh instanceof KeyboardShortcut) this.#shortcut = nsh;
+    else this.#shortcut = null;
+
     this.#value = cfg.get("value") ?? null;
     this.#handler = aver.isFunctionOrNull(cfg.get("handler"));
-
   }
+
+  //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
+  [GET_CONFIG_VERBATIM_VALUE](){ return this; }
 
   get ctx(){ return this.#ctx; }
 
@@ -164,4 +175,41 @@ export class Command {
     return html`<div class="command-icon">${verbatimHtml(this.icon)}</div>`;
   }
 
+}
+
+/**
+ * Represents a command sub type which has a menu of other commands.
+ * The menu of sub-commands is supplied as an array of commands - either their config nodes with types,
+ * or existing command instances. A null/undefined array values are treated as menu breaks
+ *
+*/
+export class MenuCommand extends Command{
+  #menu;
+
+  constructor(ctx, cfg){
+    super(ctx, cfg);
+  }
+
+  _ctor(cfg){
+    this.#menu = [];
+    super._ctor(cfg);
+
+    let menu = cfg.get("menu");
+
+    aver.isOf(menu, ConfigNode);
+    aver.isTrue(menu.isArray);
+
+    for(let {val} of menu){
+
+      //Factory method for command
+      if (val instanceof ConfigNode) val = makeNew(Command, val, this.ctx, Command);
+
+      if (isString(val))
+        this.#menu.push(val); // a string denotes a named menu section (a horizontal dash with a name)
+      else
+        this.#menu.push(aver.isOfOrNull(val, Command));//null denotes a menu break (a horizontal dash)
+    }
+  }
+
+  get menu(){ return [...this.#menu]; }
 }

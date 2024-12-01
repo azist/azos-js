@@ -316,6 +316,25 @@ describe("ConfigNode", function() {
 
   });
 
+  it("verbatim-2",   function() {
+
+    class A{  [sut.GET_CONFIG_VERBATIM_VALUE](){ return 1234;}  }
+    class B{    }
+
+    const cfg = sut.config({
+      a: new A(),
+      b: new B()
+    });
+
+    const a = cfg.root.get("a");
+    aver.isNumber(a);
+    aver.areEqual(1234, a);
+
+    const b = cfg.root.get("b");
+    aver.isOf(b, sut.ConfigNode);
+  });
+
+
   it("var recursion",   function() {
     const cfg = sut.config({
       id: "a1bold",
