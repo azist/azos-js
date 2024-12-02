@@ -11,6 +11,7 @@ import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { XyzApplet } from "./xyz-applet.js";
 import { XyzApplet2 } from "./xyz-applet2.js";
 import { XyzAppletScheduler } from "./xyz-applet-scheduler.js";
+import { XyzAppletGallery } from "./xyz-applet-gallery.js";
 
 
 class MyLogic extends Module {
@@ -91,6 +92,9 @@ switch (location.pathname) {
     break;
   case "/4.app":
     arena.appletOpen(XyzAppletScheduler);
+    break;
+  case "/5.app":
+    arena.appletOpen(XyzAppletGallery);
     break;
   case "/": // pass-thru
   default:

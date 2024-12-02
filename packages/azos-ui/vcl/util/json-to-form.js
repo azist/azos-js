@@ -1,5 +1,7 @@
+import { html } from "../../ui";
+
 /** Translates JSON object to readonly form fields */
-export default function JSONToForm(jsonObject) {
+export function JSONToForm(jsonObject) {
   let fields = '';
   const processObject = (obj, parentKey = '') => {
     Object.entries(obj).forEach(([key, value]) => {
@@ -11,7 +13,7 @@ export default function JSONToForm(jsonObject) {
             ${processObject(value, fullKey)}
           </fieldset>`;
       } else if (typeof value === 'boolean') {
-        fields += `
+        fields += html`
           <az-check
             id="${key}"
             title="${key}"
@@ -20,7 +22,7 @@ export default function JSONToForm(jsonObject) {
             isReadOnly
           ></az-check>`;
       } else {
-        fields += `
+        fields += html`
           <az-text
             id="${key}"
             title="${key}"

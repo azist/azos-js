@@ -152,7 +152,6 @@ export class ImageRecord {
 }
 
 /** Configuration snippet provides base stock system icons/images. */
-// TODO: Remove "fill" attribute from paths, rects, etc. INSTEAD Control color with CSS styles/classes (forces default SVG fill color to 0x00000)
 export const STOCK_IMAGES = Object.freeze([
   {
     uri: "xyz-test-cmd2",
