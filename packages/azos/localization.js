@@ -49,7 +49,7 @@ export const TIME_DETAILS = Object.freeze({
   NONE: "NONE", // time is off
   HM:   "HM",   // hours:minutes
   HMS:  "HMS",  // hours:minutes:seconds
-  HMSM: "HMSM"  // hours:minutes:seconds:millis
+  HMSM: "HMSM"  // hours:minutes:seconds:mills
 });
 
 
@@ -99,7 +99,7 @@ export class Localizer{
    * @param {Date} args.dt Datetime argument, it may be supplied without an args object as a sole argument
    * @param {string} args.culture Localization culture id
    * @param {DATE_FORMAT} args.dtFormat Format of date part representation
-   * @param {TIME_DETAILS} args.tmDetails Time detalization (NONE= no time)
+   * @param {TIME_DETAILS} args.tmDetails Time detail level (NONE= no time)
    * @param {boolean} args.utc Treat date time as UTC value
    */
   formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, utc = false} = {}){
@@ -202,7 +202,7 @@ export class Localizer{
    * @param {string} args.culture Formatting culture id
    * @param {int} args.precision Number of decimal places
    * @param {boolean} args.symbol True to add the currency symbol
-   * @param {boolean} args.sign  True to add minus sign, otheriwse culture accounting format is used (such as paranthesis in the US)
+   * @param {boolean} args.sign  True to add minus sign, otherwise culture accounting format is used (such as parenthesis in the US)
    * @param {boolean} args.thousands True to add thousands separator
    */
   formatCurrency({amt = NaN, iso = null, culture = null,  precision = 2, symbol = true, sign = true, thousands = true} = {}){

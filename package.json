@@ -5,7 +5,6 @@
   "version": "0.0.1",
   "type": "module",
   "--source": "",
-
   "main": "out/azos-js.js",
   "description": "Azos Dev root monorepo package",
   "author": "Azist Group",
@@ -49,7 +48,6 @@
     "test": "node  packages/azos/test/app.mjs -- --filter",
     "--test-azos": "npm test -workspace=azos",
     "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/test/index.htm\"",
-
     "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\""
   },
   "devDependencies": {
