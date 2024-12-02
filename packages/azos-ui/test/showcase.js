@@ -21,7 +21,7 @@ import "../vcl/slides/slide-deck.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
-import { asBool, isObject, isObjectOrArray } from "azos/types";
+import { asBool, asInt, isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
@@ -32,7 +32,7 @@ export class Showcase extends Control {
   static styles = css`
 :host{ display:block; }
 p{ font-size: 1rem; }
-.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap:1ch; }
+.strip-h{ display:flex;flex-wrap:wrap;align-items:center;margin-bottom:0.5em;gap:1ch; }
 .strip-h az-button{ margin:0; }
 #ToC, #Content > div{ scroll-margin-top: 50px; }
   `;
@@ -247,7 +247,6 @@ ${this.showTabbed ? html`
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
   <div slot="body">
-    <style>p{width: 60vw; min-width: 300px; text-align: left;}</style>
     <p>
      It is a long established fact that <strong>a reader will be distracted</strong> by the readable content of a page when looking at its layout.
      The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here',
@@ -276,13 +275,57 @@ ${this.showTabbed ? html`
 `;
   }
 
+  btnPreviousSlide(force) { this.slideDeck.previousSlide(force); }
+  btnNextSlide(force) { this.slideDeck.nextSlide(force); }
+  btnStartAutoTransition() {
+    this.slideDeck.startAutoTransition(asBool(this.autoWrap.value), asInt(this.slideDeckTimeout.value));
+    this.requestUpdate();
+  }
+
+  btnStopAutoTransmission() {
+    this.slideDeck.stopAutoTransition();
+    this.requestUpdate();
+  }
+
   renderSlideDeckContent() {
     return html`
 <h2>Slide Deck</h2>
-<az-slide-deck timeout="${60_000}">
-  <az-slide>Here's a slide</az-slide>
-  <az-slide>Here's a another slide</az-slide>
-</az-slide-deck>
+
+<div class="strip-h" style="align-items:flex-end;">
+  <az-check id="autoWrap" scope="this" itemType="switch" title="Auto Wrap" @change="${() => this.requestUpdate()}" value="${true}"></az-check>
+  <az-text id="slideDeckTimeout" scope="this" title="Slide Deck Timeout (ms)" placeholder="1000" value="${1000}" @change="${() => this.btnStartAutoTransition()}"></az-text>
+  <az-button title="Start AutoTransition" @click="${() => this.btnStartAutoTransition()}"></az-button>
+  <az-button title="Stop AutoTransition" .isDisabled="${!this.slideDeck?.autoTransition}" @click="${() => this.btnStopAutoTransmission()}"></az-button>
+</div>
+
+<div class="strip-h">
+
+  <div class="strip-h" style="flex-direction:column;">
+    <h3>Previous</h3>
+    <az-button title="Wrap: ${this.autoWrap?.value}" @click="${() => this.btnPreviousSlide()}"></az-button>
+    <az-button title="Force: Wrap" @click="${() => this.btnPreviousSlide(true)}"></az-button>
+    <az-button title="Force: No Wrap" @click="${() => this.btnPreviousSlide(false)}"></az-button>
+  </div>
+
+  <div class="strip-h" style="flex:1;height:100%;justify-content:center;">
+    <az-slide-deck id="slideDeck" scope="this" .autoTransition="${asInt(this.slideDeckTimeout?.value)}" .autoWrap="${this.autoWrap?.value}" style="width:100%;text-align:center;border:1px solid">
+      <az-slide>Here's slide 1</az-slide>
+      <az-slide>Here's slide 2</az-slide>
+      <az-slide>Here's slide 3</az-slide>
+      <az-slide>Here's slide 4</az-slide>
+      <az-slide>Here's slide 5</az-slide>
+    </az-slide-deck>
+  </div>
+
+  <div class="strip-h" style="flex-direction:column">
+    <h3>Next</h3>
+    <az-button title="Wrap: ${this.autoWrap?.value}" @click="${() => this.btnNextSlide()}"></az-button>
+    <az-button title="Force: Wrap" @click="${() => this.btnNextSlide(true)}"></az-button>
+    <az-button title="Force: No Wrap" @click="${() => this.btnNextSlide(false)}"></az-button>
+  </div>
+
+</div>
+
     `;
   }
 
