@@ -23,6 +23,7 @@ import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
 import { popupMenu } from "../popup-menu.js";
 import { asBool, isObject, isObjectOrArray } from "azos/types";
+import "../vcl/util/json-to-form-translator.js";
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
@@ -260,6 +261,7 @@ ${this.showTabbed ? html`
   <az-tab title="Select Field" .canClose=${false} status="warning"> ${this.renderSelectFieldContent()} </az-tab>
   <az-tab title="Modal Dialogs" .canClose=${false}> ${this.renderModalDialogContent()} </az-tab>
   <az-tab title="Toasts" .canClose=${false}> ${this.renderToastContent()} </az-tab>
+  <az-tab title="JSON to Form" .canClose=${false}> ${this.renderTranslator()} </az-tab>
 </az-tab-view>
   ` : html`
 <h1 id="ToC">Table of Contents</h1>
@@ -283,6 +285,7 @@ ${this.showTabbed ? html`
   <div id="SelectFieldContent"> ${this.renderSelectFieldContent()} </div>
   <div id="ModalDialogContent"> ${this.renderModalDialogContent()} </div>
   <div id="ToastContent"> ${this.renderToastContent()} </div>
+  <div id="TranslatorContent"> ${this.renderTranslator()} </div>
 </div>
   `}
 
@@ -705,6 +708,26 @@ ${this.showTabbed ? html`
 <h2>Toasts</h2>
 <az-button @click="${() => this.#btnToastMe(false)}" title="Toast Me..."></az-button>
 <az-button @click="${() => this.#btnToastMe(true)}" title="Toast Me Many..."></az-button>
+    `;
+  }
+
+  renderTranslator() {
+    return html`
+      <az-json-to-form
+        data='{
+          "username": "admin",
+          "isAdmin": true,
+          "email": "admin@example.com",
+          "profile": {
+            "firstName": "John",
+            "lastName": "Doe",
+            "settings": {
+              "theme": "dark",
+              "notifications": true
+            }
+          }
+        }'
+      ></az-json-to-form>
     `;
   }
 }
