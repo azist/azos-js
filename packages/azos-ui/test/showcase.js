@@ -21,7 +21,6 @@ import "../vcl/slides/slide-deck.js";
 import { Spinner } from "../spinner.js";
 import { Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
-import { popupMenu } from "../popup-menu.js";
 import { asBool, isObject, isObjectOrArray } from "azos/types";
 
 /** Test element used as a showcase of various parts and form elements in action */
@@ -64,47 +63,6 @@ p{ font-size: 1rem; }
   #btnNonModalSpinnerOpen() { this.spinnerNonModal.show(); }
   #btnNonModalSpinnerClose() { this.spinnerNonModal.hide(); }
   #btnAutoSpinnerOpen() { Spinner.show(null, 3000); }
-
-  #btnPopupMenuClick() {
-    popupMenu([
-      {
-        title: "Dima",
-        rank: 3,
-        status: "default"
-      }, {
-        title: "Shawn",
-        rank: 2,
-        status: "ok",
-        subMenu: [
-          {
-            title: "Dima",
-            rank: 3,
-            status: "default"
-          }, {
-            title: "Shawn",
-            rank: 2,
-            status: "ok"
-          }, {
-            title: "Kevin",
-            rank: 3,
-            status: "default"
-          }, {
-            title: "Shitstain Steven",
-            rank: 3,
-            status: "default"
-          }
-        ]
-      }, {
-        title: "Kevin",
-        rank: 3,
-        status: "default"
-      }, {
-        title: "Shitstain Steven",
-        rank: 3,
-        status: "default"
-      }
-    ], this.btnPopupMenu, "mid-right");
-  }
 
   #btnShowHideTab() { this.tabView.tabs[0].isAbsent = !this.tabView.tabs[0].isAbsent; }
   #btnToggleTabVisibility() { this.tabView.tabs[0].isHidden = !this.tabView.tabs[0].isHidden; }
@@ -246,7 +204,6 @@ ${this.showTabbed ? html`
 <az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
   <az-tab title="Slide Deck (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSlideDeckContent()} </az-tab>
   <az-tab title="Scheduler (WIP)" .canClose=${false}> ${this.renderSchedulerContent()} </az-tab>
-  <az-tab title="Popup Menu (WIP)" .canClose=${false}> ${this.renderPopupMenuContent()} </az-tab>
   <az-tab title="Accordion (WIP)" .canClose=${false}> ${this.renderAccordionContent()} </az-tab>
   <az-tab title="Sliders (WIP)" .canClose=${false} status="error"> ${this.renderSliderContent()} </az-tab>
   <az-tab title="Tree View" .canClose=${false}> ${this.renderTreeViewContent()} </az-tab>
@@ -269,7 +226,6 @@ ${this.showTabbed ? html`
 <div id="Content">
   <div id="SlideDeckContent"> ${this.renderSlideDeckContent()} </div>
   <div id="SchedulerContent"> ${this.renderSchedulerContent()} </div>
-  <div id="PopupMenuContent"> ${this.renderPopupMenuContent()} </div>
   <div id="AccordionContent"> ${this.renderAccordionContent()} </div>
   <div id="SliderContent"> ${this.renderSliderContent()} </div>
   <div id="TreeViewContent"> ${this.renderTreeViewContent()} </div>
@@ -337,12 +293,6 @@ ${this.showTabbed ? html`
     `;
   }
 
-  renderPopupMenuContent() {
-    return html`
-<h2>Popup Menu</h2>
-<az-button id="btnPopupMenu" scope="this" @click="${this.#btnPopupMenuClick}" title="Show the Popup Menu" status="ok"></az-button>
-    `;
-  }
 
   renderAccordionContent() {
     return html`
