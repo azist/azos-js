@@ -74,7 +74,7 @@ az-check{
     }
 
     result["PagingCount"] = this.$("fldCount").value | 0;
-    result["CrossShard"] = this.$("chkShards").checked;
+    result["CrossShard"] = this.$("chkShards").value;
     return result;
   }
 

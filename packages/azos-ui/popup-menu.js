@@ -4,214 +4,123 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { genGuid } from "azos/types";
-import { AzosElement, html, css, STATUS, RANK, POSITION, parseRank, parseStatus, isRectInViewport } from "./ui.js";
-import { isObjectOrArray } from "azos/aver";
+import { isOf } from "azos/aver";
+import { AzosElement, css, html, noContent } from "./ui";
+import { MenuCommand } from "./cmd";
 
+
+//https://developer.chrome.com/blog/anchor-positioning-api
+
+//We need more general popup manager
+//having PopupMenu derive more specific popups
+// e.g. i need a "combobox" popup, which is customized to show special content, just like popup menu, but it can be very different than menu
+
+
+/**
+ * Opens up a popup menu by the designated anchor
+ */
 export class PopupMenu extends AzosElement {
 
   static styles = css`
-    .popover{
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content:center;
-      border: var(--s-default-bor-ctl);
-      overflow: hidden;
-      box-shadow: var(--modal-shadow);
-      opacity: 0;
-    }
 
-    .popover:popover-open, .popover[open]{
-      opacity: 1;
-      transition: 0.2s ease-in;
-      inset: unset;
-      margin: 0.5em;
-      padding:0;
-    }
-
-    .item{
-      text-align: left;
-      cursor: pointer;
-      width: 100%;
-      margin: 0;
-      padding: .33em .5em;
-      border: none;
-      background: var(--s-default-bg-ctl);
-      color:  var(--s-default-fg-ctl);
-      filter: brightness(1);
-      transition: filter .2s ease;
-    }
-    .item:hover{
-      filter: brightness(.85);
-    }
-    .hasSubMenu::after{
-      content:">";
-      margin-left:1ch;
-      font-weight:bold;
-    }
-    .divider{
-      border-color: var(--ghost);
-      width:90%;
-      margin: .25em 0;
-    }
-
-    @starting-style{.popover:popover-open, .popover[open]{opacity: 0;}}
-
-    .popover:focus-visible, .popover:hover{ outline: none; }
-
-    .r1 { font-size: var(--r1-fs); }
-    .r2 { font-size: var(--r2-fs); }
-    .r3 { font-size: var(--r3-fs); }
-    .r4 { font-size: var(--r4-fs); }
-    .r5 { font-size: var(--r5-fs); }
-    .r6 { font-size: var(--r6-fs); }
-
-    .ok { background: var(--s-ok-bg-ctl); color: var(--s-ok-fg-ctl); }
-    .info { background: var(--s-info-bg-ctl); color: var(--s-info-fg-ctl); }
-    .warning { background: var(--s-warn-bg-ctl); color: var(--s-warn-fg-ctl); }
-    .alert { background: var(--s-alert-bg-ctl); color: var(--s-alert-fg-ctl); }
-    .error { background: var(--s-error-bg-ctl); color: var(--s-error-fg-ctl); }
-  `;
+  `;//css
 
   static #instances = [];
+  /** Get all menu instances in the order of their opening */
+  static get instances() { return [...PopupMenu.#instances]; }
 
-  /** Get all menu instances */
-  static get instances() { return [...PopupMenu.#instances] }
 
-  /**
-   * Construct a new context menu to display on the screen.
-   * RANK and STATUS should be tied to individual items instead of the whole menu.
-   * POSITION is tied to the anchor positioning and should react to edges of the viewport.
-   * NOTE: Menus do not understand rich content.
-   * @param {object} menu The message to display in the menu
-   * @param {string} anchor The DOM element that anchors the menu
-   * @param {POSITION} position Defines where the menu appears in relation to its anchor
-   * @returns The constructed menu added to menu.#instances
-   */
-  static popupMenu(menu, anchor, position) {
-    isObjectOrArray(menu);
-    /* menu is object of objects that follow the pattern:
-    { title, rank, status, submenu: none|submenu array } */
+  /** Opens one more popup menu, possibly a child level over an existing one*/
+  static open(cmdMenu, {anchor = null, position = null} = {}){
+    isOf(cmdMenu, MenuCommand);
 
-    const popupMenu = new PopupMenu(anchor ?? document.body);
-
-    popupMenu.#menu = menu;
-
-    popupMenu.#position = position ?? POSITION.DEFAULT;
-    console.log(popupMenu.#position);
-
-    PopupMenu.#instances.push(popupMenu);
-    popupMenu.#show();
-
-    return popupMenu;
+    const menu = new PopupMenu(cmdMenu, anchor, position);
+    PopupMenu.#instances.push(menu);
+    return menu;
   }
 
-  #anchor = null;
-  #guid = null;
-  #isShown = false;
-  #menu = null;
-  #position = null;
+  /** Closes all popup menu levels currently open */
+  static closeAll(){
+    //todo: Close in reverse order
+  }
 
-  get #positionStyles() {
-    const anchorPos = this.#anchor.getBoundingClientRect();
-    let heightOfItems = 0;
-    this.#menu.forEach((item) => {
-      let curRank = parseRank(item.rank, true);
-      //convert em to px when 1em = 16px
-      switch (curRank) {
-        case "r1":
-          heightOfItems += (2.26 * 16);
-          break;
-        case "r2":
-          heightOfItems += (2.06 * 16);
-          break;
-        case "r3":
-          heightOfItems += (1.66 * 16);
-          break;
-        case "r4":
-          heightOfItems += (1.51 * 16);
-          break;
-        case "r5":
-          heightOfItems += (1.31 * 16);
-          break;
-        case "r6":
-          heightOfItems += (1.16 * 16);
-          break;
-        default:
-          heightOfItems += (1.66 * 16);
-      }
-    });
-    console.log(heightOfItems);
-    switch (this.#position) {
-      case POSITION.TOP_LEFT:
-        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${anchorPos.left}px;`;
-      case POSITION.TOP_CENTER:
-        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
-      case POSITION.TOP_RIGHT:
-        return `top: ${anchorPos.top - (anchorPos.height + heightOfItems)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
-      case POSITION.MIDDLE_LEFT:
-        return `top: ${anchorPos.top - (heightOfItems * .5)}px; left: ${anchorPos.left - (anchorPos.width * .7)}px;`;
-      case POSITION.MIDDLE_RIGHT:
-        return `top: ${anchorPos.top - (heightOfItems * .5)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
-      case POSITION.BOTTOM_LEFT:
-        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${anchorPos.left}px;`;
-      case POSITION.BOTTOM_CENTER:
-        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${(anchorPos.left + (anchorPos.width * .45))}px;`;
-      case POSITION.BOTTOM_RIGHT:
-        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
-      case POSITION.DEFAULT: //fall-through
-      default:
-        return `top: ${anchorPos.top + (anchorPos.height * .8)}px; left: ${(anchorPos.left + (anchorPos.width * .8))}px;`;
+
+  #tmr = null;
+  #isStandalone = true;
+  #isShown = false;
+  #shownAsModal = false;
+  constructor(){
+    super();
+    this.timeout = 25_000;
+  }
+
+
+  /** Returns true if the spinner is shown */
+  get isShown(){ return this.#isShown;}
+
+
+  /** Shows a spinner returning true if it was shown, or false if it was already shown before this call */
+  show(){
+    if (this.#isShown) return false;
+    this.#isShown = true;
+    this.#isStandalone = false;
+
+    if (this.parentNode === null){
+      document.body.appendChild(this);
+      this.#isStandalone = true;
+    }
+
+    this.update();//sync update dom build
+
+    const dlg = this.$("pop");
+    this.#shownAsModal = this.isModal;
+    if (this.#shownAsModal)
+      dlg.showModal();
+    else
+      dlg.showPopover();
+
+    const to = this.timeout === 0 ? 40_000 : this.timeout;
+    this.#tmr = to > 0 ? setTimeout(() => this.hide(), to) : null;
+    return true;
+  }
+
+  /** Hides the shown spinner returning true if it was hidden, or false if it was already hidden before this call*/
+  hide(){
+    if (!this.#isShown) return false;
+    this.#isShown = false;
+    if (this.#tmr) clearTimeout(this.#tmr);
+
+    this.update();//sync update dom build
+
+    const dlg = this.$("pop");
+    if (this.#shownAsModal)
+      dlg.close();
+    else
+      dlg.hidePopover();
+
+    if (this.#isStandalone){
+      setTimeout(() => document.body.removeChild(this), 1000);
+    }
+
+    return true;
+  }
+
+  #onKeyDown(e){
+    if (e.key === "Escape"){//prevent modal spinner close on ESCAPE
+      e.preventDefault();
     }
   }
 
-  //Connected Callback to get menu after it is built?
+  render(){
+    let cls = "";// `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
 
-  get guid() { return this.#guid; }
+    if (this.isModal) cls += " modal";
 
-  constructor(anchor) {
-    super();
-    this.#guid = genGuid();
-    this.#anchor = anchor;
+    const body = this.#isShown ? html`<div>  MENU CONTENT </div>` : noContent;
+
+    return html`<dialog id="pop" popover="manual" class="pop ${cls}" style="${this.#isShown ? "" : "display: none"}" @keydown="${this.#onKeyDown}">${body}</dialog>`;
   }
 
-  // Add element to dom and show
-  #show() {
-    if (this.#isShown) return false;
-
-    // Add to DOM
-    document.body.appendChild(this);
-
-    // Redraw DOM
-    this.update();
-
-    // Show on DOM
-    this.$(this.guid).showPopover();
-    this.#isShown = true;
-  }
-
-  // Draw the menu
-  render() {
-    return html`<div id=${this.guid} popover=auto class="popover" style="${this.#positionStyles}">
-      ${this.#menu.map((item) => html`
-        <button class="item ${parseRank(item.rank, true)} ${parseStatus(item.status, true)}">
-          ${item.title}
-        </button>
-      `)}
-    </div>`;
-  }
 }
-/* <button
-  id="btnPopupSubmenu"
-  scope="this"
-  class="item hasSubMenu ${rankStyle} ${statusStyle}"
-  @click="${() => { popupMenu({}, this.btnPopupSubmenu) }}">
-    Shawn
-</button> */
-/**
- * Shortcut method to PopupMenu.popupMenu(...); {@link PopupMenu.popupMenu}.
- */
-export const popupMenu = PopupMenu.popupMenu.bind(PopupMenu);
 
 window.customElements.define("az-popup-menu", PopupMenu);
