@@ -115,13 +115,13 @@ unit("EntityId", function () {
 
   unit(".tryParse()", function () {
 
-    cs("parse00", function () {
+    cs("parse-00", function () {
       aver.isFalse(EntityId.tryParse(null).ok);
       aver.isFalse(EntityId.tryParse("").ok);
       aver.isFalse(EntityId.tryParse("               ").ok);
     });
 
-    cs("parse01", function () {
+    cs("parse-01", function () {
       const entityIdResponse = EntityId.tryParse("a@b::adr1");
       aver.isTrue(entityIdResponse.ok);
       aver.areEqual(entityIdResponse.value.type.value, "a");
@@ -130,7 +130,7 @@ unit("EntityId", function () {
       aver.areEqual(entityIdResponse.value.address, "adr1");
     });
 
-    cs("parse02", function () {
+    cs("parse-02", function () {
       const entityIdResponse = EntityId.tryParse("b::adr1");
       aver.isTrue(entityIdResponse.ok);
       aver.isTrue(entityIdResponse.value.type.isZero);
@@ -138,7 +138,7 @@ unit("EntityId", function () {
       aver.areEqual(entityIdResponse.value.address, "adr1");
     });
 
-    cs("parse03", function () {
+    cs("parse-03", function () {
       const entityIdResponse = EntityId.tryParse("system01::@://long-address::-string");
       aver.isTrue(entityIdResponse.ok);
       aver.isTrue(entityIdResponse.value.type.isZero);
@@ -146,20 +146,20 @@ unit("EntityId", function () {
       aver.areEqual(entityIdResponse.value.address, "@://long-address::-string");
     });
 
-    cs("parse04", function () { aver.isFalse(EntityId.tryParse("::abc").ok); });
-    cs("parse05", function () { aver.isFalse(EntityId.tryParse("aa::").ok); });
-    cs("parse06", function () { aver.isFalse(EntityId.tryParse("bbb@aa::").ok); });
-    cs("parse07", function () { aver.isFalse(EntityId.tryParse("bbb@::").ok); });
-    cs("parse08", function () { aver.isFalse(EntityId.tryParse("aaa::             ").ok); });
-    cs("parse09", function () { aver.isFalse(EntityId.tryParse("         @aaa::gggg").ok); });
-    cs("parse10", function () { aver.isFalse(EntityId.tryParse("@").ok); });
-    cs("parse11", function () { aver.isFalse(EntityId.tryParse("a b@dd::aaa").ok); });
-    cs("parse12", function () { aver.isFalse(EntityId.tryParse("ab@d d::aaa").ok); });
-    cs("parse13", function () { aver.isFalse(EntityId.tryParse("ab@d*d::aaa").ok); });
-    cs("parse14", function () { aver.isFalse(EntityId.tryParse("ab@dd::                             ").ok); });
-    cs("parse15", function () { aver.isFalse(EntityId.tryParse("::").ok); });
+    cs("parse-04", function () { aver.isFalse(EntityId.tryParse("::abc").ok); });
+    cs("parse-05", function () { aver.isFalse(EntityId.tryParse("aa::").ok); });
+    cs("parse-06", function () { aver.isFalse(EntityId.tryParse("bbb@aa::").ok); });
+    cs("parse-07", function () { aver.isFalse(EntityId.tryParse("bbb@::").ok); });
+    cs("parse-08", function () { aver.isFalse(EntityId.tryParse("aaa::             ").ok); });
+    cs("parse-09", function () { aver.isFalse(EntityId.tryParse("         @aaa::gggg").ok); });
+    cs("parse-10", function () { aver.isFalse(EntityId.tryParse("@").ok); });
+    cs("parse-11", function () { aver.isFalse(EntityId.tryParse("a b@dd::aaa").ok); });
+    cs("parse-12", function () { aver.isFalse(EntityId.tryParse("ab@d d::aaa").ok); });
+    cs("parse-13", function () { aver.isFalse(EntityId.tryParse("ab@d*d::aaa").ok); });
+    cs("parse-14", function () { aver.isFalse(EntityId.tryParse("ab@dd::                             ").ok); });
+    cs("parse-15", function () { aver.isFalse(EntityId.tryParse("::").ok); });
 
-    cs("parse16", function () {
+    cs("parse-16", function () {
       const entityIdResponse = EntityId.tryParse("vendor.gdid@ecom::1234");
       aver.isTrue(entityIdResponse.ok);
       aver.areEqual(entityIdResponse.value.type.value, "vendor");
@@ -168,7 +168,7 @@ unit("EntityId", function () {
       aver.areEqual(entityIdResponse.value.address, "1234");
     });
 
-    cs("parse17", function () {
+    cs("parse-17", function () {
       const entityIdResponse = EntityId.tryParse("vendor.@ecom::1234");
       aver.isTrue(entityIdResponse.ok);
       aver.areEqual(entityIdResponse.value.type.value, "vendor");
@@ -177,13 +177,13 @@ unit("EntityId", function () {
       aver.areEqual(entityIdResponse.value.address, "1234");
     });
 
-    cs("parse17_1", function () { aver.isFalse(EntityId.tryParse("vendor. @ecom::1234").ok); });
-    cs("parse18", function () { aver.isFalse(EntityId.tryParse("vendor.gdiddddddddddddddddddddddddddddd@ecom::1234").ok); });
-    cs("parse19", function () { aver.isFalse(EntityId.tryParse(".@ecom::1234").ok); });
-    cs("parse20", function () { aver.isFalse(EntityId.tryParse(" . @ecom::1234").ok); });
-    cs("parse21", function () { aver.isFalse(EntityId.tryParse(" . . @ecom::1234").ok); });
-    cs("parse22", function () { aver.isFalse(EntityId.tryParse(".gdid@ecom::1234").ok); });
-    cs("parse23", function () { aver.isFalse(EntityId.tryParse(" .gdid@ecom::1234").ok); });
+    cs("parse-17_1", function () { aver.isFalse(EntityId.tryParse("vendor. @ecom::1234").ok); });
+    cs("parse-18", function () { aver.isFalse(EntityId.tryParse("vendor.gdiddddddddddddddddddddddddddddd@ecom::1234").ok); });
+    cs("parse-19", function () { aver.isFalse(EntityId.tryParse(".@ecom::1234").ok); });
+    cs("parse-20", function () { aver.isFalse(EntityId.tryParse(" . @ecom::1234").ok); });
+    cs("parse-21", function () { aver.isFalse(EntityId.tryParse(" . . @ecom::1234").ok); });
+    cs("parse-22", function () { aver.isFalse(EntityId.tryParse(".gdid@ecom::1234").ok); });
+    cs("parse-23", function () { aver.isFalse(EntityId.tryParse(" .gdid@ecom::1234").ok); });
 
     cs("pass-eml-schema", function () {
       const entityIdResponse = EntityId.tryParse(VALID_ENTITY_URIS.EML_SCHEMA);
@@ -291,21 +291,21 @@ unit("EntityId", function () {
       aver.areEqual(entityId.toString(), parseValue);
     });
 
-    cs("pass-when-matches-original-parse-value2", function () {
+    cs("pass-when-matches-original-parse-value-2", function () {
       const parseValue = VALID_ENTITY_URIS.EML_SCHEMA;
       const entityId = EntityId.parse(parseValue);
 
       aver.areEqual(entityId.toString(), parseValue);
     });
 
-    cs("pass-when-matches-original-parse-value3", function () {
+    cs("pass-when-matches-original-parse-value-3", function () {
       const parseValue = VALID_ENTITY_URIS.GDID_SCHEMA;
       const entityId = EntityId.parse(parseValue);
 
       aver.areEqual(entityId.toString(), parseValue);
     });
 
-    cs("pass-when-matches-original-parse-value4", function () {
+    cs("pass-when-matches-original-parse-value-4", function () {
       const parseValue = VALID_ENTITY_URIS.JSON_SCHEMA;
       const entityId = EntityId.parse(parseValue);
 

@@ -13,12 +13,12 @@ unit("Aver", function () {
 
   unit("#isUndefined()", function () {
 
-    cs("pass undefined", function () {
+    cs("pass-undefined", function () {
       let x = undefined;
       sut.isUndefined(x);
     });
 
-    cs("fail defined", function () {
+    cs("fail-defined", function () {
       sut.throws(function () {
         let x = 2;
         sut.isUndefined(x);
@@ -28,12 +28,12 @@ unit("Aver", function () {
 
   unit("#isDefined()", function () {
 
-    cs("pass defined", function () {
+    cs("pass-defined", function () {
       let x = 1;
       sut.isDefined(x);
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isDefined(x);
@@ -43,19 +43,19 @@ unit("Aver", function () {
 
   unit("#isNull()", function () {
 
-    cs("pass null", function () {
+    cs("pass-null", function () {
       let x = null;
       sut.isNull(x);
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isNull(x);
       }, "averment failure: isnull");
     });
 
-    cs("fail non null", function () {
+    cs("fail-non-null", function () {
       sut.throws(function () {
         let x = {};
         sut.isNull(x);
@@ -65,19 +65,19 @@ unit("Aver", function () {
 
   unit("#isNotNull()", function () {
 
-    cs("pass non null", function () {
+    cs("pass-non-null", function () {
       let x = {};
       sut.isNotNull(x);
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isNotNull(x);
       }, "averment failure: isNotNull");
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         let x = null;
         sut.isNotNull(x);
@@ -130,32 +130,32 @@ unit("Aver", function () {
 
   unit("#isObject()", function () {
 
-    cs("pass object", function () {
+    cs("pass-object", function () {
       let x = {};
       sut.isObject(x);
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         let x = null;
         sut.isObject(x);
       }, "averment failure: isobject");
     });
 
-    cs("fail undefined1", function () {
+    cs("fail-undefined-1", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isObject(x);
       }, "averment failure: isobject");
     });
 
-    cs("fail undefined2", function () {
+    cs("fail-undefined-2", function () {
       sut.throws(function () {
         sut.isObject();
       }, "averment failure: isobject");
     });
 
-    cs("fail []", function () {
+    cs("fail-empty-array", function () {
       sut.throws(function () {
         let x = [];
         sut.isObject(x);
@@ -165,12 +165,12 @@ unit("Aver", function () {
 
   unit("#isArray()", function () {
 
-    cs("pass array", function () {
+    cs("pass-array", function () {
       let x = [];
       sut.isArray(x);
     });
 
-    cs("fail {}", function () {
+    cs("fail-empty-object", function () {
       sut.throws(function () {
         let x = {};
         sut.isArray(x);
@@ -180,12 +180,12 @@ unit("Aver", function () {
 
   unit("#isFunction()", function () {
 
-    cs("pass function", function () {
+    cs("pass-function", function () {
       let x = function () { };
       sut.isFunction(x);
     });
 
-    cs("fail {}", function () {
+    cs("fail-empty-object", function () {
       sut.throws(function () {
         let x = {};
         sut.isFunction(x);
@@ -195,26 +195,26 @@ unit("Aver", function () {
 
   unit("#isFalse()", function () {
 
-    cs("pass false", function () {
+    cs("pass-false", function () {
       let x = false;
       sut.isFalse(x);
     });
 
-    cs("fail true", function () {
+    cs("fail-true", function () {
       sut.throws(function () {
         let x = true;
         sut.isFalse(x);
       }, "averment failure: isFalse");
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isFalse(x);
       }, "averment failure: isFalse");
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         let x = null;
         sut.isFalse(x);
@@ -225,26 +225,26 @@ unit("Aver", function () {
 
   unit("#isTrue()", function () {
 
-    cs("pass true", function () {
+    cs("pass-true", function () {
       let x = true;
       sut.isTrue(x);
     });
 
-    cs("fail false", function () {
+    cs("fail-false", function () {
       sut.throws(function () {
         let x = false;
         sut.isTrue(x);
       }, "averment failure: isTrue");
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         let x = undefined;
         sut.isTrue(x);
       }, "averment failure: isTrue");
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         let x = null;
         sut.isTrue(x);
@@ -255,23 +255,23 @@ unit("Aver", function () {
 
   unit("#isString()", function () {
 
-    cs("pass string", function () {
+    cs("pass-string", function () {
       sut.isString("aaaaa");
     });
 
-    cs("fail 1", function () {
+    cs("fail-1", function () {
       sut.throws(function () {
         sut.isString(1);
       }, "averment failure: isstring");
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         sut.isString(undefined);
       }, "averment failure: isstring");
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         sut.isString(null);
       }, "averment failure: isstring");
@@ -280,25 +280,25 @@ unit("Aver", function () {
 
   unit("#isBool()", function () {
 
-    cs("pass bool", function () {
+    cs("pass-boolean", function () {
       sut.isBool(true);
       sut.isBool(false);
       sut.isBool(1 === 1);
     });
 
-    cs("fail 1", function () {
+    cs("fail-1", function () {
       sut.throws(function () {
         sut.isBool(1);
       }, "averment failure: isBool");
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         sut.isBool(undefined);
       }, "averment failure: isBool");
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         sut.isBool(null);
       }, "averment failure: isBool");
@@ -307,25 +307,25 @@ unit("Aver", function () {
 
   unit("#isNumber()", function () {
 
-    cs("pass nums", function () {
+    cs("pass-numbers", function () {
       sut.isNumber(1);
       sut.isNumber(-1123.23);
       sut.isNumber(0);
     });
 
-    cs("fail str", function () {
+    cs("fail-string", function () {
       sut.throws(function () {
         sut.isNumber("123");
       }, "averment failure: isnumber");
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         sut.isNumber(undefined);
       }, "averment failure: isnumber");
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         sut.isNumber(null);
       }, "averment failure: isnumber");
@@ -334,23 +334,23 @@ unit("Aver", function () {
 
   unit("#isDate()", function () {
 
-    cs("pass date", function () {
+    cs("pass-date", function () {
       sut.isDate(new Date(1980, 1, 1));
     });
 
-    cs("fail str", function () {
+    cs("fail-string", function () {
       sut.throws(function () {
         sut.isDate("1/1/2001");
       }, "averment failure: isdate");
     });
 
-    cs("fail undefined", function () {
+    cs("fail-undefined", function () {
       sut.throws(function () {
         sut.isDate(undefined);
       }, "averment failure: isdate");
     });
 
-    cs("fail null", function () {
+    cs("fail-null", function () {
       sut.throws(function () {
         sut.isDate(null);
       }, "averment failure: isdate");
@@ -515,14 +515,14 @@ unit("Aver", function () {
       sut.areEqual(-8, obj.b);
     });
 
-    cs("virtual override function", function () {
+    cs("virtual-override-function", function () {
       let a = new sut.MockA(3, 9);
 
       let dscr = a.describe();
       sut.areEqual("MockA(a: 3, b: 9)", dscr);
     });
 
-    cs("virtual base function", function () {
+    cs("virtual-base-function", function () {
       let a = new sut.MockB(3, 9);
 
       let dscr = a.describe();
