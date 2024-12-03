@@ -217,9 +217,8 @@ export class TabView extends Control {
     isTrue(v instanceof Tab);
     isTrue(v.tabView === this);
     if (this.#activeTab === v) return;
-    const evt = new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true });
-    this.dispatchEvent(evt);
-    if (evt.canceled) return;
+    if (this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
+
     this.tabs.forEach(one => one.slot = null);
     this.#activeTab = v;
     this.#activeTab.slot = "body";

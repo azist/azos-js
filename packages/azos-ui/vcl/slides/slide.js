@@ -10,6 +10,12 @@ import { html } from "../../ui";
 export class Slide extends Block {
   static properties = {
     slot: { type: String, reflect: true },
+    autoTransitionInterval: { type: Number },
+  }
+
+  constructor() {
+    super();
+    this.autoTransitionInterval = null;
   }
 
   get slideDeck() { return this.parentNode; }
