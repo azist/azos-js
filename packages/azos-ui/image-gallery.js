@@ -30,8 +30,8 @@ export class ImageGallery extends AzosElement {
       opacity: .8;
     }
     svg{
-      height: 1.5em;
-      width: 1.5em;
+      height: 2em;
+      width: 2em;
       margin-bottom:.5em;
     }
   `;
@@ -68,7 +68,7 @@ export class ImageGallery extends AzosElement {
       <div class="gallery">
         ${items.map((icon) => html`
           <div class="item">
-            ${icon.c}
+            ${icon.i}
             <p class="item-title">
               ${icon.uri}
             </p>
