@@ -82,10 +82,12 @@ export function renderHeader(app, self){
     <nav class="side-menu" id="navMenu">
       <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
       <ul>
-        <li><a href="/">Visual Control Showcase</a></li>
-        <li><a href="/1.app">Visual Control Showcase Tabbed</a></li>
-        <li><a href="/3.app">Simple Control Showcase</a></li>
-        <li><a href="/4.app">Scheduling Control - WIP</a></li>
+        <li><a href="/3.app">New Visual Control Showcase</a></li>
+        <li><a href="/">Old Visual Control Showcase</a></li>
+        <li><a href="/1.app">Old Visual Control Showcase Tabbed</a></li>
+        <li><a href="/2.app">Old Visual Control Showcase SlideDeck</a></li>
+        <li><a href="/4.app">Simple Control Showcase</a></li>
+        <li><a href="/5.app">Scheduling Control - WIP</a></li>
       </ul>
     </nav>
 

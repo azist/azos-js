@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/aver";
-import { Control, css, html, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
@@ -217,9 +217,8 @@ export class TabView extends Control {
     isTrue(v instanceof Tab);
     isTrue(v.tabView === this);
     if (this.#activeTab === v) return;
-    const evt = new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true });
-    this.dispatchEvent(evt);
-    if (evt.canceled) return;
+    if (this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
+
     this.tabs.forEach(one => one.slot = null);
     this.#activeTab = v;
     this.#activeTab.slot = "body";
@@ -470,10 +469,10 @@ export class TabView extends Control {
             @dragstart="${e => this.#onDragStart(e, index)}"
             @dragend="${this.#onDragEnd}"
             >
-            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : ''}
+            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
-            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : ''}
+            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : noContent}
           </div>
         `})}
     </div>

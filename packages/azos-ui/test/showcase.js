@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Control, html, css, POSITION, RANK, STATUS, renderInto } from "../ui";
+import { Control, html, css, POSITION, RANK, STATUS, renderInto, noContent } from "../ui";
 import "../modal-dialog.js";
 import "../parts/button.js";
 import "../parts/check-field.js";
@@ -19,28 +19,39 @@ import "../vcl/tree-view/tree-view.js";
 import "../vcl/time/scheduler.js";
 import "../vcl/slides/slide-deck.js";
 import { Spinner } from "../spinner.js";
-import { Toast } from "../toast.js";
+import { toast, Toast } from "../toast.js";
 import { Tab } from "../vcl/tabs/tab.js";
-import { asBool, isObject, isObjectOrArray } from "azos/types";
+import { asInt, isObject, isObjectOrArray } from "azos/types";
+
+const DISPLAY_METHODS = Object.freeze({
+  LONG_FORM: 0,
+  TABBED: 1,
+  SLIDES: 2,
+});
 
 /** Test element used as a showcase of various parts and form elements in action */
 export class Showcase extends Control {
   static properties = {
-    tocSections: { type: Array }
+    tocSections: { type: Array },
+    displayMethod: { type: DISPLAY_METHODS },
   };
 
   static styles = css`
 :host{ display:block; }
 p{ font-size: 1rem; }
-.strip-h{ display:flex;align-items:center;margin-bottom:0.5em;gap:1ch; }
+.strip-h{ display:flex;flex-Loop:wrap;align-items:center;margin-bottom:0.5em;gap:1ch; }
 .strip-h az-button{ margin:0; }
 #ToC, #Content > div{ scroll-margin-top: 50px; }
   `;
 
-  #showTabbed = false;
-  get showTabbed() { return this.#showTabbed; }
-  set showTabbed(v) {
-    this.#showTabbed = v;
+
+  #displayMethod = false;
+  get showLongForm() { return this.#displayMethod === DISPLAY_METHODS.LONG_FORM; }
+  get showTabbed() { return this.#displayMethod === DISPLAY_METHODS.TABBED; }
+  get showSlides() { return this.#displayMethod === DISPLAY_METHODS.SLIDES; }
+  get displayMethod() { return this.#displayMethod; }
+  set displayMethod(v) {
+    this.#displayMethod = v;
     this.requestUpdate();
     setTimeout(() => this.#showcaseSetup(), 100);
   }
@@ -51,6 +62,7 @@ p{ font-size: 1rem; }
   constructor() {
     super();
     this.tocSections = [];
+    this.displayMethod = 0;
   }
 
   #btnDlg1Open() { this.dlg1.show(); }
@@ -78,9 +90,6 @@ p{ font-size: 1rem; }
     const target = this.shadowRoot.getElementById(scrollToId);
     if (!target) return;
     target.scrollIntoView({ behavior: "smooth" });
-    // const headerHeight = 50;
-    // const targetTop = target.getBoundingClientRect().top - headerHeight;
-    // window.scrollTo({ top: targetTop, behavior: "smooth" });
   }
 
   async #btnSpinnerProcess() {
@@ -126,6 +135,30 @@ p{ font-size: 1rem; }
     }
   }
 
+  btnPreviousSlide(force) { this.slideDeck.previousSlide(force); }
+  btnNextSlide(force) { this.slideDeck.nextSlide(force); }
+  btnStartAutoTransition() {
+    this.slideDeck.startAutoTransition(asInt(this.slideDeckTransitionInterval.value));
+    this.requestUpdate();
+  }
+
+  btnStopAutoTransmission() {
+    this.slideDeck.stopAutoTransition();
+    this.requestUpdate();
+  }
+
+  btnShowcasePreviousSlide(force) { this.showcaseSlideDeck.previousSlide(force); }
+  btnShowcaseNextSlide(force) { this.showcaseSlideDeck.nextSlide(force); }
+  btnShowcaseStartAutoTransition() {
+    this.showcaseSlideDeck.startAutoTransition(asInt(this.showcaseSlideDeckTransitionInterval.value));
+    this.requestUpdate();
+  }
+
+  btnShowcaseStopAutoTransmission() {
+    this.showcaseSlideDeck.stopAutoTransition();
+    this.requestUpdate();
+  }
+
   #onFieldChange(e) {
     console.log("Got change event from field: ", e.target.name, e.target.value);
     this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
@@ -156,19 +189,18 @@ p{ font-size: 1rem; }
   }
 
   /** "Show Using Tabs" toggle switch */
-  async #updateUsingTabs(e) {
-    this.showTabbed = asBool(e.target.value);
+  async #updateDisplayMethod(e) {
+    this.displayMethod = asInt(e.target.value);
   }
 
   async firstUpdated() {
-    super.firstUpdated();
-    queueMicrotask(() => this.#showcaseSetup());
+    setTimeout(() => this.#showcaseSetup(), 0);
   }
 
   /** Setup instructions for firstUpdated and toggling `Show Using Tabs` */
   #showcaseSetup() {
     this.#populateTree();
-    if (!this.showTabbed) {
+    if (this.showLongForm) {
       const returnToToC = html`<div style="padding-top:0.5em;"><a href="" @click="${e => this.#btnScrollSectionIntoView(e, "ToC")}">Return to Menu</a></div>`;
 
       const sections = [...this.shadowRoot.getElementById("Content").children].filter(child => child instanceof HTMLDivElement);
@@ -185,7 +217,12 @@ p{ font-size: 1rem; }
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 </p>
 
-<az-check title="Show Using Tabs" @change="${this.#updateUsingTabs}" titleWidth="85" titlePosition="mid-right" value="${this.showTabbed}"></az-check>
+<az-radio-group title="Display Method" @change="${this.#updateDisplayMethod}" value="${this.displayMethod}" titlePosition="mid-left">
+  <item title="Long Form" value="0"></item>
+  <item title="Tabbed" value="1"></item>
+  <item title="Slide Deck"  value="2"></item>
+</az-radio-group>
+
 ${this.showTabbed ? html`
 <div class="strip-h">
   <h3>Tab View Controls:</h3>
@@ -218,7 +255,8 @@ ${this.showTabbed ? html`
   <az-tab title="Modal Dialogs" .canClose=${false}> ${this.renderModalDialogContent()} </az-tab>
   <az-tab title="Toasts" .canClose=${false}> ${this.renderToastContent()} </az-tab>
 </az-tab-view>
-  ` : html`
+  ` : noContent}
+${this.showLongForm ? html`
 <h1 id="ToC">Table of Contents</h1>
 <ol>
   ${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}
@@ -240,14 +278,60 @@ ${this.showTabbed ? html`
   <div id="ModalDialogContent"> ${this.renderModalDialogContent()} </div>
   <div id="ToastContent"> ${this.renderToastContent()} </div>
 </div>
-  `}
+  ` : noContent}
+${this.showSlides ? html`
+
+<div class="strip-h" style="align-items:flex-end;">
+  <az-check id="loop" scope="this" itemType="switch" title="Loop" @change="${() => this.requestUpdate()}" value="${true}"></az-check>
+  <az-text id="slideDeckTransitionInterval" scope="this" title="Slide Deck Transition Interval (ms)" placeholder="1000" value="${1000}" @change="${() => this.btnStartAutoTransition()}"></az-text>
+  <az-button title="Start AutoTransition" @click="${() => this.btnStartAutoTransition()}"></az-button>
+  <az-button title="Stop AutoTransition" .isDisabled="${!this.slideDeck?.autoTransitionInterval}" @click="${() => this.btnStopAutoTransmission()}"></az-button>
+</div>
+
+<div class="strip-h" style="justify-content:flex-start;align-items: flex-start;">
+
+  <div class="strip-h" style="flex-direction:column">
+    <h3>Previous</h3>
+    <az-button title="Loop: ${this.loop?.value}" @click="${() => this.btnPreviousSlide()}"></az-button>
+    <az-button title="Force: Loop" @click="${() => this.btnPreviousSlide(true)}"></az-button>
+    <az-button title="Force: No Loop" @click="${() => this.btnPreviousSlide(false)}"></az-button>
+  </div>
+
+  <div class="strip-h" style="flex:1;height:100%">
+    <az-slide-deck id="slideDeck" scope="this" .autoTransitionInterval="${asInt(this.slideDeckShowcase?.value)}" .loop="${this.loop?.value}" style="width:100%;text-align:center;border:1px solid">
+      <az-slide id="SlideDeckContent"> ${this.renderSlideDeckContent()} </az-slide>
+      <az-slide id="SchedulerContent"> ${this.renderSchedulerContent()} </az-slide>
+      <az-slide id="AccordionContent"> ${this.renderAccordionContent()} </az-slide>
+      <az-slide id="SliderContent"> ${this.renderSliderContent()} </az-slide>
+      <az-slide id="TreeViewContent"> ${this.renderTreeViewContent()} </az-slide>
+      <az-slide id="ButtonContent"> ${this.renderButtonContent()} </az-slide>
+      <az-slide id="InputContent"> ${this.renderInputContent()} </az-slide>
+      <az-slide id="CodeboxContent"> ${this.renderCodeboxContent()} </az-slide>
+      <az-slide id="RadiosContent"> ${this.renderRadiosContent()} </az-slide>
+      <az-slide id="SwitchContent"> ${this.renderSwitchContent()} </az-slide>
+      <az-slide id="CheckboxContent"> ${this.renderCheckboxContent()} </az-slide>
+      <az-slide id="TextFieldContent"> ${this.renderTextFieldContent()} </az-slide>
+      <az-slide id="SelectFieldContent"> ${this.renderSelectFieldContent()} </az-slide>
+      <az-slide id="ModalDialogContent"> ${this.renderModalDialogContent()} </az-slide>
+      <az-slide id="ToastContent"> ${this.renderToastContent()} </az-slide>
+    </az-slide-deck>
+  </div>
+
+  <div class="strip-h" style="flex-direction:column">
+    <h3>Next</h3>
+    <az-button title="Loop: ${this.loop?.value}" @click="${() => this.btnNextSlide()}"></az-button>
+    <az-button title="Force: Loop" @click="${() => this.btnNextSlide(true)}"></az-button>
+    <az-button title="Force: No Loop" @click="${() => this.btnNextSlide(false)}"></az-button>
+  </div>
+
+</div>
+  ` : noContent}
 
 <az-spinner id="spinnerModal" scope="this" status="alert" timeout="5000" isModal></az-spinner>
 <az-spinner id="spinnerNonModal" scope="this" status="info" timeout="10000" message="Dill helps to expel what you propel"></az-spinner>
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
   <div slot="body">
-    <style>p{width: 60vw; min-width: 300px; text-align: left;}</style>
     <p>
      It is a long established fact that <strong>a reader will be distracted</strong> by the readable content of a page when looking at its layout.
      The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here',
@@ -276,13 +360,53 @@ ${this.showTabbed ? html`
 `;
   }
 
+  async slideChanging(e) {
+    if (this.lockSlideSwitch.value) {
+      e.preventDefault();
+      toast("Change canceled");
+    }
+  }
+
   renderSlideDeckContent() {
     return html`
 <h2>Slide Deck</h2>
-<az-slide-deck timeout="${60_000}">
-  <az-slide>Here's a slide</az-slide>
-  <az-slide>Here's a another slide</az-slide>
-</az-slide-deck>
+
+<div class="strip-h" style="align-items:flex-end;">
+  <az-check id="lockSlideSwitch" scope="this" itemType="switch" title="Lock Slide" @change="${() => this.requestUpdate()}" value="${false}"></az-check>
+  <az-check id="showcaseLoop" scope="this" itemType="switch" title="Loop" @change="${() => this.requestUpdate()}" value="${true}"></az-check>
+  <az-text id="showcaseSlideDeckTransitionInterval" scope="this" title="Slide Deck Transition Interval (ms)" placeholder="1000" value="${1000}" @change="${() => this.btnShowcaseStartAutoTransition()}"></az-text>
+  <az-button title="Start AutoTransition" @click="${() => this.btnShowcaseStartAutoTransition()}"></az-button>
+  <az-button title="Stop AutoTransition" .isDisabled="${!this.showcaseSlideDeck?.autoTransitionInterval}" @click="${() => this.btnShowcaseStopAutoTransmission()}"></az-button>
+</div>
+
+<div class="strip-h">
+
+  <div class="strip-h" style="flex-direction:column;">
+    <h3>Previous</h3>
+    <az-button title="Loop: ${this.showcaseLoop?.value}" @click="${() => this.btnShowcasePreviousSlide()}"></az-button>
+    <az-button title="Force: Loop" @click="${() => this.btnShowcasePreviousSlide(true)}"></az-button>
+    <az-button title="Force: No Loop" @click="${() => this.btnShowcasePreviousSlide(false)}"></az-button>
+  </div>
+
+  <div class="strip-h" style="flex:1;height:100%;justify-content:center;">
+    <az-slide-deck id="showcaseSlideDeck" scope="this" @slideChanging="${this.slideChanging}" .autoTransitionInterval="${asInt(this.showcaseSlideDeckShowcase?.value)}" .loop="${this.showcaseLoop?.value}" style="width:100%;text-align:center;border:1px solid">
+      <az-slide>Here's slide 1</az-slide>
+      <az-slide>Here's slide 2</az-slide>
+      <az-slide>Here's slide 3</az-slide>
+      <az-slide>Here's slide 4</az-slide>
+      <az-slide>Here's slide 5</az-slide>
+    </az-slide-deck>
+  </div>
+
+  <div class="strip-h" style="flex-direction:column">
+    <h3>Next</h3>
+    <az-button title="Loop: ${this.showcaseLoop?.value}" @click="${() => this.btnShowcaseNextSlide()}"></az-button>
+    <az-button title="Force: Loop" @click="${() => this.btnShowcaseNextSlide(true)}"></az-button>
+    <az-button title="Force: No Loop" @click="${() => this.btnShowcaseNextSlide(false)}"></az-button>
+  </div>
+
+</div>
+
     `;
   }
 
