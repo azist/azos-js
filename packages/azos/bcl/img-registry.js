@@ -47,7 +47,7 @@ import { CONTENT_TYPE } from "../coreconsts.js";
 import { dflt } from "../strings.js";
 import { Module } from "../modules.js";
 
-
+/** Resolves  */
 export class ImageRegistry extends Module {
 
   //stores mappings of: URI -> [bucket] , bucket contains keys that we search by and record score
@@ -68,6 +68,12 @@ export class ImageRegistry extends Module {
     }
   }
 
+  /**
+   * Tries to resolve a request for an image identified by the specified URI (id) of specific image format (e.g. `svg`|`png`)
+   * and optionally matching on `isoLanguage`, `theme`, and `media` specifiers.
+   * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
+   * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
+   */
   resolve(uri, format, { isoLang, theme, media } = {}) {
     isNonEmptyString(uri);
     isNonEmptyString(format);
@@ -92,6 +98,33 @@ export class ImageRegistry extends Module {
     return bestRec;
   }
 
+  /**
+   * Tries to resolve an image specifier - a convoluted URL string containing a request for an image identified by the specified URI (id) of specific image format (e.g. `svg`|`png`)
+   * and optionally matching on `isoLanguage`, `theme`, and `media` specifiers.
+   * The specifier format is that of URL having the form:  `format://uri?iso=isoLangCode&theme=themeId&media=mediaId`, where query params are optional.
+   * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
+   * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
+   * @example resolveSpec("svg://file-open"); resolveSpec("png://business-logo-a?media=print");
+   */
+  resolveSpec(spec){
+    const url = new URL(isNonEmptyString(spec));
+
+//todo: Test in JS fiddle
+    const imgUri     = url.host;
+    const imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
+    const imgIsoLang = url.searchParams.get("iso");
+    const imgTheme = url.searchParams.get("theme");
+    const imgMedia = url.searchParams.get("media");
+    const resolved = this.resolve(imgUri, imgFormat, {imgIsoLang, imgTheme, imgMedia});
+
+    return resolved;
+  }
+
+  /**
+   * Puts an image record in the registry, creating necessary data structures internally
+   * @param {string} uri - non-empty uri string identifier
+   * @param {ImageRecord} iRec - non-null `ImageRecord` instance to register
+   */
   register(uri, iRec) {
     isNonEmptyString(uri);
     isOf(iRec, ImageRecord);
@@ -105,12 +138,14 @@ export class ImageRegistry extends Module {
     bucket.push(iRec);
   }
 
+  //FIXME: Must implement!!
   unregister() {
     ///will take out of existing bucket
   }
 
 }
 
+/** Provides information about a single image representation: (format, iso, theme, media) */
 export class ImageRecord {
 
   #format;
@@ -140,16 +175,32 @@ export class ImageRecord {
     if (this.#theme) this.#score += 1;
   }
 
+  /** Required image format, such as `svg`, `png`, `jpg` etc. */
   get format() { return this.#format; }
+
+  /** Optional language ISO string code or null, e.g. `eng`, */
   get isoLang() { return this.#isoLang; }
+
+  /** Optional theme string specifier or null */
   get theme() { return this.#theme; }
+
+  /** Optional media specifier or null, e.g. `print` */
   get media() { return this.#media; }
+
+  /** Records score. It is higher the more fields are populated. Importance: (media = 1000, isoLang = 100, theme = 1) */
   get score() { return this.#score; }
+
+  /** Image content: string or custom binary array */
   get content() { return this.#content; }
+
+  /** Image content MIME type e.g. `image/png` */
   get contentType() { return this.#contentType; }
 
   produceContent() { return { ctp: this.#contentType, content: this.#content }; }
 }
+
+
+
 
 /** Configuration snippet provides base stock system icons/images. */
 // TODO: Remove "fill" attribute from paths, rects, etc. INSTEAD Control color with CSS styles/classes (forces default SVG fill color to 0x00000)
