@@ -217,7 +217,7 @@ export class TabView extends Control {
     isTrue(v instanceof Tab);
     isTrue(v.tabView === this);
     if (this.#activeTab === v) return;
-    if (this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
+    if (!this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
 
     this.tabs.forEach(one => one.slot = null);
     this.#activeTab = v;
