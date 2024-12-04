@@ -104,7 +104,10 @@ export class ImageRegistry extends Module {
    * The specifier format is that of URL having the form:  `format://uri?iso=isoLangCode&theme=themeId&media=mediaId`, where query params are optional.
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
-   * @example resolveSpec("svg://file-open"); resolveSpec("png://business-logo-a?media=print");
+   * @example
+   *  resolveSpec("svg://file-open");
+   *  resolveSpec("png://business-logo?media=print");
+   *  resolveSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print");
    */
   resolveSpec(spec){
     const url = new URL(isNonEmptyString(spec));
