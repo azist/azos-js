@@ -18,7 +18,8 @@ export class Slide extends Block {
     this.autoTransitionInterval = null;
   }
 
-  get slideDeck() { return this.parentNode; }
+  get slideDeck() { return this.closest("az-slide-deck"); }
+  // get slideDeck() { return this.parentNode; }
 
   renderControl() {
     return html`<slot></slot>`;
