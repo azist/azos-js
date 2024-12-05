@@ -48,7 +48,7 @@ import { dflt } from "../strings.js";
 import { Module } from "../modules.js";
 import { html } from "../../azos-ui/ui.js";
 
-
+/** Resolves  */
 export class ImageRegistry extends Module {
 
   //stores mappings of: URI -> [bucket] , bucket contains keys that we search by and record score
@@ -69,6 +69,12 @@ export class ImageRegistry extends Module {
     }
   }
 
+  /**
+   * Tries to resolve a request for an image identified by the specified URI (id) of specific image format (e.g. `svg`|`png`)
+   * and optionally matching on `isoLanguage`, `theme`, and `media` specifiers.
+   * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
+   * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
+   */
   resolve(uri, format, { isoLang, theme, media } = {}) {
     isNonEmptyString(uri);
     isNonEmptyString(format);
@@ -93,6 +99,36 @@ export class ImageRegistry extends Module {
     return bestRec;
   }
 
+  /**
+   * Tries to resolve an image specifier - a convoluted URL string containing a request for an image identified by the specified URI (id) of specific image format (e.g. `svg`|`png`)
+   * and optionally matching on `isoLanguage`, `theme`, and `media` specifiers.
+   * The specifier format is that of URL having the form:  `format://uri?iso=isoLangCode&theme=themeId&media=mediaId`, where query params are optional.
+   * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
+   * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
+   * @example
+   *  resolveSpec("svg://file-open");
+   *  resolveSpec("png://business-logo?media=print");
+   *  resolveSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print");
+   */
+  resolveSpec(spec) {
+    const url = new URL(isNonEmptyString(spec));
+
+    //todo: Test in JS fiddle
+    const imgUri = url.host;
+    const imgFormat = url.protocol.slice(0, -1); //`svg`, not `svg:`
+    const imgIsoLang = url.searchParams.get("iso");
+    const imgTheme = url.searchParams.get("theme");
+    const imgMedia = url.searchParams.get("media");
+    const resolved = this.resolve(imgUri, imgFormat, { imgIsoLang, imgTheme, imgMedia });
+
+    return resolved;
+  }
+
+  /**
+   * Puts an image record in the registry, creating necessary data structures internally
+   * @param {string} uri - non-empty uri string identifier
+   * @param {ImageRecord} iRec - non-null `ImageRecord` instance to register
+   */
   register(uri, iRec) {
     isNonEmptyString(uri);
     isOf(iRec, ImageRecord);
@@ -106,12 +142,14 @@ export class ImageRegistry extends Module {
     bucket.push(iRec);
   }
 
+  //FIXME: Must implement!!
   unregister() {
     ///will take out of existing bucket
   }
 
 }
 
+/** Provides information about a single image representation: (format, iso, theme, media) */
 export class ImageRecord {
 
   #format;
@@ -141,16 +179,32 @@ export class ImageRecord {
     if (this.#theme) this.#score += 1;
   }
 
+  /** Required image format, such as `svg`, `png`, `jpg` etc. */
   get format() { return this.#format; }
+
+  /** Optional language ISO string code or null, e.g. `eng`, */
   get isoLang() { return this.#isoLang; }
+
+  /** Optional theme string specifier or null */
   get theme() { return this.#theme; }
+
+  /** Optional media specifier or null, e.g. `print` */
   get media() { return this.#media; }
+
+  /** Records score. It is higher the more fields are populated. Importance: (media = 1000, isoLang = 100, theme = 1) */
   get score() { return this.#score; }
+
+  /** Image content: string or custom binary array */
   get content() { return this.#content; }
+
+  /** Image content MIME type e.g. `image/png` */
   get contentType() { return this.#contentType; }
 
   produceContent() { return { ctp: this.#contentType, content: this.#content }; }
 }
+
+
+
 
 /** Configuration snippet provides base stock system icons/images. */
 //Dec 3, 2024 - adding i field for rendered image, leaving c field as copyable plain text
@@ -451,6 +505,7 @@ export const ICONS = Object.freeze([
     i: html`<svg viewBox="0 -960 960 960"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143Zm-61 83.92 49.62-212.54-164.93-142.84 217.23-18.85L480-777.69l85.08 200.38 217.23 18.85-164.93 142.84L667-203.08 480-315.92 293-203.08ZM480-470Z"/></svg>`,
     c: `<svg viewBox="0 -960 960 960"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143Zm-61 83.92 49.62-212.54-164.93-142.84 217.23-18.85L480-777.69l85.08 200.38 217.23 18.85-164.93 142.84L667-203.08 480-315.92 293-203.08ZM480-470Z"/></svg>`
   }, {
+    uri: "icon-support",
     uri: "icon-support",
     f: "svg",
     i: html`<svg viewBox="0 -960 960 960"><path d="M520-149.23 517.69-240H460q-125.08 0-212.54-87.46T160-540q0-125.08 87.46-212.54T460-840q62.54 0 117.12 23.42 54.57 23.43 95.3 64.16t64.16 95.3Q760-602.54 760-540q0 61.15-17.96 117.46-17.96 56.31-49.69 106.46-31.73 50.16-76 92.39-44.27 42.23-96.35 74.46ZM560-226q71-60 115.5-140.5T720-540q0-109-75.5-184.5T460-800q-109 0-184.5 75.5T200-540q0 109 75.5 184.5T460-280h100v54Zm-98.69-111.15q12.38 0 20.92-8.54 8.54-8.54 8.54-20.93 0-12.38-8.54-20.92-8.54-8.54-20.92-8.54-12.39 0-20.93 8.54-8.53 8.54-8.53 20.92 0 12.39 8.53 20.93 8.54 8.54 20.93 8.54Zm-17.46-117h35.38q1.54-24.62 9.46-38.93 7.93-14.3 37.62-44 17.23-17.23 27.31-35.15 10.07-17.92 10.07-41.15 0-43.31-29.88-68.04-29.89-24.73-72.27-24.73-37.08 0-62.85 20.27-25.77 20.26-37.77 48.34l32.93 12.77q8.07-17.77 23.61-32.35 15.54-14.57 44.08-14.57 33.92 0 50.11 18.46 16.2 18.46 16.2 40.31 0 20.07-10.39 33.96-10.38 13.88-26.69 30.19-28.85 25.39-37.89 45.58-9.03 20.19-9.03 49.04ZM460-513Z"/></svg>`,

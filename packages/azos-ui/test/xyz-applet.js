@@ -23,6 +23,17 @@ import { CLOSE_QUERY_METHOD } from "azos/types";
 /**
  * Defines a root UI element which represents an Applet - a part of application.
  * Applets run inside of arenas. Arena is akin to a "desktop" while applets are akin to "applications" running in such desktop
+ *
+ *
+ * =======================================================================================================
+ *
+ *  NOTE: This iteration has gotten out of control. Each of these controls need to be separated into new
+ *     components and those controls imported. This will keep logic and code out of the global showcase
+ *     scope files and in the controls file where it belongs.
+ *
+ *     Follow the ways of XYZ Applet 2 and Showcase 2.
+ *
+ * =======================================================================================================
  */
 export class XyzApplet extends Applet {
 
@@ -35,7 +46,7 @@ export class XyzApplet extends Applet {
 
   static properties = {
     name: { type: String },
-    showcaseTabbed: { type: Boolean },
+    displayMethod: { type: Number },
   };
 
   constructor() {
@@ -211,7 +222,7 @@ export class XyzApplet extends Applet {
       </div>
      </az-modal-dialog>
 
-     <az-test-showcase .showTabbed=${this.showcaseTabbed}></az-test-showcase>
+     <az-test-showcase .displayMethod=${this.displayMethod}></az-test-showcase>
 
     `;
   }//render

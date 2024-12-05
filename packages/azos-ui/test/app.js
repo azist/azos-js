@@ -10,6 +10,7 @@ import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { XyzApplet } from "./xyz-applet.js";
 import { XyzApplet2 } from "./xyz-applet2.js";
+import { XyzApplet3 } from "./xyz-applet3.js";
 import { XyzAppletScheduler } from "./xyz-applet-scheduler.js";
 import { XyzAppletGallery } from "./xyz-applet-gallery.js";
 
@@ -82,15 +83,18 @@ app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 switch (location.pathname) {
   case "/1.app":
-    arena.appletOpen(XyzApplet)
-      .then(() => {
-        arena.applet.showcaseTabbed = true;
-      });
+    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 1);
+    break;
+  case "/2.app":
+    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 2);
     break;
   case "/3.app":
     arena.appletOpen(XyzApplet2);
     break;
   case "/4.app":
+    arena.appletOpen(XyzApplet3);
+    break;
+  case "/5.app":
     arena.appletOpen(XyzAppletScheduler);
     break;
   case "/5.app":
@@ -98,7 +102,7 @@ switch (location.pathname) {
     break;
   case "/": // pass-thru
   default:
-    arena.appletOpen(XyzApplet);
+    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 0);
     break;
 }
 

@@ -88,8 +88,7 @@ export async function prompt(okCancelPrompt, { title, ok, cancel } = {}, { doPro
   modal.update();
   try {
     modal.show();
-    await modal.shownPromise;
-    return modal.modalResult;
+    return await modal.shownPromise;
   } finally {
     document.body.removeChild(modal);
   }

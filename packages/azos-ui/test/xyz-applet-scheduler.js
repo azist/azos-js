@@ -10,7 +10,6 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
 import "../vcl/time/timeline.js";
-import { toast } from "../toast.js";
 
 
 //import { APPLET_STYLES } from "./applet.css.js";
@@ -47,20 +46,13 @@ xaz-text {
     name: { type: String },
   };
 
-  constructor() {
-    super();
-    this.name = 'Somebody2Love';
-  }
+  constructor() { super(); }
 
-  #onPressMe(e) {
-    toast(e.target.id);
-  }
+  get title() { return `Weekly Scheduling Control` }
 
   render() {
     return html`
-
-    <az-weekly-scheduler></az-weekly-scheduler>
-
+<az-weekly-scheduler></az-weekly-scheduler>
     `;
   }//render
 
