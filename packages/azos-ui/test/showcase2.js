@@ -187,7 +187,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   </div>
 
   <div class="strip-h" style="flex:1;height:100%">
-    <az-slide-deck id="slideDeck" scope="this" .autoTransitionInterval="${asInt(this.slideDeckShowcase?.value)}" .loop="${this.loop?.value}" style="width:100%;text-align:center;border:1px solid">
+    <az-slide-deck id="slideDeck" scope="this" autoTransitionInterval="${this.slideDeckShowcase?.value}" loop="${this.loop?.value}" activeSlideIndex="10" style="width:100%;text-align:center;border:1px solid">
       <az-slide id="ButtonsContent"> <az-case-buttons></az-case-buttons> </az-slide>
       <az-slide id="TextFieldsContent"> <az-case-text-fields></az-case-text-fields> </az-slide>
       <az-slide id="InputTestsContent"> <az-case-input-tests></az-case-input-tests> </az-slide>

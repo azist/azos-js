@@ -8,6 +8,7 @@ import { isNumber, isOf, isOfOrNull, isTrue } from "azos/aver";
 import { AzosElement, Control, css, html } from "../../ui";
 
 import { Slide } from "./slide";
+import { asBool, asInt } from "azos/types";
 
 /**
  * This produces a slide control similar to that of a TabView but without the tabs.
@@ -30,18 +31,19 @@ export class SlideDeck extends Control {
 
   static properties = {
     activeSlide: { type: Slide },
-    autoTransitionInterval: { type: Number | false },
+    activeSlideIndex: { type: Number, reflect: true },
+    autoTransitionInterval: { type: Number },
     loop: { type: Boolean },
   }
+
+  #elementFirstRendered = false;
 
   /** The current slide being displayed */
   #activeSlide = null;
   get activeSlide() { return this.#activeSlide; }
   set activeSlide(v) {
     isTrue(isOf(v, Slide).slideDeck === this);
-    let initialState = false;
-    if (this.#activeSlide !== null) {
-      initialState = true;
+    if (this.#elementFirstRendered) {
       if (!this.dispatchEvent(new CustomEvent("slideChanging", { detail: { slide: v }, bubbles: true, cancelable: true }))) return;
     }
 
@@ -49,21 +51,34 @@ export class SlideDeck extends Control {
     this.#activeSlide = v;
     this.#activeSlide.slot = "body";
     this.requestUpdate();
-    if (!initialState) this.dispatchEvent(new CustomEvent("slideChanged", { detail: { slide: v }, bubbles: true }));
+    if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("slideChanged", { detail: { slide: v }, bubbles: true }));
   }
+
+  /** Set the active slide by index; atRender, this needs to be delayed until firstUpdate */
+  #pendingActiveSlide = null;
+  get activeSlideIndex() { return [...this.children].indexOf(this.activeSlide); }
+  set activeSlideIndex(v) {
+    if (!this.#elementFirstRendered) {
+      this.#pendingActiveSlide = v;
+      return;
+    }
+    this.activeSlide = [...this.children][v];
+  }
+
+  /** 'Next' at end should return to first, 'Previous' at first should return to end */
+  #loop = false;
+  get loop() { return this.#loop; }
+  set loop(v) { this.#loop = asBool(v); }
+
+  /** Set to 0 to stop auto-transitioning */
+  #autoTransitionInterval = 0;
+  get autoTransitionInterval() { return this.#autoTransitionInterval; }
+  set autoTransitionInterval(v) { this.#autoTransitionInterval = asInt(v); }
+
+  constructor() { super(); }
 
   #timer = null;
-
-  constructor() {
-    super();
-    this.autoTransitionInterval = false;
-    this.loop = false;
-  }
-
-  #startTimer() {
-    if (this.autoTransitionInterval) this.#timer = setTimeout(() => this.nextSlide(), this.#activeSlide.autoTransitionInterval ?? this.autoTransitionInterval);
-  }
-
+  #startTimer() { if (this.autoTransitionInterval) this.#timer = setTimeout(() => this.nextSlide(), this.#activeSlide.autoTransitionInterval ?? this.autoTransitionInterval); }
   #stopTimer() {
     if (this.#timer) {
       clearTimeout(this.#timer);
@@ -159,9 +174,7 @@ export class SlideDeck extends Control {
     this.#startTimer();
   }
 
-  /**
-   * Stop the interval timer
-   */
+  /** Stop the interval timer */
   stopAutoTransition() {
     this.#stopTimer();
     this.autoTransitionInterval = null;
@@ -169,10 +182,10 @@ export class SlideDeck extends Control {
 
   firstUpdated() {
     super.firstUpdated();
-    this.slideDeck = this.closest("az-slide-deck");
-    const children = [...this.children];
-    this.activeSlide = children[0];
+    if (!this.activeSlide) this.activeSlide = [...this.children][this.#pendingActiveSlide ?? 0];
+    this.#pendingActiveSlide = null;
     if (this.autoTransitionInterval) this.#startTimer();
+    this.#elementFirstRendered = true;
   }
 
   renderControl() {
