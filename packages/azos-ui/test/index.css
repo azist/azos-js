@@ -7,6 +7,10 @@ body {
   padding: 0px;
 }
 
+@media all and (max-width: 500px){
+  body{ font-size: 12px; }
+}
+
 .theme-azos {
   --arn-min-width: 360px;
   --arn-hdr-height: 44px;
