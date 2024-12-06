@@ -4,11 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isNumber, isOf, isOfOrNull, isTrue } from "azos/aver";
+import { isOf, isOfOrNull, isTrue } from "azos/aver";
+import { isNumber, asInt, isString } from "azos/types";
 import { AzosElement, Control, css, html } from "../../ui";
 
 import { Slide } from "./slide";
-import { asBool, asInt } from "azos/types";
 
 /**
  * This produces a slide control similar to that of a TabView but without the tabs.
@@ -30,10 +30,10 @@ export class SlideDeck extends Control {
   `;
 
   static properties = {
-    activeSlide: { type: Slide },
+    activeSlide: { type: Object | String },
     activeSlideIndex: { type: Number, reflect: true },
-    autoTransitionInterval: { type: Number },
-    loop: { type: Boolean },
+    autoTransitionInterval: { type: Number, reflect: true },
+    loop: { type: Boolean, reflect: true },
   }
 
   #elementFirstRendered = false;
@@ -42,43 +42,64 @@ export class SlideDeck extends Control {
   #activeSlide = null;
   get activeSlide() { return this.#activeSlide; }
   set activeSlide(v) {
+    if (isString(v)) v = this.children[v];
     isTrue(isOf(v, Slide).slideDeck === this);
-    if (this.#elementFirstRendered) {
-      if (!this.dispatchEvent(new CustomEvent("slideChanging", { detail: { slide: v }, bubbles: true, cancelable: true }))) return;
-    }
+    if (this.#activeSlide === v) return;
+    if (this.#elementFirstRendered && !this.dispatchEvent(new CustomEvent("slideChanging", { detail: { slide: v }, bubbles: true, cancelable: true }))) return;
+
+    const oldSlide = this.#activeSlide;
+    const oldIndex = this.activeSlideIndex;
 
     [...this.children].forEach(child => child.slot = undefined);
+    v.slot = "body";
     this.#activeSlide = v;
-    this.#activeSlide.slot = "body";
-    this.requestUpdate();
+    this.requestUpdate("activeSlideIndex", oldIndex); // necessary to update attribute value when slide changes
+    this.requestUpdate("activeSlide", oldSlide); // This might be how we're "supposed to" requestUpdate?
     if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("slideChanged", { detail: { slide: v }, bubbles: true }));
   }
 
   /** Set the active slide by index; atRender, this needs to be delayed until firstUpdate */
-  #pendingActiveSlide = null;
-  get activeSlideIndex() { return [...this.children].indexOf(this.activeSlide); }
+  #pendingActiveSlideIndex = null;
+  get activeSlideIndex() { return [...this.children].indexOf(this.#activeSlide); }
+
+  /**
+   * Slide.slideDeck is null until it is rendered in the DOM. Because of this, <az-slide-deck activeSlideIndex=2...> would
+   *  fail to set the active slide due to the averment failure (@see set activeSlide). activeSlideIndex setter
+   *  typically does not set #activeSlideIndex except for this edge case. #activeSlideIndex is only set via
+   *  activeSlide setter.
+   */
   set activeSlideIndex(v) {
     if (!this.#elementFirstRendered) {
-      this.#pendingActiveSlide = v;
+      // Store until firstUpdated to ensure slides are rendered.
+      this.#pendingActiveSlideIndex = v;
       return;
     }
-    this.activeSlide = [...this.children][v];
-  }
 
-  /** 'Next' at end should return to first, 'Previous' at first should return to end */
-  #loop = false;
-  get loop() { return this.#loop; }
-  set loop(v) { this.#loop = asBool(v); }
+    const children = [...this.children];
+    const childCount = children.length;
+
+    if (!this.loop && (v > childCount - 1 || v < 0)) return;
+    const step = (v < 0) ? childCount : 0;
+    v = (v + step) % childCount; // handles forward and backward wrapping
+
+    this.activeSlide = children[v];
+    this.requestUpdate();
+  }
 
   /** Set to 0 to stop auto-transitioning */
   #autoTransitionInterval = 0;
   get autoTransitionInterval() { return this.#autoTransitionInterval; }
-  set autoTransitionInterval(v) { this.#autoTransitionInterval = asInt(v); }
+  set autoTransitionInterval(v) {
+    this.#stopTimer();
+    this.#autoTransitionInterval = isNumber(v) ? asInt(v) : 0;
+    if (this.#autoTransitionInterval > 0) this.#startTimer();
+    this.requestUpdate();
+  }
 
   constructor() { super(); }
 
   #timer = null;
-  #startTimer() { if (this.autoTransitionInterval) this.#timer = setTimeout(() => this.nextSlide(), this.#activeSlide.autoTransitionInterval ?? this.autoTransitionInterval); }
+  #startTimer() { if (this.autoTransitionInterval) this.#timer = setTimeout(() => this.nextSlide(), this.#activeSlide?.autoTransitionInterval ?? this.autoTransitionInterval); }
   #stopTimer() {
     if (this.#timer) {
       clearTimeout(this.#timer);
@@ -94,7 +115,7 @@ export class SlideDeck extends Control {
     isOf(element, AzosElement);
     const slide = new Slide();
     slide.insertBefore(element);
-    this.addSlide(slide, null);
+    this.addSlide(slide);
   }
 
   /**
@@ -117,6 +138,20 @@ export class SlideDeck extends Control {
     this.removeChild(slide);
   }
 
+  transitionBy(count, forceWrap = null) {
+    const children = [...this.children];
+    const lastChildIndex = children.length - 1;
+    let nextIndex;
+    if (forceWrap) nextIndex = (this.activeSlideIndex + count) % lastChildIndex;
+    else if (this.activeSlideIndex + count > lastChildIndex) nextIndex = lastChildIndex - 1;
+    else nextIndex = this.activeSlideIndex + count;
+
+    this.#stopTimer();
+    if (this.activeSlideIndex === nextIndex) return;
+    this.activeSlide = children[nextIndex];
+    this.#startTimer();
+  }
+
   /**
    * Navigate to the next slide
    * @param {Boolean|null} forceWrap overrides the component's setting
@@ -133,7 +168,7 @@ export class SlideDeck extends Control {
         nextIndex = 0;
       else {
         if (this.loop) return; // Stay on the last slide
-        clearInterval(this.#timer);
+        this.#stopTimer();
       }
 
     this.activeSlide = children[nextIndex];
@@ -167,23 +202,16 @@ export class SlideDeck extends Control {
    * Begin an interval timer to automatically transition
    * @param {Number} timeout number of milliseconds between transitions
    */
-  startAutoTransition(timeout = 1_000) {
-    isNumber(timeout);
-    this.#stopTimer();
-    this.autoTransitionInterval = timeout;
-    this.#startTimer();
-  }
+  startAutoTransition(timeout = 1_000) { this.autoTransitionInterval = timeout; }
 
   /** Stop the interval timer */
-  stopAutoTransition() {
-    this.#stopTimer();
-    this.autoTransitionInterval = null;
-  }
+  stopAutoTransition() { this.autoTransitionInterval = 0; }
 
   firstUpdated() {
     super.firstUpdated();
-    if (!this.activeSlide) this.activeSlide = [...this.children][this.#pendingActiveSlide ?? 0];
-    this.#pendingActiveSlide = null;
+    // @see set activeSlideIndex for details about this edge case
+    if (!this.activeSlide) this.activeSlide = [...this.children][this.#pendingActiveSlideIndex ?? 0];
+    this.#pendingActiveSlideIndex = null;
     if (this.autoTransitionInterval) this.#startTimer();
     this.#elementFirstRendered = true;
   }

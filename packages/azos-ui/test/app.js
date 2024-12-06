@@ -81,6 +81,9 @@ window.ARENA = arena;
 app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 switch (location.pathname) {
+  case "/0.app":
+    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 0);
+    break;
   case "/1.app":
     arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 1);
     break;
@@ -98,7 +101,7 @@ switch (location.pathname) {
     break;
   case "/": // pass-thru
   default:
-    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 0);
+    arena.appletOpen(XyzApplet2);
     break;
 }
 

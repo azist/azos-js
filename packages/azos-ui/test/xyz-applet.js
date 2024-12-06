@@ -12,7 +12,6 @@ import "../modal-dialog.js";
 import "../parts/button.js";
 import "./xyz-dialog.js";
 import "./showcase.js";
-import "../vcl/time/timeline.js";
 import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
 import { CLOSE_QUERY_METHOD } from "azos/types";
 
@@ -115,11 +114,6 @@ export class XyzApplet extends Applet {
     console.info("Small Dialog result is: " + dr);
   }
 
-  async onClickTimeline() {
-    const dr = (await this.dlgTimeline.show()).modalResult;
-    console.info(`Showing ${dr} dialog`);
-  }
-
   async btnChronicleClick() {
     this.arena.appletOpen(ChronicleApplet);
   }
@@ -137,7 +131,6 @@ export class XyzApplet extends Applet {
       <h3>Navigate to:</h3>
       <az-button id="btnChronicle" scope="this" title="Chronicle" @click="${this.btnChronicleClick}"> </az-button>
       <az-button id="btnAdlib" scope="this" title="Adlib" @click="${this.btnAdlibClick}"> </az-button>
-      <az-button id="btnTimeline" scope="this" title="Timeline" status="info" @click="${this.onClickTimeline}"></az-button>
      </div>
 
      <div class="controls">
@@ -170,57 +163,6 @@ export class XyzApplet extends Applet {
        <button>Call Gurariy Hard!!</button>
 
      </xyz-dialog>
-
-     <az-modal-dialog status="error" id="dlgTimeline" scope="self" title="Timeline tester">
-      <div slot="body">
-        <az-flow-container status="info" currentStepIndex="1">
-          <az-timeline status="info" currentStepIndex="1">
-            <az-timeline-step title="start"></az-timeline-step>
-            <az-timeline-step title="outline"></az-timeline-step>
-            <az-timeline-step title="rough draft"></az-timeline-step>
-            <az-timeline-step title="proofread"></az-timeline-step>
-            <az-timeline-step title="revise"></az-timeline-step>
-            <az-timeline-step title="finalize"></az-timeline-step>
-            <az-timeline-step title="publish"></az-timeline-step>
-            <az-timeline-step title="finish"></az-timeline-step>
-          </az-timeline>
-          <az-form-container>
-            <az-form>
-              <h1>Start</h1>
-              <p>Starting Form screen/panel (stepIndex 0)</p>
-            </az-form>
-            <az-form>
-              <h1>Outline</h1>
-              <p>Form screen/panel for 2. Outline (stepIndex 1)</p>
-            </az-form>
-            <az-form>
-              <h1>Rough Draft</h1>
-              <p>Form screen/panel for 3. Rough Draft (stepIndex 2)</p>
-            </az-form>
-            <az-form>
-              <h1>Proofread</h1>
-              <p>Form screen/panel for 4. Proofread (stepIndex 3)</p>
-            </az-form>
-            <az-form>
-              <h1>Revise</h1>
-              <p>Form screen/panel for 5. Revise (stepIndex 4)</p>
-            </az-form>
-            <az-form>
-              <h1>Finalize</h1>
-              <p>Form screen/panel for 6. Finalize (stepIndex 5)</p>
-            </az-form>
-            <az-form>
-              <h1>Publish</h1>
-              <p>Form screen/panel for 7. Publish (stepIndex 6)</p>
-            </az-form>
-            <az-form>
-              <h1>Finish</h1>
-              <p>Final Form screen/panel (stepIndex 7)</p>
-            </az-form>
-          </az-form-container>
-        </az-flow-container>
-      </div>
-     </az-modal-dialog>
 
      <az-test-showcase .displayMethod=${this.displayMethod}></az-test-showcase>
 

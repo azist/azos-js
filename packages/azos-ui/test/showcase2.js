@@ -177,17 +177,14 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <az-button title="Stop AutoTransition" .isDisabled="${!this.slideDeck?.autoTransitionInterval}" @click="${() => this.#btnStopAutoTransmission()}"></az-button>
 </div>
 
-<div class="strip-h" style="justify-content:flex-start;align-items: flex-start;">
+<div class="strip-h" style="justify-content:flex-start;align-items:flex-start;">
 
   <div class="strip-h" style="flex-direction:column">
-    <h3>Previous</h3>
-    <az-button title="Loop: ${this.loop?.value}" @click="${() => this.#btnPreviousSlide()}"></az-button>
-    <az-button title="Force: Loop" @click="${() => this.#btnPreviousSlide(true)}"></az-button>
-    <az-button title="Force: No Loop" @click="${() => this.#btnPreviousSlide(false)}"></az-button>
+    <az-button title="Previous" @click="${() => this.slideDeck.activeSlideIndex -= 1}"></az-button>
   </div>
 
   <div class="strip-h" style="flex:1;height:100%">
-    <az-slide-deck id="slideDeck" scope="this" autoTransitionInterval="${this.slideDeckShowcase?.value}" loop="${this.loop?.value}" activeSlideIndex="10" style="width:100%;text-align:center;border:1px solid">
+    <az-slide-deck id="slideDeck" scope="this" autoTransitionInterval="0" ?loop=${this.loop?.value} activeSlideIndex="10" style="width:100%;text-align:center;border:1px solid">
       <az-slide id="ButtonsContent"> <az-case-buttons></az-case-buttons> </az-slide>
       <az-slide id="TextFieldsContent"> <az-case-text-fields></az-case-text-fields> </az-slide>
       <az-slide id="InputTestsContent"> <az-case-input-tests></az-case-input-tests> </az-slide>
@@ -207,10 +204,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   </div>
 
   <div class="strip-h" style="flex-direction:column">
-    <h3>Next</h3>
-    <az-button title="Loop: ${this.loop?.value}" @click="${() => this.#btnNextSlide()}"></az-button>
-    <az-button title="Force: Loop" @click="${() => this.#btnNextSlide(true)}"></az-button>
-    <az-button title="Force: No Loop" @click="${() => this.#btnNextSlide(false)}"></az-button>
+    <az-button title="Next" @click="${() => this.slideDeck.activeSlideIndex += 1}"></az-button>
   </div>
 </div>
     `
