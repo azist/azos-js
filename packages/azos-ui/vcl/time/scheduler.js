@@ -7,6 +7,7 @@
 import "../../parts/button";
 import "../../parts/select-field";
 import { Control, css, html, noContent } from "../../ui";
+import { isNonEmptyString } from "azos/types";
 
 /** Days of the week */
 export const DAYS_OF_WEEK = Object.freeze({
@@ -64,73 +65,68 @@ az-select {
   margin-bottom: 0.5em;
 }
 
-.days {
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
+.daysContainer {
+  display: grid;
+  grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
+  gap: 1px;
 }
 
 .dayColumn {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  display: grid;
+  grid-auto-rows: 0.35fr;
+  gap: 1px;
 }
 
 .dayCell {
-  display: block;
-  height: 100%;
-  box-sizing: border-box;
-  flex: 1;
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dayColumn .dayLabel {
+.dayCell.dayLabel {
   text-align: center;
   display: flex;
   flex-direction: column;
 }
 
-.dayColumn .dayLabel .month:empty::after {
+.dayLabel .month {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.dayCell.dayLabel .month:empty::after {
   content: '_';
   visibility: hidden;
   display: block;
 }
 
-.dayColumn.legend {
-  text-align: right;
-  flex: 0.5;
-  }
-
-.dayColumn.legend .timeLabel {
-  padding-right: 1em;
+.timeLabel:not(.onTheHour) {
+  opacity: 0.2;
+  font-size: 0.9em;
 }
 
-.dayColumn .dayCell::after {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: calc(100% - 1px);
-  width: calc(100% - 1px);
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+.timeLabel .meridiemIndicator {
+  opacity: 0.7;
+  font-size: 0.8em;
+  font-variant: small-caps;
 }
 
-.dayColumn .timeSlot.inView {
-  background-color: white;
+.timeSlot {
+  background-color: #e8e8e8;
 }
 
-.dayColumn .timeSlot:not(.inView) {
+.timeSlot:not(.inView) {
   background-color: #bbb;
 }
 
-z.dayColumn .timeSlot:not(.inView) {
-  background-color: #ccc;
+.timeSlot.available {
+  background-color: #9adfa5;
+  border: 1px solid #9adfa5;
 }
 
-:not(.legend) .timeSlot.inView:hover {
-  background-color: #ccc;
+:not(.legend) .timeSlot.available:hover {
+  background-color: #9ab2df;
+  cursor: pointer;
 }
 
 .r1 { font-size: var(--r1-fs);}
@@ -139,12 +135,6 @@ z.dayColumn .timeSlot:not(.inView) {
 .r4 { font-size: var(--r4-fs);}
 .r5 { font-size: var(--r5-fs);}
 .r6 { font-size: var(--r6-fs);}
-
-.ok-tab-btn-container { border-bottom-color: var(--s-ok-bor-color-ctl); }
-.info-tab-btn-container { border-bottom-color: var(--s-info-bor-color-ctl); }
-.warning-tab-btn-container { border-bottom-color: var(--s-warn-bor-color-ctl); }
-.alert-tab-btn-container { border-bottom-color: var(--s-alert-bor-color-ctl); }
-.error-tab-btn-container { border-bottom-color: var(--s-error-bor-color-ctl); }
 
 .ok-tab-btn { color: var(--s-ok-fg-ctl);  border-color: var(--s-ok-bor-color-ctl);}
 .info-tab-btn { color: var(--s-info-fg-ctl); border-color: var(--s-info-bor-color-ctl);}
@@ -160,6 +150,7 @@ z.dayColumn .timeSlot:not(.inView) {
     selectedMonth: { type: Number },
     availableSlots: { type: Array },
     selectedSlot: { type: Object },
+    use24hourTime: { type: Boolean },
   }
 
   #monthOptions = Object.values(MONTHS_OF_YEAR).map(monthIndex => html`<az-select-option value="${monthIndex}" title="${ALL_MONTH_NAMES[monthIndex]}"></az-select-option>`);
@@ -177,6 +168,7 @@ z.dayColumn .timeSlot:not(.inView) {
     this.timeViewEndTime = '20:00';
     this.timeViewGranularityMins = 30;
     this.timeViewRenderOffMins = 60;
+    this.use24hourTime = false;
   }
 
   #getStartOfWeek(date) {
@@ -232,7 +224,7 @@ z.dayColumn .timeSlot:not(.inView) {
       const mins = Math.floor(currentMins % 60);
       const hours = Math.floor(currentMins / 60);
       const displayTime = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-      const available = currentMins >= startMins && currentMins < endMins;
+      const available = currentMins >= startMins && currentMins <= endMins;
       this.#timeSlotsView.push([displayTime, currentMins, available]);
       currentMins += this.timeViewGranularityMins;
     }
@@ -265,12 +257,12 @@ z.dayColumn .timeSlot:not(.inView) {
 
   renderTimeSlots() {
     return html`
-<div class="days">
+<div class="daysContainer">
   <div class="dayColumn legend">
-    <div class="dayLabel">
+    <div class="dayCell dayLabel">
       <div class="month">&nbsp;</div>
-      <div class="day-name">&nbsp;</div>
-      <div class="day-date">&nbsp;</div>
+      <div class="dayName">&nbsp;</div>
+      <div class="dayDate">&nbsp;</div>
     </div>
     ${this.renderTimeSlotsViewLabels()}
   </div>
@@ -279,19 +271,57 @@ z.dayColumn .timeSlot:not(.inView) {
     `;
   }
 
+
+
   renderTimeSlotsViewLabels() {
-    return this.timeSlotsView.map(([displayTime, mins, inView]) => html`
-<div class="dayCell timeLabel ${inView ? "inView" : ""}">${displayTime}</div>
-    `);
+    return this.timeSlotsView.map(([time24, mins, inView]) => {
+      const onTheHour = mins % 60 === 0;
+      const cls = [
+        "dayCell",
+        "timeLabel",
+        inView ? "inView" : "",
+        onTheHour ? "onTheHour" : "",
+      ];
+      let timeString = noContent;
+      if (inView) {
+        let hour = time24.split(":").map(Number)[0];
+        if (this.use24hourTime) {
+          if (onTheHour) timeString = hour.toString().padStart(2, "0");
+        } else timeString = this.formatMeridianTime(time24, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour });
+      }
+      return html`<div class="${cls.filter(isNonEmptyString).join(" ")}">${timeString}</div>`
+    });
+  }
+
+  /**
+   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
+   *  - (23:00, true, false) => 11 pm
+   *  - (23:00, false, false) => 11:00 pm
+   *  - (23:00, true, true) => 11
+   *  - (23:00, false, true) => 11:00
+   * @param {string} time24 24-hour time HH:MM
+   * @param {Object} options when omitMinutesForWholeHours=true omits minutes when 0, when omitMeridianSuffix=true, omits am/pm
+   * @returns a formatted time string
+   */
+  formatMeridianTime(time24, { omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
+    let [hour, mins] = time24.split(":").map(Number);
+    const meridiemInd = hour < 12 ? "am" : "pm";
+    const hour12 = hour % 12 || 12;
+
+    let timeString = `${hour12}`;
+    if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${meridiemInd}</span>`
+
+    return timeString;
   }
 
   renderDayColumns() {
     return this.#daysView.map(([month, dayName, dayNumber], weekIndex) => html`
 <div class="dayColumn">
-  <div class="dayLabel">
+  <div class="dayCell dayLabel">
     <div class="month">${month}</div>
-    <div class="day-name">${dayName}</div>
-    <div class="day-date">${dayNumber}</div>
+    <div class="dayName">${dayName}</div>
+    <div class="dayDate">${dayNumber}</div>
   </div>
   ${this.renderTimeCells(dayNumber, weekIndex)}
 </div>
@@ -303,26 +333,31 @@ z.dayColumn .timeSlot:not(.inView) {
     const weekAppts = data.parsed;
 
     let toRender = [];
-    for (let i = 0; i < this.timeSlotsView.length - 1; i++) {
-      let stl = null;
-      const [time, mins, inView] = this.timeSlotsView[i];
+    for (let i = 0; i < this.timeSlotsView.length; i++) {
+      const [displayTime, mins, inView] = this.timeSlotsView[i];
+      let cellContent = noContent;
+      let stl = noContent;
+      let cls = ["dayCell", "timeSlot"];
+      let rowSpan;
 
       if (inView) {
+        cls.push("inView");
         const nowApptStart = weekAppts.find(appt => appt.sta === mins);
-        let rowSpan;
         if (nowApptStart) {
+          cellContent = `${nowApptStart.disp.replace('-', ' - ')}`;
           rowSpan = Math.floor(nowApptStart.dur / this.timeViewGranularityMins);
           i += rowSpan - 1;
+          stl = `grid-row: span ${rowSpan};`;
+          cls.push("available");
+          if (rowSpan > 1) cls.push("spanned");
         }
-        stl = rowSpan ? `flex: ${rowSpan}` : noContent;
-        console.log('now', nowApptStart, rowSpan, i);
       }
 
       toRender.push(html`
-<div class="dayCell timeSlot ${inView ? "inView" : ""}" style="${stl}" data-time="${time}" data-day="${dayNumber}"
-  @mouseover="${() => this.handleSlotHover(dayNumber, time)}"
+<div class="${cls.filter(isNonEmptyString).join(' ')}" style="${stl}" data-time="${displayTime}" data-day="${dayNumber}"
+  @mouseover="${() => this.handleSlotHover(dayNumber, displayTime)}"
   @mouseout="${() => this.handleSlotHoverOut()}">
-  &nbsp;
+${cellContent}
 </div>
     `);
     }
