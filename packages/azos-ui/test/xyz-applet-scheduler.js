@@ -8,8 +8,8 @@ import { html, css } from "../ui.js";
 import { Applet } from "../applet.js";
 import "../modal-dialog.js";
 import "../parts/button.js";
-import "./xyz-dialog.js";
 
+import "./showcase/case-scheduler.js";
 
 //import { APPLET_STYLES } from "./applet.css.js";
 //import * as DEFAULT_HTML from "./applet.htm.js";
@@ -21,7 +21,7 @@ import "./xyz-dialog.js";
 export class XyzAppletScheduler extends Applet {
 
   static styles = [css`
-:host { display: block; padding: 1ch 2ch; }
+:host { display: block; }
 
 xaz-button {
   border:1px solid red;
@@ -51,7 +51,7 @@ xaz-text {
 
   render() {
     return html`
-<az-weekly-scheduler></az-weekly-scheduler>
+<az-case-scheduler></az-case-scheduler>
     `;
   }//render
 

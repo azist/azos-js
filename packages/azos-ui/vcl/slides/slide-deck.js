@@ -38,11 +38,13 @@ export class SlideDeck extends Control {
 
   #elementFirstRendered = false;
 
+  get slides() { return [...this.children].filter(child => child instanceof Slide); }
+
   /** The current slide being displayed */
   #activeSlide = null;
   get activeSlide() { return this.#activeSlide; }
   set activeSlide(v) {
-    if (isString(v)) v = this.children[v];
+    if (isString(v)) v = this.slides[v];
     isTrue(isOf(v, Slide).slideDeck === this);
     if (this.#activeSlide === v) return;
     if (this.#elementFirstRendered && !this.dispatchEvent(new CustomEvent("slideChanging", { detail: { slide: v }, bubbles: true, cancelable: true }))) return;
@@ -50,7 +52,7 @@ export class SlideDeck extends Control {
     const oldSlide = this.#activeSlide;
     const oldIndex = this.activeSlideIndex;
 
-    [...this.children].forEach(child => child.slot = undefined);
+    this.slides.forEach(child => child.slot = undefined);
     v.slot = "body";
     this.#activeSlide = v;
     this.requestUpdate("activeSlideIndex", oldIndex); // necessary to update attribute value when slide changes
@@ -60,7 +62,7 @@ export class SlideDeck extends Control {
 
   /** Set the active slide by index; atRender, this needs to be delayed until firstUpdate */
   #pendingActiveSlideIndex = null;
-  get activeSlideIndex() { return [...this.children].indexOf(this.#activeSlide); }
+  get activeSlideIndex() { return this.slides.indexOf(this.#activeSlide); }
 
   /**
    * Slide.slideDeck is null until it is rendered in the DOM. Because of this, <az-slide-deck activeSlideIndex=2...> would
@@ -75,14 +77,13 @@ export class SlideDeck extends Control {
       return;
     }
 
-    const children = [...this.children];
-    const childCount = children.length;
+    const childCount = this.slides.length;
 
     if (!this.loop && (v > childCount - 1 || v < 0)) return;
     const step = (v < 0) ? childCount : 0;
     v = (v + step) % childCount; // handles forward and backward wrapping
 
-    this.activeSlide = children[v];
+    this.activeSlide = this.slides[v];
     this.requestUpdate();
   }
 
@@ -139,8 +140,7 @@ export class SlideDeck extends Control {
   }
 
   transitionBy(count, forceWrap = null) {
-    const children = [...this.children];
-    const lastChildIndex = children.length - 1;
+    const lastChildIndex = this.slides.length - 1;
     let nextIndex;
     if (forceWrap) nextIndex = (this.activeSlideIndex + count) % lastChildIndex;
     else if (this.activeSlideIndex + count > lastChildIndex) nextIndex = lastChildIndex - 1;
@@ -148,7 +148,7 @@ export class SlideDeck extends Control {
 
     this.#stopTimer();
     if (this.activeSlideIndex === nextIndex) return;
-    this.activeSlide = children[nextIndex];
+    this.activeSlide = this.slides[nextIndex];
     this.#startTimer();
   }
 
@@ -157,11 +157,10 @@ export class SlideDeck extends Control {
    * @param {Boolean|null} forceWrap overrides the component's setting
    */
   nextSlide(forceWrap = null) {
-    const children = [...this.children];
-    const currentIndex = children.indexOf(this.activeSlide);
+    const currentIndex = this.slides.indexOf(this.activeSlide);
     this.#stopTimer();
     let nextIndex = currentIndex;
-    if (currentIndex < children.length - 1)
+    if (currentIndex < this.slides.length - 1)
       nextIndex += 1;
     else
       if (forceWrap ?? this.loop)
@@ -171,7 +170,7 @@ export class SlideDeck extends Control {
         this.#stopTimer();
       }
 
-    this.activeSlide = children[nextIndex];
+    this.activeSlide = this.slides[nextIndex];
     this.#startTimer();
   }
 
@@ -180,21 +179,20 @@ export class SlideDeck extends Control {
    * @param {Boolean|null} forceWrap overrides the component's setting
    */
   previousSlide(forceWrap = null) {
-    const children = [...this.children];
-    const currentIndex = children.indexOf(this.activeSlide);
+    const currentIndex = this.slides.indexOf(this.activeSlide);
     this.#stopTimer();
     let nextIndex = currentIndex;
     if (currentIndex > 0)
       nextIndex -= 1;
     else
       if (forceWrap ?? this.loop)
-        nextIndex = children.length - 1;
+        nextIndex = this.slides.length - 1;
       else {
         if (this.loop) return; // Stay on the first slide
         clearInterval(this.#timer);
       }
 
-    this.activeSlide = children[nextIndex];
+    this.activeSlide = this.slides[nextIndex];
     this.#startTimer();
   }
 
@@ -210,7 +208,7 @@ export class SlideDeck extends Control {
   firstUpdated() {
     super.firstUpdated();
     // @see set activeSlideIndex for details about this edge case
-    if (!this.activeSlide) this.activeSlide = [...this.children][this.#pendingActiveSlideIndex ?? 0];
+    if (!this.activeSlide) this.activeSlide = this.slides[this.#pendingActiveSlideIndex ?? 0];
     this.#pendingActiveSlideIndex = null;
     if (this.autoTransitionInterval) this.#startTimer();
     this.#elementFirstRendered = true;

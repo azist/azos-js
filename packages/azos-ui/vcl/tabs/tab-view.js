@@ -8,7 +8,7 @@ import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/ave
 import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
-import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
+import { CLOSE_QUERY_METHOD, DIRTY_PROP, isNumber, isString } from "azos/types";
 
 export class TabView extends Control {
 
@@ -189,9 +189,14 @@ export class TabView extends Control {
     isDraggable: { type: Boolean },
     allowCloseAll: { type: Boolean },
     isModern: { type: Boolean },
+    activeTabIndex: { type: Number, reflect: true },
+    activeTab: { type: Tab },
   }
 
   #draggedTabIndex = null;
+  #elementFirstRendered = false;
+  #pendingActiveTabIndex = null;
+  #activeTab = null;
 
   get [DIRTY_PROP]() { return this.tabs.some(one => one[DIRTY_PROP]); }
   async [CLOSE_QUERY_METHOD]() {
@@ -205,7 +210,6 @@ export class TabView extends Control {
   get tabs() { return [...this.children].filter(child => child instanceof Tab); }
   get visibleTabs() { return [...this.children].filter(child => (child.isAbsent || child.isHidden) !== true); }
 
-  #activeTab;
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
   set activeTab(v) {
@@ -214,16 +218,33 @@ export class TabView extends Control {
       this.requestUpdate();
       return;
     }
-    isTrue(v instanceof Tab);
-    isTrue(v.tabView === this);
-    if (this.#activeTab === v) return;
-    if (!this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
 
-    this.tabs.forEach(one => one.slot = null);
+    if (isString(v)) v = this.tabs[v];
+    isTrue(isOf(v, Tab).tabView === this);
+    if (this.#activeTab === v) return;
+    if (this.#elementFirstRendered && !this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
+
+    const oldTab = this.#activeTab;
+    const oldIndex = this.activeTabIndex;
+
+    this.tabs.forEach(child => child.slot = undefined);
+    v.slot = "body";
     this.#activeTab = v;
-    this.#activeTab.slot = "body";
+    this.#scrollTabBtnIntoView(v);
+    this.requestUpdate("activeTabIndex", oldIndex);
+    this.requestUpdate("activeTab", oldTab);
+    if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
+  }
+
+  get activeTabIndex() { return this.tabs.indexOf(this.activeTab); }
+  set activeTabIndex(v) {
+    if (!this.#elementFirstRendered) {
+      this.#pendingActiveTabIndex = v;
+      return;
+    }
+    isTrue(isNumber(v) >= 0 && v < this.tabs.length);
+    this.activeTab = this.tabs[v];
     this.requestUpdate();
-    this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
   }
 
   constructor() {
@@ -241,10 +262,7 @@ export class TabView extends Control {
     this.requestUpdate();
   }
 
-  #onTabClick(e, tab) {
-    tab.activate();
-    this.#scrollTabBtnIntoView(tab);
-  }
+  #onTabClick(e, tab) { this.activeTab = tab; }
 
   #scrollTabBtnIntoView(tab) {
     isOf(tab, Tab);
@@ -410,16 +428,16 @@ export class TabView extends Control {
     this.requestUpdate();
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    if (this.tabs.length) {
-      this.#activeTab = this.tabs[0];
-      this.#activeTab.slot = "body";
-    }
+  async firstUpdated() {
+    super.firstUpdated();
+    if (this.tabs.length && !this.activeTab) this.activeTab = this.tabs[this.#pendingActiveTabIndex ?? 0];
+    this.#pendingActiveTabIndex = null;
+    this.#elementFirstRendered = true;
+    this.requestUpdate();
   }
 
   updated() {
-    if (!this.tabs.length) return;
+    if (!this.#elementFirstRendered) return;
     const tabContainerWidth = this.shadowRoot.querySelector('.tab-btn-container').offsetWidth;
     const scrollBtns = this.shadowRoot.querySelectorAll('.scroll-btn');
     const tabBtns = this.shadowRoot.querySelectorAll('.tab-btn');
@@ -431,22 +449,19 @@ export class TabView extends Control {
   renderControl() {
     return html`
     <div class="tab-view ${this.isModern ? 'modern' : ''}">
-    ${this.tabs.length ? this.renderTabs() : ''}
+    ${this.renderTabBtns()}
     ${this.renderBody()}
     </div>
     `;
   }
 
-  renderTabs() {
-    const cls = `${parseStatus(this.#activeTab.status, true, '-tab-btn-container')}`;
+  renderTabBtns() {
+    const cls = `${parseStatus(this.#activeTab?.status, true, '-tab-btn-container')}`;
     return html`
 <div class="tab-nav">
   <button class="scroll-btn left" @click="${() => this.#onScrollTabContainer(false)}"></button>
   <div class="tab-btn-container">
-    <div class="tab-btn-container-inner ${cls}"
-      @dragover="${(e) => this.#onDragOver(e)}"
-      @drop="${e => this.#onDragDrop(e)}"
-    >
+    <div class="tab-btn-container-inner ${cls}" @dragover="${(e) => this.#onDragOver(e)}" @drop="${e => this.#onDragDrop(e)}">
       ${this.tabs.map((tab, index) => {
       const cls = [
         tab.active ? "active" : "",
