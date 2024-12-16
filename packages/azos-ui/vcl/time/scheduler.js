@@ -38,7 +38,7 @@ export const MONTHS_OF_YEAR = Object.freeze({
 });
 const ALL_MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-const _data = { "available": { "AsOfUtc": "2024-12-09T02:12:19.439Z", "CorpRel": "unit.mnic@g8corp::UN-PATRTL-MAC", "ProviderName": "pcms", "DefaultTimeZone": "est", "RangeUtc": { "start": "2024-05-01T12:00:00Z", "end": "2024-05-31T12:00:00Z" }, "DefaultSchedule": { "Name": "PCMS Default Sales", "Title": { "eng": { "n": "phone-sales", "d": "Pcms Sales" } }, "Spans": [{ "Name": "apt", "Title": { "eng": { "n": "apt", "d": "Sales Appointments" } }, "Range": { "start": "2023-01-01T00:00:00Z", "end": "2100-01-01T00:00:00Z" }, "Monday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Tuesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Wednesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Thursday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Friday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Saturday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Sunday": { "data": "10am-12pm; 2pm-4pm;", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }] } }], "Overrides": [{ "Name": "j4th2025", "Title": { "eng": { "n": "ind", "d": "Independence Day 2025" } }, "Date": "2025-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2026", "Title": { "eng": { "n": "ind", "d": "Independence Day 2026" } }, "Date": "2026-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2027", "Title": { "eng": { "n": "ind", "d": "Independence Day 2027" } }, "Date": "2027-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2025", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2025" } }, "Date": "2025-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2026", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2026" } }, "Date": "2026-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2027", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2027" } }, "Date": "2027-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2025", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2025" } }, "Date": "2025-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2026", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2026" } }, "Date": "2026-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2027", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2027" } }, "Date": "2027-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }] }, "Agents": [] }, "general": { "AsOfUtc": "2024-12-09T02:12:19.439Z", "CorpRel": "unit.mnic@g8corp::UN-PATRTL-MAC", "ProviderName": "pcms", "DefaultTimeZone": "est", "RangeUtc": { "start": "2024-05-01T12:00:00Z", "end": "2024-05-31T12:00:00Z" }, "DefaultSchedule": { "Name": "PCMS Default Sales", "Title": { "eng": { "n": "phone-sales", "d": "Pcms Sales" } }, "Spans": [{ "Name": "apt", "Title": { "eng": { "n": "apt", "d": "Sales Appointments" } }, "Range": { "start": "2023-01-01T00:00:00Z", "end": "2100-01-01T00:00:00Z" }, "Monday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Tuesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Wednesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Thursday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Friday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Saturday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Sunday": { "data": "10am-12pm; 2pm-4pm;", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }] } }], "Overrides": [{ "Name": "j4th2025", "Title": { "eng": { "n": "ind", "d": "Independence Day 2025" } }, "Date": "2025-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2026", "Title": { "eng": { "n": "ind", "d": "Independence Day 2026" } }, "Date": "2026-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2027", "Title": { "eng": { "n": "ind", "d": "Independence Day 2027" } }, "Date": "2027-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2025", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2025" } }, "Date": "2025-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2026", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2026" } }, "Date": "2026-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2027", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2027" } }, "Date": "2027-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2025", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2025" } }, "Date": "2025-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2026", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2026" } }, "Date": "2026-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2027", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2027" } }, "Date": "2027-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }] }, "Agents": [] }, "reserved": { "AsOfUtc": "2024-12-09T02:12:19.439Z", "CorpRel": "unit.mnic@g8corp::UN-PATRTL-MAC", "DefaultTimeZone": "est", "ProviderName": "pcms", "RangeUtc": { "start": "2024-05-01T12:00:00Z", "end": "2024-05-31T12:00:00Z" }, "Reservations": [] } };
+const _data = { "available": { "AsOfUtc": "2024-12-09T02:12:19.439Z", "CorpRel": "unit.mnic@g8corp::UN-PATRTL-MAC", "ProviderName": "pcms", "DefaultTimeZone": "est", "RangeUtc": { "start": "2024-05-01T12:00:00Z", "end": "2024-05-31T12:00:00Z" }, "DefaultSchedule": { "Name": "PCMS Default Sales", "Title": { "eng": { "n": "phone-sales", "d": "Pcms Sales" } }, "Spans": [{ "Name": "apt", "Title": { "eng": { "n": "apt", "d": "Sales Appointments" } }, "Range": { "start": "2023-01-01T00:00:00Z", "end": "2100-01-01T00:00:00Z" }, "Monday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 60, "fin": 719, "sta": 660 }, { "disp": "14:00-16:00", "dur": 180, "fin": 959, "sta": 780 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Tuesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Wednesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Thursday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Friday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Saturday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Sunday": { "data": "10am-12pm; 2pm-4pm;", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }] } }], "Overrides": [{ "Name": "j4th2025", "Title": { "eng": { "n": "ind", "d": "Independence Day 2025" } }, "Date": "2025-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2026", "Title": { "eng": { "n": "ind", "d": "Independence Day 2026" } }, "Date": "2026-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2027", "Title": { "eng": { "n": "ind", "d": "Independence Day 2027" } }, "Date": "2027-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2025", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2025" } }, "Date": "2025-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2026", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2026" } }, "Date": "2026-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2027", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2027" } }, "Date": "2027-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2025", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2025" } }, "Date": "2025-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2026", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2026" } }, "Date": "2026-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2027", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2027" } }, "Date": "2027-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }] }, "Agents": [] }, "general": { "AsOfUtc": "2024-12-09T02:12:19.439Z", "CorpRel": "unit.mnic@g8corp::UN-PATRTL-MAC", "ProviderName": "pcms", "DefaultTimeZone": "est", "RangeUtc": { "start": "2024-05-01T12:00:00Z", "end": "2024-05-31T12:00:00Z" }, "DefaultSchedule": { "Name": "PCMS Default Sales", "Title": { "eng": { "n": "phone-sales", "d": "Pcms Sales" } }, "Spans": [{ "Name": "apt", "Title": { "eng": { "n": "apt", "d": "Sales Appointments" } }, "Range": { "start": "2023-01-01T00:00:00Z", "end": "2100-01-01T00:00:00Z" }, "Monday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Tuesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Wednesday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Thursday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Friday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Saturday": { "data": "10am-12pm; 2pm-4pm; 6pm-8pm", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }, { "disp": "18:00-20:00", "dur": 120, "fin": 1199, "sta": 1080 }] }, "Sunday": { "data": "10am-12pm; 2pm-4pm;", "parsed": [{ "disp": "10:00-12:00", "dur": 120, "fin": 719, "sta": 600 }, { "disp": "14:00-16:00", "dur": 120, "fin": 959, "sta": 840 }] } }], "Overrides": [{ "Name": "j4th2025", "Title": { "eng": { "n": "ind", "d": "Independence Day 2025" } }, "Date": "2025-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2026", "Title": { "eng": { "n": "ind", "d": "Independence Day 2026" } }, "Date": "2026-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "j4th2027", "Title": { "eng": { "n": "ind", "d": "Independence Day 2027" } }, "Date": "2027-07-04T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2025", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2025" } }, "Date": "2025-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2026", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2026" } }, "Date": "2026-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "xmas2027", "Title": { "eng": { "n": "xmas", "d": "Christmas Day 2027" } }, "Date": "2027-12-25T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2025", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2025" } }, "Date": "2025-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2026", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2026" } }, "Date": "2026-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }, { "Name": "newyr2027", "Title": { "eng": { "n": "nyr", "d": "New Years Day 2027" } }, "Date": "2027-01-01T00:00:00+00:00", "Hours": { "data": null, "parsed": [] } }] }, "Agents": [] }, "reserved": { "AsOfUtc": "2024-12-09T02:12:19.439Z", "CorpRel": "unit.mnic@g8corp::UN-PATRTL-MAC", "DefaultTimeZone": "est", "ProviderName": "pcms", "RangeUtc": { "start": "2024-05-01T12:00:00Z", "end": "2024-05-31T12:00:00Z" }, "Reservations": [] } };
 const _week_data = _data.available.DefaultSchedule.Spans[0];
 const sunday_data = _week_data.Sunday;
 const monday_data = _week_data.Monday;
@@ -69,18 +69,24 @@ az-select {
   display: grid;
   grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
   gap: 1px;
+  background-color: #d0d0d0;
 }
 
 .dayColumn {
   display: grid;
   grid-auto-rows: 0.35fr;
-  gap: 1px;
+  .gap: 1px;
 }
 
 .dayCell {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
+}
+
+.dayCell.inView {
+  border-top: 1px dashed #d0d0d0;
 }
 
 .dayCell.dayLabel {
@@ -89,15 +95,39 @@ az-select {
   flex-direction: column;
 }
 
+.legend .dayCell.dayLabel {
+  background-color: var(--paper);
+}
+
+.dayLabel .dayName {
+  font-variant: all-small-caps;
+}
+
 .dayLabel .month {
+  width: 100%;
   font-size: 1.5em;
   font-weight: bold;
+  font-variant: all-small-caps;
+}
+
+.dayCell.dayLabel .month:empty {
+  background-color: var(--paper)
 }
 
 .dayCell.dayLabel .month:empty::after {
-  content: '_';
-  visibility: hidden;
+  content: '.';
   display: block;
+  margin-right: -1px;
+  color: var(--paper);
+  background-color: var(--paper);
+}
+
+.dayCell.onTheHour.inView {
+  border-top: 1px solid #c0c0c0;
+}
+
+.timeLabel.onTheHour.inView, .timeLabel.onTheHour:nth-last-child(2) {
+  border-top: 1px solid #a0a0a0;
 }
 
 .timeLabel:not(.onTheHour) {
@@ -120,12 +150,35 @@ az-select {
 }
 
 .timeSlot.available {
-  background-color: #9adfa5;
-  border: 1px solid #9adfa5;
+  background-color: white;
+  position: relative;
+}
+
+.available.selected {
+  background-color: #a0ff90;
+  border-radius: 5px;
+}
+
+.available .icon {
+  position: absolute;
+  bottom: 0.2em;
+  left: 0.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .border: 2px solid green;
+  border-radius: 50%;
+  box-shadow: 0px 0px 6px #caffc5;
+  background-color: green;
+  height: 1.5em;
+  width: 1.5em;
+  color: #caffc5;
+  fill: #caffc5;
+  font-weight: bold;
 }
 
 :not(.legend) .timeSlot.available:hover {
-  background-color: #9ab2df;
+  background-color: #b0f0ff;
   cursor: pointer;
 }
 
@@ -144,55 +197,20 @@ az-select {
 `;
 
   static properties = {
-    currentWeekStart: { type: Date },
     weekStartDay: { type: DAYS_OF_WEEK },
     showNumDays: { type: Number },
+    currentWeekStart: { type: Date },
     selectedMonth: { type: Number },
     availableSlots: { type: Array },
-    selectedSlot: { type: Object },
     use24hourTime: { type: Boolean },
+    maxSelected: { type: Number },
+    selected: { type: Object },
   }
 
-  #monthOptions = Object.values(MONTHS_OF_YEAR).map(monthIndex => html`<az-select-option value="${monthIndex}" title="${ALL_MONTH_NAMES[monthIndex]}"></az-select-option>`);
-  #selectedAppointment = null;
+  #monthOptions = Object.values(MONTHS_OF_YEAR).map(monthIndex => html`<option value="${monthIndex}" title="${ALL_MONTH_NAMES[monthIndex]}"></option>`);
+  #timeSlotsView = null;
 
-  constructor() {
-    super();
-    this.weekStartDay = DAYS_OF_WEEK.MONDAY;
-    this.showNumDays = 6; // default to Monday - Saturday
-    this.currentWeekStart = this.#getStartOfWeek(new Date(2025, 6, 4));
-    this.selectedMonth = this.currentWeekStart.getMonth();
-    this.availableSlots = [];
-    this.selectedSlot = null;
-    this.timeViewStartTime = '10:00';
-    this.timeViewEndTime = '20:00';
-    this.timeViewGranularityMins = 30;
-    this.timeViewRenderOffMins = 60;
-    this.use24hourTime = false;
-  }
-
-  #getStartOfWeek(date) {
-    const startOfWeek = new Date(date);
-    const currentDay = startOfWeek.getDay();
-    const dayDifference = (currentDay - this.weekStartDay + 7) % 7;
-
-    startOfWeek.setDate(startOfWeek.getDate() - dayDifference);
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    // console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
-
-    return startOfWeek;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-  }
-
-  #btnPreviousWeek() { }
-  #btnMonthChange() { }
-  #btnNextWeek() { }
-
-  get #daysView() {
+  get daysView() {
     return Array.from({ length: this.showNumDays }).map((_, i) => {
       const currentDate = new Date(this.currentWeekStart);
       currentDate.setDate(this.currentWeekStart.getDate() + i);
@@ -204,7 +222,6 @@ az-select {
     });
   }
 
-  #timeSlotsView = null;
   get timeSlotsView() {
     if (this.#timeSlotsView) return this.#timeSlotsView;
 
@@ -220,18 +237,81 @@ az-select {
 
     let currentMins = renderStartMins;
 
-    while (currentMins <= renderEndMins) {
+    while (currentMins < renderEndMins) {
       const mins = Math.floor(currentMins % 60);
       const hours = Math.floor(currentMins / 60);
       const displayTime = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-      const available = currentMins >= startMins && currentMins <= endMins;
+      const available = currentMins >= startMins && currentMins < endMins;
       this.#timeSlotsView.push([displayTime, currentMins, available]);
       currentMins += this.timeViewGranularityMins;
     }
+
+    console.log(this.#timeSlotsView);
     return this.#timeSlotsView;
   }
 
-  handleSlotSelect(slot) { if (slot.available) this.selectedSlot = slot; }
+  constructor() {
+    super();
+    this.weekStartDay = DAYS_OF_WEEK.MONDAY;
+    this.showNumDays = 6; // default to Monday - Saturday
+    this.currentWeekStart = this.#getStartOfWeek(new Date(2025, 6, 4));
+    this.selectedMonth = this.currentWeekStart.getMonth();
+    this.availableSlots = [];
+    this.selectedEvents = [];
+    this.timeViewStartTime = '10:00';
+    this.timeViewEndTime = '20:00';
+    this.timeViewGranularityMins = 30;
+    this.timeViewRenderOffMins = 60;
+    this.use24hourTime = false;
+    this.maxSelected = 2;
+  }
+
+  #getStartOfWeek(date) {
+    const startOfWeek = new Date(date);
+    const currentDay = startOfWeek.getDay();
+    const dayDifference = (currentDay - this.weekStartDay + 7) % 7;
+
+    startOfWeek.setDate(startOfWeek.getDate() - dayDifference);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
+
+    return startOfWeek;
+  }
+
+  /**
+   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
+   *  - (23:00, true, false) => 11 pm
+   *  - (23:00, false, false) => 11:00 pm
+   *  - (23:00, true, true) => 11
+   *  - (23:00, false, true) => 11:00
+   * @param {string} time24 24-hour time HH:MM
+   * @param {Object} options when omitMinutesForWholeHours=true omits minutes when 0, when omitMeridianSuffix=true, omits am/pm
+   * @returns a formatted time string
+   */
+  #formatMeridianTime(time24, { omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
+    let [hour, mins] = time24.split(":").map(Number);
+    const meridiemInd = hour < 12 ? "am" : "pm";
+    const hour12 = hour % 12 || 12;
+
+    let timeString = `${hour12}`;
+    if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${meridiemInd}</span>`
+
+    return timeString;
+  }
+
+  #btnPreviousWeek() { }
+  #btnMonthChange() { }
+  #btnNextWeek() { }
+
+  handleSelectEvent(event) {
+    const eventIndex = this.selectedEvents.indexOf(event);
+    if (eventIndex > -1) this.selectedEvents.splice(eventIndex, 1);
+    else if (this.selectedEvents.length >= this.maxSelected) return;
+    else this.selectedEvents.push(event);
+    this.requestUpdate();
+  }
 
   handleSlotHover(dayIndex, time) { }
   handleSlotHoverOut() { }
@@ -271,8 +351,6 @@ az-select {
     `;
   }
 
-
-
   renderTimeSlotsViewLabels() {
     return this.timeSlotsView.map(([time24, mins, inView]) => {
       const onTheHour = mins % 60 === 0;
@@ -286,37 +364,16 @@ az-select {
       if (inView) {
         let hour = time24.split(":").map(Number)[0];
         if (this.use24hourTime) {
-          if (onTheHour) timeString = hour.toString().padStart(2, "0");
-        } else timeString = this.formatMeridianTime(time24, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour });
+          timeString = hour.toString().padStart(2, "0");
+          if (!onTheHour) timeString += `:${time24.split(":")[1]}`;
+        } else timeString = this.#formatMeridianTime(time24, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour });
       }
       return html`<div class="${cls.filter(isNonEmptyString).join(" ")}">${timeString}</div>`
     });
   }
 
-  /**
-   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
-   *  - (23:00, true, false) => 11 pm
-   *  - (23:00, false, false) => 11:00 pm
-   *  - (23:00, true, true) => 11
-   *  - (23:00, false, true) => 11:00
-   * @param {string} time24 24-hour time HH:MM
-   * @param {Object} options when omitMinutesForWholeHours=true omits minutes when 0, when omitMeridianSuffix=true, omits am/pm
-   * @returns a formatted time string
-   */
-  formatMeridianTime(time24, { omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
-    let [hour, mins] = time24.split(":").map(Number);
-    const meridiemInd = hour < 12 ? "am" : "pm";
-    const hour12 = hour % 12 || 12;
-
-    let timeString = `${hour12}`;
-    if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
-    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${meridiemInd}</span>`
-
-    return timeString;
-  }
-
   renderDayColumns() {
-    return this.#daysView.map(([month, dayName, dayNumber], weekIndex) => html`
+    return this.daysView.map(([month, dayName, dayNumber], weekIndex) => html`
 <div class="dayColumn">
   <div class="dayCell dayLabel">
     <div class="month">${month}</div>
@@ -329,33 +386,43 @@ az-select {
   }
 
   renderTimeCells(dayNumber, weekIndex) {
-    const data = week_data[weekIndex]
-    const weekAppts = data.parsed;
+    const todayOrAfter = true; // FIXME: Where is this data?
+    const data = week_data[weekIndex]; // FIXME: data for the day
+    const thisDayEvents = data.parsed;
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
-      const [displayTime, mins, inView] = this.timeSlotsView[i];
+      const [time24, slotMins, inView] = this.timeSlotsView[i];
       let cellContent = noContent;
       let stl = noContent;
       let cls = ["dayCell", "timeSlot"];
       let rowSpan;
+      let event;
 
-      if (inView) {
+      if (inView && todayOrAfter) {
+        event = thisDayEvents.find(event => event.sta === slotMins);
         cls.push("inView");
-        const nowApptStart = weekAppts.find(appt => appt.sta === mins);
-        if (nowApptStart) {
-          cellContent = `${nowApptStart.disp.replace('-', ' - ')}`;
-          rowSpan = Math.floor(nowApptStart.dur / this.timeViewGranularityMins);
+        if (slotMins % 60 === 0) cls.push("onTheHour");
+        if (event) {
+          cellContent = html`<div>${event.disp.replace('-', ' - ')}</div>`;
+          rowSpan = Math.floor(event.dur / this.timeViewGranularityMins);
           i += rowSpan - 1;
           stl = `grid-row: span ${rowSpan};`;
           cls.push("available");
           if (rowSpan > 1) cls.push("spanned");
         }
+        const eventSelectedIndex = this.selectedEvents.indexOf(event);
+        if (eventSelectedIndex > -1) {
+          cls.push("selected");
+          if (this.selectedEvents.length === 1) cellContent = html`${cellContent} <div class="icon"><svg viewBox="0 -960 960 960"><path d="M378-222 130-470l68-68 180 180 383-383 68 68-451 451Z"/></svg></div>`;
+          else cellContent = html`${cellContent} <div class="icon"><span>${eventSelectedIndex + 1}</span></div>`
+        }
       }
 
       toRender.push(html`
-<div class="${cls.filter(isNonEmptyString).join(' ')}" style="${stl}" data-time="${displayTime}" data-day="${dayNumber}"
-  @mouseover="${() => this.handleSlotHover(dayNumber, displayTime)}"
+<div class="${cls.filter(isNonEmptyString).join(' ')}" style="${stl}" data-time="${time24}" data-day="${dayNumber}"
+  @click="${event ? () => this.handleSelectEvent(event) : () => { }}"
+  @mouseover="${() => this.handleSlotHover(dayNumber, time24)}"
   @mouseout="${() => this.handleSlotHoverOut()}">
 ${cellContent}
 </div>
