@@ -49,6 +49,10 @@ const friday_data = _week_data.Friday;
 const saturday_data = _week_data.Monday;
 const week_data = [sunday_data, monday_data, tuesday_data, wednesday_data, thursday_data, friday_data, saturday_data];
 
+const ____JULY_4TH = new Date(2025, 6, 4);
+const ____NEW_YEAR = new Date(2025, 0, 1);
+const ____TODAY = new Date();
+
 export class WeeklyScheduler extends Control {
 
   static styles = css`
@@ -89,18 +93,24 @@ az-select {
   border-top: 1px dashed #d0d0d0;
 }
 
-.dayCell.dayLabel {
+.dayLabel {
   text-align: center;
   display: flex;
   flex-direction: column;
 }
 
-.legend .dayCell.dayLabel {
+.legend .dayLabel {
   background-color: var(--paper);
 }
 
 .dayLabel .dayName {
   font-variant: all-small-caps;
+}
+
+.dayLabel .year {
+  width: 100%;
+  font-size: 2.5em;
+  font-weight: bold;
 }
 
 .dayLabel .month {
@@ -110,11 +120,13 @@ az-select {
   font-variant: all-small-caps;
 }
 
-.dayCell.dayLabel .month:empty {
+.dayLabel .month:empty,
+.dayLabel .year:empty {
   background-color: var(--paper)
 }
 
-.dayCell.dayLabel .month:empty::after {
+.dayLabel .month:empty::after,
+.dayLabel .year:empty::after {
   content: '.';
   display: block;
   margin-right: -1px;
@@ -197,29 +209,49 @@ az-select {
 `;
 
   static properties = {
+    // effectiveStartDate: { type: Date },
+    // effectiveEndDate: { type: Date },
+    // enabledStartDate: { type: Date },
+    // enabledEndDate: { type: Date },
     weekStartDay: { type: DAYS_OF_WEEK },
     showNumDays: { type: Number },
     currentWeekStart: { type: Date },
     selectedMonth: { type: Number },
     availableSlots: { type: Array },
     use24hourTime: { type: Boolean },
-    maxSelected: { type: Number },
+    maxSelectedEvents: { type: Number },
     selected: { type: Object },
   }
 
+  #daysView = null;
   #monthOptions = Object.values(MONTHS_OF_YEAR).map(monthIndex => html`<option value="${monthIndex}" title="${ALL_MONTH_NAMES[monthIndex]}"></option>`);
   #timeSlotsView = null;
 
   get daysView() {
-    return Array.from({ length: this.showNumDays }).map((_, i) => {
-      const currentDate = new Date(this.currentWeekStart);
-      currentDate.setDate(this.currentWeekStart.getDate() + i);
+    if (this.#daysView) return this.#daysView;
 
-      const name = currentDate.toLocaleDateString(undefined, { weekday: 'short' });
-      const number = currentDate.getDate();
-      const month = (i === 0 || number === 1) ? currentDate.toLocaleDateString(undefined, { month: "long" }) : undefined;
-      return [month, name, number];
+    let prevYear, prevMonthNumber;
+    this.#daysView = Array.from({ length: this.showNumDays }).map((_, i) => {
+      const date = new Date(this.weekStartDate);
+      date.setDate(this.weekStartDate.getDate() + i);
+
+      const dayName = date.toLocaleDateString(undefined, { weekday: 'short' });
+      const dayNumber = date.getDate();
+      const dayNumberOfWeek = date.getDay();
+      const monthNumber = date.getMonth();
+      let monthName, year;
+      if (prevMonthNumber === undefined || prevMonthNumber !== monthNumber) {
+        console.log(prevMonthNumber, monthNumber);
+        prevMonthNumber = monthNumber;
+        monthName = date.toLocaleDateString(undefined, { month: "long" });
+      }
+      if (prevYear === undefined || prevYear !== date.getFullYear()) {
+        year = date.getFullYear();
+        prevYear = year;
+      }
+      return { dayName, dayNumber, dayNumberOfWeek, monthNumber, monthName, year, date };
     });
+    return this.#daysView;
   }
 
   get timeSlotsView() {
@@ -254,8 +286,8 @@ az-select {
     super();
     this.weekStartDay = DAYS_OF_WEEK.MONDAY;
     this.showNumDays = 6; // default to Monday - Saturday
-    this.currentWeekStart = this.#getStartOfWeek(new Date(2025, 6, 4));
-    this.selectedMonth = this.currentWeekStart.getMonth();
+    this.weekStartDate = this.#calculateWeekStartDate(____NEW_YEAR);
+    this.inViewMonth = this.weekStartDate.getMonth();
     this.availableSlots = [];
     this.selectedEvents = [];
     this.timeViewStartTime = '10:00';
@@ -263,10 +295,10 @@ az-select {
     this.timeViewGranularityMins = 30;
     this.timeViewRenderOffMins = 60;
     this.use24hourTime = false;
-    this.maxSelected = 2;
+    this.maxSelectedEvents = 2;
   }
 
-  #getStartOfWeek(date) {
+  #calculateWeekStartDate(date) {
     const startOfWeek = new Date(date);
     const currentDay = startOfWeek.getDay();
     const dayDifference = (currentDay - this.weekStartDay + 7) % 7;
@@ -308,7 +340,7 @@ az-select {
   handleSelectEvent(event) {
     const eventIndex = this.selectedEvents.indexOf(event);
     if (eventIndex > -1) this.selectedEvents.splice(eventIndex, 1);
-    else if (this.selectedEvents.length >= this.maxSelected) return;
+    else if (this.selectedEvents.length >= this.maxSelectedEvents) return;
     else this.selectedEvents.push(event);
     this.requestUpdate();
   }
@@ -329,7 +361,7 @@ az-select {
     return html`
 <div class="header">
   <az-button title="Previous" @click="${this.#btnPreviousWeek}"></az-button>
-  <az-select id="monthSelector" scope="this" @change="${this.#btnMonthChange}" value="${this.selectedMonth}">${this.#monthOptions}</az-select>
+  <az-select id="monthSelector" scope="this" @change="${this.#btnMonthChange}" value="${this.inViewMonth}">${this.#monthOptions}</az-select>
   <az-button title="Next" @click="${this.#btnNextWeek}"></az-button>
 </div>
     `;
@@ -339,7 +371,8 @@ az-select {
     return html`
 <div class="daysContainer">
   <div class="dayColumn legend">
-    <div class="dayCell dayLabel">
+    <div class="dayLabel" style="grid-row: span 4">
+      <div class="year">&nbsp;</div>
       <div class="month">&nbsp;</div>
       <div class="dayName">&nbsp;</div>
       <div class="dayDate">&nbsp;</div>
@@ -373,10 +406,12 @@ az-select {
   }
 
   renderDayColumns() {
-    return this.daysView.map(([month, dayName, dayNumber], weekIndex) => html`
+    // {dayName, dayNumber, dayNumberOfWeek, monthNumber, monthName, year, date}
+    return this.daysView.map(({ dayName, dayNumber, monthName, year }, weekIndex) => html`
 <div class="dayColumn">
-  <div class="dayCell dayLabel">
-    <div class="month">${month}</div>
+  <div class="dayLabel" style="grid-row: span 4">
+    <div class="year">${year}</div>
+    <div class="month">${monthName}</div>
     <div class="dayName">${dayName}</div>
     <div class="dayDate">${dayNumber}</div>
   </div>
@@ -385,10 +420,14 @@ az-select {
     `)
   }
 
-  renderTimeCells(dayNumber, weekIndex) {
+  calculateTheDaysEvents(date, weekDayIndex) {
+    const data = week_data[weekDayIndex]; // FIXME: data for the day
+    return data.parsed;
+  }
+
+  renderTimeCells(dayNumber, weekDayIndex) {
     const todayOrAfter = true; // FIXME: Where is this data?
-    const data = week_data[weekIndex]; // FIXME: data for the day
-    const thisDayEvents = data.parsed;
+    const thisDayEvents = this.calculateTheDaysEvents(dayNumber, weekDayIndex);
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
