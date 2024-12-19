@@ -79,6 +79,7 @@ az-select {
   text-align: center;
   display: flex;
   flex-direction: column;
+  grid-row: span 3;
 }
 
 .legend .dayLabel {
@@ -91,13 +92,11 @@ az-select {
 
 .dayLabel .year {
   width: 100%;
-  font-size: 2.5em;
   font-weight: bold;
 }
 
 .dayLabel .month {
   width: 100%;
-  font-size: 1.5em;
   font-weight: bold;
   font-variant: all-small-caps;
 }
@@ -127,7 +126,7 @@ az-select {
 }
 
 .timeCell div {
-  font-size: clamp(14px, 15cqmin, 18px);
+  font-size: clamp(10px, 15cqmin, 18px);
   padding: 2cqw;
   text-align: center;
 }
@@ -166,8 +165,9 @@ az-select {
 .timeSlot.available {
   background-color: white;
   position: relative;
-  border-left: 3px solid green;
+  border-left: 4px solid green;
   border-radius: 5px;
+  box-shadow: 0 0 8px #a0a0a0;
 }
 
 .available.selected {
@@ -186,11 +186,12 @@ az-select {
   border-radius: 50%;
   box-shadow: 0px 0px 6px #caffc5;
   background-color: green;
-  height: 1.5em;
-  width: 1.5em;
+  height: 1.2em;
+  width: 1.2em;
   color: #caffc5;
   fill: #caffc5;
   font-weight: bold;
+  opacity: 0.75;
 }
 
 :not(.legend) .timeSlot.available:hover {
@@ -436,9 +437,9 @@ az-select {
 
   renderTimeSlots() {
     return html`
-<div class="daysContainer" style="--columns:${this.showNumDays + 1};--rows:${this.timeSlotsView.length + 4}">
+<div class="daysContainer" style="--columns:${this.showNumDays + 1};--rows:${this.timeSlotsView.length + 3}">
   <div class="dayColumn legend">
-    <div class="dayLabel" style="grid-row: span 4">
+    <div class="dayLabel">
       <div class="year">&nbsp;</div>
       <div class="month">&nbsp;</div>
       <div class="dayName">&nbsp;</div>
@@ -476,7 +477,7 @@ az-select {
     // {dayName, dayNumber, dayNumberOfWeek, monthNumber, monthName, year, date}
     return this.daysView.map(({ dayName, dayNumber, monthName, year, date }) => html`
 <div class="dayColumn">
-  <div class="dayLabel" style="grid-row: span 4">
+  <div class="dayLabel">
     <div class="year">${year}</div>
     <div class="month">${monthName}</div>
     <div class="dayName">${dayName}</div>
