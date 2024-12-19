@@ -382,8 +382,14 @@ az-select {
   handleSelectEvent(event) {
     const eventIndex = this.selectedEvents.indexOf(event);
     if (eventIndex > -1) this.selectedEvents.splice(eventIndex, 1);
-    else if (this.selectedEvents.length >= this.maxSelectedEvents) return;
-    else this.selectedEvents.push(event);
+    else {
+      if (this.selectedEvents.length >= this.maxSelectedEvents) {
+        if (this.maxSelectedEvents > 1) return;
+        else this.selectedEvents.length = 0;
+      }
+      this.selectedEvents.push(event);
+    }
+
     this.requestUpdate();
   }
 
