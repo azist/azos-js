@@ -60,17 +60,11 @@ az-select {
 
 .daysContainer {
   display: grid;
-  grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
+  grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), 1fr);
+  grid-template-rows: 3fr;
+  grid-auto-rows: 1fr;
   gap: 1px;
-  .background-color: #d0d0d0;
-}
-
-.dayColumn {
-  display: grid;
-  grid-auto-rows: 0.35fr;
-  .gap: 1px;
   background-color: #d0d0d0;
-  border-radius: 10px 10px 0 0;
 }
 
 .dayCell {
@@ -90,7 +84,7 @@ az-select {
   flex-direction: column;
 }
 
-.legend .dayLabel {
+.dayLabel:first-child {
   background-color: var(--paper);
 }
 
@@ -418,53 +412,55 @@ az-select {
   renderTimeSlots() {
     return html`
 <div class="daysContainer" style="--columns:${this.showNumDays + 1}">
-  <div class="dayColumn legend">
-    <div class="dayLabel" style="grid-row: span 4">
-      <div class="year">&nbsp;</div>
-      <div class="month">&nbsp;</div>
-      <div class="dayName">&nbsp;</div>
-      <div class="dayDate">&nbsp;</div>
-    </div>
-    ${this.renderTimeSlotsViewLabels()}
+  <div class="dayLabel" style="grid-column: 1;grid-row: 1">
+    <div class="year">&nbsp;</div>
+    <div class="month">&nbsp;</div>
+    <div class="dayName">&nbsp;</div>
+    <div class="dayDate">&nbsp;</div>
   </div>
+  ${this.renderTimeSlotsViewLabels()}
   ${this.renderDayColumns()}
 </div>
     `;
   }
 
   renderTimeSlotsViewLabels() {
-    return this.timeSlotsView.map(([time24, mins, inView]) => {
+    return this.timeSlotsView.map(([time24, mins, inView], rowIndex) => {
       const onTheHour = mins % 60 === 0;
       const cls = [
         "dayCell",
         "timeLabel",
         inView ? "inView" : "",
         onTheHour ? "onTheHour" : "",
-      ];
+      ].filter(isNonEmptyString).join(" ");
+
+      const stl = [
+        `grid-column: 1`,
+        `grid-row: ${rowIndex + 2}`
+      ].filter(isNonEmptyString).join(";");
+
       let timeString = noContent;
       if (inView) {
-        let hour = time24.split(":").map(Number)[0];
         if (this.use24hourTime) {
-          timeString = hour.toString().padStart(2, "0");
-          if (!onTheHour) timeString += `:${time24.split(":")[1]}`;
+          const time24Split = time24.split(":");
+          timeString = time24Split[0];
+          if (!onTheHour) timeString += `:${time24Split[1]}`;
         } else timeString = this.#formatMeridianTime(time24, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour });
       }
-      return html`<div class="${cls.filter(isNonEmptyString).join(" ")}">${timeString}</div>`
+      return html`<div class="${cls}" style="${stl}">${timeString}</div>`
     });
   }
 
   renderDayColumns() {
     // {dayName, dayNumber, dayNumberOfWeek, monthNumber, monthName, year, date}
-    return this.daysView.map(({ dayName, dayNumber, monthName, year, date }) => html`
-<div class="dayColumn">
-  <div class="dayLabel" style="grid-row: span 4">
-    <div class="year">${year}</div>
-    <div class="month">${monthName}</div>
-    <div class="dayName">${dayName}</div>
-    <div class="dayDate">${dayNumber}</div>
-  </div>
-  ${this.renderTimeCells(date)}
+    return this.daysView.map(({ dayName, dayNumber, monthName, year, date }, dayIndex) => html`
+<div class="dayLabel" style="grid-column: ${dayIndex + 2}; grid-row: 1">
+  <div class="year">${year}</div>
+  <div class="month">${monthName}</div>
+  <div class="dayName">${dayName}</div>
+  <div class="dayDate">${dayNumber}</div>
 </div>
+${this.renderTimeCells(date, dayIndex)}
     `)
   }
 
@@ -483,7 +479,7 @@ az-select {
     return this.#formatMeridianTime(time24);
   }
 
-  renderTimeCells(date) {
+  renderTimeCells(date, dayIndex) {
     const todayOrAfter = true; // FIXME: Where is this data?
     const thisDayEvents = this.calculateTheDaysEvents(date);
 
@@ -491,8 +487,9 @@ az-select {
     for (let i = 0; i < this.timeSlotsView.length; i++) {
       const [time24, slotMins, inView] = this.timeSlotsView[i];
       let cellContent = noContent;
-      let stl = noContent;
+      let stl = [`grid-column: ${dayIndex + 2}`];
       let cls = ["dayCell", "timeSlot"];
+      let gridRow = `grid-row: ${i + 2}`;
       let rowSpan;
       let event;
 
@@ -504,7 +501,7 @@ az-select {
           cellContent = html`<div>${this.formatMins(event.sta)} - ${this.formatMins(event.fin)}</div>`;
           rowSpan = Math.floor(event.dur / this.timeViewGranularityMins);
           i += rowSpan - 1;
-          stl = `grid-row: span ${rowSpan};`;
+          gridRow += `/ span ${rowSpan};`;
           cls.push("available");
           if (rowSpan > 1) cls.push("spanned");
         }
@@ -515,9 +512,10 @@ az-select {
           else cellContent = html`${cellContent} <div class="icon"><span>${eventSelectedIndex + 1}</span></div>`
         }
       }
+      stl.push(gridRow);
 
       toRender.push(html`
-<div class="${cls.filter(isNonEmptyString).join(' ')}" style="${stl}" data-time="${time24}" data-day="${date}"
+<div class="${cls.filter(isNonEmptyString).join(' ')}" style="${stl.filter(isNonEmptyString).join(";")}" data-time="${time24}" data-day="${date}"
   @click="${event ? () => this.handleSelectEvent(event) : () => { }}"
   @mouseover="${() => this.handleSlotHover(date, time24)}"
   @mouseout="${() => this.handleSlotHoverOut()}">
@@ -587,7 +585,7 @@ function getDailyAvailable(startingAtWhichDate = "2024-12-18T00:00:00+00:00", { 
 }
 
 function combineAgentSchedulesPerDay(rangeData) {
-  const rangeCondensedAvailability = Array.from(rangeData || [])
+  const rangeCondensedAvailability = Array.from(rangeData.slice(0, 3) || [])
     .map(({ agents, day: utcDate, dayOfWeek, dayOfWeekOrd, dayOfYear, month }) => {
       let t = new Date(utcDate);
       const localDate = new Date(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate());
