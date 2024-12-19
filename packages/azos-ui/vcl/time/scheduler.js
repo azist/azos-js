@@ -61,26 +61,29 @@ az-select {
 .daysContainer {
   display: grid;
   grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
+  grid-template-rows: repeat(31, 0.35fr);
   gap: 1px;
   .background-color: #d0d0d0;
 }
 
 .dayColumn {
   display: grid;
-  grid-auto-rows: 0.35fr;
-  .gap: 1px;
+  grid-template-rows: subgrid;
+  grid-row: 1 / span max;
   background-color: #d0d0d0;
   border-radius: 10px 10px 0 0;
+  overflow: hidden;
 }
 
-.dayCell {
+.timeCell {
+  grid-row: span 1;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
 }
 
-.dayCell.inView {
+.timeCell.inView {
   border-top: 1px dashed #d0d0d0;
 }
 
@@ -125,7 +128,7 @@ az-select {
   background-color: var(--paper);
 }
 
-.dayCell.onTheHour.inView {
+.timeCell.onTheHour.inView {
   border-top: 1px solid #c0c0c0;
 }
 
@@ -214,7 +217,13 @@ az-select {
     use24hourTime: { type: Boolean },
     maxSelectedEvents: { type: Number },
     selected: { type: Object },
+
+    timeViewGranularityMins: { type: Number },
   }
+
+  #timeViewGranularityMins = null;
+  get timeViewGranularityMins() { return this.#timeViewGranularityMins; }
+  set timeViewGranularityMins(v) { throw Error("Unimplmented--anything outside of 30 min causes infinite loop.") }
 
   #effectiveStartDate = null;
   set effectiveStartDate(v) { this.#effectiveStartDate = isDate(v); this.requestUpdate(); }
@@ -302,7 +311,7 @@ az-select {
     this.selectedEvents = [];
     this.timeViewStartMins = this.#calculateMinStartTime() ?? 9 * 60;
     this.timeViewEndMins = this.#calculateMaxEndTime() ?? 17 * 60;
-    this.timeViewGranularityMins = 30;
+    this.#timeViewGranularityMins = 30;
     this.timeViewRenderOffMins = 60;
     this.use24hourTime = false;
     this.maxSelectedEvents = 2;
@@ -436,17 +445,17 @@ az-select {
     return this.timeSlotsView.map(([time24, mins, inView]) => {
       const onTheHour = mins % 60 === 0;
       const cls = [
-        "dayCell",
+        "timeCell",
         "timeLabel",
         inView ? "inView" : "",
         onTheHour ? "onTheHour" : "",
       ];
       let timeString = noContent;
       if (inView) {
-        let hour = time24.split(":").map(Number)[0];
         if (this.use24hourTime) {
-          timeString = hour.toString().padStart(2, "0");
-          if (!onTheHour) timeString += `:${time24.split(":")[1]}`;
+          const time24Split = time24.split(":");
+          timeString = time24Split[0];
+          if (!onTheHour) timeString += `:${time24Split[1]}`;
         } else timeString = this.#formatMeridianTime(time24, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour });
       }
       return html`<div class="${cls.filter(isNonEmptyString).join(" ")}">${timeString}</div>`
@@ -492,7 +501,7 @@ az-select {
       const [time24, slotMins, inView] = this.timeSlotsView[i];
       let cellContent = noContent;
       let stl = noContent;
-      let cls = ["dayCell", "timeSlot"];
+      let cls = ["timeCell", "timeSlot"];
       let rowSpan;
       let event;
 
