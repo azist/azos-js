@@ -61,7 +61,7 @@ az-select {
 .daysContainer {
   display: grid;
   grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
-  grid-template-rows: repeat(31, 0.35fr);
+  grid-template-rows: repeat(var(--rows, 31), minmax(3ch, 0.35fr));
   gap: 1px;
   .background-color: #d0d0d0;
 }
@@ -73,18 +73,6 @@ az-select {
   background-color: #d0d0d0;
   border-radius: 10px 10px 0 0;
   overflow: hidden;
-}
-
-.timeCell {
-  grid-row: span 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-}
-
-.timeCell.inView {
-  border-top: 1px dashed #d0d0d0;
 }
 
 .dayLabel {
@@ -128,6 +116,26 @@ az-select {
   background-color: var(--paper);
 }
 
+.timeCell {
+  container-type: size;
+  grid-row: span 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  overflow: hidden;
+}
+
+.timeCell div {
+  font-size: clamp(14px, 15cqmin, 18px);
+  padding: 2cqw;
+  text-align: center;
+}
+
+.timeCell.inView {
+  border-top: 1px dashed #d0d0d0;
+}
+
 .timeCell.onTheHour.inView {
   border-top: 1px solid #c0c0c0;
 }
@@ -158,6 +166,8 @@ az-select {
 .timeSlot.available {
   background-color: white;
   position: relative;
+  border-left: 3px solid green;
+  border-radius: 5px;
 }
 
 .available.selected {
@@ -426,7 +436,7 @@ az-select {
 
   renderTimeSlots() {
     return html`
-<div class="daysContainer" style="--columns:${this.showNumDays + 1}">
+<div class="daysContainer" style="--columns:${this.showNumDays + 1};--rows:${this.timeSlotsView.length + 4}">
   <div class="dayColumn legend">
     <div class="dayLabel" style="grid-row: span 4">
       <div class="year">&nbsp;</div>
