@@ -8,25 +8,26 @@ import { html } from "../../ui";
 import { CaseBase } from "./case-base";
 import * as types from "azos/types";
 
+import "../../parts/button";
+
 import "../../vcl/time/scheduler";
 import { combineAgentSchedulesPerDay, getDailyAvailable } from "./fetch-scheduling-data";
 
-const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-24T00:00:00+00:00", { mangleAgentHours: false, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
+const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-24T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
 export class CaseScheduler extends CaseBase {
 
   firstUpdated() {
     super.firstUpdated();
     // this.schTest.schedulingItemsByDay = rangeData.sort((a, b) => new Date(a.day) - new Date(b.day));
-    rangeData.forEach(({ day, items }) => {
+    rangeData.map(({ day, items }) => {
       day = new Date(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
       day.setHours(0, 0, 0, 0);
-      items.forEach(({ sta, fin, dur, agent }) => this.schTest.addItem(day, {
+      return items.map(({ sta, dur, agent }) => this.schTest.addItem({
         caption: null, //(formattedStartTime, formattedEndTime) => this.#renderCaption(formattedStartTime, formattedEndTime, agent),
         startTimeMins: sta,
-        endTimeMins: fin,
         durationMins: dur,
         day,
-        agent,
+        data: { agent },
       }));
     });
   }
@@ -44,6 +45,8 @@ export class CaseScheduler extends CaseBase {
   renderControl() {
     return html`
 <h2>Scheduler</h2>
+<az-button title="Previous" @click="${()=>this.schTest.changeViewPage(-1)}"></az-button>
+<az-button title="Next" @click="${()=>this.schTest.changeViewPage(1)}"></az-button>
 <az-weekly-scheduler id="schTest" scope="this"></az-weekly-scheduler>
     `;
   }

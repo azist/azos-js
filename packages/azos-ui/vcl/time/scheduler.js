@@ -37,37 +37,6 @@ export const MONTHS_OF_YEAR = Object.freeze({
 });
 const ALL_MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-/** The scheduling item belonging on the schedule */
-class SchedulingItem {
-  static #seed = 0;
-
-  #id = ++SchedulingItem.#seed;
-  #day = null;
-  #caption = null;
-  #startTimeMins = 0;
-  #endTimeMins = 0;
-  #durationMins = 0;
-  #agent = null;
-
-  get id() { return this.#id; }
-  get day() { return this.#day; }
-  get caption() { return this.#caption; }
-  get startTimeMins() { return this.#startTimeMins; }
-  get endTimeMins() { return this.#endTimeMins; }
-  get durationMins() { return this.#durationMins; }
-  get agent() { return this.#agent; }
-
-  constructor({ caption, day, startTimeMins, endTimeMins, agent, durationMins } = {}) {
-    if (caption !== null && !types.isNonEmptyString(caption) && !types.isFunction(caption)) aver.isNonEmptyString(caption);
-    this.#caption = caption;
-    this.#day = aver.isDate(day);
-    this.#startTimeMins = aver.isNumber(startTimeMins);
-    this.#endTimeMins = aver.isNumber(endTimeMins);
-    this.#durationMins = aver.isNumber(durationMins);
-    this.#agent = aver.isObject(agent);
-  }
-}
-
 export class WeeklyScheduler extends Control {
 
   static styles = css`
@@ -327,8 +296,8 @@ az-select {
     // TODO: v > this.effectiveStartDate() && v < this.effectiveEndDate() + viewNumDays()
     this.#viewStartDate = v;
     this.#daysView = null;
-    // this.requestUpdate("viewStartDate", oldValue);
-    this.requestUpdate();
+    this.requestUpdate("viewStartDate", oldValue);
+    // this.requestUpdate();
   }
 
   /** Calculate the day starting this week based on `viewStartDay` */
@@ -399,13 +368,13 @@ az-select {
     if (this.#timeSlotsView) return this.#timeSlotsView;
 
     this.#timeSlotsView = [];
-    const renderStartMins = this.timeViewStartMins - this.timeViewRenderOffMins;
-    const renderEndMins = this.timeViewEndMins + this.timeViewRenderOffMins;
+    const renderStartMins = this.viewStartTimeMins - this.timeViewRenderOffMins;
+    const renderEndMins = this.viewEndTimeMins + this.timeViewRenderOffMins;
 
     let currentMins = renderStartMins;
 
     while (currentMins < renderEndMins) {
-      const available = currentMins >= this.timeViewStartMins && currentMins < this.timeViewEndMins;
+      const available = currentMins >= this.viewStartTimeMins && currentMins < this.viewEndTimeMins;
       this.#timeSlotsView.push([currentMins, available]);
       currentMins += this.timeViewGranularityMins;
     }
@@ -419,16 +388,16 @@ az-select {
   get schedulingItemsByDay() { return this.#schedulingItemsByDay; }
   set schedulingItemsByDay(v) {
     const oldValue = this.#schedulingItemsByDay;
-    v.forEach(({ day: schDay, items }) => {
+    v.forEach(({ day, items }) => {
       items.forEach((item) => {
         const { sta, fin, dur, agent } = item;
-        this.addItem(schDay, {
+        this.addItem({
           caption: null, // auto-generate at time of render
           startTimeMins: sta,
           endTimeMins: fin,
           durationMins: dur,
-          day: schDay,
-          agent
+          day,
+          data: { agent }
         });
       });
     });
@@ -443,22 +412,28 @@ az-select {
     this.viewNumDays = 6; // default to Monday - Saturday
     this.selectedItems = [];
 
-    this.#updateViewProperties();
-
     this.use24HourTime = true;
     this.timeViewRenderOffMins = 60;
     this.#timeViewGranularityMins = 30;
     this.maxSelectedItems = 2;
+
+    this.#updateViewProperties();
   }
 
   #updateViewProperties() {
-    this.timeViewStartMins = this.#calculateMinStartTime() ?? 9 * 60;
-    this.timeViewEndMins = this.#calculateMaxEndTime() ?? 17 * 60;
+    this.#effectiveStartDate = null;
+    this.#viewStartDate = null;
+    this.viewStartTimeMins = this.#calculateMinStartTime() ?? 9 * 60;
+    this.viewEndTimeMins = this.#calculateMaxEndTime() ?? 17 * 60;
   }
 
   #calculateMinStartTime() {
     let minTime = Infinity;
-    this.schedulingItemsByDay.forEach(({ items }) => {
+    const startDateIndex = this.schedulingItemsByDay.findIndex(d => d.day === this.#viewStartDate);
+    const viewDays = this.schedulingItemsByDay
+      .slice(startDateIndex, startDateIndex + this.viewNumDays);
+
+    viewDays.forEach(({ items }) => {
       if (!items.length) return;
       const startTime = items[0].startTimeMins;
       if (startTime < minTime) minTime = startTime;
@@ -468,7 +443,11 @@ az-select {
 
   #calculateMaxEndTime() {
     let maxTime = 0;
-    this.schedulingItemsByDay.forEach(({ items }) => {
+    const startDateIndex = 1 + [...this.schedulingItemsByDay].reverse().findIndex(d => d.day < this.viewStartDate);
+    const viewDays = this.schedulingItemsByDay.slice(startDateIndex, startDateIndex + this.viewNumDays);
+
+    // console.log("viewDays", startDateIndex, startDateIndex + this.viewNumDays, this.viewStartDate, this.schedulingItemsByDay, viewDays);
+    viewDays.forEach(({ items }) => {
       if (!items.length) return;
       const endTime = items[items.length - 1].endTimeMins;
       if (endTime > maxTime) maxTime = endTime;
@@ -501,20 +480,60 @@ az-select {
     this.requestUpdate();
   }
 
+  calculateTheDaysItems(date) {
+    const found = this.schedulingItemsByDay.find(day => day.day.toDateString() === date.toDateString());
+    // console.log("found day:", found, this.schedulingItemsByDay);
+    return found?.items;
+  }
+
+  /**
+   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
+   *  - (1380, true, false) => 11 pm
+   *  - (1380, false, false) => 11:00 pm
+   *  - (1380, true, true) => 11
+   *  - (1380, false, true) => 11:00
+   * @param {Number} mins, mins time of day
+   * @param {Object} options
+   *          -> when omitMinutesForWholeHours=true omits minutes when 0
+   *          -> when omitMeridianSuffix=true, omits am/pm
+   *          -> when use24HourTime=true, uses 23:00; 11:00 otherwise
+   * @returns a formatted time string
+   */
+  #formatTime(minsOfDay, { omitMinutesForWholeHours = false, omitMeridianSuffix = false, use24HourTime = false } = {}) {
+    let mins = minsOfDay % 60;
+    let hour = Math.floor(minsOfDay / 60);
+    let timeString;
+
+    if (use24HourTime) {
+      timeString = `${hour.toString().padStart(2, "0")}`;
+      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+    } else {
+      timeString = `${hour % 12 || 12}`;
+      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+      if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
+    }
+
+    return timeString;
+  }
+
+  /** Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with use24HourTime in mind. */
+  formatStartEndTimes({ startTimeMins, durationMins } = {}) {
+    const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime });
+    const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime });
+    return [startTime, endTime];
+  }
+
   #handleSlotHover(dayIndex, timeMins) { }
   #handleSlotHoverOut() { }
 
-  addItem(schedulingDay, item) {
-    // FIXME: Finish this :)
-    aver.isDate(schedulingDay);
+  addItem(item) {
     if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
     aver.isOf(item, SchedulingItem);
-    // console.log(item);
 
-    let found = this.schedulingItemsByDay.find(d => schedulingDay.toLocaleDateString() === d.day.toLocaleDateString());
+    let found = this.schedulingItemsByDay.find(d => item.day.toLocaleDateString() === d.day.toLocaleDateString());
     if (!found) {
       found = {
-        day: schedulingDay,
+        day: item.day,
         items: [],
       };
       this.schedulingItemsByDay.push(found);
@@ -525,6 +544,7 @@ az-select {
     found.items.push(item);
     this.#updateViewProperties(null)
     this.requestUpdate();
+    return item;
   }
 
   renderControl() {
@@ -591,49 +611,6 @@ az-select {
   ${this.renderTimeCells(date)}
 </div>
     `)
-  }
-
-  calculateTheDaysItems(date) {
-    const found = this.schedulingItemsByDay.find(day => day.day.toDateString() === date.toDateString());
-    // console.log("found day:", found, this.schedulingItemsByDay);
-    return found?.items;
-  }
-
-  /**
-   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
-   *  - (1380, true, false) => 11 pm
-   *  - (1380, false, false) => 11:00 pm
-   *  - (1380, true, true) => 11
-   *  - (1380, false, true) => 11:00
-   * @param {Number} mins, mins time of day
-   * @param {Object} options
-   *          -> when omitMinutesForWholeHours=true omits minutes when 0
-   *          -> when omitMeridianSuffix=true, omits am/pm
-   *          -> when use24HourTime=true, uses 23:00; 11:00 otherwise
-   * @returns a formatted time string
-   */
-  #formatTime(minsOfDay, { omitMinutesForWholeHours = false, omitMeridianSuffix = false, use24HourTime = false } = {}) {
-    let mins = minsOfDay % 60;
-    let hour = Math.floor(minsOfDay / 60);
-    let timeString;
-
-    if (use24HourTime) {
-      timeString = `${hour.toString().padStart(2, "0")}`;
-      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
-    } else {
-      timeString = `${hour % 12 || 12}`;
-      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
-      if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
-    }
-
-    return timeString;
-  }
-
-  /** Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with use24HourTime in mind. */
-  formatStartEndTimes({ startTimeMins, durationMins } = {}) {
-    const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime });
-    const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime });
-    return [startTime, endTime];
   }
 
   renderTimeCells(date) {
@@ -722,3 +699,43 @@ az-select {
 }
 
 window.customElements.define("az-weekly-scheduler", WeeklyScheduler);
+
+/** The scheduling item belonging on the schedule */
+class SchedulingItem {
+  static #seed = 0;
+
+  #id = ++SchedulingItem.#seed;
+  get id() { return this.#id; }
+
+  #day = null;
+  get day() { return this.#day; }
+  set day(v) { this.#day = v; }
+
+  #caption = null;
+  get caption() { return this.#caption; }
+  set caption(v) { this.#caption = v; }
+
+  #startTimeMins = 0;
+  get startTimeMins() { return this.#startTimeMins; }
+  set startTimeMins(v) { this.#startTimeMins = v; }
+
+  get endTimeMins() { return this.#startTimeMins + this.durationMins - 1; }
+  set endTimeMins(v) { this.durationMins = v - this.#startTimeMins + 1; }
+
+  #durationMins = 0;
+  get durationMins() { return this.#durationMins; }
+  set durationMins(v) { this.#durationMins = aver.isNumber(v); }
+
+  #data = null;
+  get data() { return this.#data; }
+  set data(v) { this.#data = aver.isObject(v); }
+
+  constructor({ caption, day, startTimeMins, data, durationMins } = {}) {
+    if (caption !== null && !types.isNonEmptyString(caption) && !types.isFunction(caption)) aver.isNonEmptyString(caption);
+    this.#caption = caption;
+    this.#day = aver.isDate(day);
+    this.#startTimeMins = aver.isNumber(startTimeMins);
+    this.#durationMins = aver.isNumber(durationMins);
+    this.#data = aver.isObject(data);
+  }
+}
