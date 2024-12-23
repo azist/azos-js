@@ -271,13 +271,17 @@ az-select {
   #effectiveStartDate = null;
   get effectiveStartDate() {
     if (this.#effectiveStartDate) return this.#effectiveStartDate;
-    return this.#effectiveStartDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[0].day : new Date();
+    this.#effectiveStartDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[0].day : new Date();
+    this.#viewStartDate = null;
+    this.requestUpdate();
+    return this.#effectiveStartDate;
   }
 
   set effectiveStartDate(v) {
     const oldViewValue = this.viewStartDate;
     const oldValue = this.effectiveStartDate;
     this.#effectiveStartDate = aver.isDate(v);
+    this.#viewStartDate = null;
     this.requestUpdate("effectiveStartDate", oldValue);
     this.requestUpdate("viewStartDate", oldViewValue);
   }
@@ -300,18 +304,50 @@ az-select {
   #viewStartDay = null;
   get viewStartDay() { return this.#viewStartDay; }
   set viewStartDay(v) {
-    aver.isTrue(v >= 0 && v <= 7);
+    aver.isTrue(v >= 0 && v < 7);
     const oldValue = this.#viewStartDay;
     this.#viewStartDay = v;
     this.requestUpdate("viewStartDay", oldValue);
   }
 
+  #viewStartDate = null;
   /** The View's Starting Date Taking into account effect start date beginning mid-week */
   get viewStartDate() {
-    const startOfWeek = new Date(this.effectiveStartDate);
-    startOfWeek.setHours(0, 0, 0, 0);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + this.viewStartDay);
-    return startOfWeek;
+    if (this.#viewStartDate) return this.#viewStartDate;
+    this.#viewStartDate = this.calculateStartDate(this.effectiveStartDate);
+    this.requestUpdate("viewStartDate", null);
+    return this.#viewStartDate;
+  }
+
+  set viewStartDate(v) {
+    const oldValue = this.#viewStartDate;
+    aver.isDate(v);
+    v.setHours(0, 0, 0, 0);
+    aver.isTrue(v.getDay() === this.viewStartDay, `Start Date should start on ${this.viewStartDay}, but was ${v.getDay()}`);
+    // TODO: v > this.effectiveStartDate() && v < this.effectiveEndDate() + viewNumDays()
+    this.#viewStartDate = v;
+    this.#daysView = null;
+    // this.requestUpdate("viewStartDate", oldValue);
+    this.requestUpdate();
+  }
+
+  /** Calculate the day starting this week based on `viewStartDay` */
+  calculateStartDate(date) {
+    const dt = new Date(date);
+    dt.setHours(0, 0, 0, 0);
+    dt.setDate(dt.getDate() - dt.getDay() + this.viewStartDay);
+    return dt;
+  }
+
+  /**
+   * Show Scheduling items left/right of current view
+   * @param {Number} count > 0 moves next, < 0 move previous
+   */
+  changeViewPage(count = 1) {
+    const date = new Date(this.viewStartDate);
+    date.setDate(this.viewStartDate.getDate() + (7 * count));
+    console.log(date);
+    this.viewStartDate = date;
   }
 
   /** The View's Ending Date Taking into account effect end date ending mid-week */
@@ -473,7 +509,7 @@ az-select {
     aver.isDate(schedulingDay);
     if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
     aver.isOf(item, SchedulingItem);
-    console.log(item);
+    // console.log(item);
 
     let found = this.schedulingItemsByDay.find(d => schedulingDay.toLocaleDateString() === d.day.toLocaleDateString());
     if (!found) {
@@ -559,7 +595,7 @@ az-select {
 
   calculateTheDaysItems(date) {
     const found = this.schedulingItemsByDay.find(day => day.day.toDateString() === date.toDateString());
-    console.log("found day:", found, this.schedulingItemsByDay);
+    // console.log("found day:", found, this.schedulingItemsByDay);
     return found?.items;
   }
 
@@ -619,7 +655,7 @@ az-select {
 
         foundItem = thisDayItems?.find(item => item.startTimeMins === slotMins);
         if (foundItem) {
-          console.log("found:", foundItem);
+          // console.log("found:", foundItem);
           rowSpan = Math.floor(foundItem.durationMins / this.timeViewGranularityMins);
           i += rowSpan - 1;
           stl = `grid-row: span ${rowSpan};`;
