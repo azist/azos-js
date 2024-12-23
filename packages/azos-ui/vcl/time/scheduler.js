@@ -427,7 +427,7 @@ az-select {
     let minTime = Infinity;
     this.schedulingItemsByDay.forEach(({ items }) => {
       if (!items.length) return;
-      const startTime = items[0].sta;
+      const startTime = items[0].startTimeMins;
       if (startTime < minTime) minTime = startTime;
     });
     return minTime === Infinity ? null : minTime;
@@ -437,7 +437,7 @@ az-select {
     let maxTime = 0;
     this.schedulingItemsByDay.forEach(({ items }) => {
       if (!items.length) return;
-      const endTime = items[items.length - 1].fin;
+      const endTime = items[items.length - 1].endTimeMins;
       if (endTime > maxTime) maxTime = endTime;
     });
     return maxTime === 0 ? null : maxTime;
@@ -448,28 +448,6 @@ az-select {
     startOfWeek.setHours(0, 0, 0, 0);
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + this.viewStartDay);
     return startOfWeek;
-  }
-
-  /**
-   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
-   *  - (23:00, true, false) => 11 pm
-   *  - (23:00, false, false) => 11:00 pm
-   *  - (23:00, true, true) => 11
-   *  - (23:00, false, true) => 11:00
-   * @param {string} time24 24-hour time HH:MM
-   * @param {Object} options when omitMinutesForWholeHours=true omits minutes when 0, when omitMeridianSuffix=true, omits am/pm
-   * @returns a formatted time string
-   */
-  #formatMeridianTime(time24, { omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
-    let [hour, mins] = time24.split(":").map(Number);
-    const meridiemInd = hour < 12 ? "am" : "pm";
-    const hour12 = hour % 12 || 12;
-
-    let timeString = `${hour12}`;
-    if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
-    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${meridiemInd}</span>`
-
-    return timeString;
   }
 
   #btnPreviousWeek() { }
@@ -604,6 +582,35 @@ az-select {
     return this.#formatMeridianTime(time24);
   }
 
+  /**
+   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
+   *  - (23:00, true, false) => 11 pm
+   *  - (23:00, false, false) => 11:00 pm
+   *  - (23:00, true, true) => 11
+   *  - (23:00, false, true) => 11:00
+   * @param {string} time24 24-hour time HH:MM
+   * @param {Object} options when omitMinutesForWholeHours=true omits minutes when 0, when omitMeridianSuffix=true, omits am/pm
+   * @returns a formatted time string
+   */
+  #formatMeridianTime(time24, { omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
+    let [hour, mins] = time24.split(":").map(Number);
+    const meridiemInd = hour < 12 ? "am" : "pm";
+    const hour12 = hour % 12 || 12;
+
+    let timeString = `${hour12}`;
+    if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${meridiemInd}</span>`
+
+    return timeString;
+  }
+
+  /** Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with use24HourTime in mind. */
+  formatStartEndTimes({ startTimeMins, durationMins } = {}) {
+    const startTime = this.formatMins(startTimeMins);
+    const endTime = this.formatMins(startTimeMins + durationMins);
+    return [startTime, endTime];
+  }
+
   renderTimeCells(date) {
     const todayOrAfter = true; // FIXME: Where is this data?
     const thisDayItems = this.calculateTheDaysItems(date);
@@ -669,7 +676,7 @@ az-select {
 
   renderCaption(schItem) {
     let caption = noContent;
-    const [startTime, endTime] = this.#formatStartEndTimes(schItem);
+    const [startTime, endTime] = this.formatStartEndTimes(schItem);
 
     if (types.isFunction(schItem.caption)) caption = schItem.caption(startTime, endTime);
     else if (types.isNonEmptyString(schItem.caption)) caption = schItem.caption;
@@ -683,14 +690,8 @@ az-select {
   }
 
   renderDefaultCaption(schItem) {
-    const [startTime, endTime] = this.#formatStartEndTimes(schItem);
+    const [startTime, endTime] = this.formatStartEndTimes(schItem);
     return html`${startTime} <span class="sep">-</span> ${endTime}`;
-  }
-
-  #formatStartEndTimes(schItem) {
-    const startTime = this.formatMins(schItem.startTimeMins);
-    const endTime = this.formatMins(schItem.startTimeMins + schItem.durationMins);
-    return [startTime, endTime];
   }
 
 }
