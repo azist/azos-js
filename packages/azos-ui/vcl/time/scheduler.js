@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isDate, isOf } from "azos/aver";
 import { Control, css, html, noContent } from "../../ui";
-import { isNonEmptyString, isNumber, isObject } from "azos/types";
+import * as types from "azos/types";
+import * as aver from "azos/aver";
 
 // import "../../parts/button";
 // import "../../parts/select-field";
@@ -45,25 +45,29 @@ class SchedulingItem {
   static #seed = 0;
 
   #id = ++SchedulingItem.#seed;
+  #day = null;
   #caption = null;
-  #date = null;
-  #startMin = 0;
-  #endMin = 0;
+  #startTimeMins = 0;
+  #endTimeMins = 0;
+  #durationMins = 0;
   #agent = null;
 
   get id() { return this.#id; }
+  get day() { return this.#day; }
   get caption() { return this.#caption; }
-  get date() { return this.#date; }
-  get startMin() { return this.#startMin; }
-  get endMin() { return this.#endMin; }
+  get startTimeMins() { return this.#startTimeMins; }
+  get endTimeMins() { return this.#endTimeMins; }
+  get durationMins() { return this.#durationMins; }
   get agent() { return this.#agent; }
 
-  constructor({ caption, date, startMin, endMin, agent } = {}) {
-    this.#caption = isNonEmptyString(caption);
-    this.#date = isDate(date);
-    this.#startMin = isNumber(startMin);
-    this.#endMin = isNumber(endMin);
-    this.#agent = isObject(agent);
+  constructor({ caption, day, startTimeMins, endTimeMins, agent, durationMins } = {}) {
+    if (!types.isNonEmptyString(caption) && !types.isFunction(caption)) aver.isNonEmptyString(caption);
+    this.#caption = caption;
+    this.#day = aver.isDate(day);
+    this.#startTimeMins = aver.isNumber(startTimeMins);
+    this.#endTimeMins = aver.isNumber(endTimeMins);
+    this.#durationMins = aver.isNumber(durationMins);
+    this.#agent = aver.isObject(agent);
   }
 }
 
@@ -220,7 +224,7 @@ az-select {
 }
 
 .timeSlot.available:hover .item {
-  background-color: #b0f0ff;
+  background: #b0f0ff;
   cursor: pointer;
 }
 
@@ -239,7 +243,6 @@ az-select {
 `;
 
   static properties = {
-    /**  */
     effectiveStartDate: { type: Date },
     effectiveEndDate: { type: Date },
 
@@ -247,7 +250,7 @@ az-select {
     // enabledEndDate: { type: Date },
 
     availability: { type: Array },
-    weekStartDay: { type: DAYS_OF_WEEK },
+    viewStartDay: { type: DAYS_OF_WEEK },
     showNumDays: { type: Number },
 
     use24hourTime: { type: Boolean },
@@ -263,18 +266,27 @@ az-select {
 
   /** The date of the first scheduling item or "today" if no items. */
   #effectiveStartDate = null;
-  set effectiveStartDate(v) { this.#effectiveStartDate = isDate(v); this.requestUpdate(); }
   get effectiveStartDate() {
     if (this.#effectiveStartDate) return this.#effectiveStartDate;
-    return this.#effectiveStartDate = this.weekItemDataset.length ? this.weekItemDataset[0].day : new Date();
+    return this.#effectiveStartDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[0].day : new Date();
   }
+  set effectiveStartDate(v) { this.#effectiveStartDate = aver.isDate(v); this.requestUpdate(); }
 
   /** The date of the last scheduling item or "today" if no items. */
   #effectiveEndDate = null;
-  set effectiveEndDate(v) { this.#effectiveEndDate = isDate(v); this.requestUpdate(); }
   get effectiveEndDate() {
     if (this.#effectiveEndDate) return this.#effectiveEndDate;
-    return this.#effectiveEndDate = this.weekItemDataset.length ? this.weekItemDataset[this.weekItemDataset.length - 1].day : new Date();
+    return this.#effectiveEndDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[this.schedulingItemsByDay.length - 1].day : new Date();
+  }
+  set effectiveEndDate(v) { this.#effectiveEndDate = aver.isDate(v); this.requestUpdate(); }
+
+  #viewStartDay = null;
+  get viewStartDay() { return this.#viewStartDay; }
+  set viewStartDay(v) {
+    aver.isTrue(v >= 0 && v <= 7);
+    const oldValue = this.#viewStartDay;
+    this.#viewStartDay = v;
+    this.requestUpdate("viewStartDay", oldValue);
   }
 
   /** The View's Starting Date Taking into account effect start date beginning mid-week */
@@ -297,7 +309,8 @@ az-select {
     if (this.#daysView) return this.#daysView;
 
     let prevYear, prevMonthNumber;
-    this.#daysView = Array.from({ length: this.showNumDays }).map((_, i) => {
+    const showNumDays = this.showNumDays; //(this.viewEndDate - this.viewStartDate) / 1000 / 60 / 60 / 24;
+    this.#daysView = Array.from({ length: showNumDays }).map((_, i) => {
       const date = new Date(this.viewStartDate);
       date.setDate(date.getDate() + i);
 
@@ -342,19 +355,19 @@ az-select {
   }
 
   /** The schedule's item dataset */
-  #weekItemDataset = null;
-  get weekItemDataset() { return this.#weekItemDataset; }
-  set weekItemDataset(v) {
-    const oldValue = this.#weekItemDataset;
-    this.#weekItemDataset = v;
-    this.#updateViewProperties();
-    this.requestUpdate("weekItemData", oldValue);
+  #schedulingItemsByDay = null;
+  get schedulingItemsByDay() { return this.#schedulingItemsByDay; }
+  set schedulingItemsByDay(v) {
+    const oldValue = this.#schedulingItemsByDay;
+    this.#schedulingItemsByDay = v;
+    // this.#updateViewProperties(); // FIXME: Set view properties to null
+    this.requestUpdate("schedulingItemsByDay", oldValue);
   }
 
   constructor() {
     super();
-    this.weekItemDataset = [];
-    this.weekStartDay = DAYS_OF_WEEK.MONDAY;
+    this.schedulingItemsByDay = [];
+    this.viewStartDay = DAYS_OF_WEEK.MONDAY;
     this.showNumDays = 6; // default to Monday - Saturday
     this.selectedItems = [];
     this.#updateViewProperties();
@@ -371,9 +384,9 @@ az-select {
 
   #calculateMinStartTime() {
     let minTime = Infinity;
-    this.weekItemDataset.forEach(({ events }) => {
-      if (!events.length) return;
-      const startTime = events[0].sta;
+    this.schedulingItemsByDay.forEach(({ items }) => {
+      if (!items.length) return;
+      const startTime = items[0].sta;
       if (startTime < minTime) minTime = startTime;
     });
     return minTime === Infinity ? null : minTime;
@@ -381,9 +394,9 @@ az-select {
 
   #calculateMaxEndTime() {
     let maxTime = 0;
-    this.weekItemDataset.forEach(({ events }) => {
-      if (!events.length) return;
-      const endTime = events[events.length - 1].fin;
+    this.schedulingItemsByDay.forEach(({ items }) => {
+      if (!items.length) return;
+      const endTime = items[items.length - 1].fin;
       if (endTime > maxTime) maxTime = endTime;
     });
     return maxTime === 0 ? null : maxTime;
@@ -391,26 +404,15 @@ az-select {
 
   #calculateViewStartDate(startDate) {
     const startOfWeek = new Date(startDate);
-    const startDay = startDate.getDay();
-    const dayDifference = (startDay - this.weekStartDay + 7) % 7;
-
-    startOfWeek.setDate(startOfWeek.getDate() - dayDifference);
     startOfWeek.setHours(0, 0, 0, 0);
-
-    // console.log(date, this.weekStartDay, currentDay, dayDifference, startOfWeek,);
-
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + this.viewStartDay);
     return startOfWeek;
   }
 
   #calculateViewEndDate(endDate) {
     const endOfWeek = new Date(endDate);
-    const endDay = endDate.getDay();
-    const dayDifference = (endDay - (this.weekStartDay + this.showNumDays) + 7) % 7;
-
-    endOfWeek.setDate(endOfWeek.getDate() - dayDifference);
     endOfWeek.setHours(0, 0, 0, 0);
-
-    // console.log(endDate, this.weekStartDay, endDay, dayDifference, endOfWeek);
+    endOfWeek.setDate(this.viewStartDate.getDate() + 11);// this.showNumDays);
     return endOfWeek;
   }
 
@@ -440,15 +442,15 @@ az-select {
   #btnMonthChange() { }
   #btnNextWeek() { }
 
-  #handleSelectItem(event) {
-    const eventIndex = this.selectedItems.indexOf(event);
-    if (eventIndex > -1) this.selectedItems.splice(eventIndex, 1);
+  #handleSelectItem(item) {
+    const itemIndex = this.selectedItems.indexOf(item);
+    if (itemIndex > -1) this.selectedItems.splice(itemIndex, 1);
     else {
       if (this.selectedItems.length >= this.maxSelectedItems) {
         if (this.maxSelectedItems > 1) return;
         else this.selectedItems.length = 0;
       }
-      this.selectedItems.push(event);
+      this.selectedItems.push(item);
     }
 
     this.requestUpdate();
@@ -457,9 +459,27 @@ az-select {
   #handleSlotHover(dayIndex, time) { }
   #handleSlotHoverOut() { }
 
-  addItem(day, item) {
-    isDate(day);
-    isOf(item, SchedulingItem);
+  addItem(schedulingDay, item) {
+    // FIXME: Finish this :)
+    aver.isDate(schedulingDay);
+    if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
+    aver.isOf(item, SchedulingItem);
+    console.log(item);
+
+    let found = this.schedulingItemsByDay.find(d => schedulingDay.toLocaleDateString() === d.day.toLocaleDateString());
+    if (!found) {
+      found = {
+        day: schedulingDay,
+        items: [],
+      };
+      this.schedulingItemsByDay.push(found);
+      this.schedulingItemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
+    }
+
+    if (!types.isArray(found.items)) found.items = [];
+    found.items.push(item);
+    this.#updateViewProperties(null)
+    this.requestUpdate();
   }
 
   renderControl() {
@@ -515,7 +535,7 @@ az-select {
           if (!onTheHour) timeString += `:${time24Split[1]}`;
         } else timeString = this.#formatMeridianTime(time24, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour });
       }
-      return html`<div class="${cls.filter(isNonEmptyString).join(" ")}">${timeString}</div>`
+      return html`<div class="${cls.filter(types.isNonEmptyString).join(" ")}">${timeString}</div>`
     });
   }
 
@@ -535,8 +555,8 @@ az-select {
   }
 
   calculateTheDaysItems(date) {
-    const data = this.weekItemDataset.find(day => day.day.toDateString() === date.toDateString());
-    return data?.events;
+    const found = this.schedulingItemsByDay.find(day => day.day.toDateString() === date.toDateString());
+    return found?.items;
   }
 
   formatMins(minutes) {
@@ -578,7 +598,7 @@ az-select {
       }
 
       toRender.push(html`
-<div class="${cls.filter(isNonEmptyString).join(' ')}" style="${stl}" data-time="${time24}" data-day="${date}"
+<div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${time24}" data-day="${date}"
   @click="${item ? () => this.#handleSelectItem(item) : () => { }}"
   @mouseover="${() => this.#handleSlotHover(date, time24)}"
   @mouseout="${() => this.#handleSlotHoverOut()}">
@@ -604,14 +624,26 @@ az-select {
             </div>`;
     }
     return html`
-<div class="${cls.filter(isNonEmptyString).join(" ")}">
-  <div>
-    ${this.formatMins(item.sta)}
-    <span class="separator">-</span>
-    ${this.formatMins(item.fin)}
-  </div>
+<div class="${cls.filter(types.isNonEmptyString).join(" ")}">
+  ${this.renderCaption(item)}
   ${iconContent}
 </div>
+    `;
+  }
+
+  renderCaption(item) {
+    let caption = noContent;
+    const startTime = this.formatMins(item.sta);
+    const endTime = this.formatMins(item.sta + item.dur);
+
+    if (types.isFunction(item.caption)) caption = item.caption(startTime, endTime);
+    else if (types.isNonEmptyString(item.caption)) caption = item.caption;
+    else caption = html`${startTime} <span class="sep">-</span> ${endTime}`
+
+    return html`
+  <div class="caption">
+    ${caption}
+  </div>
     `;
   }
 

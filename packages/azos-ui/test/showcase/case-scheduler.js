@@ -6,23 +6,38 @@
 
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
+import * as types from "azos/types";
 
 import "../../vcl/time/scheduler";
 
-const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-24T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 18 * 60 }), 5);
-
+const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-22T00:00:00+00:00", { mangleAgentHours: false, earliestTime: 9 * 60, latestTime: 18 * 60 }), 5);
+console.log(rangeData)
 export class CaseScheduler extends CaseBase {
 
   firstUpdated() {
     super.firstUpdated();
-    this.schTest.weekItemDataset = rangeData.sort((a, b) => new Date(a.day) - new Date(b.day));
-    // rangeData.forEach(({ day, events }) => {
-    //   day = new Date(day);
-    //   day = new Date(day.getUTCFullYear(), day.getUTCDate(), day.getUTCMonth());
-    //   events.forEach(({ sta, fin, dur, agent }) => this.schTest.addItem(day, {
-    //     caption:
+    this.schTest.schedulingItemsByDay = rangeData.sort((a, b) => new Date(a.day) - new Date(b.day));
+    // rangeData.forEach(({ day, items }) => {
+    //   day = new Date(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
+    //   items.forEach(({ sta, fin, dur, agent }) => this.schTest.addItem(day, {
+    //     caption: (formattedStartTime, formattedEndTime) => this.#renderCaption((formattedStartTime, formattedEndTime, agent)),
+    //     startTimeMins: sta,
+    //     endTimeMins: fin,
+    //     durationMins: dur,
+    //     day,
+    //     agent,
     //   }));
     // });
+  }
+
+  #formatAgentName({ First, Last, Middle, Title, Suffix }) {
+    return [Title, First, Middle, Last, Suffix].filter(types.isNonEmptyString).join(" ");
+  }
+
+  #renderCaption(formattedStartTime, formattedEndTime, agent) {
+    return html`
+<div class="time">${formattedStartTime} - ${formattedEndTime}</div>
+<div class="agent">Agent: ${this.#formatAgentName(agent)} (${agent.Id})</div>`;
   }
 
   renderControl() {
@@ -101,7 +116,7 @@ function combineAgentSchedulesPerDay(rangeData, maxItems = 5) {
         dayOfWeekOrd,
         dayOfYear,
         month,
-        events: combineAgentSchedules(agents, maxItems),
+        items: combineAgentSchedules(agents, maxItems),
       };
     });
   // console.log(rangeData, rangeCondensedAvailability);
@@ -111,17 +126,17 @@ function combineAgentSchedulesPerDay(rangeData, maxItems = 5) {
 function combineAgentSchedules(agentSchedules, maxItems = 5) {
   let timeChunks = [];
 
-  // Flatten all agent schedules into a single array of events
-  const events = agentSchedules.flatMap(({ agent, hours }) =>
+  // Flatten all agent schedules into a single array of items
+  const items = agentSchedules.flatMap(({ agent, hours }) =>
     hours.parsed.map(({ sta, fin }) => ({ sta, fin, agent, }))
   );
 
-  // Sort events by start time, then by end time
-  events.sort((a, b) => (a.sta !== b.sta) ? a.sta - b.sta : a.fin - b.fin);
+  // Sort items by start time, then by end time
+  items.sort((a, b) => (a.sta !== b.sta) ? a.sta - b.sta : a.fin - b.fin);
 
   let lastEnd = 0;
 
-  for (const { sta, fin, agent } of events) {
+  for (const { sta, fin, agent } of items) {
     // Add the current item as a separate time chunk
     const validStart = Math.max(sta, lastEnd + 1);
     const validDuration = Math.round((fin - validStart) / 10) * 10;
@@ -143,7 +158,7 @@ function combineAgentSchedules(agentSchedules, maxItems = 5) {
     timeChunks = [...timeChunks].sort((a, b) => (a.sta !== b.sta) ? a.sta - b.sta : a.fin - b.fin);
   }
 
-  // console.log(events, timeChunks);
+  // console.log(items, timeChunks);
 
   return timeChunks;
 }
