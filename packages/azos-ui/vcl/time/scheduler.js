@@ -259,7 +259,7 @@ az-select {
     maxSelectedItems: { type: Number },
     selectedItems: { type: Object },
 
-    use24hourTime: { type: Boolean },
+    use24HourTime: { type: Boolean },
     timeViewGranularityMins: { type: Number },
   }
 
@@ -271,13 +271,17 @@ az-select {
   #effectiveStartDate = null;
   get effectiveStartDate() {
     if (this.#effectiveStartDate) return this.#effectiveStartDate;
-    return this.#effectiveStartDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[0].day : new Date();
+    this.#effectiveStartDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[0].day : new Date();
+    this.#viewStartDate = null;
+    this.requestUpdate();
+    return this.#effectiveStartDate;
   }
 
   set effectiveStartDate(v) {
     const oldViewValue = this.viewStartDate;
     const oldValue = this.effectiveStartDate;
     this.#effectiveStartDate = aver.isDate(v);
+    this.#viewStartDate = null;
     this.requestUpdate("effectiveStartDate", oldValue);
     this.requestUpdate("viewStartDate", oldViewValue);
   }
@@ -300,18 +304,50 @@ az-select {
   #viewStartDay = null;
   get viewStartDay() { return this.#viewStartDay; }
   set viewStartDay(v) {
-    aver.isTrue(v >= 0 && v <= 7);
+    aver.isTrue(v >= 0 && v < 7);
     const oldValue = this.#viewStartDay;
     this.#viewStartDay = v;
     this.requestUpdate("viewStartDay", oldValue);
   }
 
+  #viewStartDate = null;
   /** The View's Starting Date Taking into account effect start date beginning mid-week */
   get viewStartDate() {
-    const startOfWeek = new Date(this.effectiveStartDate);
-    startOfWeek.setHours(0, 0, 0, 0);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + this.viewStartDay);
-    return startOfWeek;
+    if (this.#viewStartDate) return this.#viewStartDate;
+    this.#viewStartDate = this.calculateStartDate(this.effectiveStartDate);
+    this.requestUpdate("viewStartDate", null);
+    return this.#viewStartDate;
+  }
+
+  set viewStartDate(v) {
+    const oldValue = this.#viewStartDate;
+    aver.isDate(v);
+    v.setHours(0, 0, 0, 0);
+    aver.isTrue(v.getDay() === this.viewStartDay, `Start Date should start on ${this.viewStartDay}, but was ${v.getDay()}`);
+    // TODO: v > this.effectiveStartDate() && v < this.effectiveEndDate() + viewNumDays()
+    this.#viewStartDate = v;
+    this.#daysView = null;
+    // this.requestUpdate("viewStartDate", oldValue);
+    this.requestUpdate();
+  }
+
+  /** Calculate the day starting this week based on `viewStartDay` */
+  calculateStartDate(date) {
+    const dt = new Date(date);
+    dt.setHours(0, 0, 0, 0);
+    dt.setDate(dt.getDate() - dt.getDay() + this.viewStartDay);
+    return dt;
+  }
+
+  /**
+   * Show Scheduling items left/right of current view
+   * @param {Number} count > 0 moves next, < 0 move previous
+   */
+  changeViewPage(count = 1) {
+    const date = new Date(this.viewStartDate);
+    date.setDate(this.viewStartDate.getDate() + (7 * count));
+    console.log(date);
+    this.viewStartDate = date;
   }
 
   /** The View's Ending Date Taking into account effect end date ending mid-week */
@@ -369,11 +405,8 @@ az-select {
     let currentMins = renderStartMins;
 
     while (currentMins < renderEndMins) {
-      const mins = Math.floor(currentMins % 60);
-      const hours = Math.floor(currentMins / 60);
-      const displayTime = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
       const available = currentMins >= this.timeViewStartMins && currentMins < this.timeViewEndMins;
-      this.#timeSlotsView.push([displayTime, currentMins, available]);
+      this.#timeSlotsView.push([currentMins, available]);
       currentMins += this.timeViewGranularityMins;
     }
 
@@ -412,7 +445,7 @@ az-select {
 
     this.#updateViewProperties();
 
-    this.use24hourTime = false;
+    this.use24HourTime = true;
     this.timeViewRenderOffMins = 60;
     this.#timeViewGranularityMins = 30;
     this.maxSelectedItems = 2;
@@ -427,7 +460,7 @@ az-select {
     let minTime = Infinity;
     this.schedulingItemsByDay.forEach(({ items }) => {
       if (!items.length) return;
-      const startTime = items[0].sta;
+      const startTime = items[0].startTimeMins;
       if (startTime < minTime) minTime = startTime;
     });
     return minTime === Infinity ? null : minTime;
@@ -437,7 +470,7 @@ az-select {
     let maxTime = 0;
     this.schedulingItemsByDay.forEach(({ items }) => {
       if (!items.length) return;
-      const endTime = items[items.length - 1].fin;
+      const endTime = items[items.length - 1].endTimeMins;
       if (endTime > maxTime) maxTime = endTime;
     });
     return maxTime === 0 ? null : maxTime;
@@ -448,28 +481,6 @@ az-select {
     startOfWeek.setHours(0, 0, 0, 0);
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + this.viewStartDay);
     return startOfWeek;
-  }
-
-  /**
-   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
-   *  - (23:00, true, false) => 11 pm
-   *  - (23:00, false, false) => 11:00 pm
-   *  - (23:00, true, true) => 11
-   *  - (23:00, false, true) => 11:00
-   * @param {string} time24 24-hour time HH:MM
-   * @param {Object} options when omitMinutesForWholeHours=true omits minutes when 0, when omitMeridianSuffix=true, omits am/pm
-   * @returns a formatted time string
-   */
-  #formatMeridianTime(time24, { omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
-    let [hour, mins] = time24.split(":").map(Number);
-    const meridiemInd = hour < 12 ? "am" : "pm";
-    const hour12 = hour % 12 || 12;
-
-    let timeString = `${hour12}`;
-    if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
-    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${meridiemInd}</span>`
-
-    return timeString;
   }
 
   #btnPreviousWeek() { }
@@ -490,7 +501,7 @@ az-select {
     this.requestUpdate();
   }
 
-  #handleSlotHover(dayIndex, time) { }
+  #handleSlotHover(dayIndex, timeMins) { }
   #handleSlotHoverOut() { }
 
   addItem(schedulingDay, item) {
@@ -498,7 +509,7 @@ az-select {
     aver.isDate(schedulingDay);
     if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
     aver.isOf(item, SchedulingItem);
-    console.log(item);
+    // console.log(item);
 
     let found = this.schedulingItemsByDay.find(d => schedulingDay.toLocaleDateString() === d.day.toLocaleDateString());
     if (!found) {
@@ -553,7 +564,7 @@ az-select {
   }
 
   renderTimeSlotsViewLabels() {
-    return this.timeSlotsView.map(([time24, mins, inView]) => {
+    return this.timeSlotsView.map(([mins, inView]) => {
       const onTheHour = mins % 60 === 0;
       const cls = [
         "timeCell",
@@ -562,13 +573,7 @@ az-select {
         onTheHour ? "onTheHour" : "",
       ];
       let timeString = noContent;
-      if (inView) {
-        if (this.use24hourTime) {
-          const time24Split = time24.split(":");
-          timeString = time24Split[0];
-          if (!onTheHour) timeString += `:${time24Split[1]}`;
-        } else timeString = this.#formatMeridianTime(time24, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour });
-      }
+      if (inView) timeString = this.#formatTime(mins, { omitMinutesForWholeHours: onTheHour, omitMeridianSuffix: !onTheHour, use24HourTime: this.use24HourTime });
       return html`<div class="${cls.filter(types.isNonEmptyString).join(" ")}">${timeString}</div>`
     });
   }
@@ -590,18 +595,45 @@ az-select {
 
   calculateTheDaysItems(date) {
     const found = this.schedulingItemsByDay.find(day => day.day.toDateString() === date.toDateString());
-    console.log("found day:", found, this.schedulingItemsByDay);
+    // console.log("found day:", found, this.schedulingItemsByDay);
     return found?.items;
   }
 
-  formatMins(minutes) {
-    minutes = Math.round(minutes / 10) * 10;
-    const mins = minutes % 60;
-    const hours = Math.floor(minutes / 60);
-    const time24 = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-    // console.log(minutes, mins, hours, time24);
-    if (this.use24hourTime) return time24;
-    return this.#formatMeridianTime(time24);
+  /**
+   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
+   *  - (1380, true, false) => 11 pm
+   *  - (1380, false, false) => 11:00 pm
+   *  - (1380, true, true) => 11
+   *  - (1380, false, true) => 11:00
+   * @param {Number} mins, mins time of day
+   * @param {Object} options
+   *          -> when omitMinutesForWholeHours=true omits minutes when 0
+   *          -> when omitMeridianSuffix=true, omits am/pm
+   *          -> when use24HourTime=true, uses 23:00; 11:00 otherwise
+   * @returns a formatted time string
+   */
+  #formatTime(minsOfDay, { omitMinutesForWholeHours = false, omitMeridianSuffix = false, use24HourTime = false } = {}) {
+    let mins = minsOfDay % 60;
+    let hour = Math.floor(minsOfDay / 60);
+    let timeString;
+
+    if (use24HourTime) {
+      timeString = `${hour.toString().padStart(2, "0")}`;
+      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+    } else {
+      timeString = `${hour % 12 || 12}`;
+      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+      if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
+    }
+
+    return timeString;
+  }
+
+  /** Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with use24HourTime in mind. */
+  formatStartEndTimes({ startTimeMins, durationMins } = {}) {
+    const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime });
+    const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime });
+    return [startTime, endTime];
   }
 
   renderTimeCells(date) {
@@ -610,7 +642,7 @@ az-select {
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
-      const [time24, slotMins, inView] = this.timeSlotsView[i];
+      const [slotMins, inView] = this.timeSlotsView[i];
       let cellContent = noContent;
       let stl = noContent;
       let cls = ["timeCell", "timeSlot"];
@@ -623,7 +655,7 @@ az-select {
 
         foundItem = thisDayItems?.find(item => item.startTimeMins === slotMins);
         if (foundItem) {
-          console.log("found:", foundItem);
+          // console.log("found:", foundItem);
           rowSpan = Math.floor(foundItem.durationMins / this.timeViewGranularityMins);
           i += rowSpan - 1;
           stl = `grid-row: span ${rowSpan};`;
@@ -634,9 +666,9 @@ az-select {
       }
 
       toRender.push(html`
-<div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${time24}" data-day="${date}"
+<div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${this.#formatTime(slotMins, { use24HourTime: true })}" data-day="${date}"
   @click="${foundItem ? () => this.#handleSelectItem(foundItem) : () => { }}"
-  @mouseover="${() => this.#handleSlotHover(date, time24)}"
+  @mouseover="${() => this.#handleSlotHover(date, slotMins)}"
   @mouseout="${() => this.#handleSlotHoverOut()}">
   ${cellContent}
 </div>
@@ -669,7 +701,7 @@ az-select {
 
   renderCaption(schItem) {
     let caption = noContent;
-    const [startTime, endTime] = this.#formatStartEndTimes(schItem);
+    const [startTime, endTime] = this.formatStartEndTimes(schItem);
 
     if (types.isFunction(schItem.caption)) caption = schItem.caption(startTime, endTime);
     else if (types.isNonEmptyString(schItem.caption)) caption = schItem.caption;
@@ -683,14 +715,8 @@ az-select {
   }
 
   renderDefaultCaption(schItem) {
-    const [startTime, endTime] = this.#formatStartEndTimes(schItem);
+    const [startTime, endTime] = this.formatStartEndTimes(schItem);
     return html`${startTime} <span class="sep">-</span> ${endTime}`;
-  }
-
-  #formatStartEndTimes(schItem) {
-    const startTime = this.formatMins(schItem.startTimeMins);
-    const endTime = this.formatMins(schItem.startTimeMins + schItem.durationMins);
-    return [startTime, endTime];
   }
 
 }

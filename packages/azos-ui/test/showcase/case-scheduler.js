@@ -12,7 +12,6 @@ import "../../vcl/time/scheduler";
 import { combineAgentSchedulesPerDay, getDailyAvailable } from "./fetch-scheduling-data";
 
 const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-24T00:00:00+00:00", { mangleAgentHours: false, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
-console.log("dailyAvailable", rangeData)
 export class CaseScheduler extends CaseBase {
 
   firstUpdated() {
@@ -22,7 +21,7 @@ export class CaseScheduler extends CaseBase {
       day = new Date(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
       day.setHours(0, 0, 0, 0);
       items.forEach(({ sta, fin, dur, agent }) => this.schTest.addItem(day, {
-        caption: "Scheduling Item", //(formattedStartTime, formattedEndTime) => this.#renderCaption(formattedStartTime, formattedEndTime, agent),
+        caption: null, //(formattedStartTime, formattedEndTime) => this.#renderCaption(formattedStartTime, formattedEndTime, agent),
         startTimeMins: sta,
         endTimeMins: fin,
         durationMins: dur,
