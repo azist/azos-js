@@ -8,7 +8,6 @@ import * as aver from "azos/aver";
 import * as types from "azos/types";
 
 import { Control, css, html, noContent } from "../../ui";
-import { toast } from "../../toast";
 
 /** Days of the week */
 export const DAYS_OF_WEEK = Object.freeze({
@@ -21,7 +20,7 @@ export const DAYS_OF_WEEK = Object.freeze({
   SATURDAY: 6,
 });
 
-export class WeeklyScheduler extends Control {
+export class TimeBlockPicker extends Control {
 
   static styles = css`
 :host { display: block; margin-top: 1em; margin-bottom: 1em; }
@@ -379,7 +378,7 @@ az-select {
     this.viewNumDays = 6; // default to Monday - Saturday
     this.selectedItems = [];
 
-    this.use24HourTime = true;
+    this.use24HourTime = false;
     this.timeViewRenderOffMins = 60;
     this.#timeViewGranularityMins = 30;
     this.maxSelectedItems = 2;
@@ -691,7 +690,7 @@ az-select {
 
 }
 
-window.customElements.define("az-weekly-scheduler", WeeklyScheduler);
+window.customElements.define("az-time-block-picker", TimeBlockPicker);
 
 /** The scheduling item belonging on the schedule */
 class SchedulingItem {

@@ -76,11 +76,11 @@ export class CaseScheduler extends CaseBase {
 
 <az-button title="Previous" @click="${() => this.schTest.changeViewPage(-1)}"></az-button>
 <az-button title="Next" @click="${() => this.schTest.changeViewPage(1)}"></az-button>
-<az-weekly-scheduler id="schTest" scope="this"
+<az-time-block-picker id="schTest" scope="this"
     enabledStartDate="2024-12-23"
     xenabledLastDate="2025-1-2"
 
-></az-weekly-scheduler>
+></az-time-block-picker>
     `;
   }
 }
