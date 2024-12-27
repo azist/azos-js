@@ -221,7 +221,7 @@ az-select {
   #effectiveStartDate = null;
   get effectiveStartDate() {
     if (this.#effectiveStartDate) return this.#effectiveStartDate;
-    this.#effectiveStartDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[0].day : new Date();
+    this.#effectiveStartDate = this.itemsByDay.length ? this.itemsByDay[0].day : new Date();
     this.#viewStartDate = null;
     this.requestUpdate();
     return this.#effectiveStartDate;
@@ -248,7 +248,7 @@ az-select {
   #enabledEndDate = null;
   get enabledEndDate() {
     if (this.#enabledEndDate) return this.#enabledEndDate;
-    this.#enabledEndDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[this.schedulingItemsByDay.length - 1].day : null;
+    this.#enabledEndDate = this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : null;
     this.requestUpdate();
     return this.#enabledEndDate;
   }
@@ -262,7 +262,7 @@ az-select {
   #effectiveEndDate = null;
   get effectiveEndDate() {
     if (this.#effectiveEndDate) return this.#effectiveEndDate;
-    return this.#effectiveEndDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[this.schedulingItemsByDay.length - 1].day : new Date();
+    return this.#effectiveEndDate = this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : new Date();
   }
   set effectiveEndDate(v) {
     this.#effectiveEndDate = aver.isDate(v);
@@ -355,9 +355,15 @@ az-select {
     return this.#timeSlotsView;
   }
 
-  /** The schedule's item dataset */
-  #schedulingItemsByDay = [];
-  get schedulingItemsByDay() { return this.#schedulingItemsByDay; }
+  /** The schedule's dataset */
+  #itemsByDay = [];
+  get itemsByDay() { return this.#itemsByDay; }
+  get items() { return this.#itemsByDay.flatMap(({ _, items }) => items); }
+  purge() {
+    this.#itemsByDay.length = 0;
+    this.#setViewPropertiesForRecompute();
+    this.requestUpdate();
+  }
 
   /** Calculate the day starting this week based on `viewStartDay` */
   #calculateStartDate(date) {
@@ -396,7 +402,7 @@ az-select {
 
   #calculateViewStartTime() {
     let minTime = Infinity;
-    const viewDays = this.schedulingItemsByDay.filter(d => d.day.getTime() >= this.viewStartDate.getTime() && d.day.getTime() <= this.viewEndDate.getTime());
+    const viewDays = this.itemsByDay.filter(d => d.day.getTime() >= this.viewStartDate.getTime() && d.day.getTime() <= this.viewEndDate.getTime());
 
     viewDays.forEach(({ items }) => {
       if (!items.length) return;
@@ -408,7 +414,7 @@ az-select {
 
   #calculateViewEndTime() {
     let maxTime = 0;
-    const viewDays = this.schedulingItemsByDay.filter(d => d.day.getTime() >= this.viewStartDate.getTime() && d.day.getTime() <= this.viewEndDate.getTime());
+    const viewDays = this.itemsByDay.filter(d => d.day.getTime() >= this.viewStartDate.getTime() && d.day.getTime() <= this.viewEndDate.getTime());
 
     viewDays.forEach(({ items }) => {
       if (!items.length) return;
@@ -511,14 +517,14 @@ az-select {
     if (!this.#isWithinEnabledDateRange(item.day))
       this.writeLog("Warning", `The item is outside the enabled dates`);
 
-    let found = this.schedulingItemsByDay.find(d => item.day.toLocaleDateString() === d.day.toLocaleDateString());
+    let found = this.itemsByDay.find(d => item.day.toLocaleDateString() === d.day.toLocaleDateString());
     if (!found) {
       found = {
         day: item.day,
         items: [],
       };
-      this.schedulingItemsByDay.push(found);
-      this.schedulingItemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
+      this.itemsByDay.push(found);
+      this.itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
     }
 
     if (!types.isArray(found.items)) found.items = [];
@@ -550,7 +556,7 @@ az-select {
     else
       filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
 
-    if (!this.schedulingItemsByDay.some(filter)) return;
+    if (!this.itemsByDay.some(filter)) return;
 
     this.#setViewPropertiesForRecompute();
     this.viewStartDate = newViewStartDate;
@@ -612,7 +618,7 @@ az-select {
   }
 
   renderTimeCells(day) {
-    const thisDayItems = this.schedulingItemsByDay.find(one => one.day.toLocaleDateString() === day.toLocaleDateString())?.items;
+    const thisDayItems = this.itemsByDay.find(one => one.day.toLocaleDateString() === day.toLocaleDateString())?.items;
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
