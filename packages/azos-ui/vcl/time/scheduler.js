@@ -199,7 +199,7 @@ az-select {
     effectiveEndDate: { type: Date },
 
     enabledStartDate: { type: Date },
-    enabledLastDate: { type: Date },
+    enabledEndDate: { type: Date },
 
     viewStartDay: { type: DAYS_OF_WEEK },
     viewNumDays: { type: Number },
@@ -245,16 +245,16 @@ az-select {
     this.requestUpdate();
   }
 
-  #enabledLastDate = null;
-  get enabledLastDate() {
-    if (this.#enabledLastDate) return this.#enabledLastDate;
-    this.#enabledLastDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[this.schedulingItemsByDay.length - 1].day : null;
+  #enabledEndDate = null;
+  get enabledEndDate() {
+    if (this.#enabledEndDate) return this.#enabledEndDate;
+    this.#enabledEndDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[this.schedulingItemsByDay.length - 1].day : null;
     this.requestUpdate();
-    return this.#enabledLastDate;
+    return this.#enabledEndDate;
   }
-  set enabledLastDate(v) {
+  set enabledEndDate(v) {
     if (types.isString(v)) v = this.#strToDate(v);
-    this.#enabledLastDate = aver.isDate(v);
+    this.#enabledEndDate = aver.isDate(v);
     this.requestUpdate();
   }
 
@@ -445,7 +445,7 @@ az-select {
   }
 
   #isDateWithinEnableRange(date) {
-    return date.getTime() >= this.enabledStartDate.getTime() && date.getTime() <= this.enabledLastDate.getTime();
+    return date.getTime() >= this.enabledStartDate.getTime() && date.getTime() <= this.enabledEndDate.getTime();
   }
 
   /**
@@ -461,7 +461,7 @@ az-select {
     if (count < 0)
       filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
     else
-      filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledLastDate.getTime();
+      filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
 
     if (!this.schedulingItemsByDay.some(filter)) return;
 
@@ -510,7 +510,7 @@ az-select {
   #handleSlotHoverOut() { }
 
   #isWithinEnabledDateRange(d) {
-    return d.getTime() >= this.#enabledStartDate?.getTime() && d.getTime() <= this.#enabledLastDate?.getTime()
+    return d.getTime() >= this.#enabledStartDate?.getTime() && d.getTime() <= this.#enabledEndDate?.getTime()
   }
 
   addItem(item) {
