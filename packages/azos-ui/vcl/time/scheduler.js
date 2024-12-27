@@ -240,7 +240,7 @@ az-select {
     return this.#enabledStartDate;
   }
   set enabledStartDate(v) {
-    if (types.isString(v)) v = this.#strToDate(v);
+    if (types.isString(v)) v = this.#formatStrToDate(v);
     this.#enabledStartDate = aver.isDate(v);
     this.requestUpdate();
   }
@@ -253,7 +253,7 @@ az-select {
     return this.#enabledEndDate;
   }
   set enabledEndDate(v) {
-    if (types.isString(v)) v = this.#strToDate(v);
+    if (types.isString(v)) v = this.#formatStrToDate(v);
     this.#enabledEndDate = aver.isDate(v);
     this.requestUpdate();
   }
@@ -281,7 +281,7 @@ az-select {
   get viewStartDate() {
     if (this.#viewStartDate) return this.#viewStartDate;
     /** First-time logic: The View's Starting Date Taking into account effect start date beginning mid-week */
-    this.#viewStartDate = this.#calculateStartDate(this.effectiveStartDate);
+    this.#viewStartDate = this.#calculateViewStartDate(this.effectiveStartDate);
     this.requestUpdate();
     return this.#viewStartDate;
   }
@@ -359,24 +359,6 @@ az-select {
   #itemsByDay = [];
   get itemsByDay() { return this.#itemsByDay; }
   get items() { return this.#itemsByDay.flatMap(({ _, items }) => items); }
-  purge() {
-    this.#itemsByDay.length = 0;
-    this.#setViewPropertiesForRecompute();
-    this.requestUpdate();
-  }
-
-  /** Calculate the day starting this week based on `viewStartDay` */
-  #calculateStartDate(date) {
-    const dt = new Date(date);
-    dt.setHours(0, 0, 0, 0);
-    dt.setDate(dt.getDate() - dt.getDay() + this.viewStartDay);
-    return dt;
-  }
-
-  #strToDate(v) {
-    const [year, month, day] = v.split("-").map(Number);
-    return new Date(year, month - 1, day);
-  }
 
   constructor() {
     super();
@@ -398,6 +380,14 @@ az-select {
     this.#effectiveStartDate = null;
     this.#effectiveEndDate = null;
     this.#viewStartDate = null;
+  }
+
+  /** Calculate the day starting this week based on `viewStartDay` */
+  #calculateViewStartDate(startDate) {
+    const startOfWeek = new Date(startDate);
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + this.viewStartDay);
+    return startOfWeek;
   }
 
   #calculateViewStartTime() {
@@ -424,29 +414,13 @@ az-select {
     return maxTime === 0 ? null : maxTime;
   }
 
-  calculateViewStartDate(startDate) {
-    const startOfWeek = new Date(startDate);
-    startOfWeek.setHours(0, 0, 0, 0);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + this.viewStartDay);
-    return startOfWeek;
+  #isDateWithinEnabledRange(date) {
+    return date.getTime() >= this.enabledStartDate.getTime() && date.getTime() <= this.enabledEndDate?.getTime();
   }
 
-  #handleSelectItem(item) {
-    const itemIndex = this.selectedItems.indexOf(item);
-    if (itemIndex > -1) this.selectedItems.splice(itemIndex, 1);
-    else {
-      if (this.selectedItems.length >= this.maxSelectedItems) {
-        if (this.maxSelectedItems > 1) return;
-        else this.selectedItems.length = 0;
-      }
-      this.selectedItems.push(item);
-    }
-
-    this.requestUpdate();
-  }
-
-  #isDateWithinEnableRange(date) {
-    return date.getTime() >= this.enabledStartDate.getTime() && date.getTime() <= this.enabledEndDate.getTime();
+  #formatStrToDate(v) {
+    const [year, month, day] = v.split("-").map(Number);
+    return new Date(year, month - 1, day);
   }
 
   /**
@@ -480,13 +454,30 @@ az-select {
   }
 
   /* TODO: Implement highlighting of rows and columns */
-  #handleSlotHover(dayIndex, timeMins) { }
+  #onSlotHover(dayIndex, timeMins) { }
 
   /* TODO: Undo what you just did */
-  #handleSlotHoverOut() { }
+  #onSlotHoverOut() { }
 
-  #isWithinEnabledDateRange(d) {
-    return d.getTime() >= this.#enabledStartDate?.getTime() && d.getTime() <= this.#enabledEndDate?.getTime()
+  #onSelectItem(item) {
+    const itemIndex = this.selectedItems.indexOf(item);
+    if (itemIndex > -1) this.selectedItems.splice(itemIndex, 1);
+    else {
+      if (this.selectedItems.length >= this.maxSelectedItems) {
+        if (this.maxSelectedItems > 1) return;
+        else this.selectedItems.length = 0;
+      }
+      this.selectedItems.push(item);
+    }
+
+    this.requestUpdate();
+  }
+
+  #onKeyDown(e) {
+    if (e.key === " " && this.itemInFocus) {
+      this.#onSelectItem(this.itemInFocus);
+      e.preventDefault();
+    }
   }
 
   /**
@@ -506,6 +497,11 @@ az-select {
    * @returns a {@link SchedulingItem}
    */
   addItem(item) {
+    if (!this.editMode) {
+      this.writeLog("Error", "Please call `startEdits()` before editing dataset.");
+      return;
+    }
+
     if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
     aver.isOf(item, SchedulingItem);
 
@@ -513,9 +509,6 @@ az-select {
       this.writeLog("Error", `The item must start on a time block in intervals of ${this.timeViewGranularityMins} mins.`);
       return;
     }
-
-    if (!this.#isWithinEnabledDateRange(item.day))
-      this.writeLog("Warning", `The item is outside the enabled dates`);
 
     let found = this.itemsByDay.find(d => item.day.toLocaleDateString() === d.day.toLocaleDateString());
     if (!found) {
@@ -536,10 +529,25 @@ az-select {
     }
 
     found.items.push(item);
-    this.#setViewPropertiesForRecompute();
-    this.requestUpdate();
     return item;
   }
+
+  removeItem(idOrItem) {
+    if (!this.editMode){
+      this.writeLog("Error", "Please call `startEdits()` before editing dataset.");
+      return;
+    }
+    if (types.isString(idOrItem) || types.isNumber(idOrItem)) idOrItem = this.findItemById(idOrItem);
+    const item = aver.isOf(idOrItem, SchedulingItem);
+
+    const foundDay = this.itemsByDay.find(one=>one.day === item.day);
+
+    const foundIndex = foundDay.items.findIndex(one => one.id === item.id);
+    if (foundIndex === -1) throw types.AzosError(`Unable to find item{${item.id}}`);
+    foundDay.items.splice(foundIndex, 1);
+  }
+
+  findItemById(id) { return this.items.find(one => one.id === id); }
 
   /**
    * Show Scheduling items {@link count} week(s) prior to or after current view.
@@ -562,9 +570,27 @@ az-select {
     this.viewStartDate = newViewStartDate;
   }
 
+  purge() {
+    this.startEdits();
+    this.#itemsByDay.length = 0;
+    this.finalizeEdits();
+  }
+
+  /** Call before making edits that would cause recalculation */
+  startEdits() {
+    this.editMode = true;
+  }
+
+  /** Commit the edits and re-render the view */
+  finalizeEdits() {
+    this.editMode = false;
+    this.#setViewPropertiesForRecompute();
+    this.requestUpdate();
+  }
+
   renderControl() {
     return html`
-<div class="scheduler">
+<div class="scheduler" @keydown="${this.#onKeyDown}">
   ${this.renderTimeSlots()}
 </div>
     `;
@@ -629,7 +655,7 @@ az-select {
       let rowSpan;
       let foundItem;
 
-      if (inView && this.#isDateWithinEnableRange(day)) {
+      if (inView && this.#isDateWithinEnabledRange(day)) {
         cls.push("inView");
         if (slotMins % 60 === 0) cls.push("onTheHour");
 
@@ -641,15 +667,15 @@ az-select {
           stl = `grid-row: span ${rowSpan};`;
           cls.push("available");
           if (rowSpan > 1) cls.push("spanned");
-          cellContent = this.renderSchedulingItem(foundItem);
+          cellContent = this.renderSchedulingItem(foundItem, rowSpan);
         }
       }
 
       toRender.push(html`
 <div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${this.#formatTime(slotMins, { use24HourTime: true })}" data-day="${day}"
-  @click="${foundItem ? () => this.#handleSelectItem(foundItem) : () => { }}"
-  @mouseover="${() => this.#handleSlotHover(day, slotMins)}"
-  @mouseout="${() => this.#handleSlotHoverOut()}">
+  @click="${foundItem ? () => this.#onSelectItem(foundItem) : () => { }}"
+  @mouseover="${() => this.#onSlotHover(day, slotMins)}"
+  @mouseout="${() => this.#onSlotHoverOut()}">
   ${cellContent}
 </div>
     `);
@@ -657,7 +683,7 @@ az-select {
     return toRender;
   }
 
-  renderSchedulingItem(schItem) {
+  renderSchedulingItem(schItem, rowSpan) {
     let iconContent = noContent;
     let cls = ["item"];
     const eventSelectedIndex = this.selectedItems.indexOf(schItem);
@@ -672,23 +698,21 @@ az-select {
             </div>`;
     }
     return html`
-<div class="${cls.filter(types.isNonEmptyString).join(" ")}">
-  ${this.renderCaption(schItem)}
+<div class="${cls.filter(types.isNonEmptyString).join(" ")}" tabIndex="0" @focus="${() => this.itemInFocus = schItem}" @blur="${() => this.itemInFocus = null}" data-id="${schItem.id}">
+  ${this.renderCaption(schItem, rowSpan)}
   ${iconContent}
 </div>
     `;
   }
 
-  renderCaption(schItem) {
+  renderCaption(schItem, rowSpan) {
     let caption = noContent;
-    const [startTime, endTime] = this.formatStartEndTimes(schItem);
-
-    if (types.isFunction(schItem.caption)) caption = schItem.caption(startTime, endTime);
-    else if (types.isNonEmptyString(schItem.caption)) caption = schItem.caption;
-    else caption = this.renderDefaultCaption(schItem);
+    if (rowSpan > 1 && schItem.caption)
+      caption = html`<div class="custom">${schItem.caption}</div>`;
 
     return html`
   <div class="caption">
+    <div class="timeSpan">${this.renderDefaultCaption(schItem)}</div>
     ${caption}
   </div>
     `;
@@ -698,7 +722,6 @@ az-select {
     const [startTime, endTime] = this.formatStartEndTimes(schItem);
     return html`${startTime} <span class="sep">-</span> ${endTime}`;
   }
-
 }
 
 window.customElements.define("az-time-block-picker", TimeBlockPicker);
@@ -707,7 +730,7 @@ window.customElements.define("az-time-block-picker", TimeBlockPicker);
 class SchedulingItem {
   static #seed = 0;
 
-  #id = ++SchedulingItem.#seed;
+  #id = null;
   get id() { return this.#id; }
 
   #day = null;
@@ -733,8 +756,8 @@ class SchedulingItem {
   get data() { return this.#data; }
   set data(v) { this.#data = aver.isObject(v); }
 
-  constructor({ caption, day, startTimeMins, endTimeMins, durationMins, data = {} } = {}) {
-    if (caption !== null && !types.isNonEmptyString(caption) && !types.isFunction(caption)) aver.isNonEmptyString(caption);
+  constructor({ id, caption, day, startTimeMins, endTimeMins, durationMins, data = {} } = {}) {
+    if (caption !== null && !types.isNonEmptyString(caption) && !types.isObject(caption)) aver.isNonEmptyString(caption);
     this.#caption = caption;
     this.#day = aver.isDate(day);
     this.#startTimeMins = aver.isNumber(startTimeMins);
@@ -743,5 +766,6 @@ class SchedulingItem {
     else
       this.endTimeMins = aver.isNumber(endTimeMins);
     this.#data = aver.isObject(data);
+    this.#id = aver.isStringOrNull(id) ?? ++SchedulingItem.#seed;
   }
 }
