@@ -4,9 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Control, css, html, noContent } from "../../ui";
-import * as types from "azos/types";
 import * as aver from "azos/aver";
+import * as types from "azos/types";
+
+import { Control, css, html, noContent } from "../../ui";
 
 /** Days of the week */
 export const DAYS_OF_WEEK = Object.freeze({
@@ -18,39 +19,14 @@ export const DAYS_OF_WEEK = Object.freeze({
   FRIDAY: 5,
   SATURDAY: 6,
 });
-const ALL_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-/** Days of the week */
-export const MONTHS_OF_YEAR = Object.freeze({
-  JANUARY: 0,
-  FEBRUARY: 1,
-  MARCH: 2,
-  APRIL: 3,
-  MAY: 4,
-  JUNE: 5,
-  JULY: 6,
-  AUGUST: 7,
-  SEPTEMBER: 8,
-  OCTOBER: 9,
-  NOVEMBER: 10,
-  DECEMBER: 11,
-});
-const ALL_MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-export class WeeklyScheduler extends Control {
+export class TimeBlockPicker extends Control {
 
   static styles = css`
 :host { display: block; margin-top: 1em; margin-bottom: 1em; }
 az-select {
   margin-left: 0.25em;
   margin-right: 0.25em;
-}
-
-.header {
-  display: flex;
-  align-items: end;
-  justify-content: center;
-  margin-bottom: 0.5em;
 }
 
 .daysContainer {
@@ -145,15 +121,21 @@ az-select {
 
 .timeSlot {
   background-color: #e8e8e8;
-  padding: 0 4px 4px 0;
-  overflow: hidden;
 }
 
 .timeSlot:not(.inView) {
   background-color: #bbb;
 }
 
+.timeSlot.available {
+  padding: 0 4px 4px 0;
+  overflow: hidden;
+}
+
 .timeSlot.available .item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
   height: 100%;
   width: 100%;
@@ -166,7 +148,7 @@ az-select {
 }
 
 .available .item.selected {
-  background-color: #a0ff90;
+  background: #a0ff90;
   border-radius: 5px;
 }
 
@@ -177,7 +159,6 @@ az-select {
   display: flex;
   align-items: center;
   justify-content: center;
-  .border: 2px solid green;
   border-radius: 50%;
   box-shadow: 0px 0px 6px #caffc5;
   background-color: green;
@@ -245,14 +226,36 @@ az-select {
     this.requestUpdate();
     return this.#effectiveStartDate;
   }
-
   set effectiveStartDate(v) {
-    const oldViewValue = this.viewStartDate;
-    const oldValue = this.effectiveStartDate;
     this.#effectiveStartDate = aver.isDate(v);
     this.#viewStartDate = null;
-    this.requestUpdate("effectiveStartDate", oldValue);
-    this.requestUpdate("viewStartDate", oldViewValue);
+    this.requestUpdate();
+  }
+
+  #enabledStartDate = null;
+  get enabledStartDate() {
+    if (this.#enabledStartDate) return this.#enabledStartDate;
+    this.#enabledStartDate = new Date();
+    this.requestUpdate();
+    return this.#enabledStartDate;
+  }
+  set enabledStartDate(v) {
+    if (types.isString(v)) v = this.#strToDate(v);
+    this.#enabledStartDate = aver.isDate(v);
+    this.requestUpdate();
+  }
+
+  #enabledEndDate = null;
+  get enabledEndDate() {
+    if (this.#enabledEndDate) return this.#enabledEndDate;
+    this.#enabledEndDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[this.schedulingItemsByDay.length - 1].day : null;
+    this.requestUpdate();
+    return this.#enabledEndDate;
+  }
+  set enabledEndDate(v) {
+    if (types.isString(v)) v = this.#strToDate(v);
+    this.#enabledEndDate = aver.isDate(v);
+    this.requestUpdate();
   }
 
   /** The date of the last scheduling item or "today" if no items. */
@@ -261,62 +264,35 @@ az-select {
     if (this.#effectiveEndDate) return this.#effectiveEndDate;
     return this.#effectiveEndDate = this.schedulingItemsByDay.length ? this.schedulingItemsByDay[this.schedulingItemsByDay.length - 1].day : new Date();
   }
-
   set effectiveEndDate(v) {
-    const oldViewValue = this.viewEndDate;
-    const oldValue = this.#effectiveEndDate;
     this.#effectiveEndDate = aver.isDate(v);
-    this.requestUpdate("effectiveEndDate", oldValue);
-    this.requestUpdate("viewEndDate", oldViewValue);
+    this.requestUpdate();
   }
 
   #viewStartDay = null;
   get viewStartDay() { return this.#viewStartDay; }
   set viewStartDay(v) {
     aver.isTrue(v >= 0 && v < 7);
-    const oldValue = this.#viewStartDay;
     this.#viewStartDay = v;
-    this.requestUpdate("viewStartDay", oldValue);
+    this.requestUpdate();
   }
 
   #viewStartDate = null;
-  /** The View's Starting Date Taking into account effect start date beginning mid-week */
   get viewStartDate() {
     if (this.#viewStartDate) return this.#viewStartDate;
-    this.#viewStartDate = this.calculateStartDate(this.effectiveStartDate);
-    this.requestUpdate("viewStartDate", null);
+    /** First-time logic: The View's Starting Date Taking into account effect start date beginning mid-week */
+    this.#viewStartDate = this.#calculateStartDate(this.effectiveStartDate);
+    this.requestUpdate();
     return this.#viewStartDate;
   }
-
   set viewStartDate(v) {
-    const oldValue = this.#viewStartDate;
     aver.isDate(v);
     v.setHours(0, 0, 0, 0);
     aver.isTrue(v.getDay() === this.viewStartDay, `Start Date should start on ${this.viewStartDay}, but was ${v.getDay()}`);
-    // TODO: v > this.effectiveStartDate() && v < this.effectiveEndDate() + viewNumDays()
+    this.#setViewPropertiesForRecompute();
+
     this.#viewStartDate = v;
-    this.#daysView = null;
-    this.requestUpdate("viewStartDate", oldValue);
-    // this.requestUpdate();
-  }
-
-  /** Calculate the day starting this week based on `viewStartDay` */
-  calculateStartDate(date) {
-    const dt = new Date(date);
-    dt.setHours(0, 0, 0, 0);
-    dt.setDate(dt.getDate() - dt.getDay() + this.viewStartDay);
-    return dt;
-  }
-
-  /**
-   * Show Scheduling items left/right of current view
-   * @param {Number} count > 0 moves next, < 0 move previous
-   */
-  changeViewPage(count = 1) {
-    const date = new Date(this.viewStartDate);
-    date.setDate(this.viewStartDate.getDate() + (7 * count));
-    console.log(date);
-    this.viewStartDate = date;
+    this.requestUpdate();
   }
 
   /** The View's Ending Date Taking into account effect end date ending mid-week */
@@ -325,13 +301,6 @@ az-select {
     endOfWeek.setHours(23, 59, 59, 99);
     endOfWeek.setDate(this.viewStartDate.getDate() + this.viewNumDays);
     return endOfWeek;
-  }
-
-  #monthOptions = null;
-  get monthOptions() {
-    if (this.#monthOptions) return this.#monthOptions;
-    this.#monthOptions = Object.values(MONTHS_OF_YEAR).map(monthIndex => html`<option value="${monthIndex}" title="${ALL_MONTH_NAMES[monthIndex]}"></option>`)
-    return this.#monthOptions;
   }
 
   #daysView = null;
@@ -367,14 +336,17 @@ az-select {
   get timeSlotsView() {
     if (this.#timeSlotsView) return this.#timeSlotsView;
 
+    const viewStartTimeMins = this.#calculateViewStartTime() ?? 9 * 60;
+    const viewEndTimeMins = this.#calculateViewEndTime() ?? 17 * 60;
+
     this.#timeSlotsView = [];
-    const renderStartMins = this.viewStartTimeMins - this.timeViewRenderOffMins;
-    const renderEndMins = this.viewEndTimeMins + this.timeViewRenderOffMins;
+    const renderStartMins = viewStartTimeMins - this.timeViewRenderOffMins;
+    const renderEndMins = viewEndTimeMins + this.timeViewRenderOffMins;
 
     let currentMins = renderStartMins;
 
     while (currentMins < renderEndMins) {
-      const available = currentMins >= this.viewStartTimeMins && currentMins < this.viewEndTimeMins;
+      const available = currentMins >= viewStartTimeMins && currentMins < viewEndTimeMins;
       this.#timeSlotsView.push([currentMins, available]);
       currentMins += this.timeViewGranularityMins;
     }
@@ -386,24 +358,18 @@ az-select {
   /** The schedule's item dataset */
   #schedulingItemsByDay = [];
   get schedulingItemsByDay() { return this.#schedulingItemsByDay; }
-  set schedulingItemsByDay(v) {
-    const oldValue = this.#schedulingItemsByDay;
-    v.forEach(({ day, items }) => {
-      items.forEach((item) => {
-        const { sta, fin, dur, agent } = item;
-        this.addItem({
-          caption: null, // auto-generate at time of render
-          startTimeMins: sta,
-          endTimeMins: fin,
-          durationMins: dur,
-          day,
-          data: { agent }
-        });
-      });
-    });
-    console.log("schedulingItemsByDay", v, this.#schedulingItemsByDay);
-    // this.#updateViewProperties(); // FIXME: Set view properties to null
-    this.requestUpdate("schedulingItemsByDay", oldValue);
+
+  /** Calculate the day starting this week based on `viewStartDay` */
+  #calculateStartDate(date) {
+    const dt = new Date(date);
+    dt.setHours(0, 0, 0, 0);
+    dt.setDate(dt.getDate() - dt.getDay() + this.viewStartDay);
+    return dt;
+  }
+
+  #strToDate(v) {
+    const [year, month, day] = v.split("-").map(Number);
+    return new Date(year, month - 1, day);
   }
 
   constructor() {
@@ -412,26 +378,25 @@ az-select {
     this.viewNumDays = 6; // default to Monday - Saturday
     this.selectedItems = [];
 
-    this.use24HourTime = true;
+    this.use24HourTime = false;
     this.timeViewRenderOffMins = 60;
     this.#timeViewGranularityMins = 30;
     this.maxSelectedItems = 2;
 
-    this.#updateViewProperties();
+    this.#setViewPropertiesForRecompute();
   }
 
-  #updateViewProperties() {
+  #setViewPropertiesForRecompute() {
+    this.#daysView = null;
+    this.#timeSlotsView = null;
     this.#effectiveStartDate = null;
+    this.#effectiveEndDate = null;
     this.#viewStartDate = null;
-    this.viewStartTimeMins = this.#calculateMinStartTime() ?? 9 * 60;
-    this.viewEndTimeMins = this.#calculateMaxEndTime() ?? 17 * 60;
   }
 
-  #calculateMinStartTime() {
+  #calculateViewStartTime() {
     let minTime = Infinity;
-    const startDateIndex = this.schedulingItemsByDay.findIndex(d => d.day === this.#viewStartDate);
-    const viewDays = this.schedulingItemsByDay
-      .slice(startDateIndex, startDateIndex + this.viewNumDays);
+    const viewDays = this.schedulingItemsByDay.filter(d => d.day.getTime() >= this.viewStartDate.getTime() && d.day.getTime() <= this.viewEndDate.getTime());
 
     viewDays.forEach(({ items }) => {
       if (!items.length) return;
@@ -441,12 +406,10 @@ az-select {
     return minTime === Infinity ? null : minTime;
   }
 
-  #calculateMaxEndTime() {
+  #calculateViewEndTime() {
     let maxTime = 0;
-    const startDateIndex = 1 + [...this.schedulingItemsByDay].reverse().findIndex(d => d.day < this.viewStartDate);
-    const viewDays = this.schedulingItemsByDay.slice(startDateIndex, startDateIndex + this.viewNumDays);
+    const viewDays = this.schedulingItemsByDay.filter(d => d.day.getTime() >= this.viewStartDate.getTime() && d.day.getTime() <= this.viewEndDate.getTime());
 
-    // console.log("viewDays", startDateIndex, startDateIndex + this.viewNumDays, this.viewStartDate, this.schedulingItemsByDay, viewDays);
     viewDays.forEach(({ items }) => {
       if (!items.length) return;
       const endTime = items[items.length - 1].endTimeMins;
@@ -462,10 +425,6 @@ az-select {
     return startOfWeek;
   }
 
-  #btnPreviousWeek() { }
-  #btnMonthChange() { }
-  #btnNextWeek() { }
-
   #handleSelectItem(item) {
     const itemIndex = this.selectedItems.indexOf(item);
     if (itemIndex > -1) this.selectedItems.splice(itemIndex, 1);
@@ -480,10 +439,8 @@ az-select {
     this.requestUpdate();
   }
 
-  calculateTheDaysItems(date) {
-    const found = this.schedulingItemsByDay.find(day => day.day.toDateString() === date.toDateString());
-    // console.log("found day:", found, this.schedulingItemsByDay);
-    return found?.items;
+  #isDateWithinEnableRange(date) {
+    return date.getTime() >= this.enabledStartDate.getTime() && date.getTime() <= this.enabledEndDate.getTime();
   }
 
   /**
@@ -516,19 +473,43 @@ az-select {
     return timeString;
   }
 
-  /** Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with use24HourTime in mind. */
+  /* TODO: Implement highlighting of rows and columns */
+  #handleSlotHover(dayIndex, timeMins) { }
+
+  /* TODO: Undo what you just did */
+  #handleSlotHoverOut() { }
+
+  #isWithinEnabledDateRange(d) {
+    return d.getTime() >= this.#enabledStartDate?.getTime() && d.getTime() <= this.#enabledEndDate?.getTime()
+  }
+
+  /**
+   * Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with {@link use24HourTime}.
+   *  NOTE: endTime is calculated from start + duration since endTime from server is typically endTime - 1 inclusive,
+   *    rather than endTime exclusive (2:29 inclusive, 2:30 exclusive)
+   */
   formatStartEndTimes({ startTimeMins, durationMins } = {}) {
     const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime });
     const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime });
     return [startTime, endTime];
   }
 
-  #handleSlotHover(dayIndex, timeMins) { }
-  #handleSlotHoverOut() { }
-
+  /**
+   * Creates a scheduling item to put on the TimeBlockPicker control.
+   * @param {Object} item An object with keys aligned with {@link SchedulingItem}
+   * @returns a {@link SchedulingItem}
+   */
   addItem(item) {
     if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
     aver.isOf(item, SchedulingItem);
+
+    if (item.startTimeMins % this.timeViewGranularityMins > 0) {
+      this.writeLog("Error", `The item must start on a time block in intervals of ${this.timeViewGranularityMins} mins.`);
+      return;
+    }
+
+    if (!this.#isWithinEnabledDateRange(item.day))
+      this.writeLog("Warning", `The item is outside the enabled dates`);
 
     let found = this.schedulingItemsByDay.find(d => item.day.toLocaleDateString() === d.day.toLocaleDateString());
     if (!found) {
@@ -541,29 +522,46 @@ az-select {
     }
 
     if (!types.isArray(found.items)) found.items = [];
+
+    const timeFoundIndex = found.items.findIndex(one => (item.startTimeMins >= one.startTimeMins && item.startTimeMins <= one.endTimeMins) || (item.endTimeMins >= one.startTimeMins && item.endTimeMins <= one.endTimeMins));
+    if (timeFoundIndex > -1) {
+      this.writeLog("Error", `An item already exists between "${this.formatStartEndTimes(found.items[timeFoundIndex]).join(`" and "`)}" on ${found.items[timeFoundIndex].day.toLocaleDateString()}.`);
+      return;
+    }
+
     found.items.push(item);
-    this.#updateViewProperties(null)
+    this.#setViewPropertiesForRecompute();
     this.requestUpdate();
     return item;
+  }
+
+  /**
+   * Show Scheduling items {@link count} week(s) prior to or after current view.
+   * @param {Number} > 0 moves next, < 0 move previous
+   */
+  changeViewPage(count = 1) {
+    if (count === 0) return;
+    const newViewStartDate = new Date(this.viewStartDate);
+    newViewStartDate.setDate(this.viewStartDate.getDate() + (7 * count));
+
+    let filter;
+    if (count < 0)
+      filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
+    else
+      filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
+
+    if (!this.schedulingItemsByDay.some(filter)) return;
+
+    this.#setViewPropertiesForRecompute();
+    this.viewStartDate = newViewStartDate;
   }
 
   renderControl() {
     return html`
 <div class="scheduler">
-  ${this.renderHeader()}
   ${this.renderTimeSlots()}
 </div>
     `;
-  }
-
-  renderHeader() {
-    return html``;
-    /*{ <div class="header">
-      <az-button title="Previous" @click="${this.#btnPreviousWeek}"></az-button>
-      <az-select id="monthSelector" scope="this" @change="${this.#btnMonthChange}" value="${this.inViewMonth}">${this.#monthOptions}</az-select>
-      <az-button title="Next" @click="${this.#btnNextWeek}"></az-button>
-    </div>
-        `; }*/
   }
 
   renderTimeSlots() {
@@ -613,9 +611,8 @@ az-select {
     `)
   }
 
-  renderTimeCells(date) {
-    const todayOrAfter = true; // FIXME: Where is this data?
-    const thisDayItems = this.calculateTheDaysItems(date);
+  renderTimeCells(day) {
+    const thisDayItems = this.schedulingItemsByDay.find(one => one.day.toLocaleDateString() === day.toLocaleDateString())?.items;
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
@@ -626,7 +623,7 @@ az-select {
       let rowSpan;
       let foundItem;
 
-      if (inView && todayOrAfter) {
+      if (inView && this.#isDateWithinEnableRange(day)) {
         cls.push("inView");
         if (slotMins % 60 === 0) cls.push("onTheHour");
 
@@ -643,9 +640,9 @@ az-select {
       }
 
       toRender.push(html`
-<div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${this.#formatTime(slotMins, { use24HourTime: true })}" data-day="${date}"
+<div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${this.#formatTime(slotMins, { use24HourTime: true })}" data-day="${day}"
   @click="${foundItem ? () => this.#handleSelectItem(foundItem) : () => { }}"
-  @mouseover="${() => this.#handleSlotHover(date, slotMins)}"
+  @mouseover="${() => this.#handleSlotHover(day, slotMins)}"
   @mouseout="${() => this.#handleSlotHoverOut()}">
   ${cellContent}
 </div>
@@ -698,7 +695,7 @@ az-select {
 
 }
 
-window.customElements.define("az-weekly-scheduler", WeeklyScheduler);
+window.customElements.define("az-time-block-picker", TimeBlockPicker);
 
 /** The scheduling item belonging on the schedule */
 class SchedulingItem {
@@ -730,12 +727,15 @@ class SchedulingItem {
   get data() { return this.#data; }
   set data(v) { this.#data = aver.isObject(v); }
 
-  constructor({ caption, day, startTimeMins, data, durationMins } = {}) {
+  constructor({ caption, day, startTimeMins, endTimeMins, durationMins, data = {} } = {}) {
     if (caption !== null && !types.isNonEmptyString(caption) && !types.isFunction(caption)) aver.isNonEmptyString(caption);
     this.#caption = caption;
     this.#day = aver.isDate(day);
     this.#startTimeMins = aver.isNumber(startTimeMins);
-    this.#durationMins = aver.isNumber(durationMins);
+    if (types.isAssigned(durationMins))
+      this.#durationMins = aver.isNumber(durationMins);
+    else
+      this.endTimeMins = aver.isNumber(endTimeMins);
     this.#data = aver.isObject(data);
   }
 }
