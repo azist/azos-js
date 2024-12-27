@@ -8,6 +8,14 @@ import { isOneOf, asString } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
+import { AzosError, CLIENT_MESSAGE_PROP } from 'azos/types';
+
+export class FieldError extends AzosError {
+  get [CLIENT_MESSAGE_PROP]() { return this.message; }
+  constructor(message, from = null, cause = null, code = 0) { super(message, from, cause, code); }
+}
+
+export function fieldError(msg, props) { return new FieldError(msg, props); }
 
 export class TextField extends FieldPart {
   static properties = {
