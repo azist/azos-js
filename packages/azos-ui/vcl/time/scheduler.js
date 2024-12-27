@@ -439,34 +439,8 @@ az-select {
     this.requestUpdate();
   }
 
-  #calculateTheDaysItems(date) {
-    const found = this.schedulingItemsByDay.find(day => day.day.toDateString() === date.toDateString());
-    return found?.items;
-  }
-
   #isDateWithinEnableRange(date) {
     return date.getTime() >= this.enabledStartDate.getTime() && date.getTime() <= this.enabledEndDate.getTime();
-  }
-
-  /**
-   * Show Scheduling items 1 week prior to or after current view.
-   * @param {Number} count > 0 moves next, < 0 move previous
-   */
-  changeViewPage(count = 1) {
-    if (count === 0) return;
-    const newViewStartDate = new Date(this.viewStartDate);
-    newViewStartDate.setDate(this.viewStartDate.getDate() + (7 * count));
-
-    let filter;
-    if (count < 0)
-      filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
-    else
-      filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
-
-    if (!this.schedulingItemsByDay.some(filter)) return;
-
-    this.#setViewPropertiesForRecompute();
-    this.viewStartDate = newViewStartDate;
   }
 
   /**
@@ -499,25 +473,35 @@ az-select {
     return timeString;
   }
 
-  /** Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with use24HourTime in mind. */
-  formatStartEndTimes({ startTimeMins, durationMins } = {}) {
-    const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime });
-    const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime });
-    return [startTime, endTime];
-  }
-
+  /* TODO: Implement highlighting of rows and columns */
   #handleSlotHover(dayIndex, timeMins) { }
+
+  /* TODO: Undo what you just did */
   #handleSlotHoverOut() { }
 
   #isWithinEnabledDateRange(d) {
     return d.getTime() >= this.#enabledStartDate?.getTime() && d.getTime() <= this.#enabledEndDate?.getTime()
   }
 
+  /**
+   * Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with {@link use24HourTime}.
+   *  NOTE: endTime is calculated from start + duration since endTime from server is typically endTime - 1 inclusive,
+   *    rather than endTime exclusive (2:29 inclusive, 2:30 exclusive)
+   */
+  formatStartEndTimes({ startTimeMins, durationMins } = {}) {
+    const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime });
+    const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime });
+    return [startTime, endTime];
+  }
+
+  /**
+   * Creates a scheduling item to put on the TimeBlockPicker control.
+   * @param {Object} item An object with keys aligned with {@link SchedulingItem}
+   * @returns a {@link SchedulingItem}
+   */
   addItem(item) {
     if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
     aver.isOf(item, SchedulingItem);
-
-
 
     if (item.startTimeMins % this.timeViewGranularityMins > 0) {
       this.writeLog("Error", `The item must start on a time block in intervals of ${this.timeViewGranularityMins} mins.`);
@@ -549,6 +533,27 @@ az-select {
     this.#setViewPropertiesForRecompute();
     this.requestUpdate();
     return item;
+  }
+
+  /**
+   * Show Scheduling items {@link count} week(s) prior to or after current view.
+   * @param {Number} > 0 moves next, < 0 move previous
+   */
+  changeViewPage(count = 1) {
+    if (count === 0) return;
+    const newViewStartDate = new Date(this.viewStartDate);
+    newViewStartDate.setDate(this.viewStartDate.getDate() + (7 * count));
+
+    let filter;
+    if (count < 0)
+      filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
+    else
+      filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
+
+    if (!this.schedulingItemsByDay.some(filter)) return;
+
+    this.#setViewPropertiesForRecompute();
+    this.viewStartDate = newViewStartDate;
   }
 
   renderControl() {
@@ -606,8 +611,8 @@ az-select {
     `)
   }
 
-  renderTimeCells(date) {
-    const thisDayItems = this.#calculateTheDaysItems(date);
+  renderTimeCells(day) {
+    const thisDayItems = this.schedulingItemsByDay.find(one => one.day.toLocaleDateString() === day.toLocaleDateString())?.items;
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
@@ -618,7 +623,7 @@ az-select {
       let rowSpan;
       let foundItem;
 
-      if (inView && this.#isDateWithinEnableRange(date)) {
+      if (inView && this.#isDateWithinEnableRange(day)) {
         cls.push("inView");
         if (slotMins % 60 === 0) cls.push("onTheHour");
 
@@ -635,9 +640,9 @@ az-select {
       }
 
       toRender.push(html`
-<div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${this.#formatTime(slotMins, { use24HourTime: true })}" data-day="${date}"
+<div class="${cls.filter(types.isNonEmptyString).join(' ')}" style="${stl}" data-time="${this.#formatTime(slotMins, { use24HourTime: true })}" data-day="${day}"
   @click="${foundItem ? () => this.#handleSelectItem(foundItem) : () => { }}"
-  @mouseover="${() => this.#handleSlotHover(date, slotMins)}"
+  @mouseover="${() => this.#handleSlotHover(day, slotMins)}"
   @mouseout="${() => this.#handleSlotHoverOut()}">
   ${cellContent}
 </div>
