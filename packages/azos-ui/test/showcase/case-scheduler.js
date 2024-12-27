@@ -15,32 +15,33 @@ import "../../vcl/time/scheduler";
 import { combineAgentSchedulesPerDay, getDailyAvailable } from "./fetch-scheduling-data";
 import { fieldError } from "../../parts/text-field";
 
-const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-27T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
+const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-28T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
 export class CaseScheduler extends CaseBase {
 
   firstUpdated() {
     super.firstUpdated();
+    this.schTest.startEdits();
     rangeData.map(({ day, items }) => {
       day = new Date(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
       day.setHours(0, 0, 0, 0);
       return items.map(({ sta, dur, agent }) => this.schTest.addItem({
-        caption: null, //(formattedStartTime, formattedEndTime) => this.#renderCaption(formattedStartTime, formattedEndTime, agent),
+        id: Math.random() > 0.5 ? null : `Strang${Math.floor(Math.random()*1000)}`,
+        caption: Math.random() > 0.9 ? null : this.#renderCaption(agent),
         startTimeMins: sta,
         durationMins: dur,
         day,
         data: { agent },
       }));
     });
+    this.schTest.finalizeEdits();
+  }
+
+  #renderCaption(agent) {
+    return html`<div class="agent">Agent: ${this.#formatAgentName(agent)} <small>(${agent.Id.split('@')[1]})</small></div>`;
   }
 
   #formatAgentName({ First, Last, Middle, Title, Suffix } = {}) {
     return [Title, First, Middle, Last, Suffix].filter(types.isNonEmptyString).join(" ");
-  }
-
-  #renderCaption(formattedStartTime, formattedEndTime, agent) {
-    return html`
-<div class="time">${formattedStartTime} - ${formattedEndTime}</div>
-<div class="agent">Agent: ${this.#formatAgentName(agent)} <small>(${agent.Id.split('@')[1]})</small></div>`;
   }
 
   btnAddItem() {
@@ -56,6 +57,7 @@ export class CaseScheduler extends CaseBase {
     const day = new Date(year, month - 1, date);
     day.setHours(0, 0, 0, 0);
     this.schTest.addItem({
+      id: Math.random() > 0.5 ? null : `Strang${Math.random()*10}`,
       caption,
       startTimeMins,
       durationMins: duration,
@@ -77,8 +79,8 @@ export class CaseScheduler extends CaseBase {
 <az-button title="Previous" @click="${() => this.schTest.changeViewPage(-1)}"></az-button>
 <az-button title="Next" @click="${() => this.schTest.changeViewPage(1)}"></az-button>
 <az-time-block-picker id="schTest" scope="this"
-    enabledStartDate="2024-12-23"
-    xenabledLastDate="2025-1-2"
+    enabledStartDate="2024-12-28"
+    enabledEndDate="2025-1-6"
 
 ></az-time-block-picker>
     `;
