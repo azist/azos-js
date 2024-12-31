@@ -12,28 +12,39 @@ import "../../parts/button";
 import "../../parts/text-field";
 
 import "../../vcl/time/scheduler";
-import { combineAgentSchedulesPerDay, getDailyAvailable } from "./fetch-scheduling-data";
+import { getDailyAvailable } from "./fetch-scheduling-data";
 import { fieldError } from "../../parts/text-field";
 
-const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-28T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
+// const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-28T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
+const rangeData = getDailyAvailable();
 export class CaseScheduler extends CaseBase {
 
   firstUpdated() {
     super.firstUpdated();
-    this.schTest.startEdits();
-    rangeData.map(({ day, items }) => {
-      day = new Date(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
-      day.setHours(0, 0, 0, 0);
-      return items.map(({ sta, dur, agent }) => this.schTest.addItem({
-        id: Math.random() > 0.5 ? null : `Strang${Math.floor(Math.random()*1000)}`,
-        caption: Math.random() > 0.9 ? null : this.#renderCaption(agent),
-        startTimeMins: sta,
-        durationMins: dur,
-        day,
-        data: { agent },
-      }));
-    });
-    this.schTest.finalizeEdits();
+    this.schTest.beginChanges();
+    try {
+      for (let i = 0; i < rangeData.length; i++) {
+        const one = rangeData[i];
+        const day = types.asDate(one.day, false, true);
+        console.groupCollapsed(day);
+        if (i === 0) { this.schTest.enabledStartDate = day; }
+        for (let j = 0; j < one.hours.parsed.length; j++) {
+          const span = one.hours.parsed[j];
+          this.schTest.addItem({
+            id: `n-${i}-${j}`,
+            day: day,
+            caption: null,//nothing for now
+            startTimeMins: span.sta,
+            durationMins: span.dur,
+            data: { span: span },
+          });
+        }
+        console.groupEnd();
+      }
+    } finally {
+      this.schTest.endChanges();
+    }
+    console.log(this.schTest.items);
   }
 
   #renderCaption(agent) {
@@ -57,7 +68,7 @@ export class CaseScheduler extends CaseBase {
     const day = new Date(year, month - 1, date);
     day.setHours(0, 0, 0, 0);
     this.schTest.addItem({
-      id: Math.random() > 0.5 ? null : `Strang${Math.random()*10}`,
+      id: Math.random() > 0.5 ? null : `Strang${Math.random() * 10}`,
       caption,
       startTimeMins,
       durationMins: duration,
