@@ -31,10 +31,9 @@ az-select {
 
 .daysContainer {
   display: grid;
-  grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
+  grid-template-columns: 7ch 4ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr)) 4ch;
   grid-template-rows: repeat(var(--rows, 31), minmax(3ch, 0.35fr));
   gap: 1px;
-  .background-color: #d0d0d0;
 }
 
 .dayColumn {
@@ -44,6 +43,35 @@ az-select {
   background-color: #d0d0d0;
   border-radius: 10px 10px 0 0;
   overflow: hidden;
+}
+
+.dayControls {
+  grid-row: 4 / span max;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid;
+}
+
+.dayControls button {
+  width: 100%;
+  border: none;
+}
+
+.dayControls button:hover {
+  cursor: pointer;
+  background-color: #ccc;
+}
+
+.dayControls button span {
+  display: inline-block;
+  transform: scale(1, 10) rotate(var(--rotate, 0deg));
+}
+
+.backButton button {
+  --rotate: 180deg;
 }
 
 .dayLabel {
@@ -609,7 +637,13 @@ az-select {
     </div>
     ${this.renderTimeSlotsViewLabels()}
   </div>
+  <div class="dayControls backButton">
+    <button @click="${()=>this.changeViewPage(-1)}"><span>&#x27A4;</span></button>
+  </div>
   ${this.renderDayColumns()}
+  <div class="dayControls nextButton" style="font-stretch: ultra-expanded;">
+    <button @click="${()=>this.changeViewPage(1)}"><span>&#x27A4;</span></button>
+  </div>
 </div>
     `;
   }
