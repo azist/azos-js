@@ -1178,6 +1178,28 @@ describe("Types", function() {
       aver.areEqual( 2012, d.getFullYear() );
     });
 
+    it("2024-12-31T00:00:00+00:00 !fromUTC", function() {
+      const d = sut.asDate("2024-12-31T00:00:00+00:00", false, false);
+      aver.areEqual(11, d.getMonth());
+      aver.areEqual(30, d.getDate());
+      aver.areEqual(2024, d.getFullYear());
+      aver.areEqual(19, d.getHours());
+      aver.areEqual(0, d.getMinutes());
+      aver.areEqual(0, d.getSeconds());
+      aver.areEqual(0, d.getMilliseconds());
+    });
+
+    it("2024-12-31T00:00:00+00:00 fromUTC", function() {
+      const d = sut.asDate("2024-12-31T00:00:00+00:00", false, true);
+      aver.areEqual(11, d.getMonth());
+      aver.areEqual(31, d.getDate());
+      aver.areEqual(2024, d.getFullYear());
+      aver.areEqual(0, d.getHours());
+      aver.areEqual(0, d.getMinutes());
+      aver.areEqual(0, d.getSeconds());
+      aver.areEqual(0, d.getMilliseconds());
+    });
+
     it("abrakadabra throws",   function() { aver.throws( function(){  sut.asDate("abrakadabra"); }, "Cast error");});
   });
 

@@ -1,7 +1,10 @@
-import * as schedulingData from "./_scheduling-data.json";
+import * as schedulingData_old from "./_scheduling-data.json";
+import * as schedulingData from "./_scheduling-data-20241231.json";
 
-export function getDailyAvailable(startingAtWhichDate = "2024-12-18T00:00:00+00:00", { mangleAgentHours = false, earliestTime = 5 * 60, latestTime = 23 * 60 } = {}) {
-  const result = schedulingData;
+export function getDailyAvailable() { return schedulingData.data.ResultParameters.schedule.dailyAvailable; }
+
+export function getDailyAvailable_old(startingAtWhichDate = "2024-12-18T00:00:00+00:00", { mangleAgentHours = false, earliestTime = 5 * 60, latestTime = 23 * 60 } = {}) {
+  const result = schedulingData_old;
   startingAtWhichDate = new Date(startingAtWhichDate);
 
   const increaseStartDateBy = (index) => {

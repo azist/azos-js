@@ -498,7 +498,7 @@ az-select {
    */
   addItem(item) {
     if (!this.editMode) {
-      this.writeLog("Error", "Please call `startEdits()` before editing dataset.");
+      this.writeLog("Error", "Please call `beginChanges()` before editing dataset.");
       return;
     }
 
@@ -534,7 +534,7 @@ az-select {
 
   removeItem(idOrItem) {
     if (!this.editMode){
-      this.writeLog("Error", "Please call `startEdits()` before editing dataset.");
+      this.writeLog("Error", "Please call `beginChanges()` before editing dataset.");
       return;
     }
     if (types.isString(idOrItem) || types.isNumber(idOrItem)) idOrItem = this.findItemById(idOrItem);
@@ -570,19 +570,20 @@ az-select {
     this.viewStartDate = newViewStartDate;
   }
 
+  /** Remove all items and reset view */
   purge() {
-    this.startEdits();
+    this.beginChanges();
     this.#itemsByDay.length = 0;
-    this.finalizeEdits();
+    this.endChanges();
   }
 
   /** Call before making edits that would cause recalculation */
-  startEdits() {
+  beginChanges() {
     this.editMode = true;
   }
 
   /** Commit the edits and re-render the view */
-  finalizeEdits() {
+  endChanges() {
     this.editMode = false;
     this.#setViewPropertiesForRecompute();
     this.requestUpdate();

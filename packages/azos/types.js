@@ -701,19 +701,16 @@ export function asMoney(v, canUndef = false) {
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asDate(v, canUndef = false) {
-  if (v === undefined) return canUndef ? undefined : new Date(0);
-  if (v === null) return new Date(0);
-  if (isDate(v)) return v;
-
-  if (isIntValue(v)) return new Date(asInt(v));
-
-  if (isString(v)) {
-    const ts = Date.parse(v);
-    if (!isNaN(ts)) return new Date(ts);
-  }
-
-  throw new AzosError(CAST_ERROR + `asDate("${strings.describe(v)}")`);
+export function asDate(v, canUndef = false, fromUTC = false) {
+  let d, ts;
+  if (v === undefined) canUndef ? d = undefined : d = new Date(0);
+  else if (v === null) d = new Date(0);
+  else if (isDate(v)) d = v;
+  else if (isIntValue(v)) d = new Date(asInt(v));
+  else if (isString(v) && !isNaN((ts = Date.parse(v)))) d = new Date(ts);
+  else throw new AzosError(CAST_ERROR + `asDate("${strings.describe(v)}")`);
+  if (!fromUTC) return d;
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
 }
 
 /**
