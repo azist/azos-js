@@ -570,6 +570,7 @@ az-select {
     this.viewStartDate = newViewStartDate;
   }
 
+  /** Remove all items and reset view */
   purge() {
     this.beginChanges();
     this.#itemsByDay.length = 0;
