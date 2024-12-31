@@ -71,6 +71,12 @@ export class TextField extends FieldPart {
     this.inputChanged();
   }
 
+  focus(){
+    const t = this.$("tbData");
+    if (!t) return;
+    window.queueMicrotask(() => t.focus());
+  }
+
   renderInput() {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.effectiveStatus, true, "Bg")}`;
