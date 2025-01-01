@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP } from "azos/types";
+import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP, VALIDATE_METHOD } from "azos/types";
 import { dflt } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
@@ -80,11 +80,29 @@ export class FieldPart extends Part{
     try{
       v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
       this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
-      this.error = null; //reset an error if we did not throw above
+      this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
     }catch(e){
       this.error = e;
     }
   }
+
+  /** Performs field validation, returning validation error if any for the specified context */
+  // eslint-disable-next-line no-unused-vars
+  [VALIDATE_METHOD](context){
+    return null;
+  }
+
+  /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
+  validate(context){
+    try{
+      this.error = this[VALIDATE_METHOD](context);
+    }catch(e){
+      this.error = e;
+    }
+    this.requestUpdate();
+  }
+
+
 
   /**
    * Prepares a value obtained from a user input(s) into a value which can be set as field data value.
@@ -192,7 +210,9 @@ export class FieldPart extends Part{
 
     error: {type: Object},
 
-    isRequired:  {type: Boolean, reflect: true}
+    isRequired:  {type: Boolean, reflect: true},
+
+    noAutoValidate: {type: Boolean, reflect: false}
   }
 
 

@@ -40,6 +40,13 @@ export const DIRTY_PROP = Symbol("dirty");
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
 
 /**
+ * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context): error | null`.
+ * Performs validation logic returning an error object if validation fails
+ */
+export const VALIDATE_METHOD = Symbol("validate");
+
+
+/**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -
  * is capable of being deterministically finalized aka "disposed".
  * The concept has NOTHING TO DO with the GC, and deals with logical pairing of construction/destruction
