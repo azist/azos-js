@@ -67,6 +67,16 @@ export class CaseTextFields extends CaseBase {
   <az-text id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text>
   <az-text id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text>
 </div>
+
+
+<hr>
+<p> Here we test the validation and reformatting of values per DATA_KIND enumeration</p>
+<div class="strip-h">
+  <az-text id="tbPhone" title="Phone" placeholder="Your Phone" title="Phone" dataKind="TEL"></az-text>
+  <az-text id="tbEmail" title="Email" placeholder="Your Email Address" title="EMail" dataKind="EMAIL"></az-text>
+</div>
+
+
     `;
   }
 }

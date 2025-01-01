@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP, VALIDATE_METHOD } from "azos/types";
+import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP, VALIDATE_METHOD, DATA_KIND, asDataKind } from "azos/types";
 import { dflt } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
@@ -51,6 +51,17 @@ export class FieldPart extends Part{
    */
   get dataType() { return this.#dataType; }
   set dataType(v) { this.#dataType = v ? asTypeMoniker(v) : undefined; }
+
+  #dataKind;
+  /**
+   * Defines a sub-type - a kind of data stored by this field.
+   * It is either `null | undefined` or contains a valid {@link DATA_KIND} moniker which is used to prepare input values
+   * upon their change
+   */
+  get dataKind() { return this.#dataKind; }
+  set dataKind(v) { this.#dataKind = v ? asDataKind(v) : undefined; }
+
+
 
   #value;
   #rawValue;
@@ -112,7 +123,8 @@ export class FieldPart extends Part{
    * an object with two fields `{"systolic": 120, "diastolic": 80}` or an array (effectively a tuple) `[120, 80]`.
    * The default implementation does not alter the supplied value returning it as-is.
    * You do not call this method directly, call {@link setValueFromInput} which calls this method in a guarded way, so exceptions thrown by this method
-   * will be displayed by the field via an {@link error} property
+   * will be displayed by the field via an {@link error} property.
+   * Text-related inputs typically override this property to take {@link dataKind} into consideration - pre-format EMAILS, Phones, etc.
   */
   prepareInputValue(v){ return v; }
 
@@ -201,6 +213,9 @@ export class FieldPart extends Part{
     /** Type moniker which constrains the type of this field values */
     dataType: {String},
 
+    /** Data kind enumeration  e.g. "text" | "email" | "tel" | "money" etc. see {@link DATA_KIND}*/
+    dataKind: {String},
+
     /** The value of the field */
     value: {type: Object,
             converter: { fromAttribute: (v) => v?.toString()}
@@ -208,10 +223,13 @@ export class FieldPart extends Part{
            },
 
 
+    /** Field error, such as validation error */
     error: {type: Object},
 
+    /** The value of the field is logically required */
     isRequired:  {type: Boolean, reflect: true},
 
+    /** When set, prevents the field from validating upon input change. */
     noAutoValidate: {type: Boolean, reflect: false}
   }
 
