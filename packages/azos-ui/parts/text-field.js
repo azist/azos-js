@@ -89,8 +89,13 @@ export class TextField extends FieldPart {
 
   [VALIDATE_METHOD](){
     if (this.dataKind === DATA_KIND.TEL){
-      return isValidPhone(this.value) ? null : new FieldError("Bad phone");
+      return (isValidPhone(this.value) ? null : new FieldError("Bad phone"));
     }
+    if (this.dataKind === DATA_KIND.EMAIL){
+      return (isValidEMail(this.value) ? null : new FieldError("Bad email"));
+    }
+
+    return null;
   }
 
   renderInput() {
