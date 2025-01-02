@@ -89,6 +89,7 @@ az-select {
   text-align: center;
   display: flex;
   flex-direction: column;
+  // grid-row: span 2;
   grid-row: span 3;
 }
 
@@ -103,6 +104,9 @@ az-select {
 .dayLabel .year {
   width: 100%;
   font-weight: bold;
+  // writing-mode: tb;
+  // rotate: 180deg;
+  // position: absolute;
 }
 
 .dayLabel .month {
@@ -657,17 +661,17 @@ az-select {
   <button @click="${() => this.changeViewPage(0)}" class="viewing ${this.todaySymbol} todayBtn">Today</button>
   <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">&#x2B9C;</button>
   <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">&#x2B9E;</button>
-  ${this.renderViewSpanLabel(this.viewStartDate, this.viewEndDate)}
+  ${this.renderViewSpanLabel(this.viewStartDate, this.viewEndDate, true)}
 </div>
     `;
   }
 
-  renderViewSpanLabel(startDate, endDate) {
+  renderViewSpanLabel(startDate, endDate, short = false) {
     const startYear = startDate.getFullYear();
     const endYear = endDate.getFullYear();
 
-    const startMonthName = startDate.toLocaleDateString(undefined, { month: "long" });
-    const endMonthName = endDate.toLocaleDateString(undefined, { month: "long" });
+    const startMonthName = startDate.toLocaleDateString(undefined, { month: short ? "short" : "long" });
+    const endMonthName = endDate.toLocaleDateString(undefined, { month: short ? "short" : "long" });
 
     const startDateDay = startDate.getDate();
     const endDateDay = endDate.getDate();
@@ -723,6 +727,7 @@ az-select {
     <div class="month">${monthName}</div>
     <div class="dayName">${dayName}</div>
     <div class="dayDate">${dayNumber}</div>
+    <!--div class="dayDate">${dayName} ${dayNumber}</div-->
   </div>
   ${this.renderTimeCells(date)}
 </div>
