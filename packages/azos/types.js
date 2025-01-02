@@ -9,7 +9,7 @@ import * as CC from "./coreconsts.js";
 import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
 
-import {isDate as aver_isDate} from "./aver.js";
+import {isDate as aver_isDate, isNonEmptyString as aver_isNonEmptyString, isStringOrNull as aver_isStringOrNull} from "./aver.js";
 
 
 /**
@@ -45,6 +45,12 @@ export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
  */
 export const VALIDATE_METHOD = Symbol("validate");
 
+
+/**
+ * Establishes required value check protocol: a function of signature: `[CHECK_REQUIRED_METHOD](context): bool`.
+ * Returns true if the implementing object logically has the required value, false otherwise
+ */
+export const CHECK_REQUIRED_METHOD = Symbol("checkRequired");
 
 /**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -
@@ -168,6 +174,58 @@ export class LclError extends AzosError { //declared here to avoid circular refe
   constructor(message, from = null, cause = null) { super(message, from, cause, 518); }
 }
 
+/** Thrown to indicate data validation problems e.g entity/model/field validation errors
+ * when data does not comply with the set schema (a set of business rules)
+*/
+export class ValidationError extends AzosError {
+  #schema;
+  #field;
+  #scope;
+  #clientMessage;
+
+  /**
+   * Creates an instance of ValidationError capturing (`schema`, `field`, `scope`, `message`, `clientMessage`, `from`, and `cause`) parameters
+   * @param {String} schema - required schema name. In the UI code this is typically passed from an `azElm.effectiveSchema` property
+   * @param {String} field - required field name within a schema
+   * @param {String} scope - optional field subscript, for example an array indexer, which tells what entity instance generated an error; or null
+   * @param {String} message - required validation message. Clients get shown `clientMessage` unless it is not supplied then this one is used
+   * @param {String} clientMessage - an optional user-friendly client UI display message
+   * @param {String} from - optional. What sub/component generated the error
+   * @param {object} cause - optional. Inner causing exception (if any)
+   */
+  constructor(schema, field, scope, message, clientMessage = null, from = null, cause = null) {
+    super(message, from, cause, 400);
+    this.#schema = aver_isNonEmptyString(schema);
+    this.#field = aver_isNonEmptyString(field);
+    this.#scope = aver_isStringOrNull(scope ?? null);
+    this.#clientMessage = aver_isStringOrNull(clientMessage);
+  }
+
+  /** Override to change namespace which is returned from external status */
+  get ns() { return "data.val"; }
+
+  /** Name of the schema which triggers validation error */
+  get schema() { return this.#schema; }
+
+  /** Name of the field which triggers validation error */
+  get field() { return this.#field; }
+
+  /** Name of the field sub-scope, such as an array/collection subscript e.g. Field: `Doctors`, Scope: `[3]` */
+  get scope() { return this.#scope; }
+
+  /** Allows to provide a user-friendly message which is shown in the UI */
+  get clientMessage() { return this.#clientMessage; }
+
+  get [CLIENT_MESSAGE_PROP]() { return strings.dflt(this.clientMessage, this.message); }
+
+  toString() { return `${this.name}: {${this.schema}.${this.field}.${this.scope ?? "*"}} ${this.message}` }
+
+  /** Override to add details which are provided to callers via external status,
+   * for example validation exception adds schema and field names so it can be structurally gotten
+   * by the handler
+   */
+  provideExternalStatus() { return { ns: this.ns, schema: this.schema, field: this.field, scope: this.scope, clientMessage: this[CLIENT_MESSAGE_PROP] }; }
+}
 
 
 /**

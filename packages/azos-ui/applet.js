@@ -6,6 +6,7 @@
 
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { AzosElement } from "./ui.js";
+import { dflt } from "azos/strings";
 
 /**
  * Defines a root UI element which represents an Applet - a part of application.
@@ -35,5 +36,9 @@ export class Applet extends AzosElement {
    * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
    */
   [CLOSE_QUERY_METHOD](){ return !this[DIRTY_PROP]; }
+
+
+  /** Returns schema name set by this applet or applet class name as a default one */
+  get effectiveSchema(){ return dflt(this.schema, this.constructor.name);  }
 
 }//Applet

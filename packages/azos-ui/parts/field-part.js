@@ -4,10 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP, VALIDATE_METHOD, DATA_KIND, asDataKind } from "azos/types";
-import { dflt } from "azos/strings";
+import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP, VALIDATE_METHOD, CHECK_REQUIRED_METHOD, DATA_KIND, asDataKind, ValidationError } from "azos/types";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { FieldError } from "./text-field.js";
 
 
 function guardWidth(v, d){
@@ -100,8 +101,56 @@ export class FieldPart extends Part{
   /** Performs field validation, returning validation error if any for the specified context */
   // eslint-disable-next-line no-unused-vars
   [VALIDATE_METHOD](context){
+    const val = this.value;
+    let error = this._validateRequired(context, val);
+    if (error) return error;
+
+    if (val === null || val === undefined || val === "") return null;//not required but NULL
+
+    error = this._validateDataKind(context, val);
+    if (error) return error;
+
+    error = this._validateLength(context, val);
+    if (error) return error;
+
+    error = this._validateMinMax(context, val);
+    if (error) return error;
+
+    error = this._validateValueList(context, val);
+    if (error) return error;
+
     return null;
   }
+
+  _validateRequired(context, val){
+    if (!this.isRequired) return null;
+
+    let has = (val !== null && val !== undefined || val !== "");
+
+    if (has){
+      const cr = val[CHECK_REQUIRED_METHOD];
+      if (cr){
+        has = true === cr.call(val, context);
+      }
+    }
+
+    return has ? null : new ValidationError(this.effectiveSchema, this.name, null, "Value required");
+  }
+
+  _validateDataKind(context, val){
+    switch(this.dataKind){
+      case DATA_KIND.TEL:        return (isValidPhone(val) ? null : new  ValidationError(this.effectiveSchema, this.name, null, "Bad phone"));
+      case DATA_KIND.EMAIL:      return (isValidEMail(val) ? null : new ValidationError(this.effectiveSchema, this.name, null, "Bad email"));
+      case DATA_KIND.SCREENNAME: return (isValidScreenName(val) ? null : new ValidationError(this.effectiveSchema, this.name, null, "Bad screen name/id"));
+    }
+    return null;
+  }
+
+//TODO: FINISH these below
+  _validateLength(context, val){ return null; }
+  _validateMinMax(context, val){ return null; }
+  _validateValueList(context, val){ return null; }
+
 
   /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
   validate(context){
@@ -221,7 +270,6 @@ export class FieldPart extends Part{
             converter: { fromAttribute: (v) => v?.toString()}
             /////////////hasChanged(newVal, oldVal) { return true; }
            },
-
 
     /** Field error, such as validation error */
     error: {type: Object},

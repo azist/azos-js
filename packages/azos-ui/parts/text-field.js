@@ -4,18 +4,12 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf, asString, normalizeUSPhone, isValidPhone, isValidEMail } from 'azos/strings';
+import { isOneOf, asString, normalizeUSPhone } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { AzosError, CLIENT_MESSAGE_PROP, DATA_KIND, VALIDATE_METHOD } from 'azos/types';
+import { DATA_KIND } from 'azos/types';
 
-export class FieldError extends AzosError {
-  get [CLIENT_MESSAGE_PROP]() { return this.message; }
-  constructor(message, from = null, cause = null, code = 0) { super(message, from, cause, code); }
-}
-
-export function fieldError(msg, props) { return new FieldError(msg, props); }
 
 export class TextField extends FieldPart {
   static properties = {
@@ -85,17 +79,6 @@ export class TextField extends FieldPart {
     }
 
     return v;
-  }
-
-  [VALIDATE_METHOD](){
-    if (this.dataKind === DATA_KIND.TEL){
-      return (isValidPhone(this.value) ? null : new FieldError("Bad phone"));
-    }
-    if (this.dataKind === DATA_KIND.EMAIL){
-      return (isValidEMail(this.value) ? null : new FieldError("Bad email"));
-    }
-
-    return null;
   }
 
   renderInput() {

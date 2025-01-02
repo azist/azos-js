@@ -136,7 +136,8 @@ export class AzosElement extends LitElement {
   static properties = {
     status: { type: String, reflect: true },
     rank: { type: String, reflect: true },
-    scope: { type: String }
+    scope: { type: String, reflect: false },
+    schema: { type: String, reflect: false}
   };
 
   #arena = null;
@@ -168,6 +169,19 @@ export class AzosElement extends LitElement {
       this.#arena = n.arena;
     }
     return this.#arena;
+  }
+
+  /** Returns schema name from this or parent control chain.
+   * If none define schema name, then it is taken from the applet name */
+  get effectiveSchema(){
+    let schema = this.schema;
+    if (schema) return schema;
+
+    let n = this.parentNode;
+    while (typeof n.effectiveSchema === 'undefined') {
+       n = (n.parentNode ?? n.host);
+    }
+    return n.effectiveSchema;
   }
 
   /** Returns custom HTML element tag name for this element type registered with `customElements` collection */
