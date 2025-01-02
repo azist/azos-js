@@ -4,10 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP } from "azos/types";
-import { dflt } from "azos/strings";
+import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP, VALIDATE_METHOD, CHECK_REQUIRED_METHOD, DATA_KIND, asDataKind, ValidationError } from "azos/types";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { FieldError } from "./text-field.js";
 
 
 function guardWidth(v, d){
@@ -31,6 +32,9 @@ export class FieldPart extends Part{
     this.titlePosition = POSITION.TOP_LEFT;
   }
 
+  /** Gets effective field name by coalescing `name`,`id`,`constructor.name` properties */
+  get effectiveName(){ return dflt(this.name, this.id, this.constructor.name); }
+
   #contentWidth;
   get contentWidth() { return this.#contentWidth; }
   set contentWidth(v) { this.#contentWidth = guardWidth(v, DEFAULT_CONTENT_WIDTH_PCT); }
@@ -51,6 +55,17 @@ export class FieldPart extends Part{
    */
   get dataType() { return this.#dataType; }
   set dataType(v) { this.#dataType = v ? asTypeMoniker(v) : undefined; }
+
+  #dataKind;
+  /**
+   * Defines a sub-type - a kind of data stored by this field.
+   * It is either `null | undefined` or contains a valid {@link DATA_KIND} moniker which is used to prepare input values
+   * upon their change
+   */
+  get dataKind() { return this.#dataKind; }
+  set dataKind(v) { this.#dataKind = v ? asDataKind(v) : undefined; }
+
+
 
   #value;
   #rawValue;
@@ -80,11 +95,80 @@ export class FieldPart extends Part{
     try{
       v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
       this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
-      this.error = null; //reset an error if we did not throw above
+      this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
     }catch(e){
       this.error = e;
     }
   }
+
+  /** Performs field validation, returning validation error if any for the specified context */
+  // eslint-disable-next-line no-unused-vars
+  [VALIDATE_METHOD](context){
+    const val = this.value;
+    let error = this._validateRequired(context, val);
+    if (error) return error;
+
+    if (val === null || val === undefined || val === "") return null;//not required but NULL
+
+    error = this._validateDataKind(context, val);
+    if (error) return error;
+
+    error = this._validateLength(context, val);
+    if (error) return error;
+
+    error = this._validateMinMax(context, val);
+    if (error) return error;
+
+    error = this._validateValueList(context, val);
+    if (error) return error;
+
+    return null;
+  }
+
+  _validateRequired(context, val){
+    if (!this.isRequired) return null;
+
+    let has = (val !== null && val !== undefined || val !== "");
+
+    if (has){
+      const cr = val[CHECK_REQUIRED_METHOD];
+      if (cr){
+        has = true === cr.call(val, context);
+      }
+    }
+
+    return has ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Value required");
+  }
+
+
+
+
+  _validateDataKind(context, val){
+    switch(this.dataKind){
+      case DATA_KIND.TEL:        return (isValidPhone(val) ? null : new  ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad phone"));
+      case DATA_KIND.EMAIL:      return (isValidEMail(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad email"));
+      case DATA_KIND.SCREENNAME: return (isValidScreenName(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad screen name/id"));
+    }
+    return null;
+  }
+
+//TODO: FINISH these below
+  _validateLength(context, val){ return null; }
+  _validateMinMax(context, val){ return null; }
+  _validateValueList(context, val){ return null; }
+
+
+  /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
+  validate(context){
+    try{
+      this.error = this[VALIDATE_METHOD](context);
+    }catch(e){
+      this.error = e;
+    }
+    this.requestUpdate();
+  }
+
+
 
   /**
    * Prepares a value obtained from a user input(s) into a value which can be set as field data value.
@@ -94,7 +178,8 @@ export class FieldPart extends Part{
    * an object with two fields `{"systolic": 120, "diastolic": 80}` or an array (effectively a tuple) `[120, 80]`.
    * The default implementation does not alter the supplied value returning it as-is.
    * You do not call this method directly, call {@link setValueFromInput} which calls this method in a guarded way, so exceptions thrown by this method
-   * will be displayed by the field via an {@link error} property
+   * will be displayed by the field via an {@link error} property.
+   * Text-related inputs typically override this property to take {@link dataKind} into consideration - pre-format EMAILS, Phones, etc.
   */
   prepareInputValue(v){ return v; }
 
@@ -183,16 +268,23 @@ export class FieldPart extends Part{
     /** Type moniker which constrains the type of this field values */
     dataType: {String},
 
+    /** Data kind enumeration  e.g. "text" | "email" | "tel" | "money" etc. see {@link DATA_KIND}*/
+    dataKind: {String},
+
     /** The value of the field */
     value: {type: Object,
             converter: { fromAttribute: (v) => v?.toString()}
             /////////////hasChanged(newVal, oldVal) { return true; }
            },
 
-
+    /** Field error, such as validation error */
     error: {type: Object},
 
-    isRequired:  {type: Boolean, reflect: true}
+    /** The value of the field is logically required */
+    isRequired:  {type: Boolean, reflect: true},
+
+    /** When set, prevents the field from validating upon input change. */
+    noAutoValidate: {type: Boolean, reflect: false}
   }
 
 

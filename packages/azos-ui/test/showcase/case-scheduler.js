@@ -13,7 +13,6 @@ import "../../parts/text-field";
 
 import "../../vcl/time/scheduler";
 import { getDailyAvailable } from "./fetch-scheduling-data";
-import { fieldError } from "../../parts/text-field";
 
 // const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-28T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
 const rangeData = getDailyAvailable();
@@ -60,7 +59,7 @@ export class CaseScheduler extends CaseBase {
     const endTimeMins = this.fin.value.split(":").map(Number).reduce((p, c, i) => p += i === 0 ? c * 60 : c, 0);
     const duration = endTimeMins - startTimeMins;
     if (duration <= 0) {
-      this.fin.error = fieldError("End time should be after start time.");
+      this.fin.error = new types.ValidationError(this.effectiveSchema, "EndTime", null, "End time should be after start time");
       return;
     }
     const caption = this.caption.value || null;
