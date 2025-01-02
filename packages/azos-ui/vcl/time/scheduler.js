@@ -29,9 +29,49 @@ az-select {
   margin-right: 0.25em;
 }
 
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  margin-bottom: 0.25em;
+}
+.todayBtn {
+  font-size: 0.8em;
+  font-weight: bolder;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  color: var(--ink);
+  border: 1px solid #ccc;
+  padding: 0.75ch 2ch;
+}
+.todayBtn::before {
+  font-weight: normal;
+  line-height: 1em;
+  padding-right: 0.2em;
+  width: 20px;
+  overflow: hidden;
+}
+.viewing.before.todayBtn::before {content: "🡢";}
+.viewing.after.todayBtn::before { content: "🡠";}
+.viewing.within.todayBtn::before {content: "📅";filter: grayscale(65%);}
+
+.viewBtn {
+  border-radius: 4px;
+  background-color: var(--paper);
+  color: var(--ink);
+  border: none;
+}
+.todayBtn:hover, .viewBtn:hover {
+  filter: brightness(90%);
+  cursor: pointer;
+}
+.prev.viewBtn {}
+.next.viewBtn {}
+
 .daysContainer {
   display: grid;
-  grid-template-columns: 7ch 4ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr)) 4ch;
+  grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
   grid-template-rows: repeat(var(--rows, 31), minmax(3ch, 0.35fr));
   gap: 1px;
 }
@@ -43,35 +83,6 @@ az-select {
   background-color: #d0d0d0;
   border-radius: 10px 10px 0 0;
   overflow: hidden;
-}
-
-.dayControls {
-  grid-row: 4 / span max;
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid;
-}
-
-.dayControls button {
-  width: 100%;
-  border: none;
-}
-
-.dayControls button:hover {
-  cursor: pointer;
-  background-color: #ccc;
-}
-
-.dayControls button span {
-  display: inline-block;
-  transform: scale(1, 10) rotate(var(--rotate, 0deg));
-}
-
-.backButton button {
-  --rotate: 180deg;
 }
 
 .dayLabel {
@@ -327,7 +338,7 @@ az-select {
   get viewEndDate() {
     const endOfWeek = new Date(this.viewStartDate);
     endOfWeek.setHours(23, 59, 59, 99);
-    endOfWeek.setDate(this.viewStartDate.getDate() + this.viewNumDays);
+    endOfWeek.setDate(this.viewStartDate.getDate() + this.viewNumDays - 1);
     return endOfWeek;
   }
 
@@ -561,14 +572,14 @@ az-select {
   }
 
   removeItem(idOrItem) {
-    if (!this.editMode){
+    if (!this.editMode) {
       this.writeLog("Error", "Please call `beginChanges()` before editing dataset.");
       return;
     }
     if (types.isString(idOrItem) || types.isNumber(idOrItem)) idOrItem = this.findItemById(idOrItem);
     const item = aver.isOf(idOrItem, SchedulingItem);
 
-    const foundDay = this.itemsByDay.find(one=>one.day === item.day);
+    const foundDay = this.itemsByDay.find(one => one.day === item.day);
 
     const foundIndex = foundDay.items.findIndex(one => one.id === item.id);
     if (foundIndex === -1) throw types.AzosError(`Unable to find item{${item.id}}`);
@@ -581,18 +592,24 @@ az-select {
    * Show Scheduling items {@link count} week(s) prior to or after current view.
    * @param {Number} > 0 moves next, < 0 move previous
    */
-  changeViewPage(count = 1) {
-    if (count === 0) return;
-    const newViewStartDate = new Date(this.viewStartDate);
-    newViewStartDate.setDate(this.viewStartDate.getDate() + (7 * count));
+  changeViewPage(count = 1, force = false) {
+    let newViewStartDate;
+    if (count === 0)
+      newViewStartDate = this.#calculateViewStartDate(new Date());
+    else {
+      newViewStartDate = new Date(this.viewStartDate);
+      newViewStartDate.setDate(newViewStartDate.getDate() + (7 * count));
 
-    let filter;
-    if (count < 0)
-      filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
-    else
-      filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
+      if (!force) {
+        let filter;
+        if (count < 0)
+          filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
+        else
+          filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
 
-    if (!this.itemsByDay.some(filter)) return;
+        if (!this.itemsByDay.some(filter)) return;
+      }
+    }
 
     this.#setViewPropertiesForRecompute();
     this.viewStartDate = newViewStartDate;
@@ -620,9 +637,49 @@ az-select {
   renderControl() {
     return html`
 <div class="scheduler" @keydown="${this.#onKeyDown}">
+  ${this.renderNavigationControls()}
   ${this.renderTimeSlots()}
 </div>
     `;
+  }
+
+  get todaySymbol() {
+    const d = new Date();
+    const today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (today < this.viewStartDate) return "after";
+    else if (today > this.viewEndDate) return "before";
+    else return "within";
+  }
+
+  renderNavigationControls() {
+    return html`
+<div class="nav">
+  <button @click="${() => this.changeViewPage(0)}" class="viewing ${this.todaySymbol} todayBtn">Today</button>
+  <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">&#x2B9C;</button>
+  <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">&#x2B9E;</button>
+  ${this.renderViewSpanLabel(this.viewStartDate, this.viewEndDate)}
+</div>
+    `;
+  }
+
+  renderViewSpanLabel(startDate, endDate) {
+    const startYear = startDate.getFullYear();
+    const endYear = endDate.getFullYear();
+
+    const startMonthName = startDate.toLocaleDateString(undefined, { month: "long" });
+    const endMonthName = endDate.toLocaleDateString(undefined, { month: "long" });
+
+    const startDateDay = startDate.getDate();
+    const endDateDay = endDate.getDate();
+
+    let viewSpanLabel = `${startMonthName} ${startDateDay}`;
+    if (startYear !== endYear) viewSpanLabel += `, ${startYear}`;
+    viewSpanLabel += ` — `;
+
+    if (startMonthName !== endMonthName) viewSpanLabel += `${endMonthName} `;
+    viewSpanLabel += `${endDateDay}, ${endYear}`;
+
+    return viewSpanLabel;
   }
 
   renderTimeSlots() {
@@ -637,13 +694,7 @@ az-select {
     </div>
     ${this.renderTimeSlotsViewLabels()}
   </div>
-  <div class="dayControls backButton">
-    <button @click="${()=>this.changeViewPage(-1)}"><span>&#x27A4;</span></button>
-  </div>
   ${this.renderDayColumns()}
-  <div class="dayControls nextButton" style="font-stretch: ultra-expanded;">
-    <button @click="${()=>this.changeViewPage(1)}"><span>&#x27A4;</span></button>
-  </div>
 </div>
     `;
   }
