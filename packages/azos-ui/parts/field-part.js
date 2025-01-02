@@ -32,6 +32,9 @@ export class FieldPart extends Part{
     this.titlePosition = POSITION.TOP_LEFT;
   }
 
+  /** Gets effective field name by coalescing `name`,`id`,`constructor.name` properties */
+  get effectiveName(){ return dflt(this.name, this.id, this.constructor.name); }
+
   #contentWidth;
   get contentWidth() { return this.#contentWidth; }
   set contentWidth(v) { this.#contentWidth = guardWidth(v, DEFAULT_CONTENT_WIDTH_PCT); }
@@ -134,14 +137,17 @@ export class FieldPart extends Part{
       }
     }
 
-    return has ? null : new ValidationError(this.effectiveSchema, this.name, null, "Value required");
+    return has ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Value required");
   }
+
+
+
 
   _validateDataKind(context, val){
     switch(this.dataKind){
-      case DATA_KIND.TEL:        return (isValidPhone(val) ? null : new  ValidationError(this.effectiveSchema, this.name, null, "Bad phone"));
-      case DATA_KIND.EMAIL:      return (isValidEMail(val) ? null : new ValidationError(this.effectiveSchema, this.name, null, "Bad email"));
-      case DATA_KIND.SCREENNAME: return (isValidScreenName(val) ? null : new ValidationError(this.effectiveSchema, this.name, null, "Bad screen name/id"));
+      case DATA_KIND.TEL:        return (isValidPhone(val) ? null : new  ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad phone"));
+      case DATA_KIND.EMAIL:      return (isValidEMail(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad email"));
+      case DATA_KIND.SCREENNAME: return (isValidScreenName(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad screen name/id"));
     }
     return null;
   }

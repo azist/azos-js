@@ -72,8 +72,9 @@ export class CaseTextFields extends CaseBase {
 <hr>
 <p> Here we test the validation and reformatting of values per DATA_KIND enumeration</p>
 <div class="strip-h">
-  <az-text id="tbPhone" title="Phone" placeholder="Your Phone" title="Phone" dataKind="TEL"></az-text>
-  <az-text id="tbEmail" title="Email" placeholder="Your Email Address" title="EMail" dataKind="EMAIL"></az-text>
+  <az-text id="tbPhone"      name="phone_1" title="Phone" placeholder="Your Phone" title="Phone" dataKind="TEL"></az-text>
+  <az-text id="tbEmail"      title="Email" placeholder="Your Email Address" dataKind="EMAIL"></az-text>
+  <az-text id="tbScreenName" name="user_id" title="ScreenName" placeholder="Your Id"  dataKind="SCREENNAME"></az-text>
 </div>
 
 
