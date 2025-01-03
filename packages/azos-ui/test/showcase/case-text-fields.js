@@ -87,6 +87,7 @@ export class CaseTextFields extends CaseBase {
 
 
   <az-text id="tbAirTemperature"  scope="window" name="airTemperature" title="Temperature C" datatype="int" minValue="-90" maxValue="60"></az-text>
+
   <az-text id="tbScorePercent"  scope="window" name="scorePercent" title="Score Percent" datatype="real" minValue="0" maxValue="100"></az-text>
 
   <az-text id="tbAdmissionCode" scope="window" name="admitCode" title="Admission Code" valueList='{"adm": "Admitted", "dis": "Discharged", "oth": "Other"}'></az-text>

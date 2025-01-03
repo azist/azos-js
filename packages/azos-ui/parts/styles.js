@@ -310,7 +310,7 @@ export const textFieldStyles = css`
     user-select:none;
   }
   label > span{ font-weight: 500; }
-  input[type=text],input[type=password],input[type=date],textarea,select{
+  input,textarea,select{
     width: 100%;
     box-sizing: border-box;
     padding: 0.3em 0.35em;
@@ -320,14 +320,11 @@ export const textFieldStyles = css`
     line-height: 1.3em;
     font-size: 1em;
   }
-  input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,textarea:focus,select:focus{
+  input:focus,textarea:focus,select:focus{
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
-  input[type=text]::placeholder,
-  input[type=password]::placeholder,
-  input[type=date]::placeholder,
-  textarea::placeholder{ color: var(--ghost); }
+  input::placeholder, textarea::placeholder{ color: var(--ghost); }
   textarea{font-family:inherit;}
 
   .okBg      { background-color: var(--s-ok-bg-ctl) !important;    color: var(--s-ok-fg-ctl) !important;    border: var(--s-ok-bor-ctl) !important;}

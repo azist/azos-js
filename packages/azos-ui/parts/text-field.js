@@ -110,6 +110,21 @@ export class TextField extends FieldPart {
         ></textarea>`;
     }
 
+    let tp = "text";
+    switch(this.dataKind){
+      case DATA_KIND.SCREENNAME: tp = "text"; break;
+      case DATA_KIND.URL: tp = "url"; break;
+      case DATA_KIND.PASSWORD: tp = "password"; break;
+      case DATA_KIND.TEL: tp = "tel"; break;
+      case DATA_KIND.EMAIL: tp = "email"; break;
+      case DATA_KIND.COLOR: tp = "color"; break;
+      case DATA_KIND.DATE: tp = "date"; break;
+      case DATA_KIND.DATETIME: tp = "text"; break;
+      case DATA_KIND.DATETIMELOCAL: tp = "datetime-local"; break;
+      case DATA_KIND.TIME: tp = "time"; break;
+      default: tp = "text";
+    }
+
     return html`
     <input
       class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
@@ -117,7 +132,7 @@ export class TextField extends FieldPart {
       maxLength="${this.maxLength ? this.maxLength : noContent}"
       minLength="${this.minLength ? this.minLength : noContent}"
       placeholder="${this.placeholder}"
-      type="${this.isInputText ? "text" : this.isPassword ? "password" : "date"}"
+      type="${tp}"
       .value="${val}"
       .disabled=${this.isDisabled}
       .required=${this.isRequired}
@@ -126,10 +141,6 @@ export class TextField extends FieldPart {
       part="field"
       autocomplete="off"
     />`;
-
-  // This was here prior to Jan 2025 refactoring. Garbage
-  //// const tb = this.$("tbData");
-  ////  if (tb) tb.value = val;
   }
 }
 

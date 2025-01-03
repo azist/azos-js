@@ -135,7 +135,7 @@ export class FieldPart extends Part{
   _validateRequired(context, val, scope){
     if (!this.isRequired) return null;
 
-    let empty = (val === null || val === undefined || (isString(val) &&  isEmpty(val)));
+    let empty = (val === null || val === undefined || (isString(val) && isEmpty(val)));
 
     if (!empty){
       const cr = val[CHECK_REQUIRED_METHOD];
