@@ -4,18 +4,12 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf, asString } from 'azos/strings';
+import { isOneOf, asString, normalizeUSPhone } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { AzosError, CLIENT_MESSAGE_PROP } from 'azos/types';
+import { DATA_KIND } from 'azos/types';
 
-export class FieldError extends AzosError {
-  get [CLIENT_MESSAGE_PROP]() { return this.message; }
-  constructor(message, from = null, cause = null, code = 0) { super(message, from, cause, code); }
-}
-
-export function fieldError(msg, props) { return new FieldError(msg, props); }
 
 export class TextField extends FieldPart {
   static properties = {
@@ -28,13 +22,6 @@ export class TextField extends FieldPart {
     /** Determines if this field is a single-line input, password, or
      *  textarea (multi-line block input) */
     itemType: { type: String },
-
-    /** If defined, field will not allow input to exceed this character length */
-    maxLength: { type: Number },
-
-    /** If defined, minimum character length allowed for input
-     *  (for validation use only) */
-    minLength: { type: Number },
 
     /** Ghosted text that will be replaced by user input */
     placeholder: { type: String },
@@ -75,6 +62,16 @@ export class TextField extends FieldPart {
     const t = this.$("tbData");
     if (!t) return;
     window.queueMicrotask(() => t.focus());
+  }
+
+  prepareInputValue(v){
+    if (v===null || v===undefined) return null;
+
+    if (this.dataKind === DATA_KIND.TEL){
+      return normalizeUSPhone(v);
+    }
+
+    return v;
   }
 
   renderInput() {
