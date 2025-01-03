@@ -9,7 +9,8 @@ import { asTypeMoniker,
          asObject,
          CLIENT_MESSAGE_PROP,
          VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
-         DATA_KIND, asDataKind } from "azos/types";
+         DATA_KIND, asDataKind,
+         isAssigned} from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
@@ -185,8 +186,24 @@ export class FieldPart extends Part{
   }
 
 
+  _validateMinMax(context, val, scope){
+    if (isAssigned(this.minValue)){
+      const limit = this.castValue(this.minValue);
+      const pass =  val >= limit;
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is less than allowed`);
+    }
+
+    if (isAssigned(this.maxValue)){
+      const limit = this.castValue(this.maxValue);
+      const pass =  val <= limit;
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is greater than allowed`);
+    }
+
+    return null;
+  }
+
+
   //TODO: FINISH these below
-  _validateMinMax(context, val, scope){ return null; }
   _validateValueList(context, val, scope){ return null; }
 
 
@@ -276,13 +293,13 @@ export class FieldPart extends Part{
   static properties = {
     /** Width of the content as "%" when `isHorizontal=true`. Only applies to fields with non-predefined content layout, such as text fields etc.
      *  An integer number MUST BE BETWEEN 0 and 100 - otherwise the defaults are used.  */
-    contentWidth:  {type: Number},
+    contentWidth:  {type: Number, reflect: false},
 
-    /** Validation (error) message */
-    message:       {type: String},
+    /** Field message such as a validation error message */
+    message:       {type: String, reflect: false},
 
     /** Field's title */
-    title:         {type: String},
+    title:         {type: String, reflect: false},
 
     /** Field title position, oriented to input field. Valid positions:
      *  top-left, top-center, top-right, mid-left, mid-right, bot-left,
@@ -292,16 +309,16 @@ export class FieldPart extends Part{
     /** Width of the title as "%" when `isHorizontal=true`.
      *  An integer number MUST BE BETWEEN 0 and 100 - otherwise the defaults are used.
     */
-    titleWidth:    {type: Number},
+    titleWidth:    {type: Number, reflect: false},
 
     /** The logical name of the field within its context (e.g.) */
     name:  {type: String, reflect: true},
 
     /** Type moniker which constrains the type of this field values */
-    dataType: {String},
+    dataType: {String, reflect: false},
 
     /** Data kind enumeration  e.g. "text" | "email" | "tel" | "money" etc. see {@link DATA_KIND}*/
-    dataKind: {String},
+    dataKind: {String, reflect: false},
 
     /** The value of the field */
     value: {type: Object,
@@ -310,17 +327,24 @@ export class FieldPart extends Part{
            },
 
     /** Field error, such as validation error */
-    error: {type: Object},
+    error: {type: Object, reflect: false},
 
     /** The value of the field is logically required */
     isRequired:  {type: Boolean, reflect: true},
 
-     /** If defined, field will not allow input to exceed this character length */
-     maxLength: { type: Number },
+    /** If defined, field will not allow input to exceed this character length */
+    maxLength: { type: Number, reflect: false },
 
-     /** If defined, minimum character length allowed for input
-      *  (for validation use only) */
-     minLength: { type: Number },
+    /** If defined, minimum character length allowed for input
+    *  (for validation use only) */
+    minLength: { type: Number, reflect: false },
+
+
+     /** If defined, adds minimum value constraint */
+     minValue: { type: String, reflect: false },
+
+     /** If defined, adds maximum value constraint */
+     maxValue: { type: String, reflect: false },
 
 
     /** When set, prevents the field from validating upon input change. */

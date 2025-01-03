@@ -77,6 +77,10 @@ export class CaseTextFields extends CaseBase {
   <az-text id="tbScreenName" name="user_id" title="ScreenName" placeholder="Your Id"  dataKind="SCREENNAME"></az-text>
 
   <az-text id="tbScreenName2" name="screenName2" title="Screen Name With Len" dataKind="SCREENNAME" minLength=5 maxLength=10></az-text>
+
+
+  <az-text id="tbAirTemperature" name="airTemperature" title="Temperature C" datatype="int" minValue="-90" maxValue="60"></az-text>
+  <az-text id="tbScorePercent" name="scorePercent" title="Score Percent" datatype="real" minValue="0" maxValue="100"></az-text>
 </div>
 
 
