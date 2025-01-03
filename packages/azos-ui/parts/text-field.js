@@ -39,15 +39,6 @@ export class TextField extends FieldPart {
   constructor() { super(); }
 
 
-  /** True if text input is <input type="password"> */
-  get isPassword() { return isOneOf(this.itemType, ["password", "pass", "pw", "masked"]); }
-
-  /** True if text input is <input type="date"> */
-  get isDate() { return isOneOf(this.itemType, ["date", "calendar", "day", "month", "year"]); }
-
-  /** True if text input is <input type="text"> */
-  get isInputText() { return !this.isTextArea && !this.isPassword && !this.isDate; }
-
   /** True if alignValue is a valid value */
   get isValidAlign() { return isOneOf(this.alignValue, ["left", "center", "right"]); }
 
