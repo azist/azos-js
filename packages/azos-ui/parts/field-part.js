@@ -4,11 +4,15 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asTypeMoniker, cast, asObject, CLIENT_MESSAGE_PROP, VALIDATE_METHOD, CHECK_REQUIRED_METHOD, DATA_KIND, asDataKind, ValidationError } from "azos/types";
+import { asTypeMoniker,
+         cast,
+         asObject,
+         CLIENT_MESSAGE_PROP,
+         VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
+         DATA_KIND, asDataKind } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
-import { FieldError } from "./text-field.js";
 
 
 function guardWidth(v, d){
@@ -103,29 +107,29 @@ export class FieldPart extends Part{
 
   /** Performs field validation, returning validation error if any for the specified context */
   // eslint-disable-next-line no-unused-vars
-  [VALIDATE_METHOD](context){
+  [VALIDATE_METHOD](context, scope = null){
     const val = this.value;
-    let error = this._validateRequired(context, val);
+    let error = this._validateRequired(context, val, scope);
     if (error) return error;
 
     if (val === null || val === undefined || val === "") return null;//not required but NULL
 
-    error = this._validateDataKind(context, val);
+    error = this._validateDataKind(context, val, scope);
     if (error) return error;
 
-    error = this._validateLength(context, val);
+    error = this._validateLength(context, val, scope);
     if (error) return error;
 
-    error = this._validateMinMax(context, val);
+    error = this._validateMinMax(context, val, scope);
     if (error) return error;
 
-    error = this._validateValueList(context, val);
+    error = this._validateValueList(context, val, scope);
     if (error) return error;
 
     return null;
   }
 
-  _validateRequired(context, val){
+  _validateRequired(context, val, scope){
     if (!this.isRequired) return null;
 
     let has = (val !== null && val !== undefined || val !== "");
@@ -137,31 +141,59 @@ export class FieldPart extends Part{
       }
     }
 
-    return has ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Value required");
+    return has ? null : new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Value required");
   }
 
 
 
 
-  _validateDataKind(context, val){
+  _validateDataKind(context, val, scope){
     switch(this.dataKind){
-      case DATA_KIND.TEL:        return (isValidPhone(val) ? null : new  ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad phone"));
-      case DATA_KIND.EMAIL:      return (isValidEMail(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad email"));
-      case DATA_KIND.SCREENNAME: return (isValidScreenName(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, null, "Bad screen name/id"));
+      case DATA_KIND.TEL:        return (isValidPhone(val) ? null : new  ValidationError(this.effectiveSchema, this.effectiveName, scope, "Bad phone"));
+      case DATA_KIND.EMAIL:      return (isValidEMail(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Bad email"));
+      case DATA_KIND.SCREENNAME: return (isValidScreenName(val) ? null : new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Bad screen name/id"));
     }
     return null;
   }
 
-//TODO: FINISH these below
-  _validateLength(context, val){ return null; }
-  _validateMinMax(context, val){ return null; }
-  _validateValueList(context, val){ return null; }
+  _validateLength(context, val, scope){
+    if (this.minLength > 0){
+      const chkMinLen = val[CHECK_MIN_LENGTH_METHOD];
+      let pass = false;
+      if (chkMinLen) {
+        pass = true === chkMinLen.call(val, context, this.minLength);
+      } else {
+        const len = val["length"];
+        pass =  len === undefined || len >= this.minLength;
+      }
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is shorter than ${this.minLength}`);
+    }
+
+    if (this.maxLength > 0){
+      const chkMaxLen = val[CHECK_MAX_LENGTH_METHOD];
+      let pass = false;
+      if (chkMaxLen) {
+        pass = true === chkMaxLen.call(val, context, this.maxLength);
+      } else {
+        const len = val["length"];
+        pass =  len === undefined || len <= this.maxLength;
+      }
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is longer than ${this.maxLength}`);
+    }
+
+    return null;
+  }
+
+
+  //TODO: FINISH these below
+  _validateMinMax(context, val, scope){ return null; }
+  _validateValueList(context, val, scope){ return null; }
 
 
   /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
-  validate(context){
+  validate(context, scope = null){
     try{
-      this.error = this[VALIDATE_METHOD](context);
+      this.error = this[VALIDATE_METHOD](context, scope);
     }catch(e){
       this.error = e;
     }
@@ -282,6 +314,14 @@ export class FieldPart extends Part{
 
     /** The value of the field is logically required */
     isRequired:  {type: Boolean, reflect: true},
+
+     /** If defined, field will not allow input to exceed this character length */
+     maxLength: { type: Number },
+
+     /** If defined, minimum character length allowed for input
+      *  (for validation use only) */
+     minLength: { type: Number },
+
 
     /** When set, prevents the field from validating upon input change. */
     noAutoValidate: {type: Boolean, reflect: false}

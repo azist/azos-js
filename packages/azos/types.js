@@ -40,17 +40,30 @@ export const DIRTY_PROP = Symbol("dirty");
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
 
 /**
- * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context): error | null`.
+ * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context, scope): error | null`.
  * Performs validation logic returning an error object if validation fails
  */
 export const VALIDATE_METHOD = Symbol("validate");
-
 
 /**
  * Establishes required value check protocol: a function of signature: `[CHECK_REQUIRED_METHOD](context): bool`.
  * Returns true if the implementing object logically has the required value, false otherwise
  */
 export const CHECK_REQUIRED_METHOD = Symbol("checkRequired");
+
+/**
+ * Establishes minimum value length check protocol: a function of signature: `[CHECK_MIN_LENGTH_METHOD](context, minLength): bool`.
+ * Returns true if the implementing object logically has the value of at least the required length, false otherwise
+ */
+export const CHECK_MIN_LENGTH_METHOD = Symbol("checkMinLength");
+
+/**
+ * Establishes maximum value length check protocol: a function of signature: `[CHECK_MAX_LENGTH_METHOD](context, maxLength): bool`.
+ * Returns true if the implementing object logically has the value of at most the required length, false otherwise
+ */
+export const CHECK_MAX_LENGTH_METHOD = Symbol("checkMaxLength");
+
+
 
 /**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -

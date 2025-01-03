@@ -23,13 +23,6 @@ export class TextField extends FieldPart {
      *  textarea (multi-line block input) */
     itemType: { type: String },
 
-    /** If defined, field will not allow input to exceed this character length */
-    maxLength: { type: Number },
-
-    /** If defined, minimum character length allowed for input
-     *  (for validation use only) */
-    minLength: { type: Number },
-
     /** Ghosted text that will be replaced by user input */
     placeholder: { type: String },
 
