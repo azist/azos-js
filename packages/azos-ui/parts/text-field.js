@@ -29,14 +29,15 @@ export class TextField extends FieldPart {
     /** Defines resize attribute for textarea
      * (none | both | horizontal | vertical | block | inline) */
     resize: { type: String },
+
+    /** True for multiline text fields */
+    multiline: { type: Boolean}
   }
 
   static styles = [baseStyles, textFieldStyles];
 
   constructor() { super(); }
 
-  /** True if text input is <textarea> */
-  get isTextArea() { return isOneOf(this.itemType, ["multiline", "long", "textarea"]); }
 
   /** True if text input is <input type="password"> */
   get isPassword() { return isOneOf(this.itemType, ["password", "pass", "pw", "masked"]); }
@@ -73,7 +74,8 @@ export class TextField extends FieldPart {
   }
 
   /** Override to convert a value into the one displayed in a text input */
-  prepareValueForInput(v){
+  // eslint-disable-next-line no-unused-vars
+  prepareValueForInput(v, isRawValue = false){
     return asString(v) ?? "";
   }
 
@@ -82,12 +84,15 @@ export class TextField extends FieldPart {
     const clsStatusBg = `${parseStatus(this.effectiveStatus, true, "Bg")}`;
 
     let val = this.value;
-    if ((val === undefined || val === null) && this.error) val = this.rawValue;
-    val = this.prepareValueForInput(val);
+    if ((val === undefined || val === null) && this.error)
+      val = this.prepareValueForInput(this.rawValue, true);
+    else
+      val = this.prepareValueForInput(val, false);
 
     //console.info("Will render this value: " + describe(val));
 
-    let compArea = this.isTextArea ? html`
+    if (this.multiline){
+      return  html`
       <textarea
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="tbData"
@@ -102,29 +107,29 @@ export class TextField extends FieldPart {
         @change="${this.#tbChange}"
         part="field"
         style="resize: ${this.resize}"
-        ></textarea>`
-      : html`
-      <input
-        class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="tbData"
-        maxLength="${this.maxLength ? this.maxLength : noContent}"
-        minLength="${this.minLength ? this.minLength : noContent}"
-        placeholder="${this.placeholder}"
-        type="${this.isInputText ? "text" : this.isPassword ? "password" : "date"}"
-        .value="${val}"
-        .disabled=${this.isDisabled}
-        .required=${this.isRequired}
-        ?readonly=${this.isReadonly}
-        @change="${this.#tbChange}"
-        part="field"
-        autocomplete="off"
-      />
-      `;
+        ></textarea>`;
+    }
 
-    const tb = this.$("tbData");
-    if (tb) tb.value = val;
+    return html`
+    <input
+      class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
+      id="tbData"
+      maxLength="${this.maxLength ? this.maxLength : noContent}"
+      minLength="${this.minLength ? this.minLength : noContent}"
+      placeholder="${this.placeholder}"
+      type="${this.isInputText ? "text" : this.isPassword ? "password" : "date"}"
+      .value="${val}"
+      .disabled=${this.isDisabled}
+      .required=${this.isRequired}
+      ?readonly=${this.isReadonly}
+      @change="${this.#tbChange}"
+      part="field"
+      autocomplete="off"
+    />`;
 
-    return compArea;
+  // This was here prior to Jan 2025 refactoring. Garbage
+  //// const tb = this.$("tbData");
+  ////  if (tb) tb.value = val;
   }
 }
 

@@ -10,8 +10,10 @@ import { asTypeMoniker,
          CLIENT_MESSAGE_PROP,
          VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
          DATA_KIND, asDataKind,
-         isAssigned} from "azos/types";
-import { dflt, isValidPhone, isValidEMail, isValidScreenName } from "azos/strings";
+         isAssigned,
+         isString,
+         isNonEmptyString} from "azos/types";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
@@ -133,16 +135,16 @@ export class FieldPart extends Part{
   _validateRequired(context, val, scope){
     if (!this.isRequired) return null;
 
-    let has = (val !== null && val !== undefined || val !== "");
+    let empty = (val === null || val === undefined || (isString(val) &&  isEmpty(val)));
 
-    if (has){
+    if (!empty){
       const cr = val[CHECK_REQUIRED_METHOD];
       if (cr){
-        has = true === cr.call(val, context);
+        empty = true !== cr.call(val, context);
       }
     }
 
-    return has ? null : new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Value required");
+    return empty ? new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Value required") : null;
   }
 
   _validateDataKind(context, val, scope){
