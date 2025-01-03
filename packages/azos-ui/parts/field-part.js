@@ -145,9 +145,6 @@ export class FieldPart extends Part{
     return has ? null : new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Value required");
   }
 
-
-
-
   _validateDataKind(context, val, scope){
     switch(this.dataKind){
       case DATA_KIND.TEL:        return (isValidPhone(val) ? null : new  ValidationError(this.effectiveSchema, this.effectiveName, scope, "Bad phone"));
@@ -203,8 +200,14 @@ export class FieldPart extends Part{
   }
 
 
-  //TODO: FINISH these below
-  _validateValueList(context, val, scope){ return null; }
+  _validateValueList(context, val, scope){
+    if (isAssigned(this.valueList)){
+      const pass = this.valueList[val.toString()];
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is not in the list of allowed ones`);
+    }
+
+    return null;
+  }
 
 
   /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
@@ -325,6 +328,12 @@ export class FieldPart extends Part{
             converter: { fromAttribute: (v) => v?.toString()}
             /////////////hasChanged(newVal, oldVal) { return true; }
            },
+
+    /** The value pick list, having keys represent allowed values e.g. `{ok: "Proceed", cancel: "Stop operation"}` */
+    valueList: {type: Object,
+      converter: { fromAttribute: (v) => asObject(v)}
+      /////////////hasChanged(newVal, oldVal) { return true; }
+    },
 
     /** Field error, such as validation error */
     error: {type: Object, reflect: false},
