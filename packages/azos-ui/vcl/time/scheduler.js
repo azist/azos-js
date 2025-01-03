@@ -30,6 +30,8 @@ az-select {
 }
 
 .nav {
+  grid-row: 1;
+  grid-column: 2 / span max;
   display: flex;
   align-items: center;
   gap: 0.25em;
@@ -72,14 +74,14 @@ az-select {
 .daysContainer {
   display: grid;
   grid-template-columns: 6ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
-  grid-template-rows: auto repeat(var(--rows, 31), minmax(3ch, 0.35fr));
+  grid-template-rows: auto auto repeat(var(--rows, 31), minmax(3ch, 0.35fr));
   column-gap: 1px;
 }
 
 .dayColumn {
   display: grid;
   grid-template-rows: subgrid;
-  grid-row: 1 / span max;
+  grid-row: 2 / span max;
   overflow: hidden;
 }
 
@@ -626,7 +628,6 @@ az-select {
   renderControl() {
     return html`
 <div class="scheduler" @keydown="${this.#onKeyDown}">
-  ${this.renderNavigationControls()}
   ${this.renderTimeSlots()}
 </div>
     `;
@@ -674,6 +675,7 @@ az-select {
   renderTimeSlots() {
     return html`
 <div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length}">
+  ${this.renderNavigationControls()}
   <div class="dayColumn legend">
     <div class="dayLabel">
       <div class="year">&nbsp;</div>
