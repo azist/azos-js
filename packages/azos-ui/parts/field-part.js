@@ -187,13 +187,13 @@ export class FieldPart extends Part{
     if (isAssigned(this.minValue)){
       const limit = this.castValue(this.minValue);
       const pass =  val >= limit;
-      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is less than allowed`);
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is less than ${limit}`);
     }
 
     if (isAssigned(this.maxValue)){
       const limit = this.castValue(this.maxValue);
       const pass =  val <= limit;
-      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is greater than allowed`);
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is greater than ${limit}`);
     }
 
     return null;

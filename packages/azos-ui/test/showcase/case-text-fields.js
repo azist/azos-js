@@ -72,7 +72,7 @@ export class CaseTextFields extends CaseBase {
 <hr>
 <p> Here we test the validation and reformatting of values per DATA_KIND enumeration</p>
 <div class="strip-h">
-  <az-text id="tbPhone"      name="phone_1" title="Phone" placeholder="Your Phone" title="Phone" dataKind="TEL"></az-text>
+  <az-text id="tbPhone"      name="phone_1" title="Phone" placeholder="Your Phone" title="Phone" dataKind="TEL" @change="${e => { console.info(`Control: ${e.target.id} Raw: ${e.target.rawValue} Value: ${e.target.value}`);}}" ></az-text>
   <az-text id="tbEmail"      title="Email" placeholder="Your Email Address" dataKind="EMAIL"></az-text>
   <az-text id="tbScreenName" name="user_id" title="ScreenName" placeholder="Your Id"  dataKind="SCREENNAME"></az-text>
 
@@ -81,6 +81,8 @@ export class CaseTextFields extends CaseBase {
 
   <az-text id="tbAirTemperature" name="airTemperature" title="Temperature C" datatype="int" minValue="-90" maxValue="60"></az-text>
   <az-text id="tbScorePercent" name="scorePercent" title="Score Percent" datatype="real" minValue="0" maxValue="100"></az-text>
+
+  <az-text id="tbAdmissionCode" name="admitCode" title="Admission Code" valueList='{"adm": "Admitted", "dis": "Discharged", "oth": "Other"}'></az-text>
 </div>
 
 

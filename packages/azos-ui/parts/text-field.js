@@ -66,12 +66,15 @@ export class TextField extends FieldPart {
 
   prepareInputValue(v){
     if (v===null || v===undefined) return null;
-
     if (this.dataKind === DATA_KIND.TEL){
       return normalizeUSPhone(v);
     }
-
     return v;
+  }
+
+  /** Override to convert a value into the one displayed in a text input */
+  prepareValueForInput(v){
+    return asString(v) ?? "";
   }
 
   renderInput() {
@@ -80,7 +83,7 @@ export class TextField extends FieldPart {
 
     let val = this.value;
     if ((val === undefined || val === null) && this.error) val = this.rawValue;
-    val = asString(val) ?? "";
+    val = this.prepareValueForInput(val);
 
     //console.info("Will render this value: " + describe(val));
 
