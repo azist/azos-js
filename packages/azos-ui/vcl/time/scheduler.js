@@ -30,6 +30,8 @@ az-select {
 }
 
 .nav {
+  grid-row: 1;
+  grid-column: 2 / span max;
   display: flex;
   align-items: center;
   gap: 0.25em;
@@ -71,17 +73,15 @@ az-select {
 
 .daysContainer {
   display: grid;
-  grid-template-columns: 7ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
-  grid-template-rows: repeat(var(--rows, 31), minmax(3ch, 0.35fr));
-  gap: 1px;
+  grid-template-columns: 6ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
+  grid-template-rows: auto auto repeat(var(--rows, 31), minmax(3ch, 0.35fr));
+  column-gap: 1px;
 }
 
 .dayColumn {
   display: grid;
   grid-template-rows: subgrid;
-  grid-row: 1 / span max;
-  background-color: #d0d0d0;
-  border-radius: 10px 10px 0 0;
+  grid-row: 2 / span max;
   overflow: hidden;
 }
 
@@ -89,44 +89,34 @@ az-select {
   text-align: center;
   display: flex;
   flex-direction: column;
-  // grid-row: span 2;
-  grid-row: span 3;
+  position: relative;
+  justify-content: end;
 }
 
-.legend .dayLabel {
-  background-color: var(--paper);
-}
-
-.dayLabel .dayName {
-  font-variant: all-small-caps;
+:not(.legend) > .dayLabel div,
+.timeLabel.inView {
+  background-color: #d0d0d0;
 }
 
 .dayLabel .year {
-  width: 100%;
   font-weight: bold;
-  // writing-mode: tb;
-  // rotate: 180deg;
-  // position: absolute;
+  writing-mode: tb;
+  rotate: 180deg;
+  position: absolute;
+  left: 0.2em;
+  bottom: 0.1em;
 }
 
 .dayLabel .month {
   width: 100%;
   font-weight: bold;
   font-variant: all-small-caps;
+  border-radius: 10px 10px 0 0;
 }
 
-.dayLabel .month:empty,
-.dayLabel .year:empty {
-  background-color: var(--paper)
-}
-
-.dayLabel .month:empty::after,
-.dayLabel .year:empty::after {
-  content: '.';
-  display: block;
-  margin-right: -1px;
-  color: var(--paper);
-  background-color: var(--paper);
+.dayLabel .dayDate {
+  font-variant: all-small-caps;
+  padding-bottom: 0.2em;
 }
 
 .timeCell {
@@ -139,25 +129,22 @@ az-select {
   overflow: hidden;
 }
 
-.timeCell.inView {
-  border-top: 1px dashed #d0d0d0;
-}
-
-.timeCell.onTheHour.inView {
-  border-top: 1px solid #c0c0c0;
-}
-
-.timeLabel.onTheHour.inView, .timeLabel.onTheHour:nth-last-child(2) {
-  border-top: 1px solid #a0a0a0;
-}
+/** column-gap handles vertical lines, these are the horizontal */
+.timeCell { border-top: 1px dashed #ccc; }
+.timeCell:not(.inView) { border-top-color: #ccc; }
+.timeCell.onTheHour { border-top: 1px solid #aaa; }
+.timeCell.onTheHour:not(.inView) { border-top-color: #aaa; }
+.timeLabel.inView { border-left: 1px solid #aaa; }
+.timeLabel:not(.inView), .dayLabel + .timeCell { border-top: revert; }
+.timeLabel:nth-last-child(3) { border-bottom: 1px solid #aaa; }
 
 .timeLabel:not(.onTheHour) {
-  opacity: 0.2;
+  color: #bebebe;
   font-size: 0.9em;
 }
 
 .timeLabel .meridiemIndicator {
-  opacity: 0.7;
+  color: #929292;
   font-size: 0.8em;
   font-variant: small-caps;
 }
@@ -641,7 +628,6 @@ az-select {
   renderControl() {
     return html`
 <div class="scheduler" @keydown="${this.#onKeyDown}">
-  ${this.renderNavigationControls()}
   ${this.renderTimeSlots()}
 </div>
     `;
@@ -688,12 +674,12 @@ az-select {
 
   renderTimeSlots() {
     return html`
-<div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length + 3}">
+<div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length}">
+  ${this.renderNavigationControls()}
   <div class="dayColumn legend">
     <div class="dayLabel">
       <div class="year">&nbsp;</div>
       <div class="month">&nbsp;</div>
-      <div class="dayName">&nbsp;</div>
       <div class="dayDate">&nbsp;</div>
     </div>
     ${this.renderTimeSlotsViewLabels()}
@@ -725,9 +711,7 @@ az-select {
   <div class="dayLabel">
     <div class="year">${year}</div>
     <div class="month">${monthName}</div>
-    <div class="dayName">${dayName}</div>
-    <div class="dayDate">${dayNumber}</div>
-    <!--div class="dayDate">${dayName} ${dayNumber}</div-->
+    <div class="dayDate">${dayName} ${dayNumber}</div>
   </div>
   ${this.renderTimeCells(date)}
 </div>
@@ -746,9 +730,9 @@ az-select {
       let rowSpan;
       let foundItem;
 
+      if (slotMins % 60 === 0) cls.push("onTheHour");
       if (inView && this.#isDateWithinEnabledRange(day)) {
         cls.push("inView");
-        if (slotMins % 60 === 0) cls.push("onTheHour");
 
         foundItem = thisDayItems?.find(item => item.startTimeMins === slotMins);
         if (foundItem) {
