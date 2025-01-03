@@ -24,10 +24,6 @@ export class TimeBlockPicker extends Control {
 
   static styles = css`
 :host { display: block; margin-top: 1em; margin-bottom: 1em; }
-az-select {
-  margin-left: 0.25em;
-  margin-right: 0.25em;
-}
 
 .nav {
   grid-row: 1;
@@ -57,7 +53,6 @@ az-select {
 .viewing.before.todayBtn::before {content: "🡢";}
 .viewing.after.todayBtn::before { content: "🡠";}
 .viewing.within.todayBtn::before {content: "📅";filter: grayscale(65%);}
-
 .viewBtn {
   border-radius: 4px;
   background-color: var(--paper);
@@ -68,8 +63,6 @@ az-select {
   filter: brightness(90%);
   cursor: pointer;
 }
-.prev.viewBtn {}
-.next.viewBtn {}
 
 .daysContainer {
   display: grid;
@@ -85,17 +78,29 @@ az-select {
   overflow: hidden;
 }
 
+/** background */
+:not(.legend) > .dayLabel div, .timeLabel.inView { background-color: #d0d0d0; }
+.timeSlot { background-color: #e8e8e8; }
+.timeSlot:not(.inView) { background-color: #bbb; }
+
+/** column-gap handles vertical lines, these are the horizontal */
+.timeCell { border-top: 1px dashed #ccc; }
+.timeCell:not(.inView) { border-top-color: #ccc; }
+.timeCell.onTheHour { border-top: 1px solid #aaa; }
+.timeCell.onTheHour:not(.inView) { border-top-color: #aaa; }
+.timeLabel.inView { border-left: 1px solid #aaa; }
+.timeLabel:not(.onTheHour) { border-top-color: #e5e5e5; }
+.timeLabel:not(.inView), .dayLabel + .timeCell { border-top: revert; }
+.timeLabel:nth-last-child(3) { border-bottom: 1px solid #aaa; }
+
 .dayLabel {
   text-align: center;
   display: flex;
   flex-direction: column;
   position: relative;
   justify-content: end;
-}
-
-:not(.legend) > .dayLabel div,
-.timeLabel.inView {
-  background-color: #d0d0d0;
+  user-select
+  : none;
 }
 
 .dayLabel .year {
@@ -105,6 +110,8 @@ az-select {
   position: absolute;
   left: 0.2em;
   bottom: 0.1em;
+  background: none!important;
+  color: #989898;
 }
 
 .dayLabel .month {
@@ -129,15 +136,6 @@ az-select {
   overflow: hidden;
 }
 
-/** column-gap handles vertical lines, these are the horizontal */
-.timeCell { border-top: 1px dashed #ccc; }
-.timeCell:not(.inView) { border-top-color: #ccc; }
-.timeCell.onTheHour { border-top: 1px solid #aaa; }
-.timeCell.onTheHour:not(.inView) { border-top-color: #aaa; }
-.timeLabel.inView { border-left: 1px solid #aaa; }
-.timeLabel:not(.inView), .dayLabel + .timeCell { border-top: revert; }
-.timeLabel:nth-last-child(3) { border-bottom: 1px solid #aaa; }
-
 .timeLabel:not(.onTheHour) {
   color: #bebebe;
   font-size: 0.9em;
@@ -147,14 +145,6 @@ az-select {
   color: #929292;
   font-size: 0.8em;
   font-variant: small-caps;
-}
-
-.timeSlot {
-  background-color: #e8e8e8;
-}
-
-.timeSlot:not(.inView) {
-  background-color: #bbb;
 }
 
 .timeSlot.available {
@@ -217,6 +207,12 @@ az-select {
 .warning-tab-btn { color: var(--s-warn-fg-ctl); border-color: var(--s-warn-bor-color-ctl);}
 .alert-tab-btn { color: var(--s-alert-fg-ctl); border-color: var(--s-alert-bor-color-ctl);}
 .error-tab-btn { color: var(--s-error-fg-ctl); border-color: var(--s-error-bor-color-ctl);}
+
+@media only screen and (max-width: 700px) {
+  .timeLabel:not(.onTheHour) { color: #d0d0d0 !important; }
+  .year { display: none; }
+  .month { border-radius: 5px 5px 0 0 !important;}
+}
 `;
 
   /**

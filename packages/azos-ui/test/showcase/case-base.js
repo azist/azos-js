@@ -12,6 +12,7 @@ export class CaseBase extends Block {
   static styles = [css`
 :host{ display: block; padding: 1ch 2ch; }
 .strip-h{ display:flex;flex-wrap:wrap;align-items:center;margin-bottom:0.5em;gap:1ch; }
+@media only screen and (max-width: 700px) {:host {padding:0;}}
   `];
 
 
