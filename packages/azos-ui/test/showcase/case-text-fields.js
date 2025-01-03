@@ -61,7 +61,7 @@ export class CaseTextFields extends CaseBase {
 <hr>
 <div class="strip-h">
   <az-text id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;" titlePosition="mid-left" titleWidth="25" contentWidth="75"></az-text>
-  <az-text id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text>
+  <az-text id="basicPasswordInput" dataKind="pwd" title="Basic password input" placeholder="Type something here&hellip;"></az-text>
   <az-text id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text>
   <az-text id="readOnlyInput" title="Read Only field" value="Read-only value" isReadonly></az-text>
   <az-text id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text>
