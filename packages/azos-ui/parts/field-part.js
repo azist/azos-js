@@ -204,7 +204,7 @@ export class FieldPart extends Part{
   _validateValueList(context, val, scope){
     if (isAssigned(this.valueList)){
       const pass = this.valueList[val.toString()];
-      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is not in the list of allowed ones`);
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is not in the allowed list`);
     }
 
     return null;

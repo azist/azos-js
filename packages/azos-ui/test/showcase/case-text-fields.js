@@ -90,7 +90,7 @@ export class CaseTextFields extends CaseBase {
 
   <az-text id="tbScorePercent"  scope="window" name="scorePercent" title="Score Percent" datatype="real" minValue="0" maxValue="100"></az-text>
 
-  <az-text id="tbAdmissionCode" scope="window" name="admitCode" title="Admission Code" valueList='{"adm": "Admitted", "dis": "Discharged", "oth": "Other"}'></az-text>
+  <az-text id="tbAdmissionCode" scope="window" name="admitCode" title="Admission Code" placeholder="adm|dis|oth" valueList='{"adm": "Admitted", "dis": "Discharged", "oth": "Other"}'></az-text>
 </div>
 
 
