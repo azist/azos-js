@@ -14,7 +14,6 @@ import "../../parts/text-field";
 import "../../vcl/time/scheduler";
 import { getDailyAvailable } from "./fetch-scheduling-data";
 
-// const rangeData = combineAgentSchedulesPerDay(getDailyAvailable("2024-12-28T00:00:00+00:00", { mangleAgentHours: true, earliestTime: 9 * 60, latestTime: 20 * 60 }), 5);
 const rangeData = getDailyAvailable();
 export class CaseScheduler extends CaseBase {
 
@@ -25,7 +24,6 @@ export class CaseScheduler extends CaseBase {
       for (let i = 0; i < rangeData.length; i++) {
         const one = rangeData[i];
         const day = types.asDate(one.day, false, true);
-        console.groupCollapsed(day);
         if (i === 0) { this.schTest.enabledStartDate = day; }
         for (let j = 0; j < one.hours.parsed.length; j++) {
           const span = one.hours.parsed[j];
@@ -38,20 +36,10 @@ export class CaseScheduler extends CaseBase {
             data: { span: span },
           });
         }
-        console.groupEnd();
       }
     } finally {
       this.schTest.endChanges();
     }
-    console.log(this.schTest.items);
-  }
-
-  #renderCaption(agent) {
-    return html`<div class="agent">Agent: ${this.#formatAgentName(agent)} <small>(${agent.Id.split('@')[1]})</small></div>`;
-  }
-
-  #formatAgentName({ First, Last, Middle, Title, Suffix } = {}) {
-    return [Title, First, Middle, Last, Suffix].filter(types.isNonEmptyString).join(" ");
   }
 
   btnAddItem() {
@@ -67,7 +55,7 @@ export class CaseScheduler extends CaseBase {
     const day = new Date(year, month - 1, date);
     day.setHours(0, 0, 0, 0);
     this.schTest.addItem({
-      id: Math.random() > 0.5 ? null : `Strang${Math.random() * 10}`,
+      id: Math.random() > 0.5 ? null : `n-${Math.random() * 10}`,
       caption,
       startTimeMins,
       durationMins: duration,
@@ -86,12 +74,9 @@ export class CaseScheduler extends CaseBase {
     <az-button title="Add Item" @click="${() => this.btnAddItem()}"></az-button>
 </div>
 
-<az-button title="Previous" @click="${() => this.schTest.changeViewPage(-1)}"></az-button>
-<az-button title="Next" @click="${() => this.schTest.changeViewPage(1)}"></az-button>
 <az-time-block-picker id="schTest" scope="this"
-    enabledStartDate="2024-12-28"
-    enabledEndDate="2025-1-6"
-
+    xenabledStartDate="2024-12-28"
+    xenabledEndDate="2025-1-6"
 ></az-time-block-picker>
     `;
   }
