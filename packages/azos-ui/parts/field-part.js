@@ -10,8 +10,9 @@ import { asTypeMoniker,
          CLIENT_MESSAGE_PROP,
          VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
          DATA_KIND, asDataKind,
-         isAssigned} from "azos/types";
-import { dflt, isValidPhone, isValidEMail, isValidScreenName } from "azos/strings";
+         isAssigned,
+         isString } from "azos/types";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
@@ -133,20 +134,17 @@ export class FieldPart extends Part{
   _validateRequired(context, val, scope){
     if (!this.isRequired) return null;
 
-    let has = (val !== null && val !== undefined || val !== "");
+    let empty = (val === null || val === undefined || (isString(val) && isEmpty(val)));
 
-    if (has){
+    if (!empty){
       const cr = val[CHECK_REQUIRED_METHOD];
       if (cr){
-        has = true === cr.call(val, context);
+        empty = true !== cr.call(val, context);
       }
     }
 
-    return has ? null : new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Value required");
+    return empty ? new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Value required") : null;
   }
-
-
-
 
   _validateDataKind(context, val, scope){
     switch(this.dataKind){
@@ -190,21 +188,27 @@ export class FieldPart extends Part{
     if (isAssigned(this.minValue)){
       const limit = this.castValue(this.minValue);
       const pass =  val >= limit;
-      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is less than allowed`);
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is less than ${limit}`);
     }
 
     if (isAssigned(this.maxValue)){
       const limit = this.castValue(this.maxValue);
       const pass =  val <= limit;
-      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is greater than allowed`);
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is greater than ${limit}`);
     }
 
     return null;
   }
 
 
-  //TODO: FINISH these below
-  _validateValueList(context, val, scope){ return null; }
+  _validateValueList(context, val, scope){
+    if (isAssigned(this.valueList)){
+      const pass = this.valueList[val.toString()];
+      if (!pass) return new  ValidationError(this.effectiveSchema, this.effectiveName, scope, `Value is not in the allowed list`);
+    }
+
+    return null;
+  }
 
 
   /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
@@ -325,6 +329,12 @@ export class FieldPart extends Part{
             converter: { fromAttribute: (v) => v?.toString()}
             /////////////hasChanged(newVal, oldVal) { return true; }
            },
+
+    /** The value pick list, having keys represent allowed values e.g. `{ok: "Proceed", cancel: "Stop operation"}` */
+    valueList: {type: Object,
+      converter: { fromAttribute: (v) => asObject(v)}
+      /////////////hasChanged(newVal, oldVal) { return true; }
+    },
 
     /** Field error, such as validation error */
     error: {type: Object, reflect: false},

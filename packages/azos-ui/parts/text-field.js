@@ -29,23 +29,15 @@ export class TextField extends FieldPart {
     /** Defines resize attribute for textarea
      * (none | both | horizontal | vertical | block | inline) */
     resize: { type: String },
+
+    /** True for multiline text fields */
+    multiline: { type: Boolean}
   }
 
   static styles = [baseStyles, textFieldStyles];
 
   constructor() { super(); }
 
-  /** True if text input is <textarea> */
-  get isTextArea() { return isOneOf(this.itemType, ["multiline", "long", "textarea"]); }
-
-  /** True if text input is <input type="password"> */
-  get isPassword() { return isOneOf(this.itemType, ["password", "pass", "pw", "masked"]); }
-
-  /** True if text input is <input type="date"> */
-  get isDate() { return isOneOf(this.itemType, ["date", "calendar", "day", "month", "year"]); }
-
-  /** True if text input is <input type="text"> */
-  get isInputText() { return !this.isTextArea && !this.isPassword && !this.isDate; }
 
   /** True if alignValue is a valid value */
   get isValidAlign() { return isOneOf(this.alignValue, ["left", "center", "right"]); }
@@ -66,12 +58,16 @@ export class TextField extends FieldPart {
 
   prepareInputValue(v){
     if (v===null || v===undefined) return null;
-
     if (this.dataKind === DATA_KIND.TEL){
       return normalizeUSPhone(v);
     }
-
     return v;
+  }
+
+  /** Override to convert a value into the one displayed in a text input */
+  // eslint-disable-next-line no-unused-vars
+  prepareValueForInput(v, isRawValue = false){
+    return asString(v) ?? "";
   }
 
   renderInput() {
@@ -79,12 +75,15 @@ export class TextField extends FieldPart {
     const clsStatusBg = `${parseStatus(this.effectiveStatus, true, "Bg")}`;
 
     let val = this.value;
-    if ((val === undefined || val === null) && this.error) val = this.rawValue;
-    val = asString(val) ?? "";
+    if ((val === undefined || val === null) && this.error)
+      val = this.prepareValueForInput(this.rawValue, true);
+    else
+      val = this.prepareValueForInput(val, false);
 
     //console.info("Will render this value: " + describe(val));
 
-    let compArea = this.isTextArea ? html`
+    if (this.multiline){
+      return  html`
       <textarea
         class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
         id="tbData"
@@ -99,29 +98,40 @@ export class TextField extends FieldPart {
         @change="${this.#tbChange}"
         part="field"
         style="resize: ${this.resize}"
-        ></textarea>`
-      : html`
-      <input
-        class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="tbData"
-        maxLength="${this.maxLength ? this.maxLength : noContent}"
-        minLength="${this.minLength ? this.minLength : noContent}"
-        placeholder="${this.placeholder}"
-        type="${this.isInputText ? "text" : this.isPassword ? "password" : "date"}"
-        .value="${val}"
-        .disabled=${this.isDisabled}
-        .required=${this.isRequired}
-        ?readonly=${this.isReadonly}
-        @change="${this.#tbChange}"
-        part="field"
-        autocomplete="off"
-      />
-      `;
+        ></textarea>`;
+    }
 
-    const tb = this.$("tbData");
-    if (tb) tb.value = val;
+    let tp = "text";
+    switch(this.dataKind){
+      case DATA_KIND.SCREENNAME: tp = "text"; break;
+      case DATA_KIND.URL: tp = "url"; break;
+      case DATA_KIND.PASSWORD: tp = "password"; break;
+      case DATA_KIND.TEL: tp = "tel"; break;
+      case DATA_KIND.EMAIL: tp = "email"; break;
+      case DATA_KIND.COLOR: tp = "color"; break;
+      case DATA_KIND.DATE: tp = "date"; break;
+      case DATA_KIND.DATETIME: tp = "text"; break;
+      case DATA_KIND.DATETIMELOCAL: tp = "datetime-local"; break;
+      case DATA_KIND.TIME: tp = "time"; break;
+      default: tp = "text";
+    }
 
-    return compArea;
+    return html`
+    <input
+      class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
+      id="tbData"
+      maxLength="${this.maxLength ? this.maxLength : noContent}"
+      minLength="${this.minLength ? this.minLength : noContent}"
+      placeholder="${this.placeholder}"
+      type="${tp}"
+      .value="${val}"
+      .disabled=${this.isDisabled}
+      .required=${this.isRequired}
+      ?readonly=${this.isReadonly}
+      @change="${this.#tbChange}"
+      part="field"
+      autocomplete="off"
+    />`;
   }
 }
 
