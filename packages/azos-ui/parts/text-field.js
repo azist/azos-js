@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf, asString, normalizeUSPhone } from 'azos/strings';
+import { isOneOf, asString, normalizeUSPhone, format } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
@@ -14,24 +14,27 @@ import { DATA_KIND } from 'azos/types';
 export class TextField extends FieldPart {
   static properties = {
     /** Aligns input value left, center, or right. Default: left. */
-    alignValue: { type: String },
+    alignValue: { type: String, reflect: false },
 
     /** Determines number of rows when textarea is rendered (default: 4 rows) */
-    height: { type: Number },
+    height: { type: Number, reflect: false },
 
     /** Determines if this field is a single-line input, password, or
      *  textarea (multi-line block input) */
-    itemType: { type: String },
+    itemType: { type: String, reflect: false },
 
     /** Ghosted text that will be replaced by user input */
-    placeholder: { type: String },
+    placeholder: { type: String, reflect: false },
 
     /** Defines resize attribute for textarea
      * (none | both | horizontal | vertical | block | inline) */
-    resize: { type: String },
+    resize: { type: String, reflect: false },
 
     /** True for multiline text fields */
-    multiline: { type: Boolean}
+    multiline: { type: Boolean, reflect: false},
+
+    /** Format expression for display value */
+    displayFormat: { type: String, reflect: false }
   }
 
   static styles = [baseStyles, textFieldStyles];
@@ -67,7 +70,11 @@ export class TextField extends FieldPart {
   /** Override to convert a value into the one displayed in a text input */
   // eslint-disable-next-line no-unused-vars
   prepareValueForInput(v, isRawValue = false){
-    return asString(v) ?? "";
+    const df = this.displayFormat;
+    if (!df) return asString(v) ?? "";
+
+    const result = format(df, {v}, this.arena.app.localizer);
+    return result;
   }
 
   renderInput() {
