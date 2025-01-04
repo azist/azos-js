@@ -71,7 +71,7 @@ export class TextField extends FieldPart {
   // eslint-disable-next-line no-unused-vars
   prepareValueForInput(v, isRawValue = false){
     const df = this.displayFormat;
-    if (!df) return asString(v) ?? "";
+    if (!df || isRawValue || this.error) return asString(v) ?? "";
 
     const result = format(df, {v}, this.arena.app.localizer);
     return result;
