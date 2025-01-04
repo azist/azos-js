@@ -91,6 +91,16 @@ export class CaseTextFields extends CaseBase {
   <az-text id="tbScorePercent"  scope="window" name="scorePercent" title="Score Percent" datatype="real" minValue="0" maxValue="100"></az-text>
 
   <az-text id="tbAdmissionCode" scope="window" name="admitCode" title="Admission Code" placeholder="adm|dis|oth" valueList='{"adm": "Admitted", "dis": "Discharged", "oth": "Other"}'></az-text>
+
+  <az-text id="tbDOB" scope="window" name="dob" title="DOB" dataType="date" style="width: 50ch" value="2/23/2022" displayFormat='<<v::ld{"dtFormat": "NumDate"}>>'></az-text>
+  <az-text id="tbDOBView" scope="window"
+                    name="dobView"
+                    title="DOB Readonly"
+                    isreadonly
+                    dataType="date"
+                    alignValue="center"
+                    style="width: 35ch" value="2/23/2022 18:48"
+                    displayFormat='Born on <<v::ld{"dtFormat": "NumDate", "tmDetails": "HM", "utc": true}>> UTC time'></az-text>
 </div>
 
 <div class="strip-h">
