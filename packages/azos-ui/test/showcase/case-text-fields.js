@@ -93,6 +93,13 @@ export class CaseTextFields extends CaseBase {
   <az-text id="tbAdmissionCode" scope="window" name="admitCode" title="Admission Code" placeholder="adm|dis|oth" valueList='{"adm": "Admitted", "dis": "Discharged", "oth": "Other"}'></az-text>
 </div>
 
+<div class="strip-h">
+  <az-text id="tbColorHeader"  scope="window"    title="Header Color" dataKind="color" value="#0000ff"></az-text>
+  <az-text id="tbColorBody"  scope="window"    title="Body Color" dataKind="color" value="#505050"></az-text>
+  <az-text id="tbColorFooter"  scope="window"    title="Footer Color" dataKind="color" value="#7aef45"></az-text>
+</div>
+
+
 
     `;
   }
