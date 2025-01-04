@@ -11,8 +11,7 @@ import { asTypeMoniker,
          VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
          DATA_KIND, asDataKind,
          isAssigned,
-         isString,
-         isNonEmptyString} from "azos/types";
+         isString } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
