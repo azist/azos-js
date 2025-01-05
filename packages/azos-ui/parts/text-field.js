@@ -68,12 +68,13 @@ export class TextField extends FieldPart {
   }
 
   /** Override to convert a value into the one displayed in a text input */
-  // eslint-disable-next-line no-unused-vars
   prepareValueForInput(v, isRawValue = false){
-    const df = this.displayFormat;
-    if (!df || isRawValue || this.error) return asString(v) ?? "";
+    if (v===undefined || v===null) return "";
 
-    const result = format(df, {v}, this.arena.app.localizer);
+    const df = this.displayFormat;
+    if (!df || isRawValue) return asString(v) ?? "";
+
+    const result = format(df, {v}, this.arena.app.localizer) ?? "";
     return result;
   }
 
@@ -87,7 +88,7 @@ export class TextField extends FieldPart {
     else
       val = this.prepareValueForInput(val, false);
 
-    //console.info("Will render this value: " + describe(val));
+    ////console.info("Will render this value: " + val);
 
     if (this.multiline){
       return  html`
