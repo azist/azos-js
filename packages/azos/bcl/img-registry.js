@@ -111,7 +111,7 @@ export class ImageRegistry extends Module {
    * The specifier format is that of URL having the form:  `format://uri?iso=isoLangCode&theme=themeId&media=mediaId`, where query params are optional.
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
    * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
-   * @param {null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
    * @example
    *  resolveSpec("svg://file-open");
@@ -123,12 +123,12 @@ export class ImageRegistry extends Module {
     const url = new URL(isNonEmptyString(spec));
     let imgUri     = url.host;
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
-    let imgIsoLang = url.searchParams.get("iso") ?? iso;
-    let imgTheme = url.searchParams.get("theme") ?? theme;
+    let imgIsoLang = url.searchParams.get("iso");
+    let imgTheme = url.searchParams.get("theme");
     let imgMedia = url.searchParams.get("media");
 
-    if (imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
-    if (imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
+    if (!imgIsoLang || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
+    if (!imgTheme || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
 
     const resolved = this.resolve(imgUri, imgFormat, {imgIsoLang, imgTheme, imgMedia});
     return resolved;
