@@ -46,7 +46,7 @@ export function renderToolbar(app, self, commands){
   let i=0;
   for(let cmd of commands){
     const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${toolbarClick.bind(cmd)}">
-      ${cmd.provideMarkup(self)}
+      ${cmd.provideMarkup(self, self)}
     </div>`;
     itemContent.push(one);
   }
