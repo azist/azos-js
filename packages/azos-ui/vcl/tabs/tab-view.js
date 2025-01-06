@@ -74,9 +74,21 @@ export class TabView extends Control {
   box-sizing: border-box;
 }
 
-.tab-btn.active {
-  border-bottom-color: black;
+.tab-btn.active { background-color: var(--paper); }
+
+.tab-btn .refreshBtn {
+  display: inline-block;
+  padding: 0 0.25em;
+  margin: 0 0.25em;
+  border: 1px solid transparent;
+}
+
+.refreshBtn:hover {
   background-color: var(--paper);
+  border-color: #aaa;
+  border-radius: 50%;
+  filter: brightness(80%);
+  cursor: pointer;
 }
 
 .modern .tab-btn-container-inner {
@@ -355,6 +367,7 @@ export class TabView extends Control {
   }
 
   #removeHighlight() { this.tabBtns.forEach(tab => tab.classList.remove("drop-zone", "left", "right")); }
+  #btnRefresh(tab) { tab.dispatchEvent(new Event("refresh", { composed: true, bubbles: true })); }
 
   /**
    * @returns true if tab was unselected
@@ -487,6 +500,7 @@ export class TabView extends Control {
             ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
+            ${tab.active && tab.canRefresh ? html`<div class="refreshBtn" @click="${() => this.#btnRefresh(tab)}">&#x21bb;</div>` : noContent}
             ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : noContent}
           </div>
         `})}
