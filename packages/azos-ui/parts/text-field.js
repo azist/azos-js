@@ -19,10 +19,6 @@ export class TextField extends FieldPart {
     /** Determines number of rows when textarea is rendered (default: 4 rows) */
     height: { type: Number, reflect: false },
 
-    /** Determines if this field is a single-line input, password, or
-     *  textarea (multi-line block input) */
-    itemType: { type: String, reflect: false },
-
     /** Ghosted text that will be replaced by user input */
     placeholder: { type: String, reflect: false },
 
