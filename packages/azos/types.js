@@ -594,20 +594,16 @@ const ALL_CHAR_CASES = allObjectValues(CHAR_CASE);
 export const DATA_KIND = Object.freeze({
   TEXT: "text",
   SCREENNAME: "screenname",
+  URL: "url",
+  TEL: "tel",
+  PHONE: "tel",
+  EMAIL: "email",
   COLOR: "color",
   DATE: "date",
   DATETIME: "datetime",
   DATETIMELOCAL: "datetime-local",
-  EMAIL: "email",
-  MONTH: "month",
-  NUMBER: "number",
-  RANGE: "range",
-  SEARCH: "search",
-  TEL: "tel",
-  TIME: "time",
-  URL: "url",
-  WEEK: "week",
-  MONEY: "money"
+  PASSWORD: "pwd",
+  TIME: "time"
 });
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
 

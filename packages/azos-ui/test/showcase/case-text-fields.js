@@ -42,12 +42,12 @@ export class CaseTextFields extends CaseBase {
 </div>
 <hr>
 <div class="strip-h">
-  <az-text id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;" itemType="long"></az-text>
-  <az-text id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" itemType="long" status="ok"></az-text>
-  <az-text id="infoTextArea" title="Info Status" placeholder="Type something here&hellip;" itemType="long" status="info"></az-text>
-  <az-text id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" itemType="long" status="warning"></az-text>
-  <az-text id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" itemType="long" status="alert"></az-text>
-  <az-text id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" itemType="long" status="error"></az-text>
+  <az-text id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;" multiline></az-text>
+  <az-text id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" multiline status="ok"></az-text>
+  <az-text id="infoTextArea" title="Info Status" placeholder="Type something here&hellip;" multiline status="info"></az-text>
+  <az-text id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" multiline status="warning"></az-text>
+  <az-text id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" multiline status="alert"></az-text>
+  <az-text id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" multiline status="error"></az-text>
 </div>
 <hr>
 <div class="strip-h">
@@ -61,23 +61,54 @@ export class CaseTextFields extends CaseBase {
 <hr>
 <div class="strip-h">
   <az-text id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;" titlePosition="mid-left" titleWidth="25" contentWidth="75"></az-text>
-  <az-text id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text>
+  <az-text id="basicPasswordInput" dataKind="pwd" title="Basic password input" placeholder="Type something here&hellip;"></az-text>
   <az-text id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text>
   <az-text id="readOnlyInput" title="Read Only field" value="Read-only value" isReadonly></az-text>
   <az-text id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text>
-  <az-text id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text>
+  <az-text id="basicTextArea" multiline title="Basic textarea input" placeholder="Type something here&hellip;"></az-text>
 </div>
 
 
 <hr>
 <p> Here we test the validation and reformatting of values per DATA_KIND enumeration</p>
 <div class="strip-h">
-  <az-text id="tbPhone"      name="phone_1" title="Phone" placeholder="Your Phone" title="Phone" dataKind="TEL"></az-text>
-  <az-text id="tbEmail"      title="Email" placeholder="Your Email Address" dataKind="EMAIL"></az-text>
-  <az-text id="tbScreenName" name="user_id" title="ScreenName" placeholder="Your Id"  dataKind="SCREENNAME"></az-text>
+  <az-text id="tbPhone"  scope="window"
+                         name="phone_1"
+                         title="Phone"
+                         placeholder="Your Phone"
+                         dataKind="TEL"
+                         @change="${e => { console.info(`*** Control: '${e.target.id}'   Raw: '${e.target.rawValue}'   Value: '${e.target.value}'`);}}"
+                         value="123"></az-text>
 
-  <az-text id="tbScreenName2" name="screenName2" title="Screen Name With Len" dataKind="SCREENNAME" minLength=5 maxLength=10></az-text>
+  <az-text id="tbEmail"  scope="window"    title="Email" placeholder="Your Email Address" dataKind="EMAIL"></az-text>
+  <az-text id="tbScreenName" scope="window" name="user_id" title="ScreenName" placeholder="Your Id"  dataKind="SCREENNAME"></az-text>
+
+  <az-text id="tbScreenName2"  scope="window" name="screenName2" title="Screen Name With Len" dataKind="SCREENNAME" minLength=5 maxLength=10></az-text>
+
+
+  <az-text id="tbAirTemperature"  scope="window" name="airTemperature" title="Temperature C" datatype="int" minValue="-90" maxValue="60"></az-text>
+
+  <az-text id="tbScorePercent"  scope="window" name="scorePercent" title="Score Percent" datatype="real" minValue="0" maxValue="100"></az-text>
+
+  <az-text id="tbAdmissionCode" scope="window" name="admitCode" title="Admission Code" placeholder="adm|dis|oth" valueList='{"adm": "Admitted", "dis": "Discharged", "oth": "Other"}'></az-text>
+
+  <az-text id="tbDOB" scope="window" name="dob" title="DOB" dataType="date" style="width: 50ch" value="2/23/2022" displayFormat='<<v::ld{"dtFormat": "NumDate"}>>'></az-text>
+  <az-text id="tbDOBView" scope="window"
+                    name="dobView"
+                    title="DOB Readonly"
+                    isreadonly
+                    dataType="date"
+                    alignValue="center"
+                    style="width: 35ch" value="2/23/2022 18:48"
+                    displayFormat='Born on <<v::ld{"dtFormat": "NumDate", "tmDetails": "HM", "utc": true}>> UTC time'></az-text>
 </div>
+
+<div class="strip-h">
+  <az-text id="tbColorHeader"  scope="window"    title="Header Color" dataKind="color" value="#0000ff"></az-text>
+  <az-text id="tbColorBody"  scope="window"    title="Body Color" dataKind="color" value="#505050"></az-text>
+  <az-text id="tbColorFooter"  scope="window"    title="Footer Color" dataKind="color" value="#7aef45"></az-text>
+</div>
+
 
 
     `;
