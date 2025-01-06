@@ -23,37 +23,38 @@ class IMemoryLog extends ILog{
   _doWrite(msg){ this.#buffer.push(msg); }
 }
 
+describe("Application", function() {
+  describe("Log", function() {
 
-describe("#AppLog", function() {
+    it("log-mem-buffer",   function() {
 
-  it("write membuffer",   function() {
+      let logBuffer = [];
 
-    let logBuffer = [];
+      const app = application({
+        //logLevel: "info",
+        modules: [
+          {name: "log", type: IMemoryLog, buffer: new Verbatim(logBuffer)}
+        ]
+      });
 
-    const app = application({
-      //logLevel: "info",
-      modules: [
-        {name: "log", type: IMemoryLog, buffer: new Verbatim(logBuffer)}
-      ]
+      app.log.write({text: "Message 1"});
+      app.log.write({text: "Message 2"});
+      app.log.write({text: "3 Message"});
+
+      dispose(app);
+
+      aver.areEqual(3, logBuffer.length);
+      aver.areEqual("Message 1", logBuffer[0].text);
+      aver.areEqual("Message 2", logBuffer[1].text);
+      aver.areEqual("3 Message", logBuffer[2].text);
     });
 
-    app.log.write({text: "Message 1"});
-    app.log.write({text: "Message 2"});
-    app.log.write({text: "3 Message"});
-
-    dispose(app);
-
-    aver.areEqual(3, logBuffer.length);
-    aver.areEqual("Message 1", logBuffer[0].text);
-    aver.areEqual("Message 2", logBuffer[1].text);
-    aver.areEqual("3 Message", logBuffer[2].text);
   });
-
 });
 
-describe("Log.Common", function() {
+describe("LoggingCommon", function() {
 
-  it("exceptionToData(new Error())",   function() {
+  it(".exceptionToData(new Error())",   function() {
     const got = log.exceptionToData(new Error("crap message"));
     condir("new Error()", got);
     aver.areEqual("Error", got["TypeName"]);
@@ -63,7 +64,7 @@ describe("Log.Common", function() {
     aver.isTrue(got["StackTrace"].length > 0);
   });
 
-  it("exceptionToData(throw new Error())",   function() {
+  it(".exceptionToData(throw new Error())",   function() {
     try{
       throw new Error("crap message");
     } catch(err) {
@@ -77,7 +78,7 @@ describe("Log.Common", function() {
     }
   });
 
-  it("exceptionToData(new AzosError())",   function() {
+  it(".exceptionToData(new AzosError())",   function() {
     const got = log.exceptionToData(new AzosError("AZ5 msg", "reactor4", null, -1234));
     condir("new AzosError()", got);
     aver.areEqual("AzosError -1234 @ 'reactor4'", got["TypeName"]);
@@ -87,7 +88,7 @@ describe("Log.Common", function() {
     aver.isTrue(got["StackTrace"].length > 0);
   });
 
-  it("exceptionToData(throw new AzosError(nested))",   function() {
+  it(".exceptionToData(throw new AzosError(nested))",   function() {
     try{
       try{
         throw new AzosError("Inner msg", "site-3", null, 37);

@@ -16,6 +16,7 @@ import "./conf-tests.js";
 import "./atom-tests.js";
 import "./entity-id-tests.js";
 
+import "./app-lifecycle.js";
 import "./app-mod-tests.js";
 import "./linker-tests.js";
 import "./linker-tests2.js";
