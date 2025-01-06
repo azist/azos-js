@@ -47,10 +47,15 @@ import { CONTENT_TYPE } from "../coreconsts.js";
 import { dflt } from "../strings.js";
 import { Module } from "../modules.js";
 
-/** Resolves  */
+/** Contains a registry of {@link ImageRecord} instances which describe images.
+ * The registry keeps images by their logical URI strings, resolving each request
+ * by selecting the most appropriate image record for the requested URI.
+ * Image records are image data record variations containing: `format`, `theme`, `media`, `isoLanguage`.
+ * Use {@link resolveSpec} method to get images from string spec like `jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print`
+  */
 export class ImageRegistry extends Module {
 
-  //stores mappings of: URI -> [bucket] , bucket contains keys that we search by and record score
+  //stores mappings of: URI -> [bucket] , bucket contains records that we get the best by score
   #map;
 
   constructor(app, cfg) {
@@ -58,7 +63,7 @@ export class ImageRegistry extends Module {
 
     this.#map = new Map();
 
-    cfg = cfg.get("icons", "images", "imgs");
+    cfg = cfg.get("images", "imgs");
 
     if (!cfg) cfg = config(STOCK_IMAGES).root;
     for (const cfgRec of cfg.getChildren(false)) {
@@ -77,13 +82,15 @@ export class ImageRegistry extends Module {
   resolve(uri, format, { isoLang, theme, media } = {}) {
     isNonEmptyString(uri);
     isNonEmptyString(format);
-    isoLang = dflt(isoLang, "eng");
+    isoLang = dflt(isoLang, "eng"); // US English
     theme = dflt(theme, "any"); // theme agnostic
-    media = dflt(media, "ico64");
+    media = dflt(media, "ico64"); // icon64 virtual pixels
 
     const bucket = this.#map.get(uri);
     if (!bucket) return null;
 
+    //RECORD SCORE algorithm:
+    //while linear search is slow, in reality you would rarely get more than 2-3 records per bucket array
     let bestRec = null;
     for (const rec of bucket) {
 
@@ -111,16 +118,26 @@ export class ImageRegistry extends Module {
    */
   resolveSpec(spec){
     const url = new URL(isNonEmptyString(spec));
-
-//todo: Test in JS fiddle
     const imgUri     = url.host;
     const imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
     const imgIsoLang = url.searchParams.get("iso");
     const imgTheme = url.searchParams.get("theme");
     const imgMedia = url.searchParams.get("media");
     const resolved = this.resolve(imgUri, imgFormat, {imgIsoLang, imgTheme, imgMedia});
-
     return resolved;
+  }
+
+  /** Returns an iterable of all image URIs loaded.
+   * To go through all images you can loop through this result and the call {@link getRecords} for each
+   */
+  getUris(){ return this.#map.keys(); }
+
+  /** Returns an array of {@link ImageRecord} for the specified URI or null if does not exist
+   * @returns {ImageRecord[]}
+  */
+  getRecords(uri){
+    isNonEmptyString(uri);
+    return this.#map.get(uri) ?? null;
   }
 
   /**
@@ -141,12 +158,15 @@ export class ImageRegistry extends Module {
     bucket.push(iRec);
   }
 
-  //FIXME: Must implement!!
-  unregister() {
-    ///will take out of existing bucket
+  /** Deletes all records for the URI bucket returning true, or false if such URI is not found
+   * @returns {boolean} true if found and deleted
+  */
+  unregisterRecords(uri) {
+    isNonEmptyString(uri);
+    return this.#map.delete(uri);
   }
 
-}
+}//ImageRegistry class
 
 /** Provides information about a single image representation: (format, iso, theme, media) */
 export class ImageRecord {
@@ -193,13 +213,20 @@ export class ImageRecord {
   /** Records score. It is higher the more fields are populated. Importance: (media = 1000, isoLang = 100, theme = 1) */
   get score() { return this.#score; }
 
-  /** Image content: string or custom binary array */
+  /** Image content: string or custom binary array, or an instruction how to get content. Use {@link produceContent} method to get actual image script/bytes */
   get content() { return this.#content; }
 
   /** Image content MIME type e.g. `image/png` */
   get contentType() { return this.#contentType; }
 
+  /** Call this method to get the actual image content such as PNG byte[] or SVG text.
+   * Keep in mind, the {@link content} property may only contain a reference (in future version) to the image stored elsewhere.
+   * You need to call this method to get the actual materialized content, e.g. fetched from network (and cached) by first calling async {@link materialize}
+   */
   produceContent() { return { ctp: this.#contentType, content: this.#content }; }
+
+  /** Async method which materializes the referenced content. This is reserved for future */
+  async materialize(){ return true; }
 }
 
 
