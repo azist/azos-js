@@ -163,16 +163,18 @@ export class Command {
   /**
    * Provides a main representation of the command in a toolbar/menu in a form of markup,
    * such as SVG for image. It is possible to provide a complex markup such as flex container with text input and a button etc..
+   * @param {Arena} arena - required parameter
+   * @param {object} target - target of rendering, where rendering is directed
    * @returns {TemplateResult} return html template fragment
    * */
   // eslint-disable-next-line no-unused-vars
-  provideMarkup(target){
+  provideMarkup(arena, target){
     const ico = this.#icon;
     if (!ico){
       return html`<div class="command-button">${this.title}</div>`;
     }
 
-    return html`<div class="command-icon">${verbatimHtml(this.icon)}</div>`;
+    return html`<div class="command-icon">${verbatimHtml(arena.resolveImageSpec(ico).content)}</div>`;
   }
 
 }
