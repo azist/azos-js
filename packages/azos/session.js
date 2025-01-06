@@ -26,11 +26,10 @@ export class Session extends types.DisposableObject{
   #app;
   #user;
   #isoLang;
+  #theme;
   #culture;
   #settings;
 
-    //todo settings
-  //todo culture...
 
 
   // eslint-disable-next-line no-unused-vars
@@ -64,6 +63,12 @@ export class Session extends types.DisposableObject{
     }
   }
 
+  get isoLang(){ return this.#isoLang; }
+  set isoLang(v){ this.#isoLang = v; }
+
+  get theme(){ return this.#theme; }
+  set theme(v){ this.#theme = v; }
+
   /**
    * Internal: Synchronizes this session with another one, e.g. from another browser tab.
    * The data parameter contains new principal/user
@@ -75,6 +80,9 @@ export class Session extends types.DisposableObject{
     const usr = new User(init);
     this.#user = usr;//notice assignment into pvt and no broadcast change
 
+    this.#isoLang = data.isoLang;
+    this.#theme = data.theme;
+
     //TBD: We might need to rise event here about session change
   }
 
@@ -83,7 +91,7 @@ export class Session extends types.DisposableObject{
     const sync = linker.tryResolve(AppSync);
     if (sync !== null){
       this.#app.log.write({type: LOG_TYPE.INFO, from: "sess.change()", text: "Broadcast user change"});
-      sync.postEvent(SYNC_EVT_TYPE_SESSION_CHANGE, {user: this.#user.toInitObject()});
+      sync.postEvent(SYNC_EVT_TYPE_SESSION_CHANGE, {user: this.#user.toInitObject(), isoLang: this.#isoLang, theme: this.#theme});
     }
   }
 

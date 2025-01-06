@@ -110,19 +110,26 @@ export class ImageRegistry extends Module {
    * and optionally matching on `isoLanguage`, `theme`, and `media` specifiers.
    * The specifier format is that of URL having the form:  `format://uri?iso=isoLangCode&theme=themeId&media=mediaId`, where query params are optional.
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
+   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
+   * @param {null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
    * @example
    *  resolveSpec("svg://file-open");
    *  resolveSpec("png://business-logo?media=print");
    *  resolveSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print");
+   *  resolveSpec("jpg://welcome-banner-hello1?iso=$session&theme=$session&media=print");// take ISO and theme from user session
    */
-  resolveSpec(spec){
+  resolveSpec(spec, iso = null, theme = null){
     const url = new URL(isNonEmptyString(spec));
-    const imgUri     = url.host;
-    const imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
-    const imgIsoLang = url.searchParams.get("iso");
-    const imgTheme = url.searchParams.get("theme");
-    const imgMedia = url.searchParams.get("media");
+    let imgUri     = url.host;
+    let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
+    let imgIsoLang = url.searchParams.get("iso") ?? iso;
+    let imgTheme = url.searchParams.get("theme") ?? theme;
+    let imgMedia = url.searchParams.get("media");
+
+    if (imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
+    if (imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
+
     const resolved = this.resolve(imgUri, imgFormat, {imgIsoLang, imgTheme, imgMedia});
     return resolved;
   }
@@ -223,7 +230,7 @@ export class ImageRecord {
    * Keep in mind, the {@link content} property may only contain a reference (in future version) to the image stored elsewhere.
    * You need to call this method to get the actual materialized content, e.g. fetched from network (and cached) by first calling async {@link materialize}
    */
-  produceContent() { return { ctp: this.#contentType, content: this.#content }; }
+  produceContent() { return { sc: 200, ctp: this.#contentType, content: this.#content }; }
 
   /** Async method which materializes the referenced content. This is reserved for future */
   async materialize(){ return true; }
