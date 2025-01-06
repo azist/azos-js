@@ -26,6 +26,7 @@ import "./showcase/case-toasts";
 import "./showcase/case-slide-deck";
 import "./showcase/case-tree-view";
 import "./showcase/case-scheduler";
+import { toast } from "../toast";
 
 const DISPLAY_MODES = Object.freeze({
   LONG_FORM: 0,
@@ -96,7 +97,17 @@ export class Showcase2 extends Control {
       this.tocSections = sections.map(section => ({ id: section.id, label: section.id.replace("Content", "").replace(/([A-Z])/g, " $1") }));
       sections.forEach(section => renderInto(returnToToC, section));
     }
-    this.requestUpdate();
+    this.update();
+    if (this.displayMode === DISPLAY_MODES.TABBED) {
+      this.$("tvTestTab").addEventListener("refresh", () => {
+        toast("Refreshing, isn't it?");
+        this.testCaseTreeView.refresh?.();
+      });
+      this.$("schTestTab").addEventListener("refresh", () => {
+        toast("Refreshing, isn't it?");
+        this.testCaseScheduler.refresh?.();
+      });
+    }
   }
 
   render() {
@@ -160,8 +171,8 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <az-tab title="Modals"> <az-case-modals></az-case-modals> </az-tab>
   <az-tab title="Toasts"> <az-case-toasts></az-case-toasts> </az-tab>
   <az-tab title="Slide Deck"> <az-case-slide-deck></az-case-slide-deck> </az-tab>
-  <az-tab title="Tree View"> <az-case-tree-view></az-case-tree-view> </az-tab>
-  <az-tab title="Scheduler (WIP)"> <az-case-scheduler></az-case-scheduler> </az-tab>
+  <az-tab title="Tree View" id="tvTestTab" scope="this" canRefresh> <az-case-tree-view id="testCaseTreeView" scope="this"></az-case-tree-view> </az-tab>
+  <az-tab title="Scheduler (WIP)" id="schTestTab" scope="this" canRefresh> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </az-tab>
   <az-tab title="Sliders (WIP)"> <az-case-sliders></az-case-sliders> </az-tab>
   <az-tab title="Accordion (WIP)"> <az-case-accordion></az-case-accordion> </az-tab>
 </az-tab-view>

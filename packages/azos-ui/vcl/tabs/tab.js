@@ -17,6 +17,7 @@ export class Tab extends Block {
 
   static properties = {
     active: { type: Boolean, reflect: true },
+    canRefresh: { type: Boolean },
     minWidth: { type: Number },
     maxWidth: { type: Number },
     canClose: { type: Boolean },

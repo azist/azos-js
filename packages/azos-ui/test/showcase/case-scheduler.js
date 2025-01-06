@@ -19,6 +19,15 @@ export class CaseScheduler extends CaseBase {
 
   firstUpdated() {
     super.firstUpdated();
+    this.#loadSchedulingItems();
+  }
+
+  refresh() {
+    this.schTest.purge();
+    this.#loadSchedulingItems();
+  }
+
+  #loadSchedulingItems() {
     this.schTest.beginChanges();
     try {
       for (let i = 0; i < rangeData.length; i++) {
