@@ -40,7 +40,7 @@ export class AppComponent extends types.DisposableObject{
     aver.isOf(app, Application);
     const clist = AppComponent.#appMap.get(app);
     if (clist === undefined) return [];
-    return clist.filter(c => c.director === app);
+    return clist.filter(c => c[types.DIRECTOR_PROP] === app);
   }
 
   #director;
@@ -82,6 +82,7 @@ export class AppComponent extends types.DisposableObject{
    * @returns {Application | ApplicationComponent}
   */
   get [types.DIRECTOR_PROP]() { return this.#director; }
+  get director() { return this.#director; }
 
   /** Returns int system id of this component. System ids are ever increasing while app runs
    * @returns {int}
@@ -103,7 +104,7 @@ export class AppComponent extends types.DisposableObject{
   */
   get directedComponents(){
     const all = AppComponent.getAllApplicationComponents(this.app);
-    return all.filter(c => c.director === this);
+    return all.filter(c => c[type.DIRECTOR_PROP] === this);
   }
 
   /**
@@ -126,7 +127,7 @@ export class AppComponent extends types.DisposableObject{
    * Returns log level of this component, or if it is null then from its director
    */
   get effectiveLogLevel(){
-    return this.logLevel ?? this.director.effectiveLogLevel;
+    return this.logLevel ?? this[type.DIRECTOR_PROP].effectiveLogLevel;
   }
 
   /**
