@@ -10,6 +10,7 @@ import { application } from "../application.js";
 import { ImageRegistry } from "../bcl/img-registry.js";
 import { areEqual } from "../aver.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
+import { dispose } from "../types.js";
 
 unit("ImgRegistry", function () {
 
@@ -43,6 +44,8 @@ unit("ImgRegistry", function () {
       icon = ireg.resolve("test", "svg"); // "any"
       areEqual(icon.produceContent().content, "<svg>1</svg>");
       areEqual(icon.produceContent().ctp, CONTENT_TYPE.IMG_SVG);
+
+      dispose(app);
     });
   });
 });
