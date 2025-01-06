@@ -16,6 +16,7 @@ import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
 import { isEmpty } from "azos/strings";
+import { ImageRegistry } from "azos/bcl/img-registry";
 
 /**
  * Defines a root UI element which displays the whole Azos app.
@@ -288,6 +289,31 @@ ${footer}
       exception: ex ?? null
     });
     return guid;
+  }
+
+  /** Resolves image specifier into an image content.
+   *  For example: `arena.resolveImageSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print")`. See {@link ImageRegistry.resolveSpec}
+   * Requires {@link ImageRegistry} module installed in app chassis, otherwise returns a text block for invalid image.
+   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
+   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @returns {tuple} - {sc: int, ctp: string, content: buf | string}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>"}`
+   */
+  resolveImageSpec(spec, iso = null, theme = null){
+    if (!spec || !this.#app) return {sc: 500, ctp: "text/plain", content: ""};
+
+    const reg = this.#app.moduleLinker.tryResolve(ImageRegistry);
+    if (!reg){
+      this.writeLog(logging.LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
+      return {sc: 404, ctp: "text/plain+error", content: "NO IMAGE-REGISTRY CONFIGURED"};
+    }
+
+    const rec = reg.resolveSpec(spec, iso, theme);
+    if (!rec){
+      this.writeLog(logging.LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
+      return {sc: 404, ctp: "text/plain+error", content: `UNKNOWN IMG: ${spec}`};
+    }
+
+    return rec.produceContent();
   }
 
 }//Arena

@@ -54,12 +54,14 @@ unit("Application", function () {
       areEqual(1, app.modules.length);
       isOf(app.modules[0], ConLog);
 
-      let allc = AppComponent.getAllApplicationComponents(app);
-      areEqual(1,  allc.length);
-      areEqual(app, allc[0].director);
-      allc = AppComponent.getRootApplicationComponents(app);
-      areEqual(1,  allc.length);
-      areEqual(app, allc[0].director);
+      let clist = AppComponent.getAllApplicationComponents(app);
+      areEqual(1,  clist.length);
+      areEqual(app, clist[0].director);
+      isTrue(clist[0].isDirectedByApp)
+      clist = AppComponent.getRootApplicationComponents(app);
+      areEqual(1,  clist.length);
+      areEqual(app, clist[0].director);
+      isTrue(clist[0].isDirectedByApp)
 
       isOf(app.log, ILog);
       areEqual(LOG_TYPE.DEBUG, app.logLevel);
