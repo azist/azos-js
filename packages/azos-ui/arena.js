@@ -16,6 +16,7 @@ import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
 import { isEmpty } from "azos/strings";
+import { ImageRegistry } from "azos/bcl/img-registry";
 
 /**
  * Defines a root UI element which displays the whole Azos app.
@@ -288,6 +289,34 @@ ${footer}
       exception: ex ?? null
     });
     return guid;
+  }
+
+  /** Resolves image specifier into an image content.
+   * Image specifiers starting with `@` get returned as-is without the first `@` prefix, this way you cam embed verbatim image content in identifiers.
+   *  For example: `arena.resolveImageSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print")`. See {@link ImageRegistry.resolveSpec}
+   * Requires {@link ImageRegistry} module installed in app chassis, otherwise returns a text block for invalid image.
+   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
+   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @returns {tuple} - {sc: int, ctp: string, content: buf | string}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>"}`
+   */
+  resolveImageSpec(spec, iso = null, theme = null){
+    if (!spec || !this.#app) return {sc: 500, ctp: "text/plain", content: ""};
+
+    if (spec.startsWith("@")) return spec.slice(1);//get rid of prefix, return the rest as-is
+
+    const reg = this.#app.moduleLinker.tryResolve(ImageRegistry);
+    if (!reg){
+      this.writeLog("resolveImageSpec", logging.LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
+      return {sc: 404, ctp: "text/plain+error", content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>"};
+    }
+
+    const rec = reg.resolveSpec(spec, iso, theme);
+    if (!rec){
+      this.writeLog("resolveImageSpec", logging.LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
+      return {sc: 404, ctp: "text/plain+error", content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`};
+    }
+
+    return rec.produceContent();
   }
 
 }//Arena

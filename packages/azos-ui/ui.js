@@ -252,6 +252,17 @@ export class AzosElement extends LitElement {
      */
   writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(this, type, text, ex, params, rel, src); }
 
+
+  /** Resolves image specifier into an image content.
+   * Image specifiers starting with `@` get returned as-is without the first `@` prefix, this way you cam embed verbatim image content in identifiers.
+   *  For example: `arena.resolveImageSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print")`. See {@link ImageRegistry.resolveSpec}
+   * Requires {@link ImageRegistry} module installed in app chassis, otherwise returns a text block for invalid image.
+   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
+   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @returns {tuple} - {sc: int, ctp: string, content: buf | string}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>"}`
+   */
+  resolveImageSpec(spec, iso = null, theme = null){ return this.arena.resolveImageSpec(spec, iso, theme); }
+
   render() { return html`>>AZOS ELEMENT<<`; }
 }
 
