@@ -76,21 +76,6 @@ export class TabView extends Control {
 
 .tab-btn.active { background-color: var(--paper); }
 
-.tab-btn .refreshBtn {
-  display: inline-block;
-  padding: 0 0.25em;
-  margin: 0 0.25em;
-  border: 1px solid transparent;
-}
-
-.refreshBtn:hover {
-  background-color: var(--paper);
-  border-color: #aaa;
-  border-radius: 50%;
-  filter: brightness(80%);
-  cursor: pointer;
-}
-
 .modern .tab-btn-container-inner {
   border-bottom: none;
 }
@@ -242,9 +227,8 @@ export class TabView extends Control {
     this.tabs.forEach(child => child.slot = undefined);
     v.slot = "body";
     this.#activeTab = v;
+    this.update({ "activeTab": oldTab, "activeTabIndex": oldIndex });
     this.#scrollTabBtnIntoView(v);
-    this.requestUpdate("activeTabIndex", oldIndex);
-    this.requestUpdate("activeTab", oldTab);
     if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
   }
 
@@ -279,6 +263,7 @@ export class TabView extends Control {
   #scrollTabBtnIntoView(tab) {
     isOf(tab, Tab);
     const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.id}`);
+    if (!tabBtn) return;
     const btnBounds = tabBtn.getBoundingClientRect();
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
     const tabContainerBounds = tabContainer.getBoundingClientRect();
@@ -367,7 +352,6 @@ export class TabView extends Control {
   }
 
   #removeHighlight() { this.tabBtns.forEach(tab => tab.classList.remove("drop-zone", "left", "right")); }
-  #btnRefresh(tab) { tab.dispatchEvent(new Event("refresh", { composed: true, bubbles: true })); }
 
   /**
    * @returns true if tab was unselected
@@ -401,16 +385,17 @@ export class TabView extends Control {
    * @param {Tab} tTab the tab class
    * @param {string} title
    * @param {Tab|null} beforeTab
+   * @returns {Tab, Boolean} tuple of the tab and whether it was added or existed previously
    */
   addTab(tTab, title, beforeTab = null, makeActive = true) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
     isStringOrNull(title);
 
-    const existing = this.visibleTabs.filter(tab => tab.title === title)[0];
+    const foundTab = this.visibleTabs.filter(tab => tab.title === title)[0];
 
     let tab;
-    if (existing) tab = existing;
+    if (foundTab) tab = foundTab;
     else {
       tab = new tTab();
       tab.title = dflt(title, tTab.name);
@@ -421,7 +406,7 @@ export class TabView extends Control {
     if (!this.#activeTab || makeActive) tab.activate();
 
     this.requestUpdate();
-    return tab;
+    return { tab, added: !foundTab };
   }
 
   /**
@@ -500,7 +485,6 @@ export class TabView extends Control {
             ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
-            ${tab.active && tab.canRefresh ? html`<div class="refreshBtn" @click="${() => this.#btnRefresh(tab)}">&#x21bb;</div>` : noContent}
             ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : noContent}
           </div>
         `})}
@@ -512,7 +496,11 @@ export class TabView extends Control {
   }
 
   renderBody() {
-    return html`<div class="tab-body"><slot name="body"></slot></div>`;
+    return html`
+<div class="tab-body">
+  ${this.#activeTab?.showCommands ? this.#activeTab.renderCommands() : noContent}
+  <slot name="body"></slot>
+</div>`;
   }
 
 }
