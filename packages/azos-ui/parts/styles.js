@@ -19,6 +19,9 @@ export const baseStyles = css`
 .warning { background: var(--s-warn-bg-ctl);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
 .alert   { background: var(--s-alert-bg-ctl);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
 .error   { background: var(--s-error-bg-ctl);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
+.brand1  { background: var(--s-brand1-bg-ctl);  color: var(--s-brand1-fg-ctl); border: var(--s-brand1-bor-ctl);}
+.brand2  { background: var(--s-brand2-bg-ctl);  color: var(--s-brand2-fg-ctl); border: var(--s-brand2-bor-ctl);}
+.brand3  { background: var(--s-brand3-bg-ctl);  color: var(--s-brand3-fg-ctl); border: var(--s-brand3-bor-ctl);}
 
 /*Note: These .statusBg classes are needed to give correct color
   to dots/checks of checkboxes, radios, & switches*/
@@ -27,6 +30,9 @@ export const baseStyles = css`
 .warningBg { background: var(--s-warn-bg-ctl); }
 .alertBg   { background: var(--s-alert-bg-ctl); }
 .errorBg   { background: var(--s-error-bg-ctl); }
+.brand1Bg   { background: var(--s-brand1-bg-ctl); }
+.brand2Bg   { background: var(--s-brand2-bg-ctl); }
+.brand3Bg   { background: var(--s-brand3-bg-ctl); }
 
 /* Styles for POSITION enumerated type */
 /* Built to work for the current input layout:
@@ -70,11 +76,11 @@ export const baseStyles = css`
   font-size:.7em;
   vertical-align:top;
 }
-  .field{
-    display:block;
-    border:none !important;
-    background-color:unset !important;
-  }
+.field{
+  display:block;
+  border:none !important;
+  background-color:unset !important;
+}
 `;
 
 export const buttonStyles = css`
@@ -83,11 +89,12 @@ button{
   font-weight: var(--ctl-button-fweight);
   font-style: var(--ctl-button-fstyle);
   letter-spacing: var(--ctl-button-letter-spacing);
+  box-shadow: var(--ctl-button-box-shadow);
   border: var(--s-default-bor-ctl-btn);
   color:  var(--s-default-fg-ctl);
   background: var(--s-default-bg-ctl-btn);
-  padding: .3em 2ch;
-  min-width: 8ch;
+  padding: var(--ctl-button-padding);
+  min-width: 10ch;
   transition: 0.2s;
   user-select: none;
   -webkit-user-select: none;
@@ -98,36 +105,27 @@ button:focus{
   box-shadow: var(--focus-ctl-box-shadow);
 }
 
-button:hover{
-  filter:  brightness(1.08);
-}
-
-button:active{
-  transform: translateY(1.2px);
-}
+button:hover{ filter:  brightness(1.08); }
+button:active{ transform: translateY(0.1em); }
 
 
-button.ok      { background: var(--s-ok-bg-ctl-btn);     color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl-btn);}
-button.info    { background: var(--s-info-bg-ctl-btn);   color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl-btn);}
-button.warning { background: var(--s-warn-bg-ctl-btn);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl-btn);}
-button.alert   { background: var(--s-alert-bg-ctl-btn);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl-btn);}
-button.error   { background: var(--s-error-bg-ctl-btn);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl-btn);}
+button.ok      { background: var(--s-ok-bg-ctl-btn); color: var(--s-ok-fg-ctl-btn); border: var(--s-ok-bor-ctl-btn);}
+button.info    { background: var(--s-info-bg-ctl-btn); color: var(--s-info-fg-ctl-btn); border: var(--s-info-bor-ctl-btn);}
+button.warning { background: var(--s-warn-bg-ctl-btn); color: var(--s-warn-fg-ctl-btn); border: var(--s-warn-bor-ctl-btn);}
+button.alert   { background: var(--s-alert-bg-ctl-btn); color: var(--s-alert-fg-ctl-btn); border: var(--s-alert-bor-ctl-btn);}
+button.error   { background: var(--s-error-bg-ctl-btn); color: var(--s-error-fg-ctl-btn); border: var(--s-error-bor-ctl-btn);}
+button.brand1  { background: var(--s-brand1-bg-ctl-btn); color: var(--s-brand1-fg-ctl-btn); border: var(--s-brand1-bor-ctl-btn);}
+button.brand2  { background: var(--s-brand2-bg-ctl-btn); color: var(--s-brand2-fg-ctl-btn); border: var(--s-brand2-bor-ctl-btn);}
+button.brand3  { background: var(--s-brand3-bg-ctl-btn); color: var(--s-brand3-fg-ctl-btn); border: var(--s-brand3-bor-ctl-btn);}
 
 button:disabled{
-  color: #b4b4b4;
+  color: var(--ink3);
   border: 1px solid var(--ghost);
   background: var(--paper);
   font-weight: 100;
   filter: none;
   transform: none;
 }
-
-.r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl); }
-.r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-ctl); }
-.r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-ctl); }
-.r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-ctl); }
-.r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-ctl); }
-.r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl); }
 `;
 
 export const checkStyles = css`
