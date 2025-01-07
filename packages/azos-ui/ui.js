@@ -74,16 +74,18 @@ export function parseRank(v, isCss = false, clsSuffix = null) {
   return isCss ? "" : RANK.UNDEFINED;
 }
 
-/** System statuses assign logical conditions for elements, e.g.: `ok/info/warning/alert/error` */
+/** System statuses assign logical conditions for elements, e.g.: `ok/info/warning/alert/error/brand1/brand2` */
 export const STATUS = Object.freeze({
   DEFAULT: "default",
   OK: "ok",
   INFO: "info",
   WARNING: "warning",
   ALERT: "alert",
-  ERROR: "error"
+  ERROR: "error",
+  BRAND1: "brand1",
+  BRAND2: "brand2"
 });
-const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error"];
+const ALL_STATUS_VALUES = ["ok", "info", "warning", "alert", "error", "brand1", "brand2"];
 
 /**
  * Returns status string which is either of system statuses as declared in `STATUS` enumeration

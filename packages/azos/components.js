@@ -104,7 +104,7 @@ export class AppComponent extends types.DisposableObject{
   */
   get directedComponents(){
     const all = AppComponent.getAllApplicationComponents(this.app);
-    return all.filter(c => c[type.DIRECTOR_PROP] === this);
+    return all.filter(c => c[types.DIRECTOR_PROP] === this);
   }
 
   /**

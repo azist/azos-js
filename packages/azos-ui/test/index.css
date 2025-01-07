@@ -1,17 +1,39 @@
+
+html{
+  font-family: Roboto, Tahoma, sans-serif;
+  font-size: 16px;
+}
+
+@media all and (max-width: 500px){
+  html{ font-size: 12px; }
+}
+
 body {
   color: #202020;
   background: #c0c0c0;
-  font-family: Roboto, Tahoma, sans-serif;
-  font-size: 16px;
   margin: 0px;
   padding: 0px;
 }
 
-@media all and (max-width: 500px){
-  body{ font-size: 12px; }
-}
-
 .theme-azos {
+
+  /* Variable for general brand-aware typography */
+  --brand1-paper: #f09020;
+  --brand1-ink-sup: #4068f8;
+  --brand1-ink-hdr:  #f4f4f4;
+  --brand1-ink-sub: #575757;
+
+  --brand2-paper:  #4068f8;
+  --brand2-ink-sup: #f09020;
+  --brand2-ink-hdr:  #f0f0f4;
+  --brand2-ink-sub: #d0d030;
+
+  --brand3-paper: #404040;
+  --brand3-ink-sup: #f09020;
+  --brand3-ink-hdr:  #e4e4f4;
+  --brand3-ink-sub: #4068f8;
+
+ /* Arena */
   --arn-min-width: 360px;
   --arn-hdr-height: 44px;
   --arn-hdr-color: #d0d0d0;
