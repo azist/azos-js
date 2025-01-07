@@ -173,27 +173,27 @@ body {
 
 /* BRANDED STATUSES */
   --s-brand1-fg: #f8f8ff;
-  --s-brand1-bg: #f085ff;
+  --s-brand1-bg: #c045ef;
   --s-brand1-fg-ctl: #783494;
   --s-brand1-bg-ctl: #f4c0ff;
   --s-brand1-bor-color-ctl: #e8a0f0;
   --s-brand1-bor-ctl: 1.2px solid var(--s-brand1-bor-color-ctl);
   --s-brand1-bg-ctl-btn: var(--s-brand1-bg);
-  --s-brand1-fg-ctl-btn: #503050;
-  --s-brand1-bor-ctl-btn: 1px solid var(--s-brand1-bor-color-ctl);
+  --s-brand1-fg-ctl-btn: #ffffff;
+  --s-brand1-bor-ctl-btn: 2px solid var(--s-brand1-bor-color-ctl);
   --s-brand1-fg-hcontrast: #f4a0ff;
   --s-brand1-bg-hcontrast: #422157;
   --s-brand1-bor-hcontrast: #782aa6;
 
   --s-brand2-fg: #f8f8e8;
-  --s-brand2-bg: #ffa808;
+  --s-brand2-bg: #f08051;
   --s-brand2-fg-ctl: #844e08;
   --s-brand2-bg-ctl: #ffd4c0;
   --s-brand2-bor-color-ctl: #f0a420;
   --s-brand2-bor-ctl: 1.2px solid var(--s-brand2-bor-color-ctl);
   --s-brand2-bg-ctl-btn: var(--s-brand2-bg);
-  --s-brand2-fg-ctl-btn: #743e01;
-  --s-brand2-bor-ctl-btn: 1px solid var(--s-brand2-bor-color-ctl);
+  --s-brand2-fg-ctl-btn: #fff;
+  --s-brand2-bor-ctl-btn: 2px solid #f0a420;
   --s-brand2-fg-hcontrast: #f4a00f;
   --s-brand2-bg-hcontrast: #574110;
   --s-brand2-bor-hcontrast: #604214;
@@ -206,7 +206,7 @@ body {
   --s-brand3-bor-ctl: 1.2px solid var(--s-brand3-bor-color-ctl);
   --s-brand3-bg-ctl-btn: var(--s-brand3-bg);
   --s-brand3-fg-ctl-btn: #fafafa;
-  --s-brand3-bor-ctl-btn: 1px solid var(--s-brand3-bor-color-ctl);
+  --s-brand3-bor-ctl-btn: 2px solid #4094ff;
   --s-brand3-fg-hcontrast: #f4a00f;
   --s-brand3-bg-hcontrast: #574110;
   --s-brand3-bor-hcontrast: #604214;
@@ -230,11 +230,11 @@ body {
   --r6-brad-win: 2px;
 
   /* rank border radius for smaller parts */
-  --r1-brad-ctl: 0.3em;
-  --r2-brad-ctl: 0.3em;
-  --r3-brad-ctl: 0.3em;
-  --r4-brad-ctl: 0.3em;
-  --r5-brad-ctl: 0.2em;
+  --r1-brad-ctl: 0.43em;
+  --r2-brad-ctl: 0.43em;
+  --r3-brad-ctl: 0.43em;
+  --r4-brad-ctl: 0.43em;
+  --r5-brad-ctl: 0.3em;
   --r6-brad-ctl: 1px;
 
   --modal-title-bg: #b5b5b5;
