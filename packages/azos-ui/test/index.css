@@ -205,11 +205,11 @@ body {
   --s-brand3-bor-color-ctl: #2074ff;
   --s-brand3-bor-ctl: 1.2px solid var(--s-brand3-bor-color-ctl);
   --s-brand3-bg-ctl-btn: var(--s-brand3-bg);
-  --s-brand3-fg-ctl-btn: #fafafa;
+  --s-brand3-fg-ctl-btn: #f2f2ff;
   --s-brand3-bor-ctl-btn: 2px solid #4094ff;
-  --s-brand3-fg-hcontrast: #f4a00f;
-  --s-brand3-bg-hcontrast: #574110;
-  --s-brand3-bor-hcontrast: #604214;
+  --s-brand3-fg-hcontrast: #4094ff;
+  --s-brand3-bg-hcontrast: #373761;
+  --s-brand3-bor-hcontrast: #404068;
 
 
 
@@ -230,11 +230,11 @@ body {
   --r6-brad-win: 2px;
 
   /* rank border radius for smaller parts */
-  --r1-brad-ctl: 0.43em;
-  --r2-brad-ctl: 0.43em;
-  --r3-brad-ctl: 0.43em;
-  --r4-brad-ctl: 0.43em;
-  --r5-brad-ctl: 0.3em;
+  --r1-brad-ctl: 0.25em;
+  --r2-brad-ctl: 0.28em;
+  --r3-brad-ctl: 0.3em;
+  --r4-brad-ctl: 0.3em;
+  --r5-brad-ctl: 0.2em;
   --r6-brad-ctl: 1px;
 
   --modal-title-bg: #b5b5b5;
@@ -255,6 +255,10 @@ body {
 
   --ctl-button-box-shadow: -2px -2px 10px #e0e0e0;
   --ctl-button-padding: 0.5em 2.5ch;
+
+  --ctl-box-shadow: -2px -2px 10px #d8d8d8;
+  --ctl-disabled-filter: blur(1px);
+
 
   --ctl-button-fweight: 500;
   --ctl-button-fstyle: normal;

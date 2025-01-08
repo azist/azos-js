@@ -122,8 +122,8 @@ button:disabled{
   color: var(--ink3);
   border: 1px solid var(--ghost);
   background: var(--paper);
-  font-weight: 100;
-  filter: none;
+  font-weight: 300;
+  filter: var(--ctl-disabled-filter);
   transform: none;
 }
 `;
@@ -142,14 +142,16 @@ export const checkStyles = css`
     place-content:center;
     width:1.5em;
     height:1.5em;
-    border-radius:.25em;
+    min-width: 14px;
+    min-height: 14px;
+    box-shadow: var(--ctl-box-shadow);
   }
   .check:focus{
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
   .check::before{
-    content:"×"; /*"\u{2713}";*/
+    content: "×"; /*"\u{2713}";*/
     color: var(--s-default-fg-ctl);
     text-align:center;
     position:relative;
@@ -157,8 +159,8 @@ export const checkStyles = css`
     transform-origin:center center;
     transition:.1s transform ease-in-out;
     font-size:1.85em;
-    font-weight:bolder;
   }
+  .check:disabled::before{ opacity: 0.5;}
   .check:checked::before{ transform:scale(1); }
   .check:disabled{
     border: 1px solid var(--ghost);
@@ -167,6 +169,7 @@ export const checkStyles = css`
   .disabled{
     color: #b4b4b4;
     font-weight: 100;
+    filter: var(--ctl-disabled-filter);
   }
   .okBg { background-color: var(--s-ok-bg-ctl);        border: var(--s-ok-bor-ctl);}
   .infoBg { background-color: var(--s-info-bg-ctl);    border: var(--s-info-bor-ctl);}
@@ -199,6 +202,7 @@ export const switchStyles = css`
     transition:.2 all ease;
     width:3em;
     height:1.5em;
+    box-shadow: var(--ctl-box-shadow);
   }
   .switch:focus{
     outline: var(--focus-ctl-outline);
@@ -268,6 +272,7 @@ export const radioStyles = css`
     min-width:1.5em;
     max-width:1.5em;
     height:1.5em;
+    box-shadow: var(--ctl-box-shadow);
   }
   .radio::before{
     content:"";
@@ -317,6 +322,7 @@ export const textFieldStyles = css`
     color: var(--s-default-fg-ctl);
     line-height: 1.3em;
     font-size: 1em;
+    box-shadow: var(--ctl-box-shadow);
   }
   input:focus,textarea:focus,select:focus{
     outline: var(--focus-ctl-outline);
@@ -331,7 +337,7 @@ export const textFieldStyles = css`
   .alertBg   { background-color: var(--s-alert-bg-ctl) !important; color: var(--s-alert-fg-ctl) !important; border: var(--s-alert-bor-ctl) !important;}
   .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl) !important; border: var(--s-error-bor-ctl) !important;}
 
-  .disabled{ color: #b4b4b4; font-weight: 100; }
+  .disabled{ color: #b4b4b4; filter: var(--ctl-disabled-filter); }
   input[type=text]:disabled,input[type=password]:disabled,input[type=date]:disabled,textarea:disabled,select:disabled{
     border: 1px solid var(--ghost);
     background: none;

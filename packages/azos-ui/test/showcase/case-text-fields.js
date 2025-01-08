@@ -39,6 +39,11 @@ export class CaseTextFields extends CaseBase {
   <az-text id="warningSimple" title="Warning Status" placeholder="Type something here&hellip;" message="You ran over a skunk!" status="warning"></az-text>
   <az-text id="alertSimple" title="Alert Status" placeholder="Type something here&hellip;" message="It got all over&hellip;" status="alert"></az-text>
   <az-text id="errorSimple" title="Error Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="error"></az-text>
+
+  <az-text id="brand1Simple" title="Brand1 Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="brand1"></az-text>
+  <az-text id="brand2Simple" title="Brand2 Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="brand2"></az-text>
+  <az-text id="brand3Simple" title="Brand3 Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="brand3"></az-text>
+
 </div>
 <hr>
 <div class="strip-h">

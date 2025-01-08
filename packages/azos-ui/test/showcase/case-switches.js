@@ -18,6 +18,7 @@ export class CaseSwitches extends CaseBase {
 <h3>Statuses</h3>
 <div class="strip-h" style="gap:2em;">
   <az-check itemType="switch" title="Default" titlePosition="mid-right" status="default"></az-check>
+  <az-check itemType="switch" title="Default" titlePosition="mid-right" status="default" isdisabled></az-check>
   <az-check itemType="switch" title="Ok" titlePosition="mid-right" status="ok"></az-check>
   <az-check itemType="switch" title="Info" titlePosition="mid-right" status="info"></az-check>
   <az-check itemType="switch" title="Warning" titlePosition="mid-right" status="warning"></az-check>
