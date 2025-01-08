@@ -180,7 +180,7 @@ body {
 /* BRANDED STATUSES */
   --s-brand1-fg: #f8f8ff;
   --s-brand1-bg: #c045ef;
-  --s-brand1-fg-ctl: #f4f4f4;
+  --s-brand1-fg-ctl: #ffe8ff;
   --s-brand1-bg-ctl: #c045ef;
   --s-brand1-ink-ctl: #8558a5;
   --s-brand1-bor-color-ctl: #e8a0f0;
@@ -194,7 +194,7 @@ body {
 
   --s-brand2-fg: #f8f8e8;
   --s-brand2-bg: #f08051;
-  --s-brand2-fg-ctl: #f4f4f4;
+  --s-brand2-fg-ctl: #fff4e8;
   --s-brand2-bg-ctl: #f08051;
   --s-brand2-ink-ctl: #906505;
   --s-brand2-bor-color-ctl: #f0a420;
@@ -208,7 +208,7 @@ body {
 
   --s-brand3-fg: #f8f8f8;
   --s-brand3-bg: #4074ff;
-  --s-brand3-fg-ctl: #e2e2f8;
+  --s-brand3-fg-ctl: #e8e8ff;
   --s-brand3-bg-ctl: #4074ff;
   --s-brand3-ink-ctl: #2070a4;
   --s-brand3-bor-color-ctl: #4094ff;
@@ -267,6 +267,10 @@ body {
 
   --ctl-box-shadow: -2px -2px 10px #d8d8d8;
   --ctl-disabled-filter: blur(1px);
+
+  --ctl-req-sym: "*";
+  --ctl-req-sym-text-shadow: 0px 0px 1.5px #401010;
+  --ctl-req-sym-color: #ef5010;
 
 
   --ctl-button-fweight: 500;

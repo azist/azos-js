@@ -51,9 +51,9 @@ export const baseStyles = css`
 .bottom-center { align-items: center; }
 
 .top-left,.top-center,.top-right { flex-direction:column; }
-.top-left > span                 { text-align:left; margin-bottom: .33em; }
-.top-center > span               { text-align:center; margin-bottom: .33em; }
-.top-right > span                { text-align:right; margin-bottom: .33em; }
+.top-left > span                 { text-align:left; margin-bottom: .6em; }
+.top-center > span               { text-align:center; margin-bottom: .6em; }
+.top-right > span                { text-align:right; margin-bottom: .6em; }
 
 .mid-left                        { flex-direction:row; align-items:center; justify-content:space-between;}
 .mid-left > span                 { text-align:left; }
@@ -62,19 +62,22 @@ export const baseStyles = css`
 .mid-right > span                { text-align:left; }
 
 .bottom-left,.bottom-center,.bottom-right { flex-direction:column-reverse; }
-.bottom-left > span                 { text-align:left; margin-top: .33em; }
-.bottom-center > span               { text-align:center; margin-top: .33em; }
-.bottom-right > span                { text-align:right; margin-top: .33em; }
+.bottom-left > span                 { text-align:left; margin-top: .6em; }
+.bottom-center > span               { text-align:center; margin-top: .6em; }
+.bottom-right > span                { text-align:right; margin-top: .6em; }
 
 @media screen and (max-width: 360px){
   .mid-right, .mid-left{ flex-direction: column; }
 }
 .msg { font-size: .85em; opacity: .8; margin: .33em; }
 .requiredTitle::after{
-  content:"\u{25C6}";
-  margin-left:5px;
-  font-size:.7em;
+  content: var(--ctl-req-sym);
+  margin-left: 3px;
+  font-weight: 1000;
+  font-size:0.85em;
   vertical-align:top;
+  color: var(--ctl-req-sym-color);
+  text-shadow: var(--ctl-req-sym-text-shadow);
 }
 .field{
   display:block;
@@ -191,10 +194,7 @@ export const checkStyles = css`
 `;
 
 export const switchStyles = css`
-  label{
-    gap:0 .5em;
-    user-select:none;
-  }
+  /*label{ gap:0 .5em; user-select:none; }*/
   .switch{
     appearance:none;
     position:relative;
@@ -342,6 +342,10 @@ export const textFieldStyles = css`
   .warningBg { background-color: var(--s-warn-bg-ctl) !important;  color: var(--s-warn-fg-ctl) !important;  border: var(--s-warn-bor-ctl) !important;}
   .alertBg   { background-color: var(--s-alert-bg-ctl) !important; color: var(--s-alert-fg-ctl) !important; border: var(--s-alert-bor-ctl) !important;}
   .errorBg   { background-color: var(--s-error-bg-ctl) !important; color: var(--s-error-fg-ctl) !important; border: var(--s-error-bor-ctl) !important;}
+
+  .brand1Bg   { background-color: var(--s-brand1-bg-ctl) !important; color: var(--s-brand1-fg-ctl) !important; border: var(--s-brand1-bor-ctl) !important;}
+  .brand2Bg   { background-color: var(--s-brand2-bg-ctl) !important; color: var(--s-brand2-fg-ctl) !important; border: var(--s-brand2-bor-ctl) !important;}
+  .brand3Bg   { background-color: var(--s-brand3-bg-ctl) !important; color: var(--s-brand3-fg-ctl) !important; border: var(--s-brand3-bor-ctl) !important;}
 
   .disabled{ color: #b4b4b4; filter: var(--ctl-disabled-filter); }
   input[type=text]:disabled,input[type=password]:disabled,input[type=date]:disabled,textarea:disabled,select:disabled{
