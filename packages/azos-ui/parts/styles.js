@@ -14,14 +14,14 @@ export const baseStyles = css`
 .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-ctl); }
 .r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl); }
 
-.ok      { background: var(--s-ok-bg-ctl);     color: var(--s-ok-fg-ctl);    border: var(--s-ok-bor-ctl);}
-.info    { background: var(--s-info-bg-ctl);   color: var(--s-info-fg-ctl);  border: var(--s-info-bor-ctl);}
-.warning { background: var(--s-warn-bg-ctl);   color: var(--s-warn-fg-ctl);  border: var(--s-warn-bor-ctl);}
-.alert   { background: var(--s-alert-bg-ctl);  color: var(--s-alert-fg-ctl); border: var(--s-alert-bor-ctl);}
-.error   { background: var(--s-error-bg-ctl);  color: var(--s-error-fg-ctl); border: var(--s-error-bor-ctl);}
-.brand1  { background: var(--s-brand1-bg-ctl);  color: var(--s-brand1-fg-ctl); border: var(--s-brand1-bor-ctl);}
-.brand2  { background: var(--s-brand2-bg-ctl);  color: var(--s-brand2-fg-ctl); border: var(--s-brand2-bor-ctl);}
-.brand3  { background: var(--s-brand3-bg-ctl);  color: var(--s-brand3-fg-ctl); border: var(--s-brand3-bor-ctl);}
+.ok      { background: var(--s-ok-bg-ctl);     color: var(--s-ok-ink-ctl);    border: var(--s-ok-bor-ctl);}
+.info    { background: var(--s-info-bg-ctl);   color: var(--s-info-ink-ctl);  border: var(--s-info-bor-ctl);}
+.warning { background: var(--s-warn-bg-ctl);   color: var(--s-warn-ink-ctl);  border: var(--s-warn-bor-ctl);}
+.alert   { background: var(--s-alert-bg-ctl);  color: var(--s-alert-ink-ctl); border: var(--s-alert-bor-ctl);}
+.error   { background: var(--s-error-bg-ctl);  color: var(--s-error-ink-ctl); border: var(--s-error-bor-ctl);}
+.brand1  { background: var(--s-brand1-bg-ctl);  color: var(--s-brand1-ink-ctl); border: var(--s-brand1-bor-ctl);}
+.brand2  { background: var(--s-brand2-bg-ctl);  color: var(--s-brand2-ink-ctl); border: var(--s-brand2-bor-ctl);}
+.brand3  { background: var(--s-brand3-bg-ctl);  color: var(--s-brand3-ink-ctl); border: var(--s-brand3-bor-ctl);}
 
 /*Note: These .statusBg classes are needed to give correct color
   to dots/checks of checkboxes, radios, & switches*/

@@ -92,6 +92,7 @@ body {
   --s-default-bg: var(--paper);
   --s-default-fg-ctl: var(--ink);
   --s-default-bg-ctl: #fdfdfd;
+  --s-default-ink-ctl: var(--ink);
   --s-default-bor-color-ctl: #c4c4c4;
   --s-default-bor-ctl: 1.2px solid var(--s-default-bor-color-ctl);
   --s-default-bg-ctl-btn: #d0d0d0;
@@ -106,6 +107,7 @@ body {
   --s-ok-bg: #75f487;
   --s-ok-fg-ctl: #527452;
   --s-ok-bg-ctl: #d2ffd2;
+  --s-ok-ink-ctl: var(--s-ok-fg-ctl);
   --s-ok-bor-color-ctl: #a5e474;
   --s-ok-bor-ctl: 1.2px solid var(--s-ok-bor-color-ctl);
   --s-ok-bg-ctl-btn: #a0f9a0;
@@ -120,6 +122,7 @@ body {
   --s-info-bg: #a0d8ff;
   --s-info-fg-ctl: #5276ba;
   --s-info-bg-ctl: #c0e8ff;
+  --s-info-ink-ctl: var(--s-info-fg-ctl);
   --s-info-bor-color-ctl: #90d2f5;
   --s-info-bor-ctl: 1.2px solid var(--s-info-bor-color-ctl);
   --s-info-bg-ctl-btn: #b0dfff;
@@ -134,6 +137,7 @@ body {
   --s-warn-bg: #f8f850;
   --s-warn-fg-ctl: #727220;
   --s-warn-bg-ctl: #fff8a0;
+  --s-warn-ink-ctl: var(--s-warn-fg-ctl);
   --s-warn-bor-color-ctl: #d8d850;
   --s-warn-bor-ctl: 1px solid var(--s-warn-bor-color-ctl);
   --s-warn-bg-ctl-btn: #f2f268;
@@ -148,6 +152,7 @@ body {
   --s-alert-bg: #e040f0;
   --s-alert-fg-ctl: #8a508a;
   --s-alert-bg-ctl: #ffc0ff;
+  --s-alert-ink-ctl: var(--s-alert-fg-ctl);
   --s-alert-bor-color-ctl: #e8a2e8;
   --s-alert-bor-ctl: 1.2px solid var(--s-alert-bor-color-ctl);
   --s-alert-bg-ctl-btn: #f8b0f8;
@@ -162,6 +167,7 @@ body {
   --s-error-bg: #ff4720;
   --s-error-fg-ctl: #955050;
   --s-error-bg-ctl: #ffc0c0;
+  --s-error-ink-ctl: var(--s-error-fg-ctl);
   --s-error-bor-color-ctl: #f89052;
   --s-error-bor-ctl: 1.2px solid var(--s-error-bor-color-ctl);
   --s-error-bg-ctl-btn: #ffa0a0;
@@ -176,6 +182,7 @@ body {
   --s-brand1-bg: #c045ef;
   --s-brand1-fg-ctl: #f4f4f4;
   --s-brand1-bg-ctl: #c045ef;
+  --s-brand1-ink-ctl: #8558a5;
   --s-brand1-bor-color-ctl: #e8a0f0;
   --s-brand1-bor-ctl: 1.2px solid var(--s-brand1-bor-color-ctl);
   --s-brand1-bg-ctl-btn: var(--s-brand1-bg);
@@ -189,6 +196,7 @@ body {
   --s-brand2-bg: #f08051;
   --s-brand2-fg-ctl: #f4f4f4;
   --s-brand2-bg-ctl: #f08051;
+  --s-brand2-ink-ctl: #906505;
   --s-brand2-bor-color-ctl: #f0a420;
   --s-brand2-bor-ctl: 1.2px solid var(--s-brand2-bor-color-ctl);
   --s-brand2-bg-ctl-btn: var(--s-brand2-bg);
@@ -202,6 +210,7 @@ body {
   --s-brand3-bg: #4074ff;
   --s-brand3-fg-ctl: #e2e2f8;
   --s-brand3-bg-ctl: #4074ff;
+  --s-brand3-ink-ctl: #2070a4;
   --s-brand3-bor-color-ctl: #4094ff;
   --s-brand3-bor-ctl: 1.2px solid var(--s-brand3-bor-color-ctl);
   --s-brand3-bg-ctl-btn: var(--s-brand3-bg);
@@ -214,11 +223,11 @@ body {
 
 
   /* rank font sizes - MUST be in EM */
-  --r1-fs: 1.60em;
-  --r2-fs: 1.30em;
+  --r1-fs: 1.42em;
+  --r2-fs: 1.25em;
   --r3-fs: 1em;
   --r4-fs: 0.85em;
-  --r5-fs: 0.70em;
+  --r5-fs: 0.76em;
   --r6-fs: 0.65em;
 
   /* rank border radius for window-level objects/containers */
