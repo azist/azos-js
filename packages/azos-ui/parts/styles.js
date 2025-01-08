@@ -176,12 +176,18 @@ export const checkStyles = css`
   .warningBg { background-color: var(--s-warn-bg-ctl); border: var(--s-warn-bor-ctl);}
   .alertBg { background-color: var(--s-alert-bg-ctl);  border: var(--s-alert-bor-ctl);}
   .errorBg { background-color: var(--s-error-bg-ctl);  border: var(--s-error-bor-ctl);}
+  .brand1Bg { background-color: var(--s-brand1-bg-ctl);  border: var(--s-brand1-bor-ctl);}
+  .brand2Bg { background-color: var(--s-brand2-bg-ctl);  border: var(--s-brand2-bor-ctl);}
+  .brand3Bg { background-color: var(--s-brand3-bg-ctl);  border: var(--s-brand3-bor-ctl);}
 
   .okBg[class~="check"]::before { background-color:none; color: var(--s-ok-fg-ctl); }
   .infoBg[class~="check"]::before { background-color:none; color: var(--s-info-fg-ctl); }
   .warningBg[class~="check"]::before { background-color:none; color: var(--s-warn-fg-ctl); }
   .alertBg[class~="check"]::before { background-color:none; color: var(--s-alert-fg-ctl); }
   .errorBg[class~="check"]::before { background-color:none; color: var(--s-error-fg-ctl); }
+  .brand1Bg[class~="check"]::before { background-color:none; color: var(--s-brand1-fg-ctl); }
+  .brand2Bg[class~="check"]::before { background-color:none; color: var(--s-brand2-fg-ctl); }
+  .brand3Bg[class~="check"]::before { background-color:none; color: var(--s-brand3-fg-ctl); }
 `;
 
 export const switchStyles = css`

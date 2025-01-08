@@ -174,8 +174,8 @@ body {
 /* BRANDED STATUSES */
   --s-brand1-fg: #f8f8ff;
   --s-brand1-bg: #c045ef;
-  --s-brand1-fg-ctl: #783494;
-  --s-brand1-bg-ctl: #f4c0ff;
+  --s-brand1-fg-ctl: #f4f4f4;
+  --s-brand1-bg-ctl: #c045ef;
   --s-brand1-bor-color-ctl: #e8a0f0;
   --s-brand1-bor-ctl: 1.2px solid var(--s-brand1-bor-color-ctl);
   --s-brand1-bg-ctl-btn: var(--s-brand1-bg);
@@ -187,8 +187,8 @@ body {
 
   --s-brand2-fg: #f8f8e8;
   --s-brand2-bg: #f08051;
-  --s-brand2-fg-ctl: #844e08;
-  --s-brand2-bg-ctl: #ffd4c0;
+  --s-brand2-fg-ctl: #f4f4f4;
+  --s-brand2-bg-ctl: #f08051;
   --s-brand2-bor-color-ctl: #f0a420;
   --s-brand2-bor-ctl: 1.2px solid var(--s-brand2-bor-color-ctl);
   --s-brand2-bg-ctl-btn: var(--s-brand2-bg);
@@ -201,8 +201,8 @@ body {
   --s-brand3-fg: #f8f8f8;
   --s-brand3-bg: #4074ff;
   --s-brand3-fg-ctl: #e2e2f8;
-  --s-brand3-bg-ctl: #e2eaff;
-  --s-brand3-bor-color-ctl: #2074ff;
+  --s-brand3-bg-ctl: #4074ff;
+  --s-brand3-bor-color-ctl: #4094ff;
   --s-brand3-bor-ctl: 1.2px solid var(--s-brand3-bor-color-ctl);
   --s-brand3-bg-ctl-btn: var(--s-brand3-bg);
   --s-brand3-fg-ctl-btn: #f2f2ff;
