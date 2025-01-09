@@ -39,6 +39,11 @@ export class CaseTextFields extends CaseBase {
   <az-text id="warningSimple" title="Warning Status" placeholder="Type something here&hellip;" message="You ran over a skunk!" status="warning"></az-text>
   <az-text id="alertSimple" title="Alert Status" placeholder="Type something here&hellip;" message="It got all over&hellip;" status="alert"></az-text>
   <az-text id="errorSimple" title="Error Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="error"></az-text>
+
+  <az-text id="brand1Simple" title="Brand1 Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="brand1"></az-text>
+  <az-text id="brand2Simple" title="Brand2 Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="brand2"></az-text>
+  <az-text id="brand3Simple" title="Brand3 Status" placeholder="Type something here&hellip;" message="Clean up, everywhere!" status="brand3"></az-text>
+
 </div>
 <hr>
 <div class="strip-h">
@@ -48,6 +53,10 @@ export class CaseTextFields extends CaseBase {
   <az-text id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" multiline status="warning"></az-text>
   <az-text id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" multiline status="alert"></az-text>
   <az-text id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" multiline status="error"></az-text>
+
+  <az-text id="brand1TextArea" title="Brand 1 Status" placeholder="Type something here&hellip;" multiline status="brand1"></az-text>
+  <az-text id="brand2TextArea" title="Brand 2 Status" placeholder="Type something here&hellip;" multiline status="brand2"></az-text>
+  <az-text id="brand3TextArea" title="Brand 3 Status" placeholder="Type something here&hellip;" multiline status="brand3"></az-text>
 </div>
 <hr>
 <div class="strip-h">
@@ -78,9 +87,9 @@ export class CaseTextFields extends CaseBase {
                          placeholder="Your Phone"
                          dataKind="TEL"
                          @change="${e => { console.info(`*** Control: '${e.target.id}'   Raw: '${e.target.rawValue}'   Value: '${e.target.value}'`);}}"
-                         value="123"></az-text>
+                         value="123" isrequired></az-text>
 
-  <az-text id="tbEmail"  scope="window"    title="Email" placeholder="Your Email Address" dataKind="EMAIL"></az-text>
+  <az-text id="tbEmail"  scope="window"    title="Email" placeholder="Your Email Address" dataKind="EMAIL" isrequired></az-text>
   <az-text id="tbScreenName" scope="window" name="user_id" title="ScreenName" placeholder="Your Id"  dataKind="SCREENNAME"></az-text>
 
   <az-text id="tbScreenName2"  scope="window" name="screenName2" title="Screen Name With Len" dataKind="SCREENNAME" minLength=5 maxLength=10></az-text>
