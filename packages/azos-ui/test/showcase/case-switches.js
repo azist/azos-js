@@ -18,12 +18,43 @@ export class CaseSwitches extends CaseBase {
 <h3>Statuses</h3>
 <div class="strip-h" style="gap:2em;">
   <az-check itemType="switch" title="Default" titlePosition="mid-right" status="default"></az-check>
+  <az-check itemType="switch" title="Default" titlePosition="mid-right" status="default" isdisabled></az-check>
   <az-check itemType="switch" title="Ok" titlePosition="mid-right" status="ok"></az-check>
   <az-check itemType="switch" title="Info" titlePosition="mid-right" status="info"></az-check>
   <az-check itemType="switch" title="Warning" titlePosition="mid-right" status="warning"></az-check>
   <az-check itemType="switch" title="Alert" titlePosition="mid-right" status="alert"></az-check>
   <az-check itemType="switch" title="Error" titlePosition="mid-right" status="error"></az-check>
+  <az-check itemType="switch" title="Brand 1" titlePosition="mid-right" status="brand1"></az-check>
+  <az-check itemType="switch" title="Brand 2" titlePosition="mid-right" status="brand2"></az-check>
+  <az-check itemType="switch" title="Brand 3" titlePosition="mid-right" status="brand3"></az-check>
 </div>
+<h3>Disabled</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check itemType="switch" title="Default" titlePosition="mid-right" status="default" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Ok" titlePosition="mid-right" status="ok" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Info" titlePosition="mid-right" status="info" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Warning" titlePosition="mid-right" status="warning" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Alert" titlePosition="mid-right" status="alert" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Error" titlePosition="mid-right" status="error" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Brand 1" titlePosition="mid-right" status="brand1" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Brand 2" titlePosition="mid-right" status="brand2" value="true" isdisabled></az-check>
+  <az-check itemType="switch" title="Brand 3" titlePosition="mid-right" status="brand3" value="true" isdisabled></az-check>
+</div>
+
+<h3>Readonly</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check itemType="switch" title="Default" titlePosition="mid-right" status="default"  value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Ok" titlePosition="mid-right" status="ok" value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Info" titlePosition="mid-right" status="info" value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Warning" titlePosition="mid-right" status="warning" value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Alert" titlePosition="mid-right" status="alert" value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Error" titlePosition="mid-right" status="error" value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Brand 1" titlePosition="mid-right" status="brand1" value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Brand 2" titlePosition="mid-right" status="brand2" value="true" isreadonly></az-check>
+  <az-check itemType="switch" title="Brand 3" titlePosition="mid-right" status="brand3" value="true" isreadonly></az-check>
+</div>
+
+
 
 <h3>Ranks</h3>
 <div class="strip-h" style="gap:2em;">
