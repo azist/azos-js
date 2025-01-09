@@ -763,7 +763,7 @@ export class TimeBlockPicker extends Control {
       iconContent = html`
             <div class="icon">
             ${this.selectedItems.length === 1 ?
-          html`<svg viewBox="0 -960 960 960"><path d="M378-222 130-470l68-68 180 180 383-383 68 68-451 451Z"/></svg>`
+        html`${this.renderImageSpec("svg://azos.ico.checkmark?m=i32")}`
           : html`<span>${eventSelectedIndex + 1}</span>`
         }
             </div>`;

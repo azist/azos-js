@@ -169,12 +169,13 @@ export class Command {
    * */
   // eslint-disable-next-line no-unused-vars
   provideMarkup(arena, target){
-    const ico = this.#icon;
+    let ico = this.#icon;
     if (!ico){
       return html`<div class="command-button">${this.title}</div>`;
     }
 
-    return html`<div class="command-icon">${verbatimHtml(arena.resolveImageSpec(ico).content)}</div>`;
+    ico = arena.resolveImageSpec(ico);
+    return html`<div class="command-icon">${verbatimHtml(ico.content ?? ico)}</div>`;
   }
 
 }
