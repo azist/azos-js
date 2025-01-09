@@ -502,7 +502,7 @@ ${this.showSlides ? html`
 <az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="SHITTERESSS"></az-text>
 <az-text id="tbLastName" scope="this" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text>
 
-<az-text id="getADate" scope="this" name="getADate" title="Get a Date" placeholder="2024/01/01" itemtype="date"></az-text>
+<az-text id="getADate" scope="this" name="getADate" title="Get a Date" placeholder="2024/01/01" datakind="date"></az-text>
 
 <az-check id="chkSmokes" scope="this" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-check>
 <az-check id="chkDrinks" scope="this" name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-check>
@@ -672,7 +672,7 @@ ${this.showSlides ? html`
 <h2>Text Fields</h2>
 <div class="strip-h">
   <az-text id="basicTextInput" title="Basic text input" placeholder="Type something here&hellip;" titlePosition="mid-left" titleWidth="25" contentWidth="75"></az-text>
-  <az-text id="basicPasswordInput" itemType="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text>
+  <az-text id="basicPasswordInput" datakind="password" title="Basic password input" placeholder="Type something here&hellip;"></az-text>
   <az-text id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text>
   <az-text id="readOnlyInput" title="Read Only field" value="Read-only value" isReadonly></az-text>
   <az-text id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text>

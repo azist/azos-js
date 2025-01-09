@@ -152,46 +152,6 @@ main::after {
   display: table;
 }
 
-/* This will be moved out into TAB group control of some sort
-main .strip{
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  width: var(--ar-mnu-btn-width);
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  height: auto;
-  padding-top: 55px;
-}
-
-main .strip-btn{
-  display: inline-block;
-  font-size: 0.9rem;
-  text-align: center;
-  width: 45px;
-  margin: 2px 1px 2px 4px;
-  color: #858585;
-  padding-top: 4px;
-
-  stroke: #505050;
-  stroke-width: 0.8px;
-  fill: none;
-  stroke-linecap="round";
-}
-
-main .strip-btn-selected{
-  border-left: 4px solid #40a0ff;
-  margin-left: 0px;
-}
-
-main .strip-btn:hover{
-  background-color: rgba(255, 255, 255, .2);
-  stroke-width: 1px;
-  stroke: #404040;
-}
-*/
-
 main .applet-container{
   display: block;
   width: 100%; /* calc(100% - var(--menu-btn-width)); */
@@ -208,37 +168,6 @@ main .applet-container.kiosk{
   min-height: unset;
 }
 
-/*
-@media screen and (max-width: 420px) {
-  main .applet-container{
-  width: 100%;
-  }
-
-  main .strip{
-    top: unset;
-    position: fixed;
-    bottom: 0px;
-    padding: 1px 2px 4px 2px;
-    border-top: 1px solid #d0d0d0;
-    left: 0px;
-    width: 100vw;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    height: 38px;
-    background: #e4e4e4;
-  }
-
-
-  main .strip-btn-selected{
-    border: unset;
-    border-bottom: 4px solid #40a0ff;
-    margin-bottom: 0px;
-  }
-}
- */
-
 /* ------------------- */
 
 footer{
@@ -248,9 +177,6 @@ footer{
   min-width: var(--arn-min-width);
   box-sizing: border-box;
 }
-
-      /*footer .bottom-menu{
-      }*/
 
       footer .bottom-menu a{
         text-decoration:  none;

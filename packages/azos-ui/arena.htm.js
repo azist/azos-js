@@ -93,31 +93,6 @@ export function renderHeader(app, self){
      <div class="strip" ${domRef(getRefToolbar(self))}> </div>`;
   }
 
-/*
-  <div class="strip">
-    <div class="strip-btn">
-      <svg width="28px" height="28px" viewBox="0 0 24 24">
-      <circle cx="12" cy="6" r="4"/>
-      <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
-      </svg>
-    </div>
-    <div class="strip-btn">
-    <svg width="28px" height="28px" viewBox="0 0 24 24">
-      <path d="M18.7491 9.70957V9.00497C18.7491 5.13623 15.7274 2 12 2C8.27256 2 5.25087 5.13623 5.25087 9.00497V9.70957C5.25087 10.5552 5.00972 11.3818 4.5578 12.0854L3.45036 13.8095C2.43882 15.3843 3.21105 17.5249 4.97036 18.0229C9.57274 19.3257 14.4273 19.3257 19.0296 18.0229C20.789 17.5249 21.5612 15.3843 20.5496 13.8095L19.4422 12.0854C18.9903 11.3818 18.7491 10.5552 18.7491 9.70957Z"/>
-      <path d="M10 9H14L10 13H14" stroke-linejoin="round"/>
-      <path d="M7.5 19C8.15503 20.7478 9.92246 22 12 22C14.0775 22 15.845 20.7478 16.5 19" />
-    </svg>
-    </div>
-    <div class="strip-btn">
-      <svg width="28px" height="28px" viewBox="0 0 24 24">
-        <path d="M16 4C18.175 4.01211 19.3529 4.10856 20.1213 4.87694C21 5.75562 21 7.16983 21 9.99826V15.9983C21 18.8267 21 20.2409 20.1213 21.1196C19.2426 21.9983 17.8284 21.9983 15 21.9983H9C6.17157 21.9983 4.75736 21.9983 3.87868 21.1196C3 20.2409 3 18.8267 3 15.9983V9.99826C3 7.16983 3 5.75562 3.87868 4.87694C4.64706 4.10856 5.82497 4.01211 8 4" />
-        <path d="M8 3.5C8 2.67157 8.67157 2 9.5 2H14.5C15.3284 2 16 2.67157 16 3.5V4.5C16 5.32843 15.3284 6 14.5 6H9.5C8.67157 6 8 5.32843 8 4.5V3.5Z" />
-        <path d="M15 13L12 13M12 13L9 13M12 13L12 10M12 13L12 16"/>
-      </svg>
-    </div>
-  </div>
- */
-
 }
 
 /** @param {Application} app   @param {Arena} self  */
@@ -128,21 +103,6 @@ export function renderMain(app, self, appletTagName){
   const clsMain = self.isKiosk ? "kiosk" : "";
 
   return html`
-  <!--nav class="strip" id="navAreas">  THIS will be moved out into tab group control
-    <div class="strip-btn strip-btn-selected">
-      <svg width="28px" height="28px" viewBox="0 0 24 24">
-      <circle cx="12" cy="6" r="4"/>
-      <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
-      </svg>
-    </div>
-    <div class="strip-btn">
-      <svg width="28px" height="28px" viewBox="0 0 24 24">
-      <circle cx="12" cy="6" r="4"/>
-      <path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/>
-      </svg>
-    </div>
-  </nav-->
-
   <div class="applet-container ${clsMain}" role="main" >
     ${verbatimHtml(appletHtml)}
   </div>
