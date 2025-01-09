@@ -122,12 +122,9 @@ button.brand2  { background: var(--s-brand2-bg-ctl-btn); color: var(--s-brand2-f
 button.brand3  { background: var(--s-brand3-bg-ctl-btn); color: var(--s-brand3-fg-ctl-btn); border: var(--s-brand3-bor-ctl-btn);}
 
 button:disabled{
-  color: var(--ink3);
-  border: 1px solid var(--ghost);
-  background: var(--paper);
-  font-weight: 300;
-  filter: var(--ctl-disabled-filter);
-  transform: none;
+ font-weight: 100;
+ filter: var(--ctl-disabled-filter);
+ transform: none;
 }
 `;
 
@@ -165,10 +162,7 @@ export const checkStyles = css`
   }
   .check:disabled::before{ opacity: 0.5;}
   .check:checked::before{ transform:scale(1); }
-  .check:disabled{
-    border: 1px solid var(--ghost);
-    background: none;
-  }
+  .check:disabled{  }
   .disabled{
     color: #b4b4b4;
     font-weight: 100;
@@ -256,7 +250,6 @@ export const switchStyles = css`
   .brand1Bg[class~="switch"] { background: var(--s-brand1-bg-ctl);  border: var(--s-brand1-bor-ctl);}
   .brand2Bg[class~="switch"] { background: var(--s-brand2-bg-ctl);  border: var(--s-brand2-bor-ctl);}
   .brand3Bg[class~="switch"] { background: var(--s-brand3-bg-ctl);  border: var(--s-brand3-bor-ctl);}
-
 `;
 
 export const radioStyles = css`

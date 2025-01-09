@@ -55,6 +55,9 @@ export class CaseButtons extends CaseBase {
   <az-button title="Warning" status="warning" isdisabled></az-button>
   <az-button title="Alert" status="alert" isdisabled></az-button>
   <az-button title="Error" status="error" isdisabled></az-button>
+  <az-button title="Brand 1" status="brand1" isdisabled></az-button>
+  <az-button title="Brand 2" status="brand2" isdisabled></az-button>
+  <az-button title="Brand 3" status="brand3" isdisabled></az-button>
 </div>
     `;
   }
