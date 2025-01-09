@@ -44,21 +44,14 @@ export class AdlibApplet extends Applet {
   #cmdNewQuery = new Command(this, {
     uri: "Adlib.NewQuery",
     title: "New Query",
-    icon: `<svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-            <rect width="6" height="28" x="11" y="0" fill="white"/>
-            <rect width="28" height="6" x="0" y="11" fill="white"/>
-          </svg>`,
+    icon: "svg://azos.ico.plus?m=i32",
     handler: (e) => this.#onAddTabToLeft(e)
   });
 
   #cmdPrefillQuery = new Command(this, {
     uri: "Adlib.PrefillQuery",
     title: "Add collection filter to active (or new) tab",
-    icon: `<svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 20.5V25h4.5l13.3-13.3-4.5-4.5L3 20.5zM24.7 8.3c.4-.4.4-1 0-1.4l-3.6-3.6c-.4-.4-1-.4-1.4 0L17 5.6l4.5 4.5 3.2-3.3z" fill="white"/>
-            <rect x="18" y="18" width="2" height="8" fill="white"/>
-            <rect x="15" y="21" width="8" height="2" fill="white"/>
-          </svg>`,
+    icon: `svg://azos.ico.edit?m=i32`,
     handler: (e) => this.#onAddCollectionFilter(e)
   });
 

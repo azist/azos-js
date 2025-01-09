@@ -12,6 +12,7 @@ import { XyzApplet } from "./xyz-applet.js";
 import { XyzApplet2 } from "./xyz-applet2.js";
 import { XyzApplet3 } from "./xyz-applet3.js";
 import { XyzAppletScheduler } from "./xyz-applet-scheduler.js";
+import { ImageRegistry } from "azos/bcl/img-registry";
 
 
 class MyLogic extends Module {
@@ -67,6 +68,7 @@ const cfgApp = {
     { name: "log", type: ConLog },
     { name: "logic", type: MyLogic },
     { name: "router", type: Router, menu: { root: [...appMenu] } },
+    { name: "imgRegistry", type: ImageRegistry },
   ]
 };
 

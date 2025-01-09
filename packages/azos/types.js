@@ -9,7 +9,7 @@ import * as CC from "./coreconsts.js";
 import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
 
-import {isDate as aver_isDate, isNonEmptyString as aver_isNonEmptyString, isStringOrNull as aver_isStringOrNull} from "./aver.js";
+import { isDate as aver_isDate, isNonEmptyString as aver_isNonEmptyString, isStringOrNull as aver_isStringOrNull, isNotNull } from "./aver.js";
 
 
 /**
@@ -72,7 +72,7 @@ export const CHECK_MAX_LENGTH_METHOD = Symbol("checkMaxLength");
  * of entities which need to finalize their lifecycle (e.g. write a trailer to disk file).
  * The standard is aligned with the new "using" resource block, as it uses system symbol when available
  */
-export const DISPOSE_METHOD = (typeof Symbol.dispose === 'undefined') ? Symbol("dispose") : Symbol.dispose;
+export const DISPOSE_METHOD = (typeof Symbol.dispose === 'undefined') ? Symbol("dispose") : Symbol.dispose; //FIXME: Symbol.for
 
 /**
  * When implemented, returns true if the object was already disposed.
@@ -101,6 +101,18 @@ export function dispose(v) {
     }
   }
   return false;
+}
+
+/**
+ * Try {@link body} using {@link disposable} and finally dispose of resource.
+ * @param {Object} disposable any disposable resource
+ * @param {Function} body any function that requires {@link disposable}
+ */
+export function doUsing(disposable, body) {
+  isNotNull(disposable);
+  isFunction(body);
+  try { body(disposable) }
+  finally { dispose(disposable) }
 }
 
 /**

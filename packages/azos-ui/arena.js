@@ -6,7 +6,7 @@
 
 import * as aver from "azos/aver";
 import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD } from "azos/types";
-import { html, AzosElement, noContent } from "./ui.js";
+import { html, AzosElement, noContent, verbatimHtml } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
 
@@ -318,6 +318,9 @@ ${footer}
 
     return rec.produceContent();
   }
+
+  /** This is a {@link resolveImageSpec} helper function wrapping {@link ImageRecord.content} with {@link verbatimHtml} */
+  renderImageSpec(spec, iso = null, theme = null) { return verbatimHtml(this.resolveImageSpec(spec, iso, theme).content); }
 
 }//Arena
 

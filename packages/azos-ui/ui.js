@@ -266,6 +266,9 @@ export class AzosElement extends LitElement {
    */
   resolveImageSpec(spec, iso = null, theme = null){ return this.arena.resolveImageSpec(spec, iso, theme); }
 
+  /** This is a {@link arena.resolveImageSpec} helper function wrapping {@link ImageRecord.content} with {@link verbatimHtml} */
+  renderImageSpec(spec, iso = null, theme = null) { return this.arena.renderImageSpec(spec, iso, theme); }
+
   render() { return html`>>AZOS ELEMENT<<`; }
 }
 

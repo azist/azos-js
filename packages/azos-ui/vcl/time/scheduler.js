@@ -384,7 +384,7 @@ export class TimeBlockPicker extends Control {
   /** The schedule's dataset */
   #itemsByDay = [];
   get itemsByDay() { return this.#itemsByDay; }
-  get items() { return this.#itemsByDay.flatMap(({ _, items }) => items); }
+  get items() { return this.#itemsByDay.flatMap(({ items }) => items); }
 
   constructor() {
     super();
@@ -480,6 +480,7 @@ export class TimeBlockPicker extends Control {
   }
 
   /* TODO: Implement highlighting of rows and columns */
+  // eslint-disable-next-line no-unused-vars
   #onSlotHover(dayIndex, timeMins) { }
 
   /* TODO: Undo what you just did */
@@ -763,7 +764,7 @@ export class TimeBlockPicker extends Control {
       iconContent = html`
             <div class="icon">
             ${this.selectedItems.length === 1 ?
-          html`<svg viewBox="0 -960 960 960"><path d="M378-222 130-470l68-68 180 180 383-383 68 68-451 451Z"/></svg>`
+        html`${this.renderImageSpec("svg://azos.ico.checkmark?m=i32")}`
           : html`<span>${eventSelectedIndex + 1}</span>`
         }
             </div>`;

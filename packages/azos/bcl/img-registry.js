@@ -126,14 +126,15 @@ export class ImageRegistry extends Module {
     const url = new URL(isNonEmptyString(spec));
     let imgUri     = url.host;
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
-    let imgIsoLang = url.searchParams.get("iso");
-    let imgTheme = url.searchParams.get("theme");
-    let imgMedia = url.searchParams.get("media");
+    const sp = url.searchParams;
+    let imgIsoLang = dflt(sp.get("iso"), sp.get("lang"), sp.get("isoLang"), sp.get("i"));
+    let imgTheme = dflt(sp.get("theme"), sp.get("t"));
+    let imgMedia = dflt(sp.get("media"), sp.get("m"));
 
     if (!imgIsoLang || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
     if (!imgTheme || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
 
-    const resolved = this.resolve(imgUri, imgFormat, {imgIsoLang, imgTheme, imgMedia});
+    const resolved = this.resolve(imgUri, imgFormat, { m: imgMedia, i: imgIsoLang, t: imgTheme });
     return resolved;
   }
 
@@ -246,20 +247,37 @@ export class ImageRecord {
 // TODO: Remove "fill" attribute from paths, rects, etc. INSTEAD Control color with CSS styles/classes (forces default SVG fill color to 0x00000)
 export const STOCK_IMAGES = Object.freeze([
   {
-    uri: "xyz-test-cmd2",
+    uri: "azos.ico.checkmark",  //  svg://azos.ico.checkmark&m=i32
     f: "svg",
-    c: `<svg viewBox="0 0 24 24"><path d="M18.7491 9.70957V9.00497C18.7491 5.13623 15.7274 2 12 2C8.27256 2 5.25087 5.13623 5.25087 9.00497V9.70957C5.25087 10.5552 5.00972 11.3818 4.5578 12.0854L3.45036 13.8095C2.43882 15.3843 3.21105 17.5249 4.97036 18.0229C9.57274 19.3257 14.4273 19.3257 19.0296 18.0229C20.789 17.5249 21.5612 15.3843 20.5496 13.8095L19.4422 12.0854C18.9903 11.3818 18.7491 10.5552 18.7491 9.70957Z"/><path d="M10 9H14L10 13H14" stroke-linejoin="round"/><path d="M7.5 19C8.15503 20.7478 9.92246 22 12 22C14.0775 22 15.845 20.7478 16.5 19" ></svg>`
+    m: "i32",
+    c: `<svg viewBox="0 -960 960 960"><path d="M378-222 130-470l68-68 180 180 383-383 68 68-451 451Z"/></svg>`,
   }, {
-    uri: "adlib-new-query",
+    uri: "azos.ico.testCmd2",  //  svg://azos.ico.testCmd2&m=i32
     f: "svg",
-    c: `<svg viewBox="0 0 28 28"><rect width="6" height="28" x="11" y="0" fill="white"/><rect width="28" height="6" x="0" y="11"></svg>`
+    m: "i32",
+    c: `<svg viewBox="0 0 24 24"><path d="M18.7491 9.70957V9.00497C18.7491 5.13623 15.7274 2 12 2C8.27256 2 5.25087 5.13623 5.25087 9.00497V9.70957C5.25087 10.5552 5.00972 11.3818 4.5578 12.0854L3.45036 13.8095C2.43882 15.3843 3.21105 17.5249 4.97036 18.0229C9.57274 19.3257 14.4273 19.3257 19.0296 18.0229C20.789 17.5249 21.5612 15.3843 20.5496 13.8095L19.4422 12.0854C18.9903 11.3818 18.7491 10.5552 18.7491 9.70957Z"/><path d="M10 9H14L10 13H14" stroke-linejoin="round"/><path d="M7.5 19C8.15503 20.7478 9.92246 22 12 22C14.0775 22 15.845 20.7478 16.5 19" /></svg>`,
   }, {
-    uri: "adlib-prefill-query",
+    uri: "azos.ico.user",  //  svg://azos.ico.user&m=i32
     f: "svg",
-    c: `<svg viewBox="0 0 28 28"><path d="M3 20.5V25h4.5l13.3-13.3-4.5-4.5L3 20.5zM24.7 8.3c.4-.4.4-1 0-1.4l-3.6-3.6c-.4-.4-1-.4-1.4 0L17 5.6l4.5 4.5 3.2-3.3z"/><rect x="18" y="18" width="2" height="8"/><rect x="15" y="21" width="8" height="2"></svg>`
+    m: "i32",
+    c: `<svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="4"/><path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/></svg>`,
   }, {
-    //this is done!!!
-    uri: "azos.ico.filter", //  svg://azos.ico.filter
+    uri: "azos.ico.hamburger",  //  svg://azos.ico.hamburger&m=i32
+    f: "svg",
+    m: "i32",
+    c: `<svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>`,
+  }, {
+    uri: "azos.ico.plus",  //  svg://azos.ico.plus&m=i32
+    f: "svg",
+    m: "i32",
+    c: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="M463.08-463.08H240v-33.84h223.08V-720h33.84v223.08H720v33.84H496.92V-240h-33.84v-223.08Z"/></svg>`,
+  }, {
+    uri: "azos.ico.edit",  //  svg://azos.ico.edit&m=i32
+    f: "svg",
+    m: "i32",
+    c: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="M193.85-193.85h39.87l452.69-452.54-39.87-39.87-452.69 452.54v39.87ZM160-160v-87.64l541.64-542.69q5.02-4 11.4-6.76 6.37-2.76 13.3-2.76 6.78 0 12.95 2.31 6.17 2.31 11.74 7.28l39.46 39.54q5.13 5.05 7.32 11.55 2.19 6.49 2.19 12.99 0 6.85-2.59 13.3-2.58 6.45-6.92 11.47L247.64-160H160Zm606.77-566.51-40.1-39.59 40.1 39.59Zm-100.09 60.5-20.14-20.25 39.87 39.87-19.73-19.62Z"/></svg>`,
+  }, {
+    uri: "azos.ico.filter", //  svg://azos.ico.filter&m=i32
     f: "svg",
     m: "i32",
     c: `<svg viewBox="0 0 24 24"><path d="M22 3.58002H2C1.99912 5.28492 2.43416 6.96173 3.26376 8.45117C4.09337 9.94062 5.29 11.1932 6.73999 12.09C7.44033 12.5379 8.01525 13.1565 8.41062 13.8877C8.80598 14.6189 9.00879 15.4388 9 16.27V21.54L15 20.54V16.25C14.9912 15.4188 15.194 14.599 15.5894 13.8677C15.9847 13.1365 16.5597 12.5178 17.26 12.07C18.7071 11.175 19.9019 9.92554 20.7314 8.43988C21.5608 6.95422 21.9975 5.28153 22 3.58002Z" stroke-linecap="round" stroke-linejoin="round"></svg>`

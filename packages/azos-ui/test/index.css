@@ -74,7 +74,7 @@ body {
   --arn-strip-margin: 2px 1px 2px 2px;
   --arn-strip-padding: 4px 2px 2px 2px;
   --arn-strip-font-size: 0.75em;
-  --arn-strip-min-width: 45px;
+  --arn-strip-min-width: 32px;
   --arn-strip-max-width: 20vw;
 
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
