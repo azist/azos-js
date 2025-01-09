@@ -82,12 +82,12 @@ export class ImageRegistry extends Module {
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
    */
-  resolve(uri, format, { isoLang, theme, media } = {}) {
+  resolve(uri, format, { media, m, isoLang, iso, lang, i, theme, t } = {}) {
     isNonEmptyString(uri);
     isNonEmptyString(format);
-    isoLang = dflt(isoLang, "eng"); // US English
-    theme = dflt(theme, "any"); // theme agnostic
-    media = dflt(media, "ico64"); // icon64 virtual pixels
+    media = dflt(media, m, "i64"); // icon 64 virtual pixels
+    isoLang = dflt(isoLang, iso, lang, i, "eng"); // US English
+    theme = dflt(theme, t, "any"); // theme agnostic
 
     const bucket = this.#map.get(uri);
     if (!bucket) return null;
@@ -98,9 +98,9 @@ export class ImageRegistry extends Module {
     for (const rec of bucket) {
 
       if (rec.format !== format) continue;
+      if (rec.media && rec.media !== media) continue;
       if (rec.isoLang && rec.isoLang !== isoLang) continue;
       if (rec.theme && rec.theme !== theme) continue;
-      if (rec.media && rec.media !== media) continue;
 
       if (bestRec === null || rec.score > bestRec.score) bestRec = rec;
     }
