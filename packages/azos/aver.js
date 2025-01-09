@@ -266,22 +266,24 @@ export function isTrue(a, from = undefined) {
  *  because those are different references.
  * @param {*} a
  * @param {*} b
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and b are strictly equal or throws
  */
-export function areEqual(a, b) {
+export function areEqual(a, b, from = undefined) {
   if (a === b) return;
-  throw AVERMENT_FAILURE(`areEqual(${dv(a)}, ${dv(b)})`);
+  throw AVERMENT_FAILURE(`areEqual(${dv(a)}, ${dv(b)})`, from);
 }
 
 /**
  * Performs strict inequality check using !==
  * @param {*} a
  * @param {*} b
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and be are not equal or throws
  */
-export function areNotEqual(a, b) {
+export function areNotEqual(a, b, from = undefined) {
   if (a !== b) return;
-  throw AVERMENT_FAILURE(`areNotEqual(${dv(a)}, ${dv(b)})`);
+  throw AVERMENT_FAILURE(`areNotEqual(${dv(a)}, ${dv(b)})`, from);
 }
 
 /**

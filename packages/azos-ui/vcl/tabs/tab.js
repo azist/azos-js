@@ -4,12 +4,16 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf } from "azos/aver";
+import * as aver from "azos/aver";
+import * as types from "azos/types";
+
 import { Block } from "../../blocks";
 import { html } from "../../ui";
 import { TabView } from "./tab-view";
+import { Command } from "../../cmd";
 
-import { asBool } from "azos/types";
+window.Command = Command;
+
 import "../../parts/button";
 
 export class Tab extends Block {
@@ -17,12 +21,12 @@ export class Tab extends Block {
 
   static properties = {
     active: { type: Boolean, reflect: true },
-    canRefresh: { type: Boolean },
     minWidth: { type: Number },
     maxWidth: { type: Number },
     canClose: { type: Boolean },
     iconPath: { type: String },
     slot: { type: String, reflect: true },
+    showCommands: { type: Boolean },
   };
 
   #id;
@@ -35,7 +39,7 @@ export class Tab extends Block {
   #isAbsent = false;
   get isAbsent() { return this.#isAbsent; }
   set isAbsent(v) {
-    v = asBool(v);
+    v = types.asBool(v);
     if (this.#isAbsent === v) return;
     const tabView = this.tabView;
     if (!v) {
@@ -46,7 +50,6 @@ export class Tab extends Block {
     }
     tabView?.requestUpdate();
   }
-
 
   #canClose = true;
   get canClose() { return this.#canClose; }
@@ -60,6 +63,15 @@ export class Tab extends Block {
 
   get nextTab() { return this.#getNextSibling(false); }
   get nextVisibleTab() { return this.#getNextSibling(true); }
+
+  #commands = null;
+  get commands() { return this.#commands; }
+  set commands(v) {
+    if (types.isAssigned(v)) aver.isArray(v).forEach(one => aver.isOf(one, Command));
+    const oldCommands = this.#commands;
+    this.#commands = v ?? null;
+    this.requestUpdate("commands", oldCommands);
+  }
 
   #getNextSibling(visibleOnly = true) {
     const tabView = this.tabView;
@@ -107,7 +119,7 @@ export class Tab extends Block {
 
   connectedCallback() {
     super.connectedCallback();
-    isOf(this.parentNode, TabView);
+    aver.isOf(this.parentNode, TabView);
   }
 
   /** Within the tabView, makes this tab active. */
@@ -140,6 +152,12 @@ export class Tab extends Block {
     this.tabView.moveTab(this, beforeTab);
   }
 
+  renderCommands() {
+    return html`
+<div class="toolbar">
+${this.commands?.map(cmd => html`<az-button @click="${() => cmd.exec()}" title="${cmd.icon ? cmd.icon : ""} ${cmd.title}"></az-button>`)}
+</div>
+`;
+  }
   renderControl() { return html`<slot></slot>`; }
-
 }

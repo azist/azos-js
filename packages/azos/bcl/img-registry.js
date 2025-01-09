@@ -65,7 +65,10 @@ export class ImageRegistry extends Module {
 
     cfg = cfg.get("images", "imgs");
 
-    if (!cfg) cfg = config(STOCK_IMAGES).root;
+    if (!cfg) {
+      cfg = config({ imgs: STOCK_IMAGES }).root;
+      cfg = cfg.get("imgs");
+    }
     for (const cfgRec of cfg.getChildren(false)) {
       const uri = isNonEmptyString(cfgRec.getString("uri"));
       const rec = makeNew(ImageRecord, cfgRec, null, ImageRecord);
@@ -79,12 +82,12 @@ export class ImageRegistry extends Module {
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
    */
-  resolve(uri, format, { isoLang, theme, media } = {}) {
+  resolve(uri, format, { media, m, isoLang, iso, lang, i, theme, t } = {}) {
     isNonEmptyString(uri);
     isNonEmptyString(format);
-    isoLang = dflt(isoLang, "eng"); // US English
-    theme = dflt(theme, "any"); // theme agnostic
-    media = dflt(media, "ico64"); // icon64 virtual pixels
+    media = dflt(media, m, "i64"); // icon 64 virtual pixels
+    isoLang = dflt(isoLang, iso, lang, i, "eng"); // US English
+    theme = dflt(theme, t, "any"); // theme agnostic
 
     const bucket = this.#map.get(uri);
     if (!bucket) return null;
@@ -95,9 +98,9 @@ export class ImageRegistry extends Module {
     for (const rec of bucket) {
 
       if (rec.format !== format) continue;
+      if (rec.media && rec.media !== media) continue;
       if (rec.isoLang && rec.isoLang !== isoLang) continue;
       if (rec.theme && rec.theme !== theme) continue;
-      if (rec.media && rec.media !== media) continue;
 
       if (bestRec === null || rec.score > bestRec.score) bestRec = rec;
     }
@@ -193,9 +196,9 @@ export class ImageRecord {
     // required
     this.#format = isNonEmptyString(cfg.getString(["format", "fmt", "f"], null));
 
+    this.#media = cfg.getString(["media", "m"], null);
     this.#isoLang = cfg.getString(["isoLang", "lang", "iso", "i"], null);
     this.#theme = cfg.getString(["theme", "t"], null);
-    this.#media = cfg.getString(["media", "m"], null);
 
     this.#contentType = cfg.getString(["contentType", "ctp"], CONTENT_TYPE.IMG_SVG);
     this.#content = cfg.getString(["content", "img", "image", "c"]);
@@ -257,7 +260,8 @@ export const STOCK_IMAGES = Object.freeze([
   }, {
     //this is done!!!
     uri: "azos.ico.filter", //  svg://azos.ico.filter
-    f: "svg", m: "i32",
+    f: "svg",
+    m: "i32",
     c: `<svg viewBox="0 0 24 24"><path d="M22 3.58002H2C1.99912 5.28492 2.43416 6.96173 3.26376 8.45117C4.09337 9.94062 5.29 11.1932 6.73999 12.09C7.44033 12.5379 8.01525 13.1565 8.41062 13.8877C8.80598 14.6189 9.00879 15.4388 9 16.27V21.54L15 20.54V16.25C14.9912 15.4188 15.194 14.599 15.5894 13.8677C15.9847 13.1365 16.5597 12.5178 17.26 12.07C18.7071 11.175 19.9019 9.92554 20.7314 8.43988C21.5608 6.95422 21.9975 5.28153 22 3.58002Z" stroke-linecap="round" stroke-linejoin="round"></svg>`
   },
 ]);
