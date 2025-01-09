@@ -126,14 +126,15 @@ export class ImageRegistry extends Module {
     const url = new URL(isNonEmptyString(spec));
     let imgUri     = url.host;
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
-    let imgIsoLang = url.searchParams.get("iso");
-    let imgTheme = url.searchParams.get("theme");
-    let imgMedia = url.searchParams.get("media");
+    const sp = url.searchParams;
+    let imgIsoLang = dflt(sp.get("iso"), sp.get("lang"), sp.get("isoLang"), sp.get("i"));
+    let imgTheme = dflt(sp.get("theme"), sp.get("t"));
+    let imgMedia = dflt(sp.get("media"), sp.get("m"));
 
     if (!imgIsoLang || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
     if (!imgTheme || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
 
-    const resolved = this.resolve(imgUri, imgFormat, {imgIsoLang, imgTheme, imgMedia});
+    const resolved = this.resolve(imgUri, imgFormat, { m: imgMedia, i: imgIsoLang, t: imgTheme });
     return resolved;
   }
 
