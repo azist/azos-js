@@ -16,16 +16,40 @@ export class CaseCheckboxes extends CaseBase {
 <h3>Statuses</h3>
 <div class="strip-h" style="gap:2em;">
   <az-check title="Default" titlePosition="mid-right" status="default"></az-check>
-  <az-check title="Disabled" titlePosition="mid-right" status="default" value="true" isdisabled></az-check>
   <az-check title="Ok" titlePosition="mid-right" status="ok"></az-check>
   <az-check title="Info" titlePosition="mid-right" status="info"></az-check>
   <az-check title="Warning" titlePosition="mid-right" status="warning"></az-check>
   <az-check title="Alert" titlePosition="mid-right" status="alert"></az-check>
   <az-check title="Error" titlePosition="mid-right" status="error"></az-check>
-
   <az-check title="Brand1" titlePosition="mid-right" status="brand1" value="true"></az-check>
   <az-check title="Brand2" titlePosition="mid-right" status="brand2" value="true"></az-check>
   <az-check title="Brand3" titlePosition="mid-right" status="brand3" value="true"></az-check>
+</div>
+<h3>Disabled</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check title="Default" titlePosition="mid-right" status="default" value="true" isdisabled></az-check>
+  <az-check title="Disabled" titlePosition="mid-right" status="default" value="true" isdisabled></az-check>
+  <az-check title="Ok" titlePosition="mid-right" status="ok" value="true"isdisabled></az-check>
+  <az-check title="Info" titlePosition="mid-right" status="info" value="true" isdisabled></az-check>
+  <az-check title="Warning" titlePosition="mid-right" status="warning" value="true" isdisabled></az-check>
+  <az-check title="Alert" titlePosition="mid-right" status="alert" value="true" isdisabled></az-check>
+  <az-check title="Error" titlePosition="mid-right" status="error" value="true" isdisabled></az-check>
+  <az-check title="Brand1" titlePosition="mid-right" status="brand1" value="true" isdisabled></az-check>
+  <az-check title="Brand2" titlePosition="mid-right" status="brand2" value="true" isdisabled></az-check>
+  <az-check title="Brand3" titlePosition="mid-right" status="brand3" value="true" isdisabled></az-check>
+</div>
+<h3>Read Only</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check title="Default" titlePosition="mid-right" status="default" value="true"  isreadonly></az-check>
+  <az-check title="Disabled" titlePosition="mid-right" status="default" value="true" isreadonly></az-check>
+  <az-check title="Ok" titlePosition="mid-right" status="ok" value="true"      isreadonly></az-check>
+  <az-check title="Info" titlePosition="mid-right" status="info" value="true"  isreadonly></az-check>
+  <az-check title="Warning" titlePosition="mid-right" status="warning" value="true" isreadonly></az-check>
+  <az-check title="Alert" titlePosition="mid-right" status="alert" value="true"   isreadonly></az-check>
+  <az-check title="Error" titlePosition="mid-right" status="error" value="true"   isreadonly></az-check>
+  <az-check title="Brand1" titlePosition="mid-right" status="brand1" value="true" isreadonly></az-check>
+  <az-check title="Brand2" titlePosition="mid-right" status="brand2" value="true" isreadonly></az-check>
+  <az-check title="Brand3" titlePosition="mid-right" status="brand3" value="true" isreadonly></az-check>
 </div>
 
 <h3>Ranks</h3>

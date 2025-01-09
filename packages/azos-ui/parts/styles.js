@@ -154,7 +154,7 @@ export const checkStyles = css`
     box-shadow: var(--focus-ctl-box-shadow);
   }
   .check::before{
-    content: "×"; /*"\u{2713}";*/
+    content: "×";
     color: var(--s-default-fg-ctl);
     text-align:center;
     position:relative;
@@ -244,12 +244,19 @@ export const switchStyles = css`
   .warningBg[class~="switch"]::before { background-color: var(--s-warn-fg-ctl); }
   .alertBg[class~="switch"]::before { background-color: var(--s-alert-fg-ctl); }
   .errorBg[class~="switch"]::before { background-color: var(--s-error-fg-ctl); }
+  .brand1Bg[class~="switch"]::before { background-color: var(--s-brand1-fg-ctl); }
+  .brand2Bg[class~="switch"]::before { background-color: var(--s-brand2-fg-ctl); }
+  .brand3Bg[class~="switch"]::before { background-color: var(--s-brand3-fg-ctl); }
 
   .okBg[class~="switch"]    { background: var(--s-ok-bg-ctl);    border: var(--s-ok-bor-ctl);}
   .infoBg[class~="switch"]  { background: var(--s-info-bg-ctl);  border: var(--s-info-bor-ctl);}
   .warningBg[class~="switch"] { background: var(--s-warn-bg-ctl);border: var(--s-warn-bor-ctl); }
   .alertBg[class~="switch"] { background: var(--s-alert-bg-ctl); border: var(--s-alert-bor-ctl);}
   .errorBg[class~="switch"] { background: var(--s-error-bg-ctl); border: var(--s-error-bor-ctl);}
+  .brand1Bg[class~="switch"] { background: var(--s-brand1-bg-ctl);  border: var(--s-brand1-bor-ctl);}
+  .brand2Bg[class~="switch"] { background: var(--s-brand2-bg-ctl);  border: var(--s-brand2-bor-ctl);}
+  .brand3Bg[class~="switch"] { background: var(--s-brand3-bg-ctl);  border: var(--s-brand3-bor-ctl);}
+
 `;
 
 export const radioStyles = css`
