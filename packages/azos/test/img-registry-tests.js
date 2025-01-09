@@ -10,16 +10,7 @@ import { application } from "../application.js";
 import { ImageRegistry } from "../bcl/img-registry.js";
 import { areEqual, isNull } from "../aver.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
-import { dispose } from "../types.js";
-
-function using(resource, callback) {
-  try {
-    callback(resource);
-  } finally {
-    if (typeof resource.dispose === 'function') resource.dispose();
-    else dispose(resource);
-  }
-}
+import { doUsing } from "../types.js";
 
 unit("ImgRegistry", function () {
 
@@ -34,7 +25,7 @@ unit("ImgRegistry", function () {
     }
 
     cs("resolve()- all combos of options", function () {
-      using(application({
+      doUsing(application({
         modules: [
           {
             name: "ir",
@@ -84,7 +75,7 @@ unit("ImgRegistry", function () {
 
     cs("resolve()- media, m", () => {
 
-      using(application({
+      doUsing(application({
         modules: [{
           name: "ir",
           type: ImageRegistry,
@@ -104,7 +95,7 @@ unit("ImgRegistry", function () {
 
     cs("resolve()- isoLang, iso, lang, i", () => {
 
-      using(application({
+      doUsing(application({
         modules: [{
           name: "ir",
           type: ImageRegistry,
@@ -130,7 +121,7 @@ unit("ImgRegistry", function () {
 
     cs("resolve()- theme, t", () => {
 
-      using(application({
+      doUsing(application({
         modules: [{
           name: "ir",
           type: ImageRegistry,
@@ -150,7 +141,7 @@ unit("ImgRegistry", function () {
 
     cs("resolve()- STOCK", () => {
 
-      using(application({ modules: [{ name: "ir", type: ImageRegistry }] }),
+      doUsing(application({ modules: [{ name: "ir", type: ImageRegistry }] }),
         ({ moduleLinker }) => {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
