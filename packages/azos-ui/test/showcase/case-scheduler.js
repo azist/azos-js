@@ -63,6 +63,7 @@ export class CaseScheduler extends CaseBase {
     const [year, month, date] = this.date.value.split("-").map(Number)
     const day = new Date(year, month - 1, date);
     day.setHours(0, 0, 0, 0);
+    this.schTest.beginChanges();
     this.schTest.addItem({
       id: Math.random() > 0.5 ? null : `n-${Math.random() * 10}`,
       caption,
@@ -70,15 +71,16 @@ export class CaseScheduler extends CaseBase {
       durationMins: duration,
       day,
     });
+    this.schTest.endChanges();
   }
 
   renderControl() {
     return html`
 <h2>Scheduler</h2>
 <div>
-    <az-text title="Start" id="sta" scope="this" itemType="time" value="13:00"></az-text>
-    <az-text title="End" id="fin" scope="this" itemType="time" value="13:30"></az-text>
-    <az-text title="Date" id="date" scope="this" itemType="date" value="${(new Date()).toISOString().split("T")[0]}"></az-text>
+    <az-text title="Start" id="sta" scope="this" dataKind="time" value="13:00"></az-text>
+    <az-text title="End" id="fin" scope="this" dataKind="time" value="13:30"></az-text>
+    <az-text title="Date" id="date" scope="this" dataKind="date" value="${(new Date()).toISOString().split("T")[0]}"></az-text>
     <az-text title="Caption" id="caption" scope="this"></az-text>
     <az-button title="Add Item" @click="${() => this.btnAddItem()}"></az-button>
 </div>

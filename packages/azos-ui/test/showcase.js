@@ -676,7 +676,7 @@ ${this.showSlides ? html`
   <az-text id="requiredInput" title="This is a required field" placeholder="Type something here&hellip;" isRequired></az-text>
   <az-text id="readOnlyInput" title="Read Only field" value="Read-only value" isReadonly></az-text>
   <az-text id="disabledInput" title="This is a disabled field" value="Disabled value" isDisabled></az-text>
-  <az-text id="basicTextArea" itemType="long" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text>
+  <az-text id="basicTextArea" title="Basic textarea input" placeholder="Type something here&hellip;"></az-text>
 </div>
 <hr>
 <div class="strip-h">
@@ -711,12 +711,12 @@ ${this.showSlides ? html`
   <az-text id="errorSimple" title="Error Status" placeholder="Type something here&hellip;" message="Now go clean it up" status="error"></az-text>
 </div>
 <div class="strip-h">
-  <az-text id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;" itemType="long"></az-text>
-  <az-text id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" itemType="long" status="ok"></az-text>
-  <az-text id="infoTextArea" title="Info Status" placeholder="Type something here&hellip;" itemType="long" status="info"></az-text>
-  <az-text id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" itemType="long" status="warning"></az-text>
-  <az-text id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" itemType="long" status="alert"></az-text>
-  <az-text id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" itemType="long" status="error"></az-text>
+  <az-text id="defaultTextArea" title="Default Status" placeholder="Type something here&hellip;"></az-text>
+  <az-text id="okTextArea" title="OK Status" placeholder="Type something here&hellip;" status="ok"></az-text>
+  <az-text id="infoTextArea" title="Info Status" placeholder="Type something here&hellip;" status="info"></az-text>
+  <az-text id="warningTextArea" title="Warning Status" placeholder="Type something here&hellip;" status="warning"></az-text>
+  <az-text id="alertTextArea" title="Alert Status" placeholder="Type something here&hellip;" status="alert"></az-text>
+  <az-text id="errorTextArea" title="Error Status" placeholder="Type something here&hellip;" status="error"></az-text>
 </div>
     `;
   }

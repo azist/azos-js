@@ -23,7 +23,7 @@ export class CaseInputTests extends CaseBase {
 <az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="SHITTERESSS"></az-text>
 <az-text id="tbLastName" scope="this" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text>
 
-<az-text id="getADate" scope="this" name="getADate" title="Get a Date" placeholder="2024/01/01" itemtype="date"></az-text>
+<az-text id="getADate" scope="this" name="getADate" title="Get a Date" placeholder="2024/01/01" dataKind="date"></az-text>
 
 <az-check id="chkSmokes" scope="this" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-check>
 <az-check id="chkDrinks" scope="this" name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-check>

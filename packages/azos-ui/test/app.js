@@ -34,7 +34,7 @@ const appMenu = [
   {
     uri: "processing",
     caption: "Processing",
-    icon: "<svg></svg>",
+    icon: "svg://azos.ico.none",
     nodes: [
     ],
     access: "/ns/permission1"
@@ -42,7 +42,7 @@ const appMenu = [
   {
     uri: "reports",
     caption: "Reports and Analytics",
-    icon: "<svg></svg>",
+    icon: "svg://azos.ico.none",
     nodes: [
     ]
   },
@@ -50,8 +50,8 @@ const appMenu = [
     uri: "setup", caption: "Data Setup", nodes: [
       {
         uri: "codes", caption: "Codes and Classifications", nodes: [
-          { uri: "facility", caption: "Facility Master", handler: { type: XyzApplet, a: 1, b: true }, icon: "<svg></svg>" },
-          { uri: "postal", caption: "Postal Codes", handler: { type: XyzApplet, x: -5, b: "ok" }, icon: "<svg></svg>" },
+          { uri: "facility", caption: "Facility Master", handler: { type: XyzApplet, a: 1, b: true }, icon: "svg://azos.ico.none" },
+          { uri: "postal", caption: "Postal Codes", handler: { type: XyzApplet, x: -5, b: "ok" }, icon: "svg://azos.ico.none" },
         ]
       }
     ]
