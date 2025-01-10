@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 /** Puts test into clipboard */
-export default async function writeToClipboard(text) {
+export async function writeToClipboard(text) {
   if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
   else { // deprecated, insecure, but functional method of Copy Pasta
     const textArea = document.createElement("textArea");

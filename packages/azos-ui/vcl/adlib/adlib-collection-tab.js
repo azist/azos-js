@@ -11,7 +11,7 @@ import { css, html, POSITION } from "../../ui";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { Spinner } from "../../spinner";
 import { toast } from "../../toast";
-import writeToClipboard from "../util/clipboard";
+import { writeToClipboard } from "../util/clipboard";
 import { IStorage } from "azos/storage";
 
 /**
