@@ -78,9 +78,9 @@ export class CaseScheduler extends CaseBase {
     return html`
 <h2>Scheduler</h2>
 <div>
-    <az-text title="Start" id="sta" scope="this" itemType="time" value="13:00"></az-text>
-    <az-text title="End" id="fin" scope="this" itemType="time" value="13:30"></az-text>
-    <az-text title="Date" id="date" scope="this" itemType="date" value="${(new Date()).toISOString().split("T")[0]}"></az-text>
+    <az-text title="Start" id="sta" scope="this" dataKind="time" value="13:00"></az-text>
+    <az-text title="End" id="fin" scope="this" dataKind="time" value="13:30"></az-text>
+    <az-text title="Date" id="date" scope="this" dataKind="date" value="${(new Date()).toISOString().split("T")[0]}"></az-text>
     <az-text title="Caption" id="caption" scope="this"></az-text>
     <az-button title="Add Item" @click="${() => this.btnAddItem()}"></az-button>
 </div>

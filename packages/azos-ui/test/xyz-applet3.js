@@ -83,8 +83,8 @@ xaz-text {
 <div class="h-strip">
   <az-text id="text1" title="Name" value="Borland" style="width: 70ch"></az-text>
   <az-text id="text2" title="Zip Code" value="48911"></az-text>
-  <az-text id="password" itemtype="pass" title="Password" value="48911"></az-text>
-  <az-text id="date" itemtype="date" title="Date" value="2000-01-01"></az-text>
+  <az-text id="password" dataKind="pwd" title="Password" value="48911"></az-text>
+  <az-text id="date" dataKind="date" title="Date" value="2000-01-01"></az-text>
 </div>
 
 <div class="h-strip">
@@ -106,12 +106,12 @@ xaz-text {
 </div>
 
 <div class="h-strip">
-  <az-text id="text15" itemType="multiline" resize="none" title="Huge" value="W_i\`@." rank="huge" message="Field value is required"></az-text>
-  <az-text id="text16" itemType="multiline" resize="horizontal" title="Large" value="W_i\`@." rank="large" message="Field value is required"></az-text>
-  <az-text id="text17" itemType="multiline" resize="vertical" title="Normal" value="W_i\`@." rank="normal" message="Field value is required"></az-text>
-  <az-text id="text18" itemType="multiline" title="Medium" value="W_i\`@." rank="medium" message="Field value is required"></az-text>
-  <az-text id="text19" itemType="multiline" title="Small" value="W_i\`@." rank="small" message="Field value is required"></az-text>
-  <az-text id="text20" itemType="multiline" title="Tiny" value="W_i\`@." rank="tiny" message="Field value is required"></az-text>
+  <az-text id="text15" multiline resize="none" title="Huge" value="W_i\`@." rank="huge" message="Field value is required"></az-text>
+  <az-text id="text16" multiline resize="horizontal" title="Large" value="W_i\`@." rank="large" message="Field value is required"></az-text>
+  <az-text id="text17" multiline resize="vertical" title="Normal" value="W_i\`@." rank="normal" message="Field value is required"></az-text>
+  <az-text id="text18" multiline title="Medium" value="W_i\`@." rank="medium" message="Field value is required"></az-text>
+  <az-text id="text19" multiline title="Small" value="W_i\`@." rank="small" message="Field value is required"></az-text>
+  <az-text id="text20" multiline title="Tiny" value="W_i\`@." rank="tiny" message="Field value is required"></az-text>
 </div>
 
 <div class="h-strip">

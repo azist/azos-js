@@ -213,7 +213,7 @@ az-code-box {
   render() {
     return html`
 <form @submit="${this.#onExecuteClick}" name="CollectionForm">
-  <az-text id="filterElm" scope="this" title="Filter" itemType="multiline" @input="${this.#filterTextChanged}" value="${this.#filterText}" rank="4"></az-text>
+  <az-text id="filterElm" scope="this" title="Filter" multiline @input="${this.#filterTextChanged}" value="${this.#filterText}" rank="4"></az-text>
 
   <div class="actions">
     <az-button title="Execute" status="ok" type="submit" @click="${this.#onExecuteClick}" rank="medium"></az-button>
