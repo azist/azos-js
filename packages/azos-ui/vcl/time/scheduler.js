@@ -551,7 +551,8 @@ export class TimeBlockPicker extends Control {
 
     const timeFoundIndex = found.items.findIndex(one => (item.startTimeMins >= one.startTimeMins && item.startTimeMins <= one.endTimeMins) || (item.endTimeMins >= one.startTimeMins && item.endTimeMins <= one.endTimeMins));
     if (timeFoundIndex > -1) {
-      this.writeLog("Error", `An item already exists between "${this.formatStartEndTimes(found.items[timeFoundIndex]).join(`" and "`)}" on ${found.items[timeFoundIndex].day.toLocaleDateString()}.`);
+      const [startTime, endTime] = this.formatStartEndTimes(found.items[timeFoundIndex]).map(t => types.isString(t) ? t : t.values.join(""));
+      this.writeLog("Error", `An item already exists from ${startTime} - ${endTime} on ${found.items[timeFoundIndex].day.toLocaleDateString()}.`);
       return;
     }
 
