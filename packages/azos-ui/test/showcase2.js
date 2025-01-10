@@ -11,6 +11,7 @@ import { asInt, isIntValue } from "azos/types";
 import "../vcl/tabs/tab-view";
 import "../vcl/slides/slide-deck";
 
+import "../vcl/util/img-registry-browser";
 import "../vcl/tabs/tab-view";
 import "./showcase/case-buttons";
 import "./showcase/case-text-fields";
@@ -140,6 +141,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
 <h1 id="toc">Table of Contents</h1>
 <ol>${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}</ol>
 <div id="content">
+  <div id="ImgRegistryBrowserContent"><az-img-registry-browser></az-img-registry-browser></div>
   <div id="ButtonsContent"> <az-case-buttons></az-case-buttons> </div>
   <div id="TextFieldsContent"> <az-case-text-fields schema="ShowCase.Long.TextFields"></az-case-text-fields> </div>
   <div id="InputTestsContent"> <az-case-input-tests></az-case-input-tests> </div>

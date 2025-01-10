@@ -82,12 +82,7 @@ header{
         margin: var(--arn-mnu-svg-margin);
         width: var(--arn-mnu-svg-width);
         height: var(--arn-mnu-svg-height);
-
-        stroke: var(--arn-mnu-svg-stroke);
-        stroke-width: var(--arn-mnu-svg-stroke-width);
       }
-
-
 
       header .title{
         position: absolute;

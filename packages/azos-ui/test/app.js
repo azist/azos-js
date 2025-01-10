@@ -1,18 +1,20 @@
 import { application } from "azos/application";
-import { Arena } from "../arena.js";
-import { Router } from "../router.js";
 import { LOG_TYPE } from "azos/log";
 import { ConLog } from "azos/ilog";
-
 import { dispose } from "azos/types";
 import { Module } from "azos/modules";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
-import { XyzApplet } from "./xyz-applet.js";
-import { XyzApplet2 } from "./xyz-applet2.js";
-import { XyzApplet3 } from "./xyz-applet3.js";
-import { XyzAppletScheduler } from "./xyz-applet-scheduler.js";
 import { ImageRegistry } from "azos/bcl/img-registry";
+
+import { Arena } from "../arena";
+import { Router } from "../router";
+import { XyzApplet } from "./xyz-applet";
+import { XyzApplet2 } from "./xyz-applet2";
+import { XyzApplet3 } from "./xyz-applet3";
+import { XyzAppletScheduler } from "./xyz-applet-scheduler";
+import "../vcl/util/img-registry-browser";
+
 
 
 class MyLogic extends Module {

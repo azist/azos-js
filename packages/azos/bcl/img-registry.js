@@ -247,6 +247,10 @@ export class ImageRecord {
 // TODO: Remove "fill" attribute from paths, rects, etc. INSTEAD Control color with CSS styles/classes (forces default SVG fill color to 0x00000)
 export const STOCK_IMAGES = Object.freeze([
   {
+    uri: "azos.ico.none", //  svg://azos.ico.none
+    f: "svg",
+    c: "<svg></svg>",
+  }, {
     uri: "azos.ico.checkmark",  //  svg://azos.ico.checkmark&m=i32
     f: "svg",
     m: "i32",
@@ -265,7 +269,7 @@ export const STOCK_IMAGES = Object.freeze([
     uri: "azos.ico.hamburger",  //  svg://azos.ico.hamburger&m=i32
     f: "svg",
     m: "i32",
-    c: `<svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960" fill="#e8eaed"><path d="M160-269.23v-33.85h640v33.85H160Zm0-193.85v-33.84h640v33.84H160Zm0-193.84v-33.85h640v33.85H160Z"/></svg>`,
   }, {
     uri: "azos.ico.plus",  //  svg://azos.ico.plus&m=i32
     f: "svg",

@@ -98,18 +98,6 @@ header{
         background:#f09020;
       }
 
-      header .menu svg{
-        display: block;
-        margin: 8px auto 8px auto;
-        width: 30px;
-        height: 30px;
-
-        stroke: #f0f0f0;
-        stroke-width: 4px;
-      }
-
-
-
       header .title{
         float: left;
         display: block;
