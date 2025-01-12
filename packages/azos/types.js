@@ -9,7 +9,7 @@ import * as CC from "./coreconsts.js";
 import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
 
-import { isDate as aver_isDate, isNonEmptyString as aver_isNonEmptyString, isStringOrNull as aver_isStringOrNull, isNotNull } from "./aver.js";
+import { isDate as aver_isDate, isNonEmptyString as aver_isNonEmptyString, isStringOrNull as aver_isStringOrNull, isNotNull as aver_isNotNull, isFunction as aver_isFunction } from "./aver.js";
 
 
 /**
@@ -109,8 +109,8 @@ export function dispose(v) {
  * @param {Function} body any function that requires {@link disposable}
  */
 export function doUsing(disposable, body) {
-  isNotNull(disposable);
-  isFunction(body);
+  aver_isNotNull(disposable);
+  aver_isFunction(body);
   try { body(disposable) }
   finally { dispose(disposable) }
 }

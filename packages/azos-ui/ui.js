@@ -272,6 +272,7 @@ export class AzosElement extends LitElement {
   render() { return html`>>AZOS ELEMENT<<`; }
 }
 
+//FIXME: What is this used by? Remove/test
 export function isRectInViewport(rect) {
   let bounds = rect.getBoundingClientRect();
   let viewWidth = document.documentElement.clientWidth;
