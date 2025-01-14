@@ -41,7 +41,7 @@ limitations under the License.
 */
 
 
-import { isNonEmptyString, isOf } from "../aver.js";
+import { isNonEmptyString, isOf, isStringOrNull } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
 import { dflt } from "../strings.js";
@@ -82,12 +82,14 @@ export class ImageRegistry extends Module {
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
    */
-  resolve(uri, format, { media, m, isoLang, iso, lang, i, theme, t } = {}) {
+  resolve(uri, format, { media, isoLang, theme } = {}) {
     isNonEmptyString(uri);
     isNonEmptyString(format);
-    media = dflt(media, m, "i64"); // icon 64 virtual pixels
-    isoLang = dflt(isoLang, iso, lang, i, "eng"); // US English
-    theme = dflt(theme, t, "any"); // theme agnostic
+
+    // optional props: if undefined, skips prop test. If null, test rec.prop also null (specific matches)
+    isStringOrNull(media);
+    isStringOrNull(isoLang);
+    isStringOrNull(theme);
 
     const bucket = this.#map.get(uri);
     if (!bucket) return null;
@@ -96,11 +98,11 @@ export class ImageRegistry extends Module {
     //while linear search is slow, in reality you would rarely get more than 2-3 records per bucket array
     let bestRec = null;
     for (const rec of bucket) {
-
-      if (rec.format !== format) continue;
-      if (rec.media && rec.media !== media) continue;
-      if (rec.isoLang && rec.isoLang !== isoLang) continue;
-      if (rec.theme && rec.theme !== theme) continue;
+      console.log(JSON.stringify({ uri, format, media, isoLang, theme }), JSON.stringify(rec));
+      if (format !== rec.format) continue;
+      if (media !== undefined && media !== rec.media) continue;
+      if (isoLang !== undefined && isoLang !== rec.isoLang) continue;
+      if (theme !== undefined && theme !== rec.theme) continue;
 
       if (bestRec === null || rec.score > bestRec.score) bestRec = rec;
     }
@@ -127,14 +129,22 @@ export class ImageRegistry extends Module {
     let imgUri     = url.host;
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
     const sp = url.searchParams;
-    let imgIsoLang = dflt(sp.get("iso"), sp.get("lang"), sp.get("isoLang"), sp.get("i"));
-    let imgTheme = dflt(sp.get("theme"), sp.get("t"));
-    let imgMedia = dflt(sp.get("media"), sp.get("m"));
+    let imgMedia = sp.get("media") ?? sp.get("m") ?? undefined;
+    let imgIsoLang = sp.get("iso") ?? sp.get("lang") ?? sp.get("isoLang") ?? sp.get("i") ?? undefined;
+    let imgTheme = sp.get("theme") ?? sp.get("t") ?? undefined;
 
-    if (!imgIsoLang || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
-    if (!imgTheme || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
+    if (imgMedia === "") imgMedia = null;
+    if (imgIsoLang === "") imgIsoLang = null;
+    if (imgTheme === "") imgTheme = null;
 
-    const resolved = this.resolve(imgUri, imgFormat, { m: imgMedia, i: imgIsoLang, t: imgTheme });
+    console.log({ isoLang: imgIsoLang, theme: imgTheme, media: imgMedia });
+
+    if (imgIsoLang === undefined || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
+    if (imgTheme === undefined || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
+
+    console.log({ isoLang: imgIsoLang, theme: imgTheme, media: imgMedia });
+
+    const resolved = this.resolve(imgUri, imgFormat, { media: imgMedia, isoLang: imgIsoLang, theme: imgTheme });
     return resolved;
   }
 
@@ -238,6 +248,20 @@ export class ImageRecord {
 
   /** Async method which materializes the referenced content. This is reserved for future */
   async materialize(){ return true; }
+
+  toString() { return JSON.stringify(this.toJSON(), null, 2); }
+
+  toJSON() {
+    return {
+      format: this.format,
+      isoLang: this.isoLang,
+      theme: this.theme,
+      media: this.media,
+      score: this.score,
+      contentType: this.contentType,
+      content: `${this.content.substring(0, 10)}...`,
+    };
+  }
 }
 
 
@@ -285,6 +309,11 @@ export const STOCK_IMAGES = Object.freeze([
     f: "svg",
     m: "i32",
     c: `<svg viewBox="0 0 24 24"><path d="M22 3.58002H2C1.99912 5.28492 2.43416 6.96173 3.26376 8.45117C4.09337 9.94062 5.29 11.1932 6.73999 12.09C7.44033 12.5379 8.01525 13.1565 8.41062 13.8877C8.80598 14.6189 9.00879 15.4388 9 16.27V21.54L15 20.54V16.25C14.9912 15.4188 15.194 14.599 15.5894 13.8677C15.9847 13.1365 16.5597 12.5178 17.26 12.07C18.7071 11.175 19.9019 9.92554 20.7314 8.43988C21.5608 6.95422 21.9975 5.28153 22 3.58002Z" stroke-linecap="round" stroke-linejoin="round"></svg>`
+  }, {
+    uri: "azos.ico.copy", //  svg://azos.ico.filter&m=i32
+    f: "svg",
+    m: "i32",
+    c: `<svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#e8eaed"><path d="M346.15-267.69q-24.57 0-41.52-16.94-16.94-16.95-16.94-41.52v-455.39q0-24.58 16.94-41.52Q321.58-840 346.15-840h335.39q24.58 0 41.52 16.94Q740-806.12 740-781.54v455.39q0 24.57-16.94 41.52-16.94 16.94-41.52 16.94H346.15Zm0-33.85h335.39q9.23 0 16.92-7.69 7.69-7.69 7.69-16.92v-455.39q0-9.23-7.69-16.92-7.69-7.69-16.92-7.69H346.15q-9.23 0-16.92 7.69-7.69 7.69-7.69 16.92v455.39q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69ZM238.46-160q-24.58 0-41.52-16.94Q180-193.88 180-218.46v-489.23h33.85v489.23q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69h369.23V-160H238.46Zm83.08-141.54v-504.61 504.61Z"/></svg>`
   },
 ]);
 
