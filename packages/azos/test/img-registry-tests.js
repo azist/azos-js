@@ -51,26 +51,26 @@ unit("ImgRegistry", function () {
           let icon = ireg.resolve("test", "svg", { media: "i16", isoLang: "can", theme: "patio" });
           expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#1 Capture SVG1a");
 
-          icon = ireg.resolve("test", "svg", { media: "i16", isoLang: "can", theme: null });
-          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#2 Capture SVG2a");
+          icon = ireg.resolve("test", "svg", { media: "i16", isoLang: "can" });
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#2 Cannot Specifically Capture SVG2a");
 
-          icon = ireg.resolve("test", "svg", { media: "i16", theme: "patio", isoLang: null });
-          expecting(icon, "<svg>3</svg>", CONTENT_TYPE.IMG_SVG, 1001, "#3 Capture SVG3a");
+          icon = ireg.resolve("test", "svg", { media: "i16", theme: "patio" });
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#3 Cannot Specifically Capture SVG3a");
 
-          icon = ireg.resolve("test", "svg", { media: "i16", isoLang: null, theme: null });
-          expecting(icon, "<svg>4</svg>", CONTENT_TYPE.IMG_SVG, 1000, "#4 Capture SVG4a");
+          icon = ireg.resolve("test", "svg", { media: "i16" });
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#4 Cannot Specifically Capture SVG4a");
 
-          icon = ireg.resolve("test", "svg", { isoLang: "can", theme: "patio", media: null });
-          expecting(icon, "<svg>5</svg>", CONTENT_TYPE.IMG_SVG, 101, "#5 Capture SVG5a");
+          icon = ireg.resolve("test", "svg", { isoLang: "can", theme: "patio" });
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#5 Cannot Specifically Capture SVG5a");
 
-          icon = ireg.resolve("test", "svg", { isoLang: "can", theme: null, media: null });
-          expecting(icon, "<svg>6</svg>", CONTENT_TYPE.IMG_SVG, 100, "#6 Capture SVG6a");
+          icon = ireg.resolve("test", "svg", { isoLang: "can" });
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#6 Cannot Specifically Capture SVG6a");
 
-          icon = ireg.resolve("test", "svg", { theme: "patio", media: null, isoLang: null });
-          expecting(icon, "<svg>7</svg>", CONTENT_TYPE.IMG_SVG, 1, "#7 Capture SVG7a");
+          icon = ireg.resolve("test", "svg", { theme: "patio" });
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#7 Cannot Specifically Capture SVG7a");
 
-          icon = ireg.resolve("test", "svg", { media: null, isoLang: null, theme: null });
-          expecting(icon, "<svg>8</svg>", CONTENT_TYPE.IMG_SVG, 0, "#8 Capture SVG8a");
+          icon = ireg.resolve("test", "svg", {});
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#8 Cannot Specifically Capture SVG8a");
         });
     }, () => false);
 
@@ -147,12 +147,12 @@ unit("ImgRegistry", function () {
             type: ImageRegistry,
             images: [
               { uri: "test", f: "svg", m: "i16", i: "can", t: "patio", c: `<svg>1</svg>` }, // score: 1101
-              { uri: "test", f: "svg", m: "i16", i: "can", t: null, c: `<svg>2</svg>` },    // score: 1100
-              { uri: "test", f: "svg", m: "i16", i: null, t: "patio", c: `<svg>3</svg>` },  // score: 1001
-              { uri: "test", f: "svg", m: "i16", i: null, t: null, c: `<svg>4</svg>` },     // score: 1000
-              { uri: "test", f: "svg", m: null, i: "can", t: "patio", c: `<svg>5</svg>` },  // score:  101
-              { uri: "test", f: "svg", m: null, i: "can", t: null, c: `<svg>6</svg>` },     // score:  100
-              { uri: "test", f: "svg", m: null, i: null, t: "patio", c: `<svg>7</svg>` },   // score:    1
+              { uri: "test", f: "svg", m: "i32", i: "eng", t: null, c: `<svg>2</svg>` },    // score: 1100
+              { uri: "test", f: "svg", m: "i32", i: null, t: "gdi", c: `<svg>3</svg>` },    // score: 1001
+              { uri: "test", f: "svg", m: "i32", i: null, t: null, c: `<svg>4</svg>` },     // score: 1000
+              { uri: "test", f: "svg", m: null, i: "eng", t: "gdi", c: `<svg>5</svg>` },    // score:  101
+              { uri: "test", f: "svg", m: null, i: "eng", t: null, c: `<svg>6</svg>` },     // score:  100
+              { uri: "test", f: "svg", m: null, i: null, t: "gdi", c: `<svg>7</svg>` },     // score:    1
               { uri: "test", f: "svg", m: null, i: null, t: null, c: `<svg>8</svg>` },      // score:    0
             ]
           }
@@ -162,50 +162,43 @@ unit("ImgRegistry", function () {
 
           const ireg = moduleLinker.resolve(ImageRegistry);
 
-          let icon = ireg.resolveSpec("svg://test?m=i16&i=can&t=patio");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#1 Capture SVG1a");
+          // NOTE: Cannot directly select 4, 6, 7, or 8.
 
-          icon = ireg.resolveSpec("svg://test?m=i16&i=can&t");
-          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#2 Capture SVG2a");
-
-          icon = ireg.resolveSpec("svg://test?m=i16&i=can");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#2 Capture SVG2b");
-
-          icon = ireg.resolveSpec("svg://test?m=i16&t=patio");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#3 Capture SVG3a");
-
-          icon = ireg.resolveSpec("svg://test?m=i16&t=patio&i");
-          expecting(icon, "<svg>3</svg>", CONTENT_TYPE.IMG_SVG, 1001, "#3 Capture SVG3b");
+          let icon = ireg.resolveSpec("svg://test");
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#1 Capture SVG1");
 
           icon = ireg.resolveSpec("svg://test?m=i16");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#4 Capture SVG4a");
-
-          icon = ireg.resolveSpec("svg://test?m=i16&i&t");
-          expecting(icon, "<svg>4</svg>", CONTENT_TYPE.IMG_SVG, 1000, "#4 Capture SVG4b");
-
-          icon = ireg.resolveSpec("svg://test?i=can&t=patio");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#5 Capture SVG5a");
-
-          icon = ireg.resolveSpec("svg://test?i=can&t=patio&m&i");
-          expecting(icon, "<svg>5</svg>", CONTENT_TYPE.IMG_SVG, 101, "#5 Capture SVG5b");
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#2 Capture SVG1");
 
           icon = ireg.resolveSpec("svg://test?i=can");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#6 Capture SVG6a");
-
-          icon = ireg.resolveSpec("svg://test?i=can&m=&t=");
-          expecting(icon, "<svg>6</svg>", CONTENT_TYPE.IMG_SVG, 100, "#6 Capture SVG6b");
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#3 Capture SVG1");
 
           icon = ireg.resolveSpec("svg://test?t=patio");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#7 Capture SVG7a");
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#4 Capture SVG1");
 
-          icon = ireg.resolveSpec("svg://test?t=patio&m=&i");
-          expecting(icon, "<svg>7</svg>", CONTENT_TYPE.IMG_SVG, 1, "#7 Capture SVG7b");
+          icon = ireg.resolveSpec("svg://test?m=i16&i=can");
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#5 Capture SVG1");
 
-          icon = ireg.resolveSpec("svg://test");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#8 Capture SVG8a");
+          icon = ireg.resolveSpec("svg://test?m=i16&t=patio");
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#6 Capture SVG1");
 
-          icon = ireg.resolveSpec("svg://test?m&i&t");
-          expecting(icon, "<svg>8</svg>", CONTENT_TYPE.IMG_SVG, 0, "#8 Capture SVG8b");
+          icon = ireg.resolveSpec("svg://test?i=can&t=patio");
+          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#7 Capture SVG1");
+
+          icon = ireg.resolveSpec("svg://test?m=i32");
+          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#8 Capture SVG2");
+
+          icon = ireg.resolveSpec("svg://test?m=i32&i=eng");
+          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#9 Capture SVG2");
+
+          icon = ireg.resolveSpec("svg://test?i=eng");
+          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#10 Capture SVG2");
+
+          icon = ireg.resolveSpec("svg://test?m=i32&t=gdi");
+          expecting(icon, "<svg>3</svg>", CONTENT_TYPE.IMG_SVG, 1001, "#11 Capture SVG3");
+
+          icon = ireg.resolveSpec("svg://test?i=eng&t=gdi");
+          expecting(icon, "<svg>5</svg>", CONTENT_TYPE.IMG_SVG, 101, "#12 Capture SVG5");
         });
     }, () => false);
 
@@ -214,17 +207,20 @@ unit("ImgRegistry", function () {
         modules: [{
           name: "ir",
           type: ImageRegistry,
-          images: [{ uri: "test", f: "svg", m: "i128", i: null, t: null, c: `<svg>1</svg>` }]
+          images: [
+            { uri: "test", f: "svg", m: "i128", i: null, t: "gdi", c: `<svg>1</svg>` },
+            { uri: "test", f: "svg", m: "i128", i: "eng", t: null, c: `<svg>2</svg>` },
+          ]
         }]
       }),
         ({ moduleLinker }) => {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?media=i128");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1000, "Capture SVG1a");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?m=i128");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1000, "Capture SVG1b");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#2 Capture SVG2");
         });
     }, () => false);
 
@@ -233,23 +229,26 @@ unit("ImgRegistry", function () {
         modules: [{
           name: "ir",
           type: ImageRegistry,
-          images: [{ uri: "test", f: "svg", m: null, i: "can", t: null, c: `<svg>1</svg>` }]
+          images: [
+            { uri: "test", f: "svg", m: null, i: "can", t: null, c: `<svg>1</svg>` },
+            { uri: "test", f: "svg", m: "i32", i: "can", t: null, c: `<svg>2</svg>` },
+          ]
         }]
       }),
         ({ moduleLinker }) => {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?i=can");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 100, "Capture SVG1a");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?iso=can");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 100, "Capture SVG1b");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#2 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?lang=can");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 100, "Capture SVG1c");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#3 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?isoLang=can");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 100, "Capture SVG1d");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#4 Capture SVG2");
         });
     }, () => false);
 
@@ -258,17 +257,20 @@ unit("ImgRegistry", function () {
         modules: [{
           name: "ir",
           type: ImageRegistry,
-          images: [{ uri: "test", f: "svg", m: null, i: null, t: "patio", c: `<svg>1</svg>` }]
+          images: [
+            { uri: "test", f: "svg", m: null, i: null, t: "patio", c: `<svg>1</svg>` },
+            { uri: "test", f: "svg", m: "i32", i: null, t: "patio", c: `<svg>2</svg>` },
+          ]
         }]
       }),
         ({ moduleLinker }) => {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?theme=patio");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1, "Capture SVG1a");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?t=patio");
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1, "Capture SVG1b");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001, "#2 Capture SVG2");
         });
     }, () => false);
 
@@ -323,7 +325,7 @@ unit("ImgRegistry", function () {
         ({ moduleLinker }) => {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
-          isNull(ireg.getRecords("non-existent"));
+          areEqual(ireg.getRecords("non-existent").length, 0);
 
           const records = ireg.getRecords("test");
           areEqual(records.length, 8);
@@ -335,6 +337,7 @@ unit("ImgRegistry", function () {
           areEqual(record.theme, "patio");
           areEqual(record.content, "<svg>1</svg>");
           areEqual(record.contentType, CONTENT_TYPE.IMG_SVG);
+          areEqual(record.score, 1101);
         });
     }, () => false);
 

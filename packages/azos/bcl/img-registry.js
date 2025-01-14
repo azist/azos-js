@@ -86,10 +86,10 @@ export class ImageRegistry extends Module {
     isNonEmptyString(uri);
     isNonEmptyString(format);
 
-    // optional props: if undefined, skips prop test. If null, test rec.prop also null (specific matches)
-    isStringOrNull(media);
-    isStringOrNull(isoLang);
-    isStringOrNull(theme);
+    // optional props: if null, don't factor prop for resolution
+    media = isStringOrNull(media);
+    isoLang = isStringOrNull(isoLang);
+    theme = isStringOrNull(theme);
 
     const bucket = this.#map.get(uri);
     if (!bucket) return null;
@@ -98,11 +98,10 @@ export class ImageRegistry extends Module {
     //while linear search is slow, in reality you would rarely get more than 2-3 records per bucket array
     let bestRec = null;
     for (const rec of bucket) {
-      console.log(JSON.stringify({ uri, format, media, isoLang, theme }), JSON.stringify(rec));
       if (format !== rec.format) continue;
-      if (media !== undefined && media !== rec.media) continue;
-      if (isoLang !== undefined && isoLang !== rec.isoLang) continue;
-      if (theme !== undefined && theme !== rec.theme) continue;
+      if (media && media !== rec.media) continue;
+      if (isoLang && isoLang !== rec.isoLang) continue;
+      if (theme && theme !== rec.theme) continue;
 
       if (bestRec === null || rec.score > bestRec.score) bestRec = rec;
     }
@@ -129,20 +128,12 @@ export class ImageRegistry extends Module {
     let imgUri     = url.host;
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
     const sp = url.searchParams;
-    let imgMedia = sp.get("media") ?? sp.get("m") ?? undefined;
-    let imgIsoLang = sp.get("iso") ?? sp.get("lang") ?? sp.get("isoLang") ?? sp.get("i") ?? undefined;
-    let imgTheme = sp.get("theme") ?? sp.get("t") ?? undefined;
+    let imgMedia = sp.get("media") ?? sp.get("m") ?? null;
+    let imgIsoLang = sp.get("iso") ?? sp.get("lang") ?? sp.get("isoLang") ?? sp.get("i") ?? null;
+    let imgTheme = sp.get("theme") ?? sp.get("t") ?? null;
 
-    if (imgMedia === "") imgMedia = null;
-    if (imgIsoLang === "") imgIsoLang = null;
-    if (imgTheme === "") imgTheme = null;
-
-    console.log({ isoLang: imgIsoLang, theme: imgTheme, media: imgMedia });
-
-    if (imgIsoLang === undefined || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
-    if (imgTheme === undefined || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
-
-    console.log({ isoLang: imgIsoLang, theme: imgTheme, media: imgMedia });
+    if (!imgIsoLang || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
+    if (!imgTheme || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
 
     const resolved = this.resolve(imgUri, imgFormat, { media: imgMedia, isoLang: imgIsoLang, theme: imgTheme });
     return resolved;
@@ -153,12 +144,12 @@ export class ImageRegistry extends Module {
    */
   getUris(){ return this.#map.keys(); }
 
-  /** Returns an array of {@link ImageRecord} for the specified URI or null if does not exist
+  /** Returns an array of {@link ImageRecord}s for the specified URI (empty array if does not exist)
    * @returns {ImageRecord[]}
   */
   getRecords(uri){
     isNonEmptyString(uri);
-    return this.#map.get(uri) ?? null;
+    return this.#map.get(uri) ?? [];
   }
 
   /**
