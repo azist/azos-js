@@ -182,10 +182,10 @@ export class ImageRegistry extends Module {
 /** Provides information about a single image representation: (format, iso, theme, media) */
 export class ImageRecord {
 
+  #media;
   #format;
   #isoLang;
   #theme;
-  #media;
   #score = 0;
   #contentType;
   #content;
@@ -269,7 +269,7 @@ export const STOCK_IMAGES = Object.freeze([
     uri: "azos.ico.hamburger",  //  svg://azos.ico.hamburger&m=i32
     f: "svg",
     m: "i32",
-    c: `<svg viewBox="0 -960 960 960" fill="#e8eaed"><path d="M160-269.23v-33.85h640v33.85H160Zm0-193.85v-33.84h640v33.84H160Zm0-193.84v-33.85h640v33.85H160Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960" fill="#e8eaed"><path d="M92-199v-105.33h776.67V-199H92Zm0-228.67v-104.66h776.67v104.66H92Zm0-228V-761h776.67v105.33H92Z"/></svg>`,
   }, {
     uri: "azos.ico.plus",  //  svg://azos.ico.plus&m=i32
     f: "svg",

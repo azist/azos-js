@@ -159,8 +159,9 @@ export class TimeBlockPicker extends Control {
   position: relative;
   height: 100%;
   width: 100%;
-  background: linear-gradient(0deg, #f0f8f0, white);
-  border-left: 4px solid green;
+  background: linear-gradient(0deg, #10a0ff, #20ceff);
+  color: #fff;
+  border-left: 4px solid #2080e8;
   border-radius: 5px;
   box-shadow: 0 0 6px  #a0a0a0;
   font-size: clamp(10px, 15cqmin, 18px);
@@ -168,7 +169,7 @@ export class TimeBlockPicker extends Control {
 }
 
 .available .item.selected {
-  background: #a0ff90;
+  background: #30d000;
   border-radius: 5px;
 }
 
@@ -191,8 +192,8 @@ export class TimeBlockPicker extends Control {
 }
 
 .timeSlot.available:hover .item {
-  background: #b0f0ff;
   cursor: pointer;
+  filter: brightness(1.1);
 }
 
 .r1 { font-size: var(--r1-fs);}
