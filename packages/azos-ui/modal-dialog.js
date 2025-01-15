@@ -141,9 +141,8 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   #resolve = null;
   #modalResult = null;
 
-  constructor() {
-    super();
-  }
+  /** Optional `arena` allows for programmatic association, such as dialog boxes */
+  constructor(arena) { super(arena); }
 
 
   /** Returns true if this dialog instance is already shown  */

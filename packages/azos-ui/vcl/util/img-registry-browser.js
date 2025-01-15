@@ -1,15 +1,15 @@
-import { isNonEmptyString, isStringOrNull } from "azos/aver";
+import { isOf, isStringOrNull } from "azos/aver";
 import { ImageRegistry } from "azos/bcl/img-registry"
 
 import { AzosElement, css, html, noContent, verbatimHtml } from "../../ui";
+import { Arena } from "../../arena";
+import { ModalDialog } from "../../modal-dialog";
 import { writeToClipboard } from "./clipboard";
 import { isString as types_isString } from "azos/types";
 import { matchPattern } from "azos/strings";
 import { toast } from "../../toast";
 
 export class ImageRegistryBrowser extends AzosElement {
-
-  static #instance;
 
   static styles = css`
 :host {
@@ -77,13 +77,6 @@ export class ImageRegistryBrowser extends AzosElement {
   static properties = {
     filter: { type: String },
   };
-
-  static browse(filter) {
-    isNonEmptyString(filter);
-    if (!ImageRegistryBrowser.#instance) ImageRegistryBrowser.#instance = new ImageRegistryBrowser;
-
-    ImageRegistryBrowser.#instance.show(filter);
-  }
 
   #ref = {
     imgRegistry: ImageRegistry,
@@ -227,4 +220,31 @@ ${this.hasSuggestedFilter
 
 customElements.define("az-img-registry-browser", ImageRegistryBrowser);
 
-window.dbgImgs = ImageRegistryBrowser.browse.bind(ImageRegistryBrowser);
+
+/* --------------------------------------- Debugging Facilities ------------------------------------------------*/
+
+class AzdimgBox extends ModalDialog{
+  constructor(arena){ super(arena); }
+  static styles = [ModalDialog.styles, css` az-img-registry-browser{ margin: 1em; width: 80vw; height: 80vh;}`];
+  renderBody(){ return html`<az-img-registry-browser></az-img-registry-browser>`;}
+}
+window.customElements.define("az-azdimgbox", AzdimgBox);
+
+/** Provides Image browser popup for debugging */
+export async function azdimg(arena = null){
+  arena = arena ?? window.ARENA;
+  isOf(arena, Arena);
+  const box = new AzdimgBox(arena);
+  box.title = "Image Registry Viewer";
+  arena.shadowRoot.appendChild(box);
+  box.update();
+  try{
+    box.show();
+    await box.shownPromise;
+  }finally{
+    arena.shadowRoot.removeChild(box);
+  }
+}
+
+//global dbg hook
+window.azdimg = azdimg;
