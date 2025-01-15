@@ -44,7 +44,6 @@ limitations under the License.
 import { isNonEmptyString, isOf, isStringOrNull } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
-import { dflt } from "../strings.js";
 import { Module } from "../modules.js";
 
 /** Contains a registry of {@link ImageRecord} instances which describe images.
@@ -188,6 +187,7 @@ export class ImageRecord {
   #isoLang;
   #theme;
   #score = 0;
+  #fas = false;
   #contentType;
   #content;
 
@@ -197,6 +197,7 @@ export class ImageRecord {
 
     // required
     this.#format = isNonEmptyString(cfg.getString(["format", "fmt", "f"], null));
+    this.#fas = cfg.getBool(["fas", "fillAsStroke"], false);
 
     this.#media = cfg.getString(["media", "m"], null);
     this.#isoLang = cfg.getString(["isoLang", "lang", "iso", "i"], null);
@@ -225,6 +226,9 @@ export class ImageRecord {
   /** Records score. It is higher the more fields are populated. Importance: (media = 1000, isoLang = 100, theme = 1) */
   get score() { return this.#score; }
 
+  /** Record requires fill as stroke (think: line-art) */
+  get fas() { return this.#fas; }
+
   /** Image content: string or custom binary array, or an instruction how to get content. Use {@link produceContent} method to get actual image script/bytes */
   get content() { return this.#content; }
 
@@ -249,6 +253,7 @@ export class ImageRecord {
       theme: this.theme,
       media: this.media,
       score: this.score,
+      fas: this.fas,
       contentType: this.contentType,
       content: `${this.content.substring(0, 10)}...`,
     };
@@ -267,6 +272,7 @@ export const STOCK_IMAGES = Object.freeze([
     c: "<svg></svg>",
   }, {
     uri: "azos.ico.checkmark",  //  svg://azos.ico.checkmark&m=i32
+    fas: true,
     f: "svg",
     m: "i32",
     c: `<svg viewBox="0 -960 960 960"><path d="M378-222 130-470l68-68 180 180 383-383 68 68-451 451Z"/></svg>`,
@@ -282,19 +288,22 @@ export const STOCK_IMAGES = Object.freeze([
     c: `<svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="4"/><path d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z"/></svg>`,
   }, {
     uri: "azos.ico.hamburger",  //  svg://azos.ico.hamburger&m=i32
+    fas: true,
     f: "svg",
     m: "i32",
-    c: `<svg viewBox="0 -960 960 960" fill="#e8eaed"><path d="M92-199v-105.33h776.67V-199H92Zm0-228.67v-104.66h776.67v104.66H92Zm0-228V-761h776.67v105.33H92Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"><path d="M92-199v-105.33h776.67V-199H92Zm0-228.67v-104.66h776.67v104.66H92Zm0-228V-761h776.67v105.33H92Z"/></svg>`,
   }, {
     uri: "azos.ico.plus",  //  svg://azos.ico.plus&m=i32
+    fas: true,
     f: "svg",
     m: "i32",
-    c: `<svg viewBox="0 -960 960 960" fill="#e8eaed"><path d="M463.08-463.08H240v-33.84h223.08V-720h33.84v223.08H720v33.84H496.92V-240h-33.84v-223.08Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"><path d="M463.08-463.08H240v-33.84h223.08V-720h33.84v223.08H720v33.84H496.92V-240h-33.84v-223.08Z"/></svg>`,
   }, {
     uri: "azos.ico.edit",  //  svg://azos.ico.edit&m=i32
+    fas: true,
     f: "svg",
     m: "i32",
-    c: `<svg viewBox="0 -960 960 960" fill="#e8eaed"><path d="M193.85-193.85h39.87l452.69-452.54-39.87-39.87-452.69 452.54v39.87ZM160-160v-87.64l541.64-542.69q5.02-4 11.4-6.76 6.37-2.76 13.3-2.76 6.78 0 12.95 2.31 6.17 2.31 11.74 7.28l39.46 39.54q5.13 5.05 7.32 11.55 2.19 6.49 2.19 12.99 0 6.85-2.59 13.3-2.58 6.45-6.92 11.47L247.64-160H160Zm606.77-566.51-40.1-39.59 40.1 39.59Zm-100.09 60.5-20.14-20.25 39.87 39.87-19.73-19.62Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"><path d="M193.85-193.85h39.87l452.69-452.54-39.87-39.87-452.69 452.54v39.87ZM160-160v-87.64l541.64-542.69q5.02-4 11.4-6.76 6.37-2.76 13.3-2.76 6.78 0 12.95 2.31 6.17 2.31 11.74 7.28l39.46 39.54q5.13 5.05 7.32 11.55 2.19 6.49 2.19 12.99 0 6.85-2.59 13.3-2.58 6.45-6.92 11.47L247.64-160H160Zm606.77-566.51-40.1-39.59 40.1 39.59Zm-100.09 60.5-20.14-20.25 39.87 39.87-19.73-19.62Z"/></svg>`,
   }, {
     uri: "azos.ico.filter", //  svg://azos.ico.filter&m=i32
     f: "svg",
@@ -302,9 +311,10 @@ export const STOCK_IMAGES = Object.freeze([
     c: `<svg viewBox="0 0 24 24"><path d="M22 3.58002H2C1.99912 5.28492 2.43416 6.96173 3.26376 8.45117C4.09337 9.94062 5.29 11.1932 6.73999 12.09C7.44033 12.5379 8.01525 13.1565 8.41062 13.8877C8.80598 14.6189 9.00879 15.4388 9 16.27V21.54L15 20.54V16.25C14.9912 15.4188 15.194 14.599 15.5894 13.8677C15.9847 13.1365 16.5597 12.5178 17.26 12.07C18.7071 11.175 19.9019 9.92554 20.7314 8.43988C21.5608 6.95422 21.9975 5.28153 22 3.58002Z" stroke-linecap="round" stroke-linejoin="round"></svg>`
   }, {
     uri: "azos.ico.copy", //  svg://azos.ico.filter&m=i32
+    fas: true,
     f: "svg",
     m: "i32",
-    c: `<svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#e8eaed"><path d="M346.15-267.69q-24.57 0-41.52-16.94-16.94-16.95-16.94-41.52v-455.39q0-24.58 16.94-41.52Q321.58-840 346.15-840h335.39q24.58 0 41.52 16.94Q740-806.12 740-781.54v455.39q0 24.57-16.94 41.52-16.94 16.94-41.52 16.94H346.15Zm0-33.85h335.39q9.23 0 16.92-7.69 7.69-7.69 7.69-16.92v-455.39q0-9.23-7.69-16.92-7.69-7.69-16.92-7.69H346.15q-9.23 0-16.92 7.69-7.69 7.69-7.69 16.92v455.39q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69ZM238.46-160q-24.58 0-41.52-16.94Q180-193.88 180-218.46v-489.23h33.85v489.23q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69h369.23V-160H238.46Zm83.08-141.54v-504.61 504.61Z"/></svg>`
+    c: `<svg viewBox="0 -960 960 960"><path d="M346.15-267.69q-24.57 0-41.52-16.94-16.94-16.95-16.94-41.52v-455.39q0-24.58 16.94-41.52Q321.58-840 346.15-840h335.39q24.58 0 41.52 16.94Q740-806.12 740-781.54v455.39q0 24.57-16.94 41.52-16.94 16.94-41.52 16.94H346.15Zm0-33.85h335.39q9.23 0 16.92-7.69 7.69-7.69 7.69-16.92v-455.39q0-9.23-7.69-16.92-7.69-7.69-16.92-7.69H346.15q-9.23 0-16.92 7.69-7.69 7.69-7.69 16.92v455.39q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69ZM238.46-160q-24.58 0-41.52-16.94Q180-193.88 180-218.46v-489.23h33.85v489.23q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69h369.23V-160H238.46Zm83.08-141.54v-504.61 504.61Z"/></svg>`
   },
 ]);
 

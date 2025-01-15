@@ -159,7 +159,7 @@ export class Toast extends AzosElement {
   // If not already started, start a timer to destroy this toast
   #play() {
     if (this.#tmr) return;
-    this.#tmr = setTimeout(() => this.#destroy(), this.#timeout);
+    this.#tmr = setTimeout(() => this.destroy(), this.#timeout);
   }
 
   // Hide/Show popover element. Helper to reset z-index of visible toasts.
@@ -189,7 +189,7 @@ export class Toast extends AzosElement {
   }
 
   // Destroy and clean up the toast element. Trigger next toast.
-  #destroy() {
+  destroy() {
     if (!this.#isShown) return false;
     this.#clearTimer();
 
