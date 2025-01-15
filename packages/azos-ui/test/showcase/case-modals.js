@@ -4,6 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { okMsg, infoMsg, warningMsg, alertMsg, errorMsg } from "../../msg-box";
+import { prompt } from "../../ok-cancel-modal";
 import { Spinner } from "../../spinner";
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
@@ -55,6 +57,15 @@ export class CaseModals extends CaseBase {
 
 <az-spinner id="spinnerModal" scope="this" status="alert" timeout="5000" isModal></az-spinner>
 <az-spinner id="spinnerNonModal" scope="this" status="info" timeout="10000" message="Dill helps to expel what you propel"></az-spinner>
+
+
+<az-button @click="${() => okMsg("All ok!", "My ok message content line") }" title="OK Message"></az-button>
+<az-button @click="${() => infoMsg("Info title", "Information message content line") }" title="Info Message"></az-button>
+<az-button @click="${() => warningMsg("Warning title", "Warning message content line") }" title="Warning msg"></az-button>
+<az-button @click="${() => alertMsg("Alert title", "Alert message content line ") }" title="Alert msg"></az-button>
+<az-button @click="${() => errorMsg("Error title", "Error message content line") }" title="Error msg"></az-button>
+
+<az-button @click="${() => prompt("Please confirm you ownership of this vehicle", {title: "Ownership"})}" title="Prompt user"></az-button>
 
 <az-modal-dialog id="dlg1" scope="self" title="Dialog 1" rank="normal" status="default">
   <div slot="body">

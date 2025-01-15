@@ -144,10 +144,12 @@ export class AzosElement extends LitElement {
   };
 
   #arena = null;
-  constructor() {
+  /** Optional `arena` allows for programmatic association, such as dialog boxes */
+  constructor(arena) {
     super();
     this.status = null;
     this.rank = RANK.NORMAL;
+    this.#arena = arena ?? null;
   }
 
 
@@ -165,9 +167,12 @@ export class AzosElement extends LitElement {
   */
   get arena() {
     if (this.#arena === null) {
+      const err = `Can not compute 'arena' because this element is either not inserted in DOM yet, or does not have arena instance on its parent node path`;
       let n = this.parentNode;
+      if (!n) throw new AzosError(err);
       while (typeof n.arena === 'undefined') {
         n = (n.parentNode ?? n.host);
+        if (!n) throw new AzosError(err);
       }
       this.#arena = n.arena;
     }
@@ -216,6 +221,7 @@ export class AzosElement extends LitElement {
   disconnectedCallback() {
     const ctx = this.getScopeContext();
     if (ctx && this.id) delete ctx[this.id];
+    this.#arena = null;
     super.disconnectedCallback();
   }
 
