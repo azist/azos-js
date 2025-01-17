@@ -41,11 +41,19 @@ limitations under the License.
 */
 
 
-import { isNonEmptyString, isOf, isStringOrNull } from "../aver.js";
+import { isNonEmptyString, isOf } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
 import { Module } from "../modules.js";
+import { dflt } from "../strings.js";
 import { isBool, isNumber, isString } from "../types.js";
+
+
+
+export const DEFAULT_MEDIA = "i32";
+export const DEFAULT_ISO_LANG = "eng";
+export const DEFAULT_THEME = "azos";
+
 
 /** Contains a registry of {@link ImageRecord} instances which describe images.
  * The registry keeps images by their logical URI strings, resolving each request
@@ -86,10 +94,10 @@ export class ImageRegistry extends Module {
     isNonEmptyString(uri);
     isNonEmptyString(format);
 
-    // optional props: if null, don't factor prop for resolution
-    media = isStringOrNull(media);
-    isoLang = isStringOrNull(isoLang);
-    theme = isStringOrNull(theme);
+    // when context is not specified, it is DEFAULTED
+    media = dflt(media, DEFAULT_MEDIA);
+    isoLang = dflt(isoLang, this.app.session.isoLang, DEFAULT_ISO_LANG);
+    theme = dflt(theme, this.app.session.theme, DEFAULT_ISO_LANG);
 
     const bucket = this.#map.get(uri);
     if (!bucket) return null;
@@ -100,9 +108,9 @@ export class ImageRegistry extends Module {
     for (const rec of bucket) {
       if (format !== rec.format) continue;//hard match on format
 
-      if (media   && rec.media   && media !== rec.media) continue;
-      if (isoLang && rec.isoLang && isoLang !== rec.isoLang) continue;
-      if (theme   && rec.theme   && theme !== rec.theme) continue;
+      if (rec.media  && media !== rec.media) continue;
+      if (rec.isoLang && isoLang !== rec.isoLang) continue;
+      if (rec.theme   && theme !== rec.theme) continue;
 
       if (bestRec === null || rec.score > bestRec.score) bestRec = rec;
     }
@@ -115,14 +123,13 @@ export class ImageRegistry extends Module {
    * and optionally matching on `isoLanguage`, `theme`, and `media` specifiers.
    * The specifier format is that of URL having the form:  `format://uri?iso=isoLangCode&theme=themeId&media=mediaId`, where query params are optional.
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
-   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
-   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code
+   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
    * @example
    *  resolveSpec("svg://file-open");
-   *  resolveSpec("png://business-logo?media=print");
+   *  resolveSpec("png://business-logo?media=print");// take ISO and theme from user session
    *  resolveSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print");
-   *  resolveSpec("jpg://welcome-banner-hello1?iso=$session&theme=$session&media=print");// take ISO and theme from user session
    */
   resolveSpec(spec, iso = null, theme = null){
     const url = new URL(isNonEmptyString(spec));
@@ -130,11 +137,8 @@ export class ImageRegistry extends Module {
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
     const sp = url.searchParams;
     let imgMedia = sp.get("media") ?? sp.get("m") ?? null;
-    let imgIsoLang = sp.get("iso") ?? sp.get("lang") ?? sp.get("isoLang") ?? sp.get("i") ?? null;
-    let imgTheme = sp.get("theme") ?? sp.get("t") ?? null;
-
-    if (!imgIsoLang || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
-    if (!imgTheme || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
+    let imgIsoLang = sp.get("iso") ?? sp.get("lang") ?? sp.get("isoLang") ?? sp.get("i") ?? iso;
+    let imgTheme = sp.get("theme") ?? sp.get("t") ?? theme;
 
     const resolved = this.resolve(imgUri, imgFormat, { media: imgMedia, isoLang: imgIsoLang, theme: imgTheme });
     return resolved;
