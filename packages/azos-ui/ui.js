@@ -274,6 +274,7 @@ export class AzosElement extends LitElement {
   resolveImageSpec(spec, iso = null, theme = null){ return this.arena.resolveImageSpec(spec, iso, theme); }
 
   /** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
+   * returning it as a tuple along with optional image attributes
    * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
    */
   renderImageSpec(spec, iso = null, theme = null)
