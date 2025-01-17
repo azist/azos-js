@@ -208,10 +208,10 @@ export class ImageRecord {
     this.#content = cfg.getString(["content", "img", "image", "c"]);
 
 
-    const ca = cfg.get(["attrs","attr","atrs","atr"]);
+    const ca = cfg.get("attrs","attr","atrs","atr");
     if (ca instanceof ConfigNode){
       const attrs = { };
-      for(const kvp in ca) {
+      for(const kvp of ca) {
         if (isString(kvp.val) || isNumber(kvp.val) || isBool(kvp.val)){
           attrs[kvp.key] = kvp.val;
         }
@@ -268,6 +268,7 @@ export class ImageRecord {
       score: this.score,
       contentType: this.contentType,
       content: `${this.content.substring(0, 10)}...`,
+      attrs: this.attrs
     };
   }
 }
