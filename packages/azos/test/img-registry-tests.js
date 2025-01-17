@@ -403,4 +403,54 @@ unit("ImgRegistry", function () {
     }, () => false);
   });
 
+
+  unit("RecordScoring2", function(){
+    cs("case1", () => {
+      doUsing(application({
+        modules: [{
+          name: "ir",
+          type: ImageRegistry,
+          images: [
+            { uri: "composer", f: "svg", m: null, i: null, t: null, c: `<svg>typical composer silhouette</svg>` },
+
+            { uri: "composer", f: "svg", m: null, i: null, t: "rap", c: `<svg>snoop icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: null, t: "rap", c: `<svg>snoop print page</svg>` },
+            { uri: "composer", f: "svg", m: null, i: "deu", t: "rap", c: `<svg>snoop Hund icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: "deu", t: "rap", c: `<svg>snoop Hund print page</svg>` },
+
+            { uri: "composer", f: "svg", m: null, i: null, t: "classical", c: `<svg>bach icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: null, t: "classical", c: `<svg>bach print page</svg>` },
+            { uri: "composer", f: "svg", m: null, i: "rus", t: "classical", c: `<svg>BAX icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: "rus", t: "classical", c: `<svg>BAX print page</svg>` },
+          ]
+        }]
+      }),
+        ({ moduleLinker }) => {
+          const ireg = moduleLinker.resolve(ImageRegistry);
+
+          let rec = ireg.resolveSpec("svg://composer");//i32 eng azos
+          condir(rec.toString());
+          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
+
+          rec = ireg.resolveSpec("svg://composer?media=tshirt&iso=esp&theme=lemon");
+          condir(rec.toString());
+          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
+
+          rec = ireg.resolveSpec("svg://composer?iso=esp&theme=rap");
+          condir(rec.toString());
+          areEqual("<svg>snoop icon</svg>", rec.produceContent().content);
+
+          rec = ireg.resolveSpec("svg://composer?iso=esp&theme=rap&media=print");
+          condir(rec.toString());
+          areEqual("<svg>snoop print page</svg>", rec.produceContent().content);
+
+          rec = ireg.resolveSpec("svg://composer?iso=deu&theme=rap&media=print");
+          condir(rec.toString());
+          areEqual("<svg>snoop Hund print page</svg>", rec.produceContent().content);
+
+
+        });
+    }, () => false);
+  });
+
 });
