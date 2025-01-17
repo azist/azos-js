@@ -242,7 +242,7 @@ export class ConfigNode{
       for(let i=0; i<arr.length; i++) yield {key: this.#name, idx: i, val: arr[i]};
     } else if (types.isObject(this.#value)){
       const map = this.#value;
-      for(const k in this.#value) yield {key: k, idx: -1, val: map[k]};
+      for(const k in map) yield {key: k, idx: -1, val: map[k]};
     }
   }
 
