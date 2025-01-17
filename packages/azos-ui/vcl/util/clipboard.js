@@ -4,18 +4,20 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+let _hasAccess;
 /** Puts test into clipboard */
 export async function writeToClipboard(text) {
-  if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
-  else { // deprecated, insecure, but functional method of Copy Pasta
-    const textArea = document.createElement("textArea");
-    textArea.value = text;
-    textArea.style.position = "absolute";
-    textArea.style.left = "-999999px";
-    document.body.prepend(textArea);
-    textArea.select();
-    try { document.execCommand("copy"); }
-    catch (e) { console.error(e); }
-    finally { textArea.remove(); }
+  if (!(await hasAccess())) return false;
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (error) {
+    console.error(error.message);
+    return false;
   }
+}
+async function hasAccess() {
+  if (_hasAccess !== undefined) return _hasAccess;
+  const state = (await navigator.permissions.query({ name: "clipboard-write" })).state;
+  return _hasAccess = ["granted", "prompt"].includes(state);
 }

@@ -109,12 +109,17 @@ export class Toast extends AzosElement {
 
   #guid = null;
   #tmr = null;
-  #isShown = false;
   #message = null;
   #timeout = null;
   #rank = null;
   #status = null;
   #position = null;
+  #shownPromise = null;
+  #shownPromiseResolve = null;
+
+  get guid() { return this.#guid; }
+  get isShown() { return this.#shownPromise !== null; }
+  get shownPromise() { return this.#shownPromise; }
 
   // Calculate the position styles for this rendered Toast
   get #positionStyles() {
@@ -141,8 +146,6 @@ export class Toast extends AzosElement {
         return `top:calc(50% + ${offset}px);left:50%;transform:translate(-50%,-50%);`;
     }
   }
-
-  get guid() { return this.#guid; }
 
   constructor() {
     super();
@@ -175,7 +178,7 @@ export class Toast extends AzosElement {
 
   // Add element to dom and show
   #show() {
-    if (this.#isShown) return false;
+    if (this.isShown) return false;
 
     // Add to DOM
     document.body.appendChild(this);
@@ -185,17 +188,19 @@ export class Toast extends AzosElement {
 
     // Show on DOM
     this.$(this.guid).showPopover();
-    this.#isShown = true;
+    return this.#shownPromise = new Promise(res => this.#shownPromiseResolve = res);
   }
 
   // Destroy and clean up the toast element. Trigger next toast.
   destroy() {
-    if (!this.#isShown) return false;
+    if (!this.isShown) return false;
     this.#clearTimer();
 
     // Hide from DOM
     this.$(this.guid).hidePopover();
-    this.#isShown = false;
+    this.#shownPromiseResolve();
+    this.#shownPromise = null;
+
 
     // Remove from DOM
     document.body.removeChild(this);

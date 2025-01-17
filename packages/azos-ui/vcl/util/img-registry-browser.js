@@ -19,7 +19,6 @@ export class ImageRegistryBrowser extends AzosElement {
 }
 
 :host-context(dialog), .recInfoBody{
-  box-shadow: 0 0 10px 5px var(--bgColor);
   border: 1px solid var(--svgStrokeColor);
   border-radius: 0 0 var(--r3-brad-win) var(--r3-brad-win);
 }
@@ -55,6 +54,10 @@ export class ImageRegistryBrowser extends AzosElement {
   cursor: pointer;
   margin: 0;
 }
+.record:hover{
+  background-color: hsl(from var(--bgColor) h s max(calc(l - 10), 10));
+  border-radius: 5px;
+}
 .record .name{
   font-size: 10px;
   text-align: center;
@@ -87,6 +90,16 @@ export class ImageRegistryBrowser extends AzosElement {
   padding: 1em auto;
 }
 .recInfoBody figure:hover{cursor: pointer;}
+.recInfoBody .iconWrapper{position: relative;}
+.recInfoBody .iconWrapper .copyIcon{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  height: 32px;
+  background-color: hsl(from var(--bgColor) h s max(calc(l - 10), 10));
+  border-radius: 5px;
+}
 .recInfoBody dt{font-weight: bold;}
 .recInfoBody dd{margin-left: 0;}
   `;
@@ -102,7 +115,6 @@ export class ImageRegistryBrowser extends AzosElement {
     imgRegistry: ImageRegistry,
   };
 
-  tbFilter = null;
   #copyToast = null;
   #selectedForInfoRec = null;
   #filter = null;
@@ -126,7 +138,9 @@ export class ImageRegistryBrowser extends AzosElement {
         .map(rec => ({ uri, rec }))
       );
     if (!matches.length) return null;
-    return Array.from(matches.map(({ uri, rec }) => {
+    return Array.from(matches
+      .sort(({ uri: a }, { uri: b }) => a > b ? 1 : b > a ? -1 : 0) // sort uris alphabetically
+      .map(({ uri, rec }) => {
       let parts = uri.split(".");
       const recName = parts.pop();
       const group = parts.join(".");
@@ -157,17 +171,20 @@ export class ImageRegistryBrowser extends AzosElement {
     this.requestUpdate();
   }
 
-  #filterChanged() {
-    console.log("changed:filter", this.tbFilter?.value ?? null);
-    this.filter = this.tbFilter?.value ?? null;
-  }
-
-  #onCopyClicked(uri, rec) {
+  async #onCopyClicked(uri, rec) {
     if (this.#copyToast) this.#copyToast.destroy();
 
     let spec = `${rec.format}://${uri}`;
-    writeToClipboard(spec);
-    this.#copyToast = toast(`Copied "${spec}" to clipboard`, { timeout: 3_000, status: 'ok' });
+    if (await writeToClipboard(spec))
+      this.#copyToast = toast(`Copied "${spec}" to clipboard`, { timeout: 3_000, status: 'ok' });
+    else {
+      this.#copyToast = toast(`Press ctrl+c to copy "${spec}" to clipboard`, { timeout: 5_000, status: 'alert' });
+      const range = document.createRange();
+      range.selectNodeContents(this.$("specValue"));
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
   }
 
   connectedCallback() {
@@ -177,23 +194,7 @@ export class ImageRegistryBrowser extends AzosElement {
 
   render() {
     return html`
-<style>
-.recInfoBody .icon{
-  position: relative;
-}
-.recInfoBody .icon::after{
-  display: inline-block;
-  position: absolute;
-  left: calc(100% - 32px);
-  top: calc(100% - 32px);
-  width: 16px;
-  height: 16px;
-}
-:host{
-  --bgColor: ${this.bgColor};
-  --svgStrokeColor: ${this.svgStrokeColor};
-  --svgFillColor: ${this.svgFillColor};
-}
+<style>:host{ --bgColor:${this.bgColor}; --svgStrokeColor:${this.svgStrokeColor}; --svgFillColor:${this.svgFillColor};}
 </style>
 ${this.renderFilterField()}
 ${this.renderResults()}
@@ -204,11 +205,11 @@ ${this.renderInfoDialog()}
   renderFilterField() {
     return html`
 <div class="filter">
-  <az-text id="tbFilter" scope="this" title="Filter" placeholder="*checkmark*" @change="${this.#filterChanged}" value="${this.filter}"></az-text>
-  <az-text id="tbBg" scope="this" title="BG Color" dataKind="color" @change="${e => this.bgColor = e.detail.value}" value="${this.bgColor}"></az-text>
-  <az-text id="tbStroke" scope="this" title="SVG Stroke" dataKind="color" @change="${e => this.svgStrokeColor = e.detail.value}" value="${this.svgStrokeColor}"></az-text>
-  <az-text id="tbFill" scope="this" title="SVG Fill" dataKind="color" @change="${e => this.svgFillColor = e.detail.value}" value="${this.svgFillColor}"></az-text>
-  <az-check itemType="switch" id="chFill" scope="this" title="No Fill" rank="normal" @change="${e => { this.svgFillColor = e.detail.value ? "none" : "#ffffff" }}" value="${this.svgFillColor === "none"}"></az-check>
+  <az-text class="tbFilter" title="Filter" placeholder="*checkmark*" @change="${e => this.filter = e.target.value ?? null}" value="${this.filter}"></az-text>
+  <az-text class="tbBg" title="BG Color" dataKind="color" @change="${e => this.bgColor = e.target.value}" value="${this.bgColor}"></az-text>
+  <az-text class="tbStroke" title="SVG Stroke" dataKind="color" @change="${e => this.svgStrokeColor = e.target.value}" value="${this.svgStrokeColor}"></az-text>
+  <az-text class="tbFill" title="SVG Fill" dataKind="color" @change="${e => { this.svgFillColor = e.target.value }}" value="${this.svgFillColor}"></az-text>
+  <az-check class="chFill" itemType="switch" title="No Fill" rank="normal" @change="${e => { this.svgFillColor = e.target.value ? "none" : "#ffffff" }}" value="${this.svgFillColor === "none"}"></az-check>
 </div>
     `;
   }
@@ -229,7 +230,7 @@ ${records.map(({ uri, recName, rec }) => this.renderRecord(uri, recName, rec))}
   renderRecord(uri, recName, rec) {
     return html`
 <div class="record" @click="${e => { e.preventDefault(); this.#showInfo(uri, recName, rec); }}">
-  <div class="icon${rec.fas ? " fas" : ""}">${verbatimHtml(rec.produceContent().content)}</div>
+  <div class="icon${rec.attrs.fas ? " fas" : ""}">${verbatimHtml(rec.produceContent().content)}</div>
   <span class="name">${recName}</span>
 </div>
     `;
@@ -252,8 +253,11 @@ ${this.hasSuggestedFilter
   <div slot="body" class="recInfoBody">
     ${uri ? html`
     <figure @click="${() => this.#onCopyClicked(uri, rec)}">
-      <div class="icon${rec.fas ? " fas" : ""}">${verbatimHtml(rec.produceContent().content)}</div>
-      <figCaption class="spec">${rec.format}://${uri}</figCaption>
+      <div class="iconWrapper">
+        <div class="icon ${rec.attrs.fas ? "fas" : ""}">${verbatimHtml(rec.produceContent().content)}</div>
+        <div class="copyIcon icon fas">${this.renderImageSpec("svg://azos.ico.copy").html}</div>
+      </div>
+      <figCaption id="specValue" scope="this" class="spec">${rec.format}://${uri}</figCaption>
     </figure>
     <dt>Name:</dt><dd>${recName}</dd>
     <dt>Format:</dt><dd>${rec.format ?? "--"}</dd>

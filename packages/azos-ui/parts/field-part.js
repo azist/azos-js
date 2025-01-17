@@ -403,7 +403,7 @@ export class FieldPart extends Part{
 
   /** Override to trigger `change` event dispatch after value changes DUE to user input */
   inputChanged(){
-    const evt = new CustomEvent("change", { detail: { value: this.value }, bubbles: true, cancelable: false });
+    const evt = new Event("change", { bubbles: true, cancelable: false });
     this.dispatchEvent(evt);
   }
 
