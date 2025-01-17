@@ -297,7 +297,7 @@ ${footer}
    * Requires {@link ImageRegistry} module installed in app chassis, otherwise returns a text block for invalid image.
    * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
    * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
-   * @returns {tuple} - {sc: int, ctp: string, content: buf | string}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>"}`
+   * @returns {tuple} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`
    */
   resolveImageSpec(spec, iso = null, theme = null){
     if (!spec || !this.#app) return {sc: 500, ctp: "text/plain", content: ""};
@@ -307,21 +307,16 @@ ${footer}
     const reg = this.#app.moduleLinker.tryResolve(ImageRegistry);
     if (!reg){
       this.writeLog("resolveImageSpec", logging.LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
-      return {sc: 404, ctp: "text/plain+error", content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>"};
+      return {sc: 404, ctp: "text/plain+error", content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {}};
     }
 
     const rec = reg.resolveSpec(spec, iso, theme);
     if (!rec){
       this.writeLog("resolveImageSpec", logging.LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
-      return {sc: 404, ctp: "text/plain+error", content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`};
+      return {sc: 404, ctp: "text/plain+error", content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {}};
     }
 
     return rec.produceContent();
   }
 
-  /** This is a {@link resolveImageSpec} helper function wrapping {@link ImageRecord.content} with {@link verbatimHtml} */
-  renderImageSpec(spec, iso = null, theme = null) { return verbatimHtml(this.resolveImageSpec(spec, iso, theme).content); }
-
 }//Arena
-
-

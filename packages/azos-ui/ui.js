@@ -11,6 +11,7 @@ import { isOneOf } from "azos/strings.js";
 import { link as linkModule } from "azos/linker.js";
 import { AzosError } from "azos/types";
 import { asString } from "azos/strings";
+import { isNonEmptyString } from "azos/aver";
 
 
 /** CSS template processing pragma: css`p{color: blue}` */
@@ -268,12 +269,20 @@ export class AzosElement extends LitElement {
    * Requires {@link ImageRegistry} module installed in app chassis, otherwise returns a text block for invalid image.
    * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
    * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
-   * @returns {tuple} - {sc: int, ctp: string, content: buf | string}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>"}`
+   * @returns {tuple} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`
    */
   resolveImageSpec(spec, iso = null, theme = null){ return this.arena.resolveImageSpec(spec, iso, theme); }
 
-  /** This is a {@link arena.resolveImageSpec} helper function wrapping {@link ImageRecord.content} with {@link verbatimHtml} */
-  renderImageSpec(spec, iso = null, theme = null) { return this.arena.renderImageSpec(spec, iso, theme); }
+  /** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
+   * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
+   */
+  renderImageSpec(spec, iso = null, theme = null)
+  {
+    const got = this.resolveImageSpec(spec, iso, theme);
+    const content = got.content;
+    isNonEmptyString(content, `renderImageSpec('${spec}')`);
+    return {html: verbatimHtml(content), attrs: got.attrs};
+  }
 
   render() { return html`>>AZOS ELEMENT<<`; }
 }

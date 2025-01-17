@@ -44,8 +44,8 @@ limitations under the License.
 import { isNonEmptyString, isOf, isStringOrNull } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
-import { dflt } from "../strings.js";
 import { Module } from "../modules.js";
+import { isBool, isNumber, isString } from "../types.js";
 
 /** Contains a registry of {@link ImageRecord} instances which describe images.
  * The registry keeps images by their logical URI strings, resolving each request
@@ -98,10 +98,11 @@ export class ImageRegistry extends Module {
     //while linear search is slow, in reality you would rarely get more than 2-3 records per bucket array
     let bestRec = null;
     for (const rec of bucket) {
-      if (format !== rec.format) continue;
-      if (media && media !== rec.media) continue;
-      if (isoLang && isoLang !== rec.isoLang) continue;
-      if (theme && theme !== rec.theme) continue;
+      if (format !== rec.format) continue;//hard match on format
+
+      if (media   && rec.media   && media !== rec.media) continue;
+      if (isoLang && rec.isoLang && isoLang !== rec.isoLang) continue;
+      if (theme   && rec.theme   && theme !== rec.theme) continue;
 
       if (bestRec === null || rec.score > bestRec.score) bestRec = rec;
     }
@@ -190,6 +191,7 @@ export class ImageRecord {
   #score = 0;
   #contentType;
   #content;
+  #attrs = null;
 
   /** @param {ConfigNode} cfg */
   constructor(cfg) {
@@ -205,9 +207,21 @@ export class ImageRecord {
     this.#contentType = cfg.getString(["contentType", "ctp"], CONTENT_TYPE.IMG_SVG);
     this.#content = cfg.getString(["content", "img", "image", "c"]);
 
-    if (this.#media) this.#score += 1_000;
-    if (this.#isoLang) this.#score += 100;
-    if (this.#theme) this.#score += 1;
+
+    const ca = cfg.get(["attrs","attr","atrs","atr"]);
+    if (ca instanceof ConfigNode){
+      const attrs = { };
+      for(const kvp in ca) {
+        if (isString(kvp.val) || isNumber(kvp.val) || isBool(kvp.val)){
+          attrs[kvp.key] = kvp.val;
+        }
+      }
+      this.#attrs = Object.freeze(attrs);
+    }
+
+    if (this.#media) this.#score += 1_000_000;
+    if (this.#isoLang) this.#score += 1_000;
+    if (this.#theme) this.#score += 100;
   }
 
   /** Required image format, such as `svg`, `png`, `jpg` etc. */
@@ -231,11 +245,14 @@ export class ImageRecord {
   /** Image content MIME type e.g. `image/png` */
   get contentType() { return this.#contentType; }
 
+  /** Returns optional attributes for this record. Empty object for no attributes */
+  get attrs() { return this.#attrs ?? {};}
+
   /** Call this method to get the actual image content such as PNG byte[] or SVG text.
    * Keep in mind, the {@link content} property may only contain a reference (in future version) to the image stored elsewhere.
    * You need to call this method to get the actual materialized content, e.g. fetched from network (and cached) by first calling async {@link materialize}
    */
-  produceContent() { return { sc: 200, ctp: this.#contentType, content: this.#content }; }
+  produceContent() { return { sc: 200, ctp: this.#contentType, content: this.#content, attrs: this.attrs }; }
 
   /** Async method which materializes the referenced content. This is reserved for future */
   async materialize(){ return true; }
