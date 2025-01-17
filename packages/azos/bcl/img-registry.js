@@ -41,10 +41,19 @@ limitations under the License.
 */
 
 
-import { isNonEmptyString, isOf, isStringOrNull } from "../aver.js";
+import { isNonEmptyString, isOf } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
 import { Module } from "../modules.js";
+import { dflt } from "../strings.js";
+import { isBool, isNumber, isString } from "../types.js";
+
+
+
+export const DEFAULT_MEDIA = "i32";
+export const DEFAULT_ISO_LANG = "eng";
+export const DEFAULT_THEME = "azos";
+
 
 /** Contains a registry of {@link ImageRecord} instances which describe images.
  * The registry keeps images by their logical URI strings, resolving each request
@@ -85,10 +94,10 @@ export class ImageRegistry extends Module {
     isNonEmptyString(uri);
     isNonEmptyString(format);
 
-    // optional props: if null, don't factor prop for resolution
-    media = isStringOrNull(media);
-    isoLang = isStringOrNull(isoLang);
-    theme = isStringOrNull(theme);
+    // when context is not specified, it is DEFAULTED
+    media = dflt(media, DEFAULT_MEDIA);
+    isoLang = dflt(isoLang, this.app.session.isoLang, DEFAULT_ISO_LANG);
+    theme = dflt(theme, this.app.session.theme, DEFAULT_ISO_LANG);
 
     const bucket = this.#map.get(uri);
     if (!bucket) return null;
@@ -97,10 +106,11 @@ export class ImageRegistry extends Module {
     //while linear search is slow, in reality you would rarely get more than 2-3 records per bucket array
     let bestRec = null;
     for (const rec of bucket) {
-      if (format !== rec.format) continue;
-      if (media && media !== rec.media) continue;
-      if (isoLang && isoLang !== rec.isoLang) continue;
-      if (theme && theme !== rec.theme) continue;
+      if (format !== rec.format) continue;//hard match on format
+
+      if (rec.media  && media !== rec.media) continue;
+      if (rec.isoLang && isoLang !== rec.isoLang) continue;
+      if (rec.theme   && theme !== rec.theme) continue;
 
       if (bestRec === null || rec.score > bestRec.score) bestRec = rec;
     }
@@ -113,14 +123,13 @@ export class ImageRegistry extends Module {
    * and optionally matching on `isoLanguage`, `theme`, and `media` specifiers.
    * The specifier format is that of URL having the form:  `format://uri?iso=isoLangCode&theme=themeId&media=mediaId`, where query params are optional.
    * The system tries to return the BEST matching image record as determined by the pattern match based on record scoring system.
-   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
-   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code
+   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme
    * @returns {ImageRecord | null} a best matching ImageRecord or null if not found
    * @example
    *  resolveSpec("svg://file-open");
-   *  resolveSpec("png://business-logo?media=print");
+   *  resolveSpec("png://business-logo?media=print");// take ISO and theme from user session
    *  resolveSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print");
-   *  resolveSpec("jpg://welcome-banner-hello1?iso=$session&theme=$session&media=print");// take ISO and theme from user session
    */
   resolveSpec(spec, iso = null, theme = null){
     const url = new URL(isNonEmptyString(spec));
@@ -128,11 +137,8 @@ export class ImageRegistry extends Module {
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
     const sp = url.searchParams;
     let imgMedia = sp.get("media") ?? sp.get("m") ?? null;
-    let imgIsoLang = sp.get("iso") ?? sp.get("lang") ?? sp.get("isoLang") ?? sp.get("i") ?? null;
-    let imgTheme = sp.get("theme") ?? sp.get("t") ?? null;
-
-    if (!imgIsoLang || imgIsoLang === "$session") imgIsoLang = iso ?? this.app.session.isoLang;
-    if (!imgTheme || imgTheme === "$session") imgTheme = theme ?? this.app.session.theme;
+    let imgIsoLang = sp.get("iso") ?? sp.get("lang") ?? sp.get("isoLang") ?? sp.get("i") ?? iso;
+    let imgTheme = sp.get("theme") ?? sp.get("t") ?? theme;
 
     const resolved = this.resolve(imgUri, imgFormat, { media: imgMedia, isoLang: imgIsoLang, theme: imgTheme });
     return resolved;
@@ -190,6 +196,7 @@ export class ImageRecord {
   #fas = false;
   #contentType;
   #content;
+  #attrs = null;
 
   /** @param {ConfigNode} cfg */
   constructor(cfg) {
@@ -206,9 +213,21 @@ export class ImageRecord {
     this.#contentType = cfg.getString(["contentType", "ctp"], CONTENT_TYPE.IMG_SVG);
     this.#content = cfg.getString(["content", "img", "image", "c"]);
 
-    if (this.#media) this.#score += 1_000;
-    if (this.#isoLang) this.#score += 100;
-    if (this.#theme) this.#score += 1;
+
+    const ca = cfg.get("attrs","attr","atrs","atr");
+    if (ca instanceof ConfigNode){
+      const attrs = { };
+      for(const kvp of ca) {
+        if (isString(kvp.val) || isNumber(kvp.val) || isBool(kvp.val)){
+          attrs[kvp.key] = kvp.val;
+        }
+      }
+      this.#attrs = Object.freeze(attrs);
+    }
+
+    if (this.#media) this.#score += 1_000_000;
+    if (this.#isoLang) this.#score += 1_000;
+    if (this.#theme) this.#score += 100;
   }
 
   /** Required image format, such as `svg`, `png`, `jpg` etc. */
@@ -235,11 +254,14 @@ export class ImageRecord {
   /** Image content MIME type e.g. `image/png` */
   get contentType() { return this.#contentType; }
 
+  /** Returns optional attributes for this record. Empty object for no attributes */
+  get attrs() { return this.#attrs ?? {};}
+
   /** Call this method to get the actual image content such as PNG byte[] or SVG text.
    * Keep in mind, the {@link content} property may only contain a reference (in future version) to the image stored elsewhere.
    * You need to call this method to get the actual materialized content, e.g. fetched from network (and cached) by first calling async {@link materialize}
    */
-  produceContent() { return { sc: 200, ctp: this.#contentType, content: this.#content }; }
+  produceContent() { return { sc: 200, ctp: this.#contentType, content: this.#content, attrs: this.attrs }; }
 
   /** Async method which materializes the referenced content. This is reserved for future */
   async materialize(){ return true; }
@@ -256,6 +278,7 @@ export class ImageRecord {
       fas: this.fas,
       contentType: this.contentType,
       content: `${this.content.substring(0, 10)}...`,
+      attrs: this.attrs
     };
   }
 }

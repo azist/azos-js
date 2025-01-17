@@ -111,8 +111,8 @@ export function dispose(v) {
 export function doUsing(disposable, body) {
   aver_isNotNull(disposable);
   aver_isFunction(body);
-  try { body(disposable) }
-  finally { dispose(disposable) }
+  try { body(disposable); }
+  finally { dispose(disposable); }
 }
 
 /**
