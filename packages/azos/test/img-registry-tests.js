@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { defineUnit as unit, defineCase as cs } from "../run.js";
+import { defineUnit as unit, defineCase as cs, condir } from "../run.js";
 import { application } from "../application.js";
 
 import { ImageRecord, ImageRegistry } from "../bcl/img-registry.js";
@@ -375,4 +375,32 @@ unit("ImgRegistry", function () {
     }, () => false);
 
   });
+
+
+  unit("Attributes", function(){
+    cs("simple", () => {
+      doUsing(application({
+        modules: [{
+          name: "ir",
+          type: ImageRegistry,
+          images: [{ uri: "test", f: "svg", m: null, i: null, t: "pumpkin", c: `<svg>12345</svg>`, attrs: {a: 1, b:-2, c: true} }]
+        }]
+      }),
+        ({ moduleLinker }) => {
+          const ireg = moduleLinker.resolve(ImageRegistry);
+
+          let rec = ireg.resolve("test", "svg", { theme: "pumpkin" });
+
+          condir(rec.toString());
+
+          areEqual(1, rec.attrs["a"]);
+          areEqual(-2, rec.attrs["b"]);
+          areEqual(true, rec.attrs["c"]);
+
+          areEqual("<svg>12345</svg>", rec.produceContent().content);
+
+        });
+    }, () => false);
+  });
+
 });
