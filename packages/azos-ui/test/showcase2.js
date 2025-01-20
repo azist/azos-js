@@ -27,6 +27,7 @@ import "./showcase/case-toasts";
 import "./showcase/case-slide-deck";
 import "./showcase/case-tree-view";
 import "./showcase/case-scheduler";
+import "./showcase/case-lookup";
 
 const DISPLAY_MODES = Object.freeze({
   LONG_FORM: 0,
@@ -140,6 +141,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
 <h1 id="toc">Table of Contents</h1>
 <ol>${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}</ol>
 <div id="content">
+  <div id="LookupContent"> <az-case-lookup></az-case-lookup> </div>
   <div id="ButtonsContent"> <az-case-buttons></az-case-buttons> </div>
   <div id="TextFieldsContent"> <az-case-text-fields schema="ShowCase.Long.TextFields"></az-case-text-fields> </div>
   <div id="InputTestsContent"> <az-case-input-tests></az-case-input-tests> </div>
