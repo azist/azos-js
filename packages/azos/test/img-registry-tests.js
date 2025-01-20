@@ -4,11 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { defineUnit as unit, defineCase as cs, condir } from "../run.js";
+import { defineUnit as unit, defineCase as cs} from "../run.js";
 import { application } from "../application.js";
 
 import { ImageRecord, ImageRegistry } from "../bcl/img-registry.js";
-import { areArraysEquivalent, areEqual, isFalse, isNull, isTrue } from "../aver.js";
+import { areArraysEquivalent, areEqual, isFalse, isTrue } from "../aver.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
 import { doUsing } from "../types.js";
 import { config } from "../conf.js";
