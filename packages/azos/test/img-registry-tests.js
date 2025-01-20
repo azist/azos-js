@@ -25,54 +25,45 @@ unit("ImgRegistry", function () {
       areEqual(score, eScore, from);
     }
 
-    cs("resolve()- all combos of options", () => {
+    cs("resolve()- case1", () => {
       doUsing(application({
-        modules: [
-          {
-            name: "ir",
-            type: ImageRegistry,
-            images: [
-              { uri: "test", f: "svg", m: "i16", i: "can", t: "patio", c: `<svg>1</svg>` }, // score: 1101
-              { uri: "test", f: "svg", m: "i16", i: "can", t: null, c: `<svg>2</svg>` },    // score: 1100
-              { uri: "test", f: "svg", m: "i16", i: null, t: "patio", c: `<svg>3</svg>` },  // score: 1001
-              { uri: "test", f: "svg", m: "i16", i: null, t: null, c: `<svg>4</svg>` },     // score: 1000
-              { uri: "test", f: "svg", m: null, i: "can", t: "patio", c: `<svg>5</svg>` },  // score:  101
-              { uri: "test", f: "svg", m: null, i: "can", t: null, c: `<svg>6</svg>` },     // score:  100
-              { uri: "test", f: "svg", m: null, i: null, t: "patio", c: `<svg>7</svg>` },   // score:    1
-              { uri: "test", f: "svg", m: null, i: null, t: null, c: `<svg>8</svg>` },      // score:    0
-            ]
-          }
-        ]
+        modules: [{
+          name: "ir",
+          type: ImageRegistry,
+          images: [
+            { uri: "composer", f: "svg", m: null, i: null, t: null, c: `<svg>typical composer silhouette</svg>` },
+
+            { uri: "composer", f: "svg", m: null, i: null, t: "rap", c: `<svg>snoop icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: null, t: "rap", c: `<svg>snoop print page</svg>` },
+            { uri: "composer", f: "svg", m: null, i: "deu", t: "rap", c: `<svg>snoop Hund icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: "deu", t: "rap", c: `<svg>snoop Hund print page</svg>` },
+
+            { uri: "composer", f: "svg", m: null, i: null, t: "classical", c: `<svg>bach icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: null, t: "classical", c: `<svg>bach print page</svg>` },
+            { uri: "composer", f: "svg", m: null, i: "rus", t: "classical", c: `<svg>BAX icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: "rus", t: "classical", c: `<svg>BAX print page</svg>` },
+          ]
+        }]
       }),
         ({ moduleLinker }) => {
-
           const ireg = moduleLinker.resolve(ImageRegistry);
 
-          let icon = ireg.resolve("test", "svg", { media: "i16", isoLang: "can", theme: "patio" });
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#1 Capture SVG1a");
+          let rec = ireg.resolve("composer", "svg");//i32 eng azos
+          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
 
-          icon = ireg.resolve("test", "svg", { media: "i16", isoLang: "can" });
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#2 Cannot Specifically Capture SVG2a");
+          rec = ireg.resolve("composer", "svg", { media: "tshirt", isoLang: "esp", theme: "lemon" });
+          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
 
-          icon = ireg.resolve("test", "svg", { media: "i16", theme: "patio" });
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#3 Cannot Specifically Capture SVG3a");
+          rec = ireg.resolve("composer", "svg", { isoLang: "esp", theme: "rap" });
+          areEqual("<svg>snoop icon</svg>", rec.produceContent().content);
 
-          icon = ireg.resolve("test", "svg", { media: "i16" });
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#4 Cannot Specifically Capture SVG4a");
+          rec = ireg.resolve("composer", "svg", { isoLang: "esp", theme: "rap", media: "print" });
+          areEqual("<svg>snoop print page</svg>", rec.produceContent().content);
 
-          icon = ireg.resolve("test", "svg", { isoLang: "can", theme: "patio" });
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#5 Cannot Specifically Capture SVG5a");
-
-          icon = ireg.resolve("test", "svg", { isoLang: "can" });
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#6 Cannot Specifically Capture SVG6a");
-
-          icon = ireg.resolve("test", "svg", { theme: "patio" });
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#7 Cannot Specifically Capture SVG7a");
-
-          icon = ireg.resolve("test", "svg", {});
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#8 Cannot Specifically Capture SVG8a");
+          rec = ireg.resolve("composer", "svg", { isoLang: "deu", theme: "rap", media: "print" });
+          areEqual("<svg>snoop Hund print page</svg>", rec.produceContent().content);
         });
-    }, () => false);
+    });
 
     cs("resolve()- media", () => {
       doUsing(application({
@@ -86,7 +77,7 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("test", "svg", { media: "i128" });
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1000, "Capture SVG1a");
+          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1000000, "Capture SVG1a");
         });
     }, () => false);
 
@@ -102,7 +93,7 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("test", "svg", { isoLang: "can" });
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 100, "Capture SVG1a");
+          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1000, "Capture SVG1a");
         });
     }, () => false);
 
@@ -118,7 +109,7 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("test", "svg", { theme: "patio" });
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1, "Capture SVG1a");
+          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 100, "Capture SVG1a");
         });
     }, () => false);
 
@@ -127,80 +118,59 @@ unit("ImgRegistry", function () {
         ({ moduleLinker }) => {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
-          isNull(ireg.resolve("azos.ico.filter", "svg", { media: "i64" }));
-          isNull(ireg.resolve("azos.ico.filter", "svg", { isoLang: "eng" }));
-          isNull(ireg.resolve("azos.ico.filter", "svg", { theme: "azos" }));
-
           let icon = ireg.resolve("azos.ico.filter", "svg");
-          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 1000, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
 
           icon = ireg.resolve("azos.ico.filter", "svg", { media: "i32" });
-          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 1000, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+
+          icon = ireg.resolve("azos.ico.filter", "svg", { isoLang: "eng" });
+          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+
+          icon = ireg.resolve("azos.ico.filter", "svg", { theme: "azos" });
+          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
         });
     }, () => false);
 
-    cs("resolveSpec()- all combos of options", () => {
+    cs("resolveSpec()- case1", () => {
       doUsing(application({
-        modules: [
-          {
-            name: "ir",
-            type: ImageRegistry,
-            images: [
-              { uri: "test", f: "svg", m: "i16", i: "can", t: "patio", c: `<svg>1</svg>` }, // score: 1101
-              { uri: "test", f: "svg", m: "i32", i: "eng", t: null, c: `<svg>2</svg>` },    // score: 1100
-              { uri: "test", f: "svg", m: "i32", i: null, t: "gdi", c: `<svg>3</svg>` },    // score: 1001
-              { uri: "test", f: "svg", m: "i32", i: null, t: null, c: `<svg>4</svg>` },     // score: 1000
-              { uri: "test", f: "svg", m: null, i: "eng", t: "gdi", c: `<svg>5</svg>` },    // score:  101
-              { uri: "test", f: "svg", m: null, i: "eng", t: null, c: `<svg>6</svg>` },     // score:  100
-              { uri: "test", f: "svg", m: null, i: null, t: "gdi", c: `<svg>7</svg>` },     // score:    1
-              { uri: "test", f: "svg", m: null, i: null, t: null, c: `<svg>8</svg>` },      // score:    0
-            ]
-          }
-        ]
+        modules: [{
+          name: "ir",
+          type: ImageRegistry,
+          images: [
+            { uri: "composer", f: "svg", m: null, i: null, t: null, c: `<svg>typical composer silhouette</svg>` },
+
+            { uri: "composer", f: "svg", m: null, i: null, t: "rap", c: `<svg>snoop icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: null, t: "rap", c: `<svg>snoop print page</svg>` },
+            { uri: "composer", f: "svg", m: null, i: "deu", t: "rap", c: `<svg>snoop Hund icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: "deu", t: "rap", c: `<svg>snoop Hund print page</svg>` },
+
+            { uri: "composer", f: "svg", m: null, i: null, t: "classical", c: `<svg>bach icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: null, t: "classical", c: `<svg>bach print page</svg>` },
+            { uri: "composer", f: "svg", m: null, i: "rus", t: "classical", c: `<svg>BAX icon</svg>` },
+            { uri: "composer", f: "svg", m: "print", i: "rus", t: "classical", c: `<svg>BAX print page</svg>` },
+          ]
+        }]
       }),
         ({ moduleLinker }) => {
-
           const ireg = moduleLinker.resolve(ImageRegistry);
 
-          // NOTE: Cannot directly select 4, 6, 7, or 8.
+          let rec = ireg.resolveSpec("svg://composer");//i32 eng azos
+          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
 
-          let icon = ireg.resolveSpec("svg://test");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#1 Capture SVG1");
+          rec = ireg.resolveSpec("svg://composer?media=tshirt&iso=esp&theme=lemon");
+          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
 
-          icon = ireg.resolveSpec("svg://test?m=i16");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#2 Capture SVG1");
+          rec = ireg.resolveSpec("svg://composer?iso=esp&theme=rap");
+          areEqual("<svg>snoop icon</svg>", rec.produceContent().content);
 
-          icon = ireg.resolveSpec("svg://test?i=can");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#3 Capture SVG1");
+          rec = ireg.resolveSpec("svg://composer?iso=esp&theme=rap&media=print");
+          areEqual("<svg>snoop print page</svg>", rec.produceContent().content);
 
-          icon = ireg.resolveSpec("svg://test?t=patio");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#4 Capture SVG1");
-
-          icon = ireg.resolveSpec("svg://test?m=i16&i=can");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#5 Capture SVG1");
-
-          icon = ireg.resolveSpec("svg://test?m=i16&t=patio");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#6 Capture SVG1");
-
-          icon = ireg.resolveSpec("svg://test?i=can&t=patio");
-          expecting(icon, "<svg>1</svg>", CONTENT_TYPE.IMG_SVG, 1101, "#7 Capture SVG1");
-
-          icon = ireg.resolveSpec("svg://test?m=i32");
-          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#8 Capture SVG2");
-
-          icon = ireg.resolveSpec("svg://test?m=i32&i=eng");
-          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#9 Capture SVG2");
-
-          icon = ireg.resolveSpec("svg://test?i=eng");
-          expecting(icon, "<svg>2</svg>", CONTENT_TYPE.IMG_SVG, 1100, "#10 Capture SVG2");
-
-          icon = ireg.resolveSpec("svg://test?m=i32&t=gdi");
-          expecting(icon, "<svg>3</svg>", CONTENT_TYPE.IMG_SVG, 1001, "#11 Capture SVG3");
-
-          icon = ireg.resolveSpec("svg://test?i=eng&t=gdi");
-          expecting(icon, "<svg>5</svg>", CONTENT_TYPE.IMG_SVG, 101, "#12 Capture SVG5");
+          rec = ireg.resolveSpec("svg://composer?iso=deu&theme=rap&media=print");
+          areEqual("<svg>snoop Hund print page</svg>", rec.produceContent().content);
         });
-    }, () => false);
+    });
 
     cs("resolveSpec()- media, m", () => {
       doUsing(application({
@@ -217,10 +187,10 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?media=i128");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#1 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?m=i128");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#2 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#2 Capture SVG2");
         });
     }, () => false);
 
@@ -239,16 +209,16 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?i=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#1 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?iso=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#2 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#2 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?lang=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#3 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#3 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?isoLang=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1100, "#4 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#4 Capture SVG2");
         });
     }, () => false);
 
@@ -267,10 +237,10 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?theme=patio");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001, "#1 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1000100, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?t=patio");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001, "#2 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1000100, "#2 Capture SVG2");
         });
     }, () => false);
 
@@ -279,15 +249,17 @@ unit("ImgRegistry", function () {
         ({ moduleLinker }) => {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
-          isNull(ireg.resolveSpec("svg://azos.ico.filter?isoLang=eng"));
-          isNull(ireg.resolveSpec("svg://azos.ico.filter?theme=azos"));
-          isNull(ireg.resolveSpec("svg://azos.ico.filter?media=i64"));
-
           let icon = ireg.resolveSpec("svg://azos.ico.filter");
-          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 1000, "Capture #1 azos.ico.filter");
+          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #1 azos.ico.filter");
 
           icon = ireg.resolveSpec("svg://azos.ico.filter?media=i32");
-          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 1000, "Capture #2 azos.ico.filter");
+          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+
+          icon = ireg.resolveSpec("svg://azos.ico.filter?iso=eng");
+          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+
+          icon = ireg.resolveSpec("svg://azos.ico.filter?theme=azos");
+          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
         });
     }, () => false);
 
@@ -311,12 +283,12 @@ unit("ImgRegistry", function () {
           name: "ir",
           type: ImageRegistry,
           images: [
-            { uri: "test", f: "svg", m: "i16", i: "can", t: "patio", c: `<svg>1</svg>` }, // score: 1101
-            { uri: "test", f: "svg", m: "i16", i: "can", t: null, c: `<svg>2</svg>` },    // score: 1100
-            { uri: "test", f: "svg", m: "i16", i: null, t: "patio", c: `<svg>3</svg>` },  // score: 1001
-            { uri: "test", f: "svg", m: "i16", i: null, t: null, c: `<svg>4</svg>` },     // score: 1000
+            { uri: "test", f: "svg", m: "i16", i: "can", t: "patio", c: `<svg>1</svg>` }, // score: 1001100
+            { uri: "test", f: "svg", m: "i16", i: "can", t: null, c: `<svg>2</svg>` },    // score: 1001000
+            { uri: "test", f: "svg", m: "i16", i: null, t: "patio", c: `<svg>3</svg>` },  // score: 1000100
+            { uri: "test", f: "svg", m: "i16", i: null, t: null, c: `<svg>4</svg>` },     // score: 1000000
             { uri: "test", f: "svg", m: null, i: "can", t: "patio", c: `<svg>5</svg>` },  // score:  101
-            { uri: "test", f: "svg", m: null, i: "can", t: null, c: `<svg>6</svg>` },     // score:  100
+            { uri: "test", f: "svg", m: null, i: "can", t: null, c: `<svg>6</svg>` },     // score:  1000
             { uri: "test", f: "svg", m: null, i: null, t: "patio", c: `<svg>7</svg>` },   // score:    1
             { uri: "test", f: "svg", m: null, i: null, t: null, c: `<svg>8</svg>` },      // score:    0
           ]
@@ -337,7 +309,7 @@ unit("ImgRegistry", function () {
           areEqual(record.theme, "patio");
           areEqual(record.content, "<svg>1</svg>");
           areEqual(record.contentType, CONTENT_TYPE.IMG_SVG);
-          areEqual(record.score, 1101);
+          areEqual(record.score, 1001100);
         });
     }, () => false);
 
@@ -391,63 +363,11 @@ unit("ImgRegistry", function () {
 
           let rec = ireg.resolve("test", "svg", { theme: "pumpkin" });
 
-          condir(rec.toString());
-
           areEqual(1, rec.attrs["a"]);
           areEqual(-2, rec.attrs["b"]);
           areEqual(true, rec.attrs["c"]);
 
           areEqual("<svg>12345</svg>", rec.produceContent().content);
-
-        });
-    }, () => false);
-  });
-
-
-  unit("RecordScoring2", function(){
-    cs("case1", () => {
-      doUsing(application({
-        modules: [{
-          name: "ir",
-          type: ImageRegistry,
-          images: [
-            { uri: "composer", f: "svg", m: null, i: null, t: null, c: `<svg>typical composer silhouette</svg>` },
-
-            { uri: "composer", f: "svg", m: null, i: null, t: "rap", c: `<svg>snoop icon</svg>` },
-            { uri: "composer", f: "svg", m: "print", i: null, t: "rap", c: `<svg>snoop print page</svg>` },
-            { uri: "composer", f: "svg", m: null, i: "deu", t: "rap", c: `<svg>snoop Hund icon</svg>` },
-            { uri: "composer", f: "svg", m: "print", i: "deu", t: "rap", c: `<svg>snoop Hund print page</svg>` },
-
-            { uri: "composer", f: "svg", m: null, i: null, t: "classical", c: `<svg>bach icon</svg>` },
-            { uri: "composer", f: "svg", m: "print", i: null, t: "classical", c: `<svg>bach print page</svg>` },
-            { uri: "composer", f: "svg", m: null, i: "rus", t: "classical", c: `<svg>BAX icon</svg>` },
-            { uri: "composer", f: "svg", m: "print", i: "rus", t: "classical", c: `<svg>BAX print page</svg>` },
-          ]
-        }]
-      }),
-        ({ moduleLinker }) => {
-          const ireg = moduleLinker.resolve(ImageRegistry);
-
-          let rec = ireg.resolveSpec("svg://composer");//i32 eng azos
-          condir(rec.toString());
-          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
-
-          rec = ireg.resolveSpec("svg://composer?media=tshirt&iso=esp&theme=lemon");
-          condir(rec.toString());
-          areEqual("<svg>typical composer silhouette</svg>", rec.produceContent().content);
-
-          rec = ireg.resolveSpec("svg://composer?iso=esp&theme=rap");
-          condir(rec.toString());
-          areEqual("<svg>snoop icon</svg>", rec.produceContent().content);
-
-          rec = ireg.resolveSpec("svg://composer?iso=esp&theme=rap&media=print");
-          condir(rec.toString());
-          areEqual("<svg>snoop print page</svg>", rec.produceContent().content);
-
-          rec = ireg.resolveSpec("svg://composer?iso=deu&theme=rap&media=print");
-          condir(rec.toString());
-          areEqual("<svg>snoop Hund print page</svg>", rec.produceContent().content);
-
 
         });
     }, () => false);
