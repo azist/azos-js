@@ -6,7 +6,7 @@
 
 import * as aver from "azos/aver";
 import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD } from "azos/types";
-import { html, AzosElement, noContent, verbatimHtml } from "./ui.js";
+import { html, AzosElement, noContent } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
 
