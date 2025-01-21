@@ -4,8 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "lit";
-import { AzosElement, css, parseRank, parseStatus } from "../ui";
+import { AzosElement, css, html, parseRank, parseStatus } from "../ui";
 import { FieldPart } from "./field-part";
 import { lookupStyles } from "./styles";
 
