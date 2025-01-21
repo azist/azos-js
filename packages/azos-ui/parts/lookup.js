@@ -5,8 +5,10 @@
 </FILE_LICENSE>*/
 
 import { html } from "lit";
-import { AzosElement, css, parseRank, parseStatus } from "../../ui";
-import { FieldPart } from "../../parts/field-part";
+import { AzosElement, css, parseRank, parseStatus } from "../ui";
+import { FieldPart } from "./field-part";
+import { lookupStyles } from "./styles";
+
 
 /**
  * Provides abstraction for a Lookup Protocol.
@@ -16,26 +18,8 @@ import { FieldPart } from "../../parts/field-part";
  */
 export class Lookup extends AzosElement {
 
-  static styles = css`
-#pop{
-  min-width: 200px;
-  max-width: 80vw;
-  max-height: 80vh;
-  display:flex;
-  flex-direction:column;
-}
-ul{list-style:none;padding:0;margin:0;}
-li{
-  padding: 0.5em 1em;
-}
-li+li{
-  border-top: 1px solid #eee;
-}
-li:hover{
-  cursor: pointer;
-  background-color: #ccc;
-}
-  `;//styles
+  static styles = [lookupStyles, css`
+  `];//styles
 
   static properties = {
     field: { type: FieldPart }
@@ -43,6 +27,23 @@ li:hover{
 
   #isShown = false;
   constructor() { super(); }
+
+  #onKeydown(e) {
+    if (e.key === "Escape") {
+      this.hide();
+      e.preventDefault();
+    }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.document.addEventListener("keydown", e => this.#onKeydown(e));
+  }
+
+  disconnectedCallback() {
+    window.document.removeEventListener("keydown", e => this.#onKeydown(e));
+    super.disconnectedCallback();
+  }
 
   /** Returns true if the spinner is shown */
   get isShown() { return this.#isShown; }
@@ -63,18 +64,14 @@ li:hover{
   /** Hides the shown spinner returning true if it was hidden, or false if it was already hidden before this call*/
   hide() {
     if (!this.#isShown) return false;
+    this.#isShown = false;
 
     this.update();//sync update dom build
 
     const dlg = this.$("pop");
     dlg.hidePopover();
-    this.#isShown = false;
 
     return true;
-  }
-
-  #keyPress(e) {
-
   }
 
   render() {
@@ -82,7 +79,7 @@ li:hover{
     const stl = `${this.#isShown ? "" : "display: none"}`;
 
     return html`
-<div id="pop" popover="manual" class="pop ${cls}" style="${stl}" @keypress="${e => this.#keyPress(e)}" tabindex="1">
+<div id="pop" popover="manual" class="pop ${cls}" style="${stl}" tabindex="1">
   ${this.renderBody()}
 </div>
     `;

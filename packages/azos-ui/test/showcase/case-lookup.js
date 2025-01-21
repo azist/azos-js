@@ -7,7 +7,7 @@
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
 
-import "../../vcl/lookup/lookup";
+import "../../parts/lookup";
 
 export class CaseLookup extends CaseBase {
 
