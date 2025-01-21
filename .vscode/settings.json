@@ -78,6 +78,9 @@
       "xffn"
     ],
     "files.eol": "\n",
+    "javascript.preferences.autoImportFileExcludePatterns": [
+      "**/lit/**"
+    ],
     "workbench.tree.indent": 20,
     "workbench.tree.renderIndentGuides": "always",
     "editor.mouseWheelZoom": true,
