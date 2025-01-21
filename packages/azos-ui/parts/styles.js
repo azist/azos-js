@@ -465,18 +465,21 @@ export const lookupStyles = css`
   min-width: 200px;
   max-width: 80vw;
   max-height: 80vh;
-  display:flex;
-  flex-direction:column;
+  display: flex;
+  flex-direction: column;
 }
 ul{list-style:none;padding:0;margin:0;}
 li{
   padding: 0.5em 1em;
 }
+li:focus-visible,
+li:hover,
+li.focused{
+  cursor: pointer;
+  outline: 0;
+  background: #ccc;
+}
 li+li{
   border-top: 1px solid #eee;
-}
-li:hover{
-  cursor: pointer;
-  background-color: #ccc;
 }
 `;
