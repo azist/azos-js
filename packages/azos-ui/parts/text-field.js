@@ -49,6 +49,11 @@ export class TextField extends FieldPart {
     this.inputChanged();
   }
 
+  #tbInput(e) {
+    const v = e.target.value;
+    this.onInput(v);
+  }
+
   focus(){
     const t = this.$("tbData");
     if (!t) return;
@@ -133,6 +138,7 @@ export class TextField extends FieldPart {
       .required=${this.isRequired}
       ?readonly=${this.isReadonly}
       @change="${this.#tbChange}"
+      @input="${this.#tbInput}"
       part="field"
       autocomplete="off"
     />`;

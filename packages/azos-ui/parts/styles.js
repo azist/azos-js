@@ -459,3 +459,27 @@ export const sliderStyles = css`
   input[type=range].errorBg::-moz-range-thumb              { background-color: var(--s-error-fg-ctl); }
   input[type=range].errorBg::-webkit-slider-thumb          { background-color: var(--s-error-fg-ctl); }
 `;
+
+export const lookupStyles = css`
+#pop{
+  min-width: 200px;
+  max-width: 80vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+ul{list-style:none;padding:0;margin:0;}
+li{
+  padding: 0.5em 1em;
+}
+li:focus-visible,
+li:hover,
+li.focused{
+  cursor: pointer;
+  outline: 0;
+  background: #ccc;
+}
+li+li{
+  border-top: 1px solid #eee;
+}
+`;

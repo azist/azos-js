@@ -358,10 +358,17 @@ export class FieldPart extends Part{
 
 
     /** When set, prevents the field from validating upon input change. */
-    noAutoValidate: {type: Boolean, reflect: false}
+    noAutoValidate: { type: Boolean, reflect: false },
+
+    lookupId: { type: String },
   }
 
-
+  updated(changedProperties) {
+    if (changedProperties.has("lookupId") && this.lookupId) {
+      this.lookup = this.parentNode.querySelector(`#${this.lookupId}`);
+      this.lookupId = null;
+    }
+  }
 
   /** True for field parts which have a preset/pre-defined content area layout by design, for example:
    *  checkboxes, switches, and radios have a pre-determined content area layout */
@@ -407,4 +414,6 @@ export class FieldPart extends Part{
     this.dispatchEvent(evt);
   }
 
+  /** Override to change how lookup is fed data */
+  onInput(value) { if (this.lookup) this.lookup.dispatchEvent(new CustomEvent("feed", { detail: { value } })); }
 }
