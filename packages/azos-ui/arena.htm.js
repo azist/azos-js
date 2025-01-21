@@ -52,8 +52,9 @@ export function renderToolbar(app, self, commands){
   }
 
 
+  const userIcon = self.renderImageSpec("svg://azos.ico.user?m=i32");
   const content = html`
-  <div class="strip-btn" id="divToolbar_User" @click="${showUser.bind(app)}">${self.renderImageSpec("svg://azos.ico.user?m=i32")}</div>
+  <div class="strip-btn" id="divToolbar_User" @click="${showUser.bind(app)}">${userIcon.html}</div>
 
   ${itemContent}
     `;
@@ -70,7 +71,9 @@ export function renderHeader(app, self){
 
   if (self.menu==="show"){
     return html`
-    <a href="#" class="menu" id="btnMenuOpen" @click="${menuOpen}">${self.renderImageSpec("svg://azos.ico.hamburger?m=i32")}</a>
+    <a href="#" class="menu" id="btnMenuOpen" @click="${menuOpen}">
+      <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
+    </a>
 
     <nav class="side-menu" id="navMenu">
       <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
