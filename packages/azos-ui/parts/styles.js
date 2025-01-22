@@ -470,6 +470,10 @@ export const lookupStyles = css`
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top-width: 1px;
+  padding: 0;
 }
 #pop:not(.hasOwner){
   margin: revert;
@@ -480,11 +484,10 @@ ul{
   padding: 0;
   margin: 0;
 }
-li{
+li, #pop > span.noResults{
   padding: 0.5em 1em;
 }
 li:focus-visible,
-li:hover,
 li.focused{
   cursor: pointer;
   outline: 0;
@@ -492,5 +495,8 @@ li.focused{
 }
 li+li{
   border-top: 1px solid #eee;
+}
+li:last-child{
+  border-radius: 0 0 6px 6px;
 }
 `;

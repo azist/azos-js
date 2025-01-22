@@ -4,10 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isTrue } from "azos/aver";
+import { isObjectOrNull, isOf, isTrue } from "azos/aver";
 import { AzosElement, css, html, parseRank, parseStatus } from "../ui";
 import { lookupStyles } from "./styles";
-import { AzosError, isNonEmptyString } from "azos/types";
+import { AzosError, isNonEmptyString, isObject, isString } from "azos/types";
 
 
 /**
@@ -30,9 +30,12 @@ export class Lookup extends AzosElement {
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
 
-  #isShown = false;
+  #shownPromise = null;
+  #shownPromiseResolve = null;
+  #shownPromiseReject = null;
   /** Returns true if the lookup is shown */
-  get isShown() { return this.#isShown; }
+  get isShown() { return this.#shownPromise !== null; }
+  get shownPromise() { return this.#shownPromise; }
 
   get resultNodes() { return [...this.shadowRoot.querySelectorAll(".result")]; }
 
@@ -54,12 +57,12 @@ export class Lookup extends AzosElement {
   constructor() { super(); }
 
   #onKeydown(e) {
-    if (!this.#isShown) return;
+    if (!this.isShown) return;
 
     let preventDefault = true;
     switch (e.key) {
       case "Escape":
-        this.hide();
+        this.cancel();
         break;
       case "Tab":
         this.#advanceSoftFocus(!e.shiftKey);
@@ -71,10 +74,8 @@ export class Lookup extends AzosElement {
         this.#advanceSoftFocus();
         break;
       case "Enter":
-        if (!this.results.length) {
-          this.hide();
-          return;
-        }
+        if (!this.results.length)
+          return this.cancel();
         this.#selectResult();
         break;
       default:
@@ -85,25 +86,28 @@ export class Lookup extends AzosElement {
   }
 
   #onDocumentClick(e) {
-    if (!this.#isShown) return;
-    const target = e.composedPath()[0];
-    console.log(target, this.#isShown);
+    if (!this.isShown) return;
+    const target = e.composedPath()[0]; // Account for shadowDOM
+    // console.log(target, this.isShown);
     if (this.#isWithinParent(target, this) || this.#isWithinParent(target, this.owner)) {
       e.preventDefault();
       return;
     }
-    this.hide();
+    this.cancel();
   }
 
   #onResultsClick(e) {
     const selectedResultElm = e.target.closest(".result");
+    if (!selectedResultElm) return;
     this.focusedResultElm = selectedResultElm;
     this.#selectResult();
+    e.preventDefault();
   }
 
   #onMouseOver(e) {
-    if (!e.target.classList.contains("result")) return;
-    this.focusedResultElm = e.target;
+    const resultElm = e.target.closest(".result");
+    if (!resultElm) return;
+    this.focusedResultElm = resultElm;
   }
 
   #advanceSoftFocus(forward = true) {
@@ -152,13 +156,13 @@ export class Lookup extends AzosElement {
     super.connectedCallback();
     window.document.addEventListener("keydown", this.#bound_onKeydown);
     window.document.addEventListener("click", this.#bound_onDocumentClick);
-    this.addEventListener("feed", this.#bound_onFeed);
+    this.addEventListener("lookup-feed", this.#bound_onFeed);
   }
 
   disconnectedCallback() {
     window.document.removeEventListener("keydown", this.#bound_onKeydown);
     window.document.removeEventListener("click", this.#bound_onDocumentClick);
-    this.removeEventListener("feed", this.#bound_onFeed);
+    this.removeEventListener("lookup-feed", this.#bound_onFeed);
     super.disconnectedCallback();
   }
 
@@ -177,18 +181,20 @@ export class Lookup extends AzosElement {
 
   /** Shows a lookup returning true if it was shown, or false if it was already shown before this call */
   show() {
-    if (this.#isShown) return false;
-    this.#isShown = true;
+    if (this.isShown) return false;
+    this.#shownPromise = new Promise((res, rej) => {
+      this.#shownPromiseResolve = res;
+      this.#shownPromiseReject = rej;
+    }).catch(e => this.writeLog("Info", e));
 
     this.update();//sync update dom build
 
-    const msg = `Lookup does not have an associated owner.`;
+    const msg = `Lookup does not have an owner.`;
     if (!this.owner) this.writeLog("Warning", msg, new AzosError(msg));
 
     const dlg = this.$("pop");
-    this.#setPosition(dlg, this.owner);
-
     dlg.showPopover();
+
     this.focusedResultElm = this.resultNodes[0] ?? null;
 
     this.requestUpdate();
@@ -196,26 +202,28 @@ export class Lookup extends AzosElement {
     return true;
   }
 
-  #setPosition(dlg, owner) {
-    // console.table(dlg);
-    // console.table(owner, "index", "value");
-    // const style = dlg.style;
-    // style.position = "absolute";
-    // style.left = `${owner.offsetLeft}px`;
-    // style.top = `${owner.offsetTop + owner.offsetHeight}px`;
-  }
-
-  /** Hides the shown spinner returning true if it was hidden, or false if it was already hidden before this call*/
-  hide() {
-    if (!this.#isShown) return false;
-    this.#isShown = false;
-    this.focusedResultElm = null;
-
+  /** Hides the shown lookup returning true if it was hidden, or false if it was already hidden before this call */
+  #finalize() {
+    this.#shownPromise = null;
+    this.#focusedResultElm = null;
     this.update();//sync update dom build
-
     const dlg = this.$("pop");
     dlg.hidePopover();
+  }
 
+  /** Resolve the lookup dialog */
+  hide() {
+    if (!this.isShown) return false;
+    this.#shownPromiseResolve();
+    this.#finalize();
+    return true;
+  }
+
+  /** Cancel the lookup dialog */
+  cancel() {
+    if (!this.isShown) return false;
+    this.#shownPromiseReject("canceled");
+    this.#finalize();
     return true;
   }
 
@@ -223,10 +231,9 @@ export class Lookup extends AzosElement {
     const cls = [
       parseRank(this.rank, true),
       parseStatus(this.status, true),
-      this.#isShown ? "" : "hidden",
+      this.isShown ? "" : "hidden",
       this.owner ? "hasOwner" : "",
-    ]
-      .filter(isNonEmptyString).join(" ");
+    ].filter(isNonEmptyString).join(" ");
 
     const stl = [
       this.owner ? `left: ${this.owner.offsetLeft}px` : "",
@@ -241,7 +248,7 @@ export class Lookup extends AzosElement {
   }
 
   renderBody() {
-    if (!this.results || !this.results.length) return html`No results`;
+    if (!this.results || !this.results.length) return html`<span class="noResults">No results</span>`;
     return html`
 <ul class="results" @mouseover="${e => this.#onMouseOver(e)}" @click="${e => this.#onResultsClick(e)}">
     ${this.results.map((result, index) => this.renderResult(result, index))}
@@ -264,12 +271,56 @@ export class Lookup extends AzosElement {
     // return html`NOCONTENT`;
     return html`
 <div>
-  <span>${result.street1}</span>
+  <span>${result.street1}, ${result.city}, ${result.state} ${result.zip}</span>
 </div>
     `;
   }
 
 
 }//Lookup
+
+export class LookupInstance {
+  static #idSeed = 0;
+
+  #id; get id() { return this.#id }
+  #owner; get owner() { return this.#owner }
+  #ctx; get ctx() { return this.#ctx }
+  #promise; get promise() { return this.#promise }
+  #resolve;
+  #reject;
+  #result; get result() { return this.#result }
+
+  #instance = null;
+
+  constructor(owner, ctx) {
+    this.#owner = isOf(owner, AzosElement);
+    this.#ctx = isObjectOrNull(ctx) ?? {};
+
+    this.#ctx.owner = owner;
+    this.#id = ++LookupInstance.#idSeed;
+
+    this.#instance = new Lookup();
+
+    this.#promise = new Promise((res, rej) => {
+      this.#resolve = res;
+      this.#reject = rej;
+    });
+  }
+
+  feed(data) {
+    isTrue(isObject(data) || isString(data));
+    this.#instance.feed(data);
+  }
+
+  select(result) {
+    this.#result;
+    this.#resolve(result);
+    this.#instance.hide();
+  }
+  cancel() {
+    this.#reject();
+    this.#instance.hide();
+  }
+}
 
 window.customElements.define("az-lookup", Lookup);

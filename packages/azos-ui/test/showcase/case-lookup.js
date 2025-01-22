@@ -68,7 +68,7 @@ export class CaseLookup extends CaseBase {
 <az-text id="tbStreet1" scope="this" title="Street 1" lookupId="lookup" placeholder="Start typing to search"></az-text>
 <az-text id="tbStreet2" scope="this" title="Street 2"></az-text>
 <az-text id="tbCity" scope="this" title="City"></az-text>
-<az-text id="tbState" scope="this" title="State"></az-text>
+<az-text id="tbState" scope="this" title="State" lookupType="valueList" valueList='{"mi":"Michigan", "oh":"Ohio"}'></az-text>
 <az-text id="tbZip" scope="this" title="Zip"></az-text>
 <az-lookup id="lookup" scope="this" @getContext="" @getData="${filterText => this.getAddressData(filterText)}" @select="${address => this.selectAddress(address)}"></az-lookup>
     `;

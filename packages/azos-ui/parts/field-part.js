@@ -17,6 +17,7 @@ import { asTypeMoniker,
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { Lookup } from "./lookup.js";
 
 
 function guardWidth(v, d){
@@ -363,10 +364,26 @@ export class FieldPart extends Part{
     noAutoValidate: { type: Boolean, reflect: false },
 
     lookupId: { type: String },
+    lookupData: { type: Array },
+    lookupType: { type: "data" | "valueList" | String },
   }
 
   updated(changedProperties) {
-    if (changedProperties.has("lookupId") && this.lookupId) {
+    if (changedProperties.has("lookupType")) {
+      // this.lookup = Lookup.createInstance(this);
+      this.lookup = new Lookup(this); // FIXME: attach to DOM
+      switch (this.lookupType) {
+        case "valueList":
+          console.log("valueList", Object.entries(this.valueList));
+          this.lookup.results = Object.entries(this.valueList);
+          break;
+        case "data":
+          console.log("data", this.lookupData);
+          this.lookup.results = this.lookupData;
+          break;
+      }
+    }
+    if (changedProperties.has("lookupId") && !this.lookup) {
       this.lookup = this.parentNode.querySelector(`#${this.lookupId}`);
       const msg = `Could not find Lookup with id "${this.lookupId}"`;
       if (!this.lookup) this.writeLog("error", msg, new AzosError(msg));
@@ -422,8 +439,15 @@ export class FieldPart extends Part{
   /** @param {any} event the event */
   _feedLookup(value) {
     if (this.lookup) {
-      const evt = new CustomEvent("feed", { detail: { value }, bubbles: true, cancelable: false });
+      const evt = new CustomEvent("lookup-feed", { detail: { value }, bubbles: true, cancelable: true });
       this.lookup.dispatchEvent(evt);
+
+      // if (! evt canceled) return;
+
+      // if (!this.#lookupInstance || this.#lookupInstance.done) {
+      //   this.#lookupInstance = this.lookup.open(this);
+      // }
+      // this.#lookupInstance.feed(value);
     }
   }
 
