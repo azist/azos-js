@@ -7,7 +7,7 @@
 import { isTrue } from "azos/aver";
 import { AzosElement, css, html, parseRank, parseStatus } from "../ui";
 import { lookupStyles } from "./styles";
-import { isNonEmptyString } from "azos/types";
+import { AzosError, isNonEmptyString } from "azos/types";
 
 
 /**
@@ -22,7 +22,8 @@ export class Lookup extends AzosElement {
   `];//styles
 
   static properties = {
-    results: { type: Array }
+    results: { type: Array },
+    owner: { type: AzosElement },
   };
 
   #bound_onKeydown = this.#onKeydown.bind(this);
@@ -53,6 +54,8 @@ export class Lookup extends AzosElement {
   constructor() { super(); }
 
   #onKeydown(e) {
+    if (!this.#isShown) return;
+
     let preventDefault = true;
     switch (e.key) {
       case "Escape":
@@ -68,6 +71,10 @@ export class Lookup extends AzosElement {
         this.#advanceSoftFocus();
         break;
       case "Enter":
+        if (!this.results.length) {
+          this.hide();
+          return;
+        }
         this.#selectResult();
         break;
       default:
@@ -78,6 +85,7 @@ export class Lookup extends AzosElement {
   }
 
   #advanceSoftFocus(forward = true) {
+    if (!this.resultNodes.length) return false;
     const resultNodes = this.resultNodes;
     let nextIndex;
     if (forward)
@@ -85,6 +93,7 @@ export class Lookup extends AzosElement {
     else
       nextIndex = (this.focusedResultElmIndex - 1 + resultNodes.length) % resultNodes.length;
     this.focusedResultElm = resultNodes[nextIndex] ?? null;
+    return true;
   }
 
   #selectResult() {
@@ -108,7 +117,7 @@ export class Lookup extends AzosElement {
 
   updated(changedProperties) {
     if (changedProperties.has("results")) {
-      this.focusedResultElm = this.resultNodes[0];
+      this.focusedResultElm = this.resultNodes[0] ?? null;
     }
   }
 
@@ -128,7 +137,7 @@ export class Lookup extends AzosElement {
 
   #onFeed(e) {
     const value = e.detail.value;
-    console.log(value, e);
+    // console.trace(value, e);
     this.feed(value);
   }
 
@@ -147,13 +156,27 @@ export class Lookup extends AzosElement {
 
     this.update();//sync update dom build
 
+    const msg = `Lookup does not have an associated owner.`;
+    if (!this.owner) this.writeLog("Warning", msg, new AzosError(msg));
+
     const dlg = this.$("pop");
+    this.#setPosition(dlg, this.owner);
+
     dlg.showPopover();
     this.focusedResultElm = this.resultNodes[0] ?? null;
 
     this.requestUpdate();
 
     return true;
+  }
+
+  #setPosition(dlg, owner) {
+    // console.table(dlg);
+    // console.table(owner, "index", "value");
+    // const style = dlg.style;
+    // style.position = "absolute";
+    // style.left = `${owner.offsetLeft}px`;
+    // style.top = `${owner.offsetTop + owner.offsetHeight}px`;
   }
 
   /** Hides the shown spinner returning true if it was hidden, or false if it was already hidden before this call*/
@@ -171,11 +194,21 @@ export class Lookup extends AzosElement {
   }
 
   render() {
-    const cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-    const stl = `${this.#isShown ? "" : "display: none"}`;
+    const cls = [
+      parseRank(this.rank, true),
+      parseStatus(this.status, true),
+      this.#isShown ? "" : "hidden",
+      this.owner ? "hasOwner" : "",
+    ]
+      .filter(isNonEmptyString).join(" ");
+
+    const stl = [
+      this.owner ? `left: ${this.owner.offsetLeft}px` : "",
+      this.owner ? `top: ${this.owner.offsetTop + this.owner.offsetHeight}px` : "",
+    ].filter(isNonEmptyString).join(";");
 
     return html`
-<div id="pop" popover="manual" class="pop ${cls}" style="${stl}">
+<div id="pop" popover="manual" class="${cls}" style="${stl}">
   ${this.renderBody()}
 </div>
     `;
@@ -187,7 +220,7 @@ export class Lookup extends AzosElement {
   }
 
   renderBody() {
-    if (!this.results) return html`No results`;
+    if (!this.results || !this.results.length) return html`No results`;
     return html`
 <ul class="results" @mouseover="${e => this.#onMouseOver(e)}">
     ${this.results.map((result, index) => this.renderResult(result, index))}

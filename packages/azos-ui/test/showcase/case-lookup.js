@@ -44,7 +44,10 @@ export class CaseLookup extends CaseBase {
 
   getAddressData({ detail }) {
     let results = this.results;
-    if (detail.filterText) results = results.filter(result => matchPattern(["street1", "street2", "city", "state", "zip"].map(k => result[k]).filter(isNonEmptyString), detail.filterText));
+    if (detail.filterText) results = results.filter(result => ["street1", "street2", "city", "state", "zip"]
+      .map(k => result[k])
+      .filter(isNonEmptyString)
+      .some(str => matchPattern(str, detail.filterText)));
     this.lookup.results = results;
   }
 

@@ -461,6 +461,11 @@ export const sliderStyles = css`
 `;
 
 export const lookupStyles = css`
+#pop.hidden{display:none;}
+#pop.hasOwner{
+  margin: 0;
+  position: absolute;
+}
 #pop{
   min-width: 200px;
   max-width: 80vw;

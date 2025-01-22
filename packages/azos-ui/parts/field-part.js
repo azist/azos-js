@@ -11,7 +11,9 @@ import { asTypeMoniker,
          VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
          DATA_KIND, asDataKind,
          isAssigned,
-         isString } from "azos/types";
+  isString,
+  AzosError
+} from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
@@ -366,6 +368,9 @@ export class FieldPart extends Part{
   updated(changedProperties) {
     if (changedProperties.has("lookupId") && this.lookupId) {
       this.lookup = this.parentNode.querySelector(`#${this.lookupId}`);
+      const msg = `Could not find Lookup with id "${this.lookupId}"`;
+      if (!this.lookup) this.writeLog("error", msg, new AzosError(msg));
+      this.lookup.owner = this;
       this.lookupId = null;
     }
   }
@@ -414,6 +419,14 @@ export class FieldPart extends Part{
     this.dispatchEvent(evt);
   }
 
-  /** Override to change how lookup is fed data */
-  onInput(value) { if (this.lookup) this.lookup.dispatchEvent(new CustomEvent("feed", { detail: { value } })); }
+  /**
+   * Override to customize the lookup is fed data
+   * @param {Event} event the `@input` event
+   */
+  onInput(event) {
+    if (this.lookup) {
+      const value = event.target.value;
+      this.lookup.dispatchEvent(new CustomEvent("feed", { detail: { value }, bubbles: true, cancelable: false }));
+    }
+  }
 }
