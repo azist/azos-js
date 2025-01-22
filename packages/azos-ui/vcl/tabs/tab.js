@@ -108,10 +108,11 @@ export class Tab extends Block {
 
   get tabView() { return this.parentNode; }
 
-  constructor(title, data = null) {
+  constructor(title, data) {
     super();
-    this.title = aver.isNonEmptyString(title);
-    this.data = data;
+    // It is possible to construct via markup, so these could be undefined
+    if (title) this.title = aver.isNonEmptyString(title);
+    if (data) this.data = data;
     this.#id = ++Tab.#idSeed;
   }
 
