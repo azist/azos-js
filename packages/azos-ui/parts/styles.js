@@ -462,18 +462,24 @@ export const sliderStyles = css`
 
 export const lookupStyles = css`
 #pop.hidden{display:none;}
-#pop.hasOwner{
+#pop{
   margin: 0;
   position: absolute;
-}
-#pop{
   min-width: 200px;
   max-width: 80vw;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
 }
-ul{list-style:none;padding:0;margin:0;}
+#pop:not(.hasOwner){
+  margin: revert;
+  position: revert;
+}
+ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 li{
   padding: 0.5em 1em;
 }

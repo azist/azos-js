@@ -134,6 +134,7 @@ export class TextField extends FieldPart {
       ?readonly=${this.isReadonly}
       @change="${this.#tbChange}"
       @input="${this.onInput}"
+      @click="${this.onClick}"
       part="field"
       autocomplete="off"
     />`;

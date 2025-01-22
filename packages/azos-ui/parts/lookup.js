@@ -84,6 +84,28 @@ export class Lookup extends AzosElement {
     if (preventDefault) e.preventDefault();
   }
 
+  #onDocumentClick(e) {
+    if (!this.#isShown) return;
+    const target = e.composedPath()[0];
+    console.log(target, this.#isShown);
+    if (this.#isWithinParent(target, this) || this.#isWithinParent(target, this.owner)) {
+      e.preventDefault();
+      return;
+    }
+    this.hide();
+  }
+
+  #onResultsClick(e) {
+    const selectedResultElm = e.target.closest(".result");
+    this.focusedResultElm = selectedResultElm;
+    this.#selectResult();
+  }
+
+  #onMouseOver(e) {
+    if (!e.target.classList.contains("result")) return;
+    this.focusedResultElm = e.target;
+  }
+
   #advanceSoftFocus(forward = true) {
     if (!this.resultNodes.length) return false;
     const resultNodes = this.resultNodes;
@@ -102,17 +124,22 @@ export class Lookup extends AzosElement {
   }
 
   #isWithinParent(elm, parent) {
+    // console.info(elm, parent);
     let currentElement = elm;
     while (currentElement) {
       if (currentElement === parent) return true;
-      currentElement = currentElement.parentElement;
+
+      if (currentElement.assignedSlot)
+        currentElement = currentElement.assignedSlot;
+      else if (currentElement.parentElement)
+        currentElement = currentElement.parentElement;
+      else { // dive into shadowDOM
+        const root = currentElement?.getRootNode();
+        if (root instanceof ShadowRoot) currentElement = root.host;
+        else break;
+      }
     }
     return false;
-  }
-
-  #onDocumentClick(e) {
-    if (this.#isWithinParent(e.target)) return;
-    this.hide();
   }
 
   updated(changedProperties) {
@@ -135,8 +162,8 @@ export class Lookup extends AzosElement {
     super.disconnectedCallback();
   }
 
-  #onFeed(e) {
-    const value = e.detail.value;
+  #onFeed(evt) {
+    const value = evt.detail.value;
     // console.trace(value, e);
     this.feed(value);
   }
@@ -144,7 +171,6 @@ export class Lookup extends AzosElement {
   feed(data) {
     if (data.length >= 2) {
       if (!this.isShown) this.show();
-      // this.results = this.getData(`${data}*`);
       this.dispatchEvent(new CustomEvent("getData", { detail: { filterText: `*${data}*` } }));
     }
   }
@@ -214,15 +240,10 @@ export class Lookup extends AzosElement {
     `;
   }
 
-  #onMouseOver(e) {
-    if (!e.target.classList.contains("result")) return;
-    this.focusedResultElm = e.target;
-  }
-
   renderBody() {
     if (!this.results || !this.results.length) return html`No results`;
     return html`
-<ul class="results" @mouseover="${e => this.#onMouseOver(e)}">
+<ul class="results" @mouseover="${e => this.#onMouseOver(e)}" @click="${e => this.#onResultsClick(e)}">
     ${this.results.map((result, index) => this.renderResult(result, index))}
 </ul>
     `;

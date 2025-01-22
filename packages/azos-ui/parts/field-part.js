@@ -419,14 +419,17 @@ export class FieldPart extends Part{
     this.dispatchEvent(evt);
   }
 
-  /**
-   * Override to customize the lookup is fed data
-   * @param {Event} event the `@input` event
-   */
-  onInput(event) {
+  /** @param {any} event the event */
+  _feedLookup(value) {
     if (this.lookup) {
-      const value = event.target.value;
-      this.lookup.dispatchEvent(new CustomEvent("feed", { detail: { value }, bubbles: true, cancelable: false }));
+      const evt = new CustomEvent("feed", { detail: { value }, bubbles: true, cancelable: false });
+      this.lookup.dispatchEvent(evt);
     }
   }
+
+  /** @param {Event} event the `@input` event */
+  onInput(event) { this._feedLookup(event.target.value); }
+
+  /** @param {Event} event the '@click' event */
+  onClick(event) { this._feedLookup(event.target.value); }
 }
