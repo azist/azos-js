@@ -26,6 +26,7 @@ export class Tab extends Block {
     canClose: { type: Boolean },
     iconPath: { type: String },
     slot: { type: String, reflect: true },
+    data: { type: Object },
     showCommands: { type: Boolean },
   };
 
@@ -107,8 +108,10 @@ export class Tab extends Block {
 
   get tabView() { return this.parentNode; }
 
-  constructor() {
+  constructor(title, data = null) {
     super();
+    this.title = aver.isNonEmptyString(title);
+    this.data = data;
     this.#id = ++Tab.#idSeed;
   }
 
