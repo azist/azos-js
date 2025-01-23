@@ -12,12 +12,14 @@ import { asTypeMoniker,
          DATA_KIND, asDataKind,
          isAssigned,
   isString,
-  AzosError
+  AzosError,
+  isArray,
+  isNonEmptyString
 } from "azos/types";
-import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, matchPattern } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
-import { Lookup } from "./lookup.js";
+import { Lookup, LookupSource } from "./lookup.js";
 
 
 function guardWidth(v, d){
@@ -364,30 +366,35 @@ export class FieldPart extends Part{
     noAutoValidate: { type: Boolean, reflect: false },
 
     lookupId: { type: String },
-    lookupData: { type: Array },
-    lookupType: { type: "data" | "valueList" | String },
+    lookupType: { type: String },
   }
 
   updated(changedProperties) {
     if (changedProperties.has("lookupType")) {
-      // this.lookup = Lookup.createInstance(this);
-      this.lookup = new Lookup(this); // FIXME: attach to DOM
+      let results, filterFn;
       switch (this.lookupType) {
         case "valueList":
           console.log("valueList", Object.entries(this.valueList));
-          this.lookup.results = Object.entries(this.valueList);
-          break;
-        case "data":
-          console.log("data", this.lookupData);
-          this.lookup.results = this.lookupData;
+          if (isArray(this.valueList)) {
+            results = this.valueList;
+          } else {
+            results = Object.entries(this.valueList);
+            filterFn = (one, filterPattern) => one.some(str => matchPattern(str, filterPattern));
+          }
           break;
       }
+      this.lookup = new Lookup(this, new LookupSource(null, results, filterFn));
     }
+
     if (changedProperties.has("lookupId") && !this.lookup) {
       this.lookup = this.parentNode.querySelector(`#${this.lookupId}`);
       const msg = `Could not find Lookup with id "${this.lookupId}"`;
       if (!this.lookup) this.writeLog("error", msg, new AzosError(msg));
       this.lookup.owner = this;
+      this.lookup.source.filterFn = (one, filterPattern) => ["street1", "street2", "city", "state", "zip"]
+        .map(k => one[k])
+        .filter(isNonEmptyString)
+        .some(str => matchPattern(str, filterPattern));
       this.lookupId = null;
     }
   }
@@ -439,15 +446,18 @@ export class FieldPart extends Part{
   /** @param {any} event the event */
   _feedLookup(value) {
     if (this.lookup) {
-      const evt = new CustomEvent("lookup-feed", { detail: { value }, bubbles: true, cancelable: true });
+      let gvc = 0; // works, but not guaranteed
+      const evt = new CustomEvent("lookupFeed", { detail: { get value() { gvc++; return value; } }, bubbles: true, cancelable: true });
       this.lookup.dispatchEvent(evt);
 
-      // if (! evt canceled) return;
+      console.log(`Get Value Count: ${gvc}`);
 
-      // if (!this.#lookupInstance || this.#lookupInstance.done) {
-      //   this.#lookupInstance = this.lookup.open(this);
+      if (gvc) return;
+
+      // if (this.lookup) { //} || this.#lookupInstance.done) {
+      //   this.lookup = this.lookup.open(this);
       // }
-      // this.#lookupInstance.feed(value);
+      // this.lookup.feed(value);
     }
   }
 

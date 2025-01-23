@@ -4,10 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isObjectOrNull, isOf, isTrue } from "azos/aver";
-import { AzosElement, css, html, parseRank, parseStatus } from "../ui";
+import { isArrayOrNull, isObjectOrNull, isOf, isTrue } from "azos/aver";
+import { AzosElement, css, html, parseRank, parseStatus, renderInto } from "../ui";
 import { lookupStyles } from "./styles";
-import { AzosError, isNonEmptyString, isObject, isString } from "azos/types";
+import { AzosError, isAssigned, isFunction, isNonEmptyString, isString } from "azos/types";
+import { matchPattern } from "azos/strings";
 
 
 /**
@@ -17,52 +18,91 @@ import { AzosError, isNonEmptyString, isObject, isString } from "azos/types";
  *   appropriately
  */
 export class Lookup extends AzosElement {
+  static #idSeed = 0;
 
-  static styles = [lookupStyles, css`
-  `];//styles
+  static styles = [lookupStyles, css``];
 
   static properties = {
-    results: { type: Array },
-    owner: { type: AzosElement },
+    owner: { type: Object },
+    source: { type: Object },
+    results: { type: Array }
   };
+
+  #id;
+  #result;
+  #source;
+
+  #focusedResultElm;
+
+  #promise;
+  #resolve;
+  #reject;
 
   #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
 
-  #shownPromise = null;
-  #shownPromiseResolve = null;
-  #shownPromiseReject = null;
-  /** Returns true if the lookup is shown */
-  get isShown() { return this.#shownPromise !== null; }
-  get shownPromise() { return this.#shownPromise; }
+  get id() { return this.#id; }
+  get result() { return this.#result; }
+  get source() { return this.#source; }
+  set source(v) {
+    const oldValue = this.#source;
+    this.#source = v;
+    this.requestUpdate("source", oldValue);
+  }
 
-  get resultNodes() { return [...this.shadowRoot.querySelectorAll(".result")]; }
+  get selectedResult() { return this.results[this.focusedResultElmIndex] ?? null; }
 
-  get focusedResultElmIndex() { return this.resultNodes.indexOf(this.focusedResultElm); }
+  get resultElms() { return [...this.shadowRoot.querySelectorAll(".result")]; }
 
-  #focusedResultElm = null;
   get focusedResultElm() { return this.#focusedResultElm; }
   set focusedResultElm(v) {
-    isTrue(v === null || this.resultNodes.includes(v), `"${v}" must be a valid result node.`);
-    if (this.#focusedResultElm === v) return;
-
     const oldValue = this.#focusedResultElm;
-    if (this.#focusedResultElm) this.#focusedResultElm.tabIndex = -1; // previous elm
     this.#focusedResultElm = v;
-    if (this.#focusedResultElm) this.#focusedResultElm.tabIndex = 0; // current elm
     this.requestUpdate("focusedResultElm", oldValue);
   }
 
-  constructor() { super(); }
+  get focusedResultElmIndex() { return this.resultElms.indexOf(this.focusedResultElm); }
+
+  get shownPromise() { return this.#promise; }
+  get isOpen() { return isAssigned(this.#promise); }
+
+  get dialog() { return this.$("pop"); }
+
+  constructor(owner, source) {
+    super();
+    this.owner = owner ? isOf(owner, AzosElement) : null;
+    this.source = source ? isOf(source, LookupSource) : new LookupSource();
+    this.#id = ++Lookup.#idSeed;
+  }
+
+  #attachToDOM() {
+    let arena = this.arena ?? this.owner?.arena ?? window.ARENA;
+    renderInto(this, arena);
+    this.update();
+  }
+
+  #onResultsClick(e) {
+    const selectedResultElm = e.target.closest(".result");
+    if (!selectedResultElm) return;
+    this.focusedResultElm = selectedResultElm;
+    this.#select(this.selectedResult);
+    e.preventDefault();
+  }
+
+  #onMouseOver(e) {
+    const resultElm = e.target.closest(".result");
+    if (!resultElm) return;
+    this.focusedResultElm = resultElm;
+  }
 
   #onKeydown(e) {
-    if (!this.isShown) return;
+    if (!this.isOpen) return;
 
     let preventDefault = true;
     switch (e.key) {
       case "Escape":
-        this.cancel();
+        this.#cancel();
         break;
       case "Tab":
         this.#advanceSoftFocus(!e.shiftKey);
@@ -75,8 +115,8 @@ export class Lookup extends AzosElement {
         break;
       case "Enter":
         if (!this.results.length)
-          return this.cancel();
-        this.#selectResult();
+          return this.#cancel();
+        this.#select(this.selectedResult);
         break;
       default:
         preventDefault = false;
@@ -86,105 +126,78 @@ export class Lookup extends AzosElement {
   }
 
   #onDocumentClick(e) {
-    if (!this.isShown) return;
+    if (!this.isOpen) return;
     const target = e.composedPath()[0]; // Account for shadowDOM
-    // console.log(target, this.isShown);
-    if (this.#isWithinParent(target, this) || this.#isWithinParent(target, this.owner)) {
+    // console.log(target, this.isOpen);
+    if (isWithinParent(target, this) || isWithinParent(target, this.owner)) {
       e.preventDefault();
       return;
     }
-    this.cancel();
-  }
-
-  #onResultsClick(e) {
-    const selectedResultElm = e.target.closest(".result");
-    if (!selectedResultElm) return;
-    this.focusedResultElm = selectedResultElm;
-    this.#selectResult();
-    e.preventDefault();
-  }
-
-  #onMouseOver(e) {
-    const resultElm = e.target.closest(".result");
-    if (!resultElm) return;
-    this.focusedResultElm = resultElm;
-  }
-
-  #advanceSoftFocus(forward = true) {
-    if (!this.resultNodes.length) return false;
-    const resultNodes = this.resultNodes;
-    let nextIndex;
-    if (forward)
-      nextIndex = (this.focusedResultElmIndex + 1) % resultNodes.length;
-    else
-      nextIndex = (this.focusedResultElmIndex - 1 + resultNodes.length) % resultNodes.length;
-    this.focusedResultElm = resultNodes[nextIndex] ?? null;
-    return true;
-  }
-
-  #selectResult() {
-    this.dispatchEvent(new CustomEvent("select", { detail: { value: this.results[this.focusedResultElmIndex] } }));
-    this.hide();
-  }
-
-  #isWithinParent(elm, parent) {
-    // console.info(elm, parent);
-    let currentElement = elm;
-    while (currentElement) {
-      if (currentElement === parent) return true;
-
-      if (currentElement.assignedSlot)
-        currentElement = currentElement.assignedSlot;
-      else if (currentElement.parentElement)
-        currentElement = currentElement.parentElement;
-      else { // dive into shadowDOM
-        const root = currentElement?.getRootNode();
-        if (root instanceof ShadowRoot) currentElement = root.host;
-        else break;
-      }
-    }
-    return false;
-  }
-
-  updated(changedProperties) {
-    if (changedProperties.has("results")) {
-      this.focusedResultElm = this.resultNodes[0] ?? null;
-    }
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    window.document.addEventListener("keydown", this.#bound_onKeydown);
-    window.document.addEventListener("click", this.#bound_onDocumentClick);
-    this.addEventListener("lookup-feed", this.#bound_onFeed);
-  }
-
-  disconnectedCallback() {
-    window.document.removeEventListener("keydown", this.#bound_onKeydown);
-    window.document.removeEventListener("click", this.#bound_onDocumentClick);
-    this.removeEventListener("lookup-feed", this.#bound_onFeed);
-    super.disconnectedCallback();
+    this.#cancel();
   }
 
   #onFeed(evt) {
-    const value = evt.detail.value;
-    // console.trace(value, e);
-    this.feed(value);
+    const { value, ctx } = evt.detail;
+    this.feed(value, ctx);
   }
 
-  feed(data) {
-    if (data.length >= 2) {
-      if (!this.isShown) this.show();
-      this.dispatchEvent(new CustomEvent("getData", { detail: { filterText: `*${data}*` } }));
-    }
+  #advanceSoftFocus(forward = true) {
+    if (!this.resultElms.length) return false;
+    const resultElms = this.resultElms;
+    let nextIndex;
+    if (forward)
+      nextIndex = (this.focusedResultElmIndex + 1) % resultElms.length;
+    else
+      nextIndex = (this.focusedResultElmIndex - 1 + resultElms.length) % resultElms.length;
+    this.focusedResultElm = resultElms[nextIndex] ?? null;
+    return true;
   }
 
-  /** Shows a lookup returning true if it was shown, or false if it was already shown before this call */
-  show() {
-    if (this.isShown) return false;
-    this.#shownPromise = new Promise((res, rej) => {
-      this.#shownPromiseResolve = res;
-      this.#shownPromiseReject = rej;
+  /**
+   * Selects a choice and resolves (resolve) promise
+   * @param {any} choice the selection from among {@link #results}
+   */
+  #select(choice) {
+    isTrue(this.results.includes(choice));
+    this.dispatchEvent(new CustomEvent("lookupSelect", { detail: { value: choice } }));
+    this.#result = choice;
+    this.#resolve(choice);
+    this.#finalize();
+  }
+
+  /** hide dialog and cancel (reject) promise */
+  #cancel() {
+    this.#reject("canceled");
+    this.#finalize();
+  }
+
+  /** Clean up after dialog closes */
+  #finalize() {
+    this.#promise = null;
+    this.#focusedResultElm = null;
+    this.update();//sync update dom build
+    this.dialog.hidePopover();
+  }
+
+  feed(data, ctx) {
+    if (ctx) this.#source.ctx = ctx;
+    if (!isString(data)) return;
+    if (data.length < 1) return;
+
+    if (!this.isConnected) this.#attachToDOM();
+    if (!this.isOpen) this.open();
+    this.results = this.#source.getFilteredResults(`*${data}*`);
+  }
+
+  /**
+   * Shows a Lookup dialog
+   * @returns true if dialog was opened; false if it was previously opened
+   */
+  open() {
+    if (this.isOpen) return false;
+    this.#promise = new Promise((res, rej) => {
+      this.#resolve = res;
+      this.#reject = rej;
     }).catch(e => this.writeLog("Info", e));
 
     this.update();//sync update dom build
@@ -192,46 +205,33 @@ export class Lookup extends AzosElement {
     const msg = `Lookup does not have an owner.`;
     if (!this.owner) this.writeLog("Warning", msg, new AzosError(msg));
 
-    const dlg = this.$("pop");
-    dlg.showPopover();
-
-    this.focusedResultElm = this.resultNodes[0] ?? null;
+    this.dialog.showPopover();
+    this.focusedResultElm = this.resultElms[0] ?? null;
 
     this.requestUpdate();
 
     return true;
   }
 
-  /** Hides the shown lookup returning true if it was hidden, or false if it was already hidden before this call */
-  #finalize() {
-    this.#shownPromise = null;
-    this.#focusedResultElm = null;
-    this.update();//sync update dom build
-    const dlg = this.$("pop");
-    dlg.hidePopover();
+  connectedCallback() {
+    super.connectedCallback();
+    window.document.addEventListener("keydown", this.#bound_onKeydown);
+    window.document.addEventListener("click", this.#bound_onDocumentClick);
+    this.addEventListener("lookupFeed", this.#bound_onFeed);
   }
 
-  /** Resolve the lookup dialog */
-  hide() {
-    if (!this.isShown) return false;
-    this.#shownPromiseResolve();
-    this.#finalize();
-    return true;
-  }
-
-  /** Cancel the lookup dialog */
-  cancel() {
-    if (!this.isShown) return false;
-    this.#shownPromiseReject("canceled");
-    this.#finalize();
-    return true;
+  disconnectedCallback() {
+    window.document.removeEventListener("keydown", this.#bound_onKeydown);
+    window.document.removeEventListener("click", this.#bound_onDocumentClick);
+    this.removeEventListener("lookupFeed", this.#bound_onFeed);
+    super.disconnectedCallback();
   }
 
   render() {
     const cls = [
       parseRank(this.rank, true),
       parseStatus(this.status, true),
-      this.isShown ? "" : "hidden",
+      this.isOpen ? "" : "hidden",
       this.owner ? "hasOwner" : "",
     ].filter(isNonEmptyString).join(" ");
 
@@ -275,52 +275,64 @@ export class Lookup extends AzosElement {
 </div>
     `;
   }
+}
 
+/**
+ * Provides results for lookup source.
+ *  NOTES:
+ *   - With a LookupSource instance, assign a `filterFn` which has `this` context.
+ *   - Extend it to add a service-oriented architecture
+ *   -
+ */
+export class LookupSource {
+  static DFLT_FILTER_FN = (one, filterPattern) => matchPattern(one, filterPattern);
 
-}//Lookup
+  #ctx;
+  #results;
+  _filterFn = LookupSource.DFLT_FILTER_FN;
 
-export class LookupInstance {
-  static #idSeed = 0;
+  get ctx() { return this.#ctx; }
+  set ctx(v) { this.#ctx = isObjectOrNull(v) ?? {}; }
 
-  #id; get id() { return this.#id }
-  #owner; get owner() { return this.#owner }
-  #ctx; get ctx() { return this.#ctx }
-  #promise; get promise() { return this.#promise }
-  #resolve;
-  #reject;
-  #result; get result() { return this.#result }
+  get results() { return this.#results; }
+  set results(v) { this.#results = isArrayOrNull(v) ?? []; }
 
-  #instance = null;
+  get filterFn() { return this._filterFn; }
+  set filterFn(v) { this._filterFn = isFunction(v) ? v : LookupSource.DFLT_FILTER_FN; }
 
-  constructor(owner, ctx) {
-    this.#owner = isOf(owner, AzosElement);
-    this.#ctx = isObjectOrNull(ctx) ?? {};
-
-    this.#ctx.owner = owner;
-    this.#id = ++LookupInstance.#idSeed;
-
-    this.#instance = new Lookup();
-
-    this.#promise = new Promise((res, rej) => {
-      this.#resolve = res;
-      this.#reject = rej;
-    });
+  constructor(ctx, results, filterFn) {
+    this.ctx = ctx;
+    this.results = results;
+    this.filterFn = filterFn;
   }
 
-  feed(data) {
-    isTrue(isObject(data) || isString(data));
-    this.#instance.feed(data);
+  getFilteredResults(pattern, ctx) {
+    if (ctx) this.ctx = ctx;
+    pattern = isNonEmptyString(pattern) ? pattern : "*";
+    let filtered = this.results;
+    try { filtered = this.results.filter(one => this.filterFn(one, pattern), this); }
+    catch (e) { console.error(e); }
+    return filtered;
   }
+}
 
-  select(result) {
-    this.#result;
-    this.#resolve(result);
-    this.#instance.hide();
+function isWithinParent(elm, parent) {
+  // console.info(elm, parent);
+  let currentElement = elm;
+  while (currentElement) {
+    if (currentElement === parent) return true;
+
+    if (currentElement.assignedSlot)
+      currentElement = currentElement.assignedSlot;
+    else if (currentElement.parentElement)
+      currentElement = currentElement.parentElement;
+    else { // dive into shadowDOM
+      const root = currentElement?.getRootNode();
+      if (root instanceof ShadowRoot) currentElement = root.host;
+      else break;
+    }
   }
-  cancel() {
-    this.#reject();
-    this.#instance.hide();
-  }
+  return false;
 }
 
 window.customElements.define("az-lookup", Lookup);

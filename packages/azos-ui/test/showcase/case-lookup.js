@@ -13,42 +13,17 @@ import { isNonEmptyString } from "azos/types";
 
 export class CaseLookup extends CaseBase {
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.results = [{
-      street1: "1600 Pennsylvania Ave NW",
-      street2: "",
-      city: "Washington",
-      state: "DC",
-      zip: "20500"
-    }, {
-      street1: "600 Biscayne Blvd NW",
-      street2: "",
-      city: "Miami",
-      state: "FL",
-      zip: "33132"
-    }, {
-      street1: "2 15th St NW",
-      street2: "",
-      city: "Washington",
-      state: "DC",
-      zip: "20024"
-    },];
-  }
-
-  firstUpdated() {
+  async firstUpdated() {
     super.firstUpdated();
-    // this.lookup.show();
-    // setTimeout(() => this.lookup.hide(), 5000);
-  }
-
-  getAddressData({ detail }) {
-    let results = this.results;
-    if (detail.filterText) results = results.filter(result => ["street1", "street2", "city", "state", "zip"]
+    this.$("lookup").source.results = [
+      { street1: "1600 Pennsylvania Ave NW", city: "Washington", state: "DC", zip: "20500" },
+      { street1: "600 Biscayne Blvd NW", city: "Miami", state: "FL", zip: "33132" },
+      { street1: "2 15th St NW", city: "Washington", state: "DC", zip: "20024" },
+    ];
+    this.$("lookup").source.filterFn = (result, filterPattern) => ["street1", "street2", "city", "state", "zip"]
       .map(k => result[k])
       .filter(isNonEmptyString)
-      .some(str => matchPattern(str, detail.filterText)));
-    this.lookup.results = results;
+      .some(str => matchPattern(str, filterPattern))
   }
 
   selectAddress(event) {
@@ -70,7 +45,7 @@ export class CaseLookup extends CaseBase {
 <az-text id="tbCity" scope="this" title="City"></az-text>
 <az-text id="tbState" scope="this" title="State" lookupType="valueList" valueList='{"mi":"Michigan", "oh":"Ohio"}'></az-text>
 <az-text id="tbZip" scope="this" title="Zip"></az-text>
-<az-lookup id="lookup" scope="this" @getContext="" @getData="${filterText => this.getAddressData(filterText)}" @select="${address => this.selectAddress(address)}"></az-lookup>
+<az-lookup id="lookup" scope="this" @lookupSelect="${address => this.selectAddress(address)}"></az-lookup>
     `;
   }
 }
