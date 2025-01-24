@@ -470,10 +470,14 @@ export const lookupStyles = css`
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  border-top-width: 1px;
   padding: 0;
+  border: 1px solid #c2c2c2;
+  box-shadow: 1px 4px 10px #585858;
+  border-radius: 10px;
+  border-top-width: 1px;
+  border-top-left-radius: 0;
+  color: #656565;
+
 }
 #pop:not(.hasOwner){
   margin: revert;

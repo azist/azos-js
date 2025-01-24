@@ -13,8 +13,6 @@ import { asTypeMoniker,
          isAssigned,
   isString,
   AzosError,
-  isArray,
-  isNonEmptyString
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, matchPattern } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
@@ -374,13 +372,8 @@ export class FieldPart extends Part{
       let results, filterFn;
       switch (this.lookupType) {
         case "valueList":
-          console.log("valueList", Object.entries(this.valueList));
-          if (isArray(this.valueList)) {
-            results = this.valueList;
-          } else {
-            results = Object.entries(this.valueList);
-            filterFn = (one, filterPattern) => one.some(str => matchPattern(str, filterPattern));
-          }
+          results = Object.entries(this.valueList);
+          filterFn = (one, filterPattern) => one.some(str => matchPattern(str, filterPattern));
           break;
       }
       this.lookup = new Lookup(this, new LookupSource(null, results, filterFn));
@@ -388,14 +381,14 @@ export class FieldPart extends Part{
 
     if (changedProperties.has("lookupId") && !this.lookup) {
       this.lookup = this.parentNode.querySelector(`#${this.lookupId}`);
-      const msg = `Could not find Lookup with id "${this.lookupId}"`;
-      if (!this.lookup) this.writeLog("error", msg, new AzosError(msg));
-      this.lookup.owner = this;
-      this.lookup.source.filterFn = (one, filterPattern) => ["street1", "street2", "city", "state", "zip"]
-        .map(k => one[k])
-        .filter(isNonEmptyString)
-        .some(str => matchPattern(str, filterPattern));
-      this.lookupId = null;
+
+      if (this.lookup) {
+        this.lookup.owner = this;
+        this.lookupId = null;
+      } else {
+        const err = new AzosError(`Could not find Lookup with id "${this.lookupId}"`);
+        this.writeLog("error", err.message, err);
+      }
     }
   }
 
@@ -443,22 +436,18 @@ export class FieldPart extends Part{
     this.dispatchEvent(evt);
   }
 
-  /** @param {any} event the event */
+  /** @param {any} value the value to feed to the lookup */
   _feedLookup(value) {
-    if (this.lookup) {
-      let gvc = 0; // works, but not guaranteed
-      const evt = new CustomEvent("lookupFeed", { detail: { get value() { gvc++; return value; } }, bubbles: true, cancelable: true });
-      this.lookup.dispatchEvent(evt);
+    if (!this.lookup) return;
 
-      console.log(`Get Value Count: ${gvc}`);
+    let gvc = 0; // works, but not guaranteed
+    const evt = new CustomEvent("lookupFeed", { detail: { get value() { gvc++; return value; } }, bubbles: true, cancelable: true });
+    this.lookup.dispatchEvent(evt);
 
-      if (gvc) return;
+    if (gvc) return;
 
-      // if (this.lookup) { //} || this.#lookupInstance.done) {
-      //   this.lookup = this.lookup.open(this);
-      // }
-      // this.lookup.feed(value);
-    }
+    console.warn(`'lookupFeed' event handled: ${gvc} time(s)`);
+    this.lookup.feed(value);
   }
 
   /** @param {Event} event the `@input` event */

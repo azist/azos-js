@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isArrayOrNull, isObjectOrNull, isOf, isTrue } from "azos/aver";
-import { AzosElement, css, html, parseRank, parseStatus, renderInto } from "../ui";
+import { AzosElement, css, html, parseRank, parseStatus } from "../ui";
 import { lookupStyles } from "./styles";
 import { AzosError, isAssigned, isFunction, isNonEmptyString, isString } from "azos/types";
 import { matchPattern } from "azos/strings";
@@ -18,17 +18,15 @@ import { matchPattern } from "azos/strings";
  *   appropriately
  */
 export class Lookup extends AzosElement {
-  static #idSeed = 0;
-
   static styles = [lookupStyles, css``];
 
   static properties = {
     owner: { type: Object },
     source: { type: Object },
-    results: { type: Array }
+    results: { type: Array },
+    minChars: { type: Number },
   };
 
-  #id;
   #result;
   #source;
 
@@ -42,7 +40,6 @@ export class Lookup extends AzosElement {
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
 
-  get id() { return this.#id; }
   get result() { return this.#result; }
   get source() { return this.#source; }
   set source(v) {
@@ -72,21 +69,18 @@ export class Lookup extends AzosElement {
   constructor(owner, source) {
     super();
     this.owner = owner ? isOf(owner, AzosElement) : null;
-    this.source = source ? isOf(source, LookupSource) : new LookupSource();
-    this.#id = ++Lookup.#idSeed;
+    this.source = source ? isOf(source, LookupSource) : this._makeDefaultSource();
   }
 
-  #attachToDOM() {
-    let arena = this.arena ?? this.owner?.arena ?? window.ARENA;
-    renderInto(this, arena);
-    this.update();
+  _makeDefaultSource() {
+    return new LookupSource();
   }
 
   #onResultsClick(e) {
     const selectedResultElm = e.target.closest(".result");
     if (!selectedResultElm) return;
     this.focusedResultElm = selectedResultElm;
-    this.#select(this.selectedResult);
+    this._select(this.selectedResult);
     e.preventDefault();
   }
 
@@ -105,6 +99,7 @@ export class Lookup extends AzosElement {
         this.#cancel();
         break;
       case "Tab":
+        if (!this.results.length) return this.#cancel();
         this.#advanceSoftFocus(!e.shiftKey);
         break;
       case "ArrowUp":
@@ -114,9 +109,8 @@ export class Lookup extends AzosElement {
         this.#advanceSoftFocus();
         break;
       case "Enter":
-        if (!this.results.length)
-          return this.#cancel();
-        this.#select(this.selectedResult);
+        if (!this.results.length) return this.#cancel();
+        this._select(this.selectedResult);
         break;
       default:
         preventDefault = false;
@@ -153,18 +147,6 @@ export class Lookup extends AzosElement {
     return true;
   }
 
-  /**
-   * Selects a choice and resolves (resolve) promise
-   * @param {any} choice the selection from among {@link #results}
-   */
-  #select(choice) {
-    isTrue(this.results.includes(choice));
-    this.dispatchEvent(new CustomEvent("lookupSelect", { detail: { value: choice } }));
-    this.#result = choice;
-    this.#resolve(choice);
-    this.#finalize();
-  }
-
   /** hide dialog and cancel (reject) promise */
   #cancel() {
     this.#reject("canceled");
@@ -179,14 +161,60 @@ export class Lookup extends AzosElement {
     this.dialog.hidePopover();
   }
 
+  #attachToDOM() {
+    if (this.isConnected) return;
+    const arena = window.ARENA;
+    arena.shadowRoot.appendChild(this);
+    this.update();
+  }
+
+  #positionPopover() {
+    const owner = this.owner;
+    const dialog = this.dialog;
+
+    if (!this.isOpen || !owner || !dialog) return;
+
+    const ownerRect = owner.getBoundingClientRect();
+    const dialogRect = dialog.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let top = ownerRect.bottom;
+    let left = ownerRect.left;
+
+    console.log(ownerRect, dialogRect, viewportWidth, viewportHeight, top, left, owner.offsetTop, owner.offsetLeft, owner.offsetHeight);
+
+    if (left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
+    if (top + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
+
+    dialog.style.top = `${top}px`;
+    dialog.style.left = `${left}px`;
+  }
+
+  /**
+   * Selects a choice and resolves (resolve) promise
+   * @param {any} choice the selection from among {@link #results}
+   */
+  _select(choice) {
+    isTrue(this.results.includes(choice));
+    let gvc = 0;
+    this.#result = choice;
+    this.#resolve(choice);
+    this.dispatchEvent(new CustomEvent("lookupSelect", { detail: { get value() { gvc++; return choice; } } }));
+    if (gvc === 0 && this.owner) this.owner.value = choice[0];
+    this.#finalize();
+  }
+
   feed(data, ctx) {
     if (ctx) this.#source.ctx = ctx;
     if (!isString(data)) return;
-    if (data.length < 1) return;
+    if (this.minChars && data.length <= this.minChars) return;
 
     if (!this.isConnected) this.#attachToDOM();
     if (!this.isOpen) this.open();
     this.results = this.#source.getFilteredResults(`*${data}*`);
+    this.update();
+    if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
 
   /**
@@ -200,18 +228,18 @@ export class Lookup extends AzosElement {
       this.#reject = rej;
     }).catch(e => this.writeLog("Info", e));
 
-    this.update();//sync update dom build
-
     const msg = `Lookup does not have an owner.`;
     if (!this.owner) this.writeLog("Warning", msg, new AzosError(msg));
 
     this.dialog.showPopover();
-    this.focusedResultElm = this.resultElms[0] ?? null;
 
-    this.requestUpdate();
+    this.update();//sync update dom build
+    this.focusedResultElm = this.resultElms[0] ?? null;
 
     return true;
   }
+
+  // updated() { this.#positionPopover(); }
 
   connectedCallback() {
     super.connectedCallback();
@@ -236,8 +264,8 @@ export class Lookup extends AzosElement {
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
-      this.owner ? `left: ${this.owner.offsetLeft}px` : "",
-      this.owner ? `top: ${this.owner.offsetTop + this.owner.offsetHeight}px` : "",
+      this.owner ? `left: ${this.owner.offsetLeft - 0}px` : "",
+      this.owner ? `top: ${this.owner.offsetTop + this.owner.offsetHeight + 0}px` : "",
     ].filter(isNonEmptyString).join(";");
 
     return html`
@@ -268,10 +296,10 @@ export class Lookup extends AzosElement {
   }
 
   renderResultBody(result) {
-    // return html`NOCONTENT`;
+    const [key, value] = result;
     return html`
 <div>
-  <span>${result.street1}, ${result.city}, ${result.state} ${result.zip}</span>
+  <span>${value} (${key})</span>
 </div>
     `;
   }
@@ -312,8 +340,42 @@ export class LookupSource {
     let filtered = this.results;
     try { filtered = this.results.filter(one => this.filterFn(one, pattern), this); }
     catch (e) { console.error(e); }
+    // console.info(`Filtered Results: ${filtered.length}`);
     return filtered;
   }
+}
+
+export class AddressLookup extends Lookup {
+  constructor(owner, source) { super(owner, source); }
+
+  _makeDefaultSource() {
+    return new AddressLookupSource();
+  }
+
+  renderResultBody(result) {
+    return html`
+<div>
+  <span>${result.street1}, ${result.city}, ${result.state} ${result.zip}</span>
+</div>
+    `;
+  }
+}
+
+export class AddressLookupSource extends LookupSource {
+  constructor() {
+    super();
+    this.results = [
+      { street1: "1600 Pennsylvania Ave NW", city: "Washington", state: "DC", zip: "20500" },
+      { street1: "700 Highland Rd", city: "Macedonia", state: "OH", zip: "44056" },
+      { street1: "600 Biscayne Blvd NW", city: "Miami", state: "FL", zip: "33132" },
+      { street1: "2 15th St NW", city: "Washington", state: "DC", zip: "20024" },
+    ];
+  }
+
+  _filterFn = (one, filterPattern) => ["street1", "street2", "city", "state", "zip"]
+    .map(k => one[k])
+    .filter(isNonEmptyString)
+    .some(str => matchPattern(str, filterPattern));
 }
 
 function isWithinParent(elm, parent) {
@@ -336,3 +398,4 @@ function isWithinParent(elm, parent) {
 }
 
 window.customElements.define("az-lookup", Lookup);
+window.customElements.define("az-address-lookup", AddressLookup);
