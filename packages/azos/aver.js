@@ -106,6 +106,17 @@ export function isObject(a) {
 }
 
 /**
+ * Performs strict test for object (not a primitive, array or function)
+ * @param {*} a
+ * @returns null if undefined or null, original object after successful type check, or throws
+ */
+export function isObjectOrNull(a) {
+  if (a === undefined || a === null) return null;
+  if (types.isObject(a)) return a;
+  throw AVERMENT_FAILURE(`isObjectOrNull(${dv(a)})`);
+}
+
+/**
  * Performs strict test for array (not a primitive, object or function)
  * @param {*} a
  * @returns original array after successful type check or throws

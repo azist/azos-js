@@ -461,19 +461,37 @@ export const sliderStyles = css`
 `;
 
 export const lookupStyles = css`
+#pop.hidden{display:none;}
 #pop{
+  margin: 0;
+  position: absolute;
   min-width: 200px;
   max-width: 80vw;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  padding: 0;
+  border: 1px solid #c2c2c2;
+  box-shadow: 1px 4px 10px #585858;
+  border-radius: 10px;
+  border-top-width: 1px;
+  border-top-left-radius: 0;
+  color: #656565;
+
 }
-ul{list-style:none;padding:0;margin:0;}
-li{
+#pop:not(.hasOwner){
+  margin: revert;
+  position: revert;
+}
+ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+li, #pop > span.noResults{
   padding: 0.5em 1em;
 }
 li:focus-visible,
-li:hover,
 li.focused{
   cursor: pointer;
   outline: 0;
@@ -481,5 +499,8 @@ li.focused{
 }
 li+li{
   border-top: 1px solid #eee;
+}
+li:last-child{
+  border-radius: 0 0 6px 6px;
 }
 `;

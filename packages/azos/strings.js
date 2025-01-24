@@ -95,7 +95,7 @@ export function startsWith(str, seg, scase = false, idx = 0) {
  * Returns true if the supplied string matches a specified pattern that can contain multiple char span (*) wildcards and
  *  multiple single-char (?) wildcards.
  *
- * @param {string|null|Array} str the string to match
+ * @param {string|null} str the string to match
  * @param {string|null} pattern the pattern to match
  * @param {string|undefined} wc the wildcard for multiple characters (default: *)
  * @param {string|undefined} wsc the wildcard for a single character (default: ?)
@@ -103,8 +103,6 @@ export function startsWith(str, seg, scase = false, idx = 0) {
  * @returns  {boolean} true if the string matches the given pattern
  */
 export function matchPattern(str, pattern, wc = '*', wsc = '?', senseCase = false) {
-
-  if (types.isArray(str)) return str.some(s => matchPattern(s, pattern, wc, wsc, senseCase));
 
   const snws = isNullOrWhiteSpace(str);
   const pnws = isNullOrWhiteSpace(pattern);
