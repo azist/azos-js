@@ -25,6 +25,7 @@ export class Lookup extends AzosElement {
     source: { type: Object },
     results: { type: Array },
     minChars: { type: Number },
+    debounceMs: { type: Number },
   };
 
   #result;
@@ -39,6 +40,7 @@ export class Lookup extends AzosElement {
   #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
+  #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
 
   get result() { return this.#result; }
   get source() { return this.#source; }
@@ -66,10 +68,11 @@ export class Lookup extends AzosElement {
 
   get dialog() { return this.$("pop"); }
 
-  constructor(owner, source) {
+  constructor(owner, source, { debounceMs } = {}) {
     super();
     this.owner = owner ? isOf(owner, AzosElement) : null;
     this.source = source ? isOf(source, LookupSource) : this._makeDefaultSource();
+    this.debounceMs = debounceMs ?? 200;
   }
 
   _makeDefaultSource() {
@@ -135,6 +138,12 @@ export class Lookup extends AzosElement {
     this.feed(value, ctx);
   }
 
+  #onOwnerBlur() {
+    clearTimeout(this.#debounceTimerRef);
+    // console.log("blurred");
+    if (this.isOpen) this.#cancel();
+  }
+
   #advanceSoftFocus(forward = true) {
     if (!this.resultElms.length) return false;
     const resultElms = this.resultElms;
@@ -155,6 +164,7 @@ export class Lookup extends AzosElement {
 
   /** Clean up after dialog closes */
   #finalize() {
+    clearTimeout(this.#debounceTimerRef);
     this.#promise = null;
     this.#focusedResultElm = null;
     this.update();//sync update dom build
@@ -201,15 +211,28 @@ export class Lookup extends AzosElement {
     this.#result = choice;
     this.#resolve(choice);
     this.dispatchEvent(new CustomEvent("lookupSelect", { detail: { get value() { gvc++; return choice; } } }));
-    if (gvc === 0 && this.owner) this.owner.value = choice[0];
+    // console.log(gvc, choice);
+    if (gvc === 0 && this.owner) this.owner.setValueFromInput(choice[0]);
     this.#finalize();
   }
 
-  feed(data, ctx) {
-    if (ctx) this.#source.ctx = ctx;
-    if (!isString(data)) return;
-    if (this.minChars && data.length <= this.minChars) return;
+  #debounceTimerRef = null;
+  async feed(data, ctx) {
+    if (this.#debounceTimerRef) clearTimeout(this.#debounceTimerRef);
+    if (!data?.length) {
+      if (this.isOpen) this.#cancel();
+      return;
+    }
 
+    if (ctx) this.#source.ctx = ctx;
+    if (!isString(data) || this.minChars && data.length <= this.minChars) return;
+
+    console.info(`beginning debounce`);
+    this.#debounceTimerRef = setTimeout(() => this.#performFilter(data), this.debounceMs);
+  }
+
+  #performFilter(data) {
+    console.info(`debounced`);
     if (!this.isConnected) this.#attachToDOM();
     if (!this.isOpen) this.open();
     this.results = this.#source.getFilteredResults(`*${data}*`);
@@ -246,12 +269,14 @@ export class Lookup extends AzosElement {
     window.document.addEventListener("keydown", this.#bound_onKeydown);
     window.document.addEventListener("click", this.#bound_onDocumentClick);
     this.addEventListener("lookupFeed", this.#bound_onFeed);
+    queueMicrotask(() => this.owner.addEventListener("blur", this.#bound_onOwnerBlur));
   }
 
   disconnectedCallback() {
     window.document.removeEventListener("keydown", this.#bound_onKeydown);
     window.document.removeEventListener("click", this.#bound_onDocumentClick);
     this.removeEventListener("lookupFeed", this.#bound_onFeed);
+    if (this.owner) this.owner.removeEventListener("blur", this.#bound_onOwnerBlur);
     super.disconnectedCallback();
   }
 

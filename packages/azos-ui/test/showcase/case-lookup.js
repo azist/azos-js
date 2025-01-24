@@ -28,7 +28,6 @@ export class CaseLookup extends CaseBase {
   renderControl() {
     return html`
 <h2>Testing az-lookup</h2>
-<az-button id="btnOk" scope="this" title="Whatever, OK?"></az-button>
 <az-text id="tbStreet1" scope="this" title="Street 1" lookupId="lkpAddress" placeholder="Start typing to search"></az-text>
 <az-text id="tbStreet2" scope="this" title="Street 2"></az-text>
 <az-text id="tbCity" scope="this" title="City"></az-text>
