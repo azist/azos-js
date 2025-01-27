@@ -385,9 +385,10 @@ export class TabView extends Control {
    * @param {Tab} tTab the tab class
    * @param {string} title
    * @param {Tab|null} beforeTab
+   * @param {Object|null} data
    * @returns {Tab, Boolean} tuple of the tab and whether it was added or existed previously
    */
-  addTab(tTab, title, beforeTab = null, makeActive = true) {
+  addTab(tTab, title, beforeTab = null, makeActive = true, data = null) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
     isStringOrNull(title);
@@ -397,8 +398,7 @@ export class TabView extends Control {
     let tab;
     if (foundTab) tab = foundTab;
     else {
-      tab = new tTab();
-      tab.title = dflt(title, tTab.name);
+      tab = new tTab(dflt(title, tTab.name), data);
       if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
       this.insertBefore(tab, beforeTab);
     }

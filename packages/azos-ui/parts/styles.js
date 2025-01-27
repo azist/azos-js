@@ -459,3 +459,48 @@ export const sliderStyles = css`
   input[type=range].errorBg::-moz-range-thumb              { background-color: var(--s-error-fg-ctl); }
   input[type=range].errorBg::-webkit-slider-thumb          { background-color: var(--s-error-fg-ctl); }
 `;
+
+export const lookupStyles = css`
+#pop.hidden{display:none;}
+#pop{
+  margin: 0;
+  position: absolute;
+  min-width: 200px;
+  max-width: 80vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 1px solid #c2c2c2;
+  box-shadow: 1px 4px 10px #585858;
+  border-radius: 10px;
+  border-top-width: 1px;
+  border-top-left-radius: 0;
+  color: #656565;
+
+}
+#pop:not(.hasOwner){
+  margin: revert;
+  position: revert;
+}
+ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+li, #pop > span.noResults{
+  padding: 0.5em 1em;
+}
+li:focus-visible,
+li.focused{
+  cursor: pointer;
+  outline: 0;
+  background: #ccc;
+}
+li+li{
+  border-top: 1px solid #eee;
+}
+li:last-child{
+  border-radius: 0 0 6px 6px;
+}
+`;

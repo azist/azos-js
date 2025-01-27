@@ -11,10 +11,13 @@ import { asTypeMoniker,
          VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
          DATA_KIND, asDataKind,
          isAssigned,
-         isString } from "azos/types";
-import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
+  isString,
+  AzosError,
+} from "azos/types";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, matchPattern } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { Lookup, LookupSource } from "./lookup.js";
 
 
 function guardWidth(v, d){
@@ -358,10 +361,36 @@ export class FieldPart extends Part{
 
 
     /** When set, prevents the field from validating upon input change. */
-    noAutoValidate: {type: Boolean, reflect: false}
+    noAutoValidate: { type: Boolean, reflect: false },
+
+    lookupId: { type: String },
+    lookupType: { type: String },
   }
 
+  updated(changedProperties) {
+    if (changedProperties.has("lookupType")) {
+      let results, filterFn;
+      switch (this.lookupType) {
+        case "valueList":
+          results = Object.entries(this.valueList);
+          filterFn = (one, filterPattern) => one.some(str => matchPattern(str, filterPattern));
+          break;
+      }
+      this.lookup = new Lookup(this, new LookupSource(null, results, filterFn));
+    }
 
+    if (changedProperties.has("lookupId") && !this.lookup) {
+      this.lookup = this.parentNode.querySelector(`#${this.lookupId}`);
+
+      if (this.lookup) {
+        this.lookup.owner = this;
+        this.lookupId = null;
+      } else {
+        const err = new AzosError(`Could not find Lookup with id "${this.lookupId}"`);
+        this.writeLog("error", err.message, err);
+      }
+    }
+  }
 
   /** True for field parts which have a preset/pre-defined content area layout by design, for example:
    *  checkboxes, switches, and radios have a pre-determined content area layout */
@@ -407,4 +436,23 @@ export class FieldPart extends Part{
     this.dispatchEvent(evt);
   }
 
+  /** @param {any} value the value to feed to the lookup */
+  _feedLookup(value) {
+    if (!this.lookup) return;
+
+    let gvc = 0; // works, but not guaranteed
+    const evt = new CustomEvent("lookupFeed", { detail: { get value() { gvc++; return value; } }, bubbles: true, cancelable: true });
+    this.lookup.dispatchEvent(evt);
+
+    if (gvc) return;
+
+    console.warn(`'lookupFeed' event handled: ${gvc} time(s)`);
+    this.lookup.feed(value);
+  }
+
+  /** @param {Event} event the `@input` event */
+  onInput(event) { this._feedLookup(event.target.value); }
+
+  /** @param {Event} event the '@click' event */
+  onClick(event) { this._feedLookup(event.target.value); }
 }

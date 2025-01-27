@@ -163,6 +163,35 @@ unit("Aver", function () {
     });
   });
 
+  unit("isObjectOrNull()", function () {
+
+    cs("pass object", function () {
+      let x = {};
+      sut.isObjectOrNull(x);
+    });
+
+    cs("pass null", function () {
+      let x = null;
+      sut.isObjectOrNull(x);
+    });
+
+    cs("pass undefined1", function () {
+      let x = undefined;
+      sut.isObjectOrNull(x);
+    });
+
+    cs("pass undefined2", function () {
+      sut.isObjectOrNull();
+    });
+
+    cs("fail []", function () {
+      sut.throws(function () {
+        let x = [];
+        sut.isObjectOrNull(x);
+      }, "averment failure: isobject");
+    });
+  });
+
   unit("#isArray()", function () {
 
     cs("pass array", function () {

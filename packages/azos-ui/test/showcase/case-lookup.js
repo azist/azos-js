@@ -7,24 +7,34 @@
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
 
-import "../../vcl/lookup/lookup";
+import "../../parts/lookup";
+import "../../parts/button";
 
 export class CaseLookup extends CaseBase {
+  states = JSON.stringify({ MI: "Michigan", OH: "Ohio", FL: "Florida" });
 
-  connectedCallback() {
-    super.connectedCallback();
-  }
 
-  firstUpdated() {
-    super.firstUpdated();
-    this.lookup.show();
-    // setTimeout(() => this.lookup.hide(), 5000);
+  selectAddress(event) {
+    console.log(event);
+    const { street1, street2, city, state, zip } = event.detail.value;
+    this.tbStreet1.setValueFromInput(street1);
+    this.tbStreet2.setValueFromInput(street2);
+    this.tbCity.setValueFromInput(city);
+    this.tbState.setValueFromInput(state);
+    this.tbZip.setValueFromInput(zip);
+    this.requestUpdate();
   }
 
   renderControl() {
     return html`
 <h2>Testing az-lookup</h2>
-<az-lookup id="lookup" scope="this"></az-lookup>
+<az-button id="btnOk" scope="this" title="Whatever, OK?"></az-button>
+<az-text id="tbStreet1" scope="this" title="Street 1" lookupId="lkpAddress" placeholder="Start typing to search"></az-text>
+<az-text id="tbStreet2" scope="this" title="Street 2"></az-text>
+<az-text id="tbCity" scope="this" title="City"></az-text>
+<az-text id="tbState" scope="this" title="State" lookupType="valueList" valueList="${this.states}"></az-text>
+<az-text id="tbZip" scope="this" title="Zip"></az-text>
+<az-address-lookup id="lkpAddress" scope="this" @lookupSelect="${address => this.selectAddress(address)}"></az-address-lookup>
     `;
   }
 }
