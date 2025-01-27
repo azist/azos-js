@@ -4,10 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isArrayOrNull, isObjectOrNull, isOf, isTrue } from "azos/aver";
-import { AzosElement, css, html, parseRank, parseStatus } from "../ui";
+import { isArrayOrNull, isOf, isTrue } from "azos/aver";
+import { AzosElement, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
-import { AzosError, isAssigned, isFunction, isNonEmptyString, isString } from "azos/types";
+import { isAssigned, isFunction, isNonEmptyString, isObject, isString } from "azos/types";
 import { matchPattern } from "azos/strings";
 
 
@@ -18,14 +18,22 @@ import { matchPattern } from "azos/strings";
  *   appropriately
  */
 export class Lookup extends AzosElement {
-  static styles = [lookupStyles, css``];
+  static styles = [lookupStyles];
 
   static properties = {
     owner: { type: Object },
     source: { type: Object },
     results: { type: Array },
     minChars: { type: Number },
+    debounceMs: { type: Number },
   };
+
+  constructor(owner, source, { debounceMs } = {}) {
+    super();
+    this.owner = owner ? isOf(owner, AzosElement) : null;
+    this.source = source ? isOf(source, ValueListLookupSource) : this._makeDefaultSource();
+    this.debounceMs = debounceMs ?? 200;
+  }
 
   #result;
   #source;
@@ -39,6 +47,7 @@ export class Lookup extends AzosElement {
   #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
+  #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
 
   get result() { return this.#result; }
   get source() { return this.#source; }
@@ -66,17 +75,12 @@ export class Lookup extends AzosElement {
 
   get dialog() { return this.$("pop"); }
 
-  constructor(owner, source) {
-    super();
-    this.owner = owner ? isOf(owner, AzosElement) : null;
-    this.source = source ? isOf(source, LookupSource) : this._makeDefaultSource();
-  }
-
   _makeDefaultSource() {
-    return new LookupSource();
+    return new ValueListLookupSource();
   }
 
   #onResultsClick(e) {
+    // console.log(e);
     const selectedResultElm = e.target.closest(".result");
     if (!selectedResultElm) return;
     this.focusedResultElm = selectedResultElm;
@@ -99,8 +103,12 @@ export class Lookup extends AzosElement {
         this.#cancel();
         break;
       case "Tab":
-        if (!this.results.length) return this.#cancel();
-        this.#advanceSoftFocus(!e.shiftKey);
+        if (this.results.length) {
+          this.#advanceSoftFocus(!e.shiftKey);
+        } else {
+          preventDefault = false;
+          if (this.isOpen) this.#cancel();
+        }
         break;
       case "ArrowUp":
         this.#advanceSoftFocus(false);
@@ -122,8 +130,7 @@ export class Lookup extends AzosElement {
   #onDocumentClick(e) {
     if (!this.isOpen) return;
     const target = e.composedPath()[0]; // Account for shadowDOM
-    // console.log(target, this.isOpen);
-    if (isWithinParent(target, this) || isWithinParent(target, this.owner)) {
+    if (isWithinParent(target, this) || (this.owner && isWithinParent(target, this.owner))) {
       e.preventDefault();
       return;
     }
@@ -131,8 +138,13 @@ export class Lookup extends AzosElement {
   }
 
   #onFeed(evt) {
-    const { value, ctx } = evt.detail;
-    this.feed(value, ctx);
+    const { owner, value, ctx } = evt.detail;
+    this.feed(owner, value, ctx);
+  }
+
+  #onOwnerBlur() {
+    clearTimeout(this.#debounceTimerRef);
+    setTimeout(() => { if (this.isOpen) this.#cancel() }, 1000);
   }
 
   #advanceSoftFocus(forward = true) {
@@ -150,20 +162,25 @@ export class Lookup extends AzosElement {
   /** hide dialog and cancel (reject) promise */
   #cancel() {
     this.#reject("canceled");
-    this.#finalize();
+    this.#cleanup();
   }
 
   /** Clean up after dialog closes */
-  #finalize() {
+  #cleanup() {
+    this.#cleanupDebounceTimer();
+    this.owner.removeEventListener("blur", this.#bound_onOwnerBlur);
     this.#promise = null;
     this.#focusedResultElm = null;
     this.update();//sync update dom build
     this.dialog.hidePopover();
   }
 
-  #attachToDOM() {
-    if (this.isConnected) return;
-    const arena = window.ARENA;
+  #cleanupDebounceTimer() {
+    clearTimeout(this.#debounceTimerRef);
+    this.#debounceTimerRef = null;
+  }
+
+  #attachToDOM(arena) {
     arena.shadowRoot.appendChild(this);
     this.update();
   }
@@ -201,18 +218,34 @@ export class Lookup extends AzosElement {
     this.#result = choice;
     this.#resolve(choice);
     this.dispatchEvent(new CustomEvent("lookupSelect", { detail: { get value() { gvc++; return choice; } } }));
-    if (gvc === 0 && this.owner) this.owner.value = choice[0];
-    this.#finalize();
+    // console.log(gvc, choice);
+    if (gvc === 0 && this.owner) this.owner.setValueFromInput(choice[0]);
+    this.#cleanup();
   }
 
-  feed(data, ctx) {
-    if (ctx) this.#source.ctx = ctx;
-    if (!isString(data)) return;
-    if (this.minChars && data.length <= this.minChars) return;
+  #debounceTimerRef = null;
+  async feed(owner, data, ctx) {
+    if (this.#debounceTimerRef) this.#cleanupDebounceTimer();
 
-    if (!this.isConnected) this.#attachToDOM();
-    if (!this.isOpen) this.open();
-    this.results = this.#source.getFilteredResults(`*${data}*`);
+    if (!data?.length && this.isOpen) return this.#cancel();
+
+    if (!this.owner || owner !== this.owner) {
+      this.#cancel();
+      this.owner = isOf(owner, AzosElement);
+      this.owner.addEventListener("blur", this.#bound_onOwnerBlur);
+    }
+
+    if (this.minChars && isString(data) && data.length <= this.minChars) return;
+
+    // console.info(`beginning debounce`);
+    this.#debounceTimerRef = setTimeout(() => this._performFilter(owner, data, ctx), this.debounceMs);
+  }
+
+  async _performFilter(owner, data, ctx) {
+    // console.info(`debounced`);
+    if (!this.isConnected) this.#attachToDOM(owner.arena);
+    if (!this.isOpen) this.open(owner);
+    this.results = await this.#source.getData(data, ctx);
     this.update();
     if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
@@ -221,20 +254,16 @@ export class Lookup extends AzosElement {
    * Shows a Lookup dialog
    * @returns true if dialog was opened; false if it was previously opened
    */
-  open() {
+  open(owner) {
     if (this.isOpen) return false;
     this.#promise = new Promise((res, rej) => {
       this.#resolve = res;
       this.#reject = rej;
     }).catch(e => this.writeLog("Info", e));
 
-    const msg = `Lookup does not have an owner.`;
-    if (!this.owner) this.writeLog("Warning", msg, new AzosError(msg));
+    if (!owner) this.writeLog("Warning", `Lookup does not have an owner.`);
 
     this.dialog.showPopover();
-
-    this.update();//sync update dom build
-    this.focusedResultElm = this.resultElms[0] ?? null;
 
     return true;
   }
@@ -252,6 +281,7 @@ export class Lookup extends AzosElement {
     window.document.removeEventListener("keydown", this.#bound_onKeydown);
     window.document.removeEventListener("click", this.#bound_onDocumentClick);
     this.removeEventListener("lookupFeed", this.#bound_onFeed);
+    if (this.owner) this.owner.removeEventListener("blur", this.#bound_onOwnerBlur);
     super.disconnectedCallback();
   }
 
@@ -295,13 +325,34 @@ export class Lookup extends AzosElement {
     `;
   }
 
+  highlightMatch(text, query) {
+    const regex = new RegExp(`(${query.replaceAll('*', '')})`, "gi");
+    const result = text.replace(regex, `<span class="highlight">$1</span>`);
+    return verbatimHtml(result);
+  }
+
   renderResultBody(result) {
     const [key, value] = result;
     return html`
 <div>
-  <span>${value} (${key})</span>
+  <span>${this.highlightMatch(`${value} (${key})`, this.source.filterPattern)}</span>
 </div>
     `;
+  }
+}
+
+export class DynamicLookupSource {
+  constructor(app) {
+    this.#app = isObject(app);
+  }
+
+  #svc = null;
+  #app = null;
+  get app() { return this.#app; }
+
+  async getData(pattern, ctx) {
+    // this.#svc ??= this.app.linker.resolve(MyDynamicLookupService);
+    return this.#svc.getData(pattern, ctx);
   }
 }
 
@@ -312,59 +363,58 @@ export class Lookup extends AzosElement {
  *   - Extend it to add a service-oriented architecture
  *   -
  */
-export class LookupSource {
+export class ValueListLookupSource extends DynamicLookupSource {
   static DFLT_FILTER_FN = (one, filterPattern) => matchPattern(one, filterPattern);
 
-  #ctx;
-  #results;
-  _filterFn = LookupSource.DFLT_FILTER_FN;
-
-  get ctx() { return this.#ctx; }
-  set ctx(v) { this.#ctx = isObjectOrNull(v) ?? {}; }
-
-  get results() { return this.#results; }
-  set results(v) { this.#results = isArrayOrNull(v) ?? []; }
-
-  get filterFn() { return this._filterFn; }
-  set filterFn(v) { this._filterFn = isFunction(v) ? v : LookupSource.DFLT_FILTER_FN; }
-
-  constructor(ctx, results, filterFn) {
-    this.ctx = ctx;
-    this.results = results;
+  constructor(app, data, filterFn) {
+    super(app); // app is unused.
+    this.data = data;
     this.filterFn = filterFn;
   }
 
-  getFilteredResults(pattern, ctx) {
+  #data;
+  #filterPattern;
+  _filterFn;
+
+  get data() { return this.#data; }
+  set data(v) { this.#data = isArrayOrNull(v) ?? []; }
+
+  get filterPattern() { return this.#filterPattern }
+
+  get filterFn() { return this._filterFn; }
+  set filterFn(v) { this._filterFn = isFunction(v) ? v : ValueListLookupSource.DFLT_FILTER_FN; }
+
+  async getData(pattern, ctx) {
     if (ctx) this.ctx = ctx;
-    pattern = isNonEmptyString(pattern) ? pattern : "*";
-    let filtered = this.results;
-    try { filtered = this.results.filter(one => this.filterFn(one, pattern), this); }
+    pattern = isNonEmptyString(pattern) ? `*${pattern}*` : "*";
+    this.#filterPattern = pattern;
+    let filtered = this.data;
+    try { filtered = this.data.filter(one => this.filterFn(one, pattern), this); }
     catch (e) { console.error(e); }
-    // console.info(`Filtered Results: ${filtered.length}`);
     return filtered;
   }
 }
 
-export class AddressLookup extends Lookup {
+export class XYZAddressLookup extends Lookup {
   constructor(owner, source) { super(owner, source); }
 
   _makeDefaultSource() {
-    return new AddressLookupSource();
+    return new XYZAddressLookupSource();
   }
 
   renderResultBody(result) {
     return html`
 <div>
-  <span>${result.street1}, ${result.city}, ${result.state} ${result.zip}</span>
+  <span>${this.highlightMatch(`${result.street1}, ${result.city}, ${result.state} ${result.zip}`, this.source.filterPattern)}</span>
 </div>
     `;
   }
 }
 
-export class AddressLookupSource extends LookupSource {
+export class XYZAddressLookupSource extends ValueListLookupSource {
   constructor() {
     super();
-    this.results = [
+    this.data = [
       { street1: "1600 Pennsylvania Ave NW", city: "Washington", state: "DC", zip: "20500" },
       { street1: "700 Highland Rd", city: "Macedonia", state: "OH", zip: "44056" },
       { street1: "600 Biscayne Blvd NW", city: "Miami", state: "FL", zip: "33132" },
@@ -379,7 +429,7 @@ export class AddressLookupSource extends LookupSource {
 }
 
 function isWithinParent(elm, parent) {
-  // console.info(elm, parent);
+  console.info(elm, parent);
   let currentElement = elm;
   while (currentElement) {
     if (currentElement === parent) return true;
@@ -398,4 +448,4 @@ function isWithinParent(elm, parent) {
 }
 
 window.customElements.define("az-lookup", Lookup);
-window.customElements.define("az-address-lookup", AddressLookup);
+window.customElements.define("xyz-address-lookup", XYZAddressLookup);
