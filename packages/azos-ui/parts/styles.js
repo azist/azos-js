@@ -477,7 +477,7 @@ export const lookupStyles = css`
   border-top-width: 1px;
   border-top-left-radius: 0;
   color: #656565;
-
+  scrollbar-width: none;
 }
 #pop:not(.hasOwner){
   margin: revert;
@@ -502,5 +502,9 @@ li+li{
 }
 li:last-child{
   border-radius: 0 0 6px 6px;
+}
+.highlight{
+  background-color: var(--vcl-codebox-hi-string-hover);
+  // font-weight: bold;
 }
 `;

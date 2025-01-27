@@ -17,7 +17,7 @@ import { asTypeMoniker,
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, matchPattern } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
-import { Lookup, LookupSource } from "./lookup.js";
+import { Lookup, ValueListLookupSource } from "./lookup.js";
 
 
 function guardWidth(v, d){
@@ -369,14 +369,14 @@ export class FieldPart extends Part{
 
   updated(changedProperties) {
     if (changedProperties.has("lookupType")) {
-      let results, filterFn;
+      let data, filterFn;
       switch (this.lookupType) {
         case "valueList":
-          results = Object.entries(this.valueList);
+          data = Object.entries(this.valueList);
           filterFn = (one, filterPattern) => one.some(str => matchPattern(str, filterPattern));
           break;
       }
-      this.lookup = new Lookup(this, new LookupSource(null, results, filterFn));
+      this.lookup = new Lookup(this, new ValueListLookupSource(this.app, data, filterFn));
     }
 
     if (changedProperties.has("lookupId") && !this.lookup) {
@@ -441,13 +441,20 @@ export class FieldPart extends Part{
     if (!this.lookup) return;
 
     let gvc = 0; // works, but not guaranteed
-    const evt = new CustomEvent("lookupFeed", { detail: { get value() { gvc++; return value; } }, bubbles: true, cancelable: true });
+    const evt = new CustomEvent("lookupFeed", {
+      bubbles: true,
+      cancelable: true,
+      detail: {
+        owner: this,
+        get value() { gvc++; return value; }
+      }
+    });
     this.lookup.dispatchEvent(evt);
 
     if (gvc) return;
 
     console.warn(`'lookupFeed' event handled: ${gvc} time(s)`);
-    this.lookup.feed(value);
+    this.lookup.feed(this, value);
   }
 
   /** @param {Event} event the `@input` event */
