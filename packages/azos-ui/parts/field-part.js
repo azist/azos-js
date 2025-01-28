@@ -12,12 +12,10 @@ import { asTypeMoniker,
          DATA_KIND, asDataKind,
          isAssigned,
   isString,
-  AzosError,
 } from "azos/types";
-import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, matchPattern } from "azos/strings";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
-import { Lookup, ValueListLookupSource } from "./lookup.js";
 
 
 function guardWidth(v, d){
@@ -364,32 +362,6 @@ export class FieldPart extends Part{
     noAutoValidate: { type: Boolean, reflect: false },
 
     lookupId: { type: String },
-    lookupType: { type: String },
-  }
-
-  updated(changedProperties) {
-    if (changedProperties.has("lookupType")) {
-      let data, filterFn;
-      switch (this.lookupType) {
-        case "valueList":
-          data = Object.entries(this.valueList);
-          filterFn = (one, filterPattern) => one.some(str => matchPattern(str, filterPattern));
-          break;
-      }
-      this.lookup = new Lookup(this, new ValueListLookupSource(this.app, data, filterFn));
-    }
-
-    if (changedProperties.has("lookupId") && !this.lookup) {
-      this.lookup = this.parentNode.querySelector(`#${this.lookupId}`);
-
-      if (this.lookup) {
-        this.lookup.owner = this;
-        this.lookupId = null;
-      } else {
-        const err = new AzosError(`Could not find Lookup with id "${this.lookupId}"`);
-        this.writeLog("error", err.message, err);
-      }
-    }
   }
 
   /** True for field parts which have a preset/pre-defined content area layout by design, for example:
@@ -438,9 +410,15 @@ export class FieldPart extends Part{
 
   /** @param {any} value the value to feed to the lookup */
   _feedLookup(value) {
-    if (!this.lookup) return;
+    if (!this.lookupId) return;
 
-    let gvc = 0; // works, but not guaranteed
+    const scope = this.getScopeContext();
+    if (!scope) return;
+
+    const lookup = scope[this.lookupId];
+    if (!lookup) return; // FUTURE: maybe create it here
+
+    let gvc = 0; // check for uses of value prop: works, but not guaranteed
     const evt = new CustomEvent("lookupFeed", {
       bubbles: true,
       cancelable: true,
@@ -449,12 +427,13 @@ export class FieldPart extends Part{
         get value() { gvc++; return value; }
       }
     });
-    this.lookup.dispatchEvent(evt);
+    lookup.dispatchEvent(evt);
 
+    if (evt.defaultPrevented) return;
     if (gvc) return;
 
-    console.warn(`'lookupFeed' event handled: ${gvc} time(s)`);
-    this.lookup.feed(this, value);
+    console.warn(`'lookupFeed' event was not handled--feeding manually`);
+    lookup.feed(this, value);
   }
 
   /** @param {Event} event the `@input` event */
