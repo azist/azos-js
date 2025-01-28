@@ -12,16 +12,18 @@ import "../../parts/button";
 
 export class CaseLookup extends CaseBase {
   states = JSON.stringify({ MI: "Michigan", OH: "Ohio", FL: "Florida" });
+  countries = JSON.stringify({ USA: "United States of America", CA: "Canada", MX: "Mexico", CN: "China" });
 
 
   selectAddress(event) {
     console.log(event.detail.value);
-    const { street1, street2, city, state, zip } = event.detail.value;
+    const { street1, street2, city, state, zip, country } = event.detail.value;
     this.tbStreet1.setValueFromInput(street1);
     this.tbStreet2.setValueFromInput(street2);
     this.tbCity.setValueFromInput(city);
     this.tbState.setValueFromInput(state);
     this.tbZip.setValueFromInput(zip);
+    this.tbCountry.setValueFromInput(country);
     this.requestUpdate();
   }
 
@@ -31,9 +33,11 @@ export class CaseLookup extends CaseBase {
 <az-text id="tbStreet1" scope="this" title="Street 1" lookupId="lkpAddress" placeholder="Start typing to search"></az-text>
 <az-text id="tbStreet2" scope="this" title="Street 2"></az-text>
 <az-text id="tbCity" scope="this" title="City"></az-text>
-<az-text id="tbState" scope="this" title="State" lookupType="valueList" valueList="${this.states}"></az-text>
+<az-text id="tbState" scope="this" title="State" lookupId="lkpFromValueList" valueList="${this.states}"></az-text>
 <az-text id="tbZip" scope="this" title="Zip"></az-text>
+<az-text id="tbCountry" scope="this" title="Country" lookupId="lkpFromValueList" valueList="${this.countries}"></az-text>
 <xyz-address-lookup id="lkpAddress" scope="this" @lookupSelect="${address => this.selectAddress(address)}"></xyz-address-lookup>
+<az-value-list-lookup id="lkpFromValueList" scope="this"></az-value-list-lookup>
     `;
   }
 }
