@@ -4,13 +4,17 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "../../ui";
+import { css, html } from "../../ui";
 import { CaseBase } from "./case-base";
 
 import "../../parts/lookup";
 import "../../parts/button";
 
 export class CaseLookup extends CaseBase {
+  static styles = css`
+:host{display:flex;}
+:host > az-text{min-width:200px;}
+  `;
   states = JSON.stringify({ MI: "Michigan", OH: "Ohio", FL: "Florida" });
   countries = JSON.stringify({ USA: "United States of America", CA: "Canada", MX: "Mexico", CN: "China" });
 
@@ -29,7 +33,7 @@ export class CaseLookup extends CaseBase {
 
   renderControl() {
     return html`
-<h2>Testing az-lookup</h2>
+<!--h2>Testing az-lookup</h2-->
 <az-text id="tbStreet1" scope="this" title="Street 1" lookupId="lkpAddress" placeholder="Start typing to search"></az-text>
 <az-text id="tbStreet2" scope="this" title="Street 2"></az-text>
 <az-text id="tbCity" scope="this" title="City"></az-text>

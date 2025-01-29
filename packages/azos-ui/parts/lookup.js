@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isArrayOrNull, isObjectOrNull, isOf, isTrue } from "azos/aver";
+import { isArrayOrNull, isOf, isTrue } from "azos/aver";
 import { AzosElement, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
 import { isAssigned, isNonEmptyString, isObject, isString } from "azos/types";
@@ -44,6 +44,7 @@ export class Lookup extends AzosElement {
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
   #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
+  #bound_setPopoverPosition = this.#setPopoverPosition.bind(this);
 
   constructor({ debounceMs, } = {}) {
     super();
@@ -59,6 +60,7 @@ export class Lookup extends AzosElement {
    * @param {Object|null} ctx additional filter context
    * @returns {any[]} the results fetched from service or `data` matching pattern and ctx.
    */
+  // eslint-disable-next-line no-unused-vars
   async _getData(pattern, ctx) {
     // return this._ref.myService.fetchData(pattern, ctx);
     return [];
@@ -93,6 +95,7 @@ export class Lookup extends AzosElement {
     this.update();//sync update dom build
     this.dialog.hidePopover();
   }
+
 
   /**
    * Highlight the text based on the query. Wraps matches with span.highlight and returns verbatimHtml.
@@ -133,6 +136,29 @@ export class Lookup extends AzosElement {
   get isOpen() { return isAssigned(this.#promise); }
 
   get dialog() { return this.$("pop"); }
+
+  #setPopoverPosition() {
+    const owner = this.owner;
+    const dialog = this.dialog;
+
+    if (!this.isOpen || !owner || !dialog) return;
+
+    const ownerRect = owner.getBoundingClientRect();
+    const dialogRect = dialog.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let top = ownerRect.bottom;
+    let left = ownerRect.left;
+
+    // console.log(ownerRect, dialogRect, viewportWidth, viewportHeight, top, left, owner.offsetTop, owner.offsetLeft, owner.offsetHeight);
+
+    if (left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
+    if (top + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
+
+    dialog.style.top = `${top}px`;
+    dialog.style.left = `${left}px`;
+  }
 
   #onResultsClick(e) {
     // console.log(e);
@@ -203,7 +229,7 @@ export class Lookup extends AzosElement {
     setTimeout(() => {
       if (this.isOpen) this._cancel()
       this.#teardownOwner();
-    }, 1000);
+    }, this.debounceMs);
   }
 
   #advanceSoftFocus(forward = true) {
@@ -218,37 +244,11 @@ export class Lookup extends AzosElement {
     return true;
   }
 
-  #cleanupDebounceTimer() {
-    clearTimeout(this.#debounceTimerRef);
-    this.#debounceTimerRef = null;
-  }
+  #cleanupDebounceTimer() { this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
 
   #attachToDOM(arena) {
     arena.shadowRoot.appendChild(this);
     this.update();
-  }
-
-  #positionPopover() {
-    const owner = this.owner;
-    const dialog = this.dialog;
-
-    if (!this.isOpen || !owner || !dialog) return;
-
-    const ownerRect = owner.getBoundingClientRect();
-    const dialogRect = dialog.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    let top = ownerRect.bottom;
-    let left = ownerRect.left;
-
-    console.log(ownerRect, dialogRect, viewportWidth, viewportHeight, top, left, owner.offsetTop, owner.offsetLeft, owner.offsetHeight);
-
-    if (left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
-    if (top + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
-
-    dialog.style.top = `${top}px`;
-    dialog.style.left = `${left}px`;
   }
 
   #debounceTimerRef = null;
@@ -283,7 +283,7 @@ export class Lookup extends AzosElement {
   }
 
   async _performFilter(owner, data, ctx) {
-    // console.info(`debounced`);
+    // console.info(`debounced. open: ${this.isOpen}`);
     if (!this.isConnected) this.#attachToDOM(owner.arena);
     if (!this.isOpen) this.open(owner);
     this.results = await this._getData(data, ctx);
@@ -296,6 +296,7 @@ export class Lookup extends AzosElement {
    * @returns true if dialog was opened; false if it was previously opened
    */
   open(owner) {
+    // console.info(`open: ${this.isOpen}`);
     if (this.isOpen) return false;
     this.#result = null;
     this.#promise = new Promise((res, rej) => {
@@ -306,16 +307,18 @@ export class Lookup extends AzosElement {
     if (!owner) this.writeLog("Warning", `Lookup does not have an owner.`);
 
     this.dialog.showPopover();
+    this.update();
+    this.#setPopoverPosition();
 
     return true;
   }
-
-  // updated() { this.#positionPopover(); }
 
   connectedCallback() {
     super.connectedCallback();
     window.document.addEventListener("keydown", this.#bound_onKeydown);
     window.document.addEventListener("click", this.#bound_onDocumentClick);
+    window.addEventListener("resize", this.#bound_setPopoverPosition);
+    window.addEventListener("scroll", this.#bound_setPopoverPosition);
     this.addEventListener("lookupFeed", this.#bound_onFeed);
     if (this._ref !== null) this.link(this._ref);
   }
@@ -323,6 +326,8 @@ export class Lookup extends AzosElement {
   disconnectedCallback() {
     window.document.removeEventListener("keydown", this.#bound_onKeydown);
     window.document.removeEventListener("click", this.#bound_onDocumentClick);
+    window.removeEventListener("resize", this.#bound_setPopoverPosition);
+    window.removeEventListener("scroll", this.#bound_setPopoverPosition);
     this.removeEventListener("lookupFeed", this.#bound_onFeed);
     // This is added to the owner when owner property is set
     this.#teardownOwner();
@@ -338,8 +343,6 @@ export class Lookup extends AzosElement {
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
-      this.owner ? `left: ${this.owner.offsetLeft - 0}px` : "",
-      this.owner ? `top: ${this.owner.offsetTop + this.owner.offsetHeight + 0}px` : "",
     ].filter(isNonEmptyString).join(";");
 
     return html`
@@ -381,6 +384,7 @@ export class Lookup extends AzosElement {
    * @param {any} result a data point from the results
    * @returns html template to render a single result body
    */
+  // eslint-disable-next-line no-unused-vars
   renderResultBody(result) {
     return html`NO CONTENT`;
   }
