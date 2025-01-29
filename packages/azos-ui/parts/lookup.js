@@ -4,10 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isArrayOrNull, isObjectOrNull, isOf, isTrue } from "azos/aver";
+import { isOf, isTrue } from "azos/aver";
 import { AzosElement, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
-import { isAssigned, isNonEmptyString, isObject, isString } from "azos/types";
+import { isAssigned, isNonEmptyString, isString } from "azos/types";
 import { matchPattern } from "azos/strings";
 
 import { ImageRegistry } from "azos/bcl/img-registry";
@@ -44,24 +44,34 @@ export class Lookup extends AzosElement {
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
   #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
+  #bound_setPopoverPosition = this.#setPopoverPosition.bind(this);
+  #searchPattern;
+  get searchPattern() { return this.#searchPattern; }
+  set searchPattern(v) {
+    const oldValue = this.#searchPattern;
+    this.#searchPattern = isNonEmptyString(v) ? `*${v}*` : "*";
+    this.requestUpdate("searchPattern", oldValue);
+  }
+
 
   constructor({ debounceMs, } = {}) {
     super();
     this.debounceMs = debounceMs ?? 200;
   }
 
-  /** connectedCallback links the references; property is protected to allow for override. */
-  _ref = null;
-
   /**
    * Get a list of data matching pattern and context. Override to customize data fetching.
-   * @param {Object|String} pattern the filter criteria
+   * @param {Object|String} searchPattern the filter criteria
    * @param {Object|null} ctx additional filter context
    * @returns {any[]} the results fetched from service or `data` matching pattern and ctx.
    */
-  async _getData(pattern, ctx) {
-    // return this._ref.myService.fetchData(pattern, ctx);
-    return [];
+  // eslint-disable-next-line no-unused-vars
+  async getData(searchPattern, ctx) {
+    if (!this.owner) return null;
+    this.searchPattern = searchPattern;
+
+    return Object.entries(this.#owner.valueList)
+      .filter(kvOne => kvOne.some(one => matchPattern(one, this.searchPattern)));
   }
 
   /**
@@ -70,11 +80,14 @@ export class Lookup extends AzosElement {
    */
   _select(choice) {
     isTrue(this.results.includes(choice));
-    let gvc = 0;
     this.#result = choice;
     this.#resolve(choice);
-    this.dispatchEvent(new CustomEvent("lookupSelect", { detail: { get value() { gvc++; return choice; } } }));
-    if (gvc === 0 && this.owner) this.owner.setValueFromInput(choice[0]);
+    const evt = new CustomEvent("lookupSelect", { detail: { value: choice }, cancelable: true, bubbles: true });
+    this.dispatchEvent(evt);
+
+    if (evt.defaultPrevented) return;
+
+    this.owner.setValueFromInput(choice[0]);
     this._cleanup();
   }
 
@@ -94,14 +107,15 @@ export class Lookup extends AzosElement {
     this.dialog.hidePopover();
   }
 
+
   /**
    * Highlight the text based on the query. Wraps matches with span.highlight and returns verbatimHtml.
    * @param {String} text the text to highlight
-   * @param {String} query the pattern to highlight within the text
+   * @param {String} searchPattern the searchPattern
    * @returns {HTMLTemplateElement|String} the result of highlighting--wrapped in verbatimHtml if wrapping with spans.
    */
-  _highlightMatch(text, query) {
-    const regex = new RegExp(`(${query.replaceAll('*', '')})`, "gi");
+  _highlightMatch(text, searchPattern) {
+    const regex = new RegExp(`(${searchPattern.replaceAll('*', '')})`, "gi");
     const result = text.replace(regex, `<span class="highlight">$1</span>`);
     return verbatimHtml(result);
   }
@@ -133,6 +147,29 @@ export class Lookup extends AzosElement {
   get isOpen() { return isAssigned(this.#promise); }
 
   get dialog() { return this.$("pop"); }
+
+  #setPopoverPosition() {
+    const owner = this.owner;
+    const dialog = this.dialog;
+
+    if (!this.isOpen || !owner || !dialog) return;
+
+    const ownerRect = owner.getBoundingClientRect();
+    const dialogRect = dialog.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let top = ownerRect.bottom;
+    let left = ownerRect.left;
+
+    // console.log(ownerRect, dialogRect, viewportWidth, viewportHeight, top, left, owner.offsetTop, owner.offsetLeft, owner.offsetHeight);
+
+    if (left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
+    if (top + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
+
+    dialog.style.top = `${top}px`;
+    dialog.style.left = `${left}px`;
+  }
 
   #onResultsClick(e) {
     // console.log(e);
@@ -198,12 +235,12 @@ export class Lookup extends AzosElement {
   }
 
   #onOwnerBlur() {
-    console.log("Blurred");
+    // console.log("Blurred");
     clearTimeout(this.#debounceTimerRef);
     setTimeout(() => {
       if (this.isOpen) this._cancel()
       this.#teardownOwner();
-    }, 1000);
+    }, this.debounceMs);
   }
 
   #advanceSoftFocus(forward = true) {
@@ -218,37 +255,11 @@ export class Lookup extends AzosElement {
     return true;
   }
 
-  #cleanupDebounceTimer() {
-    clearTimeout(this.#debounceTimerRef);
-    this.#debounceTimerRef = null;
-  }
+  #cleanupDebounceTimer() { this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
 
   #attachToDOM(arena) {
     arena.shadowRoot.appendChild(this);
     this.update();
-  }
-
-  #positionPopover() {
-    const owner = this.owner;
-    const dialog = this.dialog;
-
-    if (!this.isOpen || !owner || !dialog) return;
-
-    const ownerRect = owner.getBoundingClientRect();
-    const dialogRect = dialog.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    let top = ownerRect.bottom;
-    let left = ownerRect.left;
-
-    console.log(ownerRect, dialogRect, viewportWidth, viewportHeight, top, left, owner.offsetTop, owner.offsetLeft, owner.offsetHeight);
-
-    if (left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
-    if (top + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
-
-    dialog.style.top = `${top}px`;
-    dialog.style.left = `${left}px`;
   }
 
   #debounceTimerRef = null;
@@ -283,10 +294,10 @@ export class Lookup extends AzosElement {
   }
 
   async _performFilter(owner, data, ctx) {
-    // console.info(`debounced`);
+    // console.info(`debounced. open: ${this.isOpen}`);
     if (!this.isConnected) this.#attachToDOM(owner.arena);
     if (!this.isOpen) this.open(owner);
-    this.results = await this._getData(data, ctx);
+    this.results = await this.getData(data, ctx);
     this.update();
     if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
@@ -296,6 +307,7 @@ export class Lookup extends AzosElement {
    * @returns true if dialog was opened; false if it was previously opened
    */
   open(owner) {
+    // console.info(`open: ${this.isOpen}`);
     if (this.isOpen) return false;
     this.#result = null;
     this.#promise = new Promise((res, rej) => {
@@ -306,23 +318,26 @@ export class Lookup extends AzosElement {
     if (!owner) this.writeLog("Warning", `Lookup does not have an owner.`);
 
     this.dialog.showPopover();
+    this.update();
+    this.#setPopoverPosition();
 
     return true;
   }
-
-  // updated() { this.#positionPopover(); }
 
   connectedCallback() {
     super.connectedCallback();
     window.document.addEventListener("keydown", this.#bound_onKeydown);
     window.document.addEventListener("click", this.#bound_onDocumentClick);
+    window.addEventListener("resize", this.#bound_setPopoverPosition);
+    window.addEventListener("scroll", this.#bound_setPopoverPosition);
     this.addEventListener("lookupFeed", this.#bound_onFeed);
-    if (this._ref !== null) this.link(this._ref);
   }
 
   disconnectedCallback() {
     window.document.removeEventListener("keydown", this.#bound_onKeydown);
     window.document.removeEventListener("click", this.#bound_onDocumentClick);
+    window.removeEventListener("resize", this.#bound_setPopoverPosition);
+    window.removeEventListener("scroll", this.#bound_setPopoverPosition);
     this.removeEventListener("lookupFeed", this.#bound_onFeed);
     // This is added to the owner when owner property is set
     this.#teardownOwner();
@@ -338,8 +353,6 @@ export class Lookup extends AzosElement {
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
-      this.owner ? `left: ${this.owner.offsetLeft - 0}px` : "",
-      this.owner ? `top: ${this.owner.offsetTop + this.owner.offsetHeight + 0}px` : "",
     ].filter(isNonEmptyString).join(";");
 
     return html`
@@ -382,60 +395,10 @@ export class Lookup extends AzosElement {
    * @returns html template to render a single result body
    */
   renderResultBody(result) {
-    return html`NO CONTENT`;
-  }
-}
-
-export class StaticDataLookup extends Lookup {
-  constructor({ debounceMs } = {}) { super({ debounceMs }); }
-
-  _filterPattern = "";
-
-  _filterFn(one, filterPattern) { return matchPattern(one, filterPattern); }
-
-  async _getData(pattern, ctx) {
-    if (ctx) this.ctx = ctx;
-    pattern = isNonEmptyString(pattern) ? `*${pattern}*` : "*";
-    this._filterPattern = pattern;
-    let filtered = this.data;
-    try { filtered = this.data.filter(one => this._filterFn(one, pattern), this); }
-    catch (e) { console.error(e); }
-    return filtered;
-  }
-
-  #data;
-
-  get data() { return this.#data; }
-  set data(v) { this.#data = isArrayOrNull(v) ?? []; }
-
-  get filterPattern() { return this._filterPattern }
-
-  renderResultBody(result) {
-    return html`
-<div>
-  <span>${this._highlightMatch(`${result}`, this._filterPattern)}</span>
-</div>
-    `;
-  }
-}
-
-/** This lookup's data is crafted from the valueList property of the owner (anything extending field-part). */
-export class ValueListLookup extends StaticDataLookup {
-  constructor({ debounceMs } = {}) { super({ debounceMs }); }
-
-  _filterFn(one, filterPattern) { return one.some(str => matchPattern(str, filterPattern)); }
-
-  async feed(owner, match, ctx) {
-    isTrue(isObject(owner.valueList));
-    this.data = Object.entries(owner.valueList);
-    super.feed(owner, match, ctx);
-  }
-
-  renderResultBody(result) {
     const [key, value] = result;
     return html`
 <div>
-  <span>${this._highlightMatch(`${value} (${key})`, this._filterPattern)}</span>
+  <span>${this._highlightMatch(`${value} (${key})`, this.searchPattern)}</span>
 </div>
     `;
   }
@@ -446,7 +409,7 @@ export class ValueListLookup extends StaticDataLookup {
  *  NOTE: This could probably be made to be a StaticDataLookup with some formal data make-up
  *    but that's for another day.
  */
-export class XYZAddressLookup extends StaticDataLookup {
+export class XYZAddressLookup extends Lookup {
   constructor({ debounceMs } = {}) {
     super({ debounceMs });
 
@@ -458,20 +421,33 @@ export class XYZAddressLookup extends StaticDataLookup {
     ];
   }
 
-  _ref = { imgRegistry: ImageRegistry };
+  #ref = { imgRegistry: ImageRegistry };
 
-  _filterFn(one, filterPattern) {
-    return ["street1", "street2", "city", "state", "zip"]
-      .map(k => one[k])
-      .filter(isNonEmptyString)
-      .some(str => matchPattern(str, filterPattern));
+  async getData(searchPattern, ctx) {
+    if (ctx) this.ctx = ctx;
+    this.searchPattern = searchPattern;
+    let filtered = this.data;
+
+    try {
+      filtered = this.data.filter(one => ["street1", "street2", "city", "state", "zip"]
+        .map(k => one[k])
+        .filter(isNonEmptyString)
+        .some(str => matchPattern(str, this.searchPattern)));
+    } catch (e) { console.error(e); }
+
+    return filtered;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.link(this.#ref);
   }
 
   renderResultBody(result) {
     return html`
   <div style="display:flex;gap:5px;">
-    <div style="width:16px">${verbatimHtml(this._ref.imgRegistry.resolveSpec("svg://azos.ico.checkmark").produceContent().content)}</div>
-    <span>${this._highlightMatch(`${result.street1}, ${result.city}, ${result.state} ${result.zip}`, this.filterPattern)}</span>
+    <div style="width:16px">${verbatimHtml(this.#ref.imgRegistry.resolveSpec("svg://azos.ico.checkmark").produceContent().content)}</div>
+    <span>${this._highlightMatch(`${result.street1}, ${result.city}, ${result.state} ${result.zip}`, this.searchPattern)}</span>
   </div>
       `;
   }
@@ -497,5 +473,4 @@ function isWithinParent(elm, parent) {
 }
 
 window.customElements.define("az-lookup", Lookup);
-window.customElements.define("az-value-list-lookup", ValueListLookup);
 window.customElements.define("xyz-address-lookup", XYZAddressLookup);

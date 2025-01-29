@@ -464,7 +464,7 @@ export const lookupStyles = css`
 #pop.hidden{display:none;}
 #pop{
   margin: 0;
-  position: absolute;
+  position: fixed;
   min-width: 200px;
   max-width: 80vw;
   max-height: 80vh;
