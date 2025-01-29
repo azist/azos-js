@@ -285,7 +285,7 @@ customElements.define("az-img-registry-browser", ImageRegistryBrowser);
 
 class AzdimgBox extends ModalDialog{
   constructor(arena){ super(arena); }
-  static styles = [ModalDialog.styles, css`az-img-registry-browser{ margin: 1em; width: 60vw; height: 55vh;}`];
+  static styles = [ModalDialog.styles, css`az-img-registry-browser{ margin: 1em; width: 60vw; height: 55vh;overflow-y:scroll;}`];
   renderBody(){ return html`<az-img-registry-browser></az-img-registry-browser>`;}
 }
 window.customElements.define("az-azdimgbox", AzdimgBox);
