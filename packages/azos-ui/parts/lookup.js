@@ -30,6 +30,7 @@ export class Lookup extends AzosElement {
     results: { type: Array },
     minChars: { type: Number },
     debounceMs: { type: Number },
+    dataContext: { type: Object },
   };
 
   #owner = null;
@@ -73,9 +74,7 @@ export class Lookup extends AzosElement {
 
   /**
    * Get a list of data matching pattern and context. Override to customize data fetching.
-   * @param {Object|String} searchPattern the filter criteria
-   * @param {Object|null} ctx additional filter context
-   * @returns {any[]} the results fetched from service or `data` matching pattern and ctx.
+   * @returns {any[]} the results fetched from service
    */
   // eslint-disable-next-line no-unused-vars
   async getData() {
@@ -239,8 +238,8 @@ export class Lookup extends AzosElement {
   }
 
   #onFeed(evt) {
-    const { owner, value, ctx } = evt.detail;
-    this.feed(owner, value, ctx);
+    const { owner, value } = evt.detail;
+    this.feed(owner, value);
   }
 
   #onOwnerBlur() {
