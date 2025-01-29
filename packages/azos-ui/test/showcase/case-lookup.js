@@ -20,6 +20,7 @@ export class CaseLookup extends CaseBase {
 
 
   selectAddress(event) {
+    if (event.cancelable) event.preventDefault();
     console.log(event.detail.value);
     const { street1, street2, city, state, zip, country } = event.detail.value;
     this.tbStreet1.setValueFromInput(street1);
@@ -41,7 +42,7 @@ export class CaseLookup extends CaseBase {
 <az-text id="tbZip" scope="this" title="Zip"></az-text>
 <az-text id="tbCountry" scope="this" title="Country" lookupId="lkpFromValueList" valueList="${this.countries}"></az-text>
 <xyz-address-lookup id="lkpAddress" scope="this" @lookupSelect="${address => this.selectAddress(address)}"></xyz-address-lookup>
-<az-value-list-lookup id="lkpFromValueList" scope="this"></az-value-list-lookup>
+<az-lookup id="lkpFromValueList" scope="this"></az-lookup>
     `;
   }
 }
