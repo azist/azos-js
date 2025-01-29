@@ -19,7 +19,7 @@ import { ImageRegistry } from "azos/bcl/img-registry";
  * Create an instance of a lookup and associate it with your field (az-text, etc). The Lookup receives the triggers and responds
  *   appropriately
  *
- * {@link Lookup.feed} a Lookup an owner, data, and context to open a dialog attached to the owner presenting a list of
+ * {@link Lookup.feed} a Lookup an owner searchPattern to open a popover attached to the owner presenting a list of
  *  results. The results can be scrolled via shift/tab and arrow keys, selected with enter, and canceled with escape.
  */
 export class Lookup extends AzosElement {
@@ -30,6 +30,7 @@ export class Lookup extends AzosElement {
     results: { type: Array },
     minChars: { type: Number },
     debounceMs: { type: Number },
+    dataContext: { type: Object },
   };
 
   #owner = null;
@@ -73,9 +74,7 @@ export class Lookup extends AzosElement {
 
   /**
    * Get a list of data matching pattern and context. Override to customize data fetching.
-   * @param {Object|String} searchPattern the filter criteria
-   * @param {Object|null} ctx additional filter context
-   * @returns {any[]} the results fetched from service or `data` matching pattern and ctx.
+   * @returns {any[]} the results fetched from service
    */
   // eslint-disable-next-line no-unused-vars
   async getData() {
@@ -239,8 +238,8 @@ export class Lookup extends AzosElement {
   }
 
   #onFeed(evt) {
-    const { owner, value, ctx } = evt.detail;
-    this.feed(owner, value, ctx);
+    const { owner, value } = evt.detail;
+    this.feed(owner, value);
   }
 
   #onOwnerBlur() {
@@ -302,9 +301,9 @@ export class Lookup extends AzosElement {
     this.#owner.removeEventListener("blur", this.#bound_onOwnerBlur);
   }
 
-  async _performFilter(data) {
+  async _performFilter(searchPattern) {
     if (!this.isOpen) this.open();
-    this.results = await this.prepareAndGetData(data);
+    this.results = await this.prepareAndGetData(searchPattern);
     this.update();
     if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
@@ -408,11 +407,6 @@ export class Lookup extends AzosElement {
   }
 }
 
-/**
- * A clone of ValueList lookup but settings its own data in constructor for testing purposes.
- *  NOTE: This could probably be made to be a StaticDataLookup with some formal data make-up
- *    but that's for another day.
- */
 export class XYZAddressLookup extends Lookup {
   constructor({ debounceMs } = {}) {
     super({ debounceMs });
