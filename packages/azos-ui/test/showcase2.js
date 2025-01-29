@@ -141,11 +141,11 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
 <h1 id="toc">Table of Contents</h1>
 <ol>${this.tocSections.map(section => html`<li> <a href="" @click="${e => this.#btnScrollSectionIntoView(e, section.id)}"> ${section.label} </a></li>`)}</ol>
 <div id="content">
-  <div id="LookupContent"> <az-case-lookup></az-case-lookup> </div>
   <div id="ButtonsContent"> <az-case-buttons></az-case-buttons> </div>
   <div id="TextFieldsContent"> <az-case-text-fields schema="ShowCase.Long.TextFields"></az-case-text-fields> </div>
   <div id="InputTestsContent"> <az-case-input-tests></az-case-input-tests> </div>
   <div id="CheckboxesContent"> <az-case-checkboxes></az-case-checkboxes> </div>
+  <div id="LookupContent"> <az-case-lookup></az-case-lookup> </div>
   <div id="SwitchesContent"> <az-case-switches></az-case-switches> </div>
   <div id="RadiosContent"> <az-case-radios></az-case-radios> </div>
   <div id="SelectsContent"> <az-case-selects></az-case-selects> </div>
@@ -163,7 +163,8 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
 
   renderTabbed() {
     return html`
-<az-tab-view activeTabIndex=12>
+<az-tab-view activeTabIndex=0>
+  <az-tab title="Lookup"> <az-case-lookup></az-case-lookup> </az-tab>
   <az-tab title="Buttons"> <az-case-buttons></az-case-buttons> </az-tab>
   <az-tab title="Text Fields"> <az-case-text-fields></az-case-text-fields> </az-tab>
   <az-tab title="Input Tests"> <az-case-input-tests></az-case-input-tests> </az-tab>
@@ -199,7 +200,8 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   </div>
 
   <div class="strip-h" style="flex:1;height:100%">
-    <az-slide-deck id="slideDeck" scope="this" autoTransitionInterval="0" ?loop=${this.loop?.value} activeSlideIndex=12 style="width:100%;text-align:center;border:1px solid">
+    <az-slide-deck id="slideDeck" scope="this" autoTransitionInterval="0" ?loop=${this.loop?.value} activeSlideIndex=0 style="width:100%;text-align:center;border:1px solid">
+      <az-slide id="LookupContent"> <az-case-lookup></az-case-lookup> </az-slide>
       <az-slide id="ButtonsContent"> <az-case-buttons></az-case-buttons> </az-slide>
       <az-slide id="TextFieldsContent"> <az-case-text-fields></az-case-text-fields> </az-slide>
       <az-slide id="InputTestsContent"> <az-case-input-tests></az-case-input-tests> </az-slide>
