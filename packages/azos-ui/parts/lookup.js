@@ -84,11 +84,11 @@ export class Lookup extends AzosElement {
     this.#resolve(choice);
     const evt = new CustomEvent("lookupSelect", { detail: { value: choice }, cancelable: true, bubbles: true });
     this.dispatchEvent(evt);
+    this._cleanup();
 
     if (evt.defaultPrevented) return;
 
     this.owner.setValueFromInput(choice[0]);
-    this._cleanup();
   }
 
   /** hide dialog and reject shownPromise */
@@ -106,7 +106,6 @@ export class Lookup extends AzosElement {
     this.update();//sync update dom build
     this.dialog.hidePopover();
   }
-
 
   /**
    * Highlight the text based on the query. Wraps matches with span.highlight and returns verbatimHtml.
@@ -162,10 +161,12 @@ export class Lookup extends AzosElement {
     let top = ownerRect.bottom;
     let left = ownerRect.left;
 
-    // console.log(ownerRect, dialogRect, viewportWidth, viewportHeight, top, left, owner.offsetTop, owner.offsetLeft, owner.offsetHeight);
-
-    if (left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
-    if (top + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
+    if (ownerRect.right < 0 || ownerRect.left > viewportWidth || ownerRect.top < 0 || ownerRect.top > viewportHeight) {
+      this._cancel();
+      return;
+    }
+    if (ownerRect.left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
+    if (ownerRect.bottom + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
 
     dialog.style.top = `${top}px`;
     dialog.style.left = `${left}px`;
