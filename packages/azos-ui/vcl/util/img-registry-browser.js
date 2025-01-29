@@ -292,7 +292,7 @@ window.customElements.define("az-azdimgbox", AzdimgBox);
 
 /** Provides Image browser popup for debugging */
 export async function azdimg(arena = null){
-  arena = arena ?? window.ARENA;
+  arena = arena ?? window.ARENA; // WARNING: NEVER EVER use window.ARENA reference, here it is used because this is a dev-only hack
   isOf(arena, Arena);
   const box = new AzdimgBox(arena);
   box.title = "Image Registry Viewer";
