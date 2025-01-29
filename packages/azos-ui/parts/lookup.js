@@ -45,6 +45,7 @@ export class Lookup extends AzosElement {
   #bound_onFeed = this.#onFeed.bind(this);
   #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
   #bound_setPopoverPosition = this.#setPopoverPosition.bind(this);
+
   #searchPattern;
   get searchPattern() { return this.#searchPattern; }
   set searchPattern(v) {
@@ -59,6 +60,17 @@ export class Lookup extends AzosElement {
     this.debounceMs = debounceMs ?? 200;
   }
 
+  async prepareAndGetData(searchPattern) {
+    if (!this.owner) return null;
+    this.searchPattern = searchPattern;
+    this.prepareDataContext(searchPattern);
+    return await this.getData();
+  }
+
+  prepareDataContext(searchPattern) {
+    this.dispatchEvent(new CustomEvent("prepareDataContext", { detail: { searchPattern }, bubbles: false, cancelable: false }));
+  }
+
   /**
    * Get a list of data matching pattern and context. Override to customize data fetching.
    * @param {Object|String} searchPattern the filter criteria
@@ -66,12 +78,8 @@ export class Lookup extends AzosElement {
    * @returns {any[]} the results fetched from service or `data` matching pattern and ctx.
    */
   // eslint-disable-next-line no-unused-vars
-  async getData(searchPattern, ctx) {
-    if (!this.owner) return null;
-    this.searchPattern = searchPattern;
-
-    return Object.entries(this.#owner.valueList)
-      .filter(kvOne => kvOne.some(one => matchPattern(one, this.searchPattern)));
+  async getData() {
+    return Object.entries(this.#owner.valueList).filter(kvOne => kvOne.some(one => matchPattern(one, this.searchPattern)));
   }
 
   /**
@@ -154,19 +162,19 @@ export class Lookup extends AzosElement {
     if (!this.isOpen || !owner || !dialog) return;
 
     const ownerRect = owner.getBoundingClientRect();
-    const dialogRect = dialog.getBoundingClientRect();
+    const popoverRect = dialog.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
     let top = ownerRect.bottom;
     let left = ownerRect.left;
 
-    if (ownerRect.right < 0 || ownerRect.left > viewportWidth || ownerRect.top < 0 || ownerRect.top > viewportHeight) {
-      this._cancel();
-      return;
-    }
-    if (ownerRect.left + dialogRect.width > viewportWidth) left = viewportWidth - dialogRect.width;
-    if (ownerRect.bottom + dialogRect.height > viewportHeight) top = ownerRect.top - dialogRect.height;
+    if (ownerRect.right < 0 || ownerRect.left > viewportWidth || ownerRect.top < 0 || ownerRect.top > viewportHeight)
+      return this._cancel();
+
+    if (ownerRect.left + popoverRect.width > viewportWidth)
+      left = viewportWidth - popoverRect.width;
+    if (ownerRect.bottom + popoverRect.height > viewportHeight) top = ownerRect.top - popoverRect.height;
 
     dialog.style.top = `${top}px`;
     dialog.style.left = `${left}px`;
@@ -264,21 +272,21 @@ export class Lookup extends AzosElement {
   }
 
   #debounceTimerRef = null;
-  async feed(owner, data, ctx) {
+  async feed(owner, searchPattern) {
     if (this.#debounceTimerRef) this.#cleanupDebounceTimer();
 
-    if (!data?.length && this.isOpen) return this._cancel();
+    if (!searchPattern?.length && this.isOpen) return this._cancel();
 
     if (!this.owner || owner !== this.owner) {
       if (this.isOpen) this._cancel();
       this.owner = owner;
+      this.#setupOwner();
     }
 
-    if (this.minChars && isString(data) && data.length <= this.minChars) return;
-    this.#setupOwner();
+    if (this.minChars && isString(searchPattern) && searchPattern.length <= this.minChars) return;
 
     // console.info(`beginning debounce`);
-    this.#debounceTimerRef = setTimeout(() => this._performFilter(owner, data, ctx), this.debounceMs);
+    this.#debounceTimerRef = setTimeout(() => this._performFilter(searchPattern), this.debounceMs);
   }
 
   #ownerSetup = false;
@@ -294,11 +302,9 @@ export class Lookup extends AzosElement {
     this.#owner.removeEventListener("blur", this.#bound_onOwnerBlur);
   }
 
-  async _performFilter(owner, data, ctx) {
-    // console.info(`debounced. open: ${this.isOpen}`);
-    if (!this.isConnected) this.#attachToDOM(owner.arena);
-    if (!this.isOpen) this.open(owner);
-    this.results = await this.getData(data, ctx);
+  async _performFilter(data) {
+    if (!this.isOpen) this.open();
+    this.results = await this.prepareAndGetData(data);
     this.update();
     if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
@@ -307,16 +313,13 @@ export class Lookup extends AzosElement {
    * Shows a Lookup dialog
    * @returns true if dialog was opened; false if it was previously opened
    */
-  open(owner) {
-    // console.info(`open: ${this.isOpen}`);
+  open() {
     if (this.isOpen) return false;
     this.#result = null;
     this.#promise = new Promise((res, rej) => {
       this.#resolve = res;
       this.#reject = rej;
     }).catch(e => this.writeLog("Info", e));
-
-    if (!owner) this.writeLog("Warning", `Lookup does not have an owner.`);
 
     this.dialog.showPopover();
     this.update();
@@ -424,9 +427,7 @@ export class XYZAddressLookup extends Lookup {
 
   #ref = { imgRegistry: ImageRegistry };
 
-  async getData(searchPattern, ctx) {
-    if (ctx) this.ctx = ctx;
-    this.searchPattern = searchPattern;
+  async getData() {
     let filtered = this.data;
 
     try {
