@@ -26,68 +26,33 @@ export class Lookup extends AzosElement {
   static styles = [lookupStyles];
 
   static properties = {
+    dataContext: { type: Object },
+    debounceMs: { type: Number },
+    minChars: { type: Number },
     owner: { type: Object },
     results: { type: Array },
-    minChars: { type: Number },
-    debounceMs: { type: Number },
-    dataContext: { type: Object },
     searchPattern: { type: String },
   };
 
-  #owner = null;
-  #result;
+  #debounceTimerRef = null;
   #focusedResultElm;
+  #owner = null;
+  #ownerSetup = false;
+  #result;
 
   #promise;
   #resolve;
   #reject;
 
-  #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
   #bound_onFeed = this.#onFeed.bind(this);
+  #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
   #bound_setPopoverPosition = this.#setPopoverPosition.bind(this);
-
 
   constructor({ debounceMs, } = {}) {
     super();
     this.debounceMs = debounceMs ?? 300;
-  }
-
-  async prepareAndGetData(searchPattern) {
-    if (!this.owner) return null;
-    this.searchPattern = searchPattern;
-    this.prepareDataContext(searchPattern);
-    return await this.getData();
-  }
-
-  prepareDataContext(searchPattern) {
-    this.dispatchEvent(new CustomEvent("prepareDataContext", { detail: { searchPattern }, bubbles: false, cancelable: false }));
-  }
-
-  /**
-   * Get a list of data matching pattern and context. Override to customize data fetching.
-   * @returns {any[]} the results fetched from service
-   */
-  async getData() {
-    return Object.entries(this.owner.valueList).filter(kvOne => kvOne.some(one => matchPattern(one, this.searchPattern)));
-  }
-
-  /**
-   * Selects a choice and resolves shownPromise
-   * @param {any} choice the selection from among {@link #results}
-   */
-  _select(choice) {
-    isTrue(this.results.includes(choice));
-    this.#result = choice;
-    this.#resolve(choice);
-    const evt = new CustomEvent("lookupSelect", { detail: { value: choice }, cancelable: true, bubbles: true });
-    this.dispatchEvent(evt);
-    this._cleanup();
-
-    if (evt.defaultPrevented) return;
-
-    this.owner.setValueFromInput(choice[0]);
   }
 
   /** hide dialog and reject shownPromise */
@@ -102,10 +67,17 @@ export class Lookup extends AzosElement {
     this.#teardownOwner();
     this.#promise = null;
     this.#focusedResultElm = null;
-    this.#owner = null;
     this.searchPattern = "";
     this.update();//sync update dom build
     this.popover.hidePopover();
+  }
+
+  /** The debounced method to prepareAndGetData */
+  async _debouncedFeed(searchPattern) {
+    this.open();
+    this.results = await this.prepareAndGetData(searchPattern);
+    this.update();
+    if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
 
   /**
@@ -120,19 +92,21 @@ export class Lookup extends AzosElement {
     return verbatimHtml(result);
   }
 
-  get owner() { return this.#owner; }
-  set owner(v) {
-    isOf(v, AzosElement);
-    const oldValue = this.#owner;
-    this.#owner = v;
-    this.requestUpdate("owner", oldValue);
+  /**
+   * Selects a choice and resolves shownPromise
+   * @param {any} choice the selection from among {@link #results}
+   */
+  _select(choice) {
+    isTrue(this.results.includes(choice));
+    this.#result = choice;
+    this.#resolve(choice);
+    const evt = new CustomEvent("lookupSelect", { detail: { value: choice }, cancelable: true, bubbles: true });
+    this.dispatchEvent(evt);
+
+    if (!evt.defaultPrevented) this.owner.setValueFromInput(choice[0]);
+
+    this._cleanup();
   }
-
-  get result() { return this.#result; }
-
-  get selectedResult() { return this.results[this.focusedResultElmIndex] ?? null; }
-
-  get resultElms() { return [...this.shadowRoot.querySelectorAll(".result")]; }
 
   get focusedResultElm() { return this.#focusedResultElm; }
   set focusedResultElm(v) {
@@ -143,49 +117,53 @@ export class Lookup extends AzosElement {
 
   get focusedResultElmIndex() { return this.resultElms.indexOf(this.focusedResultElm); }
 
-  get shownPromise() { return this.#promise; }
-  get isOpen() { return isAssigned(this.#promise); }
+  get owner() { return this.#owner; }
+  set owner(v) {
+    isOf(v, AzosElement);
+    const oldValue = this.#owner;
+    this.#owner = v;
+    this.requestUpdate("owner", oldValue);
+  }
 
   get popover() { return this.$("pop"); }
 
-  #setPopoverPosition() {
-    const owner = this.owner;
-    const popover = this.popover;
+  get result() { return this.#result; }
+  get selectedResult() { return this.results[this.focusedResultElmIndex] ?? null; }
 
-    if (!this.isOpen || !owner || !popover) return;
+  get resultElms() { return [...this.shadowRoot.querySelectorAll(".result")]; }
 
-    const ownerRect = owner.getBoundingClientRect();
-    const popoverRect = popover.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
 
-    let top = ownerRect.bottom;
-    let left = ownerRect.left;
+  get shownPromise() { return this.#promise; }
+  get isOpen() { return isAssigned(this.#promise); }
 
-    if (ownerRect.right < 0 || ownerRect.left > viewportWidth || ownerRect.top < 0 || ownerRect.top > viewportHeight)
-      return this._cancel();
-
-    if (ownerRect.left + popoverRect.width > viewportWidth)
-      left = viewportWidth - popoverRect.width;
-    if (ownerRect.bottom + popoverRect.height > viewportHeight) top = ownerRect.top - popoverRect.height;
-
-    popover.style.top = `${top}px`;
-    popover.style.left = `${left}px`;
+  #advanceSoftFocus(forward = true) {
+    if (!this.resultElms.length) return false;
+    const resultElms = this.resultElms;
+    let nextIndex;
+    if (forward)
+      nextIndex = (this.focusedResultElmIndex + 1) % resultElms.length;
+    else
+      nextIndex = (this.focusedResultElmIndex - 1 + resultElms.length) % resultElms.length;
+    this.focusedResultElm = resultElms[nextIndex] ?? null;
+    return true;
   }
 
-  #onResultsClick(evt) {
-    // console.log(evt);
-    const selectedResultElm = evt.target.closest(".result");
-    if (!selectedResultElm) return;
-    this.focusedResultElm = selectedResultElm;
-    this._select(this.selectedResult);
+  #cleanupDebounceTimer() { this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
+
+  #onDocumentClick(evt) {
+    if (!this.isOpen) return;
+    const target = evt.composedPath()[0]; // Account for shadowDOM
+    if (isWithinParent(target, this) || (this.owner && isWithinParent(target, this.owner))) {
+      evt.preventDefault();
+      return;
+    }
+    this._cancel();
+  }
+
+  #onFeed(evt) {
     evt.preventDefault();
-  }
-
-  #onMouseOver(evt) {
-    const resultElm = evt.target.closest(".result");
-    if (!resultElm) return;
-    this.focusedResultElm = resultElm;
+    const { owner, value } = evt.detail;
+    this.feed(owner, value);
   }
 
   #onKeydown(evt) {
@@ -221,19 +199,10 @@ export class Lookup extends AzosElement {
     if (preventDefault) evt.preventDefault();
   }
 
-  #onDocumentClick(evt) {
-    if (!this.isOpen) return;
-    const target = evt.composedPath()[0]; // Account for shadowDOM
-    if (isWithinParent(target, this) || (this.owner && isWithinParent(target, this.owner))) {
-      evt.preventDefault();
-      return;
-    }
-    this._cancel();
-  }
-
-  #onFeed(evt) {
-    const { owner, value } = evt.detail;
-    this.feed(owner, value);
+  #onMouseOver(evt) {
+    const resultElm = evt.target.closest(".result");
+    if (!resultElm) return;
+    this.focusedResultElm = resultElm;
   }
 
   #onOwnerBlur() {
@@ -245,40 +214,40 @@ export class Lookup extends AzosElement {
     }, this.debounceMs);
   }
 
-  #advanceSoftFocus(forward = true) {
-    if (!this.resultElms.length) return false;
-    const resultElms = this.resultElms;
-    let nextIndex;
-    if (forward)
-      nextIndex = (this.focusedResultElmIndex + 1) % resultElms.length;
-    else
-      nextIndex = (this.focusedResultElmIndex - 1 + resultElms.length) % resultElms.length;
-    this.focusedResultElm = resultElms[nextIndex] ?? null;
-    return true;
+  #onResultsClick(evt) {
+    // console.log(evt);
+    const selectedResultElm = evt.target.closest(".result");
+    if (!selectedResultElm) return;
+    this.focusedResultElm = selectedResultElm;
+    this._select(this.selectedResult);
+    evt.preventDefault();
   }
 
-  #cleanupDebounceTimer() { this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
+  #setPopoverPosition() {
+    const owner = this.owner;
+    const popover = this.popover;
 
-  #debounceTimerRef = null;
-  async feed(owner, searchPattern) {
-    if (this.#debounceTimerRef) this.#cleanupDebounceTimer();
-    if (searchPattern === this.searchPattern) return;
+    if (!this.isOpen || !owner || !popover) return;
 
-    if (!searchPattern?.length && this.isOpen) return this._cancel();
+    const ownerRect = owner.getBoundingClientRect();
+    const popoverRect = popover.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
-    if (!this.owner || owner !== this.owner) {
-      if (this.isOpen) this._cancel();
-      this.owner = owner;
-      this.#setupOwner();
-    }
+    let top = ownerRect.bottom;
+    let left = ownerRect.left;
 
-    if (this.minChars && isString(searchPattern) && searchPattern.length <= this.minChars) return;
+    if (ownerRect.right < 0 || ownerRect.left > viewportWidth || ownerRect.top < 0 || ownerRect.top > viewportHeight)
+      return this._cancel();
 
-    // console.info(`beginning debounce`);
-    this.#debounceTimerRef = setTimeout(() => this._performFilter(searchPattern), this.debounceMs);
+    if (ownerRect.left + popoverRect.width > viewportWidth)
+      left = viewportWidth - popoverRect.width;
+    if (ownerRect.bottom + popoverRect.height > viewportHeight) top = ownerRect.top - popoverRect.height;
+
+    popover.style.top = `${top}px`;
+    popover.style.left = `${left}px`;
   }
 
-  #ownerSetup = false;
   #setupOwner() {
     if (this.#ownerSetup) return;
     this.#ownerSetup = true;
@@ -289,13 +258,45 @@ export class Lookup extends AzosElement {
     if (!this.#ownerSetup) return;
     this.#ownerSetup = false;
     this.#owner.removeEventListener("blur", this.#bound_onOwnerBlur);
+    this.#owner = null;
   }
 
-  async _performFilter(searchPattern) {
-    if (!this.isOpen) this.open();
-    this.results = await this.prepareAndGetData(searchPattern);
-    this.update();
-    if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
+  async feed(owner, searchPattern) {
+    if (this.#debounceTimerRef) this.#cleanupDebounceTimer();
+    if (searchPattern === this.searchPattern) return;
+
+    if (!searchPattern?.length && this.isOpen) return this._cancel();
+
+    if (this.minChars && isString(searchPattern) && searchPattern.length <= this.minChars) return;
+
+    if (!this.owner || owner !== this.owner) {
+      if (this.isOpen) this._cancel();
+      this.#teardownOwner();
+      this.owner = owner;
+      this.#setupOwner();
+    }
+
+    this.searchPattern = searchPattern;
+    this.#debounceTimerRef = setTimeout(() => this._debouncedFeed(searchPattern), this.debounceMs);
+  }
+
+  async prepareAndGetData(searchPattern) {
+    if (!this.owner) return null;
+    this.prepareDataContext(searchPattern);
+    return await this.getData();
+  }
+
+  prepareDataContext(searchPattern) {
+    this.dispatchEvent(new CustomEvent("prepareDataContext", { detail: { searchPattern }, bubbles: false, cancelable: false }));
+  }
+
+  /**
+   * Get a list of data matching pattern and context. Override to customize data fetching.
+   * @returns {any[]} the results fetched from service
+   */
+  async getData() {
+    const searchPattern = `*${this.searchPattern}*`;
+    return Object.entries(this.owner.valueList).filter(kvOne => kvOne.some(one => matchPattern(one, searchPattern)));
   }
 
   /**
@@ -412,13 +413,14 @@ export class XYZAddressLookup extends Lookup {
   #ref = { imgRegistry: ImageRegistry };
 
   async getData() {
+    const searchPattern = `*${this.searchPattern}*`;
     let filtered = this.data;
 
     try {
       filtered = this.data.filter(one => ["street1", "street2", "city", "state", "zip"]
         .map(k => one[k])
         .filter(isNonEmptyString)
-        .some(str => matchPattern(str, this.searchPattern)));
+        .some(str => matchPattern(str, searchPattern)));
     } catch (err) { console.error(err); }
 
     return filtered;
