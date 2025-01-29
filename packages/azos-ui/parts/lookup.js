@@ -31,10 +31,10 @@ export class Lookup extends AzosElement {
     minChars: { type: Number },
     debounceMs: { type: Number },
     dataContext: { type: Object },
+    searchPattern: { type: String },
   };
 
   #owner = null;
-  #searchPattern;
   #result;
   #focusedResultElm;
 
@@ -51,7 +51,7 @@ export class Lookup extends AzosElement {
 
   constructor({ debounceMs, } = {}) {
     super();
-    this.debounceMs = debounceMs ?? 200;
+    this.debounceMs = debounceMs ?? 300;
   }
 
   async prepareAndGetData(searchPattern) {
@@ -102,6 +102,8 @@ export class Lookup extends AzosElement {
     this.#teardownOwner();
     this.#promise = null;
     this.#focusedResultElm = null;
+    this.#owner = null;
+    this.searchPattern = "";
     this.update();//sync update dom build
     this.popover.hidePopover();
   }
@@ -124,13 +126,6 @@ export class Lookup extends AzosElement {
     const oldValue = this.#owner;
     this.#owner = v;
     this.requestUpdate("owner", oldValue);
-  }
-
-  get searchPattern() { return this.#searchPattern; }
-  set searchPattern(v) {
-    const oldValue = this.#searchPattern;
-    this.#searchPattern = isNonEmptyString(v) ? `*${v}*` : "*";
-    this.requestUpdate("searchPattern", oldValue);
   }
 
   get result() { return this.#result; }
@@ -264,14 +259,10 @@ export class Lookup extends AzosElement {
 
   #cleanupDebounceTimer() { this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
 
-  #attachToDOM(arena) {
-    arena.shadowRoot.appendChild(this);
-    this.update();
-  }
-
   #debounceTimerRef = null;
   async feed(owner, searchPattern) {
     if (this.#debounceTimerRef) this.#cleanupDebounceTimer();
+    if (searchPattern === this.searchPattern) return;
 
     if (!searchPattern?.length && this.isOpen) return this._cancel();
 
