@@ -42,7 +42,7 @@ export class CaseScheduler extends CaseBase {
             caption: null,//nothing for now
             startTimeMins: span.sta,
             durationMins: span.dur,
-            data: { span: span },
+            data: { span, day },
           });
         }
       }
@@ -74,6 +74,11 @@ export class CaseScheduler extends CaseBase {
     this.schTest.endChanges();
   }
 
+  schOnSelected(evt) {
+    const { selectedItems } = evt.detail;
+    console.log(selectedItems);
+  }
+
   renderControl() {
     return html`
 <h2>Scheduler</h2>
@@ -86,6 +91,7 @@ export class CaseScheduler extends CaseBase {
 </div>
 
 <az-time-block-picker id="schTest" scope="this"
+    @selected="${this.schOnSelected}"
     xenabledStartDate="2024-12-28"
     xenabledEndDate="2025-1-6"
 ></az-time-block-picker>
