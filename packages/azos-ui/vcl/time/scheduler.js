@@ -234,7 +234,7 @@ export class TimeBlockPicker extends Control {
     viewEndDate: { type: Date },
 
     maxSelectedItems: { type: Number },
-    selectedItems: { type: Object },
+    selectedItems: { type: Array },
 
     use24HourTime: { type: Boolean },
     timeViewGranularityMins: { type: Number },
@@ -497,6 +497,8 @@ export class TimeBlockPicker extends Control {
       }
       this.selectedItems.push(item);
     }
+
+    this.dispatchEvent(new CustomEvent("selected", { detail: { selectedItems: this.selectedItems }, cancelable: false, bubbles: true }));
 
     this.requestUpdate();
   }
@@ -766,7 +768,7 @@ export class TimeBlockPicker extends Control {
       iconContent = html`
             <div class="icon">
             ${this.selectedItems.length === 1 ?
-        html`${this.renderImageSpec("svg://azos.ico.checkmark?m=i32")}`
+        html`${this.renderImageSpec("svg://azos.ico.checkmark?m=i32").html}`
           : html`<span>${eventSelectedIndex + 1}</span>`
         }
             </div>`;
