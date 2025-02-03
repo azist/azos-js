@@ -23,39 +23,42 @@ export const DAYS_OF_WEEK = Object.freeze({
 export class TimeBlockPicker extends Control {
 
   static styles = css`
-:host { display: block; margin-top: 1em; margin-bottom: 1em; }
-
+:host{display:block;margin-top:1em;margin-bottom:1em;}
 .nav {
   grid-row: 1;
   grid-column: 2 / span max;
   display: flex;
   align-items: center;
-  gap: 0.25em;
-  margin-bottom: 0.25em;
+  gap: 1ch;
+  margin-bottom: 0.5ch;
 }
+.todayBtn, .viewBtn{
+  margin: 0;
+  padding: 0.5cap;
+  box-sizing: content-box;
+}
+.todayBtn, .todayBtn svg, .viewBtn, .viewBtn svg{
+  height: var(--height);
+  line-height: var(--height);
+}
+.viewBtn.prev svg{margin-left:-0.2ch;margin-right:0.2ch;}
+.viewBtn.next svg{margin-left:0.2ch;margin-right:-0.2ch;}
 .todayBtn {
+  --height: 2.25cap;
   font-size: 0.8em;
   font-weight: bolder;
   display: inline-flex;
   align-items: center;
-  border-radius: 4px;
+  border-radius: 8px;
   color: var(--ink);
   border: 1px solid #ccc;
-  padding: 0.75ch 2ch;
+  padding: 0.75ch 2ch 0.75ch 1.4ch;
+  gap: 0.5ch;
 }
-.todayBtn::before {
-  font-weight: normal;
-  line-height: 1em;
-  padding-right: 0.2em;
-  width: 20px;
-  overflow: hidden;
-}
-.viewing.before.todayBtn::before {content: "🡢";}
-.viewing.after.todayBtn::before { content: "🡠";}
-.viewing.within.todayBtn::before {content: "📅";filter: grayscale(65%);}
 .viewBtn {
-  border-radius: 4px;
-  background-color: var(--paper);
+  --height: 3cap;
+  border-radius: 50%;
+  background-color: hsl(from var(--paper) h s max(calc(l - 10), 10));
   color: var(--ink);
   border: none;
 }
@@ -634,20 +637,35 @@ export class TimeBlockPicker extends Control {
     `;
   }
 
+  renderIcon(rec) {
+    const { html, } = rec;
+
+    const cls = [
+      "icon",
+
+    ].filter(types.isNonEmptyString).join(' ');
+    return html`<i cls="${cls}">${html}</i>`;
+  }
+
   get todaySymbol() {
-    const d = new Date();
-    const today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    if (today < this.viewStartDate) return "after";
-    else if (today > this.viewEndDate) return "before";
-    else return "within";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    console.log({ start: this.viewStartDate, end: this.viewEndDate, today });
+
+    let rec;
+    if (today > this.viewEndDate) rec = this.renderImageSpec("svg://azos.ico.arrowRight");
+    else if (today < this.viewStartDate) rec = this.renderImageSpec("svg://azos.ico.arrowLeft");
+    else rec = this.renderImageSpec("svg://azos.ico.calendarToday");
+    return rec.html;
   }
 
   renderNavigationControls() {
     return html`
 <div class="nav">
-  <button @click="${() => this.changeViewPage(0)}" class="viewing ${this.todaySymbol} todayBtn">Today</button>
-  <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">&#x2B9C;</button>
-  <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">&#x2B9E;</button>
+  <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">${this.renderImageSpec("svg://azos.ico.caretLeft").html}</button>
+  <button @click="${() => this.changeViewPage(0)}" class="viewing todayBtn">${this.todaySymbol} Today</button>
+  <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">${this.renderImageSpec("svg://azos.ico.caretRight").html}</button>
   ${this.renderViewSpanLabel(this.viewStartDate, this.viewEndDate, true)}
 </div>
     `;
