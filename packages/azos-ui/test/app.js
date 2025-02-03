@@ -7,18 +7,18 @@
 import { application } from "azos/application";
 import { LOG_TYPE } from "azos/log";
 import { ConLog } from "azos/ilog";
-import { dispose } from "azos/types";
 import { Module } from "azos/modules";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
-import { Arena } from "../arena";
+import { Arena, addAppBoilerplate } from "../arena";
 import { Router } from "../router";
 import { XyzApplet } from "./xyz-applet";
 import { XyzApplet2 } from "./xyz-applet2";
 import { XyzApplet3 } from "./xyz-applet3";
 import { XyzAppletScheduler } from "./xyz-applet-scheduler";
+import { errorMsg } from "../msg-box";
 import "../vcl/util/img-registry-browser";
 
 
@@ -90,6 +90,9 @@ const arena = Arena.launch(app)[0];
 window.ARENA = arena;
 app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
+//Wire up app closing events and global error handlers
+addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
+
 switch (location.pathname) {
   case "/0.app":
     arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 0);
@@ -116,6 +119,8 @@ switch (location.pathname) {
 }
 
 
+/*/// superseded with `addAppBoilerplate()` above
+
 // Handle UNLOADING/CLOSING of tab/window
 //https://developer.chrome.com/docs/web-platform/page-lifecycle-api
 window.addEventListener("beforeunload", (evt) => {
@@ -130,3 +135,23 @@ window.addEventListener("beforeunload", (evt) => {
 //Not called if user decides to cancel tab close
 window.addEventListener("pagehide", () => dispose(app));
 
+window.addEventListener("error", function (e) {
+  app.log.write({
+    type: LOG_TYPE.EMERGENCY,
+    topic: "ui",
+    from: "app.js",
+    text:  `Unhandled: ${e.error.constructor.name} ${e.error.message}`,
+    exception: e.error
+  });
+});
+
+window.addEventListener('unhandledrejection', function (e) {
+  app.log.write({
+    type: LOG_TYPE.EMERGENCY,
+    topic: "ui",
+    from: "app.js",
+    text:  `Unhandled rejection: ${e.reason.constructor.name} ${e.reason.message}`,
+    exception: e.reason
+  });
+});
+*/
