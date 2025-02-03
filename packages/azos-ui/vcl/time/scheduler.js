@@ -651,8 +651,6 @@ export class TimeBlockPicker extends Control {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    console.log({ start: this.viewStartDate, end: this.viewEndDate, today });
-
     let rec;
     if (today > this.viewEndDate) rec = this.renderImageSpec("svg://azos.ico.arrowRight");
     else if (today < this.viewStartDate) rec = this.renderImageSpec("svg://azos.ico.arrowLeft");

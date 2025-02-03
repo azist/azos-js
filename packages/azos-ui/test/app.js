@@ -74,7 +74,7 @@ const cfgApp = {
     { name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET },
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
     { name: "log", type: ConLog },
-    { name: "logic", type: MyLogic },
+    // { name: "logic", type: MyLogic },
     { name: "router", type: Router, menu: { root: [...appMenu] } },
     { name: "imgRegistry", type: ImageRegistry },
   ]

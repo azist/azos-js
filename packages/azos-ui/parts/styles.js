@@ -463,21 +463,22 @@ export const sliderStyles = css`
 export const lookupStyles = css`
 #pop.hidden{display:none;}
 #pop{
-  margin: 0;
+  display: flex;
+  flex-direction: column;
   position: fixed;
   min-width: 200px;
   max-width: 80vw;
   max-height: 80vh;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
   padding: 0;
-  border: 1px solid #c2c2c2;
   box-shadow: 1px 4px 10px #585858;
+  border: 1px solid #c2c2c2;
   border-radius: 10px;
   border-top-width: 1px;
   border-top-left-radius: 0;
   color: #656565;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  overflow-y: auto;
 }
 #pop:not(.hasOwner){
   margin: revert;
@@ -505,6 +506,20 @@ li:last-child{
 }
 .highlight{
   background-color: var(--vcl-codebox-hi-string-hover);
-  // font-weight: bold;
 }
+.loading .loader{
+  display: flex;
+  margin: 1ch;
+}
+.loader::after{
+  --size: 2ch;
+  content: "";
+  width: var(--size);
+  height: var(--size);
+  border: 4px solid #dddddd;
+  border-top-color: #336699;
+  border-radius: 50%;
+  animation: loader 1s ease infinite;
+}
+@keyframes loader{ to{ transform: rotate(1turn); }}
 `;

@@ -8,7 +8,7 @@ import { isOf, isTrue } from "azos/aver";
 import { AzosElement, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
-import { matchPattern } from "azos/strings";
+import { isEmpty, matchPattern } from "azos/strings";
 
 import { ImageRegistry } from "azos/bcl/img-registry";
 
@@ -20,7 +20,7 @@ import { ImageRegistry } from "azos/bcl/img-registry";
  *   appropriately
  *
  * {@link Lookup.feed} a Lookup an owner searchPattern to open a popover attached to the owner presenting a list of
- *  results. The results can be scrolled via shift/tab and arrow keys, selected with enter, and canceled with escape.
+ *  results. The results can be scrolled via shift/tab and arrow keys, selected with enter, and cancelled with escape.
  */
 export class Lookup extends AzosElement {
   static styles = [lookupStyles];
@@ -35,9 +35,11 @@ export class Lookup extends AzosElement {
   };
 
   #debounceTimerRef = null;
+  #blurTimerRef = null;
   #focusedResultElm;
   #owner = null;
   #ownerSetup = false;
+  // #loadingData = false;
   #result;
 
   #promise;
@@ -57,26 +59,33 @@ export class Lookup extends AzosElement {
 
   /** hide dialog and reject shownPromise */
   _cancel() {
-    if (this.isShown) this.#reject("canceled");
-    this._cleanup();
+    if (this.isShown) this.#reject("cancelled");
+    this._closePopover(true);
   }
 
   /** Clean up after dialog closes */
-  _cleanup() {
+  _closePopover(isCancel = false) {
     this.#cleanupDebounceTimer();
+    this.#cleanupBlurTimer();
+    this._lookupCompleted(isCancel);
+    this._disconnectListeners();
     this.#teardownOwner();
     this.#promise = null;
     this.#focusedResultElm = null;
-    this.searchPattern = "";
+    this.searchPattern = null;
     this.update();//sync update dom build
     this.popover.hidePopover();
+    console.groupEnd();
   }
 
   /** The debounced method to prepareAndGetData */
   async _debouncedFeed(searchPattern) {
+    // this.#loadingData = true;
     this.open();
     this.results = await this.prepareAndGetData(searchPattern);
     this.update();
+    // this.#loadingData = false;
+    this.#setPopoverPosition();
     if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
 
@@ -87,10 +96,14 @@ export class Lookup extends AzosElement {
    * @returns {HTMLTemplateElement|String} the result of highlighting--wrapped in verbatimHtml if wrapping with spans.
    */
   _highlightMatch(text, searchPattern) {
+    if (!searchPattern) return text;
     const regex = new RegExp(`(${searchPattern.replaceAll('*', '')})`, "gi");
     const result = text.replace(regex, `<span class="highlight">$1</span>`);
     return verbatimHtml(result);
   }
+
+  // eslint-disable-next-line no-unused-vars
+  _lookupCompleted(isCancel) { }
 
   /**
    * Selects a choice and resolves shownPromise
@@ -100,18 +113,36 @@ export class Lookup extends AzosElement {
     isTrue(this.results.includes(choice));
     this.#result = choice;
     this.#resolve(choice);
+
     const evt = new CustomEvent("lookupSelect", { detail: { value: choice }, cancelable: true, bubbles: true });
     this.dispatchEvent(evt);
+    if (!evt.defaultPrevented) {
+      console.debug("Setting owner value manually.");
+      this.owner.setValueFromInput(choice[0]);
+    }
 
-    if (!evt.defaultPrevented) this.owner.setValueFromInput(choice[0]);
+    this._closePopover();
+  }
 
-    this._cleanup();
+  _connectListeners() {
+    window.document.addEventListener("keydown", this.#bound_onKeydown);
+    window.document.addEventListener("click", this.#bound_onDocumentClick);
+    window.addEventListener("resize", this.#bound_setPopoverPosition);
+    window.addEventListener("scroll", this.#bound_setPopoverPosition);
+  }
+
+  _disconnectListeners() {
+    window.document.removeEventListener("keydown", this.#bound_onKeydown);
+    window.document.removeEventListener("click", this.#bound_onDocumentClick);
+    window.removeEventListener("resize", this.#bound_setPopoverPosition);
+    window.removeEventListener("scroll", this.#bound_setPopoverPosition);
   }
 
   get focusedResultElm() { return this.#focusedResultElm; }
   set focusedResultElm(v) {
     const oldValue = this.#focusedResultElm;
     this.#focusedResultElm = v;
+    this.#scrollResultIntoView(v);
     this.requestUpdate("focusedResultElm", oldValue);
   }
 
@@ -148,7 +179,8 @@ export class Lookup extends AzosElement {
     return true;
   }
 
-  #cleanupDebounceTimer() { this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
+  #cleanupDebounceTimer() { if (this.#debounceTimerRef) this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
+  #cleanupBlurTimer() { if (this.#blurTimerRef) this.#blurTimerRef = clearTimeout(this.#blurTimerRef); }
 
   #onDocumentClick(evt) {
     if (!this.isOpen) return;
@@ -206,16 +238,15 @@ export class Lookup extends AzosElement {
   }
 
   #onOwnerBlur() {
-    // console.log("Blurred");
-    clearTimeout(this.#debounceTimerRef);
-    setTimeout(() => {
+    this.#cleanupDebounceTimer();
+    this.#cleanupBlurTimer();
+    this.#blurTimerRef = setTimeout(() => {
       if (this.isOpen) this._cancel()
       this.#teardownOwner();
     }, this.debounceMs);
   }
 
   #onResultsClick(evt) {
-    // console.log(evt);
     const selectedResultElm = evt.target.closest(".result");
     if (!selectedResultElm) return;
     this.focusedResultElm = selectedResultElm;
@@ -223,9 +254,35 @@ export class Lookup extends AzosElement {
     evt.preventDefault();
   }
 
+  #scrollResultIntoView(result) {
+    isOf(result, HTMLLIElement);
+    const resultBounds = result.getBoundingClientRect();
+    const popoverBounds = this.popover.getBoundingClientRect();
+
+    let top;
+    if (resultBounds.top < popoverBounds.top) {
+      const previousResult = result.previousElementSibling;
+      const previousResultBounds = previousResult?.getBoundingClientRect() || null;
+      top = resultBounds.top - popoverBounds.top - (previousResultBounds ? previousResultBounds.height / 1.5 : 20);
+    } else if (resultBounds.bottom > popoverBounds.bottom) {
+      const nextResult = result.nextElementSibling;
+      const nextResultBounds = nextResult?.getBoundingClientRect() || null;
+      top = resultBounds.bottom - popoverBounds.bottom + (nextResultBounds ? nextResultBounds.height / 1.5 : 20);
+    }
+    this.popover.scrollBy({
+      top,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+
   #setPopoverPosition() {
+    console.log("setPopoverPosition()");
     const owner = this.owner;
     const popover = this.popover;
+    const itemHeight = this.itemHeight ?? 36;
+    this.maxItems = undefined;
+    const maxItemsHeight = (this.maxItems ?? Infinity) * itemHeight;
 
     if (!this.isOpen || !owner || !popover) return;
 
@@ -234,54 +291,62 @@ export class Lookup extends AzosElement {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
+    let maxHeight = Math.min(viewportHeight - ownerRect.bottom, maxItemsHeight);
+
     let top = ownerRect.bottom;
     let left = ownerRect.left;
 
+    console.log({ ownerRect, popoverRect, viewportWidth, viewportHeight, maxHeight, top, left });
     if (ownerRect.right < 0 || ownerRect.left > viewportWidth || ownerRect.top < 0 || ownerRect.top > viewportHeight)
       return this._cancel();
 
     if (ownerRect.left + popoverRect.width > viewportWidth)
       left = viewportWidth - popoverRect.width;
-    if (ownerRect.bottom + popoverRect.height > viewportHeight) top = ownerRect.top - popoverRect.height;
+    if (ownerRect.bottom + popoverRect.height > viewportHeight) {
+      maxHeight = Math.min(ownerRect.top, maxItemsHeight);
+      top = ownerRect.top - popoverRect.height;
+    }
+
+    console.log({ ownerRect, popoverRect, viewportWidth, viewportHeight, maxHeight, top, left });
 
     popover.style.top = `${top}px`;
     popover.style.left = `${left}px`;
+    popover.style.maxHeight = `${maxHeight}px`;
   }
 
-  #setupOwner() {
+  #setupNewOwner(owner) {
     if (this.#ownerSetup) return;
     this.#ownerSetup = true;
-    this.#owner.addEventListener("blur", this.#bound_onOwnerBlur);
+    this.owner = owner;
+    // this.owner.addEventListener("blur", this.#bound_onOwnerBlur);
   }
 
   #teardownOwner() {
     if (!this.#ownerSetup) return;
     this.#ownerSetup = false;
-    this.#owner.removeEventListener("blur", this.#bound_onOwnerBlur);
+    if (this.owner) this.owner.removeEventListener("blur", this.#bound_onOwnerBlur);
     this.#owner = null;
   }
 
   async feed(owner, searchPattern) {
-    if (this.#debounceTimerRef) this.#cleanupDebounceTimer();
-    if (searchPattern === this.searchPattern) return;
+    this.#cleanupDebounceTimer();
+    this.#cleanupBlurTimer();
 
-    if (!searchPattern?.length && this.isOpen) return this._cancel();
-
-    if (this.minChars && isString(searchPattern) && searchPattern.length <= this.minChars) return;
-
-    if (!this.owner || owner !== this.owner) {
+    if (!this.owner || (owner && owner !== this.owner)) {
       if (this.isOpen) this._cancel();
       this.#teardownOwner();
-      this.owner = owner;
-      this.#setupOwner();
+      this.#setupNewOwner(owner);
     }
+    if (searchPattern === this.searchPattern) return;
+    if (isEmpty(searchPattern) && this.isOpen) return this._cancel();
+    if (this.minChars && isString(searchPattern) && searchPattern.length <= this.minChars) return;
 
-    this.searchPattern = searchPattern;
     this.#debounceTimerRef = setTimeout(() => this._debouncedFeed(searchPattern), this.debounceMs);
   }
 
   async prepareAndGetData(searchPattern) {
     if (!this.owner) return null;
+    this.searchPattern = searchPattern;
     this.prepareDataContext(searchPattern);
     return await this.getData();
   }
@@ -296,7 +361,7 @@ export class Lookup extends AzosElement {
    */
   async getData() {
     const searchPattern = `*${this.searchPattern}*`;
-    return Object.entries(this.owner.valueList).filter(kvOne => kvOne.some(one => matchPattern(one, searchPattern)));
+    if (this.isOpen) return Object.entries(this.owner.valueList).filter(kvOne => kvOne.some(one => matchPattern(one, searchPattern)));
   }
 
   /**
@@ -305,6 +370,7 @@ export class Lookup extends AzosElement {
    */
   open() {
     if (this.isOpen) return false;
+    console.groupCollapsed(`"${this.owner.id}"`);
     this.#result = null;
     this.#promise = new Promise((res, rej) => {
       this.#resolve = res;
@@ -314,27 +380,18 @@ export class Lookup extends AzosElement {
     this.popover.showPopover();
     this.update();
     this.#setPopoverPosition();
+    this._connectListeners();
 
     return true;
   }
 
   connectedCallback() {
     super.connectedCallback();
-    window.document.addEventListener("keydown", this.#bound_onKeydown);
-    window.document.addEventListener("click", this.#bound_onDocumentClick);
-    window.addEventListener("resize", this.#bound_setPopoverPosition);
-    window.addEventListener("scroll", this.#bound_setPopoverPosition);
     this.addEventListener("lookupFeed", this.#bound_onFeed);
   }
 
   disconnectedCallback() {
-    window.document.removeEventListener("keydown", this.#bound_onKeydown);
-    window.document.removeEventListener("click", this.#bound_onDocumentClick);
-    window.removeEventListener("resize", this.#bound_setPopoverPosition);
-    window.removeEventListener("scroll", this.#bound_setPopoverPosition);
     this.removeEventListener("lookupFeed", this.#bound_onFeed);
-    // This is added to the owner when owner property is set
-    this.#teardownOwner();
     super.disconnectedCallback();
   }
 
@@ -344,6 +401,7 @@ export class Lookup extends AzosElement {
       parseStatus(this.status, true),
       this.isOpen ? "" : "hidden",
       this.owner ? "hasOwner" : "",
+      // this.#loadingData ? "loading" : "",
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
@@ -360,6 +418,7 @@ export class Lookup extends AzosElement {
    * @returns render `noResults` or results mapped to {@link renderResult}
    */
   renderBody() {
+    // if (this.#loadingData) return html`<div class="loader"></div>`;
     if (!this.results || !this.results.length) return html`<span class="noResults">No results</span>`;
     return html`
 <ul class="results" @mouseover="${evt => this.#onMouseOver(evt)}" @click="${evt => this.#onResultsClick(evt)}">
@@ -369,8 +428,8 @@ export class Lookup extends AzosElement {
   }
 
   /**
-   * @param {any} result a result from the resultSet
-   * @param {Number} index the index of the result within the resultSet
+   * @param {any} result a result from the results
+   * @param {Number} index the index of the result within the results
    * @returns html template to render a single result container, calls {@link renderResultBody}
    */
   renderResult(result, index) {
