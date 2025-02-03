@@ -45,7 +45,7 @@ import { isNonEmptyString, isOf } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";
 import { CONTENT_TYPE } from "../coreconsts.js";
 import { Module } from "../modules.js";
-import { dflt } from "../strings.js";
+import { dflt, isEmpty } from "../strings.js";
 import { isBool, isNumber, isString } from "../types.js";
 
 
@@ -133,7 +133,8 @@ export class ImageRegistry extends Module {
    */
   resolveSpec(spec, iso = null, theme = null){
     const url = new URL(isNonEmptyString(spec));
-    let imgUri     = url.host;
+    let imgUri = url.host;
+    if (isEmpty(imgUri)) imgUri = isNonEmptyString(url.pathname?.substring(2), "M$Edge plfl"); // M$EDGE Polyfill
     let imgFormat  = url.protocol.slice(0, -1); //`svg`, not `svg:`
     const sp = url.searchParams;
     let imgMedia = sp.get("media") ?? sp.get("m") ?? null;
@@ -325,7 +326,32 @@ export const STOCK_IMAGES = Object.freeze([
     f: "svg",
     c: `<svg viewBox="0 -960 960 960"><path d="M346.15-267.69q-24.57 0-41.52-16.94-16.94-16.95-16.94-41.52v-455.39q0-24.58 16.94-41.52Q321.58-840 346.15-840h335.39q24.58 0 41.52 16.94Q740-806.12 740-781.54v455.39q0 24.57-16.94 41.52-16.94 16.94-41.52 16.94H346.15Zm0-33.85h335.39q9.23 0 16.92-7.69 7.69-7.69 7.69-16.92v-455.39q0-9.23-7.69-16.92-7.69-7.69-16.92-7.69H346.15q-9.23 0-16.92 7.69-7.69 7.69-7.69 16.92v455.39q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69ZM238.46-160q-24.58 0-41.52-16.94Q180-193.88 180-218.46v-489.23h33.85v489.23q0 9.23 7.69 16.92 7.69 7.69 16.92 7.69h369.23V-160H238.46Zm83.08-141.54v-504.61 504.61Z"/></svg>`,
     attrs: { fas: true },
-  },
+  }, {
+    uri: "azos.ico.calendarToday",
+    f: "svg",
+    c: `<svg viewBox="0 -960 960 960"><path d="M360-335.38q-35.08 0-59.85-24.77-24.77-24.77-24.77-59.85t24.77-59.85q24.77-24.77 59.85-24.77t59.85 24.77q24.77 24.77 24.77 59.85t-24.77 59.85q-24.77 24.77-59.85 24.77ZM224.62-120q-27.62 0-46.12-18.5Q160-157 160-184.62v-510.76q0-27.62 18.5-46.12Q197-760 224.62-760h70.76v-89.23h43.08V-760h286.16v-89.23h40V-760h70.76q27.62 0 46.12 18.5Q800-723 800-695.38v510.76q0 27.62-18.5 46.12Q763-120 735.38-120H224.62Zm0-40h510.76q9.24 0 16.93-7.69 7.69-7.69 7.69-16.93v-350.76H200v350.76q0 9.24 7.69 16.93 7.69 7.69 16.93 7.69ZM200-575.39h560v-119.99q0-9.24-7.69-16.93-7.69-7.69-16.93-7.69H224.62q-9.24 0-16.93 7.69-7.69 7.69-7.69 16.93v119.99Zm0 0V-720-575.39Z"/></svg>`,
+    attrs: { fas: true },
+  }, {
+    uri: "azos.ico.caretLeft",
+    f: "svg",
+    c: `<svg viewBox="0 -960 960 960"><path d="M640-107.69 267.69-480 640-852.31l42.54 42.54L352.77-480l329.77 329.77L640-107.69Z"/></svg>`,
+    attrs: { fas: true },
+  }, {
+    uri: "azos.ico.caretRight",
+    f: "svg",
+    c: `<svg viewBox="0 -960 960 960"><path d="m320.23-107.69-42.54-42.54L607.46-480 277.69-809.77l42.54-42.54L692.54-480 320.23-107.69Z"/></svg>`,
+    attrs: { fas: true },
+  }, {
+    uri: "azos.ico.arrowLeft",
+    f: "svg",
+    c: `<svg viewBox="0 -960 960 960"><path d="m276.85-460 231.69 231.69L480-200 200-480l280-280 28.54 28.31L276.85-500H760v40H276.85Z"/></svg>`,
+    attrs: { fas: true },
+  }, {
+    uri: "azos.ico.arrowRight",
+    f: "svg",
+    c: `<svg viewBox="0 -960 960 960"><path d="M683.15-460H200v-40h483.15L451.46-731.69 480-760l280 280-280 280-28.54-28.31L683.15-460Z"/></svg>`,
+    attrs: { fas: true },
+  }
 ]);
 
 /** Library of Common Material Icons (filled standard style) */

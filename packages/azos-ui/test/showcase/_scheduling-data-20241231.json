@@ -5,24 +5,24 @@
       "mUnit": "UN-PATRTL-MAC",
       "idUnit": "unit.gdid@g8corp::0:1:824",
       "unitAsOfUtc": "2024-10-15T00:00:00Z",
-      "nowUtc": "2024-12-31T16:37:07.406Z",
-      "nowUnitLocal": "2024-12-31T11:37:07.406+00:00",
+      "nowUtc": "2025-02-03T16:37:07.406Z",
+      "nowUnitLocal": "2025-02-03T11:37:07.406+00:00",
       "tzName": "est",
       "tzInfo": "(UTC-05:00) Eastern Time (New York)",
       "tzCurrentUtcOffsetMinutes": -300,
       "tzSupportDaylightSavingsTime": true,
-      "rangeStartUtc": "2025-01-01T00:00:00Z",
-      "rangeEndUtc": "2025-01-12T00:00:00Z",
-      "rangeStartUnitLocal": "2024-12-31T19:00:00+00:00",
-      "rangeEndUnitLocal": "2025-01-11T19:00:00+00:00",
+      "rangeStartUtc": "2025-02-01T00:00:00Z",
+      "rangeEndUtc": "2025-02-12T00:00:00Z",
+      "rangeStartUnitLocal": "2025-01-31T19:00:00+00:00",
+      "rangeEndUnitLocal": "2025-02-11T19:00:00+00:00",
       "schedule": {
         "dailyAvailable": [
           {
-            "day": "2024-12-31T00:00:00+00:00",
-            "dayOfMonth": 31,
+            "day": "2025-02-04T00:00:00+00:00",
+            "dayOfMonth": 4,
             "dayOfWeek": "Tuesday",
             "dayOfWeekOrd": 2,
-            "dayOfYear": 366,
+            "dayOfYear": 35,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -46,14 +46,14 @@
                 }
               ]
             },
-            "month": 12
+            "month": 2
           },
           {
-            "day": "2025-01-01T00:00:00+00:00",
-            "dayOfMonth": 1,
+            "day": "2025-02-05T00:00:00+00:00",
+            "dayOfMonth": 5,
             "dayOfWeek": "Wednesday",
             "dayOfWeekOrd": 3,
-            "dayOfYear": 1,
+            "dayOfYear": 36,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -77,14 +77,14 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-02T00:00:00+00:00",
-            "dayOfMonth": 2,
+            "day": "2025-02-06T00:00:00+00:00",
+            "dayOfMonth": 6,
             "dayOfWeek": "Thursday",
             "dayOfWeekOrd": 4,
-            "dayOfYear": 2,
+            "dayOfYear": 37,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -108,14 +108,14 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-03T00:00:00+00:00",
-            "dayOfMonth": 3,
+            "day": "2025-02-07T00:00:00+00:00",
+            "dayOfMonth": 7,
             "dayOfWeek": "Friday",
             "dayOfWeekOrd": 5,
-            "dayOfYear": 3,
+            "dayOfYear": 38,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -139,14 +139,14 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-04T00:00:00+00:00",
-            "dayOfMonth": 4,
+            "day": "2025-02-08T00:00:00+00:00",
+            "dayOfMonth": 8,
             "dayOfWeek": "Saturday",
             "dayOfWeekOrd": 6,
-            "dayOfYear": 4,
+            "dayOfYear": 39,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -170,26 +170,26 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-05T00:00:00+00:00",
-            "dayOfMonth": 5,
+            "day": "2025-02-09T00:00:00+00:00",
+            "dayOfMonth": 9,
             "dayOfWeek": "Sunday",
             "dayOfWeekOrd": 0,
-            "dayOfYear": 5,
+            "dayOfYear": 40,
             "hours": {
               "data": "",
               "parsed": []
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-06T00:00:00+00:00",
-            "dayOfMonth": 6,
+            "day": "2025-02-10T00:00:00+00:00",
+            "dayOfMonth": 10,
             "dayOfWeek": "Monday",
             "dayOfWeekOrd": 1,
-            "dayOfYear": 6,
+            "dayOfYear": 41,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -213,14 +213,14 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-07T00:00:00+00:00",
-            "dayOfMonth": 7,
+            "day": "2025-02-11T00:00:00+00:00",
+            "dayOfMonth": 11,
             "dayOfWeek": "Tuesday",
             "dayOfWeekOrd": 2,
-            "dayOfYear": 7,
+            "dayOfYear": 42,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -244,14 +244,14 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-08T00:00:00+00:00",
-            "dayOfMonth": 8,
+            "day": "2025-02-12T00:00:00+00:00",
+            "dayOfMonth": 12,
             "dayOfWeek": "Wednesday",
             "dayOfWeekOrd": 3,
-            "dayOfYear": 8,
+            "dayOfYear": 43,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -275,14 +275,14 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-09T00:00:00+00:00",
-            "dayOfMonth": 9,
+            "day": "2025-02-13T00:00:00+00:00",
+            "dayOfMonth": 13,
             "dayOfWeek": "Thursday",
             "dayOfWeekOrd": 4,
-            "dayOfYear": 9,
+            "dayOfYear": 44,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -306,14 +306,14 @@
                 }
               ]
             },
-            "month": 1
+            "month": 2
           },
           {
-            "day": "2025-01-10T00:00:00+00:00",
-            "dayOfMonth": 10,
+            "day": "2025-02-14T00:00:00+00:00",
+            "dayOfMonth": 14,
             "dayOfWeek": "Friday",
             "dayOfWeekOrd": 5,
-            "dayOfYear": 10,
+            "dayOfYear": 45,
             "hours": {
               "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
               "parsed": [
@@ -337,1168 +337,7 @@
                 }
               ]
             },
-            "month": 1
-          }
-        ],
-        "dailyAvailableByAgent": [
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2024-12-31T00:00:00+00:00",
-            "dayOfMonth": 31,
-            "dayOfWeek": "Tuesday",
-            "dayOfWeekOrd": 2,
-            "dayOfYear": 366,
-            "month": 12
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-01T00:00:00+00:00",
-            "dayOfMonth": 1,
-            "dayOfWeek": "Wednesday",
-            "dayOfWeekOrd": 3,
-            "dayOfYear": 1,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-02T00:00:00+00:00",
-            "dayOfMonth": 2,
-            "dayOfWeek": "Thursday",
-            "dayOfWeekOrd": 4,
-            "dayOfYear": 2,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-03T00:00:00+00:00",
-            "dayOfMonth": 3,
-            "dayOfWeek": "Friday",
-            "dayOfWeekOrd": 5,
-            "dayOfYear": 3,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-04T00:00:00+00:00",
-            "dayOfMonth": 4,
-            "dayOfWeek": "Saturday",
-            "dayOfWeekOrd": 6,
-            "dayOfYear": 4,
-            "month": 1
-          },
-          {
-            "agents": [],
-            "day": "2025-01-05T00:00:00+00:00",
-            "dayOfMonth": 5,
-            "dayOfWeek": "Sunday",
-            "dayOfWeekOrd": 0,
-            "dayOfYear": 5,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-06T00:00:00+00:00",
-            "dayOfMonth": 6,
-            "dayOfWeek": "Monday",
-            "dayOfWeekOrd": 1,
-            "dayOfYear": 6,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-07T00:00:00+00:00",
-            "dayOfMonth": 7,
-            "dayOfWeek": "Tuesday",
-            "dayOfWeekOrd": 2,
-            "dayOfYear": 7,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-08T00:00:00+00:00",
-            "dayOfMonth": 8,
-            "dayOfWeek": "Wednesday",
-            "dayOfWeekOrd": 3,
-            "dayOfYear": 8,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-09T00:00:00+00:00",
-            "dayOfMonth": 9,
-            "dayOfWeek": "Thursday",
-            "dayOfWeekOrd": 4,
-            "dayOfYear": 9,
-            "month": 1
-          },
-          {
-            "agents": [
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::806",
-                  "Name": {
-                    "Last": "Dunphy",
-                    "First": "James",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::8358",
-                  "Name": {
-                    "Last": "Dutton",
-                    "First": "Michael",
-                    "Middle": null,
-                    "Title": "Design Consultant",
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              },
-              {
-                "agent": {
-                  "Id": "agent.int@pcms::7262",
-                  "Name": {
-                    "Last": "Leonard",
-                    "First": "Jeffrey",
-                    "Middle": null,
-                    "Title": null,
-                    "Suffix": null
-                  }
-                },
-                "hours": {
-                  "data": "10:00-12:00,14:00-16:00,18:00-20:00,",
-                  "parsed": [
-                    {
-                      "disp": "10:00-12:00",
-                      "dur": 120,
-                      "fin": 719,
-                      "sta": 600
-                    },
-                    {
-                      "disp": "14:00-16:00",
-                      "dur": 120,
-                      "fin": 959,
-                      "sta": 840
-                    },
-                    {
-                      "disp": "18:00-20:00",
-                      "dur": 120,
-                      "fin": 1199,
-                      "sta": 1080
-                    }
-                  ]
-                }
-              }
-            ],
-            "day": "2025-01-10T00:00:00+00:00",
-            "dayOfMonth": 10,
-            "dayOfWeek": "Friday",
-            "dayOfWeekOrd": 5,
-            "dayOfYear": 10,
-            "month": 1
+            "month": 2
           }
         ]
       }

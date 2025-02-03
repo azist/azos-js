@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { defineUnit as unit, defineCase as cs} from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import { application } from "../application.js";
 
 import { ImageRecord, ImageRegistry } from "../bcl/img-registry.js";
