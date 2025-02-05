@@ -262,7 +262,7 @@ export class TabView extends Control {
 
   #scrollTabBtnIntoView(tab) {
     isOf(tab, Tab);
-    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.id}`);
+    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.tabid}`);
     if (!tabBtn) return;
     const btnBounds = tabBtn.getBoundingClientRect();
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
