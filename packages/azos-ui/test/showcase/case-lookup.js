@@ -42,7 +42,7 @@ export class CaseLookup extends CaseBase {
 <az-text id="tbZip" scope="this" title="Zip"></az-text>
 <az-text id="tbCountry" scope="this" title="Country" lookupId="lkpFromValueList" valueList="${this.countries}"></az-text>
 <xyz-address-lookup id="lkpAddress" scope="this" @lookupSelect="${address => this.selectAddress(address)}"></xyz-address-lookup>
-<az-lookup id="lkpFromValueList" scope="this"></az-lookup>
+<az-lookup id="lkpFromValueList" scope="this" maxItems=10 minItems=3></az-lookup>
     `;
   }
 }

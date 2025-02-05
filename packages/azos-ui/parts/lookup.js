@@ -29,6 +29,8 @@ export class Lookup extends AzosElement {
     dataContext: { type: Object },
     debounceMs: { type: Number },
     minChars: { type: Number },
+    maxItems: { type: Number },
+    minItems: { type: Number },
     owner: { type: Object },
     results: { type: Array },
     searchPattern: { type: String },
@@ -36,6 +38,7 @@ export class Lookup extends AzosElement {
 
   #debounceTimerRef = null;
   #blurTimerRef = null;
+  #debouncedRepositionPopoverTimerRef = null;
   #focusedResultElm;
   #owner = null;
   #ownerSetup = false;
@@ -50,7 +53,7 @@ export class Lookup extends AzosElement {
   #bound_onFeed = this.#onFeed.bind(this);
   #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
-  #bound_setPopoverPosition = this.#setPopoverPosition.bind(this);
+  #bound_debouncedRepositionPopover = this.#debounced_repositionPopover.bind(this);
 
   constructor({ debounceMs, } = {}) {
     super();
@@ -65,8 +68,7 @@ export class Lookup extends AzosElement {
 
   /** Clean up after dialog closes */
   _closePopover(isCancel = false) {
-    this.#cleanupDebounceTimer();
-    this.#cleanupBlurTimer();
+    this.#clearTimers();
     this._lookupCompleted(isCancel);
     this._disconnectListeners();
     this.#teardownOwner();
@@ -85,7 +87,7 @@ export class Lookup extends AzosElement {
     this.results = await this.prepareAndGetData(searchPattern);
     this.update();
     // this.#loadingData = false;
-    this.#setPopoverPosition();
+    this.#repositionPopover();
     if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
 
@@ -127,15 +129,15 @@ export class Lookup extends AzosElement {
   _connectListeners() {
     window.document.addEventListener("keydown", this.#bound_onKeydown);
     window.document.addEventListener("click", this.#bound_onDocumentClick);
-    window.addEventListener("resize", this.#bound_setPopoverPosition);
-    window.addEventListener("scroll", this.#bound_setPopoverPosition);
+    window.addEventListener("resize", this.#bound_debouncedRepositionPopover);
+    window.addEventListener("scroll", this.#bound_debouncedRepositionPopover);
   }
 
   _disconnectListeners() {
     window.document.removeEventListener("keydown", this.#bound_onKeydown);
     window.document.removeEventListener("click", this.#bound_onDocumentClick);
-    window.removeEventListener("resize", this.#bound_setPopoverPosition);
-    window.removeEventListener("scroll", this.#bound_setPopoverPosition);
+    window.removeEventListener("resize", this.#bound_debouncedRepositionPopover);
+    window.removeEventListener("scroll", this.#bound_debouncedRepositionPopover);
   }
 
   get focusedResultElm() { return this.#focusedResultElm; }
@@ -181,6 +183,12 @@ export class Lookup extends AzosElement {
 
   #cleanupDebounceTimer() { if (this.#debounceTimerRef) this.#debounceTimerRef = clearTimeout(this.#debounceTimerRef); }
   #cleanupBlurTimer() { if (this.#blurTimerRef) this.#blurTimerRef = clearTimeout(this.#blurTimerRef); }
+  #cleanupDebouncedRepositionPopoverTimer() { if (this.#debouncedRepositionPopoverTimerRef) this.#debouncedRepositionPopoverTimerRef = clearTimeout(this.#debouncedRepositionPopoverTimerRef); }
+  #clearTimers() {
+    this.#cleanupDebounceTimer();
+    this.#cleanupBlurTimer();
+    this.#cleanupDebouncedRepositionPopoverTimer();
+  }
 
   #onDocumentClick(evt) {
     if (!this.isOpen) return;
@@ -238,8 +246,7 @@ export class Lookup extends AzosElement {
   }
 
   #onOwnerBlur() {
-    this.#cleanupDebounceTimer();
-    this.#cleanupBlurTimer();
+    this.#clearTimers();
     this.#blurTimerRef = setTimeout(() => {
       if (this.isOpen) this._cancel()
       this.#teardownOwner();
@@ -255,6 +262,8 @@ export class Lookup extends AzosElement {
   }
 
   #scrollResultIntoView(result) {
+    if (!result) return;
+
     isOf(result, HTMLLIElement);
     const resultBounds = result.getBoundingClientRect();
     const popoverBounds = this.popover.getBoundingClientRect();
@@ -276,49 +285,62 @@ export class Lookup extends AzosElement {
     });
   }
 
-  #setPopoverPosition() {
-    console.log("setPopoverPosition()");
+  #repositionPopover() {
     const owner = this.owner;
     const popover = this.popover;
-    const itemHeight = this.itemHeight ?? 36;
-    this.maxItems = undefined;
-    const maxItemsHeight = (this.maxItems ?? Infinity) * itemHeight;
 
     if (!this.isOpen || !owner || !popover) return;
 
+    const PADDING = 5;
+    const TOP_BOUNDARY = 0 + PADDING;
+    const RIGHT_BOUNDARY = window.visualViewport.width - PADDING;
+    const BOTTOM_BOUNDARY = window.visualViewport.height - PADDING;
+    const LEFT_BOUNDARY = 0 + PADDING;
+
+    const ITEM_HEIGHT = this.resultElms[0]?.getBoundingClientRect()?.height ?? 36;
+    const MIN_ITEMS_HEIGHT = (this.minItems ?? 2) * ITEM_HEIGHT
+    const MAX_ITEMS_HEIGHT = (this.maxItems ?? Infinity) * ITEM_HEIGHT;
+
     const ownerRect = owner.getBoundingClientRect();
     const popoverRect = popover.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    let maxHeight = Math.min(viewportHeight - ownerRect.bottom, maxItemsHeight);
 
     let top = ownerRect.bottom;
     let left = ownerRect.left;
+    let maxHeight = Math.min(BOTTOM_BOUNDARY - ownerRect.bottom, MAX_ITEMS_HEIGHT);
+    popover.classList.remove("onLeft", "onTop");
 
-    console.log({ ownerRect, popoverRect, viewportWidth, viewportHeight, maxHeight, top, left });
-    if (ownerRect.right < 0 || ownerRect.left > viewportWidth || ownerRect.top < 0 || ownerRect.top > viewportHeight)
+    if (ownerRect.top > BOTTOM_BOUNDARY || ownerRect.right < LEFT_BOUNDARY || ownerRect.top < TOP_BOUNDARY || ownerRect.left > RIGHT_BOUNDARY)
       return this._cancel();
 
-    if (ownerRect.left + popoverRect.width > viewportWidth)
-      left = viewportWidth - popoverRect.width;
-    if (ownerRect.bottom + popoverRect.height > viewportHeight) {
-      maxHeight = Math.min(ownerRect.top, maxItemsHeight);
-      top = ownerRect.top - popoverRect.height;
+    if (ownerRect.left < LEFT_BOUNDARY) {
+      left = LEFT_BOUNDARY;
+    } else if (ownerRect.left + popoverRect.width > RIGHT_BOUNDARY) {
+      left = RIGHT_BOUNDARY - popoverRect.width;
+      popover.classList.add("onLeft");
     }
 
-    console.log({ ownerRect, popoverRect, viewportWidth, viewportHeight, maxHeight, top, left });
+    if (maxHeight < MIN_ITEMS_HEIGHT) {
+      maxHeight = Math.min(ownerRect.top - TOP_BOUNDARY, MAX_ITEMS_HEIGHT);
+      queueMicrotask(() => {
+        const ownerTop = owner.getBoundingClientRect().top;
+        const popoverHeight = popover.getBoundingClientRect().height;
+        popover.style.cssText += `top: ${ownerTop - popoverHeight}px`;
+        popover.classList.add("onTop");
+      });
+    }
 
-    popover.style.top = `${top}px`;
-    popover.style.left = `${left}px`;
-    popover.style.maxHeight = `${maxHeight}px`;
+    popover.style.cssText += `top: ${top}px; left: ${left}px; max-height: ${maxHeight}px`;
+  }
+  #debounced_repositionPopover(e) {
+    this.#cleanupDebouncedRepositionPopoverTimer();
+    this.#debouncedRepositionPopoverTimerRef = setTimeout(() => this.#repositionPopover(e), 100);
   }
 
   #setupNewOwner(owner) {
     if (this.#ownerSetup) return;
     this.#ownerSetup = true;
     this.owner = owner;
-    // this.owner.addEventListener("blur", this.#bound_onOwnerBlur);
+    this.owner.addEventListener("blur", this.#bound_onOwnerBlur);
   }
 
   #teardownOwner() {
@@ -329,8 +351,7 @@ export class Lookup extends AzosElement {
   }
 
   async feed(owner, searchPattern) {
-    this.#cleanupDebounceTimer();
-    this.#cleanupBlurTimer();
+    this.#clearTimers();
 
     if (!this.owner || (owner && owner !== this.owner)) {
       if (this.isOpen) this._cancel();
@@ -370,7 +391,6 @@ export class Lookup extends AzosElement {
    */
   open() {
     if (this.isOpen) return false;
-    console.groupCollapsed(`"${this.owner.id}"`);
     this.#result = null;
     this.#promise = new Promise((res, rej) => {
       this.#resolve = res;
@@ -379,7 +399,7 @@ export class Lookup extends AzosElement {
 
     this.popover.showPopover();
     this.update();
-    this.#setPopoverPosition();
+    this.#repositionPopover();
     this._connectListeners();
 
     return true;

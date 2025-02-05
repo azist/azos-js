@@ -474,11 +474,23 @@ export const lookupStyles = css`
   box-shadow: 1px 4px 10px #585858;
   border: 1px solid #c2c2c2;
   border-radius: 10px;
-  border-top-width: 1px;
   border-top-left-radius: 0;
+  border-top-width: 1px;
   color: #656565;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   overflow-y: auto;
+}
+#pop.onTop.onLeft{
+  border-radius: 10px;
+  border-bottom-right-radius: 0;
+}
+#pop.onTop{
+  border-radius: 10px;
+  border-bottom-left-radius: 0;
+}
+#pop.onLeft{
+  border-radius: 10px;
+  border-top-right-radius: 0;
 }
 #pop:not(.hasOwner){
   margin: revert;
@@ -500,9 +512,6 @@ li.focused{
 }
 li+li{
   border-top: 1px solid #eee;
-}
-li:last-child{
-  border-radius: 0 0 6px 6px;
 }
 .highlight{
   background-color: var(--vcl-codebox-hi-string-hover);
