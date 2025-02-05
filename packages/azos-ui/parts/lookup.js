@@ -84,7 +84,10 @@ export class Lookup extends AzosElement {
   async _debouncedFeed(searchPattern) {
     // this.#loadingData = true;
     this.open();
-    this.results = await this.prepareAndGetData(searchPattern);
+    const results = await this.prepareAndGetData(searchPattern);
+    if (!results) return;
+
+    this.results = results;
     this.update();
     // this.#loadingData = false;
     this.#repositionPopover();
