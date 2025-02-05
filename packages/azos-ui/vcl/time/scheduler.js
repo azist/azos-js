@@ -642,7 +642,7 @@ export class TimeBlockPicker extends Control {
 
     const cls = [
       "icon",
-
+      rec.attrs?.fas ? "fas" : "",
     ].filter(types.isNonEmptyString).join(' ');
     return html`<i cls="${cls}">${html}</i>`;
   }
