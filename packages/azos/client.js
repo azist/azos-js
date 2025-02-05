@@ -285,7 +285,9 @@ export class IClient extends Module{
   //this is a private method, outside parties should not be leaking token
   async #addAuthInfo(request){
     const [scheme, token] = await this.#getAccessToken();
-    request.headers.append(HEADERS.AUTH, `${scheme} ${token}`);
+    if (token){
+      request.headers.append(HEADERS.AUTH, `${scheme} ${token}`);
+    }
   }
 
   //this is a private method, outside parties should not be leaking token

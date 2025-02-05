@@ -4,10 +4,31 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { LOG_TYPE } from "azos/log";
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
 
 export class CaseButtons extends CaseBase {
+
+
+  #simulateCrash(){
+    let result = {};
+    for(let i=5; i>=0; i--){
+      if (i==0) result = null;//bug
+      result["x"] = 1000 / i;
+      this.writeLog(LOG_TYPE.INFO, `Dummy sync algo working: ${i} - ${result["x"]}`);
+    }
+  }
+
+  async #simulateCrashAsync(){
+    let result = {};
+    for(let i=5; i>=0; i--){
+      if (i==0) result = null;//bug
+      await new Promise(r => setTimeout(r, 200));
+      result["x"] = 1000 / i;
+      this.writeLog(LOG_TYPE.INFO, `Dummy async algo working: ${i} - ${result["x"]}`);
+    }
+  }
 
   renderControl() {
     // TODO: test button click to increment/decrement counter
@@ -23,6 +44,13 @@ export class CaseButtons extends CaseBase {
   <az-button title="Cancel"></az-button>
   <az-button title="Details..."></az-button>
 </div>
+
+<div class="strip-h">
+  <h4>Induce crash</h4>
+  <az-button title="Crash Synch" @click=${() => this.#simulateCrash()} status="error"></az-button>
+  <az-button title="Crash Async" @click=${() => this.#simulateCrashAsync()} status="error"></az-button>
+</div>
+
 
 <div class="strip-h">
   <h4>Buttons with specific statuses</h4>

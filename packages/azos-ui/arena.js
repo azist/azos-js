@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD } from "azos/types";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose } from "azos/types";
 import { html, AzosElement, noContent } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
@@ -17,6 +17,57 @@ import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
 import { isEmpty } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
+
+
+
+/** Adds boilerplate like global error handling and page close event handling.
+ * This is typically a last line in your `app.js` file.
+ * @param {Arena} arena instance which should be already `launch(app)`-ed at the time of making this call
+ * @param {function | null} [fError=null]  optional delegate function which takes a causing {@link Error} instance
+ *  which you can use to show fancy error popups etc.
+*/
+export function addAppBoilerplate(arena, fError = null){
+  const app = aver.isOf(aver.isOf(arena, Arena).app, Application);
+  aver.isFunctionOrNull(fError);
+
+
+  // Handle UNLOADING/CLOSING of tab/window
+  //https://developer.chrome.com/docs/web-platform/page-lifecycle-api
+  window.addEventListener("beforeunload", (evt) => {
+    if (arena.dirty) {
+      evt.preventDefault();
+      evt.returnValue = true;
+      return;
+    }
+  });
+
+  //Called on tab close POST-factum asking questions.
+  //Not called if user decides to cancel tab close
+  window.addEventListener("pagehide", () => dispose(app));
+
+  window.addEventListener("error", function (e) {
+    app.log.write({
+      type: logging.LOG_TYPE.EMERGENCY,
+      topic: "ui",
+      from: "app.js",
+      text:  `Unhandled: ${e.error.constructor.name} ${e.error.message}`,
+      exception: e.error
+    });
+    fError?.call(app, e.error);
+  });
+
+  window.addEventListener('unhandledrejection', function (e) {
+    app.log.write({
+      type: logging.LOG_TYPE.EMERGENCY,
+      topic: "ui",
+      from: "app.js",
+      text:  `Unhandled rejection: ${e.reason.constructor.name} ${e.reason.message}`,
+      exception: e.reason
+    });
+    fError?.call(app, e.reason);
+  });
+}
+
 
 /**
  * Defines a root UI element which displays the whole Azos app.
