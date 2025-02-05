@@ -642,7 +642,7 @@ export class TimeBlockPicker extends Control {
 
     const cls = [
       "icon",
-
+      rec.attrs?.fas ? "fas" : "",
     ].filter(types.isNonEmptyString).join(' ');
     return html`<i cls="${cls}">${html}</i>`;
   }
@@ -650,8 +650,6 @@ export class TimeBlockPicker extends Control {
   get todaySymbol() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    console.log({ start: this.viewStartDate, end: this.viewEndDate, today });
 
     let rec;
     if (today > this.viewEndDate) rec = this.renderImageSpec("svg://azos.ico.arrowRight");
