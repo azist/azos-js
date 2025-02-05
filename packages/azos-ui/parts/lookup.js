@@ -360,7 +360,7 @@ export class Lookup extends AzosElement {
     }
     if (searchPattern === this.searchPattern) return;
     if (isEmpty(searchPattern) && this.isOpen) return this._cancel();
-    if (this.minChars && isString(searchPattern) && searchPattern.length <= this.minChars) return;
+    if (this.minChars && isString(searchPattern) && searchPattern.length < this.minChars) return;
 
     this.#debounceTimerRef = setTimeout(() => this._debouncedFeed(searchPattern), this.debounceMs);
   }
