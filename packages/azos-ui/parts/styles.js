@@ -471,6 +471,7 @@ export const lookupStyles = css`
   max-height: 80vh;
   margin: 0;
   padding: 0;
+  background: var(--paper);
   box-shadow: 1px 4px 10px #585858;
   border: 1px solid #c2c2c2;
   border-radius: 10px;
