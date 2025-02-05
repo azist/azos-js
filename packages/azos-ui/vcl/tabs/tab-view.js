@@ -476,7 +476,7 @@ export class TabView extends Control {
       ].filter(item => item !== "").join(";");
 
       return html`
-          <div id="tabBtn${tab.id}" class="${cls}" style="${stl}"
+          <div id="tabBtn${tab.tabid}" class="${cls}" style="${stl}"
             @click="${e => this.#onTabClick(e, tab)}"
             draggable="${this.isDraggable}"
             @dragstart="${e => this.#onDragStart(e, index)}"
