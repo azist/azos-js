@@ -84,7 +84,10 @@ export class Lookup extends AzosElement {
   async _debouncedFeed(searchPattern) {
     // this.#loadingData = true;
     this.open();
-    this.results = await this.prepareAndGetData(searchPattern);
+    const results = await this.prepareAndGetData(searchPattern);
+    if (!results) return;
+
+    this.results = results;
     this.update();
     // this.#loadingData = false;
     this.#repositionPopover();
@@ -360,7 +363,7 @@ export class Lookup extends AzosElement {
     }
     if (searchPattern === this.searchPattern) return;
     if (isEmpty(searchPattern) && this.isOpen) return this._cancel();
-    if (this.minChars && isString(searchPattern) && searchPattern.length <= this.minChars) return;
+    if (this.minChars && isString(searchPattern) && searchPattern.length < this.minChars) return;
 
     this.#debounceTimerRef = setTimeout(() => this._debouncedFeed(searchPattern), this.debounceMs);
   }

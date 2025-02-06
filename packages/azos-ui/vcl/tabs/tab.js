@@ -17,7 +17,7 @@ window.Command = Command;
 import "../../parts/button";
 
 export class Tab extends Block {
-  static #idSeed = 0;
+  static #tabidSeed = 0;
 
   static properties = {
     active: { type: Boolean, reflect: true },
@@ -30,8 +30,8 @@ export class Tab extends Block {
     showCommands: { type: Boolean },
   };
 
-  #id;
-  get id() { return this.#id; }
+  #tabid;
+  get tabid() { return this.#tabid; }
 
   #iconPath;
   get iconPath() { return this.#iconPath; }
@@ -113,7 +113,7 @@ export class Tab extends Block {
     // It is possible to construct via markup, so these could be undefined
     if (title) this.title = aver.isNonEmptyString(title);
     if (data) this.data = data;
-    this.#id = ++Tab.#idSeed;
+    this.#tabid = ++Tab.#tabidSeed;
   }
 
   requestUpdate(...args) {
@@ -158,7 +158,7 @@ export class Tab extends Block {
 
   renderCommands() {
     return html`
-<div class="toolbar">
+<div class="commands" slot="commands">
 ${this.commands?.map(cmd => html`<az-button @click="${() => cmd.exec()}" title="${cmd.icon ? cmd.icon : ""} ${cmd.title}"></az-button>`)}
 </div>
 `;

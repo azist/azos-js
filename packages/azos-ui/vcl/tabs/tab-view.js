@@ -188,6 +188,10 @@ export class TabView extends Control {
     isModern: { type: Boolean },
     activeTabIndex: { type: Number, reflect: true },
     activeTab: { type: Tab },
+    tabs: {
+      state: true,
+      hasChanged(newVal, oldVal) { return (newVal.length === oldVal?.length && newVal.every((val, index) => val === oldVal[index])) ? false : true; }
+    },
   }
 
   #draggedTabIndex = null;
@@ -204,8 +208,16 @@ export class TabView extends Control {
   }
 
   get tabBtns() { return Array.from(this.shadowRoot.querySelectorAll(".tab-btn")) }
-  get tabs() { return [...this.children].filter(child => child instanceof Tab); }
-  get visibleTabs() { return [...this.children].filter(child => (child.isAbsent || child.isHidden) !== true); }
+  #tabs = [];
+  get tabs() { return this.#tabs; }
+  set tabs(v) {
+    const oldValue = this.#tabs;
+    this.#tabs = v;
+    if (this.activeTabIndex === -1) this.activeTab = this.#tabs[0] ?? null;
+    this.requestUpdate("tabs", oldValue);
+  }
+  getTabs() { return [...this.children].filter(child => child instanceof Tab); }
+  get visibleTabs() { return this.tabs.filter(child => (child.isAbsent || child.isHidden) !== true); }
 
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
@@ -262,7 +274,7 @@ export class TabView extends Control {
 
   #scrollTabBtnIntoView(tab) {
     isOf(tab, Tab);
-    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.id}`);
+    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.tabid}`);
     if (!tabBtn) return;
     const btnBounds = tabBtn.getBoundingClientRect();
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
@@ -312,6 +324,7 @@ export class TabView extends Control {
 
     const tabIndex = this.#findClosestTabIndex(event.clientX);
     this.insertBefore(this.visibleTabs[this.#draggedTabIndex], this.visibleTabs[tabIndex]);
+    this.tabs = this.getTabs();
     this.#removeHighlight();
     this.requestUpdate();
   }
@@ -371,13 +384,12 @@ export class TabView extends Control {
    * @param {Tab} tab the tab to move
    * @param {Tab|null} beforeTab the tab to insertBefore, null for "append"
    */
-  async moveTab(tab, beforeTab) {
+  moveTab(tab, beforeTab) {
     isTrue(isOf(tab, Tab).tabView === this);
     isOfOrNull(beforeTab, Tab);
     if (beforeTab) isTrue(beforeTab.tabView === this);
     this.insertBefore(tab, beforeTab);
-    this.requestUpdate();
-    await this.updateComplete;
+    this.update();
     if (tab.active) this.#scrollTabBtnIntoView(tab);
   }
 
@@ -401,6 +413,7 @@ export class TabView extends Control {
       tab = new tTab(dflt(title, tTab.name), data);
       if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
       this.insertBefore(tab, beforeTab);
+      this.tabs = this.getTabs();
     }
 
     if (!this.#activeTab || makeActive) tab.activate();
@@ -422,8 +435,21 @@ export class TabView extends Control {
     if (tab.active && !this.unselectActiveTab()) return false;
     this.dispatchEvent(new CustomEvent("tabClosed", { detail: { tab }, cancelable: false, bubbles: true }));
     this.removeChild(tab);
+    this.tabs = this.getTabs();
     // TODO: needed? if (removed) tab[DISPOSE_METHOD]();
     this.requestUpdate();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.tabs = this.getTabs();
+    this.mutationObserver = new MutationObserver(() => this.tabs = this.getTabs());
+    this.mutationObserver.observe(this, { childList: true });
+  }
+
+  disconnectedCallback() {
+    this.mutationObserver.disconnect();
+    super.disconnectedCallback();
   }
 
   async firstUpdated() {
@@ -476,7 +502,7 @@ export class TabView extends Control {
       ].filter(item => item !== "").join(";");
 
       return html`
-          <div id="tabBtn${tab.id}" class="${cls}" style="${stl}"
+          <div id="tabBtn${tab.tabid}" class="${cls}" style="${stl}"
             @click="${e => this.#onTabClick(e, tab)}"
             draggable="${this.isDraggable}"
             @dragstart="${e => this.#onDragStart(e, index)}"
@@ -498,7 +524,6 @@ export class TabView extends Control {
   renderBody() {
     return html`
 <div class="tab-body">
-  ${this.#activeTab?.showCommands ? this.#activeTab.renderCommands() : noContent}
   <slot name="body"></slot>
 </div>`;
   }
