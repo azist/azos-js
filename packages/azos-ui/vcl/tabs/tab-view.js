@@ -188,6 +188,10 @@ export class TabView extends Control {
     isModern: { type: Boolean },
     activeTabIndex: { type: Number, reflect: true },
     activeTab: { type: Tab },
+    tabs: {
+      state: true,
+      hasChanged(newVal, oldVal) { return newVal.length === oldVal?.length && newVal.every((val, index) => val === oldVal[index]); }
+    },
   }
 
   #draggedTabIndex = null;
@@ -204,8 +208,8 @@ export class TabView extends Control {
   }
 
   get tabBtns() { return Array.from(this.shadowRoot.querySelectorAll(".tab-btn")) }
-  get tabs() { return [...this.children].filter(child => child instanceof Tab); }
-  get visibleTabs() { return [...this.children].filter(child => (child.isAbsent || child.isHidden) !== true); }
+  getTabs() { return [...this.children].filter(child => child instanceof Tab); }
+  get visibleTabs() { return this.tabs.filter(child => (child.isAbsent || child.isHidden) !== true); }
 
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
@@ -245,6 +249,7 @@ export class TabView extends Control {
 
   constructor() {
     super();
+    this.tabs = [];
     this.allowCloseAll = false;
   }
 
@@ -312,6 +317,7 @@ export class TabView extends Control {
 
     const tabIndex = this.#findClosestTabIndex(event.clientX);
     this.insertBefore(this.visibleTabs[this.#draggedTabIndex], this.visibleTabs[tabIndex]);
+    this.tabs = this.getTabs();
     this.#removeHighlight();
     this.requestUpdate();
   }
@@ -371,13 +377,12 @@ export class TabView extends Control {
    * @param {Tab} tab the tab to move
    * @param {Tab|null} beforeTab the tab to insertBefore, null for "append"
    */
-  async moveTab(tab, beforeTab) {
+  moveTab(tab, beforeTab) {
     isTrue(isOf(tab, Tab).tabView === this);
     isOfOrNull(beforeTab, Tab);
     if (beforeTab) isTrue(beforeTab.tabView === this);
     this.insertBefore(tab, beforeTab);
-    this.requestUpdate();
-    await this.updateComplete;
+    this.update();
     if (tab.active) this.#scrollTabBtnIntoView(tab);
   }
 
@@ -401,6 +406,7 @@ export class TabView extends Control {
       tab = new tTab(dflt(title, tTab.name), data);
       if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
       this.insertBefore(tab, beforeTab);
+      this.tabs = this.getTabs();
     }
 
     if (!this.#activeTab || makeActive) tab.activate();
@@ -422,8 +428,15 @@ export class TabView extends Control {
     if (tab.active && !this.unselectActiveTab()) return false;
     this.dispatchEvent(new CustomEvent("tabClosed", { detail: { tab }, cancelable: false, bubbles: true }));
     this.removeChild(tab);
+    this.tabs = this.getTabs();
     // TODO: needed? if (removed) tab[DISPOSE_METHOD]();
     this.requestUpdate();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.tabs = this.getTabs();
+    this.addEventListener("slotchange", () => this.tabs = this.getTabs());
   }
 
   async firstUpdated() {
