@@ -436,7 +436,13 @@ export class TabView extends Control {
   connectedCallback() {
     super.connectedCallback();
     this.tabs = this.getTabs();
-    this.addEventListener("slotchange", () => this.tabs = this.getTabs());
+    this.mutationObserver = new MutationObserver(() => this.tabs = this.getTabs());
+    this.mutationObserver.observe(this, { childList: true });
+  }
+
+  disconnectedCallback() {
+    this.mutationObserver.disconnect();
+    super.disconnectedCallback();
   }
 
   async firstUpdated() {
