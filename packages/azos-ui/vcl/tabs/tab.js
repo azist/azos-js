@@ -158,7 +158,7 @@ export class Tab extends Block {
 
   renderCommands() {
     return html`
-<div class="toolbar">
+<div class="commands" slot="commands">
 ${this.commands?.map(cmd => html`<az-button @click="${() => cmd.exec()}" title="${cmd.icon ? cmd.icon : ""} ${cmd.title}"></az-button>`)}
 </div>
 `;
