@@ -524,7 +524,6 @@ export class TabView extends Control {
   renderBody() {
     return html`
 <div class="tab-body">
-  ${this.#activeTab?.showCommands ? this.#activeTab.renderCommands() : noContent}
   <slot name="body"></slot>
 </div>`;
   }
