@@ -190,7 +190,7 @@ export class TabView extends Control {
     activeTab: { type: Tab },
     tabs: {
       state: true,
-      hasChanged(newVal, oldVal) { return newVal.length === oldVal?.length && newVal.every((val, index) => val === oldVal[index] ? false : true); }
+      hasChanged(newVal, oldVal) { return (newVal.length === oldVal?.length && newVal.every((val, index) => val === oldVal[index])) ? false : true; }
     },
   }
 
