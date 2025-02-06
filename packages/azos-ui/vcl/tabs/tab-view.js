@@ -208,6 +208,14 @@ export class TabView extends Control {
   }
 
   get tabBtns() { return Array.from(this.shadowRoot.querySelectorAll(".tab-btn")) }
+  #tabs = [];
+  get tabs() { return this.#tabs; }
+  set tabs(v) {
+    const oldValue = this.#tabs;
+    this.#tabs = v;
+    if (this.activeTabIndex === -1) this.activeTab = this.#tabs[0] ?? null;
+    this.requestUpdate("tabs", oldValue);
+  }
   getTabs() { return [...this.children].filter(child => child instanceof Tab); }
   get visibleTabs() { return this.tabs.filter(child => (child.isAbsent || child.isHidden) !== true); }
 
@@ -249,7 +257,6 @@ export class TabView extends Control {
 
   constructor() {
     super();
-    this.tabs = [];
     this.allowCloseAll = false;
   }
 
