@@ -7,12 +7,12 @@
 import { TreeNode } from "./tree-node";
 import { Control, css, html, parseRank, parseStatus } from "../../ui";
 import { isOf, isTrue } from "azos/aver";
-import { baseStyles } from "../../parts/styles";
+import { baseStyles, iconStyles } from "../../parts/styles";
 
 export class TreeView extends Control {
 
   static #idSeed = 0;
-  static styles = [baseStyles, css`
+  static styles = [baseStyles, iconStyles, css`
 :host { display: block; }
 
 .tree-view { user-select: none; }
@@ -56,31 +56,26 @@ export class TreeView extends Control {
   margin-left: 0.5em;
 }
 
-.chevron {
-  width: 10px;
-  height: 10px;
-  border-style: solid;
-  border-width: 0 3px 3px 0;
-  border-color: rgba(0, 0, 0, 0.5);
-  border-radius: 2px;
-  display: inline-block;
-  padding: 0;
-  margin-right: 0.2em;
-  transform: rotate(45deg);
-  transition: transform 0.075s ease;
-  cursor: pointer;
-  box-sizing: border-box;
+.folder {
+  --icon-fill-color: brown;
+  --icon-stroke-color: brown;
+  margin-right: 0.5em;
 }
 
-.chevron.closed {
-  transform: rotate(-45deg);
+.chevron {
+  --icon-fill-color: black;
+  --icon-stroke-color: black;
 }
+
+.icon{--icon-width: 24px;}
   `];
 
   static properties = {
     root: { type: TreeNode },
     nodeInFocus: { type: TreeNode },
     showRoot: { type: Boolean },
+    _folder: { state: true },
+    _folderOpen: { state: true },
   };
 
   #nodeInFocus;
@@ -349,12 +344,26 @@ export class TreeView extends Control {
     } else return '';
   }
 
-  renderIcon(node) {
-    if (node.iconPath) return html`<img src="${node.iconPath}"/>`;
-    return html`${node.isOpened ? '📂' : '📁'}`;
+  connectedCallback() {
+    super.connectedCallback();
+    this._folder = this.renderIconSpec("svg://azos.ico.folder", null, null, "folder");
+    this._folderOpen = this.renderIconSpec("svg://azos.ico.folderOpen", null, null, "folder");
+    this._chevron = this.renderIconSpec("svg://azos.ico.caretRight", null, null, "chevron");
+    this._chevronClosed = this.renderIconSpec("svg://azos.ico.caretDown", null, null, "chevron");
   }
 
-  renderChevron(node) { return html`<div class="chevron ${node.isOpened ? 'open' : "closed"}"></div>` }
+  _folder = '📁';
+  _folderOpen = '📂';
+
+  renderIcon(node) {
+    if (node.iconPath) return html`<img src="${node.iconPath}"/>`;
+    return html`${node.isOpened ? this._folderOpen : this._folder}`;
+    // return html`${node.isOpened ? this._folderOpen : this._folder}`;
+  }
+
+  _chevron = '';
+  _chevronClosed = '';
+  renderChevron(node) { return html`${node.isOpened ? this._chevronClosed : this._chevron}`; }
 
   renderContent(node) { return html`${node.title} ${node.showPath ? html`<span class="path">${node.displayPath}</span>` : ``}`; }
 
