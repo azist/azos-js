@@ -283,7 +283,7 @@ export class AzosElement extends LitElement {
   }
 
   /** This is a {@link renderImageSpec} helper function rendering an icon with a uniform approach. */
-  renderIconSpec(spec, iso = null, theme = null, additionalClasses = []) {
+  renderIconSpec(spec, additionalClasses = [], iso = null, theme = null) {
     const rec = this.renderImageSpec(spec, iso, theme);
     if (isString(additionalClasses)) additionalClasses = [additionalClasses];
     const cls = ["icon", rec.attrs?.fas ? "fas" : "", ...additionalClasses].filter(isNonEmptyString).join(" ");
