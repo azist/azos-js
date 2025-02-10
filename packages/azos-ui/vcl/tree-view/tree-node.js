@@ -9,9 +9,9 @@ import { arrayDelete, DESTRUCTOR_METHOD, DisposableObject, DISPOSE_METHOD } from
 import { TreeView } from "./tree-view";
 
 export class TreeNode extends DisposableObject {
-  static #idSeed = 0;
+  static #treeNodeIdSeed = 0;
 
-  #id;
+  #treeNodeId;
   #title;
   #iconPath;
   #parent;
@@ -29,7 +29,7 @@ export class TreeNode extends DisposableObject {
 
   #data;
 
-  get id() { return this.#id; }
+  get treeNodeId() { return this.#treeNodeId; }
 
   get title() { return this.#title; }
   set title(v) { this.#title = v; }
@@ -86,9 +86,9 @@ export class TreeNode extends DisposableObject {
     this.#treeView = isOf(treeView, TreeView);
     this.#parent = isOfOrNull(parent, TreeNode);
 
-    this.#id = TreeNode.#idSeed++;
+    this.#treeNodeId = TreeNode.#treeNodeIdSeed++;
     this.#title = isStringOrNull(title);
-    this.#iconPath = iconPath ?? null;
+    this.#iconPath = iconPath; // need to account for null (don't show) and undefined (show default)
     this.#checkable = checkable ?? false;
     this.#nodeVisible = nodeVisible ?? true;
 
