@@ -38,7 +38,7 @@ export class TreeView extends Control {
   background-color: #ddd;
 }
 
-.treeNodeContent {
+.treeNodeHeaderContent {
   flex: 1;
   display: flex;
 }
@@ -340,8 +340,8 @@ export class TreeView extends Control {
       >
       ${this.renderChevron(node)}
       ${this.renderIcon(node)}
-      <div class="treeNodeContent">
-        ${this.renderContent(node)}
+      <div class="treeNodeHeaderContent">
+        ${this.renderHeaderContent(node)}
       </div>
     </div>
   `;
@@ -365,7 +365,7 @@ export class TreeView extends Control {
   `;
   }
 
-  renderContent(node) { return html`${node.title} ${node.showPath ? html`<span class="path">${node.displayPath}</span>` : ``}`; }
+  renderHeaderContent(node) { return html`${node.title} ${node.showPath ? html`<span class="path">${node.displayPath}</span>` : ``}`; }
 
 }
 

@@ -11,7 +11,7 @@ import "../../vcl/util/object-inspector";
 
 export class CaseObjectInspector extends CaseBase {
   arr = [{ key1: "value" }, { key2: { childKey1: true, childKey2: 5 } }, { key3: [{ childKey3: false, childKey4: 85 }] }];
-  obj = { a: true, b: 1, c: "Moo", d: ['d0', 'd1', 'd2', 'd3'], e: { e0: true, e1: 1, e2: "Cow", e3: [{ e30: true, e31: 31, e32: "Great", e33: ["e330", "e331", "e332", "e333"] }] } };
+  obj = { a: true, b: 1, c: "Moo", d: ['d0', 'd1', 'd2', 'd3'], e: { e0: true, e1: 1, e2: "Cow", e3: [{ e30: true, e31: 31, e32: "Great", e33: ["e330", "e331", "e332", "e333", "e331", "e332", "e333", "e331", "e332", "e333", "e331", "e332", "e333", "e331", "e332", "e333"] },{e34: true,e35: 35,e36: "Excellent",e37: ["e370","e371","e372","e373"]},] } };
 
   onRadioChange(evt) { this.objectInspector.doc = evt.target.value === "1" ? this.arr : this.obj; }
 
