@@ -14,14 +14,31 @@ export class ObjectInspector extends TreeView {
   }
 
   static styles = [TreeView.styles, css`
+.treeView{
+  font-family: var(--vcl-codebox-ffamily);
+  word-break: break-all;
+  overflow: auto;
+  color: var(--vcl-codebox-fg);
+  background: var(--vcl-codebox-bg);
+  min-height: inherit;
+  max-height: inherit;
+  padding: 0.6em;
+}
+.treeNodeChildren{
+}
 .treeNodeHeader{
   align-items: center;
+}
+.treeNodeHeader:hover{background:none;}
+.treeNodeHeader:focus{
+  filter: hue-rotate(90deg);
+  background: #f0f0f010;
 }
 .key{padding: 0 0.75em;}
 .key::after{content: ":"}
 .value .preview{
   display: inline-block;
-  max-width: 400px;
+  max-width: 50ch;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -33,6 +50,11 @@ export class ObjectInspector extends TreeView {
 .value-null    { color: var(--vcl-codebox-hi-null); }
 .value-array   { color: #aaaaaa; }
 .value-object  { color: #aaaaaa; }
+.icon.fas.chevron{
+  stroke: var(--vcl-codebox-hi-key);
+  fill: var(--vcl-codebox-hi-key);
+  stroke-width: 4ch;
+}
   `];
 
   #doc = null;
@@ -89,7 +111,7 @@ export class ObjectInspector extends TreeView {
 
   printJsonCustom(obj) {
     return '{ ' + Object.entries(obj).map(([key, value]) => {
-      if (Array.isArray(value)) return `${key}: Array(${value.length})`;
+      if (isArray(value)) return `${key}: [${value.length}]`;
       if (typeof value === 'object' && value !== null) return `${key}: {...}`;
       return `${key}: ${JSON.stringify(value)}`;
     }).join(', ') + ' }';
@@ -141,7 +163,10 @@ export class ObjectInspector extends TreeView {
         }
         break;
       case "array":
-        value = html`${node.isOpened ? "Array" : ""}(${data.value.length})`;
+        value = html`[${data.value.length}]`;
+        break;
+      case "string":
+        value = `"${data.value}"`;
         break;
       default:
         value = data.value;

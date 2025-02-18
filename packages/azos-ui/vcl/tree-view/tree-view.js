@@ -24,7 +24,6 @@ export class TreeView extends Control {
 
 .treeNodeHeader {
   cursor: pointer;
-  font-weight: bold;
   display: flex;
   align-items: baseline;
 }
