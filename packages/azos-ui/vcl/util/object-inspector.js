@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { describeTypeOf, isArray, isNonEmptyString, isNumber, isObject, isObjectOrArray } from "azos/types";
+import { describeTypeOf, isArray, isNonEmptyString, isObject, isObjectOrArray } from "azos/types";
 import { TreeView } from "../tree-view/tree-view";
 import { css, html, parseRank, parseStatus } from "../../ui";
 
@@ -17,16 +17,22 @@ export class ObjectInspector extends TreeView {
 .treeNodeHeader{
   align-items: center;
 }
-.idx, .key{
-  padding: 0 0.75em;
-  background-color: #d2b48c44;
+.key{padding: 0 0.75em;}
+.key::after{content: ":"}
+.value .preview{
+  display: inline-block;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.idx::after, .key::after{content: ":"}
-.boolean{color: green}
-.number{color: blue}
-.string{color: purple}
-.array{color: red}
-.object{color: orange}
+.value-key     { color: var(--vcl-codebox-hi-key); }
+.value-string  { color: var(--vcl-codebox-hi-string); } .value-string:hover{  color: var(--vcl-codebox-hi-string-hover); transition: 0.5s; }
+.value-number  { color: var(--vcl-codebox-hi-number); }
+.value-boolean { color: var(--vcl-codebox-hi-boolean); }
+.value-null    { color: var(--vcl-codebox-hi-null); }
+.value-array   { color: #aaaaaa; }
+.value-object  { color: #aaaaaa; }
   `];
 
   #doc = null;
@@ -81,18 +87,25 @@ export class ObjectInspector extends TreeView {
     }
   }
 
+  printJsonCustom(obj) {
+    return '{ ' + Object.entries(obj).map(([key, value]) => {
+      if (Array.isArray(value)) return `${key}: Array(${value.length})`;
+      if (typeof value === 'object' && value !== null) return `${key}: {...}`;
+      return `${key}: ${JSON.stringify(value)}`;
+    }).join(', ') + ' }';
+  }
+
   renderControl() {
     if (!this.root) return html`<div>No tree data to display.</div>`;
 
     const elmId = `tv${this.treeViewId}`;
     const cls = [
-      "treeView",
       parseRank(this.rank, true),
       parseStatus(this.status, true)
     ].filter(isNonEmptyString).join(" ");
 
     return html`
-<ol id="${elmId}" scope="this" part="tree" role="tree" class="${cls}" tabIndex=0 @keydown="${this._onKeyDown}" @focus="${this._onTreeFocus}">
+<ol id="${elmId}" scope="this" part="tree" role="tree" class="treeView ${cls}" tabIndex=0 @keydown="${this._onKeyDown}" @focus="${this._onTreeFocus}">
   ${this.showRoot
         ? this.renderNode(this.root)
         : this.root.children.map(child => this.renderNode(child))}
@@ -116,23 +129,29 @@ export class ObjectInspector extends TreeView {
   }
 
   renderHeaderContent(node) {
-    console.log(node);
     const data = node.data;
-    let header = html`<span class="${isNumber(data.key) ? "idx" : "key"}">${data.key}</span>`;
-
     const valueType = describeTypeOf(data.value);
-    // console.log({ key: data.key, value: data.value, typeofValue: typeof data.value });
+
+    let value;
     switch (valueType) {
       case "object":
-        header = html`${header} ${node.isOpened ? "" : "{...}"}`;
+        if (node.isOpened) value = "{...}";
+        else {
+          value = !this.showValuesWhileClosed ? html`<span class="preview">${this.printJsonCustom(data.value)}</span>` : '';
+        }
         break;
       case "array":
-        header = html`${header} ${node.isOpened ? "" : "Array"}(${data.value.length})`;
+        value = html`${node.isOpened ? "Array" : ""}(${data.value.length})`;
         break;
       default:
-        header = html`${header} <span class="${valueType}">${data.value}</span>`;
+        value = data.value;
+        break;
     }
-    return header;
+    return html`
+<span class="key value-key">${data.key}</span>
+<span class="value value-${valueType}">${value}</span>
+
+    `;
   }
 
   renderChildren(node) {
