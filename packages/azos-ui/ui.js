@@ -9,9 +9,9 @@ import { unsafeHTML as lit_unsafe_html } from "lit/directives/unsafe-html";
 import { ref as lit_ref, createRef as lit_create_ref } from "lit/directives/ref";
 import { isOneOf } from "azos/strings.js";
 import { link as linkModule } from "azos/linker.js";
-import { AzosError } from "azos/types";
+import { AzosError, isString } from "azos/types";
 import { asString } from "azos/strings";
-import { isNonEmptyString } from "azos/aver";
+import { isNonEmptyString } from "azos/types";
 
 
 /** CSS template processing pragma: css`p{color: blue}` */
@@ -280,6 +280,14 @@ export class AzosElement extends LitElement {
     const content = got.content;
     isNonEmptyString(content, `renderImageSpec('${spec}')`);
     return {html: verbatimHtml(content), attrs: got.attrs};
+  }
+
+  /** This is a {@link renderImageSpec} helper function rendering an icon with a uniform approach. */
+  renderIconSpec(spec, additionalClasses = [], iso = null, theme = null) {
+    const rec = this.renderImageSpec(spec, iso, theme);
+    if (isString(additionalClasses)) additionalClasses = [additionalClasses];
+    const cls = ["icon", rec.attrs?.fas ? "fas" : "", ...additionalClasses].filter(isNonEmptyString).join(" ");
+    return html`<div class="${cls}">${rec.html}</div>`;
   }
 
   render() { return html`>>AZOS ELEMENT<<`; }

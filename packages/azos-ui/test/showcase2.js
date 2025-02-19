@@ -26,6 +26,7 @@ import "./showcase/case-sliders";
 import "./showcase/case-toasts";
 import "./showcase/case-slide-deck";
 import "./showcase/case-tree-view";
+import "./showcase/case-object-inspector";
 import "./showcase/case-scheduler";
 import "./showcase/case-lookup";
 
@@ -154,6 +155,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <div id="ToastsContent"> <az-case-toasts></az-case-toasts> </div>
   <div id="SlideDeckContent"> <az-case-slide-deck></az-case-slide-deck> </div>
   <div id="TreeViewContent"> <az-case-tree-view></az-case-tree-view> </div>
+  <div id="ObjectInspectorContent"> <az-case-object-inspector></az-case-object-inspector> </div>
   <div id="SchedulerContent"> <az-case-scheduler></az-case-scheduler> </div>
   <div id="SlidersContent"> <az-case-sliders></az-case-sliders> </div>
   <div id="AccordionContent"> <az-case-accordion></az-case-accordion> </div>
@@ -177,6 +179,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <az-tab title="Toasts"> <az-case-toasts></az-case-toasts> </az-tab>
   <az-tab title="Slide Deck"> <az-case-slide-deck></az-case-slide-deck> </az-tab>
   <az-tab title="Tree View" id="tvTestTab" scope="this"> <az-case-tree-view id="testCaseTreeView" scope="this"></az-case-tree-view> </az-tab>
+  <az-tab title="Object Inspector"> <az-case-object-inspector></az-case-object-inspector> </az-tab>
   <az-tab title="Scheduler (WIP)" id="schTestTab" scope="this"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </az-tab>
   <az-tab title="Sliders (WIP)"> <az-case-sliders></az-case-sliders> </az-tab>
   <az-tab title="Accordion (WIP)"> <az-case-accordion></az-case-accordion> </az-tab>
@@ -214,6 +217,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
       <az-slide id="ToastsContent"> <az-case-toasts></az-case-toasts> </az-slide>
       <az-slide id="SlideDeckContent"> <az-case-slide-deck></az-case-slide-deck> </az-slide>
       <az-slide id="TreeViewContent"> <az-case-tree-view></az-case-tree-view> </az-slide>
+      <az-slide id="ObjectInspectorContent"> <az-case-object-inspector></az-case-object-inspector> </az-slide>
       <az-slide id="SchedulerContent"> <az-case-scheduler></az-case-scheduler> </az-slide>
       <az-slide id="SlidersContent"> <az-case-sliders></az-case-sliders> </az-slide>
       <az-slide id="AccordionContent"> <az-case-accordion></az-case-accordion> </az-slide>

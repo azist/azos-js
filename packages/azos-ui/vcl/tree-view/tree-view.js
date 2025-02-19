@@ -7,38 +7,37 @@
 import { TreeNode } from "./tree-node";
 import { Control, css, html, parseRank, parseStatus } from "../../ui";
 import { isOf, isTrue } from "azos/aver";
-import { baseStyles } from "../../parts/styles";
+import { baseStyles, iconStyles } from "../../parts/styles";
 
 export class TreeView extends Control {
 
   static #idSeed = 0;
-  static styles = [baseStyles, css`
+  static styles = [baseStyles, iconStyles, css`
 :host { display: block; }
 
-.tree-view { user-select: none; }
+.treeView { user-select: none; }
 
-.tree-view, .tree-node-children {
+.treeView, .treeNodeChildren {
   list-style: none;
   padding-left: 1em;
 }
 
-.tree-node-header {
+.treeNodeHeader {
   cursor: pointer;
-  font-weight: bold;
   display: flex;
   align-items: baseline;
 }
 
-.tree-node-header:focus {
+.treeNodeHeader:focus {
   outline: var(--focus-ctl-outline);
   box-shadow: var(--focus-ctl-box-shadow);
 }
 
-.tree-node-header:hover {
+.treeNodeHeader:hover {
   background-color: #ddd;
 }
 
-.tree-node-content {
+.treeNodeHeaderContent {
   flex: 1;
   display: flex;
 }
@@ -56,49 +55,34 @@ export class TreeView extends Control {
   margin-left: 0.5em;
 }
 
-.chevron {
-  width: 10px;
-  height: 10px;
-  border-style: solid;
-  border-width: 0 3px 3px 0;
-  border-color: rgba(0, 0, 0, 0.5);
-  border-radius: 2px;
-  display: inline-block;
-  padding: 0;
-  margin-right: 0.2em;
-  transform: rotate(45deg);
-  transition: transform 0.075s ease;
-  cursor: pointer;
-  box-sizing: border-box;
+.folder {
+  --icon-fill-color: brown;
+  --icon-stroke-color: brown;
+  margin-right: 0.5em;
 }
 
-.chevron.closed {
-  transform: rotate(-45deg);
+.chevron {
+  --icon-fill-color: black;
+  --icon-stroke-color: black;
 }
+
+.icon{--icon-width: 24px;}
   `];
 
   static properties = {
     root: { type: TreeNode },
     nodeInFocus: { type: TreeNode },
     showRoot: { type: Boolean },
+    _folder: { state: true },
+    _folderOpen: { state: true },
   };
 
   #nodeInFocus;
-  /** @param {TreeNode} node */
-  get nodeInFocus() { return this.#nodeInFocus; }
-  set nodeInFocus(node) {
-    isTrue(isOf(node, TreeNode).treeView === this);
-    this.#nodeInFocus = node;
-  }
-
   #showRoot;
-  /**
-   * @param {boolean} v
-   */
-  set showRoot(v) {
-    this.#showRoot = v;
-    this.root.isVisible = v;
-  }
+  _chevron = '';
+  _chevronClosed = '';
+  _folder = '📁';
+  _folderOpen = '📂';
 
   constructor() {
     super();
@@ -121,7 +105,6 @@ export class TreeView extends Control {
   }
 
   /**
-   *
    * @param {TreeNode} node the node that changed
    * @param {any} eArgs arguments passed to the event via detail
    */
@@ -129,41 +112,17 @@ export class TreeView extends Control {
     this.dispatchEvent(new CustomEvent("nodeUserAction", { detail: { node, ...eArgs } }));
   }
 
-  /**
-   * Retrieve all nodes--or return a single node by {@link filterNodeId}--within {@link root}
-   * @param {string} filterNodeId the element id ("tn{@link TreeNode.id}") by which to filter
-   * @param {*} root default {@link this.root}, the node from which to being collecting nodes
-   * @returns all nodes from all sub-nodes from {@link root}
-   */
-  getAllVisibleNodes(filterNodeId, root = this.root) {
-    const nodes = [];
-    traverseNode(root);
-    return filterNodeId ? (nodes.length ? nodes[0] : null) : nodes;
-
-    function traverseNode(node) {
-      if (filterNodeId) {
-        if (node.id === filterNodeId) {
-          nodes.push(node);
-          return true;
-        }
-      } else if (node.isVisible) nodes.push(node);
-      if ((node.isRoot || (node.isVisible && node.isOpened)) && node.hasChildren) node.children.some(traverseNode);
-    }
+  /** @param {TreeNode} node */
+  get nodeInFocus() { return this.#nodeInFocus; }
+  set nodeInFocus(node) {
+    isTrue(isOf(node, TreeNode).treeView === this);
+    this.#nodeInFocus = node;
   }
 
-  closeAllNodes() {
-    const visibleNodes = this.getAllVisibleNodes();
-    if (visibleNodes.length === 0) return;
-    this.#focusNode(visibleNodes[0], this.nodeInFocus, false);
-    visibleNodes.forEach(node => node.close());
-    this.requestUpdate();
-  }
-
-  removeAllNodes() {
-    if (!this.root.hasChildren) return;
-    this.nodeInFocus = this.root;
-    this.root.removeAllChildren();
-    this.requestUpdate();
+  /** @param {boolean} v */
+  set showRoot(v) {
+    this.#showRoot = v;
+    this.root.isVisible = v;
   }
 
   #close(node) {
@@ -185,7 +144,7 @@ export class TreeView extends Control {
    */
   #advanceFocus(next = true) {
     const nodes = this.getAllVisibleNodes();
-    const nodeInFocusIndex = nodes.findIndex(node => node.id === this.nodeInFocus?.id);
+    const nodeInFocusIndex = nodes.findIndex(node => node.treeNodeId === this.nodeInFocus?.treeNodeId);
     if (nodeInFocusIndex === -1) {
       if (nodes.length > 0) this.#focusNode(nodes[0]);
       return;
@@ -214,11 +173,11 @@ export class TreeView extends Control {
    */
   #focusNode(node, previousNode = null, emitEvent = true) {
     this.nodeInFocus = node;
-    const nodeElement = this.$(`tn${node.id}`);
+    const nodeElement = this.$(`tn${node.treeNodeId}`);
     nodeElement.tabindex = 0;
     nodeElement.focus();
     if (emitEvent) this._dispatchNodeUserActionEvent(node, { action: "focusChanged" });
-    if (previousNode?.isVisible) this.$(`tn${previousNode.id}`).tabindex = -1;
+    if (previousNode?.isVisible) this.$(`tn${previousNode.treeNodeId}`).tabindex = -1;
   }
 
   #onNodeToggleOpen(node) {
@@ -244,68 +203,120 @@ export class TreeView extends Control {
     this._dispatchNodeUserActionEvent(node, { action: "dblclick" });
   }
 
-  #onKeyDown(e) {
+  _onKeyDown(e) {
     const { key } = e;
+    let preventDefault = true;
     switch (key) {
       case "ArrowUp":
-        e.preventDefault();
         this.#advanceFocusPrevious();
         break;
       case "ArrowDown":
-        e.preventDefault();
         this.#advanceFocus();
         break;
       case "ArrowLeft":
-        e.preventDefault();
         if (this.nodeInFocus.hasChildren && this.nodeInFocus.isOpened) this.#close(this.nodeInFocus);
         else if (this.nodeInFocus.parent)
           if (this.nodeInFocus.parent.isVisible) this.#focusNode(this.nodeInFocus.parent);
           else this.#focusNode(this.nodeInFocus.parent.children[0]);
         break;
       case "ArrowRight":
-        e.preventDefault();
-        if (this.nodeInFocus.isClosed) this.#open(this.nodeInFocus);
+        if (this.nodeInFocus.hasChildren && this.nodeInFocus.isClosed) this.#open(this.nodeInFocus);
         else if (this.nodeInFocus.hasChildren) this.#advanceFocus(this.nodeInFocus.children[0]);
         break;
       case "Tab":
-        e.preventDefault();
         this.#advanceFocus(!e.shiftKey);
         break;
       case "Space":
-        e.preventDefault();
         if (this.nodeInFocus.checkable) {
           this.nodeInFocus.toggleChecked();
           this.dispatchEvent(new CustomEvent("nodeChecked", { detail: { node: this.nodeInFocus } }));
         }
         break;
+      default:
+        preventDefault = false;
+        break;
     }
+    if (preventDefault) e.preventDefault();
   }
 
-  async #onTreeFocus(e) {
+  async _onTreeFocus(e) {
     await this.updateComplete;
     if (this.nodeInFocus) {
       this.#focusNode(this.nodeInFocus);
       return;
     }
-    if (e.target?.id) this.$(e.target.id).tabindex = -1;
+    if (e.target?.treeNodeId) this.$(e.target.treeNodeId).tabindex = -1;
     const visibleNodes = this.getAllVisibleNodes();
     if (!visibleNodes) return;
     this.#focusNode(visibleNodes[0]);
+  }
+
+  /**
+   * Retrieve all nodes--or return a single node by {@link filterNodeId}--within {@link root}
+   * @param {string} filterNodeId the element id ("tn{@link TreeNode.treeNodeId}") by which to filter
+   * @param {*} root default {@link this.root}, the node from which to being collecting nodes
+   * @returns all nodes from all sub-nodes from {@link root}
+   */
+  getAllVisibleNodes(filterNodeId, root = this.root) {
+    const nodes = [];
+    traverseNode(root);
+    return filterNodeId ? (nodes.length ? nodes[0] : null) : nodes;
+
+    function traverseNode(node) {
+      if (filterNodeId) {
+        if (node.treeNodeId === filterNodeId) {
+          nodes.push(node);
+          return true;
+        }
+      } else if (node.isVisible) nodes.push(node);
+      if ((node.isRoot || (node.isVisible && node.isOpened)) && node.hasChildren) node.children.some(traverseNode);
+    }
+  }
+
+  closeAllNodes() {
+    const visibleNodes = this.getAllVisibleNodes();
+    if (visibleNodes.length === 0) return;
+    this.#focusNode(visibleNodes[0], this.nodeInFocus, false);
+    visibleNodes.forEach(node => node.close());
+    this.requestUpdate();
+  }
+
+  removeAllNodes() {
+    if (!this.root.hasChildren) return;
+    this.nodeInFocus = this.root;
+    this.root.removeAllChildren();
+    this.requestUpdate();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._folder = this.renderIconSpec("svg://azos.ico.folder", "folder");
+    this._folderOpen = this.renderIconSpec("svg://azos.ico.folderOpen", "folder");
+    this._chevron = this.renderIconSpec("svg://azos.ico.caretRight", "chevron");
+    this._chevronClosed = this.renderIconSpec("svg://azos.ico.caretDown", "chevron");
+  }
+
+  renderIcon(node) {
+    if (node.iconPath === null) return '';
+    let icon;
+    if (node.iconPath) icon = this.renderIconSpec(node.iconPath);
+    else icon = node.isOpened ? this._folderOpen : this._folder; // default when undefined
+    return html`<div class="treeNodeIcon">${icon}</div>`;
   }
 
   renderControl() {
     if (!this.root) return html`<div>No tree data to display.</div>`;
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     const h = html`
-    <ul id="tv${this.treeViewId}" scope="this" part="tree" role="tree" class="${cls} tree-view" @keydown="${this.#onKeyDown}" tabindex=0 @focus="${this.#onTreeFocus}">
+    <ol id="tv${this.treeViewId}" scope="this" part="tree" role="tree" class="${cls} treeView" @keydown="${this._onKeyDown}" tabindex=0 @focus="${this._onTreeFocus}">
       ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
-    </ul>`;
+    </ol>`;
     return h;
   }
 
   renderNode(node) {
     return html`
-    <li role="treeitem" class="tree-node">
+    <li role="treeitem" class="treeNode">
       ${this.renderHeader(node)}
       ${this.renderChildren(node)}
     </li>
@@ -318,22 +329,18 @@ export class TreeView extends Control {
    * @returns the html representing the {@link TreeNode} element
    */
   renderHeader(node) {
-    // console.log(node.id, this.focusedNode?.id);
+    // console.log(node.treeNodeId, this.focusedNode?.treeNodeId);
     return html`
-    <div id="tn${node.id}"
-      class="tree-node-header"
+    <div id="tn${node.treeNodeId}"
+      class="treeNodeHeader"
       @click=${() => this.#onNodeClicked(node)}
       @dblclick="${(e) => this.#onDoubleClick(e, node)}"
-      tabindex="${this.nodeInFocus?.id === node.id ? 0 : -1}"
+      tabindex="${this.nodeInFocus?.treeNodeId === node.treeNodeId ? 0 : -1}"
       >
-      <div class="tree-node-chevron" @click="${(e) => this.#onChevronClicked(e, node)}" style="${node.canOpen && node.chevronVisible ? '' : 'visibility: hidden'}">
-        ${this.renderChevron(node)}
-      </div>
-      <div class="tree-node-icon">
-        ${this.renderIcon(node)}
-      </div>
-      <div class="tree-node-content">
-        ${this.renderContent(node)}
+      ${this.renderChevron(node)}
+      ${this.renderIcon(node)}
+      <div class="treeNodeHeaderContent">
+        ${this.renderHeaderContent(node)}
       </div>
     </div>
   `;
@@ -342,21 +349,22 @@ export class TreeView extends Control {
   renderChildren(node) {
     if (node.isOpened && node.children.length) {
       return html`
-      <ul role="group" class="tree-node-children">
+      <ol role="group" class="treeNodeChildren">
         ${node.children.map(child => this.renderNode(child))}
-      </ul>
+      </ol>
       `
     } else return '';
   }
 
-  renderIcon(node) {
-    if (node.iconPath) return html`<img src="${node.iconPath}"/>`;
-    return html`${node.isOpened ? '📂' : '📁'}`;
+  renderChevron(node) {
+    return html`
+<div class="treeNodeChevron" @click="${(e) => this.#onChevronClicked(e, node)}" style="${node.canOpen && node.chevronVisible ? '' : 'visibility: hidden'}">
+  ${node.isOpened ? this._chevronClosed : this._chevron}
+</div>
+  `;
   }
 
-  renderChevron(node) { return html`<div class="chevron ${node.isOpened ? 'open' : "closed"}"></div>` }
-
-  renderContent(node) { return html`${node.title} ${node.showPath ? html`<span class="path">${node.displayPath}</span>` : ``}`; }
+  renderHeaderContent(node) { return html`${node.title} ${node.showPath ? html`<span class="path">${node.displayPath}</span>` : ``}`; }
 
 }
 

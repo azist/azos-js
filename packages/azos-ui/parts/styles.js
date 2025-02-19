@@ -533,3 +533,22 @@ li+li{
 }
 @keyframes loader{ to{ transform: rotate(1turn); }}
 `;
+
+export const iconStyles = css`
+.icon{
+  --icon-fill-color:pink;
+  --icon-stroke-color:red;
+  --icon-width: 32px;
+  display: inline-block;
+  stroke: var(--icon-stroke-color);
+  fill: var(--icon-fill-color);
+  vertical-align: middle;
+  line-height: 0.6;
+}
+.icon, .icon svg{
+  width: var(--icon-width);
+  padding: 0;
+  margin: 0;
+}
+.icon.fas{ stroke: var(--icon-fill-color) }
+`;
