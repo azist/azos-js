@@ -270,7 +270,12 @@ export class TabView extends Control {
     this.requestUpdate();
   }
 
-  #onTabClick(e, tab) { this.activeTab = tab; }
+  #onTabClick(evt, tab) { this.activeTab = tab; }
+  async #onMouseDown(evt, tab) {
+    if (evt.button === 1)
+      evt.preventDefault();
+      if (tab.canClose) await this.closeTab(tab);
+  }
 
   #scrollTabBtnIntoView(tab) {
     isOf(tab, Tab);
@@ -503,15 +508,16 @@ export class TabView extends Control {
 
       return html`
           <div id="tabBtn${tab.tabid}" class="${cls}" style="${stl}"
-            @click="${e => this.#onTabClick(e, tab)}"
+            @click="${evt => this.#onTabClick(evt, tab)}"
+            @mousedown="${evt => this.#onMouseDown(evt, tab)}"
             draggable="${this.isDraggable}"
-            @dragstart="${e => this.#onDragStart(e, index)}"
+            @dragstart="${evt => this.#onDragStart(evt, index)}"
             @dragend="${this.#onDragEnd}"
             >
             ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
-            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : noContent}
+            ${tab.canClose ? html`<div class="close-ind" @click="${evt => this.#onCloseTabClick(evt, tab)}">&times;</div>` : noContent}
           </div>
         `})}
     </div>
