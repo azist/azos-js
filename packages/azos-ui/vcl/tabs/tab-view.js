@@ -221,27 +221,30 @@ export class TabView extends Control {
 
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
-  set activeTab(v) {
-    if (v === null) {
+  set activeTab(newTab) {
+    if (newTab === null) {
+      if (this.#activeTab?.commands?.length) this.uninstallToolbarCommands(this.#activeTab.commands);
       this.#activeTab = null;
       this.requestUpdate();
       return;
     }
 
-    if (isString(v)) v = this.tabs[v];
-    isTrue(isOf(v, Tab).tabView === this);
-    if (this.#activeTab === v) return;
-    if (this.#elementFirstRendered && !this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
+    if (isString(newTab)) newTab = this.tabs[newTab];
+    isTrue(isOf(newTab, Tab).tabView === this);
+    if (this.#activeTab === newTab) return;
+    if (this.#elementFirstRendered && !this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: newTab }, bubbles: true, cancelable: true }))) return;
 
     const oldTab = this.#activeTab;
     const oldIndex = this.activeTabIndex;
 
     this.tabs.forEach(child => child.slot = undefined);
-    v.slot = "body";
-    this.#activeTab = v;
+    newTab.slot = "body";
+    if (oldTab?.commands?.length) this.uninstallToolbarCommands(oldTab.commands);
+    this.#activeTab = newTab;
+    if (newTab?.commands?.length) this.installToolbarCommands(newTab.commands);
     this.update({ "activeTab": oldTab, "activeTabIndex": oldIndex });
-    this.#scrollTabBtnIntoView(v);
-    if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
+    this.#scrollTabBtnIntoView(newTab);
+    if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: newTab }, bubbles: true }));
   }
 
   get activeTabIndex() { return this.tabs.indexOf(this.activeTab); }
@@ -281,7 +284,7 @@ export class TabView extends Control {
 
   #scrollTabBtnIntoView(tab) {
     isOf(tab, Tab);
-    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.tabid}`);
+    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.sid}`);
     if (!tabBtn) return;
     const btnBounds = tabBtn.getBoundingClientRect();
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
@@ -509,7 +512,7 @@ export class TabView extends Control {
       ].filter(item => item !== "").join(";");
 
       return html`
-          <div id="tabBtn${tab.tabid}" class="${cls}" style="${stl}"
+          <div id="tabBtn${tab.sid}" class="${cls}" style="${stl}"
             @click="${evt => this.#onTabClick(evt, tab)}"
             @mousedown="${evt => this.#onMouseDown(evt, tab)}"
             draggable="${this.isDraggable}"
