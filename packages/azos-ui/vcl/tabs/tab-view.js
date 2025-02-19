@@ -272,9 +272,11 @@ export class TabView extends Control {
 
   #onTabClick(evt, tab) { this.activeTab = tab; }
   async #onMouseDown(evt, tab) {
-    if (evt.button === 1)
+    console.log("mousedown", evt.button, evt.which, evt);
+    if (evt.button === 1) {
       evt.preventDefault();
       if (tab.canClose) await this.closeTab(tab);
+    }
   }
 
   #scrollTabBtnIntoView(tab) {
