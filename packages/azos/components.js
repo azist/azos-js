@@ -127,7 +127,7 @@ export class AppComponent extends types.DisposableObject{
    * Returns log level of this component, or if it is null then from its director
    */
   get effectiveLogLevel(){
-    return this.logLevel ?? this[type.DIRECTOR_PROP].effectiveLogLevel;
+    return this.logLevel ?? this[types.DIRECTOR_PROP].effectiveLogLevel;
   }
 
   /**
