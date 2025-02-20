@@ -5,9 +5,9 @@
 </FILE_LICENSE>*/
 
 import { IClient } from "../../client.js";
-import { isObject } from "../../aver.js";
-import * as types from "../../types.js";
-import { isString } from "../../types.js";
+import { isObject, isString } from "../../aver.js";
+import { isInsertForm } from "../../types.js";
+
 
 /** Provides functionality for consuming Sky.Adlib services*/
 export class AdlibClient extends IClient {
@@ -35,7 +35,7 @@ export class AdlibClient extends IClient {
   async saveItem(item) {
     isObject(item);
 
-    const method = types.isInsertForm(item) ? this.post : this.put;
+    const method = isInsertForm(item) ? this.post : this.put;
     const got = await method("item", item);
     return got;
   }

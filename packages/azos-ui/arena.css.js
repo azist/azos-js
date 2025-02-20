@@ -35,7 +35,7 @@ header{
         transition:var(--arn-mnu-transition);
         font-size: var(--arn-mnu-font-size);
         overflow: hidden;
-        box-shadow: var(--arn-menu-shadow);
+        box-shadow: var(--arn-mnu-shadow);
       }
 
       header .side-menu_expanded{
