@@ -329,10 +329,10 @@ export class Control extends AzosElement{
   /** Programmatic accessor with reversed meaning for `isDisabled` */
   set isEnabled(v) { this.isDisabled = !v; }
 
-  /** Programmatic accessor with reversed meaning for `isNa` */
+  /** Programmatic accessor with reversed meaning for `isNa`. Controls logical applicability similar to "business enabled" */
   get isApplicable() { return !this.isNa; }
 
-  /** Programmatic accessor with reversed meaning for `isNa` */
+  /** Programmatic accessor with reversed meaning for `isNa`. Controls logical applicability similar to "business enabled" */
   set isApplicable(v) { this.isNa = !v; }
 
   /** Programmatic accessor with reversed meaning for `isHidden` */
