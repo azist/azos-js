@@ -5,12 +5,13 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose } from "azos/types";
-import { html, AzosElement, noContent } from "./ui.js";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose, isNonEmptyString, isString } from "azos/types";
+import { html, AzosElement, noContent, verbatimHtml } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
 
 import { Command } from "./cmd.js";
+import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
@@ -107,7 +108,7 @@ export class Arena extends AzosElement {
   //shadow.adoptedStyleSheets = [sheet];
   //https://stackoverflow.com/questions/69702129/how-to-use-adoptedstylesheets-in-lit
   //https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptedStyleSheets
-  static styles = ARENA_STYLES; //[ARENA_STYLES, css`p { color: blue }`];
+  static styles = [ARENA_STYLES, iconStyles]; //[ARENA_STYLES, css`p { color: blue }`];
 
   static properties = {
     name:  {type: String},
@@ -368,6 +369,22 @@ ${footer}
     }
 
     return rec.produceContent();
+  }
+
+  /** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
+   * returning it as a tuple along with optional image attributes. If passed a class/classes, will wrap in a div with "icon" + classes
+   * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
+   */
+  renderImageSpec(spec, cls = null, iso = null, theme = null) {
+    const got = this.resolveImageSpec(spec, iso, theme);
+    const content = got.content;
+    isNonEmptyString(content, `renderImageSpec('${spec}')`);
+    const _html = verbatimHtml(content);
+    if (!cls) return { html: _html, attrs: got.attrs };
+
+    if (isString(cls)) cls = [...cls.split(" ")];
+    cls = [got.attrs?.fas ? "fas" : "", ...cls].filter(isNonEmptyString).join(" ");
+    return { html: html`<i class="icon ${cls}">${_html}</i>`, attrs: got.attrs };
   }
 
 }//Arena

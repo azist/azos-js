@@ -13,19 +13,23 @@ export class TreeView extends Control {
 
   static #idSeed = 0;
   static styles = [baseStyles, iconStyles, css`
-:host { display: block; }
+:host {
+  display: block;
+  --icon-width: 24px;
+}
+.icon{ --icon-width: 24px; }
 
 .treeView { user-select: none; }
 
 .treeView, .treeNodeChildren {
   list-style: none;
-  padding-left: 1em;
+  padding-left: var(--icon-width);
 }
 
 .treeNodeHeader {
   cursor: pointer;
   display: flex;
-  align-items: baseline;
+  align-items: center;
 }
 
 .treeNodeHeader:focus {
@@ -40,6 +44,7 @@ export class TreeView extends Control {
 .treeNodeHeaderContent {
   flex: 1;
   display: flex;
+  padding-left: 0.5em;
 }
 
 .path {
@@ -55,18 +60,15 @@ export class TreeView extends Control {
   margin-left: 0.5em;
 }
 
-.folder {
-  --icon-fill-color: brown;
-  --icon-stroke-color: brown;
-  margin-right: 0.5em;
+.icon.folder {
+  fill: maroon;
+  stroke: maroon;
 }
 
-.chevron {
-  --icon-fill-color: black;
-  --icon-stroke-color: black;
+.icon.chevron {
+  fill: black;
+  stroke: black;
 }
-
-.icon{--icon-width: 24px;}
   `];
 
   static properties = {
@@ -198,8 +200,9 @@ export class TreeView extends Control {
     this._dispatchNodeUserActionEvent(node, { action: "click" });
   }
 
-  #onDoubleClick(e, node) {
-    this.#onNodeToggleOpen(e, node);
+  #onDoubleClick(evt, node) {
+    console.log("double click");
+    this.#onNodeToggleOpen(node);
     this._dispatchNodeUserActionEvent(node, { action: "dblclick" });
   }
 
@@ -290,18 +293,16 @@ export class TreeView extends Control {
 
   connectedCallback() {
     super.connectedCallback();
-    this._folder = this.renderIconSpec("svg://azos.ico.folder", "folder");
-    this._folderOpen = this.renderIconSpec("svg://azos.ico.folderOpen", "folder");
-    this._chevron = this.renderIconSpec("svg://azos.ico.caretRight", "chevron");
-    this._chevronClosed = this.renderIconSpec("svg://azos.ico.caretDown", "chevron");
+    this._folder = this.renderImageSpec("svg://azos.ico.folder", "folder").html;
+    this._folderOpen = this.renderImageSpec("svg://azos.ico.folderOpen", "folder").html;
+    this._chevron = this.renderImageSpec("svg://azos.ico.caretRight", "chevron").html;
+    this._chevronClosed = this.renderImageSpec("svg://azos.ico.caretDown", "chevron").html;
   }
 
   renderIcon(node) {
     if (node.iconPath === null) return '';
-    let icon;
-    if (node.iconPath) icon = this.renderIconSpec(node.iconPath);
-    else icon = node.isOpened ? this._folderOpen : this._folder; // default when undefined
-    return html`<div class="treeNodeIcon">${icon}</div>`;
+    if (node.iconPath) return this.renderImageSpec(node.iconPath, "treeNodeIcon").html;
+    else return node.isOpened ? this._folderOpen : this._folder; // default when undefined
   }
 
   renderControl() {
@@ -334,7 +335,7 @@ export class TreeView extends Control {
     <div id="tn${node.treeNodeId}"
       class="treeNodeHeader"
       @click=${() => this.#onNodeClicked(node)}
-      @dblclick="${(e) => this.#onDoubleClick(e, node)}"
+      @dblclick="${evt => this.#onDoubleClick(evt, node)}"
       tabindex="${this.nodeInFocus?.treeNodeId === node.treeNodeId ? 0 : -1}"
       >
       ${this.renderChevron(node)}

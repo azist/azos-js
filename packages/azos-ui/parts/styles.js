@@ -536,12 +536,11 @@ li+li{
 
 export const iconStyles = css`
 .icon{
-  --icon-fill-color:pink;
-  --icon-stroke-color:red;
   --icon-width: 32px;
   display: inline-block;
-  stroke: var(--icon-stroke-color);
-  fill: var(--icon-fill-color);
+  stroke: var(--arn-strip-svg-stroke);
+  stroke-width: var(--arn-strip-svg-stroke-width);
+  fill: none;
   vertical-align: middle;
   line-height: 0.6;
 }
@@ -550,5 +549,5 @@ export const iconStyles = css`
   padding: 0;
   margin: 0;
 }
-.icon.fas{ stroke: var(--icon-fill-color) }
+.icon.fas{ fill: var(--arn-strip-svg-stroke) }
 `;
