@@ -8,7 +8,7 @@ import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/ave
 import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
-import { CLOSE_QUERY_METHOD, DIRTY_PROP, isNumber, isString } from "azos/types";
+import { CLOSE_QUERY_METHOD, DIRTY_PROP, isAssigned, isNumber, isString } from "azos/types";
 
 export class TabView extends Control {
 
@@ -460,7 +460,7 @@ export class TabView extends Control {
 
   async firstUpdated() {
     super.firstUpdated();
-    if (this.tabs.length && this.#pendingActiveTabIndex) this.activeTab = this.tabs[this.#pendingActiveTabIndex ?? 0];
+    if (this.tabs.length && isAssigned(this.#pendingActiveTabIndex)) this.activeTab = this.tabs[this.#pendingActiveTabIndex ?? 0];
     this.#pendingActiveTabIndex = null;
     this.#elementFirstRendered = true;
     this.update();

@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOf, isOfOrNull, isTrue } from "azos/aver";
-import { isNumber, asInt, isString } from "azos/types";
+import { isNumber, asInt, isString, isAssigned } from "azos/types";
 import { AzosElement, Control, css, html } from "../../ui";
 
 import { Slide } from "./slide";
@@ -206,7 +206,7 @@ export class SlideDeck extends Control {
   firstUpdated() {
     super.firstUpdated();
     // @see set activeSlideIndex for details about this edge case
-    if (this.slides.length && this.#pendingActiveSlideIndex) this.activeSlide = this.slides[this.#pendingActiveSlideIndex ?? 0];
+    if (this.slides.length && isAssigned(this.#pendingActiveSlideIndex)) this.activeSlide = this.slides[this.#pendingActiveSlideIndex ?? 0];
     this.#pendingActiveSlideIndex = null;
     if (this.autoTransitionInterval) this.#startTimer();
     this.#elementFirstRendered = true;
