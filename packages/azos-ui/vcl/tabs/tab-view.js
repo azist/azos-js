@@ -8,7 +8,7 @@ import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/ave
 import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
-import { CLOSE_QUERY_METHOD, DIRTY_PROP, isNumber, isString } from "azos/types";
+import { CLOSE_QUERY_METHOD, DIRTY_PROP, isAssigned, isNumber, isString } from "azos/types";
 
 export class TabView extends Control {
 
@@ -221,30 +221,30 @@ export class TabView extends Control {
 
   /** @returns an active tab or undefined */
   get activeTab() { return this.#activeTab; }
-  set activeTab(v) {
-    if (v === null) {
+  set activeTab(newTab) {
+    if (newTab === null) {
       this.#activeTab = null;
       this.requestUpdate();
       return;
     }
 
-    if (isString(v)) v = this.tabs[v];
-    isTrue(isOf(v, Tab).tabView === this);
-    if (this.#activeTab === v) return;
-    if (this.#elementFirstRendered && !this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: v }, bubbles: true, cancelable: true }))) return;
+    if (isString(newTab)) newTab = this.tabs[newTab];
+    isTrue(isOf(newTab, Tab).tabView === this);
+    if (this.#activeTab === newTab) return;
+    if (this.#elementFirstRendered && !this.dispatchEvent(new CustomEvent("tabChanging", { detail: { tab: newTab }, bubbles: true, cancelable: true }))) return;
 
     const oldTab = this.#activeTab;
     const oldIndex = this.activeTabIndex;
 
     this.tabs.forEach(child => child.slot = undefined);
-    v.slot = "body";
-    this.#activeTab = v;
+    newTab.slot = "body";
+    this.#activeTab = newTab;
     this.update({ "activeTab": oldTab, "activeTabIndex": oldIndex });
-    this.#scrollTabBtnIntoView(v);
-    if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: v }, bubbles: true }));
+    this.#scrollTabBtnIntoView(newTab);
+    if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: newTab }, bubbles: true }));
   }
 
-  get activeTabIndex() { return this.tabs.indexOf(this.activeTab); }
+  get activeTabIndex() { return this.tabs.indexOf(this.#activeTab); }
   set activeTabIndex(v) {
     if (!this.#elementFirstRendered) {
       this.#pendingActiveTabIndex = v;
@@ -270,11 +270,17 @@ export class TabView extends Control {
     this.requestUpdate();
   }
 
-  #onTabClick(e, tab) { this.activeTab = tab; }
+  #onTabClick(evt, tab) { this.activeTab = tab; }
+  async #onMouseDown(evt, tab) {
+    if (evt.button === 1) {
+      evt.preventDefault();
+      if (tab.canClose) await this.closeTab(tab);
+    }
+  }
 
   #scrollTabBtnIntoView(tab) {
     isOf(tab, Tab);
-    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.tabid}`);
+    const tabBtn = this.shadowRoot.getElementById(`tabBtn${tab.sid}`);
     if (!tabBtn) return;
     const btnBounds = tabBtn.getBoundingClientRect();
     const tabContainer = this.shadowRoot.querySelectorAll('.tab-btn-container')[0];
@@ -454,10 +460,10 @@ export class TabView extends Control {
 
   async firstUpdated() {
     super.firstUpdated();
-    if (this.tabs.length && !this.activeTab) this.activeTab = this.tabs[this.#pendingActiveTabIndex ?? 0];
+    if (this.tabs.length && isAssigned(this.#pendingActiveTabIndex)) this.activeTab = this.tabs[this.#pendingActiveTabIndex ?? 0];
     this.#pendingActiveTabIndex = null;
     this.#elementFirstRendered = true;
-    this.requestUpdate();
+    this.update();
   }
 
   updated() {
@@ -502,16 +508,17 @@ export class TabView extends Control {
       ].filter(item => item !== "").join(";");
 
       return html`
-          <div id="tabBtn${tab.tabid}" class="${cls}" style="${stl}"
-            @click="${e => this.#onTabClick(e, tab)}"
+          <div id="tabBtn${tab.sid}" class="${cls}" style="${stl}"
+            @click="${evt => this.#onTabClick(evt, tab)}"
+            @mousedown="${evt => this.#onMouseDown(evt, tab)}"
             draggable="${this.isDraggable}"
-            @dragstart="${e => this.#onDragStart(e, index)}"
+            @dragstart="${evt => this.#onDragStart(evt, index)}"
             @dragend="${this.#onDragEnd}"
             >
             ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
-            ${tab.canClose ? html`<div class="close-ind" @click="${e => this.#onCloseTabClick(e, tab)}">&times;</div>` : noContent}
+            ${tab.canClose ? html`<div class="close-ind" @click="${evt => this.#onCloseTabClick(evt, tab)}">&times;</div>` : noContent}
           </div>
         `})}
     </div>

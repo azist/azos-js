@@ -10,14 +10,11 @@ import * as types from "azos/types";
 import { Block } from "../../blocks";
 import { html } from "../../ui";
 import { TabView } from "./tab-view";
-import { Command } from "../../cmd";
-
-window.Command = Command;
 
 import "../../parts/button";
 
 export class Tab extends Block {
-  static #tabidSeed = 0;
+  static #sidSeed = 0;
 
   static properties = {
     active: { type: Boolean, reflect: true },
@@ -27,11 +24,10 @@ export class Tab extends Block {
     iconPath: { type: String },
     slot: { type: String, reflect: true },
     data: { type: Object },
-    showCommands: { type: Boolean },
   };
 
-  #tabid;
-  get tabid() { return this.#tabid; }
+  #sid;
+  get sid() { return this.#sid; }
 
   #iconPath;
   get iconPath() { return this.#iconPath; }
@@ -64,15 +60,6 @@ export class Tab extends Block {
 
   get nextTab() { return this.#getNextSibling(false); }
   get nextVisibleTab() { return this.#getNextSibling(true); }
-
-  #commands = null;
-  get commands() { return this.#commands; }
-  set commands(v) {
-    if (types.isAssigned(v)) aver.isArray(v).forEach(one => aver.isOf(one, Command));
-    const oldCommands = this.#commands;
-    this.#commands = v ?? null;
-    this.requestUpdate("commands", oldCommands);
-  }
 
   #getNextSibling(visibleOnly = true) {
     const tabView = this.tabView;
@@ -113,7 +100,7 @@ export class Tab extends Block {
     // It is possible to construct via markup, so these could be undefined
     if (title) this.title = aver.isNonEmptyString(title);
     if (data) this.data = data;
-    this.#tabid = ++Tab.#tabidSeed;
+    this.#sid = ++Tab.#sidSeed;
   }
 
   requestUpdate(...args) {
@@ -156,12 +143,5 @@ export class Tab extends Block {
     this.tabView.moveTab(this, beforeTab);
   }
 
-  renderCommands() {
-    return html`
-<div class="commands" slot="commands">
-${this.commands?.map(cmd => html`<az-button @click="${() => cmd.exec()}" title="${cmd.icon ? cmd.icon : ""} ${cmd.title}"></az-button>`)}
-</div>
-`;
-  }
   renderControl() { return html`<slot></slot>`; }
 }

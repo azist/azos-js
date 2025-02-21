@@ -64,8 +64,6 @@ export class Showcase2 extends Control {
     if (!target) return;
     target.scrollIntoView({ behavior: "smooth" });
   }
-  #btnPreviousSlide(force) { this.slideDeck.previousSlide(force); }
-  #btnNextSlide(force) { this.slideDeck.nextSlide(force); }
   #btnStartAutoTransition() {
     this.slideDeck.startAutoTransition(asInt(this.slideDeckTransitionInterval.value));
     this.requestUpdate();
@@ -92,24 +90,36 @@ export class Showcase2 extends Control {
     }
   }
 
+  #cmdRefresh = new Command(this, {
+    uri: "refresh",
+    icon: "svg://azos.ico.refresh",
+    title: "Refresh",
+    handler: function () {
+      console.log("Refreshing, isn't it?");
+      this.ctx.testCaseScheduler.refresh?.();
+    }
+  });
+
+  #onTabChanged(evt) {
+    if (evt.detail.tab === this.schTab) this.arena.installToolbarCommands([this.#cmdRefresh]);
+    else this.arena.uninstallToolbarCommands([this.#cmdRefresh]);
+  }
+
+  #onSlideChanged(evt) {
+    if (evt.detail.slide === this.SchedulerContent) this.arena.installToolbarCommands([this.#cmdRefresh]);
+    else this.arena.uninstallToolbarCommands([this.#cmdRefresh]);
+  }
+
   firstUpdated() {
     if (this.displayMode === DISPLAY_MODES.LONG_FORM) {
       const returnToToC = html`<div style="padding-top:0.5em;"><a href="" @click="${e => this.#btnScrollSectionIntoView(e, "toc")}">Return to Menu</a></div>`;
       const sections = [...this.shadowRoot.getElementById("content").children].filter(child => child instanceof HTMLDivElement);
       this.tocSections = sections.map(section => ({ id: section.id, label: section.id.replace("Content", "").replace(/([A-Z])/g, " $1") }));
       sections.forEach(section => renderInto(returnToToC, section));
-    }
-    if (this.displayMode === DISPLAY_MODES.TABBED) {
-      this.$("schTestTab").showCommands = true;
-      const cmdRefresh = new Command(this.schTestTab, {
-        uri: "refresh",
-        title: "Refresh",
-        handler: () => {
-          console.log("Refreshing, isn't it?");
-          this.$("testCaseScheduler").refresh();
-        }
-      });
-      this.$("schTestTab").commands = [cmdRefresh];
+    } else if (this.displayMode === DISPLAY_MODES.TABBED) {
+      queueMicrotask(() => { if (this.tabView.activeTab === this.schTab) this.arena.installToolbarCommands([this.#cmdRefresh]) })
+    } else if (this.displayMode === DISPLAY_MODES.SLIDES) {
+      queueMicrotask(() => { if (this.slideDeck.activeSlide === this.SchedulerContent) this.arena.installToolbarCommands([this.#cmdRefresh]) });
     }
     this.requestUpdate();
   }
@@ -156,7 +166,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <div id="SlideDeckContent"> <az-case-slide-deck></az-case-slide-deck> </div>
   <div id="TreeViewContent"> <az-case-tree-view></az-case-tree-view> </div>
   <div id="ObjectInspectorContent"> <az-case-object-inspector></az-case-object-inspector> </div>
-  <div id="SchedulerContent"> <az-case-scheduler></az-case-scheduler> </div>
+  <div id="SchedulerContent"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </div>
   <div id="SlidersContent"> <az-case-sliders></az-case-sliders> </div>
   <div id="AccordionContent"> <az-case-accordion></az-case-accordion> </div>
 </div>
@@ -165,7 +175,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
 
   renderTabbed() {
     return html`
-<az-tab-view activeTabIndex=0>
+<az-tab-view id="tabView" scope="this" activeTabIndex=14 @tabChanged="${this.#onTabChanged}">
   <az-tab title="Lookup"> <az-case-lookup></az-case-lookup> </az-tab>
   <az-tab title="Buttons"> <az-case-buttons></az-case-buttons> </az-tab>
   <az-tab title="Text Fields"> <az-case-text-fields></az-case-text-fields> </az-tab>
@@ -180,7 +190,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <az-tab title="Slide Deck"> <az-case-slide-deck></az-case-slide-deck> </az-tab>
   <az-tab title="Tree View" id="tvTestTab" scope="this"> <az-case-tree-view id="testCaseTreeView" scope="this"></az-case-tree-view> </az-tab>
   <az-tab title="Object Inspector"> <az-case-object-inspector></az-case-object-inspector> </az-tab>
-  <az-tab title="Scheduler (WIP)" id="schTestTab" scope="this"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </az-tab>
+  <az-tab title="Scheduler (WIP)" id="schTab" scope="this"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </az-tab>
   <az-tab title="Sliders (WIP)"> <az-case-sliders></az-case-sliders> </az-tab>
   <az-tab title="Accordion (WIP)"> <az-case-accordion></az-case-accordion> </az-tab>
 </az-tab-view>
@@ -203,7 +213,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   </div>
 
   <div class="strip-h" style="flex:1;height:100%">
-    <az-slide-deck id="slideDeck" scope="this" autoTransitionInterval="0" ?loop=${this.loop?.value} activeSlideIndex=0 style="width:100%;text-align:center;border:1px solid">
+    <az-slide-deck id="slideDeck" scope="this" autoTransitionInterval="0" ?loop=${this.loop?.value} activeSlideIndex=14 style="width:100%;text-align:center;border:1px solid" @slideChanged="${this.#onSlideChanged}">
       <az-slide id="LookupContent"> <az-case-lookup></az-case-lookup> </az-slide>
       <az-slide id="ButtonsContent"> <az-case-buttons></az-case-buttons> </az-slide>
       <az-slide id="TextFieldsContent"> <az-case-text-fields></az-case-text-fields> </az-slide>
@@ -218,7 +228,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
       <az-slide id="SlideDeckContent"> <az-case-slide-deck></az-case-slide-deck> </az-slide>
       <az-slide id="TreeViewContent"> <az-case-tree-view></az-case-tree-view> </az-slide>
       <az-slide id="ObjectInspectorContent"> <az-case-object-inspector></az-case-object-inspector> </az-slide>
-      <az-slide id="SchedulerContent"> <az-case-scheduler></az-case-scheduler> </az-slide>
+      <az-slide id="SchedulerContent" scope="this"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </az-slide>
       <az-slide id="SlidersContent"> <az-case-sliders></az-case-sliders> </az-slide>
       <az-slide id="AccordionContent"> <az-case-accordion></az-case-accordion> </az-slide>
     </az-slide-deck>
