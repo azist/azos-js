@@ -223,7 +223,6 @@ export class TabView extends Control {
   get activeTab() { return this.#activeTab; }
   set activeTab(newTab) {
     if (newTab === null) {
-      if (this.#activeTab?.commands?.length) this.uninstallToolbarCommands(this.#activeTab.commands);
       this.#activeTab = null;
       this.requestUpdate();
       return;
@@ -239,15 +238,13 @@ export class TabView extends Control {
 
     this.tabs.forEach(child => child.slot = undefined);
     newTab.slot = "body";
-    if (oldTab?.commands?.length) this.uninstallToolbarCommands(oldTab.commands);
     this.#activeTab = newTab;
-    if (newTab?.commands?.length) this.installToolbarCommands(newTab.commands);
     this.update({ "activeTab": oldTab, "activeTabIndex": oldIndex });
     this.#scrollTabBtnIntoView(newTab);
     if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: newTab }, bubbles: true }));
   }
 
-  get activeTabIndex() { return this.tabs.indexOf(this.activeTab); }
+  get activeTabIndex() { return this.tabs.indexOf(this.#activeTab); }
   set activeTabIndex(v) {
     if (!this.#elementFirstRendered) {
       this.#pendingActiveTabIndex = v;
@@ -275,7 +272,6 @@ export class TabView extends Control {
 
   #onTabClick(evt, tab) { this.activeTab = tab; }
   async #onMouseDown(evt, tab) {
-    console.log("mousedown", evt.button, evt.which, evt);
     if (evt.button === 1) {
       evt.preventDefault();
       if (tab.canClose) await this.closeTab(tab);
@@ -464,10 +460,10 @@ export class TabView extends Control {
 
   async firstUpdated() {
     super.firstUpdated();
-    if (this.tabs.length && !this.activeTab) this.activeTab = this.tabs[this.#pendingActiveTabIndex ?? 0];
+    if (this.tabs.length && this.#pendingActiveTabIndex) this.activeTab = this.tabs[this.#pendingActiveTabIndex ?? 0];
     this.#pendingActiveTabIndex = null;
     this.#elementFirstRendered = true;
-    this.requestUpdate();
+    this.update();
   }
 
   updated() {

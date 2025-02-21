@@ -89,7 +89,7 @@ export class TreeNode extends DisposableObject {
     this.#treeNodeId = TreeNode.#treeNodeIdSeed++;
     this.#title = isStringOrNull(title);
     this.#iconPath = iconPath; // need to account for null (don't show) and undefined (show default)
-    this.#checkable = checkable ?? false;
+    this.#checkable = checkable ?? false; // todo: Implement a checkmark
     this.#nodeVisible = nodeVisible ?? true;
 
     this.#canClose = canClose ?? true;

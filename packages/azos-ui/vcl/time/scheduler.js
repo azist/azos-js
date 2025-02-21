@@ -637,16 +637,6 @@ export class TimeBlockPicker extends Control {
     `;
   }
 
-  renderIcon(rec) {
-    const { html, } = rec;
-
-    const cls = [
-      "icon",
-      rec.attrs?.fas ? "fas" : "",
-    ].filter(types.isNonEmptyString).join(' ');
-    return html`<i cls="${cls}">${html}</i>`;
-  }
-
   get todaySymbol() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

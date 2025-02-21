@@ -55,8 +55,7 @@ export class SlideDeck extends Control {
     this.slides.forEach(child => child.slot = undefined);
     v.slot = "body";
     this.#activeSlide = v;
-    this.requestUpdate("activeSlideIndex", oldIndex); // necessary to update attribute value when slide changes
-    this.requestUpdate("activeSlide", oldSlide); // This might be how we're "supposed to" requestUpdate?
+    this.update({ "activeSlide": oldSlide, "activeSlideIndex": oldIndex });
     if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("slideChanged", { detail: { slide: v }, bubbles: true }));
   }
 
@@ -72,7 +71,6 @@ export class SlideDeck extends Control {
    */
   set activeSlideIndex(v) {
     if (!this.#elementFirstRendered) {
-      // Store until firstUpdated to ensure slides are rendered.
       this.#pendingActiveSlideIndex = v;
       return;
     }
@@ -208,10 +206,11 @@ export class SlideDeck extends Control {
   firstUpdated() {
     super.firstUpdated();
     // @see set activeSlideIndex for details about this edge case
-    if (!this.activeSlide) this.activeSlide = this.slides[this.#pendingActiveSlideIndex ?? 0];
+    if (this.slides.length && this.#pendingActiveSlideIndex) this.activeSlide = this.slides[this.#pendingActiveSlideIndex ?? 0];
     this.#pendingActiveSlideIndex = null;
     if (this.autoTransitionInterval) this.#startTimer();
     this.#elementFirstRendered = true;
+    this.update();
   }
 
   renderControl() {

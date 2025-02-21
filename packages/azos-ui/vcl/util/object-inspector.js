@@ -76,7 +76,6 @@ export class ObjectInspector extends TreeView {
   }
 
   #populateTree(doc) {
-    console.log(doc);
     this.root.removeAllChildren();
     createChild(null, doc, this.root);
     this.requestUpdate();
