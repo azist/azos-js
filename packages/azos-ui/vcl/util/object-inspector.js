@@ -10,7 +10,7 @@ import { css, html, parseRank, parseStatus } from "../../ui";
 
 export class ObjectInspector extends TreeView {
   static properties = {
-    doc: { type: Object | Array },
+    source: { type: Object | Array },
   }
 
   static styles = [TreeView.styles, css`
@@ -57,27 +57,27 @@ export class ObjectInspector extends TreeView {
 }
   `];
 
-  #doc = null;
-  get doc() { return this.#doc; }
-  set doc(doc) {
-    this.#doc = doc;
+  #source = null;
+  get source() { return this.#source; }
+  set source(source) {
+    this.#source = source;
     this.convertObjToTree();
     this.requestUpdate();
   }
 
-  constructor(doc) {
+  constructor(source) {
     super();
-    this.doc = doc;
+    this.source = source;
   }
 
   convertObjToTree() {
-    if (!this.doc) return;
-    this.#populateTree(this.doc);
+    if (!this.source) return;
+    this.#populateTree(this.source);
   }
 
-  #populateTree(doc) {
+  #populateTree(source) {
     this.root.removeAllChildren();
-    createChild(null, doc, this.root);
+    createChild(null, source, this.root);
     this.requestUpdate();
 
     function createChild(key, value, parent) {
