@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { describeTypeOf, isArray, isNonEmptyString, isObject, isObjectOrArray } from "azos/types";
+import { describeTypeOf, isArray, isAssigned, isNonEmptyString, isObject, isObjectOrArray } from "azos/types";
 import { TreeView } from "../tree-view/tree-view";
-import { css, html, parseRank, parseStatus } from "../../ui";
+import { css, html, noContent, parseRank, parseStatus } from "../../ui";
 
 export class ObjectInspector extends TreeView {
   static properties = {
@@ -23,19 +23,16 @@ export class ObjectInspector extends TreeView {
   min-height: inherit;
   max-height: inherit;
   padding: 0.6em;
+  margin: 0;
 }
-.treeNodeChildren{
-}
-.treeNodeHeader{
-  align-items: center;
-}
-.treeNodeHeader:hover{background:none;}
+.treeNodeHeader{ align-items: center }
+.treeNodeHeader:hover{ background: none }
 .treeNodeHeader:focus{
   filter: hue-rotate(90deg);
   background: #f0f0f010;
 }
-.key{padding: 0 0.75em;}
-.key::after{content: ":"}
+.key{ padding: 0 0.75em }
+.key::after{ content: ":" }
 .value .preview{
   display: inline-block;
   max-width: 50ch;
@@ -116,8 +113,12 @@ export class ObjectInspector extends TreeView {
     }).join(', ') + ' }';
   }
 
+  renderTitle() {
+    return isAssigned(this.title) ? html`<span class="title">${this.title}</span>` : noContent;
+  }
+
   renderControl() {
-    if (!this.root) return html`<div>No tree data to display.</div>`;
+    if (!this.root) return html`${this.renderTitle()}<div>Nothing to display.</div>`;
 
     const elmId = `tv${this.treeViewId}`;
     const cls = [
@@ -126,6 +127,7 @@ export class ObjectInspector extends TreeView {
     ].filter(isNonEmptyString).join(" ");
 
     return html`
+${this.renderTitle()}
 <ol id="${elmId}" scope="this" part="tree" role="tree" class="treeView ${cls}" tabIndex=0 @keydown="${this._onKeyDown}" @focus="${this._onTreeFocus}">
   ${this.showRoot
         ? this.renderNode(this.root)

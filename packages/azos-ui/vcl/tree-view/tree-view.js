@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { TreeNode } from "./tree-node";
-import { Control, css, html, parseRank, parseStatus } from "../../ui";
+import { Control, css, html, noContent, parseRank, parseStatus } from "../../ui";
 import { isOf, isTrue } from "azos/aver";
 import { baseStyles, iconStyles } from "../../parts/styles";
 
@@ -75,6 +75,7 @@ export class TreeView extends Control {
     root: { type: TreeNode },
     nodeInFocus: { type: TreeNode },
     showRoot: { type: Boolean },
+    title: { type: String },
     _folder: { state: true },
     _folderOpen: { state: true },
   };
@@ -306,13 +307,17 @@ export class TreeView extends Control {
   }
 
   renderControl() {
-    if (!this.root) return html`<div>No tree data to display.</div>`;
+    let title = noContent;
+    if (this.title) title = html`<h2>${this.title}</h2>`;
+    if (!this.root) return html`${title}<div>No tree data to display.</div>`;
+
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-    const h = html`
-    <ol id="tv${this.treeViewId}" scope="this" part="tree" role="tree" class="${cls} treeView" @keydown="${this._onKeyDown}" tabindex=0 @focus="${this._onTreeFocus}">
-      ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
-    </ol>`;
-    return h;
+    return html`
+${title}
+<ol id="tv${this.treeViewId}" scope="this" part="tree" role="tree" class="${cls} treeView" @keydown="${this._onKeyDown}" tabindex=0 @focus="${this._onTreeFocus}">
+  ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
+</ol>
+    `;
   }
 
   renderNode(node) {
