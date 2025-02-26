@@ -336,4 +336,61 @@ unit("Atom", function () {
       aver.areEqual(a.value, c.value);
     });
   });
+
+  unit(".timeUnder", function () {
+    // Adjust these values to whatever is appropriate for your environment
+    const ATOM_ENCODE_TIME_MS = .2;
+    const ATOM_VALIDITY_TIME_MS = .05;
+
+    // For ATOM.isValid tests
+    const VALID_ATOM = Atom.encode("123");
+    const VALID_ATOMS = Array.from({ length: 10000 }, (_, i) => Atom.encode(i.toString()));
+
+    cs(`should make 1 atom under ${ATOM_ENCODE_TIME_MS}ms`, function () {
+      aver.timeUnder(ATOM_ENCODE_TIME_MS, () => {
+        Atom.tryEncode(`test-suite`)
+      });
+    });
+
+    cs(`should make 100 simple atoms ${ATOM_ENCODE_TIME_MS * 10}ms`, function () {
+      aver.timeUnder(ATOM_ENCODE_TIME_MS * 10, () => {
+        let atoms = [];
+        for (let i = 0; i < 100; i++) {
+          atoms.push(Atom.tryEncode(`${i}`));
+        }
+      });
+    });
+
+    cs(`should make 1000 simple atoms ${ATOM_ENCODE_TIME_MS * 100}ms`, function () {
+      aver.timeUnder(ATOM_ENCODE_TIME_MS * 100, () => {
+        let atoms = [];
+        for (let i = 0; i < 1000; i++) {
+          atoms.push(Atom.tryEncode(`${i}`));
+        }
+      });
+    });
+
+    cs(`should make 10000 simple atoms ${ATOM_ENCODE_TIME_MS * 5000}ms`, function () {
+      aver.timeUnder(ATOM_ENCODE_TIME_MS * 5000, () => {
+        let atoms = [];
+        for (let i = 0; i < 10000; i++) {
+          atoms.push(Atom.tryEncode(`${i}`));
+        }
+      });
+    });
+
+    cs(`should determine if atom valid`, function () {
+      aver.timeUnder(ATOM_VALIDITY_TIME_MS, () => {
+        aver.isTrue(VALID_ATOM.isValid)
+      });
+    }
+    );
+
+    cs(`should determine if ${VALID_ATOMS.length} atoms are valid within ${ATOM_VALIDITY_TIME_MS * 80}ms`, function () {
+      aver.timeUnder(ATOM_VALIDITY_TIME_MS * 80, () => {
+      VALID_ATOMS.forEach(a => aver.isTrue(a.isValid));
+      });
+    });
+
+  });
 });
