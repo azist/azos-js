@@ -379,14 +379,14 @@ unit("Atom", function () {
       });
     });
 
-    cs(`should determine if 1 atom valid`, function () {
+    cs(`should determine if 1 atom isValid`, function () {
       aver.timeUnder(ATOM_VALIDITY_TIME_MS, () => {
         aver.isTrue(VALID_ATOM.isValid)
       });
     }
     );
 
-    cs(`should determine if ${VALID_ATOMS.length} atoms are valid within ${ATOM_VALIDITY_TIME_MS * 80}ms`, function () {
+    cs(`should determine if ${VALID_ATOMS.length} atoms isValid within ${ATOM_VALIDITY_TIME_MS * 80}ms`, function () {
       aver.timeUnder(ATOM_VALIDITY_TIME_MS * 80, () => {
       VALID_ATOMS.forEach(a => aver.isTrue(a.isValid));
       });
