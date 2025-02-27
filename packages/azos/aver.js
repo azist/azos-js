@@ -518,23 +518,19 @@ export function areIterablesEquivalent(a, b, f = null) {
  * Ensures that the execution time of a function is under a specified limit
  * @param {number} limitMs The time limit in milliseconds
  * @param {function} fn The function to execute
- * @param {string | undefined} msg Optional message in case of failure
+ * @param {string | undefined} from Optional tracepoint name
  * @returns undefined if function execution is within the time limit or throws
  */
-export function timeUnder(limitMs, fn, msg = undefined) {
-  if (!types.isNumber(limitMs) || limitMs <= 0) {
-    throw AVERMENT_FAILURE(`timeUnder requires a positive number as the time limit`);
-  }
-  if (!types.isFunction(fn)) {
-    throw AVERMENT_FAILURE(`timeUnder requires a function to execute`);
-  }
+export function timeUnder(limitMs, fn, from) {
+  isNumber(limitMs || limitMs <= 0);
+  isFunction(fn);
 
   const start = performance.now();
   fn();
   const duration = performance.now() - start;
 
   if (duration > limitMs) {
-    throw AVERMENT_FAILURE(`Function execution exceeded ${limitMs}ms (took ${duration.toFixed(2)}ms)`, msg);
+    throw AVERMENT_FAILURE(`Function execution exceeded ${limitMs}ms (took ${duration.toFixed(2)}ms)`, from);
   }
 }
 

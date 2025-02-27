@@ -8,6 +8,22 @@ import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "../aver.js";
 import { Atom } from "../atom.js";
 
+function generateRestrictedRandomString(length = 8) {
+  if (length <= 0) {
+    return "";
+  }
+
+  const validCharacters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * validCharacters.length);
+    result += validCharacters.charAt(randomIndex);
+  }
+
+  return result;
+}
+
 unit("Atom", function () {
 
   unit(".isValid()", function () {
@@ -338,57 +354,50 @@ unit("Atom", function () {
   });
 
   unit(".timeUnder", function () {
-    // Adjust these values to whatever is appropriate for your environment
-    const ATOM_ENCODE_TIME_MS = .2;
-    const ATOM_VALIDITY_TIME_MS = .05;
+    // populated in the encode test, used in the decode test
+    let VALID_ATOMS = [];
 
-    // For ATOM.isValid tests
-    const VALID_ATOM = Atom.encode("123");
-    const VALID_ATOMS = Array.from({ length: 10000 }, (_, i) => Atom.encode(i.toString()));
-
-    cs(`should tryEncode 1 atom under ${ATOM_ENCODE_TIME_MS}ms`, function () {
-      aver.timeUnder(ATOM_ENCODE_TIME_MS, () => {
-        Atom.tryEncode(`test-suite`)
-      });
-    });
-
-    cs(`should tryEncode 100 atoms ${ATOM_ENCODE_TIME_MS * 10}ms`, function () {
-      aver.timeUnder(ATOM_ENCODE_TIME_MS * 10, () => {
-        let atoms = [];
-        for (let i = 0; i < 100; i++) {
-          atoms.push(Atom.tryEncode(`${i}`));
-        }
-      });
-    });
-
-    cs(`should tryEncode 1000 atoms ${ATOM_ENCODE_TIME_MS * 100}ms`, function () {
-      aver.timeUnder(ATOM_ENCODE_TIME_MS * 100, () => {
-        let atoms = [];
-        for (let i = 0; i < 1000; i++) {
-          atoms.push(Atom.tryEncode(`${i}`));
-        }
-      });
-    });
-
-    cs(`should tryEncode 10000 atoms ${ATOM_ENCODE_TIME_MS * 5000}ms`, function () {
-      aver.timeUnder(ATOM_ENCODE_TIME_MS * 5000, () => {
-        let atoms = [];
-        for (let i = 0; i < 10000; i++) {
-          atoms.push(Atom.tryEncode(`${i}`));
-        }
-      });
-    });
-
-    cs(`should determine if 1 atom isValid`, function () {
-      aver.timeUnder(ATOM_VALIDITY_TIME_MS, () => {
-        aver.isTrue(VALID_ATOM.isValid)
-      });
+    const INVALID_ATOMS = new Array(50_000);
+    for (let i = 0; i < INVALID_ATOMS.length; i++) {
+      VALID_ATOMS[i] = Atom.encode('FF');
     }
-    );
 
-    cs(`should determine if ${VALID_ATOMS.length} atoms isValid within ${ATOM_VALIDITY_TIME_MS * 80}ms`, function () {
-      aver.timeUnder(ATOM_VALIDITY_TIME_MS * 80, () => {
-      VALID_ATOMS.forEach(a => aver.isTrue(a.isValid));
+    const toTryEncodeCount = 10_000;
+    const toEncodeCount = 50_000;
+
+    cs(`tryEncode ${toTryEncodeCount} atoms ${1_000}ms`, function () {
+      aver.timeUnder(1_000, () => {
+        let atoms = [];
+        for (let i = 0; i < toTryEncodeCount; i++) {
+          const a = Atom.tryEncode(generateRestrictedRandomString());
+          atoms.push(a);
+        }
+      });
+    });
+
+    cs(`encode ${toEncodeCount} atoms ${20_000}ms`, function () {
+      aver.timeUnder(20_000, () => {
+        let atoms = [];
+        for (let i = 0; i < toEncodeCount; i++) {
+          atoms.push(Atom.encode(generateRestrictedRandomString()));
+        }
+        // use this processing power to feed the other test
+        VALID_ATOMS = atoms;
+      });
+    });
+
+    cs(`decode ${VALID_ATOMS.length} atoms ${1_000}ms`, function () {
+      aver.timeUnder(1_000, () => {
+        let atoms = [];
+        for(let a of VALID_ATOMS) {
+          atoms.push(a.value);
+        }
+      });
+    });
+    
+    cs(`${VALID_ATOMS.length} atoms isValid under ${50}ms`, function () {
+      aver.timeUnder(50, () => {
+        VALID_ATOMS.forEach(a => aver.isTrue(a.isValid));
       });
     });
 
