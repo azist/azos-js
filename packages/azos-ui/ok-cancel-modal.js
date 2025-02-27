@@ -69,7 +69,7 @@ ${this.doPromptUserInput ? html`
         : html``}
 <div class="strip-h">
   <az-button title="${this.cancelBtnTitle}" @click="${this.close}"> </az-button>
-  <az-button title="${this.okBtnTitle}" @click="${this.#onOkClick}" status="ok"> </az-button>
+  <az-button title="${this.okBtnTitle}" @click="${this.#onOkClick}" status="${this.okBtnStatus}"> </az-button>
 </div>
     `;
   }
