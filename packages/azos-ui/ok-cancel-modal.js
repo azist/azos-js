@@ -83,8 +83,8 @@ ${this.doPromptUserInput ? html`
  * @param {Object} inputOptions do prompt for user input, value will be added to modalResult
  * @returns
  */
-export async function prompt(okCancelPrompt, { title, ok, cancel } = {}, { doPromptUserInput, currentValue, title: inputTitle } = {}) {
-  const modal = new OkCancelModal(okCancelPrompt, { title, ok, cancel }, { doPromptUserInput, currentValue, inputTitle });
+export async function prompt(okCancelPrompt, { title, ok, cancel, okBtnStatus } = {}, { doPromptUserInput, currentValue, title: inputTitle } = {}) {
+  const modal = new OkCancelModal(okCancelPrompt, { title, ok, cancel, okBtnStatus }, { doPromptUserInput, currentValue, inputTitle });
   document.body.appendChild(modal);
   modal.update();
   try {
