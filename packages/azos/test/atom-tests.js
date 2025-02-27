@@ -8,6 +8,22 @@ import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "../aver.js";
 import { Atom } from "../atom.js";
 
+function generateRestrictedRandomString(length = 8) {
+  if (length <= 0) {
+    return "";
+  }
+
+  const validCharacters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * validCharacters.length);
+    result += validCharacters.charAt(randomIndex);
+  }
+
+  return result;
+}
+
 unit("Atom", function () {
 
   unit(".isValid()", function () {
@@ -335,5 +351,55 @@ unit("Atom", function () {
       aver.areEqual(a.value, b.value);
       aver.areEqual(a.value, c.value);
     });
+  });
+
+  unit(".timeUnder", function () {
+    // populated in the encode test, used in the decode test
+    let VALID_ATOMS = [];
+
+    const INVALID_ATOMS = new Array(50_000);
+    for (let i = 0; i < INVALID_ATOMS.length; i++) {
+      VALID_ATOMS[i] = Atom.encode('FF');
+    }
+
+    const toTryEncodeCount = 10_000;
+    const toEncodeCount = 50_000;
+
+    cs(`tryEncode ${toTryEncodeCount} atoms ${1_000}ms`, function () {
+      aver.timeUnder(1_000, () => {
+        let atoms = [];
+        for (let i = 0; i < toTryEncodeCount; i++) {
+          const a = Atom.tryEncode(generateRestrictedRandomString());
+          atoms.push(a);
+        }
+      });
+    });
+
+    cs(`encode ${toEncodeCount} atoms ${20_000}ms`, function () {
+      aver.timeUnder(20_000, () => {
+        let atoms = [];
+        for (let i = 0; i < toEncodeCount; i++) {
+          atoms.push(Atom.encode(generateRestrictedRandomString()));
+        }
+        // use this processing power to feed the other test
+        VALID_ATOMS = atoms;
+      });
+    });
+
+    cs(`decode ${VALID_ATOMS.length} atoms ${1_000}ms`, function () {
+      aver.timeUnder(1_000, () => {
+        let atoms = [];
+        for(let a of VALID_ATOMS) {
+          atoms.push(a.value);
+        }
+      });
+    });
+    
+    cs(`${VALID_ATOMS.length} atoms isValid under ${50}ms`, function () {
+      aver.timeUnder(50, () => {
+        VALID_ATOMS.forEach(a => aver.isTrue(a.isValid));
+      });
+    });
+
   });
 });
