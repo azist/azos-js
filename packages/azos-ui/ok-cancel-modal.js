@@ -28,10 +28,11 @@ export class OkCancelModal extends ModalDialog {
    * @param {Object} modalOptions title=modal title (dflt: "Confirm"), ok=btn title (dflt: "Ok"), cancel=btn title (dflt: "Cancel")
    * @param {Object} inputOptions doPromptUserInput=produces `<az-text value='currentValue' (dflt: null) title='inputTitle' (dflt: null)></az-text>`
    */
-  constructor(okCancelPrompt, { title, ok, cancel } = {}, { doPromptUserInput, currentValue, inputTitle } = {}) {
+  constructor(okCancelPrompt, { title, ok, cancel, okBtnStatus } = {}, { doPromptUserInput, currentValue, inputTitle } = {}) {
     super();
     this.title = dflt(title, "Confirm");
     this.okBtnTitle = dflt(ok, "Ok");
+    this.okBtnStatus = dflt(okBtnStatus, "ok");
     this.cancelBtnTitle = dflt(cancel, "Cancel");
     this.okCancelPrompt = okCancelPrompt === false ? null : dflt(okCancelPrompt, "Are you sure?");
     this.doPromptUserInput = !!doPromptUserInput ?? false;
