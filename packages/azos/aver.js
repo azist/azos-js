@@ -522,7 +522,7 @@ export function areIterablesEquivalent(a, b, f = null) {
  * @returns undefined if function execution is within the time limit or throws
  */
 export function timeUnder(limitMs, fn, from) {
-  isNumber(limitMs || limitMs <= 0);
+  isTrue(isNumber(limitMs) > 0);
   isFunction(fn);
 
   const start = performance.now();

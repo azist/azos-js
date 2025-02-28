@@ -354,52 +354,22 @@ unit("Atom", function () {
   });
 
   unit(".timeUnder", function () {
-    // populated in the encode test, used in the decode test
-    let VALID_ATOMS = [];
+    cs(`atom test suite 10_000 atoms ${1000}ms`, function () {
+      aver.timeUnder(1000, () => {
+        const ATOMS = Array.from({ length: 10_000 }, (_, i) => Atom.encode(`atom${i}`));
 
-    const INVALID_ATOMS = new Array(50_000);
-    for (let i = 0; i < INVALID_ATOMS.length; i++) {
-      VALID_ATOMS[i] = Atom.encode('FF');
-    }
-
-    const toTryEncodeCount = 10_000;
-    const toEncodeCount = 50_000;
-
-    cs(`tryEncode ${toTryEncodeCount} atoms ${1_000}ms`, function () {
-      aver.timeUnder(1_000, () => {
-        let atoms = [];
-        for (let i = 0; i < toTryEncodeCount; i++) {
-          const a = Atom.tryEncode(generateRestrictedRandomString());
-          atoms.push(a);
-        }
+        ATOMS.forEach(a => {
+          aver.isString(a.value);
+          aver.isTrue(a.isValid);
+        });
       });
     });
 
-    cs(`encode ${toEncodeCount} atoms ${20_000}ms`, function () {
-      aver.timeUnder(20_000, () => {
-        let atoms = [];
-        for (let i = 0; i < toEncodeCount; i++) {
-          atoms.push(Atom.encode(generateRestrictedRandomString()));
-        }
-        // use this processing power to feed the other test
-        VALID_ATOMS = atoms;
+    cs(`invalid 1_000_000 atoms`, function () {  
+      aver.timeUnder(400, () => {
+        const INVALID_ATOMS = Array.from({ length: 1_000_000 }, (_, i) => new Atom(0xffffffffffffffffn));
+        INVALID_ATOMS.forEach(atom => aver.isFalse(atom.isValid));
       });
     });
-
-    cs(`decode ${VALID_ATOMS.length} atoms ${1_000}ms`, function () {
-      aver.timeUnder(1_000, () => {
-        let atoms = [];
-        for(let a of VALID_ATOMS) {
-          atoms.push(a.value);
-        }
-      });
-    });
-    
-    cs(`${VALID_ATOMS.length} atoms isValid under ${50}ms`, function () {
-      aver.timeUnder(50, () => {
-        VALID_ATOMS.forEach(a => aver.isTrue(a.isValid));
-      });
-    });
-
   });
 });
