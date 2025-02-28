@@ -8,7 +8,6 @@ import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "../aver.js";
 import { Atom } from "../atom.js";
 
-
 unit("Atom", function () {
 
   unit(".isValid()", function () {
