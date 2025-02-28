@@ -8,21 +8,6 @@ import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "../aver.js";
 import { Atom } from "../atom.js";
 
-function generateRestrictedRandomString(length = 8) {
-  if (length <= 0) {
-    return "";
-  }
-
-  const validCharacters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
-  let result = "";
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * validCharacters.length);
-    result += validCharacters.charAt(randomIndex);
-  }
-
-  return result;
-}
 
 unit("Atom", function () {
 
