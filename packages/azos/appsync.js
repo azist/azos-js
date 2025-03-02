@@ -51,7 +51,7 @@ export class AppSync extends Module{
     }
   }
 
-  /** Override to handle channel event. Most of times you will need to override `handleEvent(tp, body)` instead */
+  /** Override to handle channel event. Most of times you will need to override `_doHandleEvent(tp, body)` instead */
   prepareAndHandleEvent(evt){
     const appId = aver.isString(evt.data.appId);
     if (this.app.id !== appId) return false; //prevent other app on same origin

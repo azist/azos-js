@@ -431,10 +431,6 @@ ${this.showSlides ? html`
   <az-accordion-item title="Item #2 going #2 all over the fkin place">
     <h1 style="text-decoration:strikethrough;"><em>Tempor quis sit eu laborum velit enim irure velit quis.</em></h1>
   </az-accordion-item>
-  <az-accordion-item title="Open when parent's activeItemIndex is 2">
-    <h3><em>It's-a me! Maaahhhhhreeeooo</em></h3>
-    <img src="https://shawntgray.com/preNov2023/img/img/180612.png" alt="mahrio" style="width:75%;" />
-  </az-accordion-item>
 </az-accordion>`
   }
 
