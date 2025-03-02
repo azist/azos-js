@@ -12,6 +12,7 @@ import "../vcl/tabs/tab-view";
 import "../vcl/slides/slide-deck";
 
 import "../vcl/tabs/tab-view";
+import "./showcase/case-charts";
 import "./showcase/case-buttons";
 import "./showcase/case-text-fields";
 import "./showcase/case-radios";
@@ -169,6 +170,8 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <div id="SchedulerContent"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </div>
   <div id="SlidersContent"> <az-case-sliders></az-case-sliders> </div>
   <div id="AccordionContent"> <az-case-accordion></az-case-accordion> </div>
+  <div id="ChartsContent"> <az-case-charts></az-case-charts> </div>
+
 </div>
     `
   }
