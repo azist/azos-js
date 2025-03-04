@@ -12,7 +12,6 @@ import "../parts/radio-group-field.js";
 import "../parts/text-field.js";
 import "../parts/select-field.js";
 import "../parts/slider-field.js";
-import "../charts/chart.js";
 import "../vcl/util/code-box.js";
 import "../vcl/util/accordion.js";
 import "../vcl/tabs/tab-view.js";

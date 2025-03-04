@@ -12,7 +12,6 @@ import "../vcl/tabs/tab-view";
 import "../vcl/slides/slide-deck";
 
 import "../vcl/tabs/tab-view";
-import "./showcase/case-charts";
 import "./showcase/case-buttons";
 import "./showcase/case-text-fields";
 import "./showcase/case-radios";
