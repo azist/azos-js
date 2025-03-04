@@ -95,6 +95,7 @@ export const baseStyles = css`
 export const buttonStyles = css`
 button{
   width: inherit;
+  height: inherit;
   font-family: inherit;
   font-weight: var(--ctl-button-fweight);
   font-style: var(--ctl-button-fstyle);
