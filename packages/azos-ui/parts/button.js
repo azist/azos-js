@@ -25,7 +25,6 @@ export class Button extends Part {
   }
 
   renderPart() {
-    console.log('btnIcon', this.icon);
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     return html`<button class="${cls}" type="${this.type}" .disabled=${this.isDisabled}>
       ${this.renderIcon()}
