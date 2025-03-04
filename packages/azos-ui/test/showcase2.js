@@ -169,8 +169,6 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <div id="SchedulerContent"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </div>
   <div id="SlidersContent"> <az-case-sliders></az-case-sliders> </div>
   <div id="AccordionContent"> <az-case-accordion></az-case-accordion> </div>
-  <div id="ChartsContent"> <az-case-charts></az-case-charts> </div>
-
 </div>
     `
   }
