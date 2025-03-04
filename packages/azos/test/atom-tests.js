@@ -336,4 +336,24 @@ unit("Atom", function () {
       aver.areEqual(a.value, c.value);
     });
   });
+
+  unit(".timeUnder", function () {
+    cs(`atom test suite 10_000 atoms ${1000}ms`, function () {
+      aver.timeUnder(1000, () => {
+        const ATOMS = Array.from({ length: 10_000 }, (_, i) => Atom.encode(`atom${i}`));
+
+        ATOMS.forEach(a => {
+          aver.isString(a.value);
+          aver.isTrue(a.isValid);
+        });
+      });
+    });
+
+    cs(`invalid 1_000_000 atoms`, function () {  
+      aver.timeUnder(400, () => {
+        const INVALID_ATOMS = Array.from({ length: 1_000_000 }, (_, i) => new Atom(0xffffffffffffffffn));
+        INVALID_ATOMS.forEach(atom => aver.isFalse(atom.isValid));
+      });
+    });
+  });
 });
