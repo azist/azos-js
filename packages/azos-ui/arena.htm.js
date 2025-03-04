@@ -78,12 +78,7 @@ export function renderHeader(app, self){
     <nav class="side-menu" id="navMenu">
       <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
       <ul>
-        <li><a href="/">New Visual Control Showcase</a></li>
-        <li><a href="/0.app">Old Visual Control Showcase</a></li>
-        <li><a href="/1.app">Old Visual Control Showcase Tabbed</a></li>
-        <li><a href="/2.app">Old Visual Control Showcase SlideDeck</a></li>
-        <li><a href="/4.app">Simple Control Showcase</a></li>
-        <li><a href="/5.app">Scheduling Control - WIP</a></li>
+        <li><a href="/">Home</a></li>
       </ul>
     </nav>
 
@@ -116,17 +111,5 @@ export function renderMain(app, self, appletTagName){
 export function renderFooter(app, self){
   return html`
   <nav class="bottom-menu" id="navBottomMenu">
-  <ul>
-      <li><a href="index"   >Home     </a></li>
-      <li><a href="about"   >About    </a></li>
-      <li><a href="services">Services </a></li>
-      <li><a href="contact" >Contact  </a></li>
-    </ul>
-  </nav>
-
-  <div class="contact">
-    <span class="line">1982 Jack London Street suite 2A</span>
-    <span class="line">New Applewood, CA 90210-1234</span>
-    <span class="line">555.123.4567</span>
-  </div>`;
+  </nav>`;
 }

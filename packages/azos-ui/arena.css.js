@@ -168,42 +168,16 @@ main .applet-container.kiosk{
 
 /* ------------------- */
 
-footer{
+footer {
+  display: none;
+  font-size: .6em;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   background-color: #606060;
   color: #aaa;
   padding: 10px;
   min-width: var(--arn-min-width);
   box-sizing: border-box;
 }
-
-      footer .bottom-menu a{
-        text-decoration:  none;
-        color: #a8a8a0;
-        transition: 0.3s;
-        font-size: 1.1em;
-      }
-      footer .bottom-menu a:hover{
-        color: #e8e8d8;
-      }
-
-      footer .bottom-menu ul{
-        list-style: none;
-        padding: 28px 10px 10px 32px;
-      }
-
-      footer .bottom-menu li{
-        padding: 2px;
-      }
-
-      footer .contact{
-        position: relative;
-        top: -3em;
-        text-align: right;
-        font-size: 0.75em;
-        opacity: 0.5;
-      }
-
-      footer .contact .line{
-        display: block;
-      }
 `;
