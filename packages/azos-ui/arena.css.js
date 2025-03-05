@@ -123,11 +123,14 @@ header{
         color: var(--arn-strip-color);
         padding: var(--arn-strip-padding);
         overflow: hidden;
+        align-content: center;
         stroke: var(--arn-strip-svg-stroke);
         stroke-width: var(--arn-strip-svg-stroke-width);
         fill: none;
         stroke-linecap: round;
+        cursor: pointer;
       }
+      header .strip-btn.loggedIn{font-size: 1.75em;}
 
       header .strip-btn:hover{
         background-color: rgba(255, 255, 255, 0.1);
