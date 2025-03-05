@@ -123,11 +123,20 @@ header{
         color: var(--arn-strip-color);
         padding: var(--arn-strip-padding);
         overflow: hidden;
+        align-content: center;
         stroke: var(--arn-strip-svg-stroke);
         stroke-width: var(--arn-strip-svg-stroke-width);
         fill: none;
         stroke-linecap: round;
+        cursor: pointer;
       }
+      header .strip-btn.loggedIn{
+        font-size: 1em;
+        background-color: #ffffff30;
+        border-radius: 3ch;
+        padding: 0 0.25em;
+      }
+      header .strip-btn svg{ width: 28px }
 
       header .strip-btn:hover{
         background-color: rgba(255, 255, 255, 0.1);
@@ -187,8 +196,8 @@ footer{
       }
 
       footer .bottom-menu ul{
+        margin: 0px;
         list-style: none;
-        padding: 28px 10px 10px 32px;
       }
 
       footer .bottom-menu li{

@@ -94,6 +94,8 @@ export const baseStyles = css`
 
 export const buttonStyles = css`
 button{
+  width: inherit;
+  height: inherit;
   font-family: inherit;
   font-weight: var(--ctl-button-fweight);
   font-style: var(--ctl-button-fstyle);
@@ -132,6 +134,11 @@ button:disabled{
  filter: var(--ctl-disabled-filter);
  transform: none;
 }
+
+button{ display: inline-flex; gap: 0.5em; }
+button .title{ flex: 1; }
+button i{ display: block; width: 1em; }
+button i svg{ height: 100%; }
 `;
 
 export const checkStyles = css`

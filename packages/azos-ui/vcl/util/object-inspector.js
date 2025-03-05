@@ -25,6 +25,10 @@ export class ObjectInspector extends TreeView {
   padding: 0.6em;
   margin: 0;
 }
+ol{
+  max-width:100%;
+  width: 720px;
+}
 .treeNodeHeader{ align-items: center }
 .treeNodeHeader:hover{ background: none }
 .treeNodeHeader:focus{
