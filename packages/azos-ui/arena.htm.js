@@ -57,7 +57,7 @@ export function renderToolbar(app, self, commands){
 
   const userIcon = self.renderImageSpec("svg://azos.ico.user?m=i32");
   let user = app.session?.user?.toInitObject();
-  user = { asof: "2025-03-05T15:10:41.605Z", authToken: "xyz", "claims": { "a": "z", "email": "dkh@h.com", "exp": 1741274242, "iat": 1741187441, "name": "Dmitriy K", "sub": "dkh" }, "descr": "Dmitriy K", "name": "dkh", "rights": {}, "status": "Admin" };
+  // user = { asof: "2025-03-05T15:10:41.605Z", authToken: "xyz", "claims": { "a": "z", "email": "dkh@h.com", "exp": 1741274242, "iat": 1741187441, "name": "Dmitriy K", "sub": "dkh" }, "descr": "Dmitriy K", "name": "dkh", "rights": {}, "status": "Admin" };
   // user.desc = null;
   // user.name = null;
   let initials, cls;
