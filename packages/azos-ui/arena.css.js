@@ -130,7 +130,13 @@ header{
         stroke-linecap: round;
         cursor: pointer;
       }
-      header .strip-btn.loggedIn{font-size: 1.75em;}
+      header .strip-btn.loggedIn{
+        font-size: 1em;
+        background-color: #ffffff30;
+        border-radius: 3ch;
+        padding: 0 0.25em;
+      }
+      header .strip-btn svg{ width: 28px }
 
       header .strip-btn:hover{
         background-color: rgba(255, 255, 255, 0.1);
