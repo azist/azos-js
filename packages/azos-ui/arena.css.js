@@ -187,8 +187,8 @@ footer{
       }
 
       footer .bottom-menu ul{
+        margin: 0px;
         list-style: none;
-        padding: 28px 10px 10px 32px;
       }
 
       footer .bottom-menu li{

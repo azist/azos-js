@@ -6,6 +6,7 @@
 
 /* eslint-disable no-unused-vars */
 
+import { showObject } from "./object-inspector-modal.js";
 import { html, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
 
 // SVG Icons
@@ -19,8 +20,11 @@ function menuClose(){
   this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
 }
 
-function showUser(){
-  alert("Logged in user is: " + this.session.user.name);
+function showUser(user, arena) {
+  if (user.status === "Invalid")
+    window.location.pathname = "/app/login";
+  else
+    showObject(user, { title: "User Profile", okBtnTitle: "Close" }, arena);
 }
 
 async function toolbarClick(){
@@ -51,13 +55,16 @@ export function renderToolbar(app, self, commands){
     itemContent.push(one);
   }
 
-
   const userIcon = self.renderImageSpec("svg://azos.ico.user?m=i32");
-  const content = html`
-  <div class="strip-btn" id="divToolbar_User" @click="${showUser.bind(app)}">${userIcon.html}</div>
+  let user = app.session?.user?.toInitObject();
+  user = { descr: "Komi Draco Bear", status: "Admin" };
+  let initials;
+  if (user?.status !== "Invalid") initials = html`${user.descr?.split(" ").map(n => n[0]).join("").toUpperCase()}`;
 
-  ${itemContent}
-    `;
+  const content = html`
+<div class="strip-btn" id="divToolbar_User" @click="${evt => showUser.call(app, user, self)}">${initials ?? userIcon.html}</div>
+${itemContent}
+  `;
 
   renderInto(content, divToolbar);
 }
@@ -116,17 +123,11 @@ export function renderMain(app, self, appletTagName){
 export function renderFooter(app, self){
   return html`
   <nav class="bottom-menu" id="navBottomMenu">
-  <ul>
-      <li><a href="index"   >Home     </a></li>
-      <li><a href="about"   >About    </a></li>
-      <li><a href="services">Services </a></li>
-      <li><a href="contact" >Contact  </a></li>
+    <ul>
     </ul>
   </nav>
 
-  <div class="contact">
-    <span class="line">1982 Jack London Street suite 2A</span>
-    <span class="line">New Applewood, CA 90210-1234</span>
-    <span class="line">555.123.4567</span>
-  </div>`;
+  <div class="contact"></div>
+  <div class="copyright">Copyright &copy; 2022-2023 Azist</div>
+  `;
 }
