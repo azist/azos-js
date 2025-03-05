@@ -22,7 +22,7 @@ function menuClose(){
 
 function showUser(user, arena) {
   if (user.status === "Invalid")
-    window.location.pathname = "/app/login";
+    window.location.assign("/app/login");
   else
     showObject(user, { title: "User Profile", okBtnTitle: "Close" }, arena);
 }
@@ -57,7 +57,7 @@ export function renderToolbar(app, self, commands){
 
   const userIcon = self.renderImageSpec("svg://azos.ico.user?m=i32");
   let user = app.session?.user?.toInitObject();
-  user = { descr: "Komi Draco Bear", status: "Admin" };
+  // user = { asof: "2025-03-05T15:10:41.605Z", authToken: "xyz", "claims": { "aud": "zeus", "email": "dkh-g8@greatdayimprovements.com", "exp": 1741274242, "g8_loupe": "223-322", "g8_org_unit": "orgu.path@sky-auth::/org/it/se/arch", "g8_pcms_id": "d641195a-2a37-45b0-8877-8f3f7539cd1d", "g8_role": "/role/it/super", "grafana-role": "Editor", "iat": 1741187441, "iss": "G8DayImprovements", "name": "Dmitriy K", "sub": "dkh" }, "descr": "Dmitriy K", "name": "dkh", "rights": {}, "status": "Admin" };
   let initials;
   if (user?.status !== "Invalid") initials = html`${user.descr?.split(" ").map(n => n[0]).join("").toUpperCase()}`;
 

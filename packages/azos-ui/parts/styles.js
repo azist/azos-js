@@ -136,6 +136,7 @@ button:disabled{
 }
 
 button{ display: inline-flex; gap: 0.5em; }
+button .title{ flex: 1; }
 button i{ display: block; width: 1em; }
 button i svg{ height: 100%; }
 `;

@@ -9,13 +9,14 @@ import { ModalDialog } from "./modal-dialog";
 
 import "./parts/button";
 import "./vcl/util/object-inspector";
+import { isObject } from "azos/aver";
 
 export class ObjectInspectorModal extends ModalDialog {
 
   static styles = [ModalDialog.styles, css`
 .strip-h{
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
   `];
 
@@ -32,7 +33,7 @@ export class ObjectInspectorModal extends ModalDialog {
   constructor(obj, { title, okBtnTitle, okBtnStatus } = {}, arena) {
     super(arena);
     this.title = title ?? "";
-    this.objToInspect = obj;
+    this.objToInspect = isObject(obj);
     this.okBtnTitle = okBtnTitle ?? "Ok";
     this.okBtnStatus = okBtnStatus ?? "ok";
     this.modalResult = { response: false };
@@ -45,8 +46,8 @@ export class ObjectInspectorModal extends ModalDialog {
 
   renderBodyContent() {
     return html`
+<az-object-inspector .source="${this.objToInspect}"></az-object-inspector>
 <div class="strip-h">
-  <az-object-inspector .obj="${this.objToInspect}"></az-object-inspector>
   <az-button title="${this.okBtnTitle}" @click="${this.#onOkClick}" status="${this.okBtnStatus}"> </az-button>
 </div>
     `;
