@@ -6,6 +6,7 @@
 
 /* eslint-disable no-unused-vars */
 
+import { showObject } from "./object-inspector-modal.js";
 import { html, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
 
 // SVG Icons
@@ -19,8 +20,11 @@ function menuClose(){
   this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
 }
 
-function showUser(){
-  alert("Logged in user is: " + this.session.user.name);
+function showUser(user, arena) {
+  if (user.status === "Invalid")
+    window.location.assign("/app/login");
+  else
+    showObject(user, { title: "User Profile", okBtnTitle: "Close" }, arena);
 }
 
 async function toolbarClick(){
@@ -51,15 +55,39 @@ export function renderToolbar(app, self, commands){
     itemContent.push(one);
   }
 
-
   const userIcon = self.renderImageSpec("svg://azos.ico.user?m=i32");
-  const content = html`
-  <div class="strip-btn" id="divToolbar_User" @click="${showUser.bind(app)}">${userIcon.html}</div>
+  let user = app.session?.user?.toInitObject();
+  // user = { asof: "2025-03-05T15:10:41.605Z", authToken: "xyz", "claims": { "a": "z", "email": "dkh@h.com", "exp": 1741274242, "iat": 1741187441, "name": "Dmitriy K", "sub": "dkh" }, "descr": "Dmitriy K", "name": "dkh", "rights": {}, "status": "Admin" };
+  // user.desc = null;
+  // user.name = null;
+  let initials, cls;
+  if (user?.status !== "Invalid") {
+    initials = getInitials(user);
+    cls = "loggedIn";
+  }
 
-  ${itemContent}
-    `;
+  const content = html`
+<div class="strip-btn ${cls}" id="divToolbar_User" @click="${evt => showUser.call(app, user, self)}">${initials ?? userIcon.html}</div>
+${itemContent}
+  `;
 
   renderInto(content, divToolbar);
+}
+
+function getInitials(user) {
+  let parts;
+  for (let screenName of [user.descr, user.name]) {
+    if (!screenName) continue;
+    else if (screenName.includes(" ")) { parts = screenName.split(" "); break; }
+    else if (screenName.includes(".")) { parts = screenName.split("."); break; }
+    else if (screenName.includes("-")) { parts = screenName.split("-"); break; }
+    else if (screenName.includes("_")) { parts = screenName.split("_"); break; }
+  }
+  let initials;
+  if (parts?.length > 0) initials = parts.map(n => n[0]).join("");
+  else initials = user.name ?? "IN";
+
+  return initials.slice(0, 2).toUpperCase();
 }
 
 
@@ -116,16 +144,11 @@ export function renderMain(app, self, appletTagName){
 export function renderFooter(app, self){
   return html`
   <nav class="bottom-menu" id="navBottomMenu">
-  <ul>
-      <li><a href="index"   >Home     </a></li>
-      <li><a href="about"   >About    </a></li>
-      <li><a href="services">Services </a></li>
-      <li><a href="contact" >Contact  </a></li>
+    <ul>
     </ul>
   </nav>
-  <div class="contact">
-    <span class="line">1982 Jack London Street suite 2A</span>
-    <span class="line">New Applewood, CA 90210-1234</span>
-    <span class="line">555.123.4567</span>
-  </div`;
+
+  <div class="contact"></div>
+  <div class="copyright">Copyright &copy; 2022-2023 Azist</div>
+  `;
 }
