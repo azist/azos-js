@@ -50,7 +50,7 @@ export class AppComponent extends types.DisposableObject{
   constructor(dir, cfg){
     super();
     this.#sid = ++AppComponent.#idSeed;
-    this.#director = aver.isOfEither(dir, Application, AppComponent);
+    this.#director = aver.isOfEither(dir, [Application, AppComponent]);
     const app = this.app;
     let clist = AppComponent.#appMap.get(app);
     if (clist === undefined){

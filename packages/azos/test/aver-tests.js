@@ -515,19 +515,19 @@ unit("Aver", function () {
   unit("#isOfEither()", function () {
     cs("TRUE", function () {
       let obj = new sut.MockA(1, 2);
-      sut.isOfEither(obj, sut.MockBase);
-      sut.isOfEither(obj, sut.MockB, sut.MockBase);
-      sut.isOfEither(obj, sut.MockBase, Object);
-      sut.isOfEither(obj, Object, sut.MockBase);
-      sut.isOfEither(obj, Date, Object, sut.MockA);
+      sut.isOfEither(obj, [sut.MockBase]);
+      sut.isOfEither(obj, [sut.MockB, sut.MockBase]);
+      sut.isOfEither(obj, [sut.MockBase, Object]);
+      sut.isOfEither(obj, [Object, sut.MockBase]);
+      sut.isOfEither(obj, [Date, Object, sut.MockA]);
     });
 
     cs("FALSE", function () {
       let obj = new sut.MockA(1, 2);
-      sut.throws(function () { sut.isOfEither(obj, Array); }, "isOfEither");
-      sut.throws(function () { sut.isOfEither(obj, Date, Array, sut.MockB); }, "isOfEither");
-      sut.throws(function () { sut.isOfEither(null, null); }, "isOfEither");
-      sut.throws(function () { sut.isOfEither(undefined, undefined); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(obj, [Array]); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(obj, [Date, Array, sut.MockB]); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(null, [null]); }, "isOfEither");
+      sut.throws(function () { sut.isOfEither(undefined, [undefined]); }, "isOfEither");
     });
   });
 
