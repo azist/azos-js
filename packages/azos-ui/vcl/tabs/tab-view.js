@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/aver";
+import { isOf, isOfOrNull, isSubclassOf, isTrue } from "azos/aver";
 import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
@@ -409,14 +409,14 @@ export class TabView extends Control {
   addTab(tTab, title, beforeTab = null, makeActive = true, data = null) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
-    isStringOrNull(title);
+    title = dflt(title, tTab.name);
 
     const foundTab = this.visibleTabs.filter(tab => tab.title === title)[0];
 
     let tab;
     if (foundTab) tab = foundTab;
     else {
-      tab = new tTab(dflt(title, tTab.name), data);
+      tab = new tTab(title, data);
       if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
       this.insertBefore(tab, beforeTab);
       this.tabs = this.getTabs();
