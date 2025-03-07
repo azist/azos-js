@@ -94,7 +94,7 @@ export class Unit {
 
 
   register(child) {
-    aver.isOfEither(child, Unit, Case);
+    aver.isOfEither(child, [Unit, Case]);
     if (this.#children.indexOf(child) >= 0) return false;//already exists
     this.#children.push(child);
     return true;
