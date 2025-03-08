@@ -50,6 +50,7 @@ export class Router extends Module{
 
 
 export class RouteHandler{
+  #requestContext;
   #router;
   #graph;
   #path;
@@ -63,6 +64,8 @@ export class RouteHandler{
     this.#graph = aver.isOf(graph, ConfigNode);
     this.#path = aver.isNonEmptyString(path);
     this.#parent = aver.isOfOrNull(parent, RouteHandler);
+    this.#requestContext = this.#parent?.requestContext ?? { };
+
 
     const i = path.indexOf('/');
     if (i >= 0){
@@ -76,6 +79,11 @@ export class RouteHandler{
 
   /** Router which processes the request */
   get router(){ return this.#router; }
+
+  /** Returns global request context which can be used to attach properties and other state dynamically.
+   * The object is carried-over from the first node in the chain, effectively all handlers share the same context instance
+   */
+  get requestContext(){ return this.#requestContext; }
 
   /** The routing graph which this node is based on */
   get graph(){ return this.#graph; }
@@ -93,7 +101,7 @@ export class RouteHandler{
   get parent(){ return this.#parent; }
 
   /** Returns the next/child handler or NULL if this handler is the terminal/leaf action handler*/
-  next(){ return null; }
+  next(){ throw ABSTRACT("RouteHandler.next()"); }
 }
 
 export class SectionHandler extends RouteHandler{
@@ -114,7 +122,7 @@ export class ActionHandler extends RouteHandler{
     super(router, cfg, path, parent);
   }
 
-  /**  */
+  /** The Leaf node which performs an action*/
   next(){ return null; }
 
   /** Performs the actual work */
