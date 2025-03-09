@@ -8,6 +8,9 @@ import * as aver from "azos/aver";
 import { Module } from "azos/modules";
 import { ConfigNode, makeNew } from "azos/conf";
 import { ABSTRACT } from "./coreconsts";
+import { AzosError } from "./types";
+import { trim } from "./strings";
+import { Session } from "./security";
 
 /**
  * Provides routing services by maintaining a routing graph which maps requests into route handlers, such as app launch handlers
@@ -23,6 +26,26 @@ export class Router extends Module{
   /** Returns routing graph root */
   get graph(){ return this.#graph; }
 
+  /** Returns the type of SectionHandler derivative used by default by this router
+   * @returns {function}
+  */
+  get defaultSectionHandler() { return SectionHandler; }
+
+  /** Returns the type of ActionHandler derivative used by default by this router
+   * @returns {function}
+  */
+  get defaultLaunchHandler() { return ActionHandler; }
+
+  /** Override to perform a determination based on attrib ute pattern matching of the nextNode
+   * within a handler - is it a section or an action node - the specifics are up to the
+   * descendant class
+  */
+  getDefaultHandlerType(handler, nextNode){
+    aver.isOf(handler, RouteHandler);
+    aver.isOf(nextNode, ConfigNode);
+    return this.defaultSectionHandler;
+  }
+
   /**
    * Routes a path, such as the one coming from a browser URI hash fragment, into an array of segment handlers,
    * the last one handling the action of the route
@@ -31,7 +54,7 @@ export class Router extends Module{
    */
   handleRouteSegments(path){
    aver.isNonEmptyString(path);
-   const handler = makeNew(RouteHandler, this.#graph, this, SectionHandler, [path, null]);
+   const handler = makeNew(RouteHandler, this.#graph, this, this.defaultSectionHandler, [path, null]);
    const result = [];
    for(let next; (next = handler.handle());) result.push(next);
    return result;
@@ -40,7 +63,7 @@ export class Router extends Module{
   /**
    * Routes a path, such as the one coming from a browser URI hash fragment, into a handler
    * @param {String} path a string which contains a path being mapped
-   * @returns {RouteHandler} returns a last route handler
+   * @returns {RouteHandler} returns the last route handler which handles the specified path
    */
   handleRoute(path){
     return this.handleRouteSegments(path).at(-1);
@@ -48,7 +71,9 @@ export class Router extends Module{
 }//Router
 
 
-
+/** Handles route paths by navigating through routing graph of config nodes segment by segment, dynamically capturing parameters and
+ * injecting the next most appropriate polymorphic route handler for processing of the next segment
+ */
 export class RouteHandler{
   #requestContext;
   #router;
@@ -57,7 +82,7 @@ export class RouteHandler{
   #segment;
   #nextPath;
   #parent;
-  #permissions;
+  #permissions; //TODO: Implement sec in general - assertion script
 
   constructor(router, graph, path, parent){
     this.#router = aver.isOf(router, Router);
@@ -66,13 +91,14 @@ export class RouteHandler{
     this.#parent = aver.isOfOrNull(parent, RouteHandler);
     this.#requestContext = this.#parent?.requestContext ?? { };
 
-
     const i = path.indexOf('/');
-    if (i >= 0){
-      this.#segment = path.slice(0, i);
-      this.#nextPath = path.substring(i+1);
+    if (i==0) {
+      throw new AzosError("Bad route", "RouteHandler.ctor()");
+    } else if (i > 0){
+      this.#segment = trim(path.substring(0, i));
+      this.#nextPath = trim(path.substring(i + 1));
     } else {
-      this.#segment = path;
+      this.#segment = trim(path);
       this.#nextPath = "";
     }
   }
@@ -102,6 +128,23 @@ export class RouteHandler{
 
   /** Returns the next/child handler or NULL if this handler is the terminal/leaf action handler*/
   next(){ throw ABSTRACT("RouteHandler.next()"); }
+
+  /** Passes or fails with AuthorizationException/403. It checks permissions on the whole ancestry chain leading up to this handler (all parents) */
+  checkPermissionChain(session){
+    aver.isOf(session, Session);
+    let node = this;
+    while(node){
+      node.checkPermissions(session);
+      node = node.parent;
+    }
+  }
+
+  /** Checks permissions defined on this level */
+  checkPermissions(session){
+    aver.isOf(session, Session);
+    // TODO: Implement!!!!!!!!!!
+  }
+
 }
 
 export class SectionHandler extends RouteHandler{
@@ -111,13 +154,21 @@ export class SectionHandler extends RouteHandler{
   }
 
   next(){
-    //finds .segment as a child section. tries to make an action handler or section by default
+    let node = this.graph.get(this.segment);
+    if (!(node instanceof ConfigNode)){
+      //Return error handler
+      return null;//TODO: error handler
+    }
+
+    //Section or Action?
+
   }
 }
 
-/** Terminal/leaf route handler */
+/** Terminal/leaf route handler which performs an action such as renders the page or launches an applet.
+ * You need to derive a more concrete class which performs a specific action by overriding `_doExecActionAsync()` protected method
+ */
 export class ActionHandler extends RouteHandler{
-
   constructor(router, cfg, path, parent){
     super(router, cfg, path, parent);
   }
@@ -125,18 +176,29 @@ export class ActionHandler extends RouteHandler{
   /** The Leaf node which performs an action*/
   next(){ return null; }
 
-  /** Performs the actual work */
-  async execActionAsync(){ throw ABSTRACT("execActionAsync()"); }
-}
+  /** Performs the actual work after checking permissions if a user session object is passed
+   * @param {*} context execution context, e.g. for browser routing we would pass arena
+   * @param {*} args arguments for action execution
+   * @param {Session} session session which execution is under
+   */
+  async execActionAsync(context, args, session = null){
+    //Validate permissions from top to bottom
+    aver.isOfOrNull(session, Session);
+    if (session) this.checkPermissions(session);
+    await this._doExecActionAsync(context, args, session);
+  }
 
-
-
-//THis should be in AZOS-ui
-export class AppletLaunchHandler extends RouteHandler{
-  constructor(router, cfg, path, parent){
-    super(router, cfg, path, parent);
+  /** Performs the actual work. Returns the result of the action
+   * @param {*} context execution context, e.g. for browser routing we would pass arena
+   * @param {*} args arguments for action execution
+   * @param {Session} session which execution is under
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _doExecActionAsync(context, args, session){
+    throw ABSTRACT("execActionAsync()");
   }
 }
+
 
 
 /*
