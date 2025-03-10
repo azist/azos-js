@@ -36,7 +36,7 @@ export class Router extends Module{
   */
   get defaultLaunchHandler() { return ActionHandler; }
 
-  /** Override to perform a determination based on attrib ute pattern matching of the nextNode
+  /** Override to perform a determination based on attrib use pattern matching of the nextNode
    * within a handler - is it a section or an action node - the specifics are up to the
    * descendant class
   */
@@ -154,14 +154,11 @@ export class SectionHandler extends RouteHandler{
   }
 
   next(){
-    let node = this.graph.get(this.segment);
-    if (!(node instanceof ConfigNode)){
-      //Return error handler
-      return null;//TODO: error handler
-    }
-
-    //Section or Action?
-
+    //Section or Action default type
+    let node = aver.isOf(this.graph.get(this.segment), `${this.constructor.name} expects segment '${this.segment}' to be of ConfigNode type`);
+    const nxtDefaultType = this.router.getDefaultHandlerType(this, node);
+    const nxtHandler = makeNew(RouteHandler, this.graph, this, nxtDefaultType, [this.nextPath, this]);
+    return nxtHandler;
   }
 }
 
@@ -173,7 +170,7 @@ export class ActionHandler extends RouteHandler{
     super(router, cfg, path, parent);
   }
 
-  /** The Leaf node which performs an action*/
+  /** The Leaf node which performs an action. Returns NULL for action nodes as here is nothing next in the chain*/
   next(){ return null; }
 
   /** Performs the actual work after checking permissions if a user session object is passed
