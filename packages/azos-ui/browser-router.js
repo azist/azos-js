@@ -23,22 +23,19 @@ export class BrowserRouter extends Router{
     const isApplet = types_isSubclassOf(nextNode.get("applet") , Applet);
     return isApplet ? AppletLaunchActionHandler : this.defaultSectionHandler;
   }
-
-
 }
 
 /** Handles routing action by launching an associated applet */
 export class AppletLaunchActionHandler extends ActionHandler{
   #applet;
   #force;
-
-  #args;//TODO: implement
-
+  #args;
 
   constructor(router, cfg, path, parent){
     super(router, cfg, path, parent);
     this.#applet = isSubclassOf(cfg.get("applet"), Applet);
     this.#force = cfg.getBool("force", false);
+    this.#args = cfg.get("args") ?? null;//TODO: We need a getter which return Plain value like: cfg.getPlain("aaa"); which returns object or array or primitive, not config node
   }
 
   /** Returns a target applet type to launch */
@@ -47,14 +44,14 @@ export class AppletLaunchActionHandler extends ActionHandler{
   /** If true, disregards close query handling on open applets */
   get force(){ return this.#force; }
 
-  async execActionAsync(context, args, session = null){
-    session = session ?? this.router.app.session;
-    return await super.execActionAsync(context, args, session);
-  }
+  /** Arguments object or null */
+  get args(){ return this.#args; }
 
+  // eslint-disable-next-line no-unused-vars
   async _doExecActionAsync(context, args, session){//todo: Mixin args
-    const arena = isOf(context, Arena);
-    const result = await arena.appletOpen(this.#applet, this.#force);//todo: Mix-in args from this.args override by passed args
+    const arena = isOf(context, Arena, `${this.constructor.name} requires Arena context`);
+    const launchArgs = {...this.requestContext["args"], ...this.#args, ...args};//mix-in args
+    const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
     return result;
   }
 }

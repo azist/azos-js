@@ -14,9 +14,16 @@ import { dflt } from "azos/strings";
  */
 export class Applet extends AzosElement {
 
+  #args;
+
   constructor() {
     super();
   }
+
+  /** Arguments which are assigned at applet launch. You can pass parameters such as deep links into the applet  */
+  get args(){return this.#args;}
+  /** Arguments which are assigned at applet launch. You can pass parameters such as deep links into the applet  */
+  set args(v){ this.#args = v ?? null; }
 
   /** Returns the name of the applet displayed in the Arena title bar */
   get title() { return this.constructor.name; }

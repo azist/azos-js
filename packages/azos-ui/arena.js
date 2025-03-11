@@ -233,16 +233,21 @@ export class Arena extends AzosElement {
   }
 
 
-  /** Sets the specified applet as the current one in the arena.
+  /** Asynchronously launches an applet - sets the specified applet as the current one in the arena.
    * If there is an existing applet, then the system would prompt user via  `closeQuery(): bool`
-   * call where the applet can check itself of it is dirty, or bypass close query if "force=true"
+   * call where the applet can check itself if it is dirty, or bypass close query if "force=true".
+   * You can also pass launch args any object.
+   * @param {function} tapplet a type of applet which you want to launch. It has to be a derivative of Applet class
+   * @param {*} [args=null] an any object which serves as launch parameter, such as a deep link or other startup params
+   * @param {boolean} [force=false] if you pass true, instructs the already open current applet (if any) to disregard close query circuit, effectively forcing current applet close
+   * @returns {bool} true if requested applet was launched, or false if existing applet prevented the operation because of the close query abort
    */
-  async appletOpen(tapplet, force = false){
+  async appletOpen(tapplet, args = null, force = false){
     aver.isSubclassOf(tapplet, Applet);
     const tagName = customElements.getName(tapplet);
     aver.isNotNull(tagName);
 
-    //check if current one is loaded
+    //Try to close the current one is loaded
     const closed = await this.appletClose(force);
     if (!closed) return false;
 
@@ -251,6 +256,7 @@ export class Arena extends AzosElement {
     this.update();//synchronous update including DOM rebuild
     this.updateToolbar();
     this.#applet = this.shadowRoot.getElementById("elmActiveApplet");
+    this.#applet.args = args;//pass launch args
     this.requestUpdate();
     return true;
   }
@@ -264,6 +270,7 @@ export class Arena extends AzosElement {
     if (!this.#applet) return true;
     const canClose = force ? true : await this.#applet[CLOSE_QUERY_METHOD]();
     if (!canClose) return false;
+
     this.uninstallToolbarCommands([...this.#toolbar]);
     this.#applet = null;
     this.#appletTagName = null;
@@ -279,7 +286,7 @@ export class Arena extends AzosElement {
   hideFooter(h){
     const ftr = this.$("arenaFooter");
     if (!ftr) return;
-    ftr.style.display =  h ? "none" : "unset";
+    ftr.style.display =  h ? "none" : "block";
   }
 
 

@@ -17,14 +17,22 @@ import { Session } from "./security";
  */
 export class Router extends Module{
   #graph;//ConfigNode
+  #errorPath;
+
 
   constructor(dir, cfg){
     super(dir, cfg);
     this.#graph = aver.isOf(cfg.get("graph"), ConfigNode);
+    this.#errorPath = cfg.getString("errorPath", null);
   }
 
   /** Returns routing graph root */
   get graph(){ return this.#graph; }
+
+  /** Error path to use when routing fails. When routing fails exceptions are thrown.
+   * You can handle exceptions by trying to re-route into this errorPath
+   */
+  get errorPath(){ return this.#errorPath;}
 
   /** Returns the type of SectionHandler derivative used by default by this router
    * @returns {function}
