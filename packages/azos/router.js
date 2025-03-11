@@ -8,9 +8,8 @@ import * as aver from "azos/aver";
 import { Module } from "azos/modules";
 import { ConfigNode, makeNew } from "azos/conf";
 import { ABSTRACT } from "./coreconsts";
-import { AzosError } from "./types";
 import { trim } from "./strings";
-import { Session } from "./security";
+import { Session } from "./session";
 
 /**
  * Provides routing services by maintaining a routing graph which maps requests into route handlers, such as app launch handlers
@@ -62,9 +61,14 @@ export class Router extends Module{
    */
   handleRouteSegments(path){
    aver.isNonEmptyString(path);
-   const handler = makeNew(RouteHandler, this.#graph, this, this.defaultSectionHandler, [path, null]);
+   let handler = makeNew(RouteHandler, this.#graph, this, this.defaultSectionHandler, [path, null]);
    const result = [];
-   for(let next; (next = handler.handle());) result.push(next);
+   // eslint-disable-next-line no-constant-condition
+   while(true){
+     handler = handler.next();
+     if (!handler) break;
+     result.push(handler);
+   }
    return result;
   }
 
@@ -95,14 +99,14 @@ export class RouteHandler{
   constructor(router, graph, path, parent){
     this.#router = aver.isOf(router, Router);
     this.#graph = aver.isOf(graph, ConfigNode);
-    this.#path = aver.isNonEmptyString(path);
+    this.#path = path = trim(aver.isNonEmptyString(path));
     this.#parent = aver.isOfOrNull(parent, RouteHandler);
     this.#requestContext = this.#parent?.requestContext ?? { };
 
+    while(path.indexOf('/')===0) path = path.substring(1);
+
     const i = path.indexOf('/');
-    if (i==0) {
-      throw new AzosError("Bad route", "RouteHandler.ctor()");
-    } else if (i > 0){
+    if (i > 0){
       this.#segment = trim(path.substring(0, i));
       this.#nextPath = trim(path.substring(i + 1));
     } else {
@@ -163,7 +167,7 @@ export class SectionHandler extends RouteHandler{
 
   next(){
     //Section or Action default type
-    let node = aver.isOf(this.graph.get(this.segment), `${this.constructor.name} expects segment '${this.segment}' to be of ConfigNode type`);
+    let node = aver.isOf(this.graph.get(this.segment), ConfigNode, `${this.constructor.name} expects segment '${this.segment}' to be of ConfigNode type`);
     const nxtDefaultType = this.router.getDefaultHandlerType(this, node);
     const nxtHandler = makeNew(RouteHandler, this.graph, this, nxtDefaultType, [this.nextPath, this]);
     return nxtHandler;

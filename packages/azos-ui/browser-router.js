@@ -8,8 +8,8 @@ import { isOf, isSubclassOf } from "../azos/aver";
 import { ConfigNode } from "../azos/conf";
 import { Router, RouteHandler, ActionHandler, SectionHandler } from "../azos/router";
 import { isSubclassOf as types_isSubclassOf } from "../azos/types";
-import { Arena } from "arena";
-import { Applet } from "applet";
+import { Arena } from "./arena";
+import { Applet } from "./applet";
 
 /** Provides routing services in the context of a UI in a browser (such as Chrome or Firefox) user agent */
 export class BrowserRouter extends Router{

@@ -392,11 +392,11 @@ export function isNotSubclassOf(t, base) {
  * @param {typeFunction} t
  * @returns original object after successful type check or throws
  */
-export function isOf(o, t) {
+export function isOf(o, t, from) {
   if (types.isObject(o) && types.isFunction(t))
     if (o instanceof t) return o;
 
-  throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(t)})`);
+  throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(t)})`, from);
 }
 
 /**
