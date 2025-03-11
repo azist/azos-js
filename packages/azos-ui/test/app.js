@@ -13,7 +13,7 @@ import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
 import { Arena, addAppBoilerplate } from "../arena";
-import { BrowserRouter } from "../browser-router"
+import { BrowserRouter, MsgBoxActionHandler } from "../browser-router"
 import { XyzApplet } from "./xyz-applet";
 import { XyzApplet2 } from "./xyz-applet2";
 import { XyzApplet3 } from "./xyz-applet3";
@@ -40,6 +40,7 @@ class MyLogic extends Module {
 }
 
 const appRoutes = {
+  Hello: {type: MsgBoxActionHandler, status: "Info", title: "Hello", message: "Hello message", rank: 1},
   Xyz: {applet: XyzApplet},
   Xyz1: "$(Xyz)",
   Xyz2: {applet: XyzApplet2},
@@ -49,7 +50,9 @@ const appRoutes = {
   help: {
     about: {applet: XyzApplet, args: {isHelp: true }},
     legal: "$(about)"
-  }
+  },
+
+  error: {type: MsgBoxActionHandler, status: "error", title: "Routing error", message: "The requested routing operation failed", rank: 1}
 };
 
 const cfgApp = {
@@ -81,6 +84,7 @@ addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
 
 //const router = app.moduleLinker.resolve(BrowserRouter);
 //const handler = router.handleRoute(dflt(window.location.pathname, "Xyz"));
+//const handler = router.handleRoute("Hello");
 //handler.execActionAsync(arena);
 
 

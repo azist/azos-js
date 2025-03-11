@@ -10,6 +10,7 @@ import { Router, RouteHandler, ActionHandler, SectionHandler } from "../azos/rou
 import { isSubclassOf as types_isSubclassOf } from "../azos/types";
 import { Arena } from "./arena";
 import { Applet } from "./applet";
+import { showMsg } from "./msg-box";
 
 /** Provides routing services in the context of a UI in a browser (such as Chrome or Firefox) user agent */
 export class BrowserRouter extends Router{
@@ -54,4 +55,27 @@ export class AppletLaunchActionHandler extends ActionHandler{
     const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
     return result;
   }
+}
+
+
+/** Handles routing action by showing a message box */
+export class MsgBoxActionHandler extends ActionHandler{
+  #status;
+  #title;
+  #message;
+  #rank;
+  #pre;
+
+  constructor(router, cfg, path, parent){
+    super(router, cfg, path, parent);
+    this.#status = cfg.getString("status", "normal");
+    this.#title = cfg.getString("title", "Message");
+    this.#message = cfg.getString("message", "");
+    this.#rank = cfg.getInt("rank", 3);
+    this.#pre = cfg.getBool("pre", false);
+  }
+
+  async _doExecActionAsync(){
+    await showMsg(this.#status, this.#title, this.#message, this.#rank, this.#pre)
+ }
 }
