@@ -4,12 +4,12 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import * as aver from "azos/aver";
-import { Module } from "azos/modules";
-import { ConfigNode, makeNew } from "azos/conf";
-import { ABSTRACT } from "./coreconsts";
-import { trim } from "./strings";
-import { Session } from "./session";
+import * as aver from "./aver.js";
+import { Module } from "./modules.js";
+import { ConfigNode, makeNew } from "./conf.js";
+import { ABSTRACT } from "./coreconsts.js";
+import { trim } from "./strings.js";
+import { Session } from "./session.js";
 
 /**
  * Provides routing services by maintaining a routing graph which maps requests into route handlers, such as app launch handlers
@@ -226,7 +226,6 @@ Routes are stored in a config node tree in memory.
   {
     company: {
       maintenance: {
-
         // company/maintenance/masterdata/orders/order-no/233676
         masterData: {applet: MasterDataSetup, args: {a: 1, b: 2} binder: function(p,args){ }} // binder is a function which takes request, and args which it populates, by default positionalBinder
         masterData: {applet: MasterDataSetup, args: {all: "@@"}} // all: [orders,order-no,233676]

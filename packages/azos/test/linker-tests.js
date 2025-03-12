@@ -10,7 +10,6 @@ import * as aver from "azos/aver";
 import {ABSTRACT} from "azos/coreconsts";
 import * as conf from "azos/conf";
 import * as apps from "azos/application";
-//import * as cmp from "azos/components";
 import * as mod from "azos/modules";
 import * as sut from "azos/linker";
 

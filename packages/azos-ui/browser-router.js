@@ -76,6 +76,6 @@ export class MsgBoxActionHandler extends ActionHandler{
   }
 
   async _doExecActionAsync(){
-    await showMsg(this.#status, this.#title, this.#message, this.#rank, this.#pre)
- }
+    await showMsg(this.#status, this.#title, this.#message, this.#rank, this.#pre);
+  }
 }
