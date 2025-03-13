@@ -48,10 +48,13 @@
     "test": "node  packages/azos/test/app.mjs -- --filter",
     "--test-azos": "npm test -workspace=azos",
     "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/test/index.htm\"",
-    "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\""
+    "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\"",
+    "generate-class-diagram-azos": "node ./tools/mermaid-class-inheritance.cjs packages/azos out/mermaid/azos/",
+    "generate-class-diagram-azos-ui": "node ./tools/mermaid-class-inheritance.cjs packages/azos-ui out/mermaid/azos-ui/"
   },
   "devDependencies": {
     "eslint": "^8.50.0",
+    "mermaid": "^11.4.1",
     "parcel": "^2.9.3"
   }
 }
