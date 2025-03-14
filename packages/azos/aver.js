@@ -446,7 +446,23 @@ export function isOfOrNull(o, t, from) {
  * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isOfEither(classToCheck, typeArr, from) {
+export function isOfEither(classToCheck, ...typeArr) {
+  if (types.isObject(classToCheck)) {
+    for (let t of typeArr)
+      if (types.isFunction(t) && (classToCheck instanceof t)) return classToCheck;
+  }
+
+  throw AVERMENT_FAILURE(`isOfEither(${dv(classToCheck)}, ${dv(typeArr)})`);
+}
+
+/**
+ * Performs strict instanceof check on object and function args
+ * @param {Object} classToCheck instance to check
+ * @param {typeFunction} typeArr array of type functions(class names) to check
+ * @param {string | undefined} from optional clause in case of failure
+ * @returns original object after successful type check or throws
+ */
+export function isOfEitherFrom(classToCheck, from, ...typeArr) {
   if (types.isObject(classToCheck)) {
     for (let t of typeArr)
       if (types.isFunction(t) && (classToCheck instanceof t)) return classToCheck;
