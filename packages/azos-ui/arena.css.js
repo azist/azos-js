@@ -177,7 +177,7 @@ main .applet-container.kiosk{
 
 /* ------------------- */
 
-footer{
+footer {
   background-color: #606060;
   color: #aaa;
   padding: 10px;
@@ -185,12 +185,13 @@ footer{
   box-sizing: border-box;
 }
 
-      footer .bottom-menu a{
+footer .bottom-menu a {
         text-decoration:  none;
         color: #a8a8a0;
         transition: 0.3s;
         font-size: 1.1em;
       }
+
       footer .bottom-menu a:hover{
         color: #e8e8d8;
       }
