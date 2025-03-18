@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
-import { Control } from "./ui.js";
+import { Control, css } from "./ui.js";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
@@ -15,6 +15,8 @@ import { Control } from "./ui.js";
  *  A special derivation branch based on {@link Form} class represent a logically completed data-bound forms.
  */
 export class Block extends Control {
+
+  static styles = [css`:host{ display: block }`];
 
   /**
    * Reactive properties

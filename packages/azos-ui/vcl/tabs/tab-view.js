@@ -403,10 +403,10 @@ export class TabView extends Control {
    * @param {Tab} tTab the tab class
    * @param {string} title
    * @param {Tab|null} beforeTab
-   * @param {Object|null} data
+   * @param {Object|undefined} data
    * @returns {Tab, Boolean} tuple of the tab and whether it was added or existed previously
    */
-  addTab(tTab, title, beforeTab = null, makeActive = true, data = null) {
+  addTab(tTab, title, beforeTab = null, makeActive = true, data = {}) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
     title = dflt(title, tTab.name);
