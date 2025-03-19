@@ -279,6 +279,13 @@ export class ConfigNode{
           }
         };
 
+        //20250319 DKh Special case - another node reference
+        //When a variable can be treated as a non-string rather as an object if there is nothing else to interpolate
+        if (val.length > 3 && val.startsWith("$(") && val.charAt(val.length-1) === ")"){
+          return vmap(null, val.substring(2, val.length-1));
+        }
+        //20250319 DKh -------------------------------------
+
         const result = val.replace(REXP_VAR_DECL, vmap);
         return result;
     }finally{

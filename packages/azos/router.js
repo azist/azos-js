@@ -167,9 +167,10 @@ export class SectionHandler extends RouteHandler{
 
   next(){
     //Section or Action default type
+    if (this.nextPath.length === 0) return null;
     let node = aver.isOf(this.graph.get(this.segment), ConfigNode, `${this.constructor.name} expects segment '${this.segment}' to be of ConfigNode type`);
     const nxtDefaultType = this.router.getDefaultHandlerType(this, node);
-    const nxtHandler = makeNew(RouteHandler, this.graph, this, nxtDefaultType, [this.nextPath, this]);
+    const nxtHandler = makeNew(RouteHandler, node, this.router, nxtDefaultType, [this.nextPath, this]);
     return nxtHandler;
   }
 }
