@@ -131,7 +131,7 @@ export class EntityId {
   constructor(system, type = Atom.ZERO, schema = Atom.ZERO, address) {
     this.#system = aver.isOf(system, Atom);
     if (this.#system.isZero) {
-      throw aver.AzosError("Required sys.isZero");
+      throw aver.AVERMENT_FAILURE("Required sys.isZero");
     }
 
     this.#type = aver.isOf(type, Atom);

@@ -485,7 +485,7 @@ export function parentOfClass(cls) {
  * @returns {boolean} true when `t` is a subtype of `base`
  */
 export function isSubclassOf(t, base) {
-  if (!isFunction(t) && !isFunction(base)) return false;
+  if (!isFunction(t) || !isFunction(base)) return false;
   return t.prototype instanceof base;
   // while(t!==null){
   //   t = parentOfClass(t);
