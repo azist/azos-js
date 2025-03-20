@@ -25,41 +25,45 @@ const dv = (v, ml = 16) => str.describe(v, ml); //shortcut
 /**
  * Performs strict test for undefined
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isUndefined(a) {
+export function isUndefined(a, from) {
   if (a === undefined) return a;
-  throw AVERMENT_FAILURE(`isUndefined(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isUndefined(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for not undefined
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isDefined(a) {
+export function isDefined(a, from) {
   if (a !== undefined) return a;
-  throw AVERMENT_FAILURE(`isDefined(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isDefined(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for being defined null
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isNull(a) {
+export function isNull(a, from) {
   if (a !== undefined && a === null) return a;
-  throw AVERMENT_FAILURE(`isNull(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isNull(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for being defined not-null
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isNotNull(a) {
+export function isNotNull(a, from) {
   if (a !== undefined && a !== null) return a;
-  throw AVERMENT_FAILURE(`isNotNull(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isNotNull(${dv(a)})`, from);
 }
 
 /**
@@ -68,25 +72,25 @@ export function isNotNull(a) {
  * @param {string | undefined} from optional clause in case of failure
  * @returns original string after successful type check or throws
  */
-export function isNonEmptyString(a, from = undefined) {
+export function isNonEmptyString(a, from) {
   if (types.isNonEmptyString(a)) return a;
   throw AVERMENT_FAILURE(`isNonEmptyString(${dv(a)})`, from);
 }
 
 /**
- *
+ * Performs strict test for a non-empty string value within a specified length range
  * @param {*} a
- * @param {*} min
- * @param {*} max
+ * @param {*} min minimum length
+ * @param {*} max maximum length
  * @param {string | undefined} from optional clause in case of failure
- * @returns
+ * @returns original string after successful type check or throws
  */
-export function isNonEmptyMinMaxString(a, min, max, from = undefined) {
+export function isNonEmptyMinMaxString(a, min, max, from) {
   isNonEmptyString(a, from);
 
   min = types.asInt(min);
   max = types.asInt(max);
-  isTrue(min < max, "min < max");
+  isTrue(min < max, "min < max", from);
 
   if (a.length < min || a.length > max) {
     throw AVERMENT_FAILURE(`isNonEmptyMinMaxString(${dv(a)}, ${min}, ${max}})`, from);
@@ -98,155 +102,170 @@ export function isNonEmptyMinMaxString(a, min, max, from = undefined) {
 /**
  * Performs strict test for object (not a primitive, array or function)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isObject(a) {
+export function isObject(a, from) {
   if (types.isObject(a)) return a;
-  throw AVERMENT_FAILURE(`isObject(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isObject(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for object (not a primitive, array or function)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns null if undefined or null, original object after successful type check, or throws
  */
-export function isObjectOrNull(a) {
+export function isObjectOrNull(a, from) {
   if (a === undefined || a === null) return null;
   if (types.isObject(a)) return a;
-  throw AVERMENT_FAILURE(`isObjectOrNull(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isObjectOrNull(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for array (not a primitive, object or function)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original array after successful type check or throws
  */
-export function isArray(a) {
+export function isArray(a, from) {
   if (types.isArray(a)) return a;
-  throw AVERMENT_FAILURE(`isArray(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isArray(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for array (not a primitive, object, or function)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns null if undefined or null, original array after successful type check, or throws
  */
-export function isArrayOrNull(a) {
+export function isArrayOrNull(a, from) {
   if (a === undefined || a === null) return null;
   if (types.isArray(a)) return a;
-  throw AVERMENT_FAILURE(`isArrayOrNull(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isArrayOrNull(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for object or array (not a primitive or function)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object or array after successful type check or throws
  */
-export function isObjectOrArray(a) {
+export function isObjectOrArray(a, from) {
   if (types.isObjectOrArray(a)) return a;
-  throw AVERMENT_FAILURE(`isObjectOrArray(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isObjectOrArray(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for function (not a primitive, object or array)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original function after successful type check or throws
  */
-export function isFunction(a) {
+export function isFunction(a, from) {
   if (types.isFunction(a)) return a;
-  throw AVERMENT_FAILURE(`isFunction(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isFunction(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for function (not a primitive, object or array), OR null/undefined. Undefined is returned as null
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns null if undefined or null, original function after successful type check, or throws
  */
-export function isFunctionOrNull(a) {
+export function isFunctionOrNull(a, from) {
   if (a === undefined || a === null) return null;
   if (types.isFunction(a)) return a;
-  throw AVERMENT_FAILURE(`isFunctionOrNull(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isFunctionOrNull(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for function or object (not a primitive or array)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object or function after successful type check or throws
  */
-export function isObjectOrFunction(a) {
+export function isObjectOrFunction(a, from) {
   if (types.isObjectOrFunction(a)) return a;
-  throw AVERMENT_FAILURE(`isObjectOrFunction(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isObjectOrFunction(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for Iterable protocol
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original iterable after successful type check or throws
  */
-export function isIterable(a) {
+export function isIterable(a, from) {
   if (types.isIterable(a)) return a;
-  throw AVERMENT_FAILURE(`isIterable(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isIterable(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for date
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original date after successful type check or throws
  */
-export function isDate(a) {
+export function isDate(a, from) {
   if (types.isDate(a)) return a;
-  throw AVERMENT_FAILURE(`isDate(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isDate(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for number
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original number after successful type check or throws
  */
-export function isNumber(a) {
+export function isNumber(a, from) {
   if (types.isNumber(a)) return a;
-  throw AVERMENT_FAILURE(`isNumber(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isNumber(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for string
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original string after successful type check or throws
  */
-export function isString(a) {
+export function isString(a, from) {
   if (types.isString(a)) return a;
-  throw AVERMENT_FAILURE(`isString(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isString(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for string or null/undefined (converted to null)
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns null if undefined or null, original string after successful type check, or throws
  */
-export function isStringOrNull(a) {
+export function isStringOrNull(a, from) {
   if (a === undefined || a === null) return null;
   if (types.isString(a)) return a;
-  throw AVERMENT_FAILURE(`isStringOrNull(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isStringOrNull(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for bool
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original bool after successful type check or throws
  */
-export function isBool(a) {
+export function isBool(a, from) {
   if (types.isBool(a)) return a;
-  throw AVERMENT_FAILURE(`isBool(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isBool(${dv(a)})`, from);
 }
 
 /**
  * Performs strict test for symbol
  * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original symbol after successful type check or throws
  */
-export function isSymbol(a) {
+export function isSymbol(a, from) {
   if (types.isSymbol(a)) return a;
-  throw AVERMENT_FAILURE(`isSymbol(${dv(a)})`);
+  throw AVERMENT_FAILURE(`isSymbol(${dv(a)})`, from);
 }
 
 /**
@@ -255,7 +274,7 @@ export function isSymbol(a) {
  * @param {string | undefined} from optional clause in case of failure
  * @returns original bool if false or throws
  */
-export function isFalse(a, from = undefined) {
+export function isFalse(a, from) {
   if (a === false) return a;
   throw AVERMENT_FAILURE(`isFalse(${dv(a)})`, from);
 }
@@ -266,7 +285,7 @@ export function isFalse(a, from = undefined) {
  * @param {string | undefined} from optional clause in case of failure
  * @returns original bool if true or throws
  */
-export function isTrue(a, from = undefined) {
+export function isTrue(a, from) {
   if (a === true) return a;
   throw AVERMENT_FAILURE(`isTrue(${dv(a)})`, from);
 }
@@ -280,7 +299,7 @@ export function isTrue(a, from = undefined) {
  * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and b are strictly equal or throws
  */
-export function areEqual(a, b, from = undefined) {
+export function areEqual(a, b, from) {
   if (a === b) return;
   throw AVERMENT_FAILURE(`areEqual(${dv(a)}, ${dv(b)})`, from);
 }
@@ -292,7 +311,7 @@ export function areEqual(a, b, from = undefined) {
  * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and be are not equal or throws
  */
-export function areNotEqual(a, b, from = undefined) {
+export function areNotEqual(a, b, from) {
   if (a !== b) return;
   throw AVERMENT_FAILURE(`areNotEqual(${dv(a)}, ${dv(b)})`, from);
 }
@@ -305,14 +324,15 @@ export function areNotEqual(a, b, from = undefined) {
  * and may be equated using either of the methods.
  * @param {*} a
  * @param {*} b
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and b are same reference, a and b are assigned same values, or throws
  */
-export function areEqualValues(a, b) {
+export function areEqualValues(a, b, from) {
   if (a === b) return;
   if (types.isAssigned(a) && types.isAssigned(b))
     if (a.valueOf() === b.valueOf()) return;
 
-  throw AVERMENT_FAILURE(`areEqualValues(${dv(a)}, ${dv(b)})`);
+  throw AVERMENT_FAILURE(`areEqualValues(${dv(a)}, ${dv(b)})`, from);
 }
 
 /**
@@ -323,15 +343,16 @@ export function areEqualValues(a, b) {
  * and may be equated using either of the methods.
  * @param {*} a
  * @param {*} b
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and b are same reference, a and b are assigned same values, or throws
  */
-export function areNotEqualValues(a, b) {
+export function areNotEqualValues(a, b, from) {
   if (a !== b) {
     if (types.isAssigned(a) && types.isAssigned(b))
       if (a.valueOf() !== b.valueOf()) return;
   }
 
-  throw AVERMENT_FAILURE(`areEqualValues(${dv(a)}, ${dv(b)})`);
+  throw AVERMENT_FAILURE(`areEqualValues(${dv(a)}, ${dv(b)})`, from);
 }
 
 
@@ -339,9 +360,10 @@ export function areNotEqualValues(a, b) {
  * Expects that function throws a message optionally containing the msg
  * @param {function} f function to call
  * @param {string} [msg] optional message to expect in the error
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if f throws with no msg present or f throws containing msg, or throws
  */
-export function throws(f, msg) {
+export function throws(f, msg, from) {
   try {
     f();
   }
@@ -353,36 +375,38 @@ export function throws(f, msg) {
     msg = msg.toLowerCase();
 
     if (got.indexOf(msg) == -1)
-      throw AVERMENT_FAILURE(`throws(${dv(f)}, expect '${msg}' but was '${got}')`);
+      throw AVERMENT_FAILURE(`throws(${dv(f)}, expect '${msg}' but was '${got}')`, from);
 
     return;
   }
 
-  throw AVERMENT_FAILURE(`throws(${dv(f)})`);
+  throw AVERMENT_FAILURE(`throws(${dv(f)})`, from);
 }
 
 /**
  * Succeeds when `t` is a direct or indirect subtype of `base`
  * @param {Function} t a type to check
  * @param {Function} base base type
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isSubclassOf(t, base) {
+export function isSubclassOf(t, base, from) {
   if (types.isSubclassOf(t, base)) return t;
-  throw AVERMENT_FAILURE(`isSubclassOf(${dv(t)}, ${dv(base)})`);
+  throw AVERMENT_FAILURE(`isSubclassOf(${dv(t)}, ${dv(base)})`, from);
 }
 
 /**
  * Succeeds when `t` is NOT a direct or indirect subtype of `base`
  * @param {Function} t a type to check
  * @param {Function} base base type
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isNotSubclassOf(t, base) {
+export function isNotSubclassOf(t, base, from) {
   if (types.isFunction(t) && types.isFunction(base))
     if (!types.isSubclassOf(t, base)) return t;
 
-  throw AVERMENT_FAILURE(`isNotSubclassOf(${dv(t)}, ${dv(base)})`);
+  throw AVERMENT_FAILURE(`isNotSubclassOf(${dv(t)}, ${dv(base)})`, from);
 }
 
 
@@ -390,42 +414,61 @@ export function isNotSubclassOf(t, base) {
  * Performs strict instanceof check on object and function args
  * @param {Object} o
  * @param {typeFunction} t
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isOf(o, t) {
+export function isOf(o, t, from) {
   if (types.isObject(o) && types.isFunction(t))
     if (o instanceof t) return o;
 
-  throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(t)})`);
+  throw AVERMENT_FAILURE(`isOf(${dv(o)}, ${dv(t)})`, from);
 }
 
 /**
  * Performs strict instanceof check on object and function args; if object is null or undefined returns null
  * @param {Object} o
  * @param {typeFunction} t
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws or NULL for undefined/null object
  */
-export function isOfOrNull(o, t) {
+export function isOfOrNull(o, t, from) {
   if (o === undefined || o === null) return null;
   if (types.isObject(o) && types.isFunction(t))
     if (o instanceof t) return o;
 
-  throw AVERMENT_FAILURE(`isOfOrNull(${dv(o)}, ${dv(t)})`);
+  throw AVERMENT_FAILURE(`isOfOrNull(${dv(o)}, ${dv(t)})`, from);
 }
 
 /**
  * Performs strict instanceof check on object and function args
- * @param {Object} o instance to check
- * @param {typeFunction} ts array of type functions(class names) to check
+ * @param {Object} classToCheck instance to check
+ * @param {typeFunction} typeArr array of type functions(class names) to check
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original object after successful type check or throws
  */
-export function isOfEither(o, ...ts) {
-  if (types.isObject(o)) {
-    for (let t of ts)
-      if (types.isFunction(t) && (o instanceof t)) return o;
+export function isOfEither(classToCheck, ...typeArr) {
+  if (types.isObject(classToCheck)) {
+    for (let t of typeArr)
+      if (types.isFunction(t) && (classToCheck instanceof t)) return classToCheck;
   }
 
-  throw AVERMENT_FAILURE(`isOfEither(${dv(o)}, ${dv(ts)})`);
+  throw AVERMENT_FAILURE(`isOfEither(${dv(classToCheck)}, ${dv(typeArr)})`);
+}
+
+/**
+ * Performs strict instanceof check on object and function args
+ * @param {Object} classToCheck instance to check
+ * @param {typeFunction} typeArr array of type functions(class names) to check
+ * @param {string | undefined} from optional clause in case of failure
+ * @returns original object after successful type check or throws
+ */
+export function isOfEitherFrom(classToCheck, from, ...typeArr) {
+  if (types.isObject(classToCheck)) {
+    for (let t of typeArr)
+      if (types.isFunction(t) && (classToCheck instanceof t)) return classToCheck;
+  }
+
+  throw AVERMENT_FAILURE(`isOfEither(${dv(classToCheck)}, ${dv(typeArr)})`, from);
 }
 
 
@@ -433,13 +476,14 @@ export function isOfEither(o, ...ts) {
  * Performs strict !instanceof check on object and function args
  * @param {Object} o
  * @param {typeFunction} t
+ * @param {string | undefined} from optional clause in case of failure
  * @returns original function o if o is object, t is function, and o is not instance of t; else throws
  */
-export function isNotOf(o, t) {
+export function isNotOf(o, t, from) {
   if (types.isObject(o) && types.isFunction(t))
     if (!(o instanceof t)) return o;
 
-  throw AVERMENT_FAILURE(`isNotOf(${dv(o)}, ${dv(t)})`);
+  throw AVERMENT_FAILURE(`isNotOf(${dv(o)}, ${dv(t)})`, from);
 }
 
 
@@ -448,9 +492,10 @@ export function isNotOf(o, t) {
  * Notes: 1.) does not do deep comparison, 2.) arrays are not sorted
  * @param {Array} a
  * @param {Array} b
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and b are same reference array or if each element is strictly equal, or throws
  */
-export function areArraysEquivalent(a, b) {
+export function areArraysEquivalent(a, b, from) {
   if (types.isArray(a) && types.isArray(b)) {
     if (a === b) return;
     if (a.length === b.length) {
@@ -464,7 +509,7 @@ export function areArraysEquivalent(a, b) {
     }
   }
 
-  throw AVERMENT_FAILURE(`areArraysEquivalent(${dv(a)}, ${dv(b)})`);
+  throw AVERMENT_FAILURE(`areArraysEquivalent(${dv(a)}, ${dv(b)})`, from);
 }
 
 
@@ -473,10 +518,11 @@ export function areArraysEquivalent(a, b) {
  * Notes: 1.) does not do deep comparison, 2.) arrays are not sorted
  * @param {Array} a
  * @param {Array} b
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and b are not same reference array or if each element is not strictly equal, or throws
  *   if arrays are same reference or each element is strictly equal, throws if a and b are not both arrays
  */
-export function areArraysNotEquivalent(a, b) {
+export function areArraysNotEquivalent(a, b, from) {
   if (types.isArray(a) && types.isArray(b)) {
     if (a !== b) {
       if (a.length === b.length) {
@@ -493,7 +539,7 @@ export function areArraysNotEquivalent(a, b) {
     }
   }
 
-  throw AVERMENT_FAILURE(`areArraysNotEquivalent(${dv(a)}, ${dv(b)})`);
+  throw AVERMENT_FAILURE(`areArraysNotEquivalent(${dv(a)}, ${dv(b)})`, from);
 }
 
 /**
@@ -501,9 +547,10 @@ export function areArraysNotEquivalent(a, b) {
  * @param {Iterable<*>} a First sequence
  * @param {Iterable<*>} b Second sequence
  * @param {function} [f] Optional equality comparer predicate of (a,b): bool
+ * @param {string | undefined} from optional clause in case of failure
  * @returns undefined if a and b are same reference iterable or if a and b match isEquivalentTo check or throws
  */
-export function areIterablesEquivalent(a, b, f = null) {
+export function areIterablesEquivalent(a, b, f = null, from) {
   if (types.isIterable(a) && types.isIterable(b)) {
     if (a === b) return;
     const al = linq.$(a);
@@ -511,7 +558,7 @@ export function areIterablesEquivalent(a, b, f = null) {
     if (al.isEquivalentTo(bl, f)) return;
   }
 
-  throw AVERMENT_FAILURE(`areIterablesEquivalent(${dv(a)}, ${dv(b)})`);
+  throw AVERMENT_FAILURE(`areIterablesEquivalent(${dv(a)}, ${dv(b)})`, from);
 }
 
 /**
@@ -522,8 +569,8 @@ export function areIterablesEquivalent(a, b, f = null) {
  * @returns undefined if function execution is within the time limit or throws
  */
 export function timeUnder(limitMs, fn, from) {
-  isTrue(isNumber(limitMs) > 0);
-  isFunction(fn);
+  isTrue(isNumber(limitMs) > 0, from);
+  isFunction(fn, from);
 
   const start = performance.now();
   fn();
