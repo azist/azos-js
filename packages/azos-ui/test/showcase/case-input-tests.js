@@ -6,6 +6,8 @@
 
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
+import "../../parts/text-field";
+import "../../parts/date-range";
 
 export class CaseInputTests extends CaseBase {
 
@@ -17,6 +19,8 @@ export class CaseInputTests extends CaseBase {
   renderControl() {
     return html`
 <h2>Testing @change with az-text and az-check</h2>
+
+<az-date-range title="Valid Span UTC"></az-date-range>
 
 <az-text id="tbNasa" scope="window" name="Nasa" title="Nasa Experimentation" placeholder="Hatch diameter inches" @change="${this.#onFieldChange}" datatype="int" value="10"></az-text>
 

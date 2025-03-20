@@ -175,7 +175,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
 
   renderTabbed() {
     return html`
-<az-tab-view id="tabView" scope="this" activeTabIndex=14 @tabChanged="${this.#onTabChanged}">
+<az-tab-view id="tabView" scope="this" activeTabIndex=3 @tabChanged="${this.#onTabChanged}">
   <az-tab title="Lookup"> <az-case-lookup></az-case-lookup> </az-tab>
   <az-tab title="Buttons"> <az-case-buttons></az-case-buttons> </az-tab>
   <az-tab title="Text Fields"> <az-case-text-fields></az-case-text-fields> </az-tab>

@@ -372,6 +372,36 @@ export const textFieldStyles = css`
   select > option { padding: 0.3em 0.35em; }
 `;
 
+export const dateRangeStyles = css`
+.inputs{
+  display: inline-grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-column-gap: 0.5em;
+  align-items: center;
+  justify-items: center;
+
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-size: 1em;
+  background-color: field;
+  color: var(--s-default-fg-ctl);
+  border: var(--s-default-bor-ctl);
+  border-radius: var(--r3-brad-ctl);
+  box-shadow: var(--ctl-box-shadow);
+}
+.inputs > input{
+  background-color: var(--s-default-bg-ctl);
+  border: none;
+  box-shadow: none;
+}
+.input[type=date]{
+  padding: calc(0.3em - 1px) 0.35em;
+}
+#tbStartDate{ border-radius: var(--r3-brad-ctl) 0 0 var(--r3-brad-ctl); }
+#tbEndDate{ border-radius: 0 var(--r3-brad-ctl) var(--r3-brad-ctl) 0; }
+`;
+
 export const sliderStyles = css`
   label{
     gap:0 .5em;
