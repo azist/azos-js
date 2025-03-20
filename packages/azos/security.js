@@ -63,7 +63,7 @@ export function parseJwtToken(jwt){
 
 
 /**
- * Describes user principal
+ * Describes user principal context
  */
 export class User {
   static #invalid = new User({asof: new Date(),

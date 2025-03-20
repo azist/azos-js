@@ -279,7 +279,14 @@ export class ConfigNode{
           }
         };
 
-        const result = val.replace(REXP_VAR_DECL, vmap);
+        //20250319 DKh Special case - another node reference
+        //When a variable can be treated as a non-string rather as an object if there is nothing else to interpolate
+        if (val.length > 3 && val.startsWith("$(") && val.charAt(val.length-1) === ")"){
+          return vmap(null, val.substring(2, val.length-1));
+        }
+        //20250319 DKh -------------------------------------
+
+        const result = val.replace(REXP_VAR_DECL, vmap);//REXP has a `/g` flag for global replace all
         return result;
     }finally{
       stack._level--;
