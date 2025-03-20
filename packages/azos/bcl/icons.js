@@ -46,7 +46,7 @@ export const WEB_APP_ICONS = Object.freeze([
   }, {
     uri: "azos.ico.checkmark",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M382-267.69 183.23-466.46 211.77-495 382-324.77 748.23-691l28.54 28.54L382-267.69Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M382-267.69 183.23-466.46 211.77-495 382-324.77 748.23-691l28.54 28.54L382-267.69Z"/></svg>`,
     attrs: { fas: true },
   }, {
     uri: "azos.ico.copy",
@@ -61,18 +61,18 @@ export const WEB_APP_ICONS = Object.freeze([
   }, {
     uri: "azos.ico.filter",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M440-200v-253.85L198-760h564L520-453.85V-200h-80Zm40-268 198-252H282l198 252Zm0 0Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M440-200v-253.85L198-760h564L520-453.85V-200h-80Zm40-268 198-252H282l198 252Zm0 0Z"/></svg>`,
     attrs: { fas: true },
 
   }, {
     uri: "azos.ico.folder",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M120-200v-560h263.85l80 80H840v480H120Zm40-40h640v-400H447.77l-80-80H160v480Zm0 0v-480 480Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M120-200v-560h263.85l80 80H840v480H120Zm40-40h640v-400H447.77l-80-80H160v480Zm0 0v-480 480Z"/></svg>`,
     attrs: { fas: true },
   }, {
     uri: "azos.ico.folderOpen",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M120-200v-560h263.85l80 80h369.23v40H447.77l-80-80H160v478.46l90.62-303.08h664L811.54-200H120Zm81.69-40h579.85l78.92-264.62H280.62L201.69-240Zm0 0 78.93-264.62L201.69-240ZM160-640v-80 80Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M120-200v-560h263.85l80 80h369.23v40H447.77l-80-80H160v478.46l90.62-303.08h664L811.54-200H120Zm81.69-40h579.85l78.92-264.62H280.62L201.69-240Zm0 0 78.93-264.62L201.69-240ZM160-640v-80 80Z"/></svg>`,
     attrs: { fas: true },
   }, {
     uri: "azos.ico.home",
@@ -126,12 +126,12 @@ export const WEB_APP_ICONS = Object.freeze([
   }, {
     uri: "azos.ico.add",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M460-460H240v-40h220v-220h40v220h220v40H500v220h-40v-220Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M460-460H240v-40h220v-220h40v220h220v40H500v220h-40v-220Z"/></svg>`,
     attrs: { fas: true },
   }, {
     uri: "azos.ico.delete",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M240-160v-560h-40v-40h160v-30.77h240V-760h160v40h-40v560H240Zm40-40h400v-520H280v520Zm112.31-80h40v-360h-40v360Zm135.38 0h40v-360h-40v360ZM280-720v520-520Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M240-160v-560h-40v-40h160v-30.77h240V-760h160v40h-40v560H240Zm40-40h400v-520H280v520Zm112.31-80h40v-360h-40v360Zm135.38 0h40v-360h-40v360ZM280-720v520-520Z"/></svg>`,
     attrs: { fas: true },
   }, {
     uri: "azos.ico.settings",
@@ -147,7 +147,7 @@ export const WEB_APP_ICONS = Object.freeze([
   }, {
     uri: "azos.ico.download",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M480-336.92 338.46-478.46l28.31-28.77L460-414v-346h40v346l93.23-93.23 28.31 28.77L480-336.92ZM200-200v-161.54h40V-240h480v-121.54h40V-200H200Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M480-336.92 338.46-478.46l28.31-28.77L460-414v-346h40v346l93.23-93.23 28.31 28.77L480-336.92ZM200-200v-161.54h40V-240h480v-121.54h40V-200H200Z"/></svg>`,
     attrs: { fas: true },
   }, {
     uri: "azos.ico.upload",
@@ -162,7 +162,7 @@ export const WEB_APP_ICONS = Object.freeze([
   }, {
     uri: "azos.ico.close",
     f: "svg",
-    c: `<svg viewBox="0 -960 960 960"  fill="#e8eaed"><path d="M256-227.69 227.69-256l224-224-224-224L256-732.31l224 224 224-224L732.31-704l-224 224 224 224L704-227.69l-224-224-224 224Z"/></svg>`,
+    c: `<svg viewBox="0 -960 960 960"  ><path d="M256-227.69 227.69-256l224-224-224-224L256-732.31l224 224 224-224L732.31-704l-224 224 224 224L704-227.69l-224-224-224 224Z"/></svg>`,
     attrs: { fas: true },
   },
   {
