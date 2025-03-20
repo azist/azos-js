@@ -8,7 +8,7 @@ import { isOneOf, asString, format } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, dateRangeStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { DATA_KIND, isNonEmptyString, ValidationError } from 'azos/types';
+import { isNonEmptyString, ValidationError } from 'azos/types';
 
 export class DateRangeField extends FieldPart {
   static properties = {
@@ -24,7 +24,7 @@ export class DateRangeField extends FieldPart {
 
     /** Re-Defines required to allow values
     * (none | both | start | end) */
-    isRequired: { type: String, reflect: true },
+    requiredFields: { type: String, reflect: true },
   }
 
   static styles = [baseStyles, textFieldStyles, dateRangeStyles];
@@ -32,10 +32,14 @@ export class DateRangeField extends FieldPart {
   constructor() {
     super();
     // this.dataKind = DATA_KIND.DATE;
-    this.dataKind = DATA_KIND.TEXT;
-    // this.displayFormat = "MM/dd/yyyy";
+    // this.dataKind = DATA_KIND.TEXT;
+    this.displayFormat = `<<date::ld>>`;
     this.placeholder = "mm/dd/yyyy";
-    this.isRequired = "both"; // or start, end, none
+    this.requiredFields = "both"; // or start, end, none
+  }
+
+  get isRequired() {
+    return this.requiredFields === "start" || this.requiredFields === "end" || this.requiredFields === "both";
   }
 
   #tbStartDateChange(e) {
@@ -54,13 +58,13 @@ export class DateRangeField extends FieldPart {
   get isValidAlign() { return isOneOf(this.alignValue, ["left", "center", "right"]); }
 
   /** True if optionalProps is a valid value */
-  get isValidRequired() { return isOneOf(this.isRequired, ["start", "end", "both", "none"]); }
+  get isValidRequired() { return isOneOf(this.requiredFields, ["start", "end", "both", "none"]); }
 
   _validateRequired(context, val, scope) {
-    if (!this.isRequired || this.isRequired === "none") return null;
-    const rq = this.isRequired;
-    if ((rq === "start" || rq === "both") && !val.start) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date is required");
-    if ((rq === "end" || rq === "both") && !val.end) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "End date is required");
+    if (!this.requiredFields || this.requiredFields === "none") return null;
+    const rf = this.requiredFields;
+    if ((rf === "start" || rf === "both") && !val.start) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date is required");
+    if ((rf === "end" || rf === "both") && !val.end) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "End date is required");
     return null;
   }
 
@@ -73,22 +77,13 @@ export class DateRangeField extends FieldPart {
     return null;
   }
 
-  prepareInputValue(v) {
-    if (v === null || v === undefined) return null;
-    const parts = v.split("-");
-    if (parts.length !== 2) return null;
-    return { start: parts[0], end: parts[1] };
-  }
-
   /** Override to convert a value into the one displayed in a text input */
   prepareValueForInput(v, isRawValue = false) {
     if (v === undefined || v === null) return "";
 
-    const df = this.displayFormat;
-    if (!df || isRawValue) return asString(v) ?? "";
+    if (isRawValue) return asString(v) ?? "";
 
-    const result = format(df, { v }, this.arena.app.localizer) ?? "";
-    return result;
+    return format(this.displayFormat, { date: v }, this.arena.app.localizer) ?? "";
   }
 
   focus() {
@@ -99,11 +94,18 @@ export class DateRangeField extends FieldPart {
 
   renderInput() {
 
-    let val = this.value;
-    if ((val === undefined || val === null) && this.error)
-      val = this.prepareValueForInput(this.rawValue, true);
+    let startValue = this.value?.start;
+    let endValue = this.value?.end;
+
+    if (!startValue && this.error)
+      startValue = this.prepareValueForInput(this.rawValue.start, true);
     else
-      val = this.prepareValueForInput(val, false);
+      startValue = this.prepareValueForInput(startValue, false);
+
+    if (!endValue && this.error)
+      endValue = this.prepareValueForInput(this.rawValue.end, true);
+    else
+      endValue = this.prepareValueForInput(endValue, false);
 
     ////console.info("Will render this value: " + val);
     const cls = [
@@ -121,10 +123,10 @@ export class DateRangeField extends FieldPart {
           maxLength="${this.maxLength ? this.maxLength : noContent}"
           minLength="${this.minLength ? this.minLength : noContent}"
           placeholder="${this.placeholder}"
-          type="${this.dataKind}"
-          .value="${val.start ?? ""}"
+          type="text"
+          .value="${startValue ?? ""}"
           .disabled=${this.isDisabled}
-          .required=${this.optionalProps !== "end" && this.isRequired}
+          .required=${this.requiredFields !== "start" || this.requiredFields === "both"}
           ?readonly=${this.isReadonly}
           @change="${this.#tbStartDateChange}"
           part="start-date"
@@ -137,10 +139,10 @@ export class DateRangeField extends FieldPart {
           maxLength="${this.maxLength ? this.maxLength : noContent}"
           minLength="${this.minLength ? this.minLength : noContent}"
           placeholder="${this.placeholder}"
-          type="${this.dataKind}"
-          .value="${val.end ?? ""}"
+          type="text"
+          .value="${endValue ?? ""}"
           .disabled=${this.isDisabled}
-          .required=${this.optionalProps !== "start" && this.isRequired}
+          .required=${this.requiredFields === "end" || this.requiredFields === "both"}
           ?readonly=${this.isReadonly}
           @change="${this.#tbEndDateChange}"
           part="end-date"
