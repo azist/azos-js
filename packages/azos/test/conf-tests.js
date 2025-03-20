@@ -260,11 +260,12 @@ describe("ConfigNode", function() {
         data: "~/data-$(/id)",
         mongo: "$(data)/mongo"
       },
-      paths_Alias: "$(paths)",
+      paths_Alias: "$(paths)",// notice that we create a direct node shortcut by not including anything else but a reference in a variable value
+      paths_Alias2: "$(paths_Alias)",
       providers:[
         { name: "logger", disk: "$(/paths/log)"},
         { name: "snake", disk: "$(/paths/mongo)"},
-        { name: "drake", disk: "$(/paths_Alias/data)/drakes", paths: "$(/paths_Alias)"},
+        { name: "drake", disk: "$(/paths_Alias/data)/drakes", paths: "$(/paths_Alias)", paths2: "$(/paths_Alias2)"},
       ]
     });
 
@@ -284,12 +285,17 @@ describe("ConfigNode", function() {
     aver.areEqual("~/data-a1bold/drakes", drake.get("disk"));
     aver.isTrue(drake.get("paths").isSection);
     aver.areEqual("/paths", drake.get("paths").path);
+    aver.isTrue(drake.get("paths2").isSection);
+    aver.areEqual("/paths", drake.get("paths2").path);
+
 
     aver.areEqual("Bingo Bongo: a1bold|a1bold", cfg.root.evaluate("Bingo Bongo: $(id)|$(id)"));
     aver.areEqual("Saved into: ~/data-a1bold/mongo", cfg.root.evaluate("Saved into: $(/providers/1/disk)"));
 
     aver.areEqual("Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/1").evaluate("Saved into: $(disk)"));
     aver.areEqual("App `a1bold` Saved into: ~/data-a1bold/mongo", cfg.root.nav("providers/#1").evaluate("App `$(/id)` Saved into: $(disk)"));
+
+    aver.areEqual("~/data-a1bold", cfg.root.get("paths_Alias2").get("data"));
   });
 
   it("verbatim",   function() {
@@ -343,7 +349,7 @@ describe("ConfigNode", function() {
   });
 
 
-  it("var recursion",   function() {
+  it("var-recursion",   function() {
     const cfg = sut.config({
       id: "a1bold",
       paths: {

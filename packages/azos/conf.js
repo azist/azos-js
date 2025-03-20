@@ -286,7 +286,7 @@ export class ConfigNode{
         }
         //20250319 DKh -------------------------------------
 
-        const result = val.replace(REXP_VAR_DECL, vmap);
+        const result = val.replace(REXP_VAR_DECL, vmap);//REXP has a `/g` flag for global replace all
         return result;
     }finally{
       stack._level--;
