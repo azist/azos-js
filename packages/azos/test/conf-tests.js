@@ -252,7 +252,7 @@ describe("ConfigNode", function() {
     aver.areIterablesEquivalent([1, 5, cfg.root.nav("/dole/2")], doleItems.select(one => one.val));
   });
 
-  it("var path eval",   function() {
+  it("var-path-eval",   function() {
     const cfg = sut.config({
       id: "a1bold",
       paths: {
@@ -260,9 +260,11 @@ describe("ConfigNode", function() {
         data: "~/data-$(/id)",
         mongo: "$(data)/mongo"
       },
+      paths_Alias: "$(paths)",
       providers:[
         { name: "logger", disk: "$(/paths/log)"},
         { name: "snake", disk: "$(/paths/mongo)"},
+        { name: "drake", disk: "$(/paths_Alias/data)/drakes", paths: "$(/paths_Alias)"},
       ]
     });
 
@@ -276,6 +278,12 @@ describe("ConfigNode", function() {
     const snake = providers.firstOrDefault(one => one.get("name") === "snake").value;
     aver.isNotNull(snake);
     aver.areEqual("~/data-a1bold/mongo", snake.get("disk"));
+
+    const drake = providers.firstOrDefault(one => one.get("name") === "drake").value;
+    aver.isNotNull(drake);
+    aver.areEqual("~/data-a1bold/drakes", drake.get("disk"));
+    aver.isTrue(drake.get("paths").isSection);
+    aver.areEqual("/paths", drake.get("paths").path);
 
     aver.areEqual("Bingo Bongo: a1bold|a1bold", cfg.root.evaluate("Bingo Bongo: $(id)|$(id)"));
     aver.areEqual("Saved into: ~/data-a1bold/mongo", cfg.root.evaluate("Saved into: $(/providers/1/disk)"));
