@@ -391,13 +391,21 @@ export const dateRangeStyles = css`
   box-shadow: var(--ctl-box-shadow);
 }
 .inputs > input{
-  background-color: var(--s-default-bg-ctl);
+  background: none;
   border: none;
   box-shadow: none;
+  text-align: center;
 }
 .input[type=date]{
   padding: calc(0.3em - 1px) 0.35em;
 }
+
+.infoBg > input{ color: var(--s-info-fg-ctl) !important; }
+.warningBg > input{ color: var(--s-warn-fg-ctl) !important; }
+.errorBg > input{ color: var(--s-error-fg-ctl) !important; }
+.okBg > input{ color: var(--s-ok-fg-ctl) !important; }
+.alertBg > input{ color: var(--s-alert-fg-ctl) !important; }
+
 #tbStartDate{ border-radius: var(--r3-brad-ctl) 0 0 var(--r3-brad-ctl); }
 #tbEndDate{ border-radius: 0 var(--r3-brad-ctl) var(--r3-brad-ctl) 0; }
 `;

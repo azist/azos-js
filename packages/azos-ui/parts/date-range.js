@@ -4,86 +4,82 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf, asString, format } from 'azos/strings';
-import { html, parseRank, parseStatus, noContent } from '../ui.js';
+import { asString, isOneOf } from 'azos/strings';
+import { html, parseRank, parseStatus } from '../ui.js';
 import { baseStyles, dateRangeStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { isNonEmptyString, ValidationError } from 'azos/types';
+import { asDate, isNonEmptyString, VALIDATE_METHOD, ValidationError } from 'azos/types';
+import { isTrue } from 'azos/aver';
 
 export class DateRangeField extends FieldPart {
   static properties = {
-    /** Aligns input value left, center, or right. Default: left. */
-    alignValue: { type: String, reflect: false },
-
-    /** Determines number of rows when textarea is rendered (default: 4 rows) */
-    height: { type: Number, reflect: false },
-
-    /** Defines resize attribute for textarea
-     * (none | both | horizontal | vertical | block | inline) */
-    resize: { type: String, reflect: false },
-
-    /** Re-Defines required to allow values
-    * (none | both | start | end) */
-    requiredFields: { type: String, reflect: true },
+    optionalStart: { type: Boolean, reflect: true },
+    optionalEnd: { type: Boolean, reflect: true },
   }
 
   static styles = [baseStyles, textFieldStyles, dateRangeStyles];
 
   constructor() {
     super();
-    // this.dataKind = DATA_KIND.DATE;
-    // this.dataKind = DATA_KIND.TEXT;
-    this.displayFormat = `<<date::ld>>`;
     this.placeholder = "mm/dd/yyyy";
-    this.requiredFields = "both"; // or start, end, none
+    this.optionalStart = false;
+    this.optionalEnd = false;
   }
+
+  #rawValue = null;
+  #value = null;
+
+  get rawValue() { return this.#rawValue; }
+  get value() { return this.#value; }
 
   get isRequired() {
-    return this.requiredFields === "start" || this.requiredFields === "end" || this.requiredFields === "both";
+    return !this.optionalStart && !this.optionalEnd;
   }
 
-  #tbStartDateChange(e) {
+  #dateChanged(e, field) {
+    isTrue(isOneOf(field, ["start", "end"]));
     const v = e.target.value;
-    this.setValueFromInput({ ...this.value, start: v });
+    this.setValueFromInput(v, field);
     this.inputChanged();
   }
 
-  #tbEndDateChange(e) {
-    const v = e.target.value;
-    this.setValueFromInput({ ...this.value, end: v });
-    this.inputChanged();
+  setValueFromInput(v, field) {
+    this.#rawValue ??= {};
+    this.#value ??= {};
+
+    this.#rawValue[field] = v;
+    this.#value[field] = undefined;
+
+    try {
+      v = this.prepareInputValue(v);
+      this.#value[field] = v;
+      this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
+    } catch (e) {
+      this.error = e;
+    } finally {
+      this.requestUpdate();
+    }
   }
 
-  /** True if alignValue is a valid value */
-  get isValidAlign() { return isOneOf(this.alignValue, ["left", "center", "right"]); }
-
-  /** True if optionalProps is a valid value */
-  get isValidRequired() { return isOneOf(this.requiredFields, ["start", "end", "both", "none"]); }
+  prepareInputValue(v) {
+    if (v === null || v === undefined) return null;
+    return asDate(v, true);
+  }
 
   _validateRequired(context, val, scope) {
-    if (!this.requiredFields || this.requiredFields === "none") return null;
-    const rf = this.requiredFields;
-    if ((rf === "start" || rf === "both") && !val.start) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date is required");
-    if ((rf === "end" || rf === "both") && !val.end) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "End date is required");
+    if (this.optionalStart && this.optionalEnd) return null;
+    if (!this.optionalStart && !val.start) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date is required");
+    if (!this.optionalEnd && !val.end) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "End date is required");
     return null;
   }
 
   _validateDataKind(context, val, scope) {
-    if (!val.start || !val.end) return null;
-    const start = Date.parse(val.start);
-    const end = Date.parse(val.end);
+    if (!val.start && !val.end) return null;
+    const start = asDate(val.start, true);
+    const end = asDate(val.end, true);
     if (isNaN(start) || isNaN(end)) return null;
-    if (start > end) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date must be less than end date");
+    if (start >= end) return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date must be less than end date");
     return null;
-  }
-
-  /** Override to convert a value into the one displayed in a text input */
-  prepareValueForInput(v, isRawValue = false) {
-    if (v === undefined || v === null) return "";
-
-    if (isRawValue) return asString(v) ?? "";
-
-    return format(this.displayFormat, { date: v }, this.arena.app.localizer) ?? "";
   }
 
   focus() {
@@ -92,59 +88,55 @@ export class DateRangeField extends FieldPart {
     window.queueMicrotask(() => t.focus());
   }
 
+  prepareValueForInput(v, isRawValue = false) {
+    if (v === undefined || v === null) return "";
+    if (isRawValue) return asString(v) ?? "";
+    return this.arena.app.localizer.formatDateTime({ dt: asDate(v, true) });
+  }
+
   renderInput() {
-
-    let startValue = this.value?.start;
-    let endValue = this.value?.end;
-
-    if (!startValue && this.error)
-      startValue = this.prepareValueForInput(this.rawValue.start, true);
-    else
-      startValue = this.prepareValueForInput(startValue, false);
-
-    if (!endValue && this.error)
-      endValue = this.prepareValueForInput(this.rawValue.end, true);
-    else
-      endValue = this.prepareValueForInput(endValue, false);
-
-    ////console.info("Will render this value: " + val);
     const cls = [
       parseRank(this.rank, true),
       parseStatus(this.effectiveStatus, true, "Bg"),
-      this.isValidAlign ? `text-${this.alignValue}` : '',
       this.isReadonly ? 'readonlyInput' : '',
     ].filter(isNonEmptyString).join(' ');
 
+    let startValue = this.value?.start;
+    if ((startValue === undefined || startValue === null) && this.error)
+      startValue = this.prepareValueForInput(this.rawValue?.start, true);
+    else
+      startValue = this.prepareValueForInput(startValue, false);
+
+    let endValue = this.value?.end;
+    if ((endValue === undefined || endValue === null) && this.error)
+      endValue = this.prepareValueForInput(this.rawValue?.end, true);
+    else
+      endValue = this.prepareValueForInput(endValue, false);
+
     return html`
-      <div class="inputs">
+      <div class="inputs ${cls}">
         <input
-          class="${cls}"
           id="tbStartDate"
-          maxLength="${this.maxLength ? this.maxLength : noContent}"
-          minLength="${this.minLength ? this.minLength : noContent}"
           placeholder="${this.placeholder}"
           type="text"
-          .value="${startValue ?? ""}"
+          .value="${startValue}"
           .disabled=${this.isDisabled}
-          .required=${this.requiredFields !== "start" || this.requiredFields === "both"}
+          .required=${!this.optionalStart}
           ?readonly=${this.isReadonly}
-          @change="${this.#tbStartDateChange}"
+          @change="${e => this.#dateChanged(e, "start")}"
           part="start-date"
           autocomplete="off"
         />
         <span class="dash">&mdash;</span>
         <input
-          class="${cls}"
           id="tbEndDate"
-          maxLength="${this.maxLength ? this.maxLength : noContent}"
-          minLength="${this.minLength ? this.minLength : noContent}"
           placeholder="${this.placeholder}"
           type="text"
-          .value="${endValue ?? ""}"
+          .value="${endValue}"
           .disabled=${this.isDisabled}
-          .required=${this.requiredFields === "end" || this.requiredFields === "both"}
+          .required=${!this.optionalEnd}
           ?readonly=${this.isReadonly}
-          @change="${this.#tbEndDateChange}"
+          @change="${e => this.#dateChanged(e, "end")}"
           part="end-date"
           autocomplete="off"
         />
