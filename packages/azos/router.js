@@ -82,6 +82,18 @@ export class Router extends Module{
   }
 }//Router
 
+//return a tuple [segment, nextPath]
+function splitPaths(path){
+  while(path.indexOf('/')===0) path = path.substring(1);
+
+  const i = path.indexOf('/');
+  if (i > 0){
+    return [trim(path.substring(0, i)), trim(path.substring(i + 1)) ];
+  } else {
+    return [trim(path), ""];
+  }
+}
+
 
 /** Handles route paths by navigating through routing graph of config nodes segment by segment, dynamically capturing parameters and
  * injecting the next most appropriate polymorphic route handler for processing of the next segment
@@ -103,16 +115,10 @@ export class RouteHandler{
     this.#parent = aver.isOfOrNull(parent, RouteHandler);
     this.#requestContext = this.#parent?.requestContext ?? { };
 
-    while(path.indexOf('/')===0) path = path.substring(1);
-
-    const i = path.indexOf('/');
-    if (i > 0){
-      this.#segment = trim(path.substring(0, i));
-      this.#nextPath = trim(path.substring(i + 1));
-    } else {
-      this.#segment = trim(path);
-      this.#nextPath = "";
-    }
+    if (!parent){//very root
+      this.#segment = "/";
+      this.#nextPath = path;
+    } else  [this.#segment, this.#nextPath] = splitPaths(path);
   }
 
   /** Router which processes the request */
@@ -168,9 +174,10 @@ export class SectionHandler extends RouteHandler{
   next(){
     //Section or Action default type
     if (this.nextPath.length === 0) return null;
-    let node = aver.isOf(this.graph.get(this.segment), ConfigNode, `${this.constructor.name} expects segment '${this.segment}' to be of ConfigNode type`);
-    const nxtDefaultType = this.router.getDefaultHandlerType(this, node);
-    const nxtHandler = makeNew(RouteHandler, node, this.router, nxtDefaultType, [this.nextPath, this]);
+    const [nxtSeg, ] = splitPaths(this.nextPath);
+    let nxtNode = aver.isOf(this.graph.get(nxtSeg), ConfigNode, `${this.constructor.name} expects segment '${nxtSeg}' to be of ConfigNode type`);
+    const nxtDefaultType = this.router.getDefaultHandlerType(this, nxtNode);
+    const nxtHandler = makeNew(RouteHandler, nxtNode, this.router, nxtDefaultType, [this.nextPath, this]);
     return nxtHandler;
   }
 }

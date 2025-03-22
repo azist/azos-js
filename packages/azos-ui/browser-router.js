@@ -49,7 +49,7 @@ export class AppletLaunchActionHandler extends ActionHandler{
   get args(){ return this.#args; }
 
   // eslint-disable-next-line no-unused-vars
-  async _doExecActionAsync(context, args, session){//todo: Mixin args
+  async _doExecActionAsync(context, args, session){
     const arena = isOf(context, Arena, `${this.constructor.name} requires Arena context`);
     const launchArgs = {...this.requestContext["args"], ...this.#args, ...args};//mix-in args
     const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
