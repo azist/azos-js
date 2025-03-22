@@ -37,6 +37,13 @@ unit("Router", function() {
 
         aver.areEqual("about", h1.segment);
         aver.areEqual("about", h2.segment);
+
+        aver.isOf(h1, sut.SectionHandler);
+        aver.areEqual("about", h1.path);
+        aver.isOf(h1.parent, sut.SectionHandler);
+        aver.areEqual("help/about", h1.parent.path);
+        aver.areEqual("help", h1.parent.segment);
+        aver.isNull(h1.parent.parent);
       });
 
 
