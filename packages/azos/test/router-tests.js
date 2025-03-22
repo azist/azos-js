@@ -54,9 +54,15 @@ unit("Router", function() {
         aver.areEqual("help/about", h1.parent.path);
         aver.areEqual("about", h1.parent.nextPath);
         aver.areEqual("help", h1.parent.segment);
-        aver.isNull(h1.parent.parent);
+
+        aver.isOf(h1.parent.parent, sut.SectionHandler);
+        aver.areEqual("/help/about", h1.parent.parent.path);
+        aver.areEqual("help/about", h1.parent.parent.nextPath);
+        aver.areEqual("/", h1.parent.parent.segment);
+        aver.isNull(h1.parent.parent.parent);
 
         aver.areEqual(h1.requestContext, h1.parent.requestContext);
+        aver.areEqual(h1.requestContext, h1.parent.parent.requestContext);
       });
 
 

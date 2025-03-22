@@ -85,7 +85,6 @@ export class Router extends Module{
 //return a tuple [segment, nextPath]
 function splitPaths(path){
   while(path.indexOf('/')===0) path = path.substring(1);
-
   const i = path.indexOf('/');
   if (i > 0){
     return [trim(path.substring(0, i)), trim(path.substring(i + 1)) ];
@@ -117,8 +116,13 @@ export class RouteHandler{
 
     if (!parent){//very root
       this.#segment = "/";
-      this.#nextPath = path;
-    } else  [this.#segment, this.#nextPath] = splitPaths(path);
+      if (path.startsWith("/")){
+        this.#nextPath = path.substring(1);
+      } else {
+        this.#nextPath = path;
+        this.#path = "/" + path;
+      }
+    } else  [this.#segment, this.#nextPath] = splitPaths(this.#path);
   }
 
   /** Router which processes the request */
