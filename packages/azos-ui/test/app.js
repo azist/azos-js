@@ -87,7 +87,7 @@ app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 //Wire up app closing events and global error handlers
 addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
 
-/** @type {BrowserRouter} */
-const router = app.moduleLinker.resolve(BrowserRouter);
-//const handler = router.handleRoute(dflt(window.location.pathname, "Xyz"));
-router.safeHandleUiActionAsync(arena, "Hello");
+// // // /** @type {BrowserRouter} */
+// // // const router = app.moduleLinker.resolve(BrowserRouter);
+// // // //const handler = router.handleRoute(dflt(window.location.pathname, "Xyz"));
+// // // router.safeHandleUiActionAsync(arena, "Hello");
