@@ -92,7 +92,7 @@ export class BrowserRouter extends Router{
     window.location.hash = path;
     console.warn("notifyRouteChanged()", path);
 
-    if (this.#history && pushHistory) history.pushState(path);
+    if (this.#history && pushHistory) history.pushState(path, "");
   }
 
   getDefaultHandlerType(handler, nextNode){
