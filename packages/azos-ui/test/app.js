@@ -49,7 +49,10 @@ const appRoutes = {
 
   help: {
     about: {applet: XyzApplet, args: {isHelp: true }},
-    legal: "$(about)"
+    legal: "$(about)",
+    test1: {type: MsgBoxActionHandler, status: "Info", title: "Test1", message: "Test number one"},
+    test2: {type: MsgBoxActionHandler, status: "Info", title: "Test2", message: "Test number two"},
+    test3: {type: MsgBoxActionHandler, status: "Info", title: "Test3", message: "Test number three"},
   },
 
   error: {type: MsgBoxActionHandler, status: "error", title: "Routing error", message: "The requested routing operation failed", rank: 1}

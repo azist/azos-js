@@ -4,10 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isNonEmptyString, isOf, isSubclassOf } from "../azos/aver";
+import { isNonEmptyString, isOf, isString, isSubclassOf } from "../azos/aver";
 import { ConfigNode } from "../azos/conf";
 import { Router, RouteHandler, ActionHandler, SectionHandler } from "../azos/router";
-import { isSubclassOf as types_isSubclassOf } from "../azos/types";
+import { DESTRUCTOR_METHOD, isSubclassOf as types_isSubclassOf } from "../azos/types";
 import { Arena } from "./arena";
 import { Applet } from "./applet";
 import { showMsg } from "./msg-box";
@@ -17,8 +17,67 @@ import { LOG_TYPE } from "azos/log";
 /** Provides routing services in the context of a UI in a browser (such as Chrome or Firefox) user agent */
 export class BrowserRouter extends Router{
 
+  #integrated = true;
+  #history = true;
+
+  #onHashChange;
+  #onHistoryPopState;
+
+  constructor(dir, cfg){
+    super(dir, cfg);
+    this.#integrated = cfg.getBool("integrated", true);
+    this.#history = cfg.getBool("history", true);
+
+    if (this.#integrated){
+
+      this.#onHashChange = (function(){
+        const path = window.location.hash.slice(1) || '/';
+        this.safeHandleUiActionAsync(window.ARENA, path);
+      }).bind(this);
+
+      window.addEventListener("hashchange", this.#onHashChange);
+      window.addEventListener("load", this.#onHashChange);
+
+      if (this.#history){
+        this.#onHistoryPopState = (function(evt){
+          if (!evt || !evt.state) return;
+          this.safeHandleUiActionAsync(window.ARENA, evt.state);
+        }).bind(this);
+        window.addEventListener("popstate", this.#onHistoryPopState);
+      }
+    }
+  }
+
+  [DESTRUCTOR_METHOD](){
+    if (this.#onHashChange){
+      window.removeEventListener("hashchange", this.#onHashChange);
+      window.removeEventListener("load", this.#onHashChange);
+    }
+    if (this.#onHistoryPopState){
+      window.removeEventListener("popstate", this.#onHistoryPopState);
+    }
+  }
+
+  /** Returns true when this router was created in the integrated mode with the browser - it reacts to hash changes  */
+  get integrated(){ return this.#integrated; }
+
+  /** Returns true when history is used  */
+  get history(){ return this.#history; }
+
   get defaultSectionHandler(){ return SectionHandler; }
   get defaultLaunchHandler(){ return AppletLaunchActionHandler; }
+
+
+  /** Called by action handler derivatives to notify the routing integrated parts, such as browser about the route change */
+  notifyRouteChanged(path){
+    isString(path);
+    //do nothing if not integrated with browser
+    if (!this.#integrated) return;
+
+    window.location.hash = path;
+
+    if (this.#history) history.pushState(path);
+  }
 
   getDefaultHandlerType(handler, nextNode){
     isOf(handler, RouteHandler);
@@ -81,6 +140,9 @@ export class AppletLaunchActionHandler extends ActionHandler{
     const arena = isOf(context, Arena, `${this.constructor.name} requires Arena context`);
     const launchArgs = {...this.requestContext["args"], ...this.#args, ...args};//mix-in args
     const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
+
+    if (result) this.router.notifyRouteChanged(this.path);
+
     return result;
   }
 }
