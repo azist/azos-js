@@ -19,7 +19,9 @@ export class BrowserRouter extends Router{
 
   #integrated = true;
   #history = true;
+  #appStart;
 
+  #hasLoaded;
   #onHashChange;
   #onHistoryPopState;
 
@@ -27,10 +29,12 @@ export class BrowserRouter extends Router{
     super(dir, cfg);
     this.#integrated = cfg.getBool("integrated", true);
     this.#history = cfg.getBool("history", true);
+    this.#appStart = cfg.getString("start", null);
 
     if (this.#integrated){
 
       this.#onHashChange = (function(){
+        if (!this.#hasLoaded) return;
         const path = window.location.hash.slice(1) || '/';
         this.safeHandleUiActionAsync(window.ARENA, path);
       }).bind(this);
@@ -58,11 +62,22 @@ export class BrowserRouter extends Router{
     }
   }
 
+  _appAfterLoad() {
+    if (this.#appStart)
+      queueMicrotask(async () => { try{await this.safeHandleUiActionAsync(window.ARENA, this.#appStart);} finally { this.#hasLoaded = true;} });
+    else
+      this.#hasLoaded = true;
+  }
+
   /** Returns true when this router was created in the integrated mode with the browser - it reacts to hash changes  */
   get integrated(){ return this.#integrated; }
 
   /** Returns true when history is used  */
   get history(){ return this.#history; }
+
+  get hasLoaded(){ return this.#hasLoaded; }
+
+  get start(){ return this.#appStart; }
 
   get defaultSectionHandler(){ return SectionHandler; }
   get defaultLaunchHandler(){ return AppletLaunchActionHandler; }
@@ -75,6 +90,7 @@ export class BrowserRouter extends Router{
     if (!this.#integrated) return;
 
     window.location.hash = path;
+    console.warn("notifyRouteChanged()", path);
 
     if (this.#history && pushHistory) history.pushState(path);
   }
@@ -146,7 +162,7 @@ export class AppletLaunchActionHandler extends ActionHandler{
     const launchArgs = {...this.requestContext["args"], ...this.#args, ...args};//mix-in args
     const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
 
-    if (result) this.router.notifyRouteChanged(this.path, this.#history);
+    if (result) this.router.notifyRouteChanged(this.rootPath, this.#history);
 
     return result;
   }

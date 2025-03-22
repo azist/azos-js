@@ -13,4 +13,4 @@ export class ExampleFeatureBApplet extends Applet{
   }
 }
 
-window.customElements.define("examples-home-applet", ExampleFeatureBApplet);
+window.customElements.define("examples-featureb-applet", ExampleFeatureBApplet);

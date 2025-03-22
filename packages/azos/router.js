@@ -139,6 +139,12 @@ export class RouteHandler{
   /** The path being processed by this and the next node(s) */
   get path(){ return this.#path; }
 
+  /** Returns full path from the very parent of the route to this node*/
+  get rootPath(){
+    if (!this.#parent) return "/";
+    return this.#parent.#parent ? `${this.#parent.rootPath}/${this.#segment}` : `/${this.#segment}`;
+  }
+
   /** The path segment being processed by this node */
   get segment(){ return this.#segment; }
 

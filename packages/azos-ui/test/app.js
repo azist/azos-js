@@ -52,7 +52,7 @@ const appRoutes = {
     scheduler: {applet: XyzAppletScheduler}
   },
 
-  examples:{
+  examples: {
     home:  {applet: ExampleHomeApplet, args: {displayMethod: 0}},
     featurea:  {applet: ExampleFeatureAApplet, args: {displayMethod: 0}},
     featureb:  {applet: ExampleFeatureBApplet, args: {displayMethod: 1}}
@@ -77,7 +77,7 @@ const cfgApp = {
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
     { name: "log", type: ConLog },
     { name: "logic", type: MyLogic },
-    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes} },
+    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home" },
     { name: "imgRegistry", type: ImageRegistry },
   ]
 };
@@ -94,8 +94,3 @@ app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 //Wire up app closing events and global error handlers
 addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
-
-// // // /** @type {BrowserRouter} */
-// // // const router = app.moduleLinker.resolve(BrowserRouter);
-// // // //const handler = router.handleRoute(dflt(window.location.pathname, "Xyz"));
-// // // router.safeHandleUiActionAsync(arena, "Hello");
