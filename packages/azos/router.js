@@ -206,7 +206,7 @@ export class ActionHandler extends RouteHandler{
     //Validate permissions from top to bottom
     aver.isOfOrNull(session, Session);
     if (session) this.checkPermissions(session);
-    await this._doExecActionAsync(context, args, session);
+    return await this._doExecActionAsync(context, args, session);
   }
 
   /** Performs the actual work. Returns the result of the action

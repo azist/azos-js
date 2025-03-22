@@ -4,13 +4,15 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf, isSubclassOf } from "../azos/aver";
+import { isNonEmptyString, isOf, isSubclassOf } from "../azos/aver";
 import { ConfigNode } from "../azos/conf";
 import { Router, RouteHandler, ActionHandler, SectionHandler } from "../azos/router";
 import { isSubclassOf as types_isSubclassOf } from "../azos/types";
 import { Arena } from "./arena";
 import { Applet } from "./applet";
 import { showMsg } from "./msg-box";
+import { isNullOrWhiteSpace } from "azos/strings";
+import { LOG_TYPE } from "azos/log";
 
 /** Provides routing services in the context of a UI in a browser (such as Chrome or Firefox) user agent */
 export class BrowserRouter extends Router{
@@ -23,6 +25,30 @@ export class BrowserRouter extends Router{
     isOf(nextNode, ConfigNode);
     const isApplet = types_isSubclassOf(nextNode.get("applet") , Applet);
     return isApplet ? AppletLaunchActionHandler : this.defaultSectionHandler;
+  }
+
+  /**
+   * Handles a route leading up to a UI `ActionHandler`-derivative in the scope of Arena
+   * @param {Arena} arena - required scope
+   * @param {string} path - route path string
+   * @param {any} args - optional launch args
+   * @param {Session} session - execution session scope
+   * @returns {any} result of action, such as applet launch result
+   */
+  async safeHandleUiActionAsync(arena, path, args, session){
+    isOf(arena, Arena);
+    isNonEmptyString(path);
+    try {
+      const handler = this.handleRoute(path);
+      isOf(handler, ActionHandler, `Route '${path}' must land on ActionHandler`);
+      return await handler.execActionAsync(arena, args, session);
+    } catch(e) {
+      this.writeLog(LOG_TYPE.EMERGENCY, `Bad route '${path}'`, e, {path})
+      if (isNullOrWhiteSpace(this.errorPath)) throw e;
+      const eHandler = this.handleRoute(this.errorPath);
+      isOf(eHandler, ActionHandler, `Misconfigured error route '${this.errorPath}' must land on ActionHandler`);
+      return await eHandler.execActionAsync(arena, args, session);
+    }
   }
 }
 
@@ -76,6 +102,6 @@ export class MsgBoxActionHandler extends ActionHandler{
   }
 
   async _doExecActionAsync(){
-    await showMsg(this.#status, this.#title, this.#message, this.#rank, this.#pre);
+    return await showMsg(this.#status, this.#title, this.#message, this.#rank, this.#pre);
   }
 }
