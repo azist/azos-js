@@ -85,8 +85,7 @@ addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
 /** @type {BrowserRouter} */
 const router = app.moduleLinker.resolve(BrowserRouter);
 //const handler = router.handleRoute(dflt(window.location.pathname, "Xyz"));
-const handler = router.handleRoute("Hello");
-handler.execActionAsync(arena);
+router.safeHandleUiActionAsync(arena, "Hello");
 
 
 switch (location.pathname) {

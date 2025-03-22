@@ -31,13 +31,15 @@ export class BrowserRouter extends Router{
    * Handles a route leading up to a UI `ActionHandler`-derivative in the scope of Arena
    * @param {Arena} arena - required scope
    * @param {string} path - route path string
-   * @param {any} args - optional launch args
-   * @param {Session} session - execution session scope
+   * @param {any|null} [args=null] - optional launch args
+   * @param {Session | null} [session=null] - execution session scope
    * @returns {any} result of action, such as applet launch result
    */
-  async safeHandleUiActionAsync(arena, path, args, session){
+  async safeHandleUiActionAsync(arena, path, args = null, session = null){
     isOf(arena, Arena);
     isNonEmptyString(path);
+    if (!session) session = arena.app.session;
+
     try {
       const handler = this.handleRoute(path);
       isOf(handler, ActionHandler, `Route '${path}' must land on ActionHandler`);
@@ -47,7 +49,7 @@ export class BrowserRouter extends Router{
       if (isNullOrWhiteSpace(this.errorPath)) throw e;
       const eHandler = this.handleRoute(this.errorPath);
       isOf(eHandler, ActionHandler, `Misconfigured error route '${this.errorPath}' must land on ActionHandler`);
-      return await eHandler.execActionAsync(arena, args, session);
+      return await eHandler.execActionAsync(arena, {error: e, ...args}, session);//with error args mix-in
     }
   }
 }
