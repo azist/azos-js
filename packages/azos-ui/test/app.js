@@ -20,8 +20,6 @@ import { XyzApplet3 } from "./xyz-applet3";
 import { XyzAppletScheduler } from "./xyz-applet-scheduler";
 import { errorMsg } from "../msg-box";
 import "../vcl/util/img-registry-browser";
-import { dflt } from "azos/strings";
-
 
 
 class MyLogic extends Module {
@@ -41,11 +39,15 @@ class MyLogic extends Module {
 
 const appRoutes = {
   Hello: {type: MsgBoxActionHandler, status: "Info", title: "Hello", message: "Hello message", rank: 1},
-  Xyz: {applet: XyzApplet},
-  Xyz1: "$(Xyz)",
-  Xyz2: {applet: XyzApplet2},
-  Xyz3: {applet: XyzApplet3},
-  Scheduler: {applet: XyzAppletScheduler},
+  snake: "$(xyz)",
+  xyz: {
+    a0:  {applet: XyzApplet, args: {displayMethod: 0}},
+    a1:  {applet: XyzApplet, args: {displayMethod: 1}},
+    a2:  {applet: XyzApplet, args: {displayMethod: 2}},
+    two: {applet: XyzApplet2},
+    three: {applet: XyzApplet3},
+    scheduler: {applet: XyzAppletScheduler}
+  },
 
   help: {
     about: {applet: XyzApplet, args: {isHelp: true }},
@@ -89,31 +91,3 @@ addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
 const router = app.moduleLinker.resolve(BrowserRouter);
 //const handler = router.handleRoute(dflt(window.location.pathname, "Xyz"));
 router.safeHandleUiActionAsync(arena, "Hello");
-
-
-switch (location.pathname) {
-  case "/0.app":
-    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 0);
-    break;
-  case "/1.app":
-    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 1);
-    break;
-  case "/2.app":
-    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 2);
-    break;
-  case "/3.app":
-    arena.appletOpen(XyzApplet2);
-    break;
-  case "/4.app":
-    arena.appletOpen(XyzApplet3);
-    break;
-  case "/5.app":
-    arena.appletOpen(XyzAppletScheduler);
-    break;
-  case "/": // pass-thru
-  default:
-    arena.appletOpen(XyzApplet2);
-    break;
-}
-
-
