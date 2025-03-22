@@ -20,6 +20,9 @@ import { XyzApplet3 } from "./xyz-applet3";
 import { XyzAppletScheduler } from "./xyz-applet-scheduler";
 import { errorMsg } from "../msg-box";
 import "../vcl/util/img-registry-browser";
+import { ExampleHomeApplet } from "./examples/home-applet";
+import { ExampleFeatureAApplet } from "./examples/featureA-applet";
+import { ExampleFeatureBApplet } from "./examples/featureB-applet";
 
 
 class MyLogic extends Module {
@@ -39,8 +42,8 @@ class MyLogic extends Module {
 
 const appRoutes = {
   Hello: {type: MsgBoxActionHandler, status: "Info", title: "Hello", message: "Hello message", rank: 1},
-  snake: "$(xyz)",
-  xyz: {
+  old: "$(legacy)",
+  legacy: {
     a0:  {applet: XyzApplet, args: {displayMethod: 0}},
     a1:  {applet: XyzApplet, args: {displayMethod: 1}},
     a2:  {applet: XyzApplet, args: {displayMethod: 2}},
@@ -49,6 +52,11 @@ const appRoutes = {
     scheduler: {applet: XyzAppletScheduler}
   },
 
+  examples:{
+    home:  {applet: ExampleHomeApplet, args: {displayMethod: 0}},
+    featurea:  {applet: ExampleFeatureAApplet, args: {displayMethod: 0}},
+    featureb:  {applet: ExampleFeatureBApplet, args: {displayMethod: 1}}
+  },
   help: {
     about: {applet: XyzApplet, args: {isHelp: true }},
     legal: "$(about)",
