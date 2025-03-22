@@ -69,14 +69,14 @@ export class BrowserRouter extends Router{
 
 
   /** Called by action handler derivatives to notify the routing integrated parts, such as browser about the route change */
-  notifyRouteChanged(path){
+  notifyRouteChanged(path, pushHistory){
     isString(path);
     //do nothing if not integrated with browser
     if (!this.#integrated) return;
 
     window.location.hash = path;
 
-    if (this.#history) history.pushState(path);
+    if (this.#history && pushHistory) history.pushState(path);
   }
 
   getDefaultHandlerType(handler, nextNode){
@@ -118,12 +118,14 @@ export class AppletLaunchActionHandler extends ActionHandler{
   #applet;
   #force;
   #args;
+  #history;
 
   constructor(router, cfg, path, parent){
     super(router, cfg, path, parent);
     this.#applet = isSubclassOf(cfg.get("applet"), Applet);
     this.#force = cfg.getBool("force", false);
     this.#args = cfg.get("args") ?? null;//TODO: We need a getter which return Plain value like: cfg.getPlain("aaa"); which returns object or array or primitive, not config node
+    this.#history = cfg.getBool("history", true);
   }
 
   /** Returns a target applet type to launch */
@@ -135,13 +137,16 @@ export class AppletLaunchActionHandler extends ActionHandler{
   /** Arguments object or null */
   get args(){ return this.#args; }
 
+  /** True if the successful launch should go on the browser history stack */
+  get history(){ return this.#history; }
+
   // eslint-disable-next-line no-unused-vars
   async _doExecActionAsync(context, args, session){
     const arena = isOf(context, Arena, `${this.constructor.name} requires Arena context`);
     const launchArgs = {...this.requestContext["args"], ...this.#args, ...args};//mix-in args
     const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
 
-    if (result) this.router.notifyRouteChanged(this.path);
+    if (result) this.router.notifyRouteChanged(this.path, this.#history);
 
     return result;
   }
