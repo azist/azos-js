@@ -119,16 +119,16 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("azos.ico.filter", "svg");
-          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
 
           icon = ireg.resolve("azos.ico.filter", "svg", { media: "i32" });
-          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
 
           icon = ireg.resolve("azos.ico.filter", "svg", { isoLang: "eng" });
-          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
 
           icon = ireg.resolve("azos.ico.filter", "svg", { theme: "azos" });
-          expecting(icon, `<path d="M22 3.58002H2C1`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
         });
     }, () => false);
 
@@ -139,12 +139,10 @@ unit("ImgRegistry", function () {
           type: ImageRegistry,
           images: [
             { uri: "composer", f: "svg", m: null, i: null, t: null, c: `<svg>typical composer silhouette</svg>` },
-
             { uri: "composer", f: "svg", m: null, i: null, t: "rap", c: `<svg>snoop icon</svg>` },
             { uri: "composer", f: "svg", m: "print", i: null, t: "rap", c: `<svg>snoop print page</svg>` },
             { uri: "composer", f: "svg", m: null, i: "deu", t: "rap", c: `<svg>snoop Hund icon</svg>` },
             { uri: "composer", f: "svg", m: "print", i: "deu", t: "rap", c: `<svg>snoop Hund print page</svg>` },
-
             { uri: "composer", f: "svg", m: null, i: null, t: "classical", c: `<svg>bach icon</svg>` },
             { uri: "composer", f: "svg", m: "print", i: null, t: "classical", c: `<svg>bach print page</svg>` },
             { uri: "composer", f: "svg", m: null, i: "rus", t: "classical", c: `<svg>BAX icon</svg>` },
@@ -250,16 +248,16 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://azos.ico.filter");
-          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #1 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #1 azos.ico.filter");
 
           icon = ireg.resolveSpec("svg://azos.ico.filter?media=i32");
-          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
 
           icon = ireg.resolveSpec("svg://azos.ico.filter?iso=eng");
-          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
 
           icon = ireg.resolveSpec("svg://azos.ico.filter?theme=azos");
-          expecting(icon, `<path d="M22 3.58002H2C1.99912 5.28492`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
         });
     }, () => false);
 
