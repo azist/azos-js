@@ -47,7 +47,6 @@ import { CONTENT_TYPE } from "../coreconsts.js";
 import { Module } from "../modules.js";
 import { dflt, isEmpty } from "../strings.js";
 import { isBool, isNumber, isString } from "../types.js";
-import { WEB_APP_ICONS } from "./icons.js";
 
 
 
