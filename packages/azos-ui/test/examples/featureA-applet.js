@@ -23,8 +23,17 @@ export class ExampleFeatureAApplet extends Applet{
 
   render(){
    return html`
-     THis is feature A
+     This is feature A applet
+     <pre>
+        AAAA
+       A    A
+       AAAAAA
+       A    A
+       A    A
+     </pre>
+     <p>
      <az-check id="chkDirty" scope="this" title="Dirty"> </az-check>
+     </p>
    `;
   }
 }
