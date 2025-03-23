@@ -25,6 +25,8 @@ export class BrowserRouter extends Router{
   #onHashChange;
   #onHistoryPopState;
 
+  #currentPath;
+
   constructor(dir, cfg){
     super(dir, cfg);
     this.#integrated = cfg.getBool("integrated", true);
@@ -35,7 +37,14 @@ export class BrowserRouter extends Router{
 
       this.#onHashChange = (function(){
         if (!this.#hasLoaded) return;
-        const path = window.location.hash.slice(1) || '/';
+
+        const hash = window.location.hash;
+        if (isNullOrWhiteSpace(hash)) return;
+        const path = hash.substring(1) || '/';
+
+        if (path === this.#currentPath) return;//nothing changed
+
+//console.warn("HASH CHANGE CALLED   ", hash, " -> ", path, " Current path: ", this.#currentPath);
         this.safeHandleUiActionAsync(window.ARENA, path);
       }).bind(this);
 
@@ -63,10 +72,15 @@ export class BrowserRouter extends Router{
   }
 
   _appAfterLoad() {
-    if (this.#appStart)
-      queueMicrotask(async () => { try{await this.safeHandleUiActionAsync(window.ARENA, this.#appStart);} finally { this.#hasLoaded = true;} });
-    else
-      this.#hasLoaded = true;
+    if (isNullOrWhiteSpace(window.location.hash)){
+      if (this.#appStart) {
+        queueMicrotask(async () => { try{await this.safeHandleUiActionAsync(window.ARENA, this.#appStart);} finally { this.#hasLoaded = true;} });
+      } else {
+        this.#hasLoaded = true;
+      }
+    } else {
+      queueMicrotask(async () => { try{await this.safeHandleUiActionAsync(window.ARENA, window.location.hash.substring(1));} finally { this.#hasLoaded = true;} });
+    }
   }
 
   /** Returns true when this router was created in the integrated mode with the browser - it reacts to hash changes  */
@@ -77,7 +91,11 @@ export class BrowserRouter extends Router{
 
   get hasLoaded(){ return this.#hasLoaded; }
 
+  /** Route path to go to upon application start if no other path is supplied via URL */
   get start(){ return this.#appStart; }
+
+  /** Current route path selected in browser */
+  get currentPath(){ return this.#currentPath; }
 
   get defaultSectionHandler(){ return SectionHandler; }
   get defaultLaunchHandler(){ return AppletLaunchActionHandler; }
@@ -86,11 +104,15 @@ export class BrowserRouter extends Router{
   /** Called by action handler derivatives to notify the routing integrated parts, such as browser about the route change */
   notifyRouteChanged(path, pushHistory){
     isString(path);
+
+    this.#currentPath = path;
+
     //do nothing if not integrated with browser
     if (!this.#integrated) return;
 
-    window.location.hash = path;
-    console.warn("notifyRouteChanged()", path);
+    window.location.hash = `#${path}`;
+
+    console.warn("notifyRouteChanged()", path, " --location.hash--> ", window.location.hash);
 
     if (this.#history && pushHistory) history.pushState(path, "");
   }
