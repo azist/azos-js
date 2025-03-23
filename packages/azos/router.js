@@ -82,6 +82,17 @@ export class Router extends Module{
   }
 }//Router
 
+//return a tuple [segment, nextPath]
+function splitPaths(path){
+  while(path.indexOf('/')===0) path = path.substring(1);
+  const i = path.indexOf('/');
+  if (i > 0){
+    return [trim(path.substring(0, i)), trim(path.substring(i + 1)) ];
+  } else {
+    return [trim(path), ""];
+  }
+}
+
 
 /** Handles route paths by navigating through routing graph of config nodes segment by segment, dynamically capturing parameters and
  * injecting the next most appropriate polymorphic route handler for processing of the next segment
@@ -103,16 +114,15 @@ export class RouteHandler{
     this.#parent = aver.isOfOrNull(parent, RouteHandler);
     this.#requestContext = this.#parent?.requestContext ?? { };
 
-    while(path.indexOf('/')===0) path = path.substring(1);
-
-    const i = path.indexOf('/');
-    if (i > 0){
-      this.#segment = trim(path.substring(0, i));
-      this.#nextPath = trim(path.substring(i + 1));
-    } else {
-      this.#segment = trim(path);
-      this.#nextPath = "";
-    }
+    if (!parent){//very root
+      this.#segment = "/";
+      if (path.startsWith("/")){
+        this.#nextPath = path.substring(1);
+      } else {
+        this.#nextPath = path;
+        this.#path = "/" + path;
+      }
+    } else  [this.#segment, this.#nextPath] = splitPaths(this.#path);
   }
 
   /** Router which processes the request */
@@ -128,6 +138,12 @@ export class RouteHandler{
 
   /** The path being processed by this and the next node(s) */
   get path(){ return this.#path; }
+
+  /** Returns full path from the very parent of the route to this node*/
+  get rootPath(){
+    if (!this.#parent) return "/";
+    return this.#parent.#parent ? `${this.#parent.rootPath}/${this.#segment}` : `/${this.#segment}`;
+  }
 
   /** The path segment being processed by this node */
   get segment(){ return this.#segment; }
@@ -168,9 +184,10 @@ export class SectionHandler extends RouteHandler{
   next(){
     //Section or Action default type
     if (this.nextPath.length === 0) return null;
-    let node = aver.isOf(this.graph.get(this.segment), ConfigNode, `${this.constructor.name} expects segment '${this.segment}' to be of ConfigNode type`);
-    const nxtDefaultType = this.router.getDefaultHandlerType(this, node);
-    const nxtHandler = makeNew(RouteHandler, node, this.router, nxtDefaultType, [this.nextPath, this]);
+    const [nxtSeg, ] = splitPaths(this.nextPath);
+    let nxtNode = aver.isOf(this.graph.get(nxtSeg), ConfigNode, `${this.constructor.name} expects segment '${nxtSeg}' to be of ConfigNode type`);
+    const nxtDefaultType = this.router.getDefaultHandlerType(this, nxtNode);
+    const nxtHandler = makeNew(RouteHandler, nxtNode, this.router, nxtDefaultType, [this.nextPath, this]);
     return nxtHandler;
   }
 }
@@ -195,7 +212,7 @@ export class ActionHandler extends RouteHandler{
     //Validate permissions from top to bottom
     aver.isOfOrNull(session, Session);
     if (session) this.checkPermissions(session);
-    await this._doExecActionAsync(context, args, session);
+    return await this._doExecActionAsync(context, args, session);
   }
 
   /** Performs the actual work. Returns the result of the action

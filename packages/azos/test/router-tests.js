@@ -35,8 +35,38 @@ unit("Router", function() {
         const h1 = router.handleRoute("help/about");
         const h2 = router.handleRoute("support/about");
 
+        aver.isNotNull(h1);
+        aver.isNotNull(h2);
+
+        aver.isOf(h1, sut.SectionHandler);
+        aver.isOf(h2, sut.SectionHandler);
+
+        aver.areEqual(router, h1.router);
+        aver.areEqual(router, h2.router);
+
         aver.areEqual("about", h1.segment);
         aver.areEqual("about", h2.segment);
+
+        aver.areEqual("about", h1.path);
+        aver.areEqual("", h1.nextPath);
+        aver.areEqual("/help/about", h1.rootPath);
+
+
+        aver.isOf(h1.parent, sut.SectionHandler);
+        aver.areEqual("help/about", h1.parent.path);
+        aver.areEqual("about", h1.parent.nextPath);
+        aver.areEqual("help", h1.parent.segment);
+        aver.areEqual("/help", h1.parent.rootPath);
+
+        aver.isOf(h1.parent.parent, sut.SectionHandler);
+        aver.areEqual("/help/about", h1.parent.parent.path);
+        aver.areEqual("help/about", h1.parent.parent.nextPath);
+        aver.areEqual("/", h1.parent.parent.segment);
+        aver.areEqual("/", h1.parent.parent.rootPath);
+        aver.isNull(h1.parent.parent.parent);
+
+        aver.areEqual(h1.requestContext, h1.parent.requestContext);
+        aver.areEqual(h1.requestContext, h1.parent.parent.requestContext);
       });
 
 
