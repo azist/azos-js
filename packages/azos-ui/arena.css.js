@@ -124,10 +124,6 @@ header{
         padding: var(--arn-strip-padding);
         overflow: hidden;
         align-content: center;
-        stroke: var(--arn-strip-svg-stroke);
-        stroke-width: var(--arn-strip-svg-stroke-width);
-        fill: none;
-        stroke-linecap: round;
         cursor: pointer;
       }
       header .strip-btn.loggedIn{
@@ -136,11 +132,8 @@ header{
         border-radius: 3ch;
         padding: 0 0.25em;
       }
-      header .strip-btn svg{ width: 28px }
-
-      header .strip-btn:hover{
-        background-color: rgba(255, 255, 255, 0.1);
-      }
+      header .strip-btn:hover{ background-color: rgba(255, 255, 255, 0.1); }
+      header .strip-btn svg{ --icon-width: 28px }
 
 /* ------------------- */
 
