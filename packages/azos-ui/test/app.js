@@ -20,8 +20,9 @@ import { XyzApplet3 } from "./xyz-applet3";
 import { XyzAppletScheduler } from "./xyz-applet-scheduler";
 import { errorMsg } from "../msg-box";
 import "../vcl/util/img-registry-browser";
-import { dflt } from "azos/strings";
-
+import { ExampleHomeApplet } from "./examples/home-applet";
+import { ExampleFeatureAApplet } from "./examples/featureA-applet";
+import { ExampleFeatureBApplet } from "./examples/featureB-applet";
 
 
 class MyLogic extends Module {
@@ -41,15 +42,27 @@ class MyLogic extends Module {
 
 const appRoutes = {
   Hello: {type: MsgBoxActionHandler, status: "Info", title: "Hello", message: "Hello message", rank: 1},
-  Xyz: {applet: XyzApplet},
-  Xyz1: "$(Xyz)",
-  Xyz2: {applet: XyzApplet2},
-  Xyz3: {applet: XyzApplet3},
-  Scheduler: {applet: XyzAppletScheduler},
+  old: "$(legacy)",
+  legacy: {
+    a0:  {applet: XyzApplet, args: {displayMethod: 0}},
+    a1:  {applet: XyzApplet, args: {displayMethod: 1}},
+    a2:  {applet: XyzApplet, args: {displayMethod: 2}},
+    two: {applet: XyzApplet2},
+    three: {applet: XyzApplet3},
+    scheduler: {applet: XyzAppletScheduler}
+  },
 
+  examples: {
+    home:  {applet: ExampleHomeApplet, args: {displayMethod: 0}},
+    featurea:  {applet: ExampleFeatureAApplet, args: {displayMethod: 0}},
+    featureb:  {applet: ExampleFeatureBApplet, args: {displayMethod: 1}}
+  },
   help: {
     about: {applet: XyzApplet, args: {isHelp: true }},
-    legal: "$(about)"
+    legal: "$(about)",
+    test1: {type: MsgBoxActionHandler, status: "Info", title: "Test1", message: "Test number one"},
+    test2: {type: MsgBoxActionHandler, status: "Info", title: "Test2", message: "Test number two"},
+    test3: {type: MsgBoxActionHandler, status: "Info", title: "Test3", message: "Test number three"},
   },
 
   error: {type: MsgBoxActionHandler, status: "error", title: "Routing error", message: "The requested routing operation failed", rank: 1}
@@ -63,8 +76,8 @@ const cfgApp = {
     { name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET },
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
     { name: "log", type: ConLog },
-    // { name: "logic", type: MyLogic },
-    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes} },
+    { name: "logic", type: MyLogic },
+    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home", history: false },
     { name: "imgRegistry", type: ImageRegistry },
   ]
 };
@@ -81,36 +94,3 @@ app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 //Wire up app closing events and global error handlers
 addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
-
-//const router = app.moduleLinker.resolve(BrowserRouter);
-//const handler = router.handleRoute(dflt(window.location.pathname, "Xyz"));
-//const handler = router.handleRoute("Hello");
-//handler.execActionAsync(arena);
-
-
-switch (location.pathname) {
-  case "/0.app":
-    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 0);
-    break;
-  case "/1.app":
-    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 1);
-    break;
-  case "/2.app":
-    arena.appletOpen(XyzApplet).then(() => arena.applet.displayMethod = 2);
-    break;
-  case "/3.app":
-    arena.appletOpen(XyzApplet2);
-    break;
-  case "/4.app":
-    arena.appletOpen(XyzApplet3);
-    break;
-  case "/5.app":
-    arena.appletOpen(XyzAppletScheduler);
-    break;
-  case "/": // pass-thru
-  default:
-    arena.appletOpen(XyzApplet2);
-    break;
-}
-
-
