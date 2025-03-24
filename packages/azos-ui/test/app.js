@@ -23,6 +23,7 @@ import "../vcl/util/img-registry-browser";
 import { ExampleHomeApplet } from "./examples/home-applet";
 import { ExampleFeatureAApplet } from "./examples/featureA-applet";
 import { ExampleFeatureBApplet } from "./examples/featureB-applet";
+import { ShowcaseApplet } from "./examples/showcase-applet";
 
 
 class MyLogic extends Module {
@@ -55,7 +56,8 @@ const appRoutes = {
   examples: {
     home:  {applet: ExampleHomeApplet, args: {displayMethod: 0}},
     featurea:  {applet: ExampleFeatureAApplet, args: {displayMethod: 0}},
-    featureb:  {applet: ExampleFeatureBApplet, args: {displayMethod: 1}}
+    featureb: {applet: ExampleFeatureBApplet, args: {displayMethod: 1}},
+    showcase: {applet: ShowcaseApplet},
   },
   help: {
     about: {applet: XyzApplet, args: {isHelp: true }},
