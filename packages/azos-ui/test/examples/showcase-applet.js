@@ -1,8 +1,35 @@
+/*<FILE_LICENSE>
+ * Azos (A to Z Application Operating System) Framework
+ * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
+ * See the LICENSE file in the project root for more information.
+</FILE_LICENSE>*/
+
 import { Applet } from "../../applet";
 import { css, html, noContent } from "../../ui";
 
+import "../showcase/case-accordion";
+import "../showcase/case-buttons";
+import "../showcase/case-checkboxes";
+import "../showcase/case-code-box";
+import "../showcase/case-date-range";
+import "../showcase/case-input-tests";
+import "../showcase/case-lookup";
+import "../showcase/case-modals";
+import "../showcase/case-object-inspector";
+import "../showcase/case-radios";
+import "../showcase/case-scheduler";
+import "../showcase/case-selects";
+import "../showcase/case-slide-deck";
+import "../showcase/case-switches";
+import "../showcase/case-toasts";
+import "../showcase/case-tree-view";
 
 export class ShowcaseApplet extends Applet{
+
+  constructor() {
+    super();
+    this.selectedCase = "DateRange";
+  }
 
   static properties = {
     selectedCase: { type: String, reflect: true }
@@ -44,6 +71,7 @@ export class ShowcaseApplet extends Applet{
       <option value="Buttons">Buttons</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
+      <option value="DateRange">Date Range</option>
       <option value="InputTests">Input Tests</option>
       <option value="Lookup">Lookup</option>
       <option value="Modals">Modals</option>
@@ -71,6 +99,8 @@ export class ShowcaseApplet extends Applet{
           return html`<az-case-checkboxes></az-case-checkboxes>`;
         case "CodeBox":
           return html`<az-case-code-box></az-case-code-box>`;
+      case "DateRange":
+        return html`<az-case-date-range></az-case-date-range>`;
         case "InputTests":
           return html`<az-case-input-tests></az-case-input-tests>`;
         case "Lookup":

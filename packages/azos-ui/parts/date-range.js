@@ -28,13 +28,12 @@ export class DateRangeField extends FieldPart {
 
   #rawValue = null;
   #value = null;
+  #fieldErrors = null;
 
   get rawValue() { return this.#rawValue; }
   get value() { return this.#value; }
 
-  get isRequired() {
-    return !this.optionalStart && !this.optionalEnd;
-  }
+  get isRequired() { return !this.optionalStart || !this.optionalEnd; }
 
   #dateChanged(e, field) {
     isTrue(isOneOf(field, ["start", "end"]));
@@ -46,23 +45,27 @@ export class DateRangeField extends FieldPart {
   setValueFromInput(v, field) {
     this.#rawValue ??= {};
     this.#value ??= {};
+    this.#fieldErrors ??= {};
 
     this.#rawValue[field] = v;
     this.#value[field] = undefined;
+    this.#fieldErrors[field] = undefined;
+    this.error = null;
+    this.requestUpdate();
 
     try {
-      v = this.prepareInputValue(v);
-      this.#value[field] = v;
-      this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
+      this.#value[field] = this.castValue(v);
     } catch (e) {
-      this.error = e;
+      this.#fieldErrors[field] = e;
     } finally {
-      this.requestUpdate();
+      if (this.#fieldErrors["start"] || this.#fieldErrors["end"])
+        this.error = this.#fieldErrors["start"] || this.#fieldErrors["end"];
     }
+    if (!this.error) this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
   }
 
-  prepareInputValue(v) {
-    if (v === null || v === undefined) return null;
+  castValue(v) {
+    if (v === null || v === undefined || v === "") return null;
     return asDate(v, true);
   }
 
@@ -117,6 +120,7 @@ export class DateRangeField extends FieldPart {
       <div class="inputs ${cls}">
         <input
           id="tbStartDate"
+          class="${this.#fieldErrors?.["start"] ? "error" : ""}"
           placeholder="${this.placeholder}"
           type="text"
           .value="${startValue}"
@@ -130,6 +134,7 @@ export class DateRangeField extends FieldPart {
         <span class="dash">&mdash;</span>
         <input
           id="tbEndDate"
+          class="${this.#fieldErrors?.["end"] ? "error" : ""}"
           placeholder="${this.placeholder}"
           type="text"
           .value="${endValue}"

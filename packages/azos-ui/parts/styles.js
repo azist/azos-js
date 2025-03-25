@@ -396,9 +396,7 @@ export const dateRangeStyles = css`
   box-shadow: none;
   text-align: center;
 }
-.input[type=date]{
-  padding: calc(0.3em - 1px) 0.35em;
-}
+input.error{ border: var(--s-error-bor-ctl) }
 
 .infoBg > input{ color: var(--s-info-fg-ctl) !important; }
 .warningBg > input{ color: var(--s-warn-fg-ctl) !important; }

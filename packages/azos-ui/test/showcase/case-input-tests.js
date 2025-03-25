@@ -20,8 +20,6 @@ export class CaseInputTests extends CaseBase {
     return html`
 <h2>Testing @change with az-text and az-check</h2>
 
-<az-date-range title="Valid Span UTC" status="info" optionalStart optionalEnd></az-date-range>
-
 <az-text id="tbNasa" scope="window" status="info" name="Nasa" title="Nasa Experimentation" placeholder="Hatch diameter inches" @change="${this.#onFieldChange}" datatype="int" value="10"></az-text>
 
 <az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="Patient A"></az-text>
