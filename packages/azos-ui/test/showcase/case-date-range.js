@@ -10,12 +10,6 @@ import "../../parts/text-field";
 import "../../parts/date-range";
 
 export class CaseDateRange extends CaseBase {
-
-  #onFieldChange(e) {
-    console.log("Got change event from field: ", e.target.name, e.target.value);
-    this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
-  }
-
   renderControl() {
     return html`
 <h2>Date Range</h2>
