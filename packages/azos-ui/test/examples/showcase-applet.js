@@ -5,7 +5,10 @@
 </FILE_LICENSE>*/
 
 import { Applet } from "../../applet";
+import { Command } from "../../cmd";
 import { css, html, noContent } from "../../ui";
+
+import "../../parts/button";
 
 import "../showcase/case-accordion";
 import "../showcase/case-buttons";
@@ -24,16 +27,19 @@ import "../showcase/case-switches";
 import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
+import { prompt } from "../../ok-cancel-modal";
 
 export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
     this.selectedCase = "TabView";
+    this.x = 1;
   }
 
   static properties = {
-    selectedCase: { type: String, reflect: true }
+    selectedCase: { type: String, reflect: true },
+    x: { state: true },
   }
 
   static styles = [css`
@@ -57,7 +63,14 @@ export class ShowcaseApplet extends Applet {
 }
   `];
 
-  get title() { return "Azos Showcase"; }
+  #cmdHelp = new Command(this, {
+    uri: "Showcase.PromptFor.CmdHelp",
+    icon: "svg://azos.ico.questionMark",
+    title: "Help",
+    handler: async () => console.log((await prompt("Do you need help?", { title: "Help!", ok: "Yes", cancel: "No", okBtnStatus: "ok" })).modalResult?.response)
+  });
+
+  get title() { return `Azos Showcase - ${this.x}`; }
 
   #onCaseChanged(e) {
     this.selectedCase = e.target.value;
@@ -66,6 +79,8 @@ export class ShowcaseApplet extends Applet {
 
   render() {
     return html`
+    <az-button title="Toggle Toolbar Button" @click="${() => this.arena.installToolbarCommands([this.#cmdHelp])}"></az-button>
+    <az-button title="Increase X" @click="${() => { ++this.x }}"></az-button>
     <select id="caseSelect" @change="${this.#onCaseChanged}" .value="${this.selectedCase ?? ""}">
       <option value="">Select a showcase item...</option>
       <option value="Accordion">Accordion</option>
