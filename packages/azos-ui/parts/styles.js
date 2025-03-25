@@ -376,7 +376,7 @@ export const dateRangeStyles = css`
 .inputs{
   display: inline-grid;
   grid-template-columns: 1fr auto 1fr;
-  grid-column-gap: 0.5em;
+  grid-column-gap: 0.25em;
   align-items: center;
   justify-items: center;
 
@@ -391,6 +391,7 @@ export const dateRangeStyles = css`
   box-shadow: var(--ctl-box-shadow);
 }
 .inputs > input{
+  width: 12ch;
   background: none;
   border: none;
   box-shadow: none;
