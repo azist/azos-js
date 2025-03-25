@@ -9,11 +9,13 @@ import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui"
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP, isAssigned, isNumber, isString } from "azos/types";
+import { iconStyles } from "../../parts/styles";
 
 export class TabView extends Control {
 
-  static styles = css`
-:host { display: block; margin-top: 1.0em }
+  static styles = [iconStyles, css`
+:host{ display: block; margin-top: 1.0em; }
+.icon{ --icon-width: 2.5ex; }
 
 .tab-nav {
   display: flex;
@@ -178,7 +180,7 @@ export class TabView extends Control {
 .warning-tab-btn { color: var(--s-warn-fg-ctl); border-color: var(--s-warn-bor-color-ctl);}
 .alert-tab-btn { color: var(--s-alert-fg-ctl); border-color: var(--s-alert-bor-color-ctl);}
 .error-tab-btn { color: var(--s-error-fg-ctl); border-color: var(--s-error-bor-color-ctl);}
-`;
+`];
 
   static properties = {
     defaultMinTabWidth: { type: Number },
@@ -515,7 +517,7 @@ export class TabView extends Control {
             @dragstart="${evt => this.#onDragStart(evt, index)}"
             @dragend="${this.#onDragEnd}"
             >
-            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
+            ${tab.iconPath ? this.renderImageSpec(tab.iconPath, "tab-icon").html : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
             ${tab.canClose ? html`<div class="close-ind" @click="${evt => this.#onCloseTabClick(evt, tab)}">&times;</div>` : noContent}
