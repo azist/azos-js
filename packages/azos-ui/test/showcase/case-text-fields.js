@@ -10,7 +10,6 @@ import { CaseBase } from "./case-base";
 export class CaseTextFields extends CaseBase {
 
   renderControl() {
-    // TODO: test button click to increment/decrement counter
     return html`
 <h2>Text Fields</h2>
 

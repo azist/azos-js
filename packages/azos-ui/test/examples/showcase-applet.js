@@ -83,6 +83,7 @@ export class ShowcaseApplet extends Applet{
       <option value="SlideDeck">Slide Deck</option>
       <option value="Switches">Switches</option>
       <option value="TabView">Tab View</option>
+      <option value="TextFields">Text Fields</option>
       <option value="Toasts">Toasts</option>
       <option value="TreeView">Tree View</option>
     </select>
@@ -123,6 +124,8 @@ export class ShowcaseApplet extends Applet{
           return html`<az-case-switches></az-case-switches>`;
       case "TabView":
         return html`<az-case-tab-view></az-case-tab-view>`;
+      case "TextFields":
+        return html`<az-case-text-fields></az-case-text-fields>`;
         case "Toasts":
           return html`<az-case-toasts></az-case-toasts>`;
         case "TreeView":
