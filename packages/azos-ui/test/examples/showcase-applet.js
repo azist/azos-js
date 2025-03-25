@@ -21,6 +21,7 @@ import "../showcase/case-scheduler";
 import "../showcase/case-selects";
 import "../showcase/case-slide-deck";
 import "../showcase/case-switches";
+import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
 
@@ -28,7 +29,7 @@ export class ShowcaseApplet extends Applet{
 
   constructor() {
     super();
-    this.selectedCase = "DateRange";
+    this.selectedCase = "TabView";
   }
 
   static properties = {
@@ -81,6 +82,7 @@ export class ShowcaseApplet extends Applet{
       <option value="Selects">Selects</option>
       <option value="SlideDeck">Slide Deck</option>
       <option value="Switches">Switches</option>
+      <option value="TabView">Tab View</option>
       <option value="Toasts">Toasts</option>
       <option value="TreeView">Tree View</option>
     </select>
@@ -119,6 +121,8 @@ export class ShowcaseApplet extends Applet{
           return html`<az-case-slide-deck></az-case-slide-deck>`;
         case "Switches":
           return html`<az-case-switches></az-case-switches>`;
+      case "TabView":
+        return html`<az-case-tab-view></az-case-tab-view>`;
         case "Toasts":
           return html`<az-case-toasts></az-case-toasts>`;
         case "TreeView":
