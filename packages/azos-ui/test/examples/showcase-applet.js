@@ -25,7 +25,7 @@ import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
 
-export class ShowcaseApplet extends Applet{
+export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
@@ -57,15 +57,15 @@ export class ShowcaseApplet extends Applet{
 }
   `];
 
-  get title(){ return "Azos Showcase"; }
+  get title() { return "Azos Showcase"; }
 
   #onCaseChanged(e) {
     this.selectedCase = e.target.value;
     console.warn("Case changed to", this.selectedCase);
   }
 
-  render(){
-  return html`
+  render() {
+    return html`
     <select id="caseSelect" @change="${this.#onCaseChanged}" .value="${this.selectedCase ?? ""}">
       <option value="">Select a showcase item...</option>
       <option value="Accordion">Accordion</option>
@@ -93,46 +93,46 @@ export class ShowcaseApplet extends Applet{
   }
   renderCase() {
     const showcase = this.selectedCase;
-    switch(showcase) {
-        case "Accordion":
-          return html`<az-case-accordion></az-case-accordion>`;
-        case "Buttons":
-          return html`<az-case-buttons></az-case-buttons>`;
-        case "Checkboxes":
-          return html`<az-case-checkboxes></az-case-checkboxes>`;
-        case "CodeBox":
-          return html`<az-case-code-box></az-case-code-box>`;
+    switch (showcase) {
+      case "Accordion":
+        return html`<az-case-accordion></az-case-accordion>`;
+      case "Buttons":
+        return html`<az-case-buttons></az-case-buttons>`;
+      case "Checkboxes":
+        return html`<az-case-checkboxes></az-case-checkboxes>`;
+      case "CodeBox":
+        return html`<az-case-code-box></az-case-code-box>`;
       case "DateRange":
         return html`<az-case-date-range></az-case-date-range>`;
-        case "InputTests":
-          return html`<az-case-input-tests></az-case-input-tests>`;
-        case "Lookup":
-          return html`<az-case-lookup></az-case-lookup>`;
-        case "Modals":
-          return html`<az-case-modals></az-case-modals>`;
-        case "ObjectInspector":
-          return html`<az-case-object-inspector></az-case-object-inspector>`;
-        case "RadioButtons":
-          return html`<az-case-radios></az-case-radios>`;
-        case "Scheduler":
-          return html`<az-case-scheduler></az-case-scheduler>`;
-        case "Selects":
-          return html`<az-case-selects></az-case-selects>`;
-        case "SlideDeck":
-          return html`<az-case-slide-deck></az-case-slide-deck>`;
-        case "Switches":
-          return html`<az-case-switches></az-case-switches>`;
+      case "InputTests":
+        return html`<az-case-input-tests></az-case-input-tests>`;
+      case "Lookup":
+        return html`<az-case-lookup></az-case-lookup>`;
+      case "Modals":
+        return html`<az-case-modals></az-case-modals>`;
+      case "ObjectInspector":
+        return html`<az-case-object-inspector></az-case-object-inspector>`;
+      case "RadioButtons":
+        return html`<az-case-radios></az-case-radios>`;
+      case "Scheduler":
+        return html`<az-case-scheduler></az-case-scheduler>`;
+      case "Selects":
+        return html`<az-case-selects></az-case-selects>`;
+      case "SlideDeck":
+        return html`<az-case-slide-deck></az-case-slide-deck>`;
+      case "Switches":
+        return html`<az-case-switches></az-case-switches>`;
       case "TabView":
         return html`<az-case-tab-view></az-case-tab-view>`;
       case "TextFields":
         return html`<az-case-text-fields></az-case-text-fields>`;
-        case "Toasts":
-          return html`<az-case-toasts></az-case-toasts>`;
-        case "TreeView":
-          return html`<az-case-tree-view></az-case-tree-view>`;
-        default:
-          return noContent;
-      }
+      case "Toasts":
+        return html`<az-case-toasts></az-case-toasts>`;
+      case "TreeView":
+        return html`<az-case-tree-view></az-case-tree-view>`;
+      default:
+        return noContent;
+    }
   }
 }
 
