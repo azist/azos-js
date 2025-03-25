@@ -122,10 +122,10 @@ export class ShowcaseApplet extends Applet{
           return html`<az-case-slide-deck></az-case-slide-deck>`;
         case "Switches":
           return html`<az-case-switches></az-case-switches>`;
-      case "TabView":
-        return html`<az-case-tab-view></az-case-tab-view>`;
-      case "TextFields":
-        return html`<az-case-text-fields></az-case-text-fields>`;
+        case "TabView":
+          return html`<az-case-tab-view></az-case-tab-view>`;
+        case "TextFields":
+          return html`<az-case-text-fields></az-case-text-fields>`;
         case "Toasts":
           return html`<az-case-toasts></az-case-toasts>`;
         case "TreeView":
