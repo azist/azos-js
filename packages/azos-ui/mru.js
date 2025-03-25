@@ -5,9 +5,8 @@ import { isFunctionOrNull, isNonEmptyString, isObjectOrArray, isOf, isOfOrNull, 
 import { keepBetween } from "azos/types";
 import { matchPattern } from "azos/strings";
 
-/** Provides Most Recently Used named list management functionality in a UI application */
+/** Provides Most Recently Used (MRU) named list management functionality in a UI application */
 export class MruLogic extends Module{
-
   #ref = {storage: IStorage};
   #max = 25;
 
@@ -18,7 +17,7 @@ export class MruLogic extends Module{
 
   _appAfterLoad(){
     super._appAfterLoad();
-    this.link(this.#ref);
+    this.link(this.#ref); //in future we may add optional name
   }
 
   #getKeyName(applet, idList){ return `MRU::${(applet?.localStoragePrefix ?? "*")}::${idList ?? "*"}`;}
@@ -58,27 +57,20 @@ export class MruLogic extends Module{
    *  mruLogic.putMruListItem(thisApplet, "filter", {s: "Harris Joe*"}, (a,b) => matchPattern(a.s, `*.${b.s}*`);
   */
   putMruListItem(applet, idList, item, fItemIdentityComparer = null){
-    const list = this.getMruList(applet, idList);
     isObjectOrArray(item);
     isFunctionOrNull(fItemIdentityComparer);
 
+    const list = this.getMruList(applet, idList);
     if (fItemIdentityComparer){
-      let iMatch = -1;
-      for(let i =0; i < list.length; i++){
-        if (fItemIdentityComparer(list[i], item)){
-          iMatch = i;
-          break;
-        }
-      }
-      if (iMatch >=0 ) {
-        list.splice(iMatch, 1);
+      let idx = list.findIndex(one => fItemIdentityComparer(one, item));
+      if (idx >=0 ) {
+        list.splice(idx, 1);
       }
     }
 
     list.unshift(item);//insert up front
 
-
-    if (list.length > this.#max) list.pop();//impose a limit
+    if (list.length > this.#max) list.pop();//impose a limit at the end
 
     const fullKey = this.#getKeyName(applet, idList);
     this.#ref.storage.setItem(fullKey, list);
