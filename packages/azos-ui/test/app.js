@@ -23,6 +23,8 @@ import "../vcl/util/img-registry-browser";
 import { ExampleHomeApplet } from "./examples/home-applet";
 import { ExampleFeatureAApplet } from "./examples/featureA-applet";
 import { ExampleFeatureBApplet } from "./examples/featureB-applet";
+import { MruLogic } from "../mru";
+import { BrowserStorage } from "azos/storage";
 
 
 class MyLogic extends Module {
@@ -77,8 +79,10 @@ const cfgApp = {
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
     { name: "log", type: ConLog },
     { name: "logic", type: MyLogic },
-    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home", history: false },
     { name: "imgRegistry", type: ImageRegistry },
+    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home", history: false },
+    { name: "lclStorage", type: BrowserStorage, session: false},
+    { name: "mruLogic", type: MruLogic}//most recently used
   ]
 };
 
