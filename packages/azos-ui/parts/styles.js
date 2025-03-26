@@ -384,7 +384,7 @@ export const dateRangeStyles = css`
   padding: 0;
   margin: 0;
   font-size: 1em;
-  background-color: field;
+  background-color: var(--s-default-bg-ctl);
   color: var(--s-default-fg-ctl);
   border: var(--s-default-bor-ctl);
   border-radius: var(--r3-brad-ctl);
