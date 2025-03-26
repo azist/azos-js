@@ -39,14 +39,14 @@ export class IdpAdminClient extends IClient {
   async saveUserAsync(user) {
     isObject(user);
     const method = isInsertForm(user) ? this.post : this.put;
-    const got = await method("user", { user: user });
+    const got = await method.call(this, "user", { user: user });
     return got;
   }
 
   async saveLoginAsync(login) {
     isObject(login);
     const method = isInsertForm(login) ? this.post : this.put;
-    const got = await method("login", { login: login });
+    const got = await method.call(this, "login", { login: login });
     return got;
   }
 

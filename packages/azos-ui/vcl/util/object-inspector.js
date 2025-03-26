@@ -124,7 +124,7 @@ ol{
   renderControl() {
     if (!this.root) return html`${this.renderTitle()}<div>Nothing to display.</div>`;
 
-    const elmId = `tv${this.treeViewId}`;
+    const elmId = `tv${this.sid}`;
     const cls = [
       parseRank(this.rank, true),
       parseStatus(this.status, true)

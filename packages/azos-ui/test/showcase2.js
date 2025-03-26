@@ -22,7 +22,6 @@ import "./showcase/case-input-tests";
 import "./showcase/case-code-box";
 import "./showcase/case-modals";
 import "./showcase/case-accordion";
-import "./showcase/case-sliders";
 import "./showcase/case-toasts";
 import "./showcase/case-slide-deck";
 import "./showcase/case-tree-view";
@@ -167,7 +166,6 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <div id="TreeViewContent"> <az-case-tree-view></az-case-tree-view> </div>
   <div id="ObjectInspectorContent"> <az-case-object-inspector></az-case-object-inspector> </div>
   <div id="SchedulerContent"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </div>
-  <div id="SlidersContent"> <az-case-sliders></az-case-sliders> </div>
   <div id="AccordionContent"> <az-case-accordion></az-case-accordion> </div>
 </div>
     `
@@ -175,7 +173,7 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
 
   renderTabbed() {
     return html`
-<az-tab-view id="tabView" scope="this" activeTabIndex=14 @tabChanged="${this.#onTabChanged}">
+<az-tab-view id="tabView" scope="this" activeTabIndex=3 @tabChanged="${this.#onTabChanged}">
   <az-tab title="Lookup"> <az-case-lookup></az-case-lookup> </az-tab>
   <az-tab title="Buttons"> <az-case-buttons></az-case-buttons> </az-tab>
   <az-tab title="Text Fields"> <az-case-text-fields></az-case-text-fields> </az-tab>
@@ -191,7 +189,6 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
   <az-tab title="Tree View" id="tvTestTab" scope="this"> <az-case-tree-view id="testCaseTreeView" scope="this"></az-case-tree-view> </az-tab>
   <az-tab title="Object Inspector"> <az-case-object-inspector></az-case-object-inspector> </az-tab>
   <az-tab title="Scheduler (WIP)" id="schTab" scope="this"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </az-tab>
-  <az-tab title="Sliders (WIP)"> <az-case-sliders></az-case-sliders> </az-tab>
   <az-tab title="Accordion (WIP)"> <az-case-accordion></az-case-accordion> </az-tab>
 </az-tab-view>
         `
@@ -229,7 +226,6 @@ ${ this.displayMode === DISPLAY_MODES.ACCORDION ? this.renderAccordion() : noCon
       <az-slide id="TreeViewContent"> <az-case-tree-view></az-case-tree-view> </az-slide>
       <az-slide id="ObjectInspectorContent"> <az-case-object-inspector></az-case-object-inspector> </az-slide>
       <az-slide id="SchedulerContent" scope="this"> <az-case-scheduler id="testCaseScheduler" scope="this"></az-case-scheduler> </az-slide>
-      <az-slide id="SlidersContent"> <az-case-sliders></az-case-sliders> </az-slide>
       <az-slide id="AccordionContent"> <az-case-accordion></az-case-accordion> </az-slide>
     </az-slide-deck>
   </div>

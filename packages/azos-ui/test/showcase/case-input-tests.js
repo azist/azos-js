@@ -6,6 +6,8 @@
 
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
+import "../../parts/text-field";
+import "../../parts/date-range";
 
 export class CaseInputTests extends CaseBase {
 
@@ -18,12 +20,12 @@ export class CaseInputTests extends CaseBase {
     return html`
 <h2>Testing @change with az-text and az-check</h2>
 
-<az-text id="tbNasa" scope="window" name="Nasa" title="Nasa Experimentation" placeholder="Hatch diameter inches" @change="${this.#onFieldChange}" datatype="int" value="10"></az-text>
+<az-text id="tbNasa" scope="window" status="info" name="Nasa" title="Nasa Experimentation" placeholder="Hatch diameter inches" @change="${this.#onFieldChange}" datatype="int" value="10"></az-text>
 
-<az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="SHITTERESSS"></az-text>
+<az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="Patient A"></az-text>
 <az-text id="tbLastName" scope="this" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text>
 
-<az-text id="getADate" scope="this" name="getADate" title="Get a Date" placeholder="2024/01/01" dataKind="date"></az-text>
+<az-text id="getADate" scope="this" name="getADate" title="Get a Date" placeholder="2024/01/01" dataKind="text"></az-text>
 
 <az-check id="chkSmokes" scope="this" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-check>
 <az-check id="chkDrinks" scope="this" name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-check>

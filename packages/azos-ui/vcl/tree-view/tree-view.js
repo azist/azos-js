@@ -11,7 +11,7 @@ import { baseStyles, iconStyles } from "../../parts/styles";
 
 export class TreeView extends Control {
 
-  static #idSeed = 0;
+  static #sidSeed = 0;
   static styles = [baseStyles, iconStyles, css`
 :host {
   display: block;
@@ -89,7 +89,7 @@ export class TreeView extends Control {
 
   constructor() {
     super();
-    this.treeViewId = TreeView.#idSeed++;
+    this.sid = TreeView.#sidSeed++;
     this.root = this._createNode(null, "/"); // default for rendering's sake
     this.showRoot = false;
   }
@@ -314,7 +314,7 @@ export class TreeView extends Control {
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     return html`
 ${title}
-<ol id="tv${this.treeViewId}" scope="this" part="tree" role="tree" class="${cls} treeView" @keydown="${this._onKeyDown}" tabindex=0 @focus="${this._onTreeFocus}">
+<ol id="tv${this.sid}" scope="this" part="tree" role="tree" class="${cls} treeView" @keydown="${this._onKeyDown}" tabindex=0 @focus="${this._onTreeFocus}">
   ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
 </ol>
     `;

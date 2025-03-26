@@ -4,16 +4,18 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf, isOfOrNull, isStringOrNull, isSubclassOf, isTrue } from "azos/aver";
+import { isOf, isOfOrNull, isSubclassOf, isTrue } from "azos/aver";
 import { Control, css, html, parseRank, parseStatus, noContent } from "../../ui";
 import { Tab } from "./tab";
 import { dflt } from "azos/strings";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP, isAssigned, isNumber, isString } from "azos/types";
+import { iconStyles } from "../../parts/styles";
 
 export class TabView extends Control {
 
-  static styles = css`
-:host { display: block; margin-top: 1.0em }
+  static styles = [iconStyles, css`
+:host{ display: block; margin-top: 1.0em; }
+.icon{ --icon-width: 2.5ex; }
 
 .tab-nav {
   display: flex;
@@ -178,7 +180,7 @@ export class TabView extends Control {
 .warning-tab-btn { color: var(--s-warn-fg-ctl); border-color: var(--s-warn-bor-color-ctl);}
 .alert-tab-btn { color: var(--s-alert-fg-ctl); border-color: var(--s-alert-bor-color-ctl);}
 .error-tab-btn { color: var(--s-error-fg-ctl); border-color: var(--s-error-bor-color-ctl);}
-`;
+`];
 
   static properties = {
     defaultMinTabWidth: { type: Number },
@@ -403,20 +405,20 @@ export class TabView extends Control {
    * @param {Tab} tTab the tab class
    * @param {string} title
    * @param {Tab|null} beforeTab
-   * @param {Object|null} data
+   * @param {Object|undefined} data
    * @returns {Tab, Boolean} tuple of the tab and whether it was added or existed previously
    */
-  addTab(tTab, title, beforeTab = null, makeActive = true, data = null) {
+  addTab(tTab, title, beforeTab = null, makeActive = true, data = {}) {
     tTab === Tab || isSubclassOf(tTab, Tab);
     isOfOrNull(beforeTab, Tab);
-    isStringOrNull(title);
+    title = dflt(title, tTab.name);
 
     const foundTab = this.visibleTabs.filter(tab => tab.title === title)[0];
 
     let tab;
     if (foundTab) tab = foundTab;
     else {
-      tab = new tTab(dflt(title, tTab.name), data);
+      tab = new tTab(title, data);
       if (beforeTab) isTrue(isOf(beforeTab, Tab).tabView === this);
       this.insertBefore(tab, beforeTab);
       this.tabs = this.getTabs();
@@ -515,7 +517,7 @@ export class TabView extends Control {
             @dragstart="${evt => this.#onDragStart(evt, index)}"
             @dragend="${this.#onDragEnd}"
             >
-            ${tab.iconPath ? html`<img class="tab-icon" src="${tab.iconPath}"/>` : noContent}
+            ${tab.iconPath ? this.renderImageSpec(tab.iconPath, "tab-icon").html : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
             ${tab.canClose ? html`<div class="close-ind" @click="${evt => this.#onCloseTabClick(evt, tab)}">&times;</div>` : noContent}

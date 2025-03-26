@@ -384,7 +384,7 @@ export class FieldPart extends Part{
     const stlTitleWidth = isHorizon ? css`width: ${this.titleWidth}%;` : null;
     const stlTitleHidden = this.title ? null : css`display:none`;
     //Set the field's content width if field is not of a predefined layout
-    const stlContentWidth = isHorizon && !isPreContent ? css`width: ${this.contentWidth}%;` : null;
+    const stlContentWidth = isHorizon && !isPreContent ? css`width: ${this.contentWidth}%;` : "";
 
     const em = this.effectiveMessage;
     const msg = em ? html`<p class="msg">${em}</p>` : '';
@@ -392,7 +392,7 @@ export class FieldPart extends Part{
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <label class="${clsPosition}">
-          <span class="${this.isRequired ? 'requiredTitle' : noContent}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title}</span>
+          <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title}</span>
           ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput()} ${msg}</div>` : html`${this.renderInput()} ${msg}`}
         </label>
       </div>
@@ -404,7 +404,7 @@ export class FieldPart extends Part{
 
   /** Override to trigger `change` event dispatch after value changes DUE to user input */
   inputChanged(){
-    const evt = new Event("change", { bubbles: true, cancelable: false });
+    const evt = new Event("change", { bubbles: true, composed: true, cancelable: false });
     this.dispatchEvent(evt);
   }
 

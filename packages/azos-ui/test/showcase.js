@@ -242,7 +242,6 @@ ${this.showTabbed ? html`
   <az-tab title="Slide Deck (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSlideDeckContent()} </az-tab>
   <az-tab title="Scheduler (WIP)" .canClose=${false}> ${this.renderSchedulerContent()} </az-tab>
   <az-tab title="Accordion (WIP)" .canClose=${false}> ${this.renderAccordionContent()} </az-tab>
-  <az-tab title="Sliders (WIP)" .canClose=${false} status="error"> ${this.renderSliderContent()} </az-tab>
   <az-tab title="Tree View" .canClose=${false}> ${this.renderTreeViewContent()} </az-tab>
   <az-tab title="Buttons" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderButtonContent()} </az-tab>
   <az-tab title="Input Test" .canClose=${false}> ${this.renderInputContent()} </az-tab>
@@ -733,25 +732,6 @@ ${this.showSlides ? html`
   <option value="optionNine" title="Almost done"></option>
   <option value="finalValue" title="Last test option"></option>
 </az-select>
-    `;
-  }
-
-  renderSliderContent() {
-    return html`
-<h2>Sliders</h2>
-<p>This az-slider renders as an &lt;input type="range"&gt; element. These are the available properties/attributes:</p>
-<ol>
-  <li>General attributes: id, title, titlePosition, titleWidth, inputWidth rank, status, isDisabled, isRequired</li>
-  <li>rangeMin, rangeMax - slider's extremes</li>
-  <li>rangeStep - Interval that controls the slider's granularity. Default is 1.</li>
-  <li>value - if not defined, defaults to median of rangeMin & rangeMax</li>
-  <li>valueLabel - value's description</li>
-  <li>displayValue - Boolean treated as "isDisabled," "isRequired," or "isReadonly". Displays valueLabel followed by value.</li>
-  <li>orientation - determines if slider is horizontal or vertical</li>
-  <li>numTicks - Number of evenly-spaced tick marks displayed on the slider</li>
-</ol>
-<br>
-<az-slider id="basicSlider" title="Basic Slider" rangeMin="0" rangeMax="10" rangeStep="1" numTicks="5" status="alert" displayValue valueLabel="Number of tomatoes: "></az-slider>
     `;
   }
 
