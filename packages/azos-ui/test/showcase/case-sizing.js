@@ -4,34 +4,13 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html, css } from "../ui.js";
-import { Applet } from "../applet.js";
-import "../modal-dialog.js";
-import "../parts/button.js";
-import "./examples/xyz-dialog.js";
-import { toast } from "../toast.js";
+import { toast } from "../../toast";
+import { css, html } from "../../ui";
+import { CaseBase } from "./case-base";
 
-
-//import { APPLET_STYLES } from "./applet.css.js";
-//import * as DEFAULT_HTML from "./applet.htm.js";
-
-/**
- * Defines a root UI element which represents an Applet - a part of application.
- * Applets run inside of arenas. Arena is akin to a "desktop" while applets are akin to "applications" running in such desktop
- */
-export class XyzApplet3 extends Applet {
+export class CaseSizing extends CaseBase {
 
   static styles = [css`
-:host { display: block; padding: 1ch 2ch; }
-
-xaz-button {
-  border:1px solid red;
-}
-
-xaz-text {
-  border: 1px solid red;
-}
-
 .h-strip {
   display: flex;
   flex-direction: row;
@@ -41,23 +20,11 @@ xaz-text {
   padding: 50px 0;
   border-bottom: 1px dotted black;
 }
-
   `];
 
-  static properties = {
-    name: { type: String },
-  };
+  #onPressMe(e) { toast(e.target.id); }
 
-  constructor() {
-    super();
-    this.name = 'Somebody2Love';
-  }
-
-  #onPressMe(e) {
-    toast(e.target.id);
-  }
-
-  render() {
+  renderControl() {
     return html`
 <div class="h-strip">
   <az-button id="btn1" title="Press me" @click="${this.#onPressMe}"></az-button>
@@ -81,7 +48,7 @@ xaz-text {
 </div>
 
 <div class="h-strip">
-  <az-text id="text1" title="Name" value="Borland" style="width: 70ch"></az-text>
+  <az-text id="text1" title="Name" value="Borderland" style="width: 70ch"></az-text>
   <az-text id="text2" title="Zip Code" value="48911"></az-text>
   <az-text id="password" dataKind="pwd" title="Password" value="48911"></az-text>
   <az-text id="date" dataKind="date" title="Date" value="2000-01-01"></az-text>
@@ -163,30 +130,30 @@ xaz-text {
 </div>
 
 <div class="h-strip">
-    <az-check id="check6" title="Huge Checkbox" rank="1" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="check7" title="Large Checkbox" rank="2" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="check8" title="Normal Checkbox" rank="3" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="check9" title="Medium Checkbox" rank="4" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="check10" title="Small Checkbox" rank="5" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="check11" title="Tiny Checkbox" rank="tiny" titleposition="mid-right" titlewidth="75"></az-check>
+    <az-check id="check6" title="Huge Checkbox" rank="1" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="check7" title="Large Checkbox" rank="2" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="check8" title="Normal Checkbox" rank="3" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="check9" title="Medium Checkbox" rank="4" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="check10" title="Small Checkbox" rank="5" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="check11" title="Tiny Checkbox" rank="tiny" titlePosition="mid-right" titleWidth="75"></az-check>
 </div>
 
 <div class="h-strip">
-    <az-check id="switch0" title="Huge Switch" itemtype="switch" rank="1"></az-check>
-    <az-check id="switch1" title="Large Switch" itemtype="switch" rank="2"></az-check>
-    <az-check id="switch2" title="Normal Switch" itemtype="switch" rank="3"></az-check>
-    <az-check id="switch3" title="Medium Switch" itemtype="switch" rank="4"></az-check>
-    <az-check id="switch4" title="Small Switch" itemtype="switch" rank="5"></az-check>
-    <az-check id="switch5" title="Tiny Switch" itemtype="switch" rank="tiny"></az-check>
+    <az-check id="switch0" title="Huge Switch" itemType="switch" rank="1"></az-check>
+    <az-check id="switch1" title="Large Switch" itemType="switch" rank="2"></az-check>
+    <az-check id="switch2" title="Normal Switch" itemType="switch" rank="3"></az-check>
+    <az-check id="switch3" title="Medium Switch" itemType="switch" rank="4"></az-check>
+    <az-check id="switch4" title="Small Switch" itemType="switch" rank="5"></az-check>
+    <az-check id="switch5" title="Tiny Switch" itemType="switch" rank="tiny"></az-check>
 </div>
 
 <div class="h-strip">
-    <az-check id="switch6" title="Huge Switch" itemtype="switch" rank="1" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="switch7" title="Large Switch" itemtype="switch" rank="2" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="switch8" title="Normal Switch" itemtype="switch" rank="3" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="switch9" title="Medium Switch" itemtype="switch" rank="4" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="switch10" title="Small Switch" itemtype="switch" rank="5" titleposition="mid-right" titlewidth="75"></az-check>
-    <az-check id="switch11" title="Tiny Switch" itemtype="switch" rank="tiny" titleposition="mid-right" titlewidth="75"></az-check>
+    <az-check id="switch6" title="Huge Switch" itemType="switch" rank="1" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="switch7" title="Large Switch" itemType="switch" rank="2" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="switch8" title="Normal Switch" itemType="switch" rank="3" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="switch9" title="Medium Switch" itemType="switch" rank="4" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="switch10" title="Small Switch" itemType="switch" rank="5" titlePosition="mid-right" titleWidth="75"></az-check>
+    <az-check id="switch11" title="Tiny Switch" itemType="switch" rank="tiny" titlePosition="mid-right" titleWidth="75"></az-check>
 </div>
 
 <div class="h-strip">
@@ -229,47 +196,45 @@ xaz-text {
 </div>
 
 <div class="h-strip">
-    <az-radio-group id="radios0" itemtype="switch" value="" title="Huge Group of radios" rank="1">
+    <az-radio-group id="radios0" itemType="switch" value="" title="Huge Group of radios" rank="1">
       <item title="Option 1" value="v1"></item>
       <item title="Option 2" value="v2"></item>
       <item title="Another" value="v3"></item>
       <item title="Snake Number Four" value="v4"></item>
     </az-radio-group>
-    <az-radio-group id="radios1" itemtype="switch" value="" title="Large Group of radios" rank="2">
+    <az-radio-group id="radios1" itemType="switch" value="" title="Large Group of radios" rank="2">
       <item title="Option 1" value="v1"></item>
       <item title="Option 2" value="v2"></item>
       <item title="Another" value="v3"></item>
       <item title="Snake Number Four" value="v4"></item>
     </az-radio-group>
-    <az-radio-group id="radios2" itemtype="switch" value="" title="Normal Group of radios" rank="3">
+    <az-radio-group id="radios2" itemType="switch" value="" title="Normal Group of radios" rank="3">
       <item title="Option 1" value="v1"></item>
       <item title="Option 2" value="v2"></item>
       <item title="Another" value="v3"></item>
       <item title="Snake Number Four" value="v4"></item>
     </az-radio-group>
-    <az-radio-group id="radios3" itemtype="switch" value="" title="Medium Group of radios" rank="4">
+    <az-radio-group id="radios3" itemType="switch" value="" title="Medium Group of radios" rank="4">
       <item title="Option 1" value="v1"></item>
       <item title="Option 2" value="v2"></item>
       <item title="Another" value="v3"></item>
       <item title="Snake Number Four" value="v4"></item>
     </az-radio-group>
-    <az-radio-group id="radios4" itemtype="switch" value="" title="Small Group of radios" rank="5">
+    <az-radio-group id="radios4" itemType="switch" value="" title="Small Group of radios" rank="5">
       <item title="Option 1" value="v1"></item>
       <item title="Option 2" value="v2"></item>
       <item title="Another" value="v3"></item>
       <item title="Snake Number Four" value="v4"></item>
     </az-radio-group>
-    <az-radio-group id="radios5" itemtype="switch" value="" title="Tiny Group of radios" rank="6">
+    <az-radio-group id="radios5" itemType="switch" value="" title="Tiny Group of radios" rank="6">
       <item title="Option 1" value="v1"></item>
       <item title="Option 2" value="v2"></item>
       <item title="Another" value="v3"></item>
       <item title="Snake Number Four" value="v4"></item>
     </az-radio-group>
 </div>
-
     `;
-  }//render
+  }
+}
 
-}//XyzApplet3
-
-window.customElements.define("xyz-applet3", XyzApplet3);
+window.customElements.define("az-case-sizing", CaseSizing);

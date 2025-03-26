@@ -7,8 +7,10 @@
 import { Applet } from "../../applet";
 import { Command } from "../../cmd";
 import { css, html, noContent } from "../../ui";
+import { prompt } from "../../ok-cancel-modal";
 
 import "../../parts/button";
+import "./xyz-dialog";
 
 import "../showcase/case-accordion";
 import "../showcase/case-buttons";
@@ -24,10 +26,11 @@ import "../showcase/case-scheduler";
 import "../showcase/case-selects";
 import "../showcase/case-slide-deck";
 import "../showcase/case-switches";
+import "../showcase/case-text-fields";
+import "../showcase/case-sizing";
 import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
-import { prompt } from "../../ok-cancel-modal";
 
 export class ShowcaseApplet extends Applet {
 
@@ -39,7 +42,7 @@ export class ShowcaseApplet extends Applet {
 
   static properties = {
     selectedCase: { type: String, reflect: true },
-    x: { state: true },
+    x: { type: Number, reflect: true },
   }
 
   static styles = [css`
@@ -70,17 +73,28 @@ export class ShowcaseApplet extends Applet {
     handler: async () => console.log((await prompt("Do you need help?", { title: "Help!", ok: "Yes", cancel: "No", okBtnStatus: "ok" })).modalResult?.response)
   });
 
-  get title() { return `Azos Showcase - ${this.x}`; }
+  #x = 0;
+  get x() { return this.#x; }
+  set x(v) {
+    const oldValue = this.#x;
+    this.#x = v;
+    queueMicrotask(() => this.arena?.requestUpdate("x", oldValue));
+  }
+  get title() { return `Azos Showcase / x = ${this.x}`; }
 
-  #onCaseChanged(e) {
-    this.selectedCase = e.target.value;
-    console.warn("Case changed to", this.selectedCase);
+  #onCaseChanged(e) { this.selectedCase = e.target.value; }
+  #toggleToolbarButton() { this.arena.installToolbarCommands([this.#cmdHelp]); }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.#toggleToolbarButton();
   }
 
   render() {
     return html`
-    <az-button title="Toggle Toolbar Button" @click="${() => this.arena.installToolbarCommands([this.#cmdHelp])}"></az-button>
-    <az-button title="Increase X" @click="${() => { ++this.x }}"></az-button>
+    <az-button title="Toggle Toolbar Button" @click="${this.#toggleToolbarButton}"></az-button>
+    <az-button title="Increase X to ${this.x + 1}" @click="${() => { ++this.x }}"></az-button>
+    <az-button title="Complex Dialog" @click="${() => this.xyzDialog.show()}"></az-button>
     <select id="caseSelect" @change="${this.#onCaseChanged}" .value="${this.selectedCase ?? ""}">
       <option value="">Select a showcase item...</option>
       <option value="Accordion">Accordion</option>
@@ -95,6 +109,7 @@ export class ShowcaseApplet extends Applet {
       <option value="RadioButtons">Radio Buttons</option>
       <option value="Scheduler">Scheduler</option>
       <option value="Selects">Selects</option>
+      <option value="Sizing">Sizing</option>
       <option value="SlideDeck">Slide Deck</option>
       <option value="Switches">Switches</option>
       <option value="TabView">Tab View</option>
@@ -104,6 +119,10 @@ export class ShowcaseApplet extends Applet {
     </select>
 
    ${this.renderCase()}
+   <xyz-dialog id="xyzDialog" scope="this" toad="Baby Toad">
+    <p>I say, if you didn't wash your hands, you're going to bed early!</p>
+    <p>Hit 'x' or press Escape key to close (confirm "ok")</p>
+   </xyz-dialog>
   `;
   }
   renderCase() {
@@ -133,6 +152,8 @@ export class ShowcaseApplet extends Applet {
         return html`<az-case-scheduler></az-case-scheduler>`;
       case "Selects":
         return html`<az-case-selects></az-case-selects>`;
+      case "Sizing":
+        return html`<az-case-sizing></az-case-sizing>`;
       case "SlideDeck":
         return html`<az-case-slide-deck></az-case-slide-deck>`;
       case "Switches":
