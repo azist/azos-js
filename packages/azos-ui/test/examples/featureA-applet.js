@@ -2,9 +2,13 @@ import { Applet } from "../../applet";
 import { html } from "../../ui";
 import "../../parts/check-field";
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
+import { MruLogic } from "../../mru";
 
 
 export class ExampleFeatureAApplet extends Applet{
+
+ #ref = {mru: MruLogic};
+
 
   get title(){ return "Feature A"; }
 
@@ -21,7 +25,24 @@ export class ExampleFeatureAApplet extends Applet{
     return true;
   }
 
+  connectedCallback(){
+    super.connectedCallback();
+    console.warn("ExampleFeatureAApplet CONNECTED CALLBACK HAPPENED JUST NOW");
+    this.link(this.#ref);
+  }
+
+  #btnAddClick(){
+    this.#ref.mru.putMruListItem(this, "files", {msg: this.tbText.value}, (a, b) => a.msg === b.msg);
+    this.requestUpdate();
+  }
+
+  #btnClearClick(){
+    this.#ref.mru.clearAll(this, "files");
+    this.requestUpdate();
+  }
+
   render(){
+   var items =  this.#ref.mru.getMruList(this, "files");
    return html`
      This is feature A applet
      <pre>
@@ -34,6 +55,13 @@ export class ExampleFeatureAApplet extends Applet{
      <p>
      <az-check id="chkDirty" scope="this" title="Dirty"> </az-check>
      </p>
+
+     Here is a list of most recently used items (APPLET A): <br>
+      ${JSON.stringify(items)}
+
+      <az-text id="tbText" scope="this" title="Add MRU item"> </az-text>
+      <az-button @click="${this.#btnAddClick}" title="Add MRU item"> </az-button>
+      <az-button @click="${this.#btnClearClick}" title="Clear items"> </az-button>
    `;
   }
 }

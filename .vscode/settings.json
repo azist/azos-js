@@ -82,10 +82,11 @@
     "javascript.preferences.autoImportFileExcludePatterns": [
       "**/lit/**"
     ],
-    "workbench.tree.indent": 20,
+    "workbench.tree.indent": 25,
     "workbench.tree.renderIndentGuides": "always",
     "editor.mouseWheelZoom": true,
     "workbench.colorCustomizations": {
-      "tree.indentGuidesStroke": "#729292"
+      "tree.indentGuidesStroke": "#729292",
+      "editor.background":"#102325"
     }
 }
