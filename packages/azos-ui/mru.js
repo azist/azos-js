@@ -45,7 +45,7 @@ export class MruLogic extends Module{
   }
 
   /** Returns the most recently used item list by id and an applet, e.g. `filter`.
-   * Returns empty array if such MRU list is not found by id for the supplied applet
+   * Returns an empty array if such MRU list is not found by id for the supplied applet
    */
   getMruList(applet, idList){
     isOf(applet, Applet);
@@ -65,7 +65,7 @@ export class MruLogic extends Module{
   /** Puts an item into a named MRU list. Adds the item to the head (at the beginning) of the list.
    * The item identity is defined by a supplied comparer `fn(a, b): bool`.
    * If the list has more than a maximum count allowed, the last item at the list tail is dropped
-   *
+   * @returns {Array} an MRU list after the put operation
    * @example
    *  mruLogic.putMruListItem(thisApplet, "filter", {id: 278, s: "Harris Joe*", now}, (a,b) => a.id === b.id);
    *  mruLogic.putMruListItem(thisApplet, "filter", {s: "Harris Joe*"}, (a,b) => matchPattern(a.s, `*.${b.s}*`);
