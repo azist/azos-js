@@ -26,6 +26,8 @@ import "../showcase/case-scheduler";
 import "../showcase/case-selects";
 import "../showcase/case-slide-deck";
 import "../showcase/case-switches";
+import "../showcase/case-text-fields";
+import "../showcase/case-sizing";
 import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
@@ -107,6 +109,7 @@ export class ShowcaseApplet extends Applet {
       <option value="RadioButtons">Radio Buttons</option>
       <option value="Scheduler">Scheduler</option>
       <option value="Selects">Selects</option>
+      <option value="Sizing">Sizing</option>
       <option value="SlideDeck">Slide Deck</option>
       <option value="Switches">Switches</option>
       <option value="TabView">Tab View</option>
@@ -149,6 +152,8 @@ export class ShowcaseApplet extends Applet {
         return html`<az-case-scheduler></az-case-scheduler>`;
       case "Selects":
         return html`<az-case-selects></az-case-selects>`;
+      case "Sizing":
+        return html`<az-case-sizing></az-case-sizing>`;
       case "SlideDeck":
         return html`<az-case-slide-deck></az-case-slide-deck>`;
       case "Switches":
