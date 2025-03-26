@@ -410,7 +410,7 @@ export class FieldPart extends Part{
 
   /** @param {any} value the value to feed to the lookup */
   _feedLookup(value) {
-    if (!this.lookupId) return;
+    if (!this.lookupId || this.isReadonly || this.isDisabled) return;
 
     const scope = this.getScopeContext();
     if (!scope) return;
