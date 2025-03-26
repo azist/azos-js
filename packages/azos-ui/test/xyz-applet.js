@@ -10,7 +10,7 @@ import { Command } from "../cmd.js";
 import { ChronicleApplet } from "../vcl/chron/chron-applet.js";
 import "../modal-dialog.js";
 import "../parts/button.js";
-import "./xyz-dialog.js";
+import "./examples/xyz-dialog.js";
 import "./showcase.js";
 import { AdlibApplet } from "../vcl/adlib/adlib-applet.js";
 import { CLOSE_QUERY_METHOD } from "azos/types";

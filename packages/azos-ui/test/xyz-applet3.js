@@ -8,7 +8,7 @@ import { html, css } from "../ui.js";
 import { Applet } from "../applet.js";
 import "../modal-dialog.js";
 import "../parts/button.js";
-import "./xyz-dialog.js";
+import "./examples/xyz-dialog.js";
 import { toast } from "../toast.js";
 
 
