@@ -83,6 +83,11 @@ export class ShowcaseApplet extends Applet {
   #onCaseChanged(e) { this.selectedCase = e.target.value; }
   #toggleToolbarButton() { this.arena.installToolbarCommands([this.#cmdHelp]); }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.#toggleToolbarButton();
+  }
+
   render() {
     return html`
     <az-button title="Toggle Toolbar Button" @click="${this.#toggleToolbarButton}"></az-button>
