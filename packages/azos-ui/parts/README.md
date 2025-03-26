@@ -127,3 +127,15 @@ The following shows all available Attributes/Properties for the Azos Parts.
 | **valueLabel** | _String_ | Description for value that is shown when `displayValue` is listed. | _any_ |
 
 ---
+
+### DateRange `<az-date-range>`
+
+A field whose value is {start: Date, end: Date} when start and end are filled. If start/end is optional, a value is entered and then removed, start/end are `undefined`.
+
+| Property | Type | Definition | Valid Value(s) |
+| -------- | ---- | ---------- | -------------- |
+| **optionalStart** | _Boolean_ | If listed, `start-field` can be `empty`. | _optionalStart_ |
+| **optionalEnd** | _Boolean_ | If listed, `end-field` can be `empty`. | _optionalEnd_ |
+
+---
+
