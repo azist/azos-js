@@ -16,7 +16,7 @@ export class ExampleHomeApplet extends Applet{
   }
 
   #btnAddClick(){
-    this.#ref.mru.putMruListItem(this, "files", {msg: this.tbText.value});
+    this.#ref.mru.putMruListItem(this, "files", {msg: this.tbText.value}, (a, b) => a.msg === b.msg);
     this.requestUpdate();
   }
 
@@ -25,7 +25,7 @@ export class ExampleHomeApplet extends Applet{
    return html`
      <h1>Examples home applet content</h1>
 
-     Here is a list of most recently used items: <br>
+     Here is a list of most recently used items (APPLET HOME): <br>
       ${JSON.stringify(items)}
 
       <az-text id="tbText" scope="this" title="Add MRU item"> </az-text>

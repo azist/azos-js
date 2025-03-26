@@ -71,7 +71,7 @@ const appRoutes = {
 };
 
 const cfgApp = {
-  id: "abc",
+  id: "azosTest",
   name: "$(id)",
   description: "Test '$(name)' application",
   modules: [

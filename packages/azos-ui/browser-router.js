@@ -184,7 +184,10 @@ export class AppletLaunchActionHandler extends ActionHandler{
     const launchArgs = {...this.requestContext["args"], ...this.#args, ...args};//mix-in args
     const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
 
-    if (result) this.router.notifyRouteChanged(this.rootPath, this.#history);
+    if (result)
+      this.router.notifyRouteChanged(this.rootPath, this.#history);
+    else
+      window.location.hash = `#${this.router.currentPath}`;//bring path back after failed change attempt
 
     return result;
   }
