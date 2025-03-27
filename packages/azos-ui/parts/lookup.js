@@ -9,6 +9,8 @@ import { Part, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
 import { isEmpty, matchPattern } from "azos/strings";
+import { LOG_TYPE } from "azos/log";
+import { ABORT_ERROR_NAME, ABSTRACT } from "azos/coreconsts";
 
 
 /**
@@ -500,3 +502,54 @@ function isWithinParent(elm, parent) {
 }
 
 window.customElements.define("az-lookup", Lookup);
+
+/** Provides a uniform base abstraction for look-ups which get their data by executing some 3rd party code such as a service call.
+ * The concept introduces an abort controller to be able to cancel a pending call, such as a service client Http call or the like.
+ * You MUST DERIVE from this type and implement `_makeGetDataCall`
+ */
+export class ExternalCallLookup extends Lookup {
+
+  #abortController = null;
+
+  /** Returns current abort controller or NULL */
+  get abortController() {return this.#abortController; }
+
+  // eslint-disable-next-line no-unused-vars
+  _lookupCompleted(isCancel){ this._abortPendingCallIfAny(); }
+
+  /** Aborts the pending call if there is anything pending, otherwise does nothing */
+  _abortPendingCallIfAny(){
+    try {
+      if (this.#abortController){
+        this.#abortController.abort(ABORT_ERROR_NAME);
+      }
+    } catch (cause){
+      this.writeLog(LOG_TYPE.ERROR, "Leaked _abortPendingCallIfAny()", cause);
+    } finally{
+      this.#abortController = null;
+    }
+  }
+
+  /**
+   * Override to make an actual external call, such as a service call to the remote party
+   * @param {AbortController} abortController to be used to abort the call
+   * */
+  // eslint-disable-next-line no-unused-vars
+  _makeGetDataCall(abortController){
+    throw ABSTRACT("_getDataCore(abortController)");
+  }
+
+  async getData(){
+    this._abortPendingCallIfAny();
+    this.#abortController = new AbortController();
+    try {
+      const gotData = await this._makeGetDataCall(this.#abortController);
+      return gotData;
+    } catch(e) {
+      if (e.cause === ABORT_ERROR_NAME) return null;
+      throw e;
+    } finally {
+      this.#abortController = null;
+    }
+  }
+}

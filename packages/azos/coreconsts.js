@@ -39,6 +39,10 @@ export const CONTENT_TYPE = Object.freeze({
   BINARY: "application/octet-stream"
 });
 
+//https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+/** Name of abort exception when for example AbortController.abort() is used. See MDN */
+export const ABORT_ERROR_NAME = "AbortError";
+
 /** Creates an `Error` exception ready to be thrown indicating that operation is abstract and is not implemented */
 export function ABSTRACT(nm){ return new Error(`Method '${nm ?? UNDEFINED}' is abstract`); }
 
