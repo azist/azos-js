@@ -34,7 +34,7 @@ export class CheckField extends FieldPart{
    get isPredefinedContentLayout(){ return true; }
 
 
-  #chkChange(e){
+   #chkChange(e){
     this.value = e.target.checked;
     this.inputChanged();
   }
@@ -44,6 +44,21 @@ export class CheckField extends FieldPart{
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
 
+    if(this.isReadonly) return html`
+      <input
+        type="checkbox"
+        class="${this.isCheck ? "check" : "switch"} ${clsRank} ${clsStatusBg}"
+        id="${this.id}"
+        name="${this.id}"
+        .checked=${this.value}
+        .disabled=${this.isDisabled}
+        .required=${this.isRequired}
+        ?readonly=${this.isReadonly}
+        @change="${this.#chkChange}"
+        onclick="return false"
+      />
+    `;
+  
     return html`
       <input
         type="checkbox"
@@ -54,7 +69,8 @@ export class CheckField extends FieldPart{
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         .checked=${this.value}
-        @change="${this.#chkChange}" />
+        @change="${this.#chkChange}"
+      />
     `;
   }
 }

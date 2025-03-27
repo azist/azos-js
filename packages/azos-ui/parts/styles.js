@@ -164,17 +164,23 @@ export const checkStyles = css`
     box-shadow: var(--focus-ctl-box-shadow);
   }
   .check::before{
-    content: "×";
-    color: var(--s-default-fg-ctl);
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 8px;
+    bottom: 1px;
+    border-right: 2px solid var(--s-default-fg-ctl);
+    border-bottom: 2px solid var(--s-default-fg-ctl);
+    opacity: 0;
+    transform: scale(0) rotate(45deg);
     text-align:center;
     position:relative;
-    transform:scale(0);
     transform-origin:center center;
     transition:.1s transform ease-in-out;
     font-size:1.85em;
   }
   .check:disabled::before{ opacity: 0.5;}
-  .check:checked::before{ transform:scale(1); }
+  .check:checked::before{ transform:scale(1) rotate(45deg); opacity: 1 }
   .check:disabled{  }
   .disabled{
     color: #b4b4b4;
