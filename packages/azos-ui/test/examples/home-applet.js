@@ -25,7 +25,6 @@ export class ExampleHomeApplet extends Applet{
    return html`
      <h1>Examples home applet content</h1>
 
-     <xyz-applet2></xyz-applet2>
      Here is a list of most recently used items (APPLET HOME): <br>
       ${JSON.stringify(items)}
 

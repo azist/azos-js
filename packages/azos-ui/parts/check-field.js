@@ -34,7 +34,7 @@ export class CheckField extends FieldPart{
    get isPredefinedContentLayout(){ return true; }
 
 
-   #chkChange(e){
+  #chkChange(e){
     this.value = e.target.checked;
     this.inputChanged();
   }
