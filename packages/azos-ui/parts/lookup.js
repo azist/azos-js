@@ -505,7 +505,7 @@ window.customElements.define("az-lookup", Lookup);
 
 /** Provides a uniform base abstraction for look-ups which get their data by executing some 3rd party code such as a service call.
  * The concept introduces an abort controller to be able to cancel a pending call, such as a service client Http call or the like.
- * You MUST DERIVE from this type and implement `_makeGetDataCall`
+ * You MUST DERIVE from this type and implement `_doCall(abortController)`
  */
 export class ExternalCallLookup extends Lookup {
 
@@ -535,7 +535,7 @@ export class ExternalCallLookup extends Lookup {
    * @param {AbortController} abortController to be used to abort the call
    * */
   // eslint-disable-next-line no-unused-vars
-  _makeGetDataCall(abortController){
+  _doCall(abortController){
     throw ABSTRACT("_getDataCore(abortController)");
   }
 
@@ -543,7 +543,7 @@ export class ExternalCallLookup extends Lookup {
     this._abortPendingCallIfAny();
     this.#abortController = new AbortController();
     try {
-      const gotData = await this._makeGetDataCall(this.#abortController);
+      const gotData = await this._doCall(this.#abortController);
       return gotData;
     } catch(e) {
       if (e.cause === ABORT_ERROR_NAME) return null;
