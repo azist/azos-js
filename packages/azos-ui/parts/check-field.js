@@ -69,8 +69,7 @@ export class CheckField extends FieldPart{
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         .checked=${this.value}
-        @change="${this.#chkChange}"
-      />
+        @change="${this.#chkChange}" />
     `;
   }
 }
