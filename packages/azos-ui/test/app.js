@@ -26,6 +26,7 @@ import { ExampleFeatureBApplet } from "./examples/featureB-applet";
 import { ShowcaseApplet } from "./examples/showcase-applet";
 import { MruLogic } from "../mru";
 import { BrowserStorage } from "azos/storage";
+import { TEST_IMAGES } from "./test-images";
 
 
 class MyLogic extends Module {
@@ -81,7 +82,7 @@ const cfgApp = {
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
     { name: "log", type: ConLog },
     { name: "logic", type: MyLogic },
-    { name: "imgRegistry", type: ImageRegistry, images: [ ...STOCK_IMAGES ] },
+    { name: "imgRegistry", type: ImageRegistry, images: [...STOCK_IMAGES, ...TEST_IMAGES] },
     { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home", history: false },
     { name: "lclStorage", type: BrowserStorage, session: false},
     { name: "mruLogic", type: MruLogic}//most recently used
