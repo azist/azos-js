@@ -6,18 +6,18 @@
 </FILE_LICENSE>*/
 
 import { html, noContent, parseRank, parseStatus, Part } from '../ui.js';
-import { baseStyles, buttonStyles } from './styles.js';
+import { baseStyles, buttonStyles, iconStyles } from './styles.js';
 
 /** Defines a simple button exposed as `az-button` tag */
 export class Button extends Part {
-  static styles = [baseStyles, buttonStyles];
+  static styles = [baseStyles, buttonStyles, iconStyles];
 
   static properties = {
     title: { type: String },
     type: { type: String },
     icon: { type: String },
+    iconOpts: { type: Object },
   };
-
 
   constructor() {
     super();
@@ -34,7 +34,7 @@ export class Button extends Part {
 
   renderIcon() {
     if (!this.icon) return noContent;
-    return this.arena.renderImageSpec(this.icon, "btnIcon").html;
+    return this.arena.renderImageSpec(this.icon, { ...this.iconOpts }).html;
   }
 }
 

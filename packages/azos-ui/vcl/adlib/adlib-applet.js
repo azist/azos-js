@@ -44,14 +44,14 @@ export class AdlibApplet extends Applet {
   #cmdNewQuery = new Command(this, {
     uri: "Adlib.NewQuery",
     title: "New Query",
-    icon: "svg://azos.ico.plus?m=i32",
+    icon: "svg://azos.ico.plus",
     handler: (e) => this.#onAddTabToLeft(e)
   });
 
   #cmdPrefillQuery = new Command(this, {
     uri: "Adlib.PrefillQuery",
     title: "Add collection filter to active (or new) tab",
-    icon: `svg://azos.ico.edit?m=i32`,
+    icon: `svg://azos.ico.edit`,
     handler: (e) => this.#onAddCollectionFilter(e)
   });
 

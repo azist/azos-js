@@ -135,10 +135,11 @@ button:disabled{
  transform: none;
 }
 
-button{ display: inline-flex; gap: 0.5em; }
-button .title{ flex: 1; }
-button i{ display: block; width: 1em; }
-button i svg{ height: 100%; }
+button{ display: inline-block; }
+button .icon{
+  --icon-width: 24px;
+  --arn-strip-svg-stroke: var(--ink);
+}
 `;
 
 export const checkStyles = css`
@@ -384,7 +385,7 @@ export const dateRangeStyles = css`
   padding: 0;
   margin: 0;
   font-size: 1em;
-  background-color: field;
+  background-color: var(--s-default-bg-ctl);
   color: var(--s-default-fg-ctl);
   border: var(--s-default-bor-ctl);
   border-radius: var(--r3-brad-ctl);
@@ -586,10 +587,9 @@ export const iconStyles = css`
   stroke-width: var(--arn-strip-svg-stroke-width);
   fill: none;
   vertical-align: middle;
-  line-height: 0.6;
 }
 .icon, .icon svg{
-  width: var(--icon-width);
+  width: var(--icon-width, 32px);
   padding: 0;
   margin: 0;
 }

@@ -294,15 +294,15 @@ export class TreeView extends Control {
 
   connectedCallback() {
     super.connectedCallback();
-    this._folder = this.renderImageSpec("svg://azos.ico.folder", "folder").html;
-    this._folderOpen = this.renderImageSpec("svg://azos.ico.folderOpen", "folder").html;
-    this._chevron = this.renderImageSpec("svg://azos.ico.caretRight", "chevron").html;
-    this._chevronClosed = this.renderImageSpec("svg://azos.ico.caretDown", "chevron").html;
+    this._folder = this.renderImageSpec("svg://azos.ico.folder", { cls: "folder icon" }).html;
+    this._folderOpen = this.renderImageSpec("svg://azos.ico.folderOpen", { cls: "folder icon" }).html;
+    this._chevron = this.renderImageSpec("svg://azos.ico.caretRight", { cls: "chevron icon" }).html;
+    this._chevronClosed = this.renderImageSpec("svg://azos.ico.caretDown", { cls: "chevron icon" }).html;
   }
 
   renderIcon(node) {
     if (node.iconPath === null) return '';
-    if (node.iconPath) return this.renderImageSpec(node.iconPath, "treeNodeIcon").html;
+    if (node.iconPath) return this.renderImageSpec(node.iconPath).html;
     else return node.isOpened ? this._folderOpen : this._folder; // default when undefined
   }
 
