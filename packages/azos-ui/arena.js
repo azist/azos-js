@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose, isNonEmptyString, isString } from "azos/types";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose, isNonEmptyString, isString, isNumber } from "azos/types";
 import { html, AzosElement, noContent, verbatimHtml } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
@@ -379,19 +379,51 @@ ${footer}
   }
 
   /** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
-   * returning it as a tuple along with optional image attributes. If passed a class/classes, will wrap in a div with "icon" + classes
+   * returning it as a tuple along with optional image attributes. Other params include:
+   * @param spec {string} - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print`
+   * @param  options {object} - optional object with the following properties:
+   *  - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
+   *  - iso {string} - optional system-wide ISO code to use when resolving the image spec, default is null
+   *  - ox {string | number} - optional X offset to apply to the image, default is unset
+   *  - oy {string | number} - optional Y offset to apply to the image, default is unset
+   *  - scale {number} - optional scale factor to apply to the image, default is unset
+   *  - theme {string} - optional system-wide theme to use when resolving the image spec, default is null
+   *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
    * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
    */
-  renderImageSpec(spec, cls = null, iso = null, theme = null) {
-    const got = this.resolveImageSpec(spec, iso, theme);
-    const content = got.content;
-    isNonEmptyString(content, `renderImageSpec('${spec}')`);
-    const _html = verbatimHtml(content);
-    if (!cls) return { html: _html, attrs: got.attrs };
+  renderImageSpec(spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
+    cls ??= "icon";
+    wrapImage ??= true;
+    if (isNumber(ox)) ox = `${ox}px`;
+    if (isNumber(oy)) oy = `${oy}px`;
 
-    if (isString(cls)) cls = [...cls.split(" ")];
-    cls = [got.attrs?.fas ? "fas" : "", ...cls].filter(isNonEmptyString).join(" ");
-    return { html: html`<i class="icon ${cls}">${_html}</i>`, attrs: got.attrs };
+    const got = this.resolveImageSpec(spec, iso, theme);
+    let content = got.content;
+    let transforms = [];
+    let stl = noContent;
+
+    if (scale) transforms.push(`scale(${scale})`);
+    if (ox) transforms.push(`translateX(${ox})`);
+    if (oy) transforms.push(`translateY(${oy})`);
+    if (transforms.length) stl = `transform: ${transforms.join(" ")}`;
+
+    if (isString(cls)) cls = cls.split(" ");
+    cls = [...(cls ?? []), got.attrs?.fas ? "fas" : ""].filter(isNonEmptyString);
+
+    if (cls.length) cls = cls.join(" ");
+    else cls = noContent;
+
+    if (wrapImage || !["svg", "png", "jpg"].some(option => content.startsWith(`<${option}`))) // or if content is an svg
+      content = html`<i class="${cls}" style="${stl}">${verbatimHtml(content)}</i>`;
+    else
+      content = verbatimHtml([
+        content.slice(0, 4),
+        (cls !== noContent) ? `class="${cls}"` : '',
+        (stl !== noContent) ? `style="${stl}"` : '',
+        content.slice(5)
+      ].join(' '));
+
+    return { html: content, attrs: got.attrs };
   }
 
 }//Arena

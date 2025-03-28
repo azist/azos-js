@@ -55,7 +55,7 @@ export function renderToolbar(app, self, commands){
     itemContent.push(one);
   }
 
-  const userIcon = self.renderImageSpec("svg://azos.ico.user", "icon-user");
+  const userIcon = self.renderImageSpec("svg://azos.ico.user", { scale: 1.35 });
   let user = app.session?.user?.toInitObject();
   // user = { asof: "2025-03-05T15:10:41.605Z", authToken: "xyz", "claims": { "a": "z", "email": "dkh@h.com", "exp": 1741274242, "iat": 1741187441, "name": "Dmitriy K", "sub": "dkh" }, "descr": "Dmitriy K", "name": "dkh", "rights": {}, "status": "Admin" };
   // user.desc = null;

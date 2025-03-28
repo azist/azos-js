@@ -48,7 +48,6 @@ export class TimeBlockPicker extends Control {
   font-size: 0.8em;
   font-weight: bolder;
   display: inline-flex;
-  align-items: center;
   border-radius: 8px;
   color: var(--ink);
   border: 1px solid #ccc;
@@ -652,7 +651,7 @@ export class TimeBlockPicker extends Control {
     return html`
 <div class="nav">
   <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">${this.renderImageSpec("svg://azos.ico.caretLeft").html}</button>
-  <button @click="${() => this.changeViewPage(0)}" class="viewing todayBtn">${this.todaySymbol} Today</button>
+  <button @click="${() => this.changeViewPage(0)}" class="viewing todayBtn">${this.todaySymbol} <span>Today</span></button>
   <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">${this.renderImageSpec("svg://azos.ico.caretRight").html}</button>
   ${this.renderViewSpanLabel(this.viewStartDate, this.viewEndDate, true)}
 </div>
@@ -771,13 +770,9 @@ export class TimeBlockPicker extends Control {
     const eventSelectedIndex = this.selectedItems.indexOf(schItem);
     if (eventSelectedIndex > -1) {
       cls.push("selected");
-      iconContent = html`
-            <div class="icon">
-            ${this.selectedItems.length === 1 ?
-        html`${this.renderImageSpec("svg://azos.ico.checkmark?m=i32").html}`
-          : html`<span>${eventSelectedIndex + 1}</span>`
-        }
-            </div>`;
+      iconContent = this.selectedItems.length === 1
+        ? html`${this.renderImageSpec("svg://azos.ico.checkmark").html}`
+        : html`<span class="icon">${eventSelectedIndex + 1}</span>`;
     }
     return html`
 <div class="${cls.filter(types.isNonEmptyString).join(" ")}" tabIndex="0" @focus="${() => this.itemInFocus = schItem}" @blur="${() => this.itemInFocus = null}" data-id="${schItem.id}">

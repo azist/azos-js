@@ -174,7 +174,7 @@ export class Command {
       return html`<div class="command-button">${this.title}</div>`;
     }
 
-    ico = arena.renderImageSpec(ico, "command-icon");
+    ico = arena.renderImageSpec(ico, { cls: "command-icon icon" });
     if (ico.html) return ico.html;
     else return html`<div class="command-icon">${verbatimHtml(ico)}</div>`;
   }

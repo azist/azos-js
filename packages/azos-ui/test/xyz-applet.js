@@ -64,7 +64,7 @@ export class XyzApplet extends Applet {
     uri: "Test.Cmd2",
     //active: false,
     title: "Help",
-    icon: `svg://azos.ico.star?m=i32`,
+    icon: `svg://azos.ico.star`,
     handler: function () { alert("Command 2 activated"); }
   });
 

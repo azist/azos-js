@@ -272,7 +272,7 @@ export class AzosElement extends LitElement {
    * returning it as a tuple along with optional image attributes
    * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
    */
-  renderImageSpec(spec, cls = null, iso = null, theme = null) { return this.arena.renderImageSpec(spec, cls, iso, theme); }
+  renderImageSpec(spec, { cls, scale, ox, oy, iso, theme, wrapImage } = {}) { return this.arena.renderImageSpec(spec, { cls, scale, ox, oy, iso, theme, wrapImage }); }
 
   render() { return html`>>AZOS ELEMENT<<`; }
 }
