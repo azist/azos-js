@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOneOf } from 'azos/strings';
-import { html, parseRank, parseStatus, domCreateRef, domRef } from '../ui.js';
+import { html, parseRank, parseStatus } from '../ui.js';
 import { FieldPart } from './field-part.js';
 import { baseStyles, checkStyles, switchStyles } from './styles.js';
 import { asTriBool } from 'azos/types';
@@ -21,8 +21,6 @@ export class CheckField extends FieldPart{
     super();
   }
 
-  inputRef = domCreateRef();
-
   /** check fields store boolean value only */
   castValue(v){ return asTriBool(v); }
 
@@ -32,19 +30,12 @@ export class CheckField extends FieldPart{
   /** True if this part has a switch instead of a checkbox */
   get isSwitch(){ return isOneOf(this.itemType, ["switch", "sw"]); }
 
-   /** Checkboxes and switches have pre-defined content layout */
-   get isPredefinedContentLayout(){ return true; }
-
+  /** Checkboxes and switches have pre-defined content layout */
+  get isPredefinedContentLayout(){ return true; }
 
   #chkChange(e){
     this.value = e.target.checked;
     this.inputChanged();
-  }
-
-  firstUpdated() {
-    if(this.isReadonly) {
-      this.inputRef.value.setAttribute("onclick", "return false");
-    }
   }
 
   renderInput(){
@@ -54,7 +45,6 @@ export class CheckField extends FieldPart{
 
     return html`
       <input
-        ${domRef(this.inputRef)}
         type="checkbox"
         class="${checkboxStyles} ${clsRank} ${clsStatusBg}"
         id="${this.id}"
@@ -63,7 +53,8 @@ export class CheckField extends FieldPart{
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         .checked=${this.value}
-        @change="${this.#chkChange}" />
+        @change="${this.#chkChange}"
+        @click="${(e) => { if (this.isReadonly) e.preventDefault(); }}" />
     `;
   }
 }
