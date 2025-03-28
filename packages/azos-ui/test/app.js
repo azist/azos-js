@@ -10,7 +10,7 @@ import { ConLog } from "azos/ilog";
 import { Module } from "azos/modules";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
-import { ImageRegistry } from "azos/bcl/img-registry";
+import { ImageRegistry, STOCK_IMAGES } from "azos/bcl/img-registry";
 
 import { Arena, addAppBoilerplate } from "../arena";
 import { BrowserRouter, MsgBoxActionHandler } from "../browser-router"
@@ -81,7 +81,7 @@ const cfgApp = {
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
     { name: "log", type: ConLog },
     { name: "logic", type: MyLogic },
-    { name: "imgRegistry", type: ImageRegistry },
+    { name: "imgRegistry", type: ImageRegistry, images: [ ...STOCK_IMAGES ] },
     { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home", history: false },
     { name: "lclStorage", type: BrowserStorage, session: false},
     { name: "mruLogic", type: MruLogic}//most recently used

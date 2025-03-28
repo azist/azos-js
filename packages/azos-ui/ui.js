@@ -9,8 +9,16 @@ import { unsafeHTML as lit_unsafe_html } from "lit/directives/unsafe-html";
 import { ref as lit_ref, createRef as lit_create_ref } from "lit/directives/ref";
 import { isOneOf } from "azos/strings.js";
 import { link as linkModule } from "azos/linker.js";
-import { AzosError } from "azos/types";
+import { AzosError,
+         isNumber as types_isNumber,
+         isString as types_isString,
+         isNonEmptyString as types_isNonEmptyString
+       } from "azos/types";
 import { asString } from "azos/strings";
+import { ImageRegistry } from "azos/bcl/img-registry";
+import { isOfOrNull, isStringOrNull } from "azos/aver";
+import { LOG_TYPE } from "azos/log";
+import { CONTENT_TYPE } from "azos/coreconsts";
 
 /** CSS template processing pragma: css`p{color: blue}` */
 export const css = lit_css;
@@ -363,3 +371,97 @@ export class Part extends Control{
   /** Override to render your specific part */
   renderPart(){ return "***NO PART***"; }
 }
+
+
+/** Resolves image specifier into an image content.
+   * Image specifiers starting with `@` get returned as-is without the first `@` prefix, this way you cam embed verbatim image content in identifiers.
+   *  For example: `arena.resolveImageSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print")`. See {@link ImageRegistry.resolveSpec}
+   * Requires {@link ImageRegistry} passed in as a first parameter
+   * @param {ImageRegistry} reg a required ImageRegistry reference
+   * @param {string} spec a required image specification
+   * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
+   * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @returns {tuple | string} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`, returns plain strings without verbatim `@` specifier
+   */
+export function  resolveImageSpec(reg, spec, iso = null, theme = null){
+  isOfOrNull(reg, ImageRegistry);
+  isStringOrNull(spec);
+  if (!spec) return {sc: 500, ctp: "text/plain", content: ""};
+
+  if (spec.startsWith("@")) return spec.slice(1);//get rid of prefix, return the rest as-is
+
+  if (!reg) {
+    this.writeLog("resolveImageSpec", LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
+    return {sc: 404, ctp: "text/plain+error", content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {}};
+  }
+
+  const rec = reg.resolveSpec(spec, iso, theme);
+  if (!rec) {
+    this.writeLog("resolveImageSpec", LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
+    return {sc: 404, ctp: "text/plain+error", content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {}};
+  }
+
+  return rec.produceContent();
+}
+
+/** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
+ * returning it as a tuple along with optional image attributes. Other params include:
+ * @param spec {string} - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print`
+ * @param  options {object} - optional object with the following properties:
+ *  - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
+ *  - iso {string} - optional system-wide ISO code to use when resolving the image spec, default is null
+ *  - ox {string | number} - optional X offset to apply to the image, default is unset
+ *  - oy {string | number} - optional Y offset to apply to the image, default is unset
+ *  - scale {number} - optional scale factor to apply to the image, default is unset
+ *  - theme {string} - optional system-wide theme to use when resolving the image spec, default is null
+ *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
+ * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
+ */
+export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
+  cls ??= "icon";
+  wrapImage ??= true;
+  if (types_isNumber(ox)) ox = `${ox}px`;
+  if (types_isNumber(oy)) oy = `${oy}px`;
+
+  const got = resolveImageSpec(reg, spec, iso, theme);
+  //if a string is returned - you need to render an image with SRC parameter to the returned value
+  if (got instanceof String){
+     //render image with OX OY SCALE
+  }
+
+  let content = got.content;
+  // need to analyze content type. Is it a byte array? Then we need an img tag with BASE64 data source
+  if (CONTENT_TYPE.isImageFamily(got.ctp)){ //any image family
+
+  }
+
+
+  let transforms = [];
+  let stl = noContent;
+
+  if (scale) transforms.push(`scale(${scale})`);
+  if (ox) transforms.push(`translateX(${ox})`);
+  if (oy) transforms.push(`translateY(${oy})`);
+  if (transforms.length) stl = `transform: ${transforms.join(" ")}`;
+
+  if (types_isString(cls)) cls = cls.split(" ");
+  cls = [...(cls ?? []), got.attrs?.fas ? "fas" : ""].filter(types_isNonEmptyString);
+
+  if (cls.length) cls = cls.join(" ");
+  else cls = noContent;
+
+  if (wrapImage || !["svg", "png", "jpg"].some(option => content.startsWith(`<${option}`))) // or if content is an svg
+    content = html`<i class="${cls}" style="${stl}">${verbatimHtml(content)}</i>`;
+  else
+    content = verbatimHtml([
+      content.slice(0, 4),
+      (cls !== noContent) ? `class="${cls}"` : '',
+      (stl !== noContent) ? `style="${stl}"` : '',
+      content.slice(5)
+    ].join(' '));
+
+  return { html: content, attrs: got.attrs };
+}
+
+
+
