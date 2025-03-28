@@ -38,7 +38,7 @@ export class ChronicleApplet extends Applet{
     uri: "cmdChronicleFilter",
     //active: false,
     title: "Help",
-    icon: `svg://azos.ico.filter?m=i32`,
+    icon: `svg://azos.ico.filter`,
     handler: async function(){
       const filter = (await this.ctx.dlgFilter.show()).modalResult;
       if (!filter) return;

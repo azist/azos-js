@@ -145,7 +145,7 @@ export class TabView extends Control {
   filter: brightness(1.05);
 }
 
-.tab-icon { margin-right: 0.3em; }
+.icon { margin-right: 0.3em; }
 
 .dirty-ind {
   font-weight: bold;
@@ -517,7 +517,7 @@ export class TabView extends Control {
             @dragstart="${evt => this.#onDragStart(evt, index)}"
             @dragend="${this.#onDragEnd}"
             >
-            ${tab.iconPath ? this.renderImageSpec(tab.iconPath, "tab-icon").html : noContent}
+            ${tab.iconPath ? this.renderImageSpec(tab.iconPath).html : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
             ${tab.canClose ? html`<div class="close-ind" @click="${evt => this.#onCloseTabClick(evt, tab)}">&times;</div>` : noContent}

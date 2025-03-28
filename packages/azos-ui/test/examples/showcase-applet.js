@@ -14,6 +14,7 @@ import "./xyz-dialog";
 
 import "../showcase/case-accordion";
 import "../showcase/case-buttons";
+import "../showcase/case-buttons-with-icons";
 import "../showcase/case-checkboxes";
 import "../showcase/case-code-box";
 import "../showcase/case-date-range";
@@ -99,6 +100,7 @@ export class ShowcaseApplet extends Applet {
       <option value="">Select a showcase item...</option>
       <option value="Accordion">Accordion</option>
       <option value="Buttons">Buttons</option>
+      <option value="ButtonsWithIcons">Buttons With Icons</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
       <option value="DateRange">Date Range</option>
@@ -132,6 +134,8 @@ export class ShowcaseApplet extends Applet {
         return html`<az-case-accordion></az-case-accordion>`;
       case "Buttons":
         return html`<az-case-buttons></az-case-buttons>`;
+      case "ButtonsWithIcons":
+        return html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`;
       case "Checkboxes":
         return html`<az-case-checkboxes></az-case-checkboxes>`;
       case "CodeBox":

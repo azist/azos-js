@@ -10,7 +10,6 @@ import { CaseBase } from "./case-base";
 
 export class CaseButtons extends CaseBase {
 
-
   #simulateCrash(){
     let result = {};
     for(let i=5; i>=0; i--){
@@ -31,7 +30,6 @@ export class CaseButtons extends CaseBase {
   }
 
   renderControl() {
-    // TODO: test button click to increment/decrement counter
     return html`
 <h2>Buttons</h2>
 
