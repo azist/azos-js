@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOneOf } from 'azos/strings';
-import { html, parseRank, parseStatus } from '../ui.js';
+import { html, parseRank, parseStatus, domCreateRef, domRef } from '../ui.js';
 import { FieldPart } from './field-part.js';
 import { baseStyles, checkStyles, switchStyles } from './styles.js';
 import { asTriBool } from 'azos/types';
@@ -20,6 +20,8 @@ export class CheckField extends FieldPart{
   constructor(){
     super();
   }
+
+  inputRef = domCreateRef();
 
   /** check fields store boolean value only */
   castValue(v){ return asTriBool(v); }
@@ -39,30 +41,22 @@ export class CheckField extends FieldPart{
     this.inputChanged();
   }
 
+  firstUpdated() {
+    if(this.isReadonly) {
+      this.inputRef.value.setAttribute("onclick", "return false");
+    }
+  }
 
   renderInput(){
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
+    const checkboxStyles = this.isCheck ? "check" : "switch";
 
-    if(this.isReadonly) return html`
-      <input
-        type="checkbox"
-        class="${this.isCheck ? "check" : "switch"} ${clsRank} ${clsStatusBg}"
-        id="${this.id}"
-        name="${this.id}"
-        .checked=${this.value}
-        .disabled=${this.isDisabled}
-        .required=${this.isRequired}
-        ?readonly=${this.isReadonly}
-        @change="${this.#chkChange}"
-        onclick="return false"
-      />
-    `;
-  
     return html`
       <input
+        ${domRef(this.inputRef)}
         type="checkbox"
-        class="${this.isCheck ? "check" : "switch"} ${clsRank} ${clsStatusBg}"
+        class="${checkboxStyles} ${clsRank} ${clsStatusBg}"
         id="${this.id}"
         name="${this.id}"
         .disabled=${this.isDisabled}

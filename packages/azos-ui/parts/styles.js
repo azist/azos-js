@@ -166,9 +166,9 @@ export const checkStyles = css`
   .check::before{
     content: "";
     position: absolute;
-    width: 4px;
-    height: 8px;
-    bottom: 1px;
+    width: .2em;
+    height: .4em;
+    bottom: .055em;
     border-right: 2px solid var(--s-default-fg-ctl);
     border-bottom: 2px solid var(--s-default-fg-ctl);
     opacity: 0;
