@@ -424,17 +424,6 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
   if (types_isNumber(oy)) oy = `${oy}px`;
 
   const got = resolveImageSpec(reg, spec, iso, theme);
-  //if a string is returned - you need to render an image with SRC parameter to the returned value
-  if (got instanceof String){
-     //render image with OX OY SCALE
-  }
-
-  let content = got.content;
-  // need to analyze content type. Is it a byte array? Then we need an img tag with BASE64 data source
-  if (CONTENT_TYPE.isImageFamily(got.ctp)){ //any image family
-
-  }
-
 
   let transforms = [];
   let stl = noContent;
@@ -450,7 +439,15 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
   if (cls.length) cls = cls.join(" ");
   else cls = noContent;
 
-  if (wrapImage || !["svg", "png", "jpg"].some(option => content.startsWith(`<${option}`))) // or if content is an svg
+  let content;
+  if (typeof got === "string") {
+    content = `<img src="${got}" />`;
+  } else if (CONTENT_TYPE.isImageFamily(got.ctp)) {
+    content = got.content;
+  } else {
+    content = "<<<<INVALID IMAGE CONTENT>>>>";
+  }
+  if (wrapImage || !["svg", "img"].some(option => content.startsWith(`<${option}`))) // or if content is an svg
     content = html`<i class="${cls}" style="${stl}">${verbatimHtml(content)}</i>`;
   else
     content = verbatimHtml([

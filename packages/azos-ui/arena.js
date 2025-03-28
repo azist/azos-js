@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose, isNonEmptyString, isString, isNumber } from "azos/types";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose } from "azos/types";
 import { html, AzosElement, noContent, resolveImageSpec, renderImageSpec } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
@@ -368,11 +368,21 @@ ${footer}
   }
 
 
-  //FIXME: UPDATE THE TEXT HERE once it is done under ui.js
-  /**  UPDATE THE TXT
+  /** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
+   * returning it as a tuple along with optional image attributes. Other params include:
+   * @param spec {string} - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print`
+   * @param  options {object} - optional object with the following properties:
+   *  - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
+   *  - iso {string} - optional system-wide ISO code to use when resolving the image spec, default is null
+   *  - ox {string | number} - optional X offset to apply to the image, default is unset
+   *  - oy {string | number} - optional Y offset to apply to the image, default is unset
+   *  - scale {number} - optional scale factor to apply to the image, default is unset
+   *  - theme {string} - optional system-wide theme to use when resolving the image spec, default is null
+   *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
+   * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
    */
   renderImageSpec(spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
-    const result = renderImageSpec(this.#defaultImageRegistry, spec, cls, iso, ox, oy, scale, theme, wrapImage);
+    const result = renderImageSpec(this.#defaultImageRegistry, spec, { cls, iso, ox, oy, scale, theme, wrapImage });
     return result;
   }
 

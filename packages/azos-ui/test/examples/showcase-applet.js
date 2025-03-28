@@ -4,6 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+//#region IMPORTS
 import { Applet } from "../../applet";
 import { Command } from "../../cmd";
 import { css, html, noContent } from "../../ui";
@@ -11,13 +12,13 @@ import { prompt } from "../../ok-cancel-modal";
 
 import "../../parts/button";
 import "./xyz-dialog";
-
 import "../showcase/case-accordion";
 import "../showcase/case-buttons";
 import "../showcase/case-buttons-with-icons";
 import "../showcase/case-checkboxes";
 import "../showcase/case-code-box";
 import "../showcase/case-date-range";
+import "../showcase/case-images";
 import "../showcase/case-input-tests";
 import "../showcase/case-lookup";
 import "../showcase/case-modals";
@@ -32,12 +33,13 @@ import "../showcase/case-sizing";
 import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
+//#endregion IMPORTS
 
 export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
-    this.selectedCase = "TabView";
+    this.selectedCase = "Images";
     this.x = 1;
   }
 
@@ -62,9 +64,7 @@ export class ShowcaseApplet extends Applet {
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-#caseSelect option{
-  padding: 0.3em 0.35em;
-}
+#caseSelect option{ padding: 0.3em 0.35em; }
   `];
 
   #cmdHelp = new Command(this, {
@@ -104,6 +104,7 @@ export class ShowcaseApplet extends Applet {
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
       <option value="DateRange">Date Range</option>
+      <option value="Images">Images</option>
       <option value="InputTests">Input Tests</option>
       <option value="Lookup">Lookup</option>
       <option value="Modals">Modals</option>
@@ -142,6 +143,8 @@ export class ShowcaseApplet extends Applet {
         return html`<az-case-code-box></az-case-code-box>`;
       case "DateRange":
         return html`<az-case-date-range></az-case-date-range>`;
+      case "Images":
+        return html`<az-case-images></az-case-images>`;
       case "InputTests":
         return html`<az-case-input-tests></az-case-input-tests>`;
       case "Lookup":
