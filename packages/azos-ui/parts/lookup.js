@@ -5,24 +5,26 @@
 </FILE_LICENSE>*/
 
 import { isOf, isTrue } from "azos/aver";
-import { AzosElement, html, parseRank, parseStatus, verbatimHtml } from "../ui";
+import { Part, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
 import { isEmpty, matchPattern } from "azos/strings";
-
-import { ImageRegistry } from "azos/bcl/img-registry";
+import { LOG_TYPE } from "azos/log";
+import { ABORT_ERROR_NAME, ABSTRACT } from "azos/coreconsts";
 
 
 /**
  * Provides abstraction for a Lookup / Typeahead Suggestion / AutoComplete protocol.
- *
+ * Lookups are popover-like parts: you can customize where and how they get data in a context and customize how they render
+ * the popover content itself.
  * Create an instance of a lookup and associate it with your field (az-text, etc). The Lookup receives the triggers and responds
  *   appropriately
  *
  * {@link Lookup.feed} a Lookup an owner searchPattern to open a popover attached to the owner presenting a list of
  *  results. The results can be scrolled via shift/tab and arrow keys, selected with enter, and cancelled with escape.
  */
-export class Lookup extends AzosElement {
+export class Lookup extends Part {
+
   static styles = [lookupStyles];
 
   static properties = {
@@ -155,7 +157,7 @@ export class Lookup extends AzosElement {
 
   get owner() { return this.#owner; }
   set owner(v) {
-    isOf(v, AzosElement);
+    isOf(v, Part);
     const oldValue = this.#owner;
     this.#owner = v;
     this.requestUpdate("owner", oldValue);
@@ -418,7 +420,7 @@ export class Lookup extends AzosElement {
     super.disconnectedCallback();
   }
 
-  render() {
+  renderPart() {
     const cls = [
       parseRank(this.rank, true),
       parseStatus(this.status, true),
@@ -480,49 +482,6 @@ export class Lookup extends AzosElement {
   }
 }
 
-export class XYZAddressLookup extends Lookup {
-  constructor({ debounceMs } = {}) {
-    super({ debounceMs });
-
-    this.data = [
-      { street1: "1600 Pennsylvania Ave NW", city: "Washington", state: "DC", zip: "20500", country: "USA" },
-      { street1: "700 Highland Rd", city: "Macedonia", state: "OH", zip: "44056", country: "USA" },
-      { street1: "600 Biscayne Blvd NW", city: "Miami", state: "FL", zip: "33132", country: "USA" },
-      { street1: "2 15th St NW", city: "Washington", state: "DC", zip: "20024", country: "CN" },
-    ];
-  }
-
-  #ref = { imgRegistry: ImageRegistry };
-
-  async getData() {
-    const searchPattern = `*${this.searchPattern}*`;
-    let filtered = this.data;
-
-    try {
-      filtered = this.data.filter(one => ["street1", "street2", "city", "state", "zip"]
-        .map(k => one[k])
-        .filter(isNonEmptyString)
-        .some(str => matchPattern(str, searchPattern)));
-    } catch (err) { console.error(err); }
-
-    return filtered;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.link(this.#ref);
-  }
-
-  renderResultBody(result) {
-    return html`
-  <div style="display:flex;gap:5px;">
-    <div style="width:16px">${verbatimHtml(this.#ref.imgRegistry.resolveSpec("svg://azos.ico.checkmark").produceContent().content)}</div>
-    <span>${this._highlightMatch(`${result.street1}, ${result.city}, ${result.state} ${result.zip}`, this.searchPattern)}</span>
-  </div>
-      `;
-  }
-}
-
 function isWithinParent(elm, parent) {
   // console.info(elm, parent);
   let currentElement = elm;
@@ -543,4 +502,54 @@ function isWithinParent(elm, parent) {
 }
 
 window.customElements.define("az-lookup", Lookup);
-window.customElements.define("xyz-address-lookup", XYZAddressLookup);
+
+/** Provides a uniform base abstraction for look-ups which get their data by executing some 3rd party code such as a service call.
+ * The concept introduces an abort controller to be able to cancel a pending call, such as a service client Http call or the like.
+ * You MUST DERIVE from this type and implement `_doCall(abortController)`
+ */
+export class ExternalCallLookup extends Lookup {
+
+  #abortController = null;
+
+  /** Returns current abort controller or NULL */
+  get abortController() {return this.#abortController; }
+
+  // eslint-disable-next-line no-unused-vars
+  _lookupCompleted(isCancel){ this._abortPendingCallIfAny(); }
+
+  /** Aborts the pending call if there is anything pending, otherwise does nothing */
+  _abortPendingCallIfAny(){
+    try {
+      if (this.#abortController){
+        this.#abortController.abort(ABORT_ERROR_NAME);
+      }
+    } catch (cause){
+      this.writeLog(LOG_TYPE.ERROR, "Leaked _abortPendingCallIfAny()", cause);
+    } finally{
+      this.#abortController = null;
+    }
+  }
+
+  /**
+   * Override to make an actual external call, such as a service call to the remote party
+   * @param {AbortController} abortController to be used to abort the call
+   * */
+  // eslint-disable-next-line no-unused-vars
+  _doCall(abortController){
+    throw ABSTRACT("_getDataCore(abortController)");
+  }
+
+  async getData(){
+    this._abortPendingCallIfAny();
+    this.#abortController = new AbortController();
+    try {
+      const gotData = await this._doCall(this.#abortController);
+      return gotData;
+    } catch(e) {
+      if (e.cause === ABORT_ERROR_NAME) return null;
+      throw e;
+    } finally {
+      this.#abortController = null;
+    }
+  }
+}

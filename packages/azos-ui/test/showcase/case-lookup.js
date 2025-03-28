@@ -4,11 +4,65 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { css, html } from "../../ui";
+import { matchPattern } from "azos/strings";
+import { ImageRegistry } from "azos/bcl/img-registry";
+
+import { css, html, verbatimHtml } from "../../ui";
+import { Lookup } from "../../parts/lookup";
 import { CaseBase } from "./case-base";
 
-import "../../parts/lookup";
 import "../../parts/button";
+import { isNonEmptyString } from "azos/types";
+
+
+
+export class XYZAddressLookup extends Lookup {
+  constructor({ debounceMs } = {}) {
+    super({ debounceMs });
+
+    this.data = [
+      { street1: "1600 Pennsylvania Ave NW", city: "Washington", state: "DC", zip: "20500", country: "USA" },
+      { street1: "700 Highland Rd", city: "Macedonia", state: "OH", zip: "44056", country: "USA" },
+      { street1: "600 Biscayne Blvd NW", city: "Miami", state: "FL", zip: "33132", country: "USA" },
+      { street1: "2 15th St NW", city: "Washington", state: "DC", zip: "20024", country: "CN" },
+    ];
+  }
+
+  #ref = { imgRegistry: ImageRegistry };
+
+  async getData() {
+    const searchPattern = `*${this.searchPattern}*`;
+    let filtered = this.data;
+
+    try {
+      filtered = this.data.filter(one => ["street1", "street2", "city", "state", "zip"]
+        .map(k => one[k])
+        .filter(isNonEmptyString)
+        .some(str => matchPattern(str, searchPattern)));
+    } catch (err) { console.error(err); }
+
+    return filtered;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.link(this.#ref);
+  }
+
+  renderResultBody(result) {
+    return html`
+  <div style="display:flex;gap:5px;">
+    <div style="width:16px">${verbatimHtml(this.#ref.imgRegistry.resolveSpec("svg://azos.ico.checkmark").produceContent().content)}</div>
+    <span>${this._highlightMatch(`${result.street1}, ${result.city}, ${result.state} ${result.zip}`, this.searchPattern)}</span>
+  </div>
+      `;
+  }
+}
+
+window.customElements.define("xyz-address-lookup", XYZAddressLookup);
+
+
+
 
 export class CaseLookup extends CaseBase {
   static styles = css`
