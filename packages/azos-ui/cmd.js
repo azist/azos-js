@@ -27,8 +27,8 @@ export class KeyboardShortcut {
     this.#title = cfg.getString("title", "");
   }
 
-   //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
-   [GET_CONFIG_VERBATIM_VALUE](){ return this; }
+  //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
+  [GET_CONFIG_VERBATIM_VALUE](){ return this; }
 
   get ctl()  { return this.#ctl; }
   get alt()  { return this.#alt; }
