@@ -40,6 +40,11 @@ limitations under the License.
     Style: Material Symbols (New), Sharp
 */
 
+/*
+  Another source of icons can be found here:
+  https://www.svgrepo.com/
+*/
+
 
 import { isNonEmptyString, isOf } from "../aver.js";
 import { config, ConfigNode, makeNew } from "../conf.js";

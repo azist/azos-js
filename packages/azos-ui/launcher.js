@@ -6,7 +6,7 @@
 
 import * as aver from "azos/aver";
 import { Control, css, html, noContent } from "./ui";
-import { MenuCommand } from "./cmd";
+import { Command, MenuCommand } from "./cmd";
 
 /** Visualizes menu commands in a cascading fashion as used in
  * arena launcher  */
@@ -60,6 +60,14 @@ export class Launcher extends Control {
   }
 
   static styles = [css`
+
+:host{
+  display: block;
+  width: 100%;
+  padding: 1em;
+  box-sizing: border-box;
+}
+
 .breadcrumb{
   font-size: 0.85em;
   opacity: 0.5;
@@ -68,6 +76,28 @@ export class Launcher extends Control {
 .breadcrumb span{
   font-size: 0.9em;
   opacity: 1.0;
+}
+
+ul {
+  list-style-type: none;
+  display: block;
+  margin: 0px;
+  padding: 0px;
+}
+
+li{
+  padding: 0.1em;
+}
+
+.menu-divider{
+}
+.menu-command{}
+.menu-section{
+  background: #c9c9c9;
+  color: #f8f8f8;
+  border-bottom: 1px solid #bababa;
+  margin: 0.2em 0 0.35em 0em;
+  padding: 0.25em;
 }
 
    `];//styles
@@ -98,7 +128,19 @@ export class Launcher extends Control {
   renderMenu(){
    const children = [];
    for(const one of this.current.menu){
-    children.push(html`<li>${one.title}</li>`);
+
+     if (!one){ //menu divider
+      children.push(html`<li class="menu-divider"> <hr> </li>`);
+      continue;
+     }
+
+     if (one instanceof Command){
+       children.push(html`<li class="menu-command">${one.title}</li>`);
+       continue;
+     }
+
+     //Section name
+     children.push(html`<li class="menu-section">${one.toString()}</li>`);
    }
    return html`<ul> ${children} </ul>`;
   }

@@ -87,11 +87,7 @@ export class Command {
     if (!(cfg instanceof ConfigNode)){
       cfg = config(cfg).root;
     }
-    this._ctor(cfg);
-  }
 
-  /** Protected constructor method not to be called by public callers */
-  _ctor(cfg){
     this.#kind = cfg.getString("kind", null);
     this.#uri = cfg.getString("uri", null);
     this.#title = cfg.getString("title", null);
@@ -109,7 +105,7 @@ export class Command {
 
     this.#value = cfg.get("value") ?? null;
     this.#handler = aver.isFunctionOrNull(cfg.get("handler"));
-  }
+  }//.ctor
 
   //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
   [GET_CONFIG_VERBATIM_VALUE](){ return this; }
@@ -191,11 +187,13 @@ export class MenuCommand extends Command{
   #menu = [];
 
   constructor(ctx, cfg){
-    super(ctx, cfg);
-  }
+    aver.isNotNull(cfg);
 
-  _ctor(cfg){
-    super._ctor(cfg);
+    if (!(cfg instanceof ConfigNode)){
+      cfg = config(cfg).root;
+    }
+
+    super(ctx, cfg);
 
     let menu = cfg.get("menu");
 
@@ -212,7 +210,7 @@ export class MenuCommand extends Command{
       else
         this.#menu.push(aver.isOfOrNull(val, Command));//null denotes a menu break (a horizontal dash)
     }
-  }
+  }//.ctor
 
   /** Returns an array of menu items: each item is either a Command, a String section name or a null which represents a divider. */
   get menu(){ return [...this.#menu]; }

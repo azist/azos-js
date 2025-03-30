@@ -9,9 +9,6 @@
 import { showObject } from "./object-inspector-modal.js";
 import { html, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
 
-// SVG Icons
-// https://www.svgrepo.com/collection/solar-outline-icons/
-
 
 function menuOpen(){
   this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
@@ -105,14 +102,8 @@ export function renderHeader(app, self){
 
     <nav class="side-menu" id="navMenu">
       <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
-      <ul>
-        <li><a href="/">New Visual Control Showcase</a></li>
-        <li><a href="/0.app">Old Visual Control Showcase</a></li>
-        <li><a href="/1.app">Old Visual Control Showcase Tabbed</a></li>
-        <li><a href="/2.app">Old Visual Control Showcase SlideDeck</a></li>
-        <li><a href="/4.app">Simple Control Showcase</a></li>
-        <li><a href="/5.app">Scheduling Control - WIP</a></li>
-      </ul>
+      <az-launcher id="launchArena" scope="this">
+      </az-launcher>
     </nav>
 
     <div class="title">${title}</div>
