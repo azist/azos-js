@@ -8,37 +8,68 @@ import * as aver from "azos/aver";
 import { Control, css, html, noContent } from "./ui";
 import { MenuCommand } from "./cmd";
 
-
 /** Visualizes menu commands in a cascading fashion as used in
  * arena launcher  */
 export class Launcher extends Control {
 
-  #state = {
-   ranks: []
-  };
+  #ranks = [];
 
   #menu;
   /** Returns the root rank of the launcher menu */
   get menu(){ return this.#menu; }
   /** Sets the root rank of the launcher menu */
-  set menu(v) { this.#menu = aver.isOf(v, MenuCommand); }
+  set menu(v) {
+    this.#menu = aver.isOf(v, MenuCommand);
+    this.requestUpdate();
+  }
 
   static properties = {
     menu: { type: Object, reflect: false}
   };
 
 
-  /** Returns currently open menu rank or root rank */
-  get current(){ return this.#state.path.at(-1); }
+  /** Returns currently open menu rank starting at the root menu rank */
+  get current(){ return this.#ranks.length > 0 ? this.#ranks.at(-1) : this.#menu; }
 
   /** Collapses menu navigation and starts over from the top */
   reset(){
-   this.#state.ranks = [];
+   this.#ranks = [];
    this.requestUpdate();
   }
 
+  /** Navigates to a next child rank of the current one */
+  navChild(rank){
+    aver.isOf(rank, MenuCommand);
+    aver.isTrue(this.current.menu.some(one => one === rank), "Menu rank must be a child of the current one");
+    this.#ranks.push(rank);
+    this.requestUpdate();
+  }
+
+  /** Navigates back to any rank on the parent path. Null navigates to the root */
+  navBack(rank){
+    aver.isOfOrNull(rank, MenuCommand);
+    if (!rank || rank === this.#menu) {
+      this.reset();
+      return;
+    }
+    const idx = this.#ranks.indexOf(rank);
+    aver.isTrue(idx >= 0, "Existing parent menu rank");
+    this.#ranks.splice(idx + 1);
+    this.requestUpdate();
+    return true;
+  }
 
   static styles = [css`
+.breadcrumb{
+  font-size: 0.85em;
+  opacity: 0.5;
+}
+
+.breadcrumb span{
+  font-size: 0.9em;
+  opacity: 1.0;
+}
+
    `];//styles
 
 
@@ -50,18 +81,26 @@ export class Launcher extends Control {
     const foot = this.renderFoot();
 
     return html`
-     <section id="sHead">${head}</section>
-     <section id="sMenu">${menu} </section>
-     <section id="sFoot">${foot}</section>
+     <section id="sectHead">${head}</section>
+     <section id="sectMenu">${menu} </section>
+     <section id="sectFoot">${foot}</section>
     `;
   }
 
   renderHead(){
-   return html`Menu Parent/Menu Child/...`;
+   const ranks = [];
+   for(const one of this.#ranks){
+     ranks.push(html`&nbsp;/&nbsp;<span>${one.title}</span>`);
+   }
+   return html`<div class="breadcrumb"> ${ranks} </div>`;
   }
 
   renderMenu(){
-   return html` MENU BODY `;
+   const children = [];
+   for(const one of this.current.menu){
+    children.push(html`<li>${one.title}</li>`);
+   }
+   return html`<ul> ${children} </ul>`;
   }
 
   renderFoot(){
@@ -73,3 +112,5 @@ export class Launcher extends Control {
   }
 
 }
+
+window.customElements.define("az-launcher", Launcher);

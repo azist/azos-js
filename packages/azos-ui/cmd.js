@@ -188,14 +188,13 @@ export class Command {
  *
 */
 export class MenuCommand extends Command{
-  #menu;
+  #menu = [];
 
   constructor(ctx, cfg){
     super(ctx, cfg);
   }
 
   _ctor(cfg){
-    this.#menu = [];
     super._ctor(cfg);
 
     let menu = cfg.get("menu");
@@ -215,5 +214,6 @@ export class MenuCommand extends Command{
     }
   }
 
+  /** Returns an array of menu items: each item is either a Command, a String section name or a null which represents a divider. */
   get menu(){ return [...this.#menu]; }
 }
