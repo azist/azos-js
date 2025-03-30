@@ -79,10 +79,10 @@ const appMenu = {
   hint: "This is just a root menu item",
   menu: [
     "Section A",
-    {title: "Item A"},
-    "Section B",
-    {title: "Item B"},
-    {title: "Item C"},
+    {title: "Showcase", route: "/examples/showcase"},
+    "Examples",
+    {title: "Feature A", route: "/examples/featurea"},
+    {title: "Feature B", route: "/examples/featureb"},
     {title: "Item D"},
     null,//divider
     {title: "Item E"},

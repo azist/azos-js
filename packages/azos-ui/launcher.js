@@ -165,6 +165,8 @@ li{
     } else {
       await item.exec(this);
     }
+
+    //todo: Add custom event to close
   }
 
 }

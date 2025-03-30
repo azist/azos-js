@@ -168,9 +168,9 @@ export class Command {
     if (this.#route){
       const arena = sender instanceof Arena ? sender : sender.arena;
       if (arena){
-        const router = sender.app.moduleLinker.tryResolve(BrowserRouter);
+        const router = arena.app.moduleLinker.tryResolve(BrowserRouter);
         if (router) {
-          return await router.safeHandleUiActionAsync(sender, this.#route);
+          return await router.safeHandleUiActionAsync(arena, this.#route);
         }
       }
     }
