@@ -13,7 +13,6 @@ import * as logging from "azos/log";
 import { Command } from "./cmd.js";
 import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
-import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
 import { isEmpty } from "azos/strings";
@@ -249,7 +248,7 @@ export class Arena extends AzosElement {
     const app = this.#app;
     if (!app) return;
     if (!this.isKiosk){
-      DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+      this.#renderToolbar(this.#toolbar);
     }
     //TODO: in future we will add kiosk toolbar here
   }
@@ -490,7 +489,7 @@ ${footer}
  async #toolbarClick(){ await this.exec(this); }
 
  #renderToolbar(commands){
-   const divToolbar = this.#getRefToolbar(self).value;
+   const divToolbar = this.#getRefToolbar(this).value;
    if (!divToolbar) return;
 
    const itemContent = [];
@@ -498,12 +497,12 @@ ${footer}
    let i=0;
    for(let cmd of commands){
      const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${this.#toolbarClick.bind(cmd)}">
-       ${cmd.provideMarkup(self, self)}
+       ${cmd.provideMarkup(this, this)}
      </div>`;
      itemContent.push(one);
    }
 
-   const userIcon = self.renderImageSpec("svg://azos.ico.user");
+   const userIcon = this.renderImageSpec("svg://azos.ico.user");
    let user = this.app.session?.user?.toInitObject();
    let initials, cls;
    if (user?.status !== "Invalid") {
