@@ -402,12 +402,12 @@ ${footer}
 
     if (this.menu === "show"){
       return html`
-      <a href="#" class="menu" id="btnMenuOpen" @click="${this.#menuOpen}">
+      <a href="#" class="menu" id="btnMenuOpen" @click="${(e) => { this.#menuOpen(); e.preventDefault(); }}">
         <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
       </a>
 
       <nav class="side-menu" id="navMenu">
-        <a href="#" class="close-button" id="btnMenuClose" @click="${this.#menuClose}" >&times;</a>
+        <a href="#" class="close-button" id="btnMenuClose" @click="${(e) => { this.#menuClose(); e.preventDefault(); }}" >&times;</a>
         <az-launcher id="launcherMain" scope="this">
         </az-launcher>
       </nav>
@@ -473,49 +473,46 @@ ${footer}
    this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
  }
 
- #menuClose(){
+  #menuClose(){
    this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
- }
+  }
 
- async #showUser() {
-   const user = this.app.session.user;
+  async #showUser() {
+    const user = this.app.session.user;
 
-   if (user.status === "Invalid")
-     window.location.assign("/app/login");
-   else
-     showObject(user, { title: "User Profile", okBtnTitle: "Close" }, this);
- }
+    if (user.status === "Invalid")
+      window.location.assign("/app/login");
+    else
+      showObject(user, { title: "User Profile", okBtnTitle: "Close" }, this);
+  }
 
- async #toolbarClick(){ await this.exec(this); }
+  async #toolbarClick(){ await this.exec(this); }
 
- #renderToolbar(commands){
-   const divToolbar = this.#getRefToolbar(this).value;
-   if (!divToolbar) return;
+  #renderToolbar(commands){
+    const divToolbar = this.#getRefToolbar(this).value;
+    if (!divToolbar) return;
 
-   const itemContent = [];
+    const itemContent = [];
 
-   let i=0;
-   for(let cmd of commands){
-     const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${this.#toolbarClick.bind(cmd)}">
-       ${cmd.provideMarkup(this, this)}
-     </div>`;
-     itemContent.push(one);
-   }
+    let i=0;
+    for(let cmd of commands){
+      const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${this.#toolbarClick.bind(cmd)}">
+        ${cmd.provideMarkup(this, this)}
+      </div>`;
+      itemContent.push(one);
+    }
 
-   const userIcon = this.renderImageSpec("svg://azos.ico.user");
-   let user = this.app.session?.user?.toInitObject();
-   let initials, cls;
-   if (user?.status !== "Invalid") {
-     initials = getUserInitials(user);
-     cls = "loggedIn";
-   }
+    const userIcon = this.renderImageSpec("svg://azos.ico.user");
+    let user = this.app.session?.user?.toInitObject();
+    let initials, cls;
+    if (user?.status !== "Invalid") {
+      initials = getUserInitials(user);
+      cls = "loggedIn";
+    }
 
-   const content = html`
- <div class="strip-btn ${cls}" id="divToolbar_User" @click="${this.#showUser}">${initials ?? userIcon.html}</div>
- ${itemContent}
-   `;
+    const content = html`<div class="strip-btn ${cls}" id="divToolbar_User" @click="${this.#showUser}">${initials ?? userIcon.html}</div> ${itemContent} `;
 
-   renderInto(content, divToolbar);
- }
+    renderInto(content, divToolbar);
+  }
 
 }//Arena
