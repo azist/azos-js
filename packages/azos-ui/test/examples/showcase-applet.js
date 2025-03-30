@@ -33,13 +33,14 @@ import "../showcase/case-sizing";
 import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
+import "../showcase/case-launcher"
 //#endregion IMPORTS
 
 export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
-    this.selectedCase = "Images";
+    this.selectedCase = "Launcher";
     this.x = 1;
   }
 
@@ -119,6 +120,7 @@ export class ShowcaseApplet extends Applet {
       <option value="TextFields">Text Fields</option>
       <option value="Toasts">Toasts</option>
       <option value="TreeView">Tree View</option>
+      <option value="Launcher">Launcher</option>
     </select>
 
    ${this.renderCase()}
@@ -173,6 +175,8 @@ export class ShowcaseApplet extends Applet {
         return html`<az-case-toasts></az-case-toasts>`;
       case "TreeView":
         return html`<az-case-tree-view></az-case-tree-view>`;
+      case "Launcher":
+          return html`<az-case-launcher></az-case-launcher>`;
       default:
         return noContent;
     }

@@ -9,9 +9,6 @@
 import { showObject } from "./object-inspector-modal.js";
 import { html, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
 
-// SVG Icons
-// https://www.svgrepo.com/collection/solar-outline-icons/
-
 
 function menuOpen(){
   this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
@@ -55,7 +52,7 @@ export function renderToolbar(app, self, commands){
     itemContent.push(one);
   }
 
-  const userIcon = self.renderImageSpec("svg://azos.ico.user", { scale: 1.35 });
+  const userIcon = self.renderImageSpec("svg://azos.ico.user");
   let user = app.session?.user?.toInitObject();
   // user = { asof: "2025-03-05T15:10:41.605Z", authToken: "xyz", "claims": { "a": "z", "email": "dkh@h.com", "exp": 1741274242, "iat": 1741187441, "name": "Dmitriy K", "sub": "dkh" }, "descr": "Dmitriy K", "name": "dkh", "rights": {}, "status": "Admin" };
   // user.desc = null;
@@ -105,14 +102,8 @@ export function renderHeader(app, self){
 
     <nav class="side-menu" id="navMenu">
       <a href="#" class="close-button" id="btnMenuClose" @click="${menuClose}" >&times;</a>
-      <ul>
-        <li><a href="/">New Visual Control Showcase</a></li>
-        <li><a href="/0.app">Old Visual Control Showcase</a></li>
-        <li><a href="/1.app">Old Visual Control Showcase Tabbed</a></li>
-        <li><a href="/2.app">Old Visual Control Showcase SlideDeck</a></li>
-        <li><a href="/4.app">Simple Control Showcase</a></li>
-        <li><a href="/5.app">Scheduling Control - WIP</a></li>
-      </ul>
+      <az-launcher id="launchArena" scope="this">
+      </az-launcher>
     </nav>
 
     <div class="title">${title}</div>

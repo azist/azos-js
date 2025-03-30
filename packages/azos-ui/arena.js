@@ -19,6 +19,8 @@ import { ModalDialog } from "./modal-dialog.js";
 import { isEmpty } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
+import "./launcher.js";
+
 
 
 /** Adds boilerplate like global error handling and page close event handling.
