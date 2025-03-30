@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isNonEmptyString, isOf, isString, isSubclassOf } from "../azos/aver";
-import { ConfigNode } from "../azos/conf";
+import { ConfigNode, makeNew } from "../azos/conf";
 import { Router, RouteHandler, ActionHandler, SectionHandler } from "../azos/router";
 import { DESTRUCTOR_METHOD, isSubclassOf as types_isSubclassOf } from "../azos/types";
 import { Arena } from "./arena";
@@ -13,6 +13,7 @@ import { Applet } from "./applet";
 import { showMsg } from "./msg-box";
 import { isNullOrWhiteSpace } from "azos/strings";
 import { LOG_TYPE } from "azos/log";
+import { MenuCommand } from "./cmd";
 
 /** Provides routing services in the context of a UI in a browser (such as Chrome or Firefox) user agent */
 export class BrowserRouter extends Router{
@@ -20,6 +21,7 @@ export class BrowserRouter extends Router{
   #integrated = true;
   #history = true;
   #appStart;
+  #mainMenu = null;
 
   #hasLoaded;
   #onHashChange;
@@ -32,6 +34,11 @@ export class BrowserRouter extends Router{
     this.#integrated = cfg.getBool("integrated", true);
     this.#history = cfg.getBool("history", true);
     this.#appStart = cfg.getString("start", null);
+
+    const menu = cfg.get("menu", null);
+    if (menu instanceof ConfigNode){
+      this.#mainMenu = makeNew(MenuCommand, menu, this, MenuCommand);
+    }
 
     if (this.#integrated){
 
@@ -82,6 +89,11 @@ export class BrowserRouter extends Router{
       queueMicrotask(async () => { try{await this.safeHandleUiActionAsync(window.ARENA, window.location.hash.substring(1));} finally { this.#hasLoaded = true;} });
     }
   }
+
+  /** Returns {@link MenuCommand} for main application menu or null if not set
+   * @returns {MenuCommand} menu command or null if not set
+  */
+  get mainMenu(){ return this.#mainMenu; }
 
   /** Returns true when this router was created in the integrated mode with the browser - it reacts to hash changes  */
   get integrated(){ return this.#integrated; }

@@ -6,21 +6,38 @@
 
 import * as aver from "azos/aver";
 import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose } from "azos/types";
-import { html, AzosElement, noContent, resolveImageSpec, renderImageSpec } from "./ui.js";
+import { html, AzosElement, noContent, resolveImageSpec, renderImageSpec, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
 
 import { Command } from "./cmd.js";
 import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
-import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
 import { isEmpty } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
 import "./launcher.js";
+import { BrowserRouter } from "./browser-router.js";
+import { showObject } from "./object-inspector-modal.js";
 
+//todo Move outside of here
+function getUserInitials(user) {
+  let parts;
+  for (let screenName of [user.descr, user.name]) {
+    if (!screenName) continue;
+    else if (screenName.includes(" ")) { parts = screenName.split(" "); break; }
+    else if (screenName.includes(".")) { parts = screenName.split("."); break; }
+    else if (screenName.includes("-")) { parts = screenName.split("-"); break; }
+    else if (screenName.includes("_")) { parts = screenName.split("_"); break; }
+  }
+  let initials;
+  if (parts?.length > 0) initials = parts.map(n => n[0]).join("");
+  else initials = user.name ?? "IN";
+
+  return initials.slice(0, 2).toUpperCase();
+}
 
 
 /** Adds boilerplate like global error handling and page close event handling.
@@ -231,7 +248,7 @@ export class Arena extends AzosElement {
     const app = this.#app;
     if (!app) return;
     if (!this.isKiosk){
-      DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+      this.#renderToolbar(this.#toolbar);
     }
     //TODO: in future we will add kiosk toolbar here
   }
@@ -282,44 +299,6 @@ export class Arena extends AzosElement {
     this.hideFooter(false);
     return true;
   }
-
-  /** Hides footer from arena markup. This may be needed for some applets which control their own full-screen scrolling such as large table-based grids.
-   * You need to call this method with (true) arg to hide the footer.
-   * Upon applet close arena automatically un-hides the footer.
-   */
-  hideFooter(h){
-    const ftr = this.$("arenaFooter");
-    if (!ftr) return;
-    ftr.style.display =  h ? "none" : "block";
-  }
-
-
-  render() {
-    const app = this.#app;
-    if (!app) return "";
-    //---------------------------
-    const kiosk = this.isKiosk;
-    const header = kiosk ? noContent : html`<header>${this.renderHeader(app)}</header>`;
-    const footer = kiosk ? noContent : html`<footer id="arenaFooter">${this.renderFooter(app)}</footer>`;
-
-    return html`
-${header}
-<main>
-${this.renderMain(app)}
-</main>
-${footer}
-`;
-  }//render
-
-  /** @param {Application} app  */
-  renderHeader(app){ return DEFAULT_HTML.renderHeader(app, this); }
-
-  /** @param {Application} app  */
-  renderMain(app){ return DEFAULT_HTML.renderMain(app, this, this.#appletTagName); }
-
-  /** @param {Application} app  */
-  renderFooter(app){ return DEFAULT_HTML.renderFooter(app, this); }
-
 
   /**
      * Writes to log if current component effective level permits, returning guid of newly written message
@@ -386,6 +365,154 @@ ${footer}
   renderImageSpec(spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
     const result = renderImageSpec(this.#defaultImageRegistry, spec, { cls, iso, ox, oy, scale, theme, wrapImage });
     return result;
+  }
+
+  /** Hides footer from arena markup. This may be needed for some applets which control their own full-screen scrolling such as large table-based grids.
+   * You need to call this method with (true) arg to hide the footer.
+   * Upon applet close arena automatically un-hides the footer.
+   */
+  hideFooter(h){
+    const ftr = this.$("arenaFooter");
+    if (!ftr) return;
+    ftr.style.display =  h ? "none" : "block";
+  }
+
+
+  render() {
+    const app = this.#app;
+    if (!app) return "";
+    //---------------------------
+    const kiosk = this.isKiosk;
+    const header = kiosk ? noContent : html`<header>${this.renderHeader(app)}</header>`;
+    const footer = kiosk ? noContent : html`<footer id="arenaFooter">${this.renderFooter(app)}</footer>`;
+
+    return html`
+${header}
+<main>
+${this.renderMain()}
+</main>
+${footer}
+`;
+  }//render
+
+  /** @param {Application} app  */
+  renderHeader(app){
+    const applet = this.applet;
+    const title = applet !== null ? html`${applet.title}` : html`${app.description} - ${this.name}`
+
+    if (this.menu === "show"){
+      return html`
+      <a href="#" class="menu" id="btnMenuOpen" @click="${(e) => { this.#menuOpen(); e.preventDefault(); }}">
+        <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
+      </a>
+
+      <nav class="side-menu" id="navMenu">
+        <a href="#" class="close-button" id="btnMenuClose" @click="${(e) => { this.#menuClose(); e.preventDefault(); }}" >&times;</a>
+        <az-launcher id="launcherMain" scope="this">
+        </az-launcher>
+      </nav>
+
+      <div class="title">${title}</div>
+      <div class="strip" ${domRef(this.#getRefToolbar())}> </div>
+    `;
+    } else {//noMenu
+      return html`
+        <div class="title" style="left: 0px;">${title}</div>
+        <div class="strip" ${domRef(this.#getRefToolbar())}> </div>`;
+    }
+  }
+
+
+  /** @param {Application} app  */
+  renderMain(app){
+    const tag =  this.#appletTagName;
+    const appletHtml = tag ? `<${tag} id="elmActiveApplet"></${tag}>` : `<slot name="applet-content"> </slot>`;
+    const clsMain = this.isKiosk ? "kiosk" : "";
+    return html`
+    <div class="applet-container ${clsMain}" role="main" >
+      ${verbatimHtml(appletHtml)}
+    </div>
+    `;
+  }
+
+
+  renderFooter(){
+    return html`
+    <nav class="bottom-menu" id="navBottomMenu">
+      <ul>
+      </ul>
+    </nav>
+
+    <div class="contact"></div>
+    <div class="copyright">Copyright &copy; 2022-2023 Azist</div>
+    `;
+  }
+
+  #refToolbar;
+
+  #getRefToolbar(){
+    let refToolbar = this.#refToolbar;
+    if (!refToolbar){
+      this.#refToolbar = refToolbar = domCreateRef();
+    }
+    return refToolbar;
+  }
+
+  #menuOpen(){
+    //todo: Add a function call on arena, if not defined ONLY THEN resolve the router module
+    const linker = this.app.moduleLinker;
+    if (linker && this.launcherMain) {
+      const router = linker.tryResolve(BrowserRouter);
+      if (router) {
+        this.launcherMain.menu = router.mainMenu;
+      } else {
+        this.launcherMain.menu = null;
+      }
+    }
+
+   this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
+ }
+
+  #menuClose(){
+   this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
+  }
+
+  async #showUser() {
+    const user = this.app.session.user;
+
+    if (user.status === "Invalid")
+      window.location.assign("/app/login");
+    else
+      showObject(user, { title: "User Profile", okBtnTitle: "Close" }, this);
+  }
+
+  async #toolbarClick(){ await this.exec(this); }
+
+  #renderToolbar(commands){
+    const divToolbar = this.#getRefToolbar(this).value;
+    if (!divToolbar) return;
+
+    const itemContent = [];
+
+    let i=0;
+    for(let cmd of commands){
+      const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${this.#toolbarClick.bind(cmd)}">
+        ${cmd.provideMarkup(this, this)}
+      </div>`;
+      itemContent.push(one);
+    }
+
+    const userIcon = this.renderImageSpec("svg://azos.ico.user");
+    let user = this.app.session?.user?.toInitObject();
+    let initials, cls;
+    if (user?.status !== "Invalid") {
+      initials = getUserInitials(user);
+      cls = "loggedIn";
+    }
+
+    const content = html`<div class="strip-btn ${cls}" id="divToolbar_User" @click="${this.#showUser}">${initials ?? userIcon.html}</div> ${itemContent} `;
+
+    renderInto(content, divToolbar);
   }
 
 }//Arena

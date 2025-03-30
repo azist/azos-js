@@ -34,8 +34,6 @@ export class CaseLauncher extends CaseBase {
     this.launchMain.reset();
   }
 
-
-
   renderControl() {
     return html`
 <h2>Launcher</h2>

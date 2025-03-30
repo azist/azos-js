@@ -73,6 +73,22 @@ const appRoutes = {
   error: {type: MsgBoxActionHandler, status: "error", title: "Routing error", message: "The requested routing operation failed", rank: 1}
 };
 
+const appMenu = {
+  title: "Root Menu",
+  icon: "svg://azos.ico.user",
+  hint: "This is just a root menu item",
+  menu: [
+    "Section A",
+    {title: "Showcase", route: "/examples/showcase"},
+    "Examples",
+    {title: "Feature A", route: "/examples/featurea"},
+    {title: "Feature B", route: "/examples/featureb"},
+    {title: "Item D"},
+    null,//divider
+    {title: "Item E"},
+  ]
+};
+
 const cfgApp = {
   id: "azosTest",
   name: "$(id)",
@@ -83,7 +99,7 @@ const cfgApp = {
     { name: "log", type: ConLog },
     { name: "logic", type: MyLogic },
     { name: "imgRegistry", type: ImageRegistry, images: [...STOCK_IMAGES, ...TEST_IMAGES] },
-    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home", history: false },
+    { name: "router", type: BrowserRouter, errorPath: "error", graph: {...appRoutes}, menu: {...appMenu}, start: "/examples/home", history: false },
     { name: "lclStorage", type: BrowserStorage, session: false},
     { name: "mruLogic", type: MruLogic}//most recently used
   ]
