@@ -66,6 +66,7 @@ export class Launcher extends Control {
   width: 100%;
   padding: 1em;
   box-sizing: border-box;
+  user-select: none;
 }
 
 .breadcrumb{
@@ -87,17 +88,30 @@ ul {
 
 li{
   padding: 0.1em;
+  font-size: 0.825em;
 }
 
-.menu-divider{
+.menu-command:hover{
+  text-shadow: 0px 0px 8px  #202020af;
 }
+
+.menu-divider hr {
+  height: 0px;
+  width: 95%;
+  border: 1px solid #e0e0e040;
+  font-size: 0.1em;
+  float: left;
+}
+
 .menu-command{}
 .menu-section{
-  background: #c9c9c9;
-  color: #f8f8f8;
-  border-bottom: 1px solid #bababa;
+  color: #ffffffa0;
+  border-bottom: 1px solid #f0f0f060;
   margin: 0.2em 0 0.35em 0em;
   padding: 0.25em;
+  font-size: 1em;
+  position: relative;
+  left: -1ch;
 }
 
    `];//styles
@@ -108,12 +122,10 @@ li{
 
     const head = this.renderHead();
     const menu = this.renderMenu();
-    const foot = this.renderFoot();
 
     return html`
      <section id="sectHead">${head}</section>
      <section id="sectMenu">${menu} </section>
-     <section id="sectFoot">${foot}</section>
     `;
   }
 
@@ -135,7 +147,7 @@ li{
      }
 
      if (one instanceof Command){
-       children.push(html`<li class="menu-command">${one.title}</li>`);
+       children.push(html`<li class="menu-command" @click="${() => { this.#onClickItem(one);} }">${one.title}</li>`);
        continue;
      }
 
@@ -145,12 +157,14 @@ li{
    return html`<ul> ${children} </ul>`;
   }
 
-  renderFoot(){
-    return html`
-    Read Application Description
-    (c) 2025 App Copyright
-    App Version Tag / App Environment
-    `;
+
+  async #onClickItem(item){
+    console.dir(item);
+    if (item instanceof MenuCommand){
+      this.navChild(item);
+    } else {
+      await item.exec(this);
+    }
   }
 
 }
