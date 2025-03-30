@@ -54,7 +54,7 @@ export class Launcher extends Control {
     }
     const idx = this.#ranks.indexOf(rank);
     aver.isTrue(idx >= 0, "Existing parent menu rank");
-    this.#ranks.splice(idx + 1);
+    this.#ranks.splice(idx);
     this.requestUpdate();
     return true;
   }
@@ -67,16 +67,6 @@ export class Launcher extends Control {
   padding: 1em;
   box-sizing: border-box;
   user-select: none;
-}
-
-.breadcrumb{
-  font-size: 0.85em;
-  opacity: 0.5;
-}
-
-.breadcrumb span{
-  font-size: 0.9em;
-  opacity: 1.0;
 }
 
 ul {
@@ -104,12 +94,23 @@ li{
 }
 
 .menu-command{}
+
+.menu-header{
+  color: #ffffffa0;
+  border-bottom: 1px solid #f0f0f060;
+  margin: 0.2em 0 0.35em 0em;
+  padding: 0.25em;
+  font-size: 0.85em;
+  position: relative;
+  left: -1ch;
+}
+
 .menu-section{
   color: #ffffffa0;
   border-bottom: 1px solid #f0f0f060;
   margin: 0.2em 0 0.35em 0em;
   padding: 0.25em;
-  font-size: 1em;
+  font-size: 0.75em;
   position: relative;
   left: -1ch;
 }
@@ -137,12 +138,26 @@ li{
     `;
   }
 
+  // renderHead(){
+  //  const menus = [this.#menu, ...this.#ranks];
+
+  //  const ranks = [];
+  //  let first = true;
+  //  for(const one of menus){
+  //    if (!first) ranks.push(html`&nbsp;/&nbsp;<span>${one.title}</span>`);
+  //    first = false;
+  //  }
+  //  return html`<div class="breadcrumb"> ${ranks} </div>`;
+  // }
+
   renderHead(){
-   const ranks = [];
-   for(const one of this.#ranks){
-     ranks.push(html`&nbsp;/&nbsp;<span>${one.title}</span>`);
-   }
-   return html`<div class="breadcrumb"> ${ranks} </div>`;
+    const menus = [this.#menu, ...this.#ranks].slice(1);//skip root
+    const children = [];
+    for(const one of menus){
+      const ico = one.icon ? this.renderImageSpec(one.icon).html : noContent;
+      children.push(html`<li class="menu-header" @click="${() => { this.#onClickHeader(one);} }">${ico} ${one.title}</li>`);
+    }
+    return html`<ul> ${children} </ul>`;
   }
 
   renderMenu(){
@@ -166,6 +181,13 @@ li{
    return html`<ul> ${children} </ul>`;
   }
 
+  async #onClickHeader(item){
+    console.dir(item);
+    if (item instanceof MenuCommand){
+      this.navBack(item);
+    }
+    //todo: Add custom event to close
+  }
 
   async #onClickItem(item){
     console.dir(item);

@@ -225,7 +225,10 @@ export class MenuCommand extends Command{
     for(let {val} of menu){
 
       //Factory method for command
-      if (val instanceof ConfigNode) val = makeNew(Command, val, this.ctx, Command);
+      if (val instanceof ConfigNode) {
+        const tdflt = val.get("menu") ? MenuCommand : Command;
+        val = makeNew(Command, val, this.ctx, tdflt);
+      }
 
       if (isString(val))
         this.#menu.push(val); // a string denotes a named menu section (a horizontal dash with a name)

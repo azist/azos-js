@@ -80,10 +80,11 @@ const appMenu = {
   menu: [
     "Section A",
     {title: "Showcase", icon: "svg://azos.ico.database", route: "/examples/showcase"},
+    {title: "Something Else", icon: "svg://azos.ico.category"},
     "Examples",
     {title: "Feature A", route: "/examples/featurea"},
     {title: "Feature B", route: "/examples/featureb"},
-    {title: "Subsection", menu: [
+    {title: "Subsection...", icon: "svg://azos.ico.category", menu: [
       {title: "A"},
       {title: "B"}
     ]},
