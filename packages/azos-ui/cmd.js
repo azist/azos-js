@@ -7,7 +7,9 @@
 import * as aver from "azos/aver";
 import { isString } from "azos/types";
 import { makeNew, config, ConfigNode, GET_CONFIG_VERBATIM_VALUE } from "azos/conf";
-import { html, verbatimHtml } from "./ui.js";
+import { AzosElement, html, verbatimHtml } from "./ui.js";
+import { Arena } from "./arena.js";
+import { BrowserRouter } from "./browser-router.js";
 
 /** Define a keyboard shortcut */
 export class KeyboardShortcut {
@@ -67,6 +69,7 @@ export class Command {
   #ctx;
   #kind;
   #uri;
+  #route;
   #title;
   #hint;
   #icon;
@@ -90,6 +93,7 @@ export class Command {
 
     this.#kind = cfg.getString("kind", null);
     this.#uri = cfg.getString("uri", null);
+    this.#route = cfg.getString("route", null);
     this.#title = cfg.getString("title", null);
     this.#hint = cfg.getString("hint", null);
     this.#icon = cfg.getString("icon", null);
@@ -115,6 +119,10 @@ export class Command {
   /** Globally (cross-applet) unique URI of the command. The convention is to use this pattern `Applet/Area/Ns/Cmd` */
   get uri(){ return this.#uri; }
   set uri(v){ this.#uri = aver.isNonEmptyString(v); }
+
+  /** Navigates this route upon command execution */
+  get route(){ return this.#route; }
+  set route(v){ this.#route = aver.isStringOrNull(v); }
 
   get kind(){ return this.#kind; }
   set kind(v){ this.#kind = aver.isStringOrNull(v); }
@@ -152,8 +160,22 @@ export class Command {
 
   /** Executes the command. Commands return a Promise which completes upon command execution */
   async exec(sender){
-    if (!this.#active) return;
-    if (this.#handler) await this.#handler.call(this, sender);
+    if (!this.#active) return undefined;
+    if (this.#handler) {
+      return await this.#handler.call(this, sender);
+    }
+
+    if (this.#route){
+      const arena = sender instanceof Arena ? sender : sender.arena;
+      if (arena){
+        const router = sender.app.moduleLinker.tryResolve(BrowserRouter);
+        if (router) {
+          return await router.safeHandleUiActionAsync(sender, this.#route);
+        }
+      }
+    }
+
+    return undefined;
   }
 
   /**
