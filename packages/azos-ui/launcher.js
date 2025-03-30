@@ -114,6 +114,14 @@ li{
   left: -1ch;
 }
 
+.icon svg{
+  height: 2.0em;
+  stroke: #ffffffd0;
+  vertical-align: middle;
+}
+.fas svg{ fill: #ffffffa0; }
+
+
    `];//styles
 
 
@@ -147,7 +155,8 @@ li{
      }
 
      if (one instanceof Command){
-       children.push(html`<li class="menu-command" @click="${() => { this.#onClickItem(one);} }">${one.title}</li>`);
+       const ico = one.icon ? this.renderImageSpec(one.icon).html : noContent;
+       children.push(html`<li class="menu-command" @click="${() => { this.#onClickItem(one);} }">${ico} ${one.title}</li>`);
        continue;
      }
 

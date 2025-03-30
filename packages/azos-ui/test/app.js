@@ -79,10 +79,14 @@ const appMenu = {
   hint: "This is just a root menu item",
   menu: [
     "Section A",
-    {title: "Showcase", route: "/examples/showcase"},
+    {title: "Showcase", icon: "svg://azos.ico.database", route: "/examples/showcase"},
     "Examples",
     {title: "Feature A", route: "/examples/featurea"},
     {title: "Feature B", route: "/examples/featureb"},
+    {title: "Subsection", menu: [
+      {title: "A"},
+      {title: "B"}
+    ]},
     {title: "Item D"},
     null,//divider
     {title: "Item E"},
