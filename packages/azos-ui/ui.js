@@ -16,7 +16,7 @@ import { AzosError,
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
-import { isOfOrNull, isStringOrNull } from "azos/aver";
+import { isFunctionOrNull, isOfOrNull, isStringOrNull } from "azos/aver";
 import { LOG_TYPE } from "azos/log";
 import { CONTENT_TYPE } from "azos/coreconsts";
 
@@ -263,7 +263,7 @@ export class AzosElement extends LitElement {
      * @param {int | null} src optional int src line num
      * @returns {guid | null} null if nothing was written or guid of the newly written message
      */
-  writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(this, type, text, ex, params, rel, src); }
+  writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(type, text, ex, params, rel, src); }
 
 
   /** Resolves image specifier into an image content.
@@ -381,24 +381,26 @@ export class Part extends Control{
    * @param {string} spec a required image specification
    * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
    * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
+   * @param {function | null} [log=console.log] optional logging function to use for error reporting. By default, it uses `console.error` but ideally, would be {@link Arena.writeLog}. If you want to suppress logs, pass a no-op function.
    * @returns {tuple | string} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`, returns plain strings without verbatim `@` specifier
    */
-export function  resolveImageSpec(reg, spec, iso = null, theme = null){
+export function resolveImageSpec(reg, spec, log = () => { }, iso = null, theme = null) {
   isOfOrNull(reg, ImageRegistry);
   isStringOrNull(spec);
+  isFunctionOrNull(log);
   if (!spec) return {sc: 500, ctp: "text/plain", content: ""};
 
   if (spec.startsWith("@")) return spec.slice(1);//get rid of prefix, return the rest as-is
 
   if (!reg) {
-    this.writeLog("resolveImageSpec", LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
-    return {sc: 404, ctp: "text/plain+error", content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {}};
+    log("resolveImageSpec", LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
+    return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {} };
   }
 
   const rec = reg.resolveSpec(spec, iso, theme);
   if (!rec) {
-    this.writeLog("resolveImageSpec", LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
-    return {sc: 404, ctp: "text/plain+error", content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {}};
+    log("resolveImageSpec", LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
+    return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {} };
   }
 
   return rec.produceContent();
@@ -417,11 +419,11 @@ export function  resolveImageSpec(reg, spec, iso = null, theme = null){
  *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
  * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
  */
-export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
+export function renderImageSpec(reg, spec, log, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
   cls ??= "icon";
   wrapImage ??= true;
 
-  const got = resolveImageSpec(reg, spec, iso, theme);
+  const got = resolveImageSpec(reg, spec, log, iso, theme);
 
   scale ??= got?.attrs?.scale;
   ox ??= got?.attrs?.ox;
@@ -445,13 +447,15 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
   else cls = noContent;
 
   let content;
-  if (typeof got === "string") {
+  if (typeof got === "string")
     content = `<img src="${got}" />`;
-  } else if (CONTENT_TYPE.isImageFamily(got.ctp)) {
+  else if (CONTENT_TYPE.isImageFamily(got.ctp))
+    content = `<img src="data:${got.ctp};${got.content}" />`;
+  else if (CONTENT_TYPE.isHtml(got.ctp))
     content = got.content;
-  } else {
-    content = "<<<<INVALID IMAGE CONTENT>>>>";
-  }
+  else
+    content = got.content ?? "NO CONTENT";
+
   if (wrapImage || !["svg", "img"].some(option => content.startsWith(`<${option}`))) // or if content is an svg
     content = html`<i class="${cls}" style="${stl}">${verbatimHtml(content)}</i>`;
   else
