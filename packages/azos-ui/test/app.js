@@ -10,7 +10,7 @@ import { ConLog } from "azos/ilog";
 import { Module } from "azos/modules";
 import { ChronicleClient } from "azos/sysvc/chron/chron-client";
 import { AdlibClient } from "azos/sysvc/adlib/adlib-client";
-import { ImageRegistry } from "azos/bcl/img-registry";
+import { ImageRegistry, STOCK_IMAGES } from "azos/bcl/img-registry";
 
 import { Arena, addAppBoilerplate } from "../arena";
 import { BrowserRouter, MsgBoxActionHandler } from "../browser-router"
@@ -26,6 +26,7 @@ import { ExampleFeatureBApplet } from "./examples/featureB-applet";
 import { ShowcaseApplet } from "./examples/showcase-applet";
 import { MruLogic } from "../mru";
 import { BrowserStorage } from "azos/storage";
+import { TEST_IMAGES } from "./test-images";
 
 
 class MyLogic extends Module {
@@ -72,6 +73,27 @@ const appRoutes = {
   error: {type: MsgBoxActionHandler, status: "error", title: "Routing error", message: "The requested routing operation failed", rank: 1}
 };
 
+const appMenu = {
+  title: "Root Menu",
+  icon: "svg://azos.ico.user",
+  hint: "This is just a root menu item",
+  menu: [
+    "Section A",
+    {title: "Showcase", icon: "svg://azos.ico.database", route: "/examples/showcase"},
+    {title: "Something Else", icon: "svg://azos.ico.category"},
+    "Examples",
+    {title: "Feature A", route: "/examples/featurea"},
+    {title: "Feature B", route: "/examples/featureb"},
+    {title: "Subsection...", icon: "svg://azos.ico.category", menu: [
+      {title: "A"},
+      {title: "B"}
+    ]},
+    {title: "Item D"},
+    null,//divider
+    {title: "Item E"},
+  ]
+};
+
 const cfgApp = {
   id: "azosTest",
   name: "$(id)",
@@ -81,8 +103,8 @@ const cfgApp = {
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
     { name: "log", type: ConLog },
     { name: "logic", type: MyLogic },
-    { name: "imgRegistry", type: ImageRegistry },
-    { name: "router", type: BrowserRouter, errorPath: "error",  graph: {...appRoutes}, start: "/examples/home", history: false },
+    { name: "imgRegistry", type: ImageRegistry, images: [...STOCK_IMAGES, ...TEST_IMAGES] },
+    { name: "router", type: BrowserRouter, errorPath: "error", graph: {...appRoutes}, menu: {...appMenu}, start: "/examples/home", history: false },
     { name: "lclStorage", type: BrowserStorage, session: false},
     { name: "mruLogic", type: MruLogic}//most recently used
   ]

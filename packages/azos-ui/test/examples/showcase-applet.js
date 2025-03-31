@@ -4,6 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+//#region IMPORTS
 import { Applet } from "../../applet";
 import { Command } from "../../cmd";
 import { css, html, noContent } from "../../ui";
@@ -11,12 +12,13 @@ import { prompt } from "../../ok-cancel-modal";
 
 import "../../parts/button";
 import "./xyz-dialog";
-
 import "../showcase/case-accordion";
 import "../showcase/case-buttons";
+import "../showcase/case-buttons-with-icons";
 import "../showcase/case-checkboxes";
 import "../showcase/case-code-box";
 import "../showcase/case-date-range";
+import "../showcase/case-images";
 import "../showcase/case-input-tests";
 import "../showcase/case-lookup";
 import "../showcase/case-modals";
@@ -31,12 +33,14 @@ import "../showcase/case-sizing";
 import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
+import "../showcase/case-launcher"
+//#endregion IMPORTS
 
 export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
-    this.selectedCase = "TabView";
+    this.selectedCase = "Launcher";
     this.x = 1;
   }
 
@@ -61,9 +65,7 @@ export class ShowcaseApplet extends Applet {
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-#caseSelect option{
-  padding: 0.3em 0.35em;
-}
+#caseSelect option{ padding: 0.3em 0.35em; }
   `];
 
   #cmdHelp = new Command(this, {
@@ -99,9 +101,11 @@ export class ShowcaseApplet extends Applet {
       <option value="">Select a showcase item...</option>
       <option value="Accordion">Accordion</option>
       <option value="Buttons">Buttons</option>
+      <option value="ButtonsWithIcons">Buttons With Icons</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
       <option value="DateRange">Date Range</option>
+      <option value="Images">Images</option>
       <option value="InputTests">Input Tests</option>
       <option value="Lookup">Lookup</option>
       <option value="Modals">Modals</option>
@@ -116,6 +120,7 @@ export class ShowcaseApplet extends Applet {
       <option value="TextFields">Text Fields</option>
       <option value="Toasts">Toasts</option>
       <option value="TreeView">Tree View</option>
+      <option value="Launcher">Launcher</option>
     </select>
 
    ${this.renderCase()}
@@ -132,12 +137,16 @@ export class ShowcaseApplet extends Applet {
         return html`<az-case-accordion></az-case-accordion>`;
       case "Buttons":
         return html`<az-case-buttons></az-case-buttons>`;
+      case "ButtonsWithIcons":
+        return html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`;
       case "Checkboxes":
         return html`<az-case-checkboxes></az-case-checkboxes>`;
       case "CodeBox":
         return html`<az-case-code-box></az-case-code-box>`;
       case "DateRange":
         return html`<az-case-date-range></az-case-date-range>`;
+      case "Images":
+        return html`<az-case-images></az-case-images>`;
       case "InputTests":
         return html`<az-case-input-tests></az-case-input-tests>`;
       case "Lookup":
@@ -166,6 +175,8 @@ export class ShowcaseApplet extends Applet {
         return html`<az-case-toasts></az-case-toasts>`;
       case "TreeView":
         return html`<az-case-tree-view></az-case-tree-view>`;
+      case "Launcher":
+          return html`<az-case-launcher></az-case-launcher>`;
       default:
         return noContent;
     }

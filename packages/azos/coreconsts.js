@@ -10,6 +10,12 @@ export const UNDEFINED = "<undefined>";
 export const UNKNOWN   = "<unknown>";
 export const EMPTY     = "<empty>";
 
+function anyOf(s, vs){
+  if (!s.toLowerCase) return false;
+  s = s.toLowerCase();
+  return vs.some(one => s.indexOf(one) > -1);
+}
+
 export const METHODS = Object.freeze({
   GET: "GET",
   HEAD: "HEAD",
@@ -36,8 +42,23 @@ export const CONTENT_TYPE = Object.freeze({
   IMG_JPEG: "image/jpeg",
   IMG_PNG: "image/png",
   IMG_SVG: "image/svg+xml",
-  BINARY: "application/octet-stream"
+  BINARY: "application/octet-stream",
+
+  isHtml: (v) => anyOf(v, ["/html"]),
+  isJson: (v) => anyOf(v, ["/json"]),
+  isTextFamily: (v) => anyOf(v, ["text/"]),
+  isImageFamily: (v) => anyOf(v, ["image/"]),
+  isImageJpeg: (v) => anyOf(v, ["/jpeg", "/jfif", "/jpg"]),
+  isImagePng:  (v) => anyOf(v, ["/png"]),
+  isImageSvg:  (v) => anyOf(v, ["/svg"]),
+  isImageWebP: (v) => anyOf(v, ["/webp"]),
+  isImageGif:  (v) => anyOf(v, ["/gif"]),
+  isBinary: (v) => anyOf(v, ["/octet"]),
 });
+
+//https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+/** Name of abort exception when for example AbortController.abort() is used. See MDN */
+export const ABORT_ERROR_NAME = "AbortError";
 
 /** Creates an `Error` exception ready to be thrown indicating that operation is abstract and is not implemented */
 export function ABSTRACT(nm){ return new Error(`Method '${nm ?? UNDEFINED}' is abstract`); }

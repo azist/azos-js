@@ -21,6 +21,10 @@ header{
   background-color: var(--arn-hdr-bg-color);
   box-shadow: var(--arn-hdr-shadow);
 }
+      header az-launcher{
+        margin-top: 0.25em;
+      }
+
       header .side-menu{
         display: block;
         position: fixed;

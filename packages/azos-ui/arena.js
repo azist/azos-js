@@ -5,20 +5,39 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose, isNonEmptyString, isString } from "azos/types";
-import { html, AzosElement, noContent, verbatimHtml } from "./ui.js";
+import { isSubclassOf, AzosError, arrayDelete, isFunction, isObject, isAssigned, DIRTY_PROP, CLOSE_QUERY_METHOD, dispose } from "azos/types";
+import { html, AzosElement, noContent, resolveImageSpec, renderImageSpec, verbatimHtml, domRef, domCreateRef, renderInto } from "./ui.js";
 import { Application } from "azos/application";
 import * as logging from "azos/log";
 
 import { Command } from "./cmd.js";
 import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
-import * as DEFAULT_HTML from "./arena.htm.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
 import { isEmpty } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
+import "./launcher.js";
+import { BrowserRouter } from "./browser-router.js";
+import { showObject } from "./object-inspector-modal.js";
+
+//todo Move outside of here
+function getUserInitials(user) {
+  let parts;
+  for (let screenName of [user.descr, user.name]) {
+    if (!screenName) continue;
+    else if (screenName.includes(" ")) { parts = screenName.split(" "); break; }
+    else if (screenName.includes(".")) { parts = screenName.split("."); break; }
+    else if (screenName.includes("-")) { parts = screenName.split("-"); break; }
+    else if (screenName.includes("_")) { parts = screenName.split("_"); break; }
+  }
+  let initials;
+  if (parts?.length > 0) initials = parts.map(n => n[0]).join("");
+  else initials = user.name ?? "IN";
+
+  return initials.slice(0, 2).toUpperCase();
+}
 
 
 /** Adds boilerplate like global error handling and page close event handling.
@@ -121,6 +140,7 @@ export class Arena extends AzosElement {
   #applet = null;
   #appletTagName = null;
   #toolbar = [];
+  #defaultImageRegistry;//optimization only DO NOT EXPOSE this property publicly
 
   #kiosk;
   get kiosk(){ return this.#kiosk; }
@@ -145,6 +165,7 @@ export class Arena extends AzosElement {
   /** System internal, don't use */
   ____bindApplicationAtLaunch(app){
     this.#app = app;
+    this.#defaultImageRegistry = app.moduleLinker.tryResolve(ImageRegistry);//cache the DEFAULT image registry
     this.requestUpdate();
   }
 
@@ -227,7 +248,7 @@ export class Arena extends AzosElement {
     const app = this.#app;
     if (!app) return;
     if (!this.isKiosk){
-      DEFAULT_HTML.renderToolbar(app, this, this.#toolbar);
+      this.#renderToolbar(this.#toolbar);
     }
     //TODO: in future we will add kiosk toolbar here
   }
@@ -279,44 +300,6 @@ export class Arena extends AzosElement {
     return true;
   }
 
-  /** Hides footer from arena markup. This may be needed for some applets which control their own full-screen scrolling such as large table-based grids.
-   * You need to call this method with (true) arg to hide the footer.
-   * Upon applet close arena automatically un-hides the footer.
-   */
-  hideFooter(h){
-    const ftr = this.$("arenaFooter");
-    if (!ftr) return;
-    ftr.style.display =  h ? "none" : "block";
-  }
-
-
-  render() {
-    const app = this.#app;
-    if (!app) return "";
-    //---------------------------
-    const kiosk = this.isKiosk;
-    const header = kiosk ? noContent : html`<header>${this.renderHeader(app)}</header>`;
-    const footer = kiosk ? noContent : html`<footer id="arenaFooter">${this.renderFooter(app)}</footer>`;
-
-    return html`
-${header}
-<main>
-${this.renderMain(app)}
-</main>
-${footer}
-`;
-  }//render
-
-  /** @param {Application} app  */
-  renderHeader(app){ return DEFAULT_HTML.renderHeader(app, this); }
-
-  /** @param {Application} app  */
-  renderMain(app){ return DEFAULT_HTML.renderMain(app, this, this.#appletTagName); }
-
-  /** @param {Application} app  */
-  renderFooter(app){ return DEFAULT_HTML.renderFooter(app, this); }
-
-
   /**
      * Writes to log if current component effective level permits, returning guid of newly written message
      * @param {string|function|object} from - specifies the name of the component which produces the log message
@@ -350,48 +333,186 @@ ${footer}
     return guid;
   }
 
-  /** Resolves image specifier into an image content.
+  /** Resolves image specifier into an image content using a default image registry.
+   * If you need to use another registry than the default one, you can call {@link resolveImageSpec} function directly.
    * Image specifiers starting with `@` get returned as-is without the first `@` prefix, this way you cam embed verbatim image content in identifiers.
    *  For example: `arena.resolveImageSpec("jpg://welcome-banner-hello1?iso=deu&theme=bananas&media=print")`. See {@link ImageRegistry.resolveSpec}
    * Requires {@link ImageRegistry} module installed in app chassis, otherwise returns a text block for invalid image.
+   * @param {string} spec a required image specification
    * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
    * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
-   * @returns {tuple} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`
+   * @returns {tuple | string} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`, returns plain strings without verbatim `@` specifier
    */
   resolveImageSpec(spec, iso = null, theme = null){
-    if (!spec || !this.#app) return {sc: 500, ctp: "text/plain", content: ""};
-
-    if (spec.startsWith("@")) return spec.slice(1);//get rid of prefix, return the rest as-is
-
-    const reg = this.#app.moduleLinker.tryResolve(ImageRegistry);
-    if (!reg){
-      this.writeLog("resolveImageSpec", logging.LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
-      return {sc: 404, ctp: "text/plain+error", content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {}};
-    }
-
-    const rec = reg.resolveSpec(spec, iso, theme);
-    if (!rec){
-      this.writeLog("resolveImageSpec", logging.LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
-      return {sc: 404, ctp: "text/plain+error", content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {}};
-    }
-
-    return rec.produceContent();
+    const result = resolveImageSpec(this.#defaultImageRegistry, spec, iso, theme);
+    return result;
   }
 
+
   /** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
-   * returning it as a tuple along with optional image attributes. If passed a class/classes, will wrap in a div with "icon" + classes
+   * returning it as a tuple along with optional image attributes. Other params include:
+   * @param spec {string} - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print`
+   * @param  options {object} - optional object with the following properties:
+   *  - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
+   *  - iso {string} - optional system-wide ISO code to use when resolving the image spec, default is null
+   *  - ox {string | number} - optional X offset to apply to the image, default is unset
+   *  - oy {string | number} - optional Y offset to apply to the image, default is unset
+   *  - scale {number} - optional scale factor to apply to the image, default is unset
+   *  - theme {string} - optional system-wide theme to use when resolving the image spec, default is null
+   *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
    * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
    */
-  renderImageSpec(spec, cls = null, iso = null, theme = null) {
-    const got = this.resolveImageSpec(spec, iso, theme);
-    const content = got.content;
-    isNonEmptyString(content, `renderImageSpec('${spec}')`);
-    const _html = verbatimHtml(content);
-    if (!cls) return { html: _html, attrs: got.attrs };
+  renderImageSpec(spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
+    const result = renderImageSpec(this.#defaultImageRegistry, spec, { cls, iso, ox, oy, scale, theme, wrapImage });
+    return result;
+  }
 
-    if (isString(cls)) cls = [...cls.split(" ")];
-    cls = [got.attrs?.fas ? "fas" : "", ...cls].filter(isNonEmptyString).join(" ");
-    return { html: html`<i class="icon ${cls}">${_html}</i>`, attrs: got.attrs };
+  /** Hides footer from arena markup. This may be needed for some applets which control their own full-screen scrolling such as large table-based grids.
+   * You need to call this method with (true) arg to hide the footer.
+   * Upon applet close arena automatically un-hides the footer.
+   */
+  hideFooter(h){
+    const ftr = this.$("arenaFooter");
+    if (!ftr) return;
+    ftr.style.display =  h ? "none" : "block";
+  }
+
+
+  render() {
+    const app = this.#app;
+    if (!app) return "";
+    //---------------------------
+    const kiosk = this.isKiosk;
+    const header = kiosk ? noContent : html`<header>${this.renderHeader(app)}</header>`;
+    const footer = kiosk ? noContent : html`<footer id="arenaFooter">${this.renderFooter(app)}</footer>`;
+
+    return html`
+${header}
+<main>
+${this.renderMain()}
+</main>
+${footer}
+`;
+  }//render
+
+  /** @param {Application} app  */
+  renderHeader(app){
+    const applet = this.applet;
+    const title = applet !== null ? html`${applet.title}` : html`${app.description} - ${this.name}`
+
+    if (this.menu === "show"){
+      return html`
+      <a href="#" class="menu" id="btnMenuOpen" @click="${(e) => { this.#menuOpen(); e.preventDefault(); }}">
+        <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
+      </a>
+
+      <nav class="side-menu" id="navMenu">
+        <a href="#" class="close-button" id="btnMenuClose" @click="${(e) => { this.#menuClose(); e.preventDefault(); }}" >&times;</a>
+        <az-launcher id="launcherMain" scope="this">
+        </az-launcher>
+      </nav>
+
+      <div class="title">${title}</div>
+      <div class="strip" ${domRef(this.#getRefToolbar())}> </div>
+    `;
+    } else {//noMenu
+      return html`
+        <div class="title" style="left: 0px;">${title}</div>
+        <div class="strip" ${domRef(this.#getRefToolbar())}> </div>`;
+    }
+  }
+
+
+  /** @param {Application} app  */
+  renderMain(app){
+    const tag =  this.#appletTagName;
+    const appletHtml = tag ? `<${tag} id="elmActiveApplet"></${tag}>` : `<slot name="applet-content"> </slot>`;
+    const clsMain = this.isKiosk ? "kiosk" : "";
+    return html`
+    <div class="applet-container ${clsMain}" role="main" >
+      ${verbatimHtml(appletHtml)}
+    </div>
+    `;
+  }
+
+
+  renderFooter(){
+    return html`
+    <nav class="bottom-menu" id="navBottomMenu">
+      <ul>
+      </ul>
+    </nav>
+
+    <div class="contact"></div>
+    <div class="copyright">Copyright &copy; 2022-2023 Azist</div>
+    `;
+  }
+
+  #refToolbar;
+
+  #getRefToolbar(){
+    let refToolbar = this.#refToolbar;
+    if (!refToolbar){
+      this.#refToolbar = refToolbar = domCreateRef();
+    }
+    return refToolbar;
+  }
+
+  #menuOpen(){
+    //todo: Add a function call on arena, if not defined ONLY THEN resolve the router module
+    const linker = this.app.moduleLinker;
+    if (linker && this.launcherMain) {
+      const router = linker.tryResolve(BrowserRouter);
+      if (router) {
+        this.launcherMain.menu = router.mainMenu;
+      } else {
+        this.launcherMain.menu = null;
+      }
+    }
+
+   this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
+ }
+
+  #menuClose(){
+   this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
+  }
+
+  async #showUser() {
+    const user = this.app.session.user;
+
+    if (user.status === "Invalid")
+      window.location.assign("/app/login");
+    else
+      showObject(user, { title: "User Profile", okBtnTitle: "Close" }, this);
+  }
+
+  async #toolbarClick(){ await this.exec(this); }
+
+  #renderToolbar(commands){
+    const divToolbar = this.#getRefToolbar(this).value;
+    if (!divToolbar) return;
+
+    const itemContent = [];
+
+    let i=0;
+    for(let cmd of commands){
+      const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${this.#toolbarClick.bind(cmd)}">
+        ${cmd.provideMarkup(this, this)}
+      </div>`;
+      itemContent.push(one);
+    }
+
+    const userIcon = this.renderImageSpec("svg://azos.ico.user");
+    let user = this.app.session?.user?.toInitObject();
+    let initials, cls;
+    if (user?.status !== "Invalid") {
+      initials = getUserInitials(user);
+      cls = "loggedIn";
+    }
+
+    const content = html`<div class="strip-btn ${cls}" id="divToolbar_User" @click="${this.#showUser}">${initials ?? userIcon.html}</div> ${itemContent} `;
+
+    renderInto(content, divToolbar);
   }
 
 }//Arena

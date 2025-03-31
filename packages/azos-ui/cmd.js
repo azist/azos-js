@@ -7,7 +7,9 @@
 import * as aver from "azos/aver";
 import { isString } from "azos/types";
 import { makeNew, config, ConfigNode, GET_CONFIG_VERBATIM_VALUE } from "azos/conf";
-import { html, verbatimHtml } from "./ui.js";
+import { AzosElement, html, verbatimHtml } from "./ui.js";
+import { Arena } from "./arena.js";
+import { BrowserRouter } from "./browser-router.js";
 
 /** Define a keyboard shortcut */
 export class KeyboardShortcut {
@@ -27,8 +29,8 @@ export class KeyboardShortcut {
     this.#title = cfg.getString("title", "");
   }
 
-   //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
-   [GET_CONFIG_VERBATIM_VALUE](){ return this; }
+  //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
+  [GET_CONFIG_VERBATIM_VALUE](){ return this; }
 
   get ctl()  { return this.#ctl; }
   get alt()  { return this.#alt; }
@@ -67,6 +69,7 @@ export class Command {
   #ctx;
   #kind;
   #uri;
+  #route;
   #title;
   #hint;
   #icon;
@@ -87,13 +90,10 @@ export class Command {
     if (!(cfg instanceof ConfigNode)){
       cfg = config(cfg).root;
     }
-    this._ctor(cfg);
-  }
 
-  /** Protected constructor method not to be called by public callers */
-  _ctor(cfg){
     this.#kind = cfg.getString("kind", null);
     this.#uri = cfg.getString("uri", null);
+    this.#route = cfg.getString("route", null);
     this.#title = cfg.getString("title", null);
     this.#hint = cfg.getString("hint", null);
     this.#icon = cfg.getString("icon", null);
@@ -109,7 +109,7 @@ export class Command {
 
     this.#value = cfg.get("value") ?? null;
     this.#handler = aver.isFunctionOrNull(cfg.get("handler"));
-  }
+  }//.ctor
 
   //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
   [GET_CONFIG_VERBATIM_VALUE](){ return this; }
@@ -119,6 +119,10 @@ export class Command {
   /** Globally (cross-applet) unique URI of the command. The convention is to use this pattern `Applet/Area/Ns/Cmd` */
   get uri(){ return this.#uri; }
   set uri(v){ this.#uri = aver.isNonEmptyString(v); }
+
+  /** Navigates this route upon command execution */
+  get route(){ return this.#route; }
+  set route(v){ this.#route = aver.isStringOrNull(v); }
 
   get kind(){ return this.#kind; }
   set kind(v){ this.#kind = aver.isStringOrNull(v); }
@@ -156,8 +160,22 @@ export class Command {
 
   /** Executes the command. Commands return a Promise which completes upon command execution */
   async exec(sender){
-    if (!this.#active) return;
-    if (this.#handler) await this.#handler.call(this, sender);
+    if (!this.#active) return undefined;
+    if (this.#handler) {
+      return await this.#handler.call(this, sender);
+    }
+
+    if (this.#route){
+      const arena = sender instanceof Arena ? sender : sender.arena;
+      if (arena){
+        const router = arena.app.moduleLinker.tryResolve(BrowserRouter);
+        if (router) {
+          return await router.safeHandleUiActionAsync(arena, this.#route);
+        }
+      }
+    }
+
+    return undefined;
   }
 
   /**
@@ -174,7 +192,7 @@ export class Command {
       return html`<div class="command-button">${this.title}</div>`;
     }
 
-    ico = arena.renderImageSpec(ico, "command-icon");
+    ico = arena.renderImageSpec(ico, { cls: "command-icon icon" });
     if (ico.html) return ico.html;
     else return html`<div class="command-icon">${verbatimHtml(ico)}</div>`;
   }
@@ -188,15 +206,16 @@ export class Command {
  *
 */
 export class MenuCommand extends Command{
-  #menu;
+  #menu = [];
 
   constructor(ctx, cfg){
-    super(ctx, cfg);
-  }
+    aver.isNotNull(cfg);
 
-  _ctor(cfg){
-    this.#menu = [];
-    super._ctor(cfg);
+    if (!(cfg instanceof ConfigNode)){
+      cfg = config(cfg).root;
+    }
+
+    super(ctx, cfg);
 
     let menu = cfg.get("menu");
 
@@ -206,14 +225,18 @@ export class MenuCommand extends Command{
     for(let {val} of menu){
 
       //Factory method for command
-      if (val instanceof ConfigNode) val = makeNew(Command, val, this.ctx, Command);
+      if (val instanceof ConfigNode) {
+        const tdflt = val.get("menu") ? MenuCommand : Command;
+        val = makeNew(Command, val, this.ctx, tdflt);
+      }
 
       if (isString(val))
         this.#menu.push(val); // a string denotes a named menu section (a horizontal dash with a name)
       else
         this.#menu.push(aver.isOfOrNull(val, Command));//null denotes a menu break (a horizontal dash)
     }
-  }
+  }//.ctor
 
+  /** Returns an array of menu items: each item is either a Command, a String section name or a null which represents a divider. */
   get menu(){ return [...this.#menu]; }
 }
