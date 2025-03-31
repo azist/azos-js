@@ -32,6 +32,9 @@ export class CaseImages extends CaseBase {
 <div class="case-images">
   ${this.renderImageSpec("jpg://azos.ico.testJpg", { cls: "the-admiral jpg", wrapImage: false }).html}
   ${this.renderImageSpec("@https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Surgeon_Vice-Admiral_Alasdair_Walker.jpg/800px-Surgeon_Vice-Admiral_Alasdair_Walker.jpg", {cls: "the-admiral jpg", wrapImage: false}).html}
+  ${this.renderImageSpec("png://azos.ico.testPng", { cls: "the-admiral png", wrapImage: false }).html}
+  ${this.renderImageSpec("@https://upload.wikimedia.org/wikipedia/commons/2/21/Nhonlam.png", { cls: "the-admiral png", wrapImage: false }).html}
+
 </div>
     `;
   }
