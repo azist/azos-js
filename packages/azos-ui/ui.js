@@ -420,10 +420,15 @@ export function  resolveImageSpec(reg, spec, iso = null, theme = null){
 export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
   cls ??= "icon";
   wrapImage ??= true;
-  if (types_isNumber(ox)) ox = `${ox}px`;
-  if (types_isNumber(oy)) oy = `${oy}px`;
 
   const got = resolveImageSpec(reg, spec, iso, theme);
+
+  scale ??= got?.attrs?.scale;
+  ox ??= got?.attrs?.ox;
+  oy ??= got?.attrs?.oy;
+
+  if (types_isNumber(ox)) ox = `${ox}px`;
+  if (types_isNumber(oy)) oy = `${oy}px`;
 
   let transforms = [];
   let stl = noContent;
