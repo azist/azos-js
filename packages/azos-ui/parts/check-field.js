@@ -44,11 +44,24 @@ export class CheckField extends FieldPart{
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
     const checkboxStyles = this.isCheck ? "check" : "switch";
-    
+
+    /**
+     * only define checkTypeStyle if this is a checkbox
+     * we do not want to add checkTypeStyle to the switch
+     */
+    let checkTypeStyle = '';
+    if(this.isCheck) {
+      if(this.checkType === 'cross') {
+        checkTypeStyle = 'cross';
+      } else {
+        checkTypeStyle = this.checkType;
+      } 
+    }
+
     return html`
       <input
         type="checkbox"
-        class="${this.checkType} ${checkboxStyles} ${clsRank} ${clsStatusBg}"
+        class="${checkTypeStyle} ${checkboxStyles} ${clsRank} ${clsStatusBg}"
         id="${this.id}"
         name="${this.id}"
         .disabled=${this.isDisabled}
