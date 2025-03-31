@@ -97,7 +97,7 @@ li{
 
 .menu-header{
   color: #ffffffa0;
-  border-bottom: 1px solid #f0f0f060;
+  border-bottom: 1px solid #f0f0f0d0;
   margin: 0.2em 0 0.35em 0em;
   padding: 0.25em;
   font-size: 0.85em;
@@ -107,12 +107,10 @@ li{
 
 .menu-section{
   color: #ffffffa0;
-  border-bottom: 1px solid #f0f0f060;
+  border-bottom: 1px solid #f0f0f050;
   margin: 0.2em 0 0.35em 0em;
   padding: 0.25em;
   font-size: 0.75em;
-  position: relative;
-  left: -1ch;
 }
 
 .icon svg{
