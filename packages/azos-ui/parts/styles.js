@@ -187,6 +187,56 @@ export const checkStyles = css`
     font-weight: 100;
     filter: var(--ctl-disabled-filter);
   }
+
+  .checkmark {
+    &::before {
+      content: "";
+      position: absolute;
+      width: .2em;
+      height: .4em;
+      bottom: .055em;
+      border-right: 2px solid var(--s-default-fg-ctl);
+      border-bottom: 2px solid var(--s-default-fg-ctl);
+      opacity: 0;
+      transform: scale(0) rotate(45deg);
+      text-align:center;
+      position:relative;
+      transform-origin:center center;
+      transition:.1s transform ease-in-out;
+      font-size:1.85em;
+    }
+  }
+  .cross {
+    &::after {
+      content: "";
+      position: absolute;
+      width: .2em;
+      height: .4em;
+      bottom: .055em;
+      border-right: 2px solid var(--s-default-fg-ctl);
+      border-bottom: 2px solid var(--s-default-fg-ctl);
+      opacity: 0;
+      transform: scale(0) rotate(-45deg);
+      text-align:center;
+      position:relative;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      width: .2em;
+      height: .4em;
+      bottom: .055em;
+      border-right: 2px solid var(--s-default-fg-ctl);
+      border-bottom: 2px solid var(--s-default-fg-ctl);
+      opacity: 0;
+      transform: scale(0) rotate(45deg);
+      text-align:center;
+      position:relative;
+      transform-origin:center center;
+      transition:.1s transform ease-in-out;
+      font-size:1.85em;
+    }
+  }
   .okBg { background-color: var(--s-ok-bg-ctl);        border: var(--s-ok-bor-ctl);}
   .infoBg { background-color: var(--s-info-bg-ctl);    border: var(--s-info-bor-ctl);}
   .warningBg { background-color: var(--s-warn-bg-ctl); border: var(--s-warn-bor-ctl);}

@@ -12,7 +12,8 @@ import { asTriBool } from 'azos/types';
 
 export class CheckField extends FieldPart{
   static properties = {
-    itemType: {type: String}
+    itemType: {type: String},
+    checkType: {type: String},
   };
 
   static styles = [baseStyles, checkStyles, switchStyles];
@@ -42,11 +43,12 @@ export class CheckField extends FieldPart{
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
     const checkboxStyles = this.isCheck ? "check" : "switch";
+    const checkmarkStyle = this.checkType ? "checkmark" : "cross";
 
     return html`
       <input
         type="checkbox"
-        class="${checkboxStyles} ${clsRank} ${clsStatusBg}"
+        class="${checkmarkStyle} ${checkboxStyles} ${clsRank} ${clsStatusBg}"
         id="${this.id}"
         name="${this.id}"
         .disabled=${this.isDisabled}
