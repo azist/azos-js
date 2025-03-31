@@ -164,24 +164,8 @@ export const checkStyles = css`
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
-  .check::before{
-    content: "";
-    position: absolute;
-    width: .2em;
-    height: .4em;
-    bottom: .055em;
-    border-right: 2px solid var(--s-default-fg-ctl);
-    border-bottom: 2px solid var(--s-default-fg-ctl);
-    opacity: 0;
-    transform: scale(0) rotate(45deg);
-    text-align:center;
-    position:relative;
-    transform-origin:center center;
-    transition:.1s transform ease-in-out;
-    font-size:1.85em;
-  }
   .check:disabled::before{ opacity: 0.5;}
-  .check:checked::before{ transform:scale(1) rotate(45deg); opacity: 1 }
+
   .check:disabled{  }
   .disabled{
     color: #b4b4b4;
@@ -190,52 +174,53 @@ export const checkStyles = css`
   }
 
   .checkmark {
-    &::before {
+    &:before {
       content: "";
       position: absolute;
       width: .2em;
       height: .4em;
       bottom: .055em;
-      border-right: 2px solid var(--s-default-fg-ctl);
-      border-bottom: 2px solid var(--s-default-fg-ctl);
+      border-right: .07em solid var(--s-default-fg-ctl);
+      border-bottom: .07em solid var(--s-default-fg-ctl);
       opacity: 0;
-      transform: scale(0) rotate(45deg);
+      scale: 0;
+      rotate: 45deg;
       text-align:center;
       position:relative;
       transform-origin:center center;
-      transition:.1s transform ease-in-out;
+      transition:.1s scale ease-in-out;
       font-size:1.85em;
+    }
+    &:checked:before {
+      scale: 1;
+      opacity: 1;
     }
   }
   .cross {
-    &::after {
+    position: relative;
+    &:before,&:after {
+      opacity: 0;
       content: "";
       position: absolute;
-      width: .2em;
-      height: .4em;
-      bottom: .055em;
-      border-right: 2px solid var(--s-default-fg-ctl);
-      border-bottom: 2px solid var(--s-default-fg-ctl);
-      opacity: 0;
-      transform: scale(0) rotate(-45deg);
-      text-align:center;
-      position:relative;
+      top: 50%;
+      left: 50%;
+      width: 1em;
+      height: 0.1em;
+      background-color: var(--s-default-fg-ctl);
+      transition:.1s scale ease-in-out;
+      translate: -50% -50%;
+      scale: 0;
     }
-    &::before {
-      content: "";
-      position: absolute;
-      width: .2em;
-      height: .4em;
-      bottom: .055em;
-      border-right: 2px solid var(--s-default-fg-ctl);
-      border-bottom: 2px solid var(--s-default-fg-ctl);
-      opacity: 0;
-      transform: scale(0) rotate(45deg);
-      text-align:center;
-      position:relative;
-      transform-origin:center center;
-      transition:.1s transform ease-in-out;
-      font-size:1.85em;
+    &:after {
+      rotate: -45deg;
+    }
+    &:before {
+      rotate: 45deg;
+    }
+    &:checked {
+      &:before, &:after { 
+        scale: 1;
+        opacity: 1; }
     }
   }
   .okBg { background-color: var(--s-ok-bg-ctl);        border: var(--s-ok-bor-ctl);}
