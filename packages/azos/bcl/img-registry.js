@@ -217,7 +217,7 @@ export class ImageRecord {
     this.#isoLang = cfg.getString(["isoLang", "lang", "iso", "i"], null);
     this.#theme = cfg.getString(["theme", "t"], null);
 
-    this.#contentType = cfg.getString(["contentType", "ctp"], CONTENT_TYPE.IMG_SVG);
+    this.#contentType = cfg.getString(["contentType", "ctp"], CONTENT_TYPE.TEXT_HTML);
     this.#content = cfg.getString(["content", "img", "image", "c"]);
 
 

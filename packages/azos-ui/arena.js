@@ -424,6 +424,7 @@ ${footer}
 
 
   /** @param {Application} app  */
+  // eslint-disable-next-line no-unused-vars
   renderMain(app){
     const tag =  this.#appletTagName;
     const appletHtml = tag ? `<${tag} id="elmActiveApplet"></${tag}>` : `<slot name="applet-content"> </slot>`;

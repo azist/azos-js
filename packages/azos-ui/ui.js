@@ -16,7 +16,7 @@ import { AzosError,
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
-import { isOfOrNull, isStringOrNull } from "azos/aver";
+import { isFunctionOrNull, isOfOrNull, isStringOrNull } from "azos/aver";
 import { LOG_TYPE } from "azos/log";
 import { CONTENT_TYPE } from "azos/coreconsts";
 
@@ -263,7 +263,7 @@ export class AzosElement extends LitElement {
      * @param {int | null} src optional int src line num
      * @returns {guid | null} null if nothing was written or guid of the newly written message
      */
-  writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(this, type, text, ex, params, rel, src); }
+  writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(type, text, ex, params, rel, src); }
 
 
   /** Resolves image specifier into an image content.
@@ -383,23 +383,17 @@ export class Part extends Control{
    * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
    * @returns {tuple | string} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`, returns plain strings without verbatim `@` specifier
    */
-export function  resolveImageSpec(reg, spec, iso = null, theme = null){
+export function resolveImageSpec(reg, spec, iso = null, theme = null) {
   isOfOrNull(reg, ImageRegistry);
   isStringOrNull(spec);
   if (!spec) return {sc: 500, ctp: "text/plain", content: ""};
 
-  if (spec.startsWith("@")) return spec.slice(1);//get rid of prefix, return the rest as-is
+  if (spec.startsWith("@")) return spec.slice(1); //get rid of prefix, return the rest as-is
 
-  if (!reg) {
-    this.writeLog("resolveImageSpec", LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
-    return {sc: 404, ctp: "text/plain+error", content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {}};
-  }
+  if (!reg) return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {} };
 
   const rec = reg.resolveSpec(spec, iso, theme);
-  if (!rec) {
-    this.writeLog("resolveImageSpec", LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
-    return {sc: 404, ctp: "text/plain+error", content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {}};
-  }
+  if (!rec) return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {} };
 
   return rec.produceContent();
 }
@@ -445,13 +439,15 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
   else cls = noContent;
 
   let content;
-  if (typeof got === "string") {
+  if (typeof got === "string")
     content = `<img src="${got}" />`;
-  } else if (CONTENT_TYPE.isImageFamily(got.ctp)) {
+  else if (CONTENT_TYPE.isImageFamily(got.ctp))
+    content = `<img src="data:${got.ctp};${got.content}" />`;
+  else if (CONTENT_TYPE.isHtml(got.ctp))
     content = got.content;
-  } else {
-    content = "<<<<INVALID IMAGE CONTENT>>>>";
-  }
+  else
+    content = got.content ?? "NO CONTENT";
+
   if (wrapImage || !["svg", "img"].some(option => content.startsWith(`<${option}`))) // or if content is an svg
     content = html`<i class="${cls}" style="${stl}">${verbatimHtml(content)}</i>`;
   else
