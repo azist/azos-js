@@ -119,7 +119,7 @@ header{
       }
 
       .icon svg{
-        height: 2rem;
+        height: var(--arn-strip-svg-size);
        }
 
       header .strip-btn.loggedIn{
