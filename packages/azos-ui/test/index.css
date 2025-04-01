@@ -35,7 +35,7 @@ body {
 
  /* Arena */
   --arn-min-width: 360px;
-  --arn-hdr-height: 44px;
+  --arn-hdr-height: 2.75rem;
   --arn-hdr-color: #d0d0d0;
   --arn-hdr-bg-color: #404040;
   --arn-hdr-shadow: 50px 0px 12px rgba(0, 0, 0, 0.35);
@@ -53,24 +53,21 @@ body {
   --arn-mnu-opacity: 1.0;
   --arn-mnu-font-size: 1.5em;
   --arn-mnu-shadow: 4px 0px 24px rgba(0, 0, 0, 0.25);
-  --arn-mnu-close-font-size: 1.8em;
-  --arn-mnu-close-top: 6px;
-  --arn-mnu-close-left: 6px;
-  --arn-mnu-close-margin-top: -10px;
-  --arn-mnu-hover-color: #d8d8d8;
-  --arn-mnu-ul-padding: 28px 24px 8px 48px;
-  --arn-mnu-li-padding: 8px;
-  --arn-mnu-btn-width: 58px;
+  --arn-mnu-close-font-size: 1.65em;
+  --arn-mnu-close-top: 0em;
+  --arn-mnu-close-left: 0.2em;
+  --arn-mnu-close-margin-top: -5px;
+  --arn-mnu-btn-width: 3.5rem;
   --arn-mnu-btn-color: #f09020;
   --arn-mnu-svg-stroke: #f4f4f4;
   --arn-mnu-svg-stroke-width: 2.2px;
-  --arn-mnu-svg-width: 32px;
-  --arn-mnu-svg-height: 32px;
-  --arn-mnu-svg-margin: 8px auto 8px auto;
+  --arn-mnu-svg-size: 2rem;
+
 
   --arn-strip-color: #d0d0d0;
   --arn-strip-svg-stroke: #e0e0e0;
   --arn-strip-svg-stroke-width: 0.8px;
+  --arn-strip-svg-size: 2rem;
   --arn-strip-margin: 2px 1px 2px 2px;
   --arn-strip-padding: 4px 2px 2px 2px;
   --arn-strip-font-size: 0.75em;

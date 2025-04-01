@@ -60,18 +60,6 @@ header{
         color: inherit;
         transition: 0.3s;
       }
-      header .side-menu a:hover{
-       color: var(--arn-mnu-hover-color);
-      }
-
-      header .side-menu ul{
-        list-style: none;
-        padding: var(--arn-mnu-ul-padding);
-      }
-
-      header .side-menu li{
-        padding: var(--arn-mnu-li-padding);
-      }
 
       header .menu{
         float: left;
@@ -79,13 +67,12 @@ header{
         height: 100%;
         display: block;
         background: var(--arn-mnu-btn-color);
+        padding: 0.5rem 0rem 0.5rem 0.7rem;
+        box-sizing: border-box;
       }
 
       header .menu svg{
-        display: block;
-        margin: var(--arn-mnu-svg-margin);
-        width: var(--arn-mnu-svg-width);
-        height: var(--arn-mnu-svg-height);
+        width: var(--arn-mnu-svg-size);
 
         stroke: var(--arn-mnu-svg-stroke);
         stroke-width: var(--arn-mnu-svg-stroke-width);
@@ -130,6 +117,11 @@ header{
         align-content: center;
         cursor: pointer;
       }
+
+      .icon svg{
+        height: var(--arn-strip-svg-size);
+       }
+
       header .strip-btn.loggedIn{
         font-size: 1em;
         background-color: #ffffff30;
@@ -137,7 +129,6 @@ header{
         padding: 0 0.25em;
       }
       header .strip-btn:hover{ background-color: rgba(255, 255, 255, 0.1); }
-      header .strip-btn svg{ --icon-width: 28px }
 
 /* ------------------- */
 
