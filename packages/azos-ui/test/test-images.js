@@ -1,3 +1,26 @@
+/*<FILE_LICENSE>
+ * Azos (A to Z Application Operating System) Framework
+ * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
+ * See the LICENSE file in the project root for more information.
+</FILE_LICENSE>*/
+
+/**
+ * The following files are licensed as:
+ *  - https://en.wikipedia.org/wiki/en:Creative_Commons
+ *  - https://creativecommons.org/licenses/by-sa/4.0/deed.en
+ *
+ * azos.ico.testJpg:
+ *  - https://commons.wikimedia.org/wiki/File:Surgeon_Vice-Admiral_Alasdair_Walker.jpg
+ *
+ * azos.ico.testPng:
+ *  - https://commons.wikimedia.org/wiki/File:Nhonlam.png
+ *
+ * azos.ico.testSvg:
+ *  - https://upload.wikimedia.org/wikipedia/commons/3/35/%281%2B2%29_Dimensional_SC_lattice.svg
+ *
+ * azos.ico.testGif:
+ *  - https://upload.wikimedia.org/wikipedia/commons/c/c8/132C_trans.gif
+ */
 import { CONTENT_TYPE } from "azos/coreconsts";
 
 export const TEST_IMAGES = Object.freeze([
