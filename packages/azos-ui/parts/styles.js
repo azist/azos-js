@@ -137,7 +137,7 @@ button:disabled{
 
 button{ display: inline-block; }
 button .icon{
-  --icon-width: 1.5em;
+  --icon-width: 24px;
   --arn-strip-svg-stroke: var(--ink);
 }
 `;
@@ -630,7 +630,7 @@ export const iconStyles = css`
   vertical-align: middle;
 }
 .icon, .icon svg{
-  width: var(--icon-width);
+  width: var(--icon-width, 32px);
   padding: 0;
   margin: 0;
 }
