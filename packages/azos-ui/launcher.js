@@ -60,18 +60,13 @@ export class Launcher extends Control {
   }
 
   static styles = [css`
-:root {
-  --link-pad: .25em 1em;
-}
+
 :host{
   display: block;
   width: 100%;
-  /* padding: 1em; */
-  margin: 1em 0;
+  padding: 1em;
   box-sizing: border-box;
   user-select: none;
-  font-size: 16px;
-  padding-top: 44px;
 }
 
 ul {
@@ -83,11 +78,11 @@ ul {
 
 li{
   padding: 0.1em;
-  padding: var(--link-pad);
-  }
+  font-size: 0.825em;
+}
 
 .menu-command:hover{
-  /* text-shadow: 0px 0px 8px  #202020af; */
+  text-shadow: 0px 0px 8px  #202020af;
 }
 
 .menu-divider hr {
@@ -100,21 +95,19 @@ li{
 
 .menu-command{}
 
-.menu-header, .menu-command, li {
-  padding: var(--link-pad);
-}
-
 .menu-header{
-  cursor: pointer;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin: 10px 0px;
-  padding: 8px 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 0px;
+  color: #ffffffa0;
+  border-bottom: 1px solid #f0f0f0d0;
+  margin: 0.2em 0 0.35em 0em;
+  padding: 0.25em;
+  font-size: 0.85em;
+  position: relative;
+  left: -1ch;
 }
 
 .menu-section{
+  color: #ffffffa0;
+  border-bottom: 1px solid #f0f0f050;
   margin: 0.2em 0 0.35em 0em;
   padding: 0.25em;
   font-size: 0.75em;
@@ -122,89 +115,11 @@ li{
 
 .icon svg{
   height: 2.0em;
-  stroke: #fff;
+  stroke: #ffffffd0;
   vertical-align: middle;
 }
-.fas svg{ fill: #fff; }
+.fas svg{ fill: #ffffffa0; }
 
-/* General Styles */
-#sectMenu {
-
-    padding: 15px;
-}
-
-/* List Styles */
-ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-li {
-    padding: 8px 12px;
-    border-radius: 4px;
-    transition: background 0.3s ease-in-out;
-    font-weight: 500;
-}
-
-li:not(.menu-section):hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* Section Headers */
-.menu-section {
-    font-weight: bold;
-    text-transform: uppercase;
-    margin: 10px 0;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 0;
-}
-
-/* Menu Items */
-.menu-command {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s ease-in-out;
-}
-
-.menu-command:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.menu-command i {
-    margin-right: 10px;
-}
-
-/* SVG Icons */
-.menu-command svg {
-    width: 20px;
-    height: 20px;
-}
-
-/* Dividers */
-.menu-divider {
-  margin: 1em 0;
-  border: 1px solid #e0e0e040;
-  padding: 0;
-  hr {
-    display: none;
-  }
-}
-
-.menu-header:hover {
-  position: relative;
-  .header-back {
-    display: block; }
-}
-.header-back {
-  position: absolute;
-  display: none;
-  /* background-blend-mode: multiply; */
-  background-color: #f9a33d;
-  backdrop-filter: blur(10px);
-}
 
    `];//styles
 
@@ -238,7 +153,7 @@ li:not(.menu-section):hover {
     const children = [];
     for(const one of menus){
       const ico = one.icon ? this.renderImageSpec(one.icon).html : noContent;
-      children.push(html`<li class="menu-header" @click="${() => { this.#onClickHeader(one);} }"><span class="header-back">${this.renderImageSpec('svg://azos.ico.arrowLeft').html}</span> ${ico} ${one.title}</li>`);
+      children.push(html`<li class="menu-header" @click="${() => { this.#onClickHeader(one);} }">${ico} ${one.title}</li>`);
     }
     return html`<ul> ${children} </ul>`;
   }

@@ -387,13 +387,11 @@ export class Arena extends AzosElement {
     const footer = kiosk ? noContent : html`<footer id="arenaFooter">${this.renderFooter(app)}</footer>`;
 
     return html`
-    <div class="app-container">
 ${header}
 <main>
 ${this.renderMain()}
 </main>
 ${footer}
-</div>
 `;
   }//render
 
@@ -473,12 +471,10 @@ ${footer}
     }
 
    this.renderRoot.getElementById("navMenu").classList.add("side-menu_expanded");
-   this.renderRoot.querySelector('.app-container').classList.add("app-sidenav-open");
  }
 
   #menuClose(){
    this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
-   this.renderRoot.querySelector('.app-container').classList.remove("app-sidenav-open");
   }
 
   async #showUser() {
