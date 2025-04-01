@@ -10,7 +10,7 @@ import { html, AzosElement, noContent, resolveImageSpec, renderImageSpec, verbat
 import { Application } from "azos/application";
 import * as logging from "azos/log";
 
-import { Command } from "./cmd.js";
+import { Command, MenuCommand } from "./cmd.js";
 import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import { Applet } from "./applet.js";
@@ -408,7 +408,7 @@ ${footer}
 
       <nav class="side-menu" id="navMenu">
         <a href="#" class="close-button" id="btnMenuClose" @click="${(e) => { this.#menuClose(); e.preventDefault(); }}" >&times;</a>
-        <az-launcher id="launcherMain" scope="this">
+        <az-launcher id="launcherMain" scope="this" @itemActivated="${this.#launcherItemActivated}">
         </az-launcher>
       </nav>
 
@@ -475,6 +475,10 @@ ${footer}
 
   #menuClose(){
    this.renderRoot.getElementById("navMenu").classList.remove("side-menu_expanded");
+  }
+
+  #launcherItemActivated(e){
+    if (!(e.detail.item instanceof MenuCommand)) this.#menuClose();
   }
 
   async #showUser() {

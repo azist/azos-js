@@ -56,7 +56,6 @@ export class Launcher extends Control {
     aver.isTrue(idx >= 0, "Existing parent menu rank");
     this.#ranks.splice(idx);
     this.requestUpdate();
-    return true;
   }
 
   static styles = [css`
@@ -179,23 +178,34 @@ li{
    return html`<ul> ${children} </ul>`;
   }
 
+  _onItemActivated(item, result){
+    const options = {
+      detail: {item: item, result: result},
+      bubbles: true,
+      composed: true,
+      cancelable: false
+    };
+    this.dispatchEvent(new CustomEvent('itemActivated', options));
+  }
+
   async #onClickHeader(item){
-    console.dir(item);
     if (item instanceof MenuCommand){
       this.navBack(item);
     }
-    //todo: Add custom event to close
+    this._onItemActivated(item, null);
   }
 
   async #onClickItem(item){
-    console.dir(item);
+
+    let result = null;
+
     if (item instanceof MenuCommand){
       this.navChild(item);
     } else {
-      await item.exec(this);
+      result = await item.exec(this);
     }
 
-    //todo: Add custom event to close
+    this._onItemActivated(item, result);
   }
 
 }
