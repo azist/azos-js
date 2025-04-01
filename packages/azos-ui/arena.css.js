@@ -37,6 +37,7 @@ header{
         background: var(--arn-mnu-bg);
         opacity: var(--arn-mnu-opacity);
         transition:var(--arn-mnu-transition);
+        transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
         font-size: var(--arn-mnu-font-size);
         overflow: hidden;
         box-shadow: var(--arn-mnu-shadow);
@@ -213,4 +214,22 @@ footer .bottom-menu a {
       footer .contact .line{
         display: block;
       }
+
+      .app-sidenav-open {
+        header, main, footer {
+          transition: var(--arn-mnu-transition);
+          transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+
+        }
+        header {
+          margin-left: var(--arn-mnu-width);
+        }
+        main {
+          margin-left: var(--arn-mnu-width);
+        }
+        footer {
+          margin-left: var(--arn-mnu-width);
+        } 
+      }
 `;
+
