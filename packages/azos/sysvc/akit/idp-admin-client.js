@@ -31,15 +31,15 @@ export class IdpAdminClient extends IClient {
   }
 
   /** Returns a list of login info objects for the selected user account */
-  async getLoginsAsync(gUser) {
-    const got = await this.get(`userLogins?gUser=${isString(gUser)}`);
+  async getLoginsAsync(gdid, realm) {
+    const got = await this.get(`userlogins?gUser=${isString(gdid)}`, this.#makeHeaders(realm));
     return got;
   }
 
-  async saveUserAsync(user) {
+  async saveUserAsync(user, realm) {
     isObject(user);
     const method = isInsertForm(user) ? this.post : this.put;
-    const got = await method.call(this, "user", { user: user });
+    const got = await method.call(this, "user", { user: user }, this.#makeHeaders(realm));
     return got;
   }
 
@@ -50,8 +50,8 @@ export class IdpAdminClient extends IClient {
     return got;
   }
 
-  async setLockStatusAsync(status) {
-    const got = await this.put("lock", { lockStatus: isObject(status) });
+  async setLockStatusAsync(status, realm) {
+    const got = await this.put("lock", { lockStatus: isObject(status) }, this.#makeHeaders(realm));
     return got;
   }
 }
