@@ -263,7 +263,7 @@ export class AzosElement extends LitElement {
      * @param {int | null} src optional int src line num
      * @returns {guid | null} null if nothing was written or guid of the newly written message
      */
-  writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(type, text, ex, params, rel, src); }
+  writeLog(type, text, ex, params, rel, src) { return this.arena.writeLog(this, type, text, ex, params, rel, src); }
 
 
   /** Resolves image specifier into an image content.
