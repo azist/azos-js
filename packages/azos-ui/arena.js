@@ -403,7 +403,7 @@ ${footer}
     if (this.menu === "show"){
       return html`
       <a href="#" class="menu" id="btnMenuOpen" @click="${(e) => { this.#menuOpen(); e.preventDefault(); }}">
-        <svg><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
+        <svg viewBox="0 0 30 30"><path d="M0,5 30,5  M0,14 25,14  M0,23 30,23"/></svg>
       </a>
 
       <nav class="side-menu" id="navMenu">
