@@ -90,7 +90,7 @@ figcaption strong{
   <div class="examples">
     ${this.renderFigure(null, undefined, "No Image Specified")}
     ${this.renderFigure("png://nonesistent")}
-    ${this.renderFigure("No Image Registry", null, null, renderImageSpec(null, "jpg://azos.ico.testJpg", this.writeLog.bind(this)))}
+    ${this.renderFigure("No Image Registry", null, null, renderImageSpec(null, "jpg://azos.ico.testJpg"))}
   </div>
 </div>
     `;

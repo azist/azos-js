@@ -381,27 +381,19 @@ export class Part extends Control{
    * @param {string} spec a required image specification
    * @param {string | null} [iso=null] Pass language ISO code which will be used as a default when the spec does not contain a specific code. You can also set `$session` in the spec to override it with this value
    * @param {string | null} [theme=null] Pass theme id which will be used as a default when the spec does not contain a specific theme. You can also set `$session` in the spec to override it with this value
-   * @param {function | null} [log=console.log] optional logging function to use for error reporting. By default, it uses `console.error` but ideally, would be {@link Arena.writeLog}. If you want to suppress logs, pass a no-op function.
    * @returns {tuple | string} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`, returns plain strings without verbatim `@` specifier
    */
-export function resolveImageSpec(reg, spec, log = () => { }, iso = null, theme = null) {
+export function resolveImageSpec(reg, spec, iso = null, theme = null) {
   isOfOrNull(reg, ImageRegistry);
   isStringOrNull(spec);
-  isFunctionOrNull(log);
   if (!spec) return {sc: 500, ctp: "text/plain", content: ""};
 
-  if (spec.startsWith("@")) return spec.slice(1);//get rid of prefix, return the rest as-is
+  if (spec.startsWith("@")) return spec.slice(1); //get rid of prefix, return the rest as-is
 
-  if (!reg) {
-    log("resolveImageSpec", LOG_TYPE.ERROR, `No ImageRegistry configured to resolve ${spec}`)
-    return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {} };
-  }
+  if (!reg) return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: "<div style='font-size: 9px; color: yellow; background: red; width: 64px; border: 2px solid yellow;'>NO IMAGE-REGISTRY</div>", attrs: {} };
 
   const rec = reg.resolveSpec(spec, iso, theme);
-  if (!rec) {
-    log("resolveImageSpec", LOG_TYPE.ERROR, `███████ Unknown image '${spec}'`)
-    return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {} };
-  }
+  if (!rec) return { sc: 404, ctp: CONTENT_TYPE.TEXT_HTML, content: `<div style='font-size: 9px; color: #202020; background: #ff00ff; width: 64px; border: 2px solid white;'>UNKNOWN IMG: <br>${spec}</div>`, attrs: {} };
 
   return rec.produceContent();
 }
@@ -419,11 +411,11 @@ export function resolveImageSpec(reg, spec, log = () => { }, iso = null, theme =
  *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
  * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
  */
-export function renderImageSpec(reg, spec, log, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
+export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
   cls ??= "icon";
   wrapImage ??= true;
 
-  const got = resolveImageSpec(reg, spec, log, iso, theme);
+  const got = resolveImageSpec(reg, spec, iso, theme);
 
   scale ??= got?.attrs?.scale;
   ox ??= got?.attrs?.ox;

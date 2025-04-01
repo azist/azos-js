@@ -344,7 +344,7 @@ export class Arena extends AzosElement {
    * @returns {tuple | string} - {sc: int, ctp: string, content: buf | string, attrs: {}}, for example `{sc: 200, ctp: "image/svg+xml", content: "<svg>.....</svg>", {fas: true}}`, returns plain strings without verbatim `@` specifier
    */
   resolveImageSpec(spec, iso = null, theme = null){
-    const result = resolveImageSpec(this.#defaultImageRegistry, spec, this.writeLog.bind(this), iso, theme);
+    const result = resolveImageSpec(this.#defaultImageRegistry, spec, iso, theme);
     return result;
   }
 
@@ -363,7 +363,7 @@ export class Arena extends AzosElement {
    * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
    */
   renderImageSpec(spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
-    const result = renderImageSpec(this.#defaultImageRegistry, spec, this.writeLog.bind(this), { cls, iso, ox, oy, scale, theme, wrapImage });
+    const result = renderImageSpec(this.#defaultImageRegistry, spec, { cls, iso, ox, oy, scale, theme, wrapImage });
     return result;
   }
 
