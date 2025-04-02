@@ -283,8 +283,10 @@ body {
   --vcl-codebox-hi-number: #40e510;
   --vcl-codebox-hi-boolean: #c065eb;
   --vcl-codebox-hi-null: #e75e45;
-
   --vcl-codebox-hi-string-hover: #a4d4ff;
+
+  --vcl-tabview-svg-stroke: var(--ink);
+  --vcl-tabview-svg-width: 2.5ex;
 }
 
 
