@@ -485,10 +485,14 @@ ${footer}
   async #showUser() {
     const user = this.app.session.user;
 
-    if (user.status === "Invalid")
-      window.location.assign("/app/login");
-    else
+    if (user.isValid){
+      //this is temporary
       showObject(user, { title: "User Profile", okBtnTitle: "Close" }, this);
+    }
+    else {
+      //todo: this needs to be configurable in the applet "OAuth login redirect URI"
+      window.location.assign("/app/login#");
+    }
   }
 
   async #toolbarClick(){ await this.exec(this); }
@@ -515,7 +519,7 @@ ${footer}
       cls = "loggedIn";
     }
 
-    const content = html`<div class="strip-btn ${cls}" id="divToolbar_User" @click="${this.#showUser}">${initials ?? userIcon.html}</div> ${itemContent} `;
+    const content = html`<div class="strip-btn ${cls}" id="divToolbar_User" @click="${() => this.#showUser()}">${initials ?? userIcon.html}</div> ${itemContent} `;
 
     renderInto(content, divToolbar);
   }
