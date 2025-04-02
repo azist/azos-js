@@ -13,6 +13,12 @@ export class CaseCheckboxes extends CaseBase {
     return html`
 <h2>Checkboxes</h2>
 
+<h3>checkType</h3>
+<div class="strip-h" style="gap:2em;">
+  <az-check checkType="checkmark" title="default 'checkMark'" titlePosition="mid-right" status="default"></az-check>
+  <az-check checkType="cross" title="checkType='cross'" titlePosition="mid-right" status="default"></az-check>
+</div>
+
 <h3>Statuses</h3>
 <div class="strip-h" style="gap:2em;">
   <az-check title="Default" titlePosition="mid-right" status="default"></az-check>
@@ -68,6 +74,14 @@ export class CaseCheckboxes extends CaseBase {
   <az-check title="Normal" titlePosition="mid-right" rank="normal" isdisabled></az-check>
   <az-check title="Large" titlePosition="mid-right" rank="large"  value="true" isdisabled></az-check>
   <az-check title="Huge" titlePosition="mid-right" rank="huge"  value="true" isdisabled></az-check>
+</div>
+<div class="strip-h" style="gap:2em;">
+  <az-check checkType="cross" title="Tiny" titlePosition="mid-right" rank="tiny"></az-check>
+  <az-check checkType="cross" title="Small" titlePosition="mid-right" rank="small"></az-check>
+  <az-check checkType="cross" title="Medium" titlePosition="mid-right" rank="medium"></az-check>
+  <az-check checkType="cross" title="Normal" titlePosition="mid-right" rank="normal"></az-check>
+  <az-check checkType="cross" title="Large" titlePosition="mid-right" rank="large"></az-check>
+  <az-check checkType="cross" title="Huge" titlePosition="mid-right" rank="huge"></az-check>
 </div>
 
 <h3>Title Positioning</h3>
