@@ -15,7 +15,12 @@ export class TabView extends Control {
 
   static styles = [iconStyles, css`
 :host{ display: block; margin-top: 1.0em; }
-.icon{ --icon-stroke: var(--vcl-tabview-svg-stroke); --icon-width: var(--vcl-tabview-svg-width); }
+.icon{
+  --icon-stroke: var(--vcl-tabview-svg-stroke);
+  --icon-stroke-width: var(--vcl-tabview-svg-stroke-width);
+  --icon-size: var(--vcl-tabview-svg-size);
+  --icon-fill: var(--vcl-tabview-svg-fill);
+}
 
 .tab-nav {
   display: flex;

@@ -137,7 +137,8 @@ button:disabled{
 
 button{ display: inline-block; }
 button .icon{
-  --arn-strip-svg-stroke: var(--ink);
+  --icon-size: 1.5rem;
+  --icon-stroke: var(--ink);
 }
 `;
 
@@ -621,20 +622,19 @@ li+li{
 
 export const iconStyles = css`
 .icon{
-  --icon-width: 2rem;
+  --icon-size: var(--arn-mnu-svg-size);
   --icon-stroke: var(--arn-strip-svg-stroke);
   --icon-stroke-width: var(--arn-strip-svg-stroke-width);
-.icon {
+  --icon-fill: none;
+
   display: inline-block;
   stroke: var(--icon-stroke);
   stroke-width: var(--icon-stroke-width);
-  fill: none;
+  fill: var(--icon-fill);
   vertical-align: middle;
 }
-.icon, .icon svg{
-  width: var(--icon-width);
-.icon, .icon svg {
-  width: var(--icon-width);
+.icon, .icon svg{ /* sometimes, svg is wrapped */
+  width: var(--icon-size);
   padding: 0;
   margin: 0;
 }

@@ -4,13 +4,15 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "../../ui";
+import { css, html } from "../../ui";
 import { CaseBase } from "./case-base";
 import { isObject, isObjectOrArray } from "azos/types";
 
 import "../../vcl/tree-view/tree-view";
 
 export class CaseTreeView extends CaseBase {
+  static styles = [CaseBase.styles, css`h2{ margin-top: 0 }`];
+  constructor() { super(); }
 
   firstUpdated() {
     const results = [{ key1: "value" }, { key2: { childKey1: true, childKey2: 5 } }, { key3: [{ childKey3: false, childKey4: 85 }] }];
