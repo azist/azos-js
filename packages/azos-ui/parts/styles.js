@@ -137,8 +137,7 @@ button:disabled{
 
 button{ display: inline-block; }
 button .icon{
-  --icon-width: 1.5rem;
-  --icon-stroke: var(--ink);
+  --arn-strip-svg-stroke: var(--ink);
 }
 `;
 
@@ -164,23 +163,64 @@ export const checkStyles = css`
     outline: var(--focus-ctl-outline);
     box-shadow: var(--focus-ctl-box-shadow);
   }
-  .check::before{
-    content: "×";
-    color: var(--s-default-fg-ctl);
-    text-align:center;
-    position:relative;
-    transform:scale(0);
-    transform-origin:center center;
-    transition:.1s transform ease-in-out;
-    font-size:1.85em;
-  }
   .check:disabled::before{ opacity: 0.5;}
-  .check:checked::before{ transform:scale(1); }
+
   .check:disabled{  }
   .disabled{
     color: #b4b4b4;
     font-weight: 100;
     filter: var(--ctl-disabled-filter);
+  }
+
+  .checkmark {
+    &:before {
+      content: "";
+      position: absolute;
+      width: .2em;
+      height: .4em;
+      bottom: .055em;
+      border-right: .07em solid var(--s-default-fg-ctl);
+      border-bottom: .07em solid var(--s-default-fg-ctl);
+      opacity: 0;
+      scale: 0;
+      rotate: 45deg;
+      text-align:center;
+      position:relative;
+      transform-origin:center center;
+      transition:.1s scale ease-in-out;
+      font-size:1.85em;
+    }
+    &:checked:before {
+      scale: 1;
+      opacity: 1;
+    }
+  }
+  .cross {
+    position: relative;
+    &:before,&:after {
+      opacity: 0;
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1em;
+      height: 0.1em;
+      background-color: var(--s-default-fg-ctl);
+      transition:.1s scale ease-in-out;
+      translate: -50% -50%;
+      scale: 0;
+    }
+    &:after {
+      rotate: -45deg;
+    }
+    &:before {
+      rotate: 45deg;
+    }
+    &:checked {
+      &:before, &:after {
+        scale: 1;
+        opacity: 1; }
+    }
   }
   .okBg { background-color: var(--s-ok-bg-ctl);        border: var(--s-ok-bor-ctl);}
   .infoBg { background-color: var(--s-info-bg-ctl);    border: var(--s-info-bor-ctl);}
@@ -584,6 +624,7 @@ export const iconStyles = css`
   --icon-width: 2rem;
   --icon-stroke: var(--arn-strip-svg-stroke);
   --icon-stroke-width: var(--arn-strip-svg-stroke-width);
+.icon {
   display: inline-block;
   stroke: var(--icon-stroke);
   stroke-width: var(--icon-stroke-width);
@@ -591,6 +632,8 @@ export const iconStyles = css`
   vertical-align: middle;
 }
 .icon, .icon svg{
+  width: var(--icon-width);
+.icon, .icon svg {
   width: var(--icon-width);
   padding: 0;
   margin: 0;
