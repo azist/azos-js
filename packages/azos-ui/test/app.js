@@ -98,6 +98,7 @@ const cfgApp = {
   id: "azosTest",
   name: "$(id)",
   description: "Test '$(name)' application",
+  copyright: "2018-2025 Azist Group",
   modules: [
     { name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET },
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },

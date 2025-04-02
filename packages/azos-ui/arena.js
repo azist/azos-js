@@ -15,7 +15,7 @@ import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
-import { isEmpty } from "azos/strings";
+import { dflt, isEmpty } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
 import "./launcher.js";
@@ -437,15 +437,20 @@ ${footer}
   }
 
 
-  renderFooter(){
+  renderFooter(app){
     return html`
     <nav class="bottom-menu" id="navBottomMenu">
       <ul>
+        <li></li>
       </ul>
     </nav>
+    ${ app.copyright ? html`<div class="copyright">Copyright &copy; ${app.copyright}</div>` : noContent }
 
-    <div class="contact"></div>
-    <div class="copyright">Copyright &copy; 2022-2023 Azist</div>
+    <div class="contact">
+      <div class="line">${app.id}@${app.envName}</div>
+      <div class="line">${app.name}</div>
+      <div class="line">${app.description}</div>
+    </div>
     `;
   }
 
