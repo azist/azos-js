@@ -137,7 +137,7 @@ button:disabled{
 
 button{ display: inline-block; }
 button .icon{
-  --arn-strip-svg-stroke: var(--ink);
+  --icon-stroke: var(--ink);
 }
 `;
 
@@ -620,17 +620,20 @@ li+li{
 `;
 
 export const iconStyles = css`
-.icon {
+.icon{
+  --icon-width: 2rem;
+  --icon-stroke: var(--arn-strip-svg-stroke);
+  --icon-stroke-width: var(--arn-strip-svg-stroke-width);
   display: inline-block;
-  stroke: var(--arn-strip-svg-stroke);
-  stroke-width: var(--arn-strip-svg-stroke-width);
+  stroke: var(--icon-stroke);
+  stroke-width: var(--icon-stroke-width);
   fill: none;
   vertical-align: middle;
 }
-.icon, .icon svg {
-  width: var(--icon-width);
+.icon, .icon svg{
+  width: var(--icon-width, 32px);
   padding: 0;
   margin: 0;
 }
-.icon.fas{ fill: var(--arn-strip-svg-stroke) }
+.icon.fas{ fill: var(--icon-stroke) }
 `;
