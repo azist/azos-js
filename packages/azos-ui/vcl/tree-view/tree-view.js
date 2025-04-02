@@ -13,17 +13,21 @@ export class TreeView extends Control {
 
   static #sidSeed = 0;
   static styles = [baseStyles, iconStyles, css`
-:host {
-  display: block;
-  --icon-width: 24px;
+:host { display: block; }
+.icon{
+  --icon-stroke: var(--vcl-treeview-svg-stroke);
+  --icon-stroke-width: var(--vcl-treeview-svg-stroke-width);
+  --icon-size: var(--vcl-treeview-svg-size);
+  --icon-fill: var(--vcl-treeview-svg-fill);
 }
-.icon{ --icon-width: 24px; }
 
-.treeView { user-select: none; }
-
-.treeView, .treeNodeChildren {
+.treeNodeChildren {
+  user-select: none;
   list-style: none;
-  padding-left: var(--icon-width);
+  padding-left: 0;
+}
+.treeNodeChildren .treeNodeChildren {
+  padding-left: var(--vcl-treeview-svg-size);
 }
 
 .treeNodeHeader {
@@ -34,6 +38,7 @@ export class TreeView extends Control {
 
 .treeNodeHeader:focus {
   outline: var(--focus-ctl-outline);
+  outline-offset: -1px;
   box-shadow: var(--focus-ctl-box-shadow);
 }
 
@@ -60,15 +65,8 @@ export class TreeView extends Control {
   margin-left: 0.5em;
 }
 
-.icon.folder {
-  fill: maroon;
-  stroke: maroon;
-}
-
-.icon.chevron {
-  fill: black;
-  stroke: black;
-}
+.icon.folder{ --icon-stroke: maroon; }
+.icon.chevron{ --icon-stroke: black; }
   `];
 
   static properties = {
@@ -294,15 +292,15 @@ export class TreeView extends Control {
 
   connectedCallback() {
     super.connectedCallback();
-    this._folder = this.renderImageSpec("svg://azos.ico.folder", { cls: "folder icon" }).html;
-    this._folderOpen = this.renderImageSpec("svg://azos.ico.folderOpen", { cls: "folder icon" }).html;
-    this._chevron = this.renderImageSpec("svg://azos.ico.caretRight", { cls: "chevron icon" }).html;
-    this._chevronClosed = this.renderImageSpec("svg://azos.ico.caretDown", { cls: "chevron icon" }).html;
+    this._folder = this.renderImageSpec("svg://azos.ico.folder", { cls: "folder icon", wrapImage: false }).html;
+    this._folderOpen = this.renderImageSpec("svg://azos.ico.folderOpen", { cls: "folder icon", wrapImage: false }).html;
+    this._chevron = this.renderImageSpec("svg://azos.ico.caretRight", { cls: "chevron icon", wrapImage: false }).html;
+    this._chevronClosed = this.renderImageSpec("svg://azos.ico.caretDown", { cls: "chevron icon", wrapImage: false }).html;
   }
 
   renderIcon(node) {
     if (node.iconPath === null) return '';
-    if (node.iconPath) return this.renderImageSpec(node.iconPath).html;
+    if (node.iconPath) return this.renderImageSpec(node.iconPath, { wrapImage: false }).html;
     else return node.isOpened ? this._folderOpen : this._folder; // default when undefined
   }
 
@@ -314,7 +312,7 @@ export class TreeView extends Control {
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     return html`
 ${title}
-<ol id="tv${this.sid}" scope="this" part="tree" role="tree" class="${cls} treeView" @keydown="${this._onKeyDown}" tabindex=0 @focus="${this._onTreeFocus}">
+<ol id="tv${this.sid}" scope="this" part="tree" role="tree" class="${cls} treeNodeChildren" @keydown="${this._onKeyDown}" tabindex=0 @focus="${this._onTreeFocus}">
   ${this.#showRoot ? this.renderNode(this.root) : this.root.children.map(child => this.renderNode(child))}
 </ol>
     `;

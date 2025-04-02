@@ -289,7 +289,14 @@ body {
   --vcl-codebox-hi-string-hover: #a4d4ff;
 
   --vcl-tabview-svg-stroke: var(--ink);
-  --vcl-tabview-svg-width: 2.5ex;
+  --vcl-tabview-svg-stroke-width: var(--arn-mnu-svg-stroke-width);
+  --vcl-tabview-svg-size: 2.5ex;
+  --vcl-tabview-svg-fill: none;
+
+  --vcl-treeview-svg-stroke: var(--ink);
+  --vcl-treeview-svg-stroke-width: var(--arn-mnu-svg-stroke-width);
+  --vcl-treeview-svg-size: 2.5ex;
+  --vcl-treeview-svg-fill: none;
 }
 
 
