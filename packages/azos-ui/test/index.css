@@ -74,6 +74,9 @@ body {
   --arn-strip-min-width: 32px;
   --arn-strip-max-width: 20vw;
 
+  --arn-ftr-color: #c4c2c0;
+  --arn-ftr-bg-color: #93938a;
+
   /* paper is the primary whitespace background color (e.g. dialog box base color, form base color etc) */
   /* ink is primary text color on paper */
   --paper: #f0f0f0;

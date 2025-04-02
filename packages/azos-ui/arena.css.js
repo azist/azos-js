@@ -166,8 +166,8 @@ main .applet-container.kiosk{
 /* ------------------- */
 
 footer {
-  background-color: #606060;
-  color: #aaa;
+  background: var(--arn-ftr-bg-color);
+  color: var(--arn-ftr-color);
   padding: 10px;
   min-width: var(--arn-min-width);
   box-sizing: border-box;
@@ -194,14 +194,17 @@ footer .bottom-menu a {
       }
 
       footer .contact{
-        position: relative;
-        top: -3em;
         text-align: right;
         font-size: 0.75em;
-        opacity: 0.5;
+        opacity: 0.75;
       }
 
       footer .contact .line{
         display: block;
+      }
+
+      footer .copyright{
+        font-size: 0.85em;
+        text-align: center;
       }
 `;

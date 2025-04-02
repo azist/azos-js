@@ -95,7 +95,7 @@ export class Application extends types.DisposableObject{
     this.#id = root.getString("id", "#0");
     this.#name = root.getString("name", this.#id);
     this.#description = root.getString("description", this.#id);
-    this.#copyright = root.getString("copyright", "2023 Azist Group");
+    this.#copyright = root.getString("copyright", null);
     this.#envName = root.getString(["envName", "env", "environment"], "local");
     this.#isTest = root.getBool("isTest", false);
 
