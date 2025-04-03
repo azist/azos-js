@@ -8,7 +8,7 @@ import { asString, isOneOf } from 'azos/strings';
 import { html, parseRank, parseStatus } from '../ui.js';
 import { baseStyles, dateRangeStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { asDate, isNonEmptyString, VALIDATE_METHOD, ValidationError } from 'azos/types';
+import { asDate, asObject, isNonEmptyString, isObject, VALIDATE_METHOD, ValidationError } from 'azos/types';
 import { isTrue } from 'azos/aver';
 
 export class DateRangeField extends FieldPart {
@@ -33,25 +33,48 @@ export class DateRangeField extends FieldPart {
   get rawValue() { return this.#rawValue; }
   get value() { return this.#value; }
 
+  /**
+   * Sets field data values which will each be type-cast in accordance with the specified {@link dataType}.
+   * If the cast fails the exception gets thrown, this behavior differs from  {@link setValueFromInput}
+   * which will capture cast exception as a field error
+   * @param {Object} v object with start and end date values
+   */
+  set value(v) {
+    this.#rawValue = v;
+    this.#value = undefined;
+    this.requestUpdate();
+    if (!isObject(v)) v = asObject(v);
+    this.#value = {
+      start: this.castValue(v?.start),
+      end: this.castValue(v?.end)
+    };
+  }
+
   get isRequired() { return !this.optionalStart || !this.optionalEnd; }
 
   #dateChanged(e, field) {
     isTrue(isOneOf(field, ["start", "end"]));
-    const v = e.target.value;
-    this.setValueFromInput(v, field);
+    const fv = e.target.value;
+    this.setFieldValueFromInput(fv, field);
     this.inputChanged();
   }
 
-  setValueFromInput(v, field) {
+  setValueFromInput(v) {
+    this.setFieldValueFromInput(v?.start, "start");
+    this.setFieldValueFromInput(v?.end, "end");
+  }
+
+  setFieldValueFromInput(v, field) {
     this.#rawValue ??= {};
     this.#value ??= {};
     this.#fieldErrors ??= {};
 
+    this.error = null;
+    this.requestUpdate();
+
     this.#rawValue[field] = v;
     this.#value[field] = undefined;
     this.#fieldErrors[field] = undefined;
-    this.error = null;
-    this.requestUpdate();
 
     try {
       this.#value[field] = this.castValue(v);
@@ -66,7 +89,7 @@ export class DateRangeField extends FieldPart {
 
   castValue(v) {
     if (v === null || v === undefined || v === "") return null;
-    return asDate(v, true);
+    return asDate(v, true, true);
   }
 
   _validateRequired(context, val, scope) {

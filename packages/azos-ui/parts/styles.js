@@ -415,6 +415,7 @@ export const textFieldStyles = css`
 `;
 
 export const dateRangeStyles = css`
+:host{ width: 28ch; }
 .inputs{
   display: inline-grid;
   grid-template-columns: 1fr auto 1fr;
@@ -433,7 +434,7 @@ export const dateRangeStyles = css`
   box-shadow: var(--ctl-box-shadow);
 }
 .inputs > input{
-  width: 12ch;
+  width: 100%;
   background: none;
   border: none;
   box-shadow: none;
