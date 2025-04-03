@@ -15,7 +15,7 @@ import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
-import { isEmpty } from "azos/strings";
+import { dflt, isEmpty } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
 import "./launcher.js";
@@ -437,15 +437,20 @@ ${footer}
   }
 
 
-  renderFooter(){
+  renderFooter(app){
     return html`
     <nav class="bottom-menu" id="navBottomMenu">
       <ul>
+        <li></li>
       </ul>
     </nav>
+    ${ app.copyright ? html`<div class="copyright">Copyright &copy; ${app.copyright}</div>` : noContent }
 
-    <div class="contact"></div>
-    <div class="copyright">Copyright &copy; 2022-2023 Azist</div>
+    <div class="contact">
+      <div class="line">${app.id}@${app.envName}</div>
+      <div class="line">${app.name}</div>
+      <div class="line">${app.description}</div>
+    </div>
     `;
   }
 
@@ -485,10 +490,14 @@ ${footer}
   async #showUser() {
     const user = this.app.session.user;
 
-    if (user.status === "Invalid")
-      window.location.assign("/app/login");
-    else
+    if (user.isValid){
+      //this is temporary
       showObject(user, { title: "User Profile", okBtnTitle: "Close" }, this);
+    }
+    else {
+      //todo: this needs to be configurable in the applet "OAuth login redirect URI"
+      window.location.assign("/app/login#");
+    }
   }
 
   async #toolbarClick(){ await this.exec(this); }
@@ -515,7 +524,7 @@ ${footer}
       cls = "loggedIn";
     }
 
-    const content = html`<div class="strip-btn ${cls}" id="divToolbar_User" @click="${this.#showUser}">${initials ?? userIcon.html}</div> ${itemContent} `;
+    const content = html`<div class="strip-btn ${cls}" id="divToolbar_User" @click="${() => this.#showUser()}">${initials ?? userIcon.html}</div> ${itemContent} `;
 
     renderInto(content, divToolbar);
   }
