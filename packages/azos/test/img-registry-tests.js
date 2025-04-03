@@ -77,7 +77,7 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("test", "svg", { media: "i128" });
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1000000, "Capture SVG1a");
+          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.TEXT_HTML, 1000000, "Capture SVG1a");
         });
     }, () => false);
 
@@ -93,7 +93,7 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("test", "svg", { isoLang: "can" });
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 1000, "Capture SVG1a");
+          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.TEXT_HTML, 1000, "Capture SVG1a");
         });
     }, () => false);
 
@@ -109,7 +109,7 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("test", "svg", { theme: "patio" });
-          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.IMG_SVG, 100, "Capture SVG1a");
+          expecting(icon, `<svg>1</svg>`, CONTENT_TYPE.TEXT_HTML, 100, "Capture SVG1a");
         });
     }, () => false);
 
@@ -119,16 +119,16 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolve("azos.ico.filter", "svg");
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture azos.ico.filter");
 
           icon = ireg.resolve("azos.ico.filter", "svg", { media: "i32" });
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture azos.ico.filter");
 
           icon = ireg.resolve("azos.ico.filter", "svg", { isoLang: "eng" });
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture azos.ico.filter");
 
           icon = ireg.resolve("azos.ico.filter", "svg", { theme: "azos" });
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture azos.ico.filter");
         });
     }, () => false);
 
@@ -185,10 +185,10 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?media=i128");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#1 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1001000, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?m=i128");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#2 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1001000, "#2 Capture SVG2");
         });
     }, () => false);
 
@@ -207,16 +207,16 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?i=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#1 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1001000, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?iso=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#2 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1001000, "#2 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?lang=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#3 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1001000, "#3 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?isoLang=can");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1001000, "#4 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1001000, "#4 Capture SVG2");
         });
     }, () => false);
 
@@ -235,10 +235,10 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://test?theme=patio");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1000100, "#1 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1000100, "#1 Capture SVG2");
 
           icon = ireg.resolveSpec("svg://test?t=patio");
-          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.IMG_SVG, 1000100, "#2 Capture SVG2");
+          expecting(icon, `<svg>2</svg>`, CONTENT_TYPE.TEXT_HTML, 1000100, "#2 Capture SVG2");
         });
     }, () => false);
 
@@ -248,16 +248,16 @@ unit("ImgRegistry", function () {
           const ireg = moduleLinker.resolve(ImageRegistry);
 
           let icon = ireg.resolveSpec("svg://azos.ico.filter");
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #1 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture #1 azos.ico.filter");
 
           icon = ireg.resolveSpec("svg://azos.ico.filter?media=i32");
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture #2 azos.ico.filter");
 
           icon = ireg.resolveSpec("svg://azos.ico.filter?iso=eng");
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture #2 azos.ico.filter");
 
           icon = ireg.resolveSpec("svg://azos.ico.filter?theme=azos");
-          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.IMG_SVG, 0, "Capture #2 azos.ico.filter");
+          expecting(icon, `<path d="M440-200v-253.85L198-760h564L520`, CONTENT_TYPE.TEXT_HTML, 0, "Capture #2 azos.ico.filter");
         });
     }, () => false);
 
@@ -306,7 +306,7 @@ unit("ImgRegistry", function () {
           areEqual(record.isoLang, "can");
           areEqual(record.theme, "patio");
           areEqual(record.content, "<svg>1</svg>");
-          areEqual(record.contentType, CONTENT_TYPE.IMG_SVG);
+          areEqual(record.contentType, CONTENT_TYPE.TEXT_HTML);
           areEqual(record.score, 1001100);
         });
     }, () => false);
