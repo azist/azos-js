@@ -286,8 +286,17 @@ body {
   --vcl-codebox-hi-number: #40e510;
   --vcl-codebox-hi-boolean: #c065eb;
   --vcl-codebox-hi-null: #e75e45;
-
   --vcl-codebox-hi-string-hover: #a4d4ff;
+
+  --vcl-tabview-svg-stroke: var(--ink);
+  --vcl-tabview-svg-stroke-width: var(--arn-mnu-svg-stroke-width);
+  --vcl-tabview-svg-size: 2.5ex;
+  --vcl-tabview-svg-fill: none;
+
+  --vcl-treeview-svg-stroke: var(--ink);
+  --vcl-treeview-svg-stroke-width: var(--arn-mnu-svg-stroke-width);
+  --vcl-treeview-svg-size: 2.5ex;
+  --vcl-treeview-svg-fill: none;
 }
 
 

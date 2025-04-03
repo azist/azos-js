@@ -137,7 +137,8 @@ button:disabled{
 
 button{ display: inline-block; }
 button .icon{
-  --arn-strip-svg-stroke: var(--ink);
+  --icon-size: 1.5rem;
+  --icon-stroke: var(--ink);
 }
 `;
 
@@ -217,7 +218,7 @@ export const checkStyles = css`
       rotate: 45deg;
     }
     &:checked {
-      &:before, &:after { 
+      &:before, &:after {
         scale: 1;
         opacity: 1; }
     }
@@ -414,6 +415,7 @@ export const textFieldStyles = css`
 `;
 
 export const dateRangeStyles = css`
+:host{ width: 28ch; }
 .inputs{
   display: inline-grid;
   grid-template-columns: 1fr auto 1fr;
@@ -432,7 +434,7 @@ export const dateRangeStyles = css`
   box-shadow: var(--ctl-box-shadow);
 }
 .inputs > input{
-  width: 12ch;
+  width: 100%;
   background: none;
   border: none;
   box-shadow: none;
@@ -620,17 +622,22 @@ li+li{
 `;
 
 export const iconStyles = css`
-.icon {
+.icon{
+  --icon-size: var(--arn-mnu-svg-size);
+  --icon-stroke: var(--arn-strip-svg-stroke);
+  --icon-stroke-width: var(--arn-strip-svg-stroke-width);
+  --icon-fill: none;
+
   display: inline-block;
-  stroke: var(--arn-strip-svg-stroke);
-  stroke-width: var(--arn-strip-svg-stroke-width);
-  fill: none;
+  stroke: var(--icon-stroke);
+  stroke-width: var(--icon-stroke-width);
+  fill: var(--icon-fill);
   vertical-align: middle;
 }
-.icon, .icon svg {
-  width: var(--icon-width);
+.icon, .icon svg{ /* sometimes, svg is wrapped */
+  width: var(--icon-size);
   padding: 0;
   margin: 0;
 }
-.icon.fas{ fill: var(--arn-strip-svg-stroke) }
+.icon.fas{ fill: var(--icon-stroke) }
 `;
