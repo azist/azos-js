@@ -136,9 +136,23 @@ button:disabled{
 }
 
 button{ display: inline-block; }
-button .icon{
-  --icon-size: 1.5rem;
+
+/**
+ * Icons in Buttons should always be 1em so it doesn't stretch out the button
+ * using scale to make icon bigger without affecting the button size
+ */
+button .icon {
   --icon-stroke: var(--ink);
+  --icon-size: 1em; 
+  scale: 1.4; 
+  margin-inline-end: .5ch;
+  margin-inline-start: -.5ch;
+}
+button:has(i) {
+  display: inline-flex;
+  i {
+    display: inline-flex !important;
+  }
 }
 `;
 

@@ -33,7 +33,10 @@ import "../showcase/case-sizing";
 import "../showcase/case-tab-view";
 import "../showcase/case-toasts";
 import "../showcase/case-tree-view";
-import "../showcase/case-launcher"
+import "../showcase/case-launcher";
+import "../showcase/case-cards";
+import "../showcase/case-grids";
+import "../showcase/case-prose";
 //#endregion IMPORTS
 
 export class ShowcaseApplet extends Applet {
@@ -121,6 +124,9 @@ export class ShowcaseApplet extends Applet {
       <option value="Toasts">Toasts</option>
       <option value="TreeView">Tree View</option>
       <option value="Launcher">Launcher</option>
+      <option value="Cards">Cards</option>
+      <option value="Grids">Grids</option>
+      <option value="Prose">Prose</option>
     </select>
 
    ${this.renderCase()}
@@ -132,54 +138,37 @@ export class ShowcaseApplet extends Applet {
   }
   renderCase() {
     const showcase = this.selectedCase;
-    switch (showcase) {
-      case "Accordion":
-        return html`<az-case-accordion></az-case-accordion>`;
-      case "Buttons":
-        return html`<az-case-buttons></az-case-buttons>`;
-      case "ButtonsWithIcons":
-        return html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`;
-      case "Checkboxes":
-        return html`<az-case-checkboxes></az-case-checkboxes>`;
-      case "CodeBox":
-        return html`<az-case-code-box></az-case-code-box>`;
-      case "DateRange":
-        return html`<az-case-date-range></az-case-date-range>`;
-      case "Images":
-        return html`<az-case-images></az-case-images>`;
-      case "InputTests":
-        return html`<az-case-input-tests></az-case-input-tests>`;
-      case "Lookup":
-        return html`<az-case-lookup></az-case-lookup>`;
-      case "Modals":
-        return html`<az-case-modals></az-case-modals>`;
-      case "ObjectInspector":
-        return html`<az-case-object-inspector></az-case-object-inspector>`;
-      case "RadioButtons":
-        return html`<az-case-radios></az-case-radios>`;
-      case "Scheduler":
-        return html`<az-case-scheduler></az-case-scheduler>`;
-      case "Selects":
-        return html`<az-case-selects></az-case-selects>`;
-      case "Sizing":
-        return html`<az-case-sizing></az-case-sizing>`;
-      case "SlideDeck":
-        return html`<az-case-slide-deck></az-case-slide-deck>`;
-      case "Switches":
-        return html`<az-case-switches></az-case-switches>`;
-      case "TabView":
-        return html`<az-case-tab-view></az-case-tab-view>`;
-      case "TextFields":
-        return html`<az-case-text-fields></az-case-text-fields>`;
-      case "Toasts":
-        return html`<az-case-toasts></az-case-toasts>`;
-      case "TreeView":
-        return html`<az-case-tree-view></az-case-tree-view>`;
-      case "Launcher":
-          return html`<az-case-launcher></az-case-launcher>`;
-      default:
-        return noContent;
-    }
+    const showcaseMap = {
+      Accordion: html`<az-case-accordion></az-case-accordion>`,
+      Buttons: html`<az-case-buttons></az-case-buttons>`,
+      ButtonsWithIcons: html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`,
+      Checkboxes: html`<az-case-checkboxes></az-case-checkboxes>`,
+      CodeBox: html`<az-case-code-box></az-case-code-box>`,
+      DateRange: html`<az-case-date-range></az-case-date-range>`,
+      Images: html`<az-case-images></az-case-images>`,
+      InputTests: html`<az-case-input-tests></az-case-input-tests>`,
+      Lookup: html`<az-case-lookup></az-case-lookup>`,
+      Modals: html`<az-case-modals></az-case-modals>`,
+      ObjectInspector: html`<az-case-object-inspector></az-case-object-inspector>`,
+      RadioButtons: html`<az-case-radios></az-case-radios>`,
+      Scheduler: html`<az-case-scheduler></az-case-scheduler>`,
+      Selects: html`<az-case-selects></az-case-selects>`,
+      Sizing: html`<az-case-sizing></az-case-sizing>`,
+      SlideDeck: html`<az-case-slide-deck></az-case-slide-deck>`,
+      Switches: html`<az-case-switches></az-case-switches>`,
+      TabView: html`<az-case-tab-view></az-case-tab-view>`,
+      TextFields: html`<az-case-text-fields></az-case-text-fields>`,
+      Toasts: html`<az-case-toasts></az-case-toasts>`,
+      TreeView: html`<az-case-tree-view></az-case-tree-view>`,
+      Launcher: html`<az-case-launcher></az-case-launcher>`,
+      Cards: html`<az-case-cards></az-case-cards>`,
+      Grids: html`<az-case-grids></az-case-grids>`,
+      Prose: html`<az-case-prose></az-case-prose>`,
+
+    };
+
+    return showcaseMap[showcase] || noContent;
+    
   }
 }
 
