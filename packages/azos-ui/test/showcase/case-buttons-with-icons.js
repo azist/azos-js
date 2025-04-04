@@ -32,14 +32,14 @@ export class CaseButtons extends CaseBase {
 <div class="strip-h">
   <h4>Buttons with specific statuses</h4>
   <az-button icon="svg://azos.ico.checkmark"  title="Regular"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Success" status="ok"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Information" status="info"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Warning" status="warning"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Alert" status="alert"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Error" status="error"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Brand 1" status="brand1"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Brand 2" status="brand2"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Brand 3" status="brand3"></az-button>
+  <az-button icon="svg://azos.ico.delete" title="Success" status="ok"></az-button>
+  <az-button icon="svg://azos.ico.user" title="Information" status="info"></az-button>
+  <az-button icon="svg://azos.ico.add" title="Warning" status="warning"></az-button>
+  <az-button icon="svg://azos.ico.arrowLeft" title="Alert" status="alert"></az-button>
+  <az-button icon="svg://azos.ico.key" title="Error" status="error"></az-button>
+  <az-button icon="svg://azos.ico.lock" title="Brand 1" status="brand1"></az-button>
+  <az-button icon="svg://azos.ico.folder" title="Brand 2" status="brand2"></az-button>
+  <az-button icon="svg://azos.ico.play" title="Brand 3" status="brand3"></az-button>
 </div>
 
 <div class="strip-h">
@@ -47,8 +47,8 @@ export class CaseButtons extends CaseBase {
   <az-button icon="svg://azos.ico.checkmark" title="Tiny" rank="tiny"></az-button>
   <az-button icon="svg://azos.ico.checkmark" title="Small" rank="small"></az-button>
   <az-button icon="svg://azos.ico.checkmark" title="Medium" rank="medium"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Normal" rank="normal"></az-button>
-  <az-button icon="svg://azos.ico.checkmark" title="Large" rank="large"></az-button>
+  <az-button icon="svg://azos.ico.play" title="Normal" rank="normal"></az-button>
+  <az-button icon="svg://azos.ico.add" title="Large" rank="large"></az-button>
   <az-button icon="svg://azos.ico.checkmark" title="Huge" rank="huge"></az-button>
 </div>
 
