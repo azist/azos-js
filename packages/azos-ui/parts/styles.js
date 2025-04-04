@@ -650,7 +650,6 @@ export const iconStyles = css`
 }
 .icon, .icon svg{ /* sometimes, svg is wrapped */
   width: var(--icon-size);
-  width: 1em;
   padding: 0;
   margin: 0;
 }
