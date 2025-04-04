@@ -232,7 +232,7 @@ export const checkStyles = css`
       rotate: 45deg;
     }
     &:checked {
-      &:before, &:after { 
+      &:before, &:after {
         scale: 1;
         opacity: 1; }
     }
