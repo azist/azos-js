@@ -138,10 +138,10 @@ button:disabled{
 button{ display: inline-block; }
 
 /**
- *Icons in Buttons should always be 1em so it doesn't stretch out the button
- *using scale to make icon bigger without affecting the button size
+ * Icons in Buttons should always be 1em so it doesn't stretch out the button
+ * using scale to make icon bigger without affecting the button size
  */
-button .icon{
+button .icon {
   --icon-stroke: var(--ink);
   --icon-size: 1em; 
   scale: 1.4; 
@@ -650,6 +650,7 @@ export const iconStyles = css`
 }
 .icon, .icon svg{ /* sometimes, svg is wrapped */
   width: var(--icon-size);
+  width: 1em;
   padding: 0;
   margin: 0;
 }
