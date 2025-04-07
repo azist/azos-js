@@ -7,12 +7,69 @@
 import * as types from "./types.js";
 import * as strings from "./strings.js";
 import * as aver from "./aver.js";
-import { Configuration } from "./conf.js";
+import { ConfigNode, Configuration } from "./conf.js";
+import { Session } from "./session.js";
+
 
 /** Provides uniform base for Security-related exceptions */
 export class SecurityError extends types.AzosError {
-  constructor(message, from = null, cause = null){ super(message, from, cause, 503); }
+  constructor(message, from = null, cause = null, code = 503){ super(message, from, cause, code); }
 }
+
+/** Thrown when authorization permission check fails, indicating that access is denied */
+export class AuthorizationError extends SecurityError {
+  #permission;
+
+  constructor(permission, message = null, from = null, cause = null){
+    permission = aver.isOf(permission, Permission);
+    message = `Permission '${permission.path}' failed authorization '${permission.description}'`;
+    if (types.isNonEmptyString(message)) message += `: ${message}`;
+    super(message, from, cause, 403);
+    this.#permission = permission;
+  }
+
+  /** Returns failing permission instance */
+  get permission(){ return this.#permission; }
+
+  /** Override to change namespace which is returned from external status */
+  get ns() { return "js.sec"; }
+
+   /** Override to add details which are provided to callers via external status */
+   provideExternalStatus() {
+    const result = super.provideExternalStatus();
+    result["permission"] = this.#permission.path;
+    return result;
+  }
+}
+
+/** Security ACL descriptor config attribute name.
+ * WARNING: This has to match Azos server constant values in `./Azos/Security/authorization/AccessLevel.cs`
+ */
+export const CONFIG_LEVEL_ATTR = "level";
+
+/** Defines Azos security system canonical access level.
+ * WARNING: This has to match Azos server constant values in `./Azos/Security/authorization/AccessLevel.cs`
+ */
+export const ACCESS_LEVEL = Object.freeze({
+  /** All access denied */
+  DENIED: 0,
+
+  /** View only access */
+  VIEW: 1,
+
+  /** View and change access */
+  CHANGE: 2,
+
+  /** Full CRUD: View, Change, and Delete */
+  DELETE: 3,
+
+  /**
+   * Bearers have above the full control. In the scope of system administration permissions only:  this is typically used
+   * to protect irrevocable actions, direct data access, ability to launch arbitrary processes and other activities that
+   * might destabilize the system
+   */
+  ADVANCED: 1000
+});
 
 /** User login status types */
 export const USER_STATUS = Object.freeze({
@@ -190,4 +247,108 @@ export class User {
 
   /** Returns JWT "picture" claim containing URL of user image  @returns {string} */
   get claims_Picture(){ return this.#claims.root.getString("picture", null); }
+}
+
+
+/** Permission is a security authorization assertion, you allocate permissions and call `check(session)` method which either passes or fails with
+ * `AuthorizationError`. You can create your own permissions which embody possibly complex authorization checks.
+ * The ideology is taken from Azos full server framework where permissions are used everywhere
+ */
+export class Permission {
+  /**
+   *  Returns a first permission which fails authorization check or null, if all pass
+   * @param {Session} session security context for the call
+   * @param {Iterable<Permission>} permissions - iterable of permission instances
+   * @returns {Permission} first failing permission or null if none failed
+  */
+  static findFirstFailing(session, permissions){
+    aver.isOf(session, Session);
+    aver.isIterable(permissions);
+    for(const one of permissions){
+      if (!one.check(session)) return one;
+    }
+    return null;
+  }
+
+  /**
+   * Runs guard check an all supplied permissions. This throws a {@link AuthorizationError} on the first permission which fails the check
+   * @param {Session} session security context for the call
+   * @param {Iterable<Permission>} permissions - iterable of permission instances
+   * @param {string | null} [message=null] - optional error message for exception
+   * @param {string | null} [from=null] - optional error from clause for exception
+  */
+  static guardAll(session, permissions, message = null, from = null){
+    aver.isOf(session, Session);
+    aver.isIterable(permissions);
+    for(const one of permissions){
+      one.guard(session, message, from);
+    }
+  }
+
+  #ns;
+  #name;
+  #level;
+
+  /**
+   * Creates an instance of Permission which represents a security assertion
+   * @param {string} ns required namespace name
+   * @param {string} name required name within namespace
+   * @param {int} level requires access level
+   */
+  constructor(ns, name, level){
+    aver.isNonEmptyString(ns);
+    ns = strings.trim(ns);
+    if (ns.endsWith("/")) ns = ns.slice(0, -1);
+    this.#ns = ns;
+    this.#name = aver.isNonEmptyString(name);
+    this.#level = types.asInt(level, false);
+  }
+
+  /** Permission namespace name e.g. `Azos/System/Services` */
+  get ns(){ return this.#ns; }
+
+  /** Permission name which is the trailing segment of full path e.g `DataAdminPermission` */
+  get name(){ return this.#name; }
+
+  /** Full path concatenating `ns + / + name` e.g. `Azos/System/Services/DataAdminPermission` */
+  get path(){ return `${this.#ns}/${this.#name}`; }
+
+  /** Asserted access level. 0 = DENIED, {@link ACCESS_LEVEL} */
+  get level(){ return this.#level; }
+
+  /** Describes the security assertion action/parameters. Override to reflect your specific checks */
+  get description(){ return `Level >= ${this.#level}`; }
+
+
+  /** Returns true/false if permission check passes or fails in the context of a given session */
+  check(session){
+    aver.isOf(session, Session);
+    const user = session.user;
+    const rights = user.rights;
+    //The descriptor is taken from user rights ACL and it MUST BE a config section
+    const descriptor = rights.nav(this.path);
+    if (!(descriptor instanceof ConfigNode) || !descriptor.isSection) return false;// no security descriptor in the ACL was found = failed authorization
+    const result = this._doCheck(session, user, descriptor);
+    return result;
+  }
+
+  /** Throws an {@link AuthorizationError} when authorization check fails */
+  guard(session, message = null, from = null){
+    const pass = this.check(session);
+    if (!pass) throw new AuthorizationError(this, message, from);
+  }
+
+
+  /**
+   * Protected method which performs authorization assertion check. The default one check the access level
+   * @param {Session} session session context
+   * @param {User} user user principal object as extracted from the session context
+   * @param {ConfigNode} descriptor security descriptor config section as gotten from this permission path
+   */
+  // eslint-disable-next-line no-unused-vars
+  _doCheck(session, user, descriptor){
+    const aclLevel = descriptor.getInt(CONFIG_LEVEL_ATTR, ACCESS_LEVEL.DENIED);
+    return aclLevel >= this.#level;
+  }
+
 }
