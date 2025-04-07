@@ -328,7 +328,7 @@ export class Permission {
     //The descriptor is taken from user rights ACL and it MUST BE a config section
     const descriptor = rights.nav(this.path);
     if (!(descriptor instanceof ConfigNode) || !descriptor.isSection) return false;// no security descriptor in the ACL was found = failed authorization
-    const result = this._doCheck(session, user, rights, descriptor);
+    const result = this._doCheck(session, user, descriptor);
     return result;
   }
 
@@ -340,15 +340,14 @@ export class Permission {
 
 
   /**
-   * Protected method which performs authorization assertion check
-   * @param {*} session session context
-   * @param {*} user user principal object as extracted from the session context
-   * @param {*} rights user principal rights, as extracted from the user principal
-   * @param {*} descriptor security descriptor config section as gotten from this permission path
+   * Protected method which performs authorization assertion check. The default one check the access level
+   * @param {Session} session session context
+   * @param {User} user user principal object as extracted from the session context
+   * @param {ConfigNode} descriptor security descriptor config section as gotten from this permission path
    */
   // eslint-disable-next-line no-unused-vars
-  _doCheck(session, user, rights, descriptor){
-    const aclLevel = descriptor.getInt(CONFIG_LEVEL_ATTR, 0);
+  _doCheck(session, user, descriptor){
+    const aclLevel = descriptor.getInt(CONFIG_LEVEL_ATTR, ACCESS_LEVEL.DENIED);
     return aclLevel >= this.#level;
   }
 
