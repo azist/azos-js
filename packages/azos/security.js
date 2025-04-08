@@ -7,7 +7,7 @@
 import * as types from "./types.js";
 import * as strings from "./strings.js";
 import * as aver from "./aver.js";
-import { ConfigNode, Configuration } from "./conf.js";
+import { config, ConfigNode, Configuration, makeNew } from "./conf.js";
 import { Session } from "./session.js";
 
 
@@ -255,17 +255,41 @@ export class User {
  * The ideology is taken from Azos full server framework where permissions are used everywhere
  */
 export class Permission {
+
+  /** Returns an instance of `Permission` or its derivative out of the supplied specifier.
+   * If you pass a string, returns a permission configured from the string,
+   * if you pass ConfigNode builds a Permission object, otherwise throws averment error
+   * @param {string | Configuration | ConfigNode | Permission} spec permission specifier of one of the supported types
+   * @returns {Permission | null}
+   */
+  static specToPermission(spec){
+    if (!spec) return null;
+    if (spec instanceof Permission) return spec;//as-is
+    if (types.isString(spec)) spec = config(spec);
+    if (spec instanceof Configuration) spec = spec.root;
+    if (spec instanceof ConfigNode){
+      return makeNew(Permission, spec, null, Permission);//factory method
+    }
+    if (types.isObject(spec)) {
+      spec = config(spec).root;
+      return makeNew(Permission, spec, null, Permission);//factory method
+    }
+    throw aver.AVERMENT_FAILURE(`Bad permission spec '${spec}'`, "specToPermission()");
+  }
+
+
   /**
    *  Returns a first permission which fails authorization check or null, if all pass
    * @param {Session} session security context for the call
-   * @param {Iterable<Permission>} permissions - iterable of permission instances
+   * @param {Iterable<Permission | Configuration | ConfigNode | string>} permissionSpecs - iterable of permission specifiers
    * @returns {Permission} first failing permission or null if none failed
   */
-  static findFirstFailing(session, permissions){
+  static findFirstFailing(session, permissionSpecs){
     aver.isOf(session, Session);
-    aver.isIterable(permissions);
-    for(const one of permissions){
-      if (!one.check(session)) return one;
+    aver.isIterable(permissionSpecs);
+    for(const one of permissionSpecs){
+      const perm = this.specToPermission(one);
+      if (!perm.check(session)) return perm;
     }
     return null;
   }
@@ -273,15 +297,16 @@ export class Permission {
   /**
    * Runs guard check an all supplied permissions. This throws a {@link AuthorizationError} on the first permission which fails the check
    * @param {Session} session security context for the call
-   * @param {Iterable<Permission>} permissions - iterable of permission instances
+   * @param {Iterable<Permission | Configuration | ConfigNode | string>} permissionSpecs - iterable of permission specifiers
    * @param {string | null} [message=null] - optional error message for exception
    * @param {string | null} [from=null] - optional error from clause for exception
   */
-  static guardAll(session, permissions, message = null, from = null){
+  static guardAll(session, permissionSpecs, message = null, from = null){
     aver.isOf(session, Session);
-    aver.isIterable(permissions);
-    for(const one of permissions){
-      one.guard(session, message, from);
+    aver.isIterable(permissionSpecs);
+    for(const one of permissionSpecs){
+      const perm = this.specToPermission(one);
+      perm.guard(session, message, from);
     }
   }
 
@@ -291,11 +316,24 @@ export class Permission {
 
   /**
    * Creates an instance of Permission which represents a security assertion
-   * @param {string} ns required namespace name
+   * @param {string | Configuration | ConfigNode} nsOrCfg required namespace name or ConfigNode or Configuration object
    * @param {string} name required name within namespace
    * @param {int} level requires access level
    */
-  constructor(ns, name, level){
+  constructor(nsOrCfg, name, level){
+
+    if (nsOrCfg instanceof Configuration){
+      nsOrCfg = nsOrCfg.root;
+    }
+
+    let ns = nsOrCfg;
+    if (nsOrCfg instanceof ConfigNode){
+      const cfg = nsOrCfg;
+      ns = cfg.getString("ns", null);
+      name = cfg.getString("name", null);
+      level = cfg.getInt("level", 0);
+    }
+
     aver.isNonEmptyString(ns);
     ns = strings.trim(ns);
     if (ns.endsWith("/")) ns = ns.slice(0, -1);
@@ -350,5 +388,5 @@ export class Permission {
     const aclLevel = descriptor.getInt(CONFIG_LEVEL_ATTR, ACCESS_LEVEL.DENIED);
     return aclLevel >= this.#level;
   }
-
 }
+

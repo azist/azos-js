@@ -16,6 +16,16 @@ export class Applet extends AzosElement {
 
   #args;
 
+  /** Returns a STATIC iterable/array of permission specifiers which this applet CLASS requires for activation
+   * Arena checks this permissions BEFORE activating the desired applet type.
+   * You declare this STATIC (per class) property in every applet class where you want to implement security
+   * @example
+   * class B extends A {
+   *   static permissions = [new SpecialPermission(1),'{"ns": "/System/Admin", "name": "UserManager", "level": 3}', ...super.permissions];
+   * }
+   */
+  static permissions = [];
+
   constructor() {
     super();
   }
@@ -28,11 +38,11 @@ export class Applet extends AzosElement {
   /** Returns the name of the applet displayed in the Arena title bar */
   get title() { return this.constructor.name; }
 
-  /** Returns the prefix used for local storage key names */
-  get localStoragePrefix() { return `${this.arena.app.id}::${this.constructor.name}`; }
-
   /** Returns short description */
   get description() { return ""; }
+
+  /** Returns the prefix used for local storage key names */
+  get localStoragePrefix() { return `${this.arena.app.id}::${this.constructor.name}`; }
 
   /** Override to return true when this applet has unsaved data */
   get [DIRTY_PROP]() { return false; }

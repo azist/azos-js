@@ -1,8 +1,12 @@
+import { Permission } from "azos/security";
 import { Applet } from "../../applet";
 import { html } from "../../ui";
 
 
 export class ExampleFeatureBApplet extends Applet{
+
+ ////Uncommenting this will require user principal to have that permission
+  //static permissions = [ new Permission("test", "Master", 5), {ns: "System", name: "UserManager", level: 500}];
 
   get title(){ return "Feature B"; }
 
