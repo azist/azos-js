@@ -1,8 +1,7 @@
 import { css } from "../ui";
  
 /**
- * Provides a basic grid system that can be imported and used in other components.
- * See saga-form.js for an example of how to use this.
+ * Provides a basic grid system
  */
 const STL_GRID = css`
   .grid {
