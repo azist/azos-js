@@ -5,6 +5,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { BREAKPOINT_SM } from "../styles/breakpoints.js";
 import { css } from "../ui.js";
 
 export const baseStyles = css`
@@ -72,6 +73,9 @@ export const baseStyles = css`
 .bottom-center > span               { text-align:center; margin-top: .6em; }
 .bottom-right > span                { text-align:right; margin-top: .6em; }
 
+/**
+ * TODO: determine if we can change 360 to ${BREAKPOINT_SM}
+ */
 @media screen and (max-width: 360px){
   .mid-right, .mid-left{ flex-direction: column; }
 }
@@ -105,7 +109,6 @@ button{
   color:  var(--s-default-fg-ctl);
   background: var(--s-default-bg-ctl-btn);
   padding: var(--ctl-button-padding);
-  min-width: 10ch;
   transition: 0.2s;
   user-select: none;
   -webkit-user-select: none;
@@ -150,6 +153,13 @@ button .icon {
 }
 button:has(i) {
   display: inline-flex;
+  &.compact {
+    @media (max-width: ${BREAKPOINT_SM}px) { 
+      padding: .5em;
+      .title {display: none }
+      .icon { margin: 0 }
+    }
+  }
   i {
     display: inline-flex !important;
   }

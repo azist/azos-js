@@ -53,6 +53,16 @@ export class CaseButtons extends CaseBase {
 </div>
 
 <div class="strip-h">
+  <h4>Compact Button</h4>
+  <az-button compact="true" icon="svg://azos.ico.search" title="Search"></az-button>
+  <az-button compact="true" icon="svg://azos.ico.filter" title="Filter"></az-button>
+  <az-button compact="true" icon="svg://azos.ico.close" title="Clear"></az-button>
+  <az-button compact="true" icon="svg://azos.ico.category" title="View"></az-button>
+
+</div>
+
+
+<div class="strip-h">
   <h4>Disabled buttons</h4>
   <az-button icon="svg://azos.ico.checkmark" title="Regular" isDisabled></az-button>
   <az-button icon="svg://azos.ico.checkmark" title="Success" status="ok" isDisabled></az-button>
