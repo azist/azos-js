@@ -21,6 +21,7 @@ import { ImageRegistry } from "azos/bcl/img-registry";
 import "./launcher.js";
 import { BrowserRouter } from "./browser-router.js";
 import { showObject } from "./object-inspector-modal.js";
+import { Permission } from "azos/security";
 
 //todo Move outside of here
 function getUserInitials(user) {
@@ -267,6 +268,13 @@ export class Arena extends AzosElement {
     aver.isSubclassOf(tapplet, Applet);
     const tagName = customElements.getName(tapplet);
     aver.isNotNull(tagName);
+
+    //Check permissions
+    const permissions = tapplet.permissions;
+    if (permissions){
+      //This throws
+      Permission.guardAll(this.app.session, permissions, `Launching '${tapplet.constructor.name}'`, `arn.appletOpen()`);
+    }
 
     //Try to close the current one is loaded
     const closed = await this.appletClose(force);
