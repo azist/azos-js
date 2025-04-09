@@ -16,17 +16,17 @@ export class Button extends Part {
     type: { type: String },
     icon: { type: String },
     iconOpts: { type: Object },
-    compact: { type: Boolean }
+    shrink: { type: Boolean }
   };
 
   constructor() {
     super();
     this.type = "";
-    this.compact = false;
+    this.shrink = false;
   }
 
   renderPart() {
-    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)} ${this.compact ? "compact" : ""}`;
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)} ${this.shrink ? "shrink" : ""}`;
 
     return html`<button class="${cls}" type="${this.type}" .disabled=${this.isDisabled}>
       ${this.renderIcon()}

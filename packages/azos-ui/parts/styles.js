@@ -153,7 +153,7 @@ button .icon {
 }
 button:has(i) {
   display: inline-flex;
-  &.compact {
+  &.shrink {
     @media (max-width: ${BREAKPOINT_SM}px) { 
       padding: .5em;
       .title {display: none }
