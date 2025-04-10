@@ -202,7 +202,7 @@ li{
     if (item instanceof MenuCommand){
       this.navChild(item);
     } else {
-      result = await item.exec(this);
+      result = await item.exec(this.arena, this);
     }
 
     this._onItemActivated(item, result);

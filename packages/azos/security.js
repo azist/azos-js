@@ -7,7 +7,7 @@
 import * as types from "./types.js";
 import * as strings from "./strings.js";
 import * as aver from "./aver.js";
-import { config, ConfigNode, Configuration, makeNew } from "./conf.js";
+import { config, ConfigNode, Configuration, GET_CONFIG_VERBATIM_VALUE, makeNew } from "./conf.js";
 import { Session } from "./session.js";
 
 
@@ -341,6 +341,9 @@ export class Permission {
     this.#name = aver.isNonEmptyString(name);
     this.#level = types.asInt(level, false);
   }
+
+  //Enables treatment by config framework as a verbatim value instead of being deconstructed into a ConfigSection
+  [GET_CONFIG_VERBATIM_VALUE](){ return this; }
 
   /** Permission namespace name e.g. `Azos/System/Services` */
   get ns(){ return this.#ns; }

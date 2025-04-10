@@ -7,9 +7,11 @@
 import * as aver from "azos/aver";
 import { isString } from "azos/types";
 import { makeNew, config, ConfigNode, GET_CONFIG_VERBATIM_VALUE } from "azos/conf";
-import { AzosElement, html, verbatimHtml } from "./ui.js";
+import { html, verbatimHtml } from "./ui.js";
 import { Arena } from "./arena.js";
 import { BrowserRouter } from "./browser-router.js";
+import { Permission } from "azos/security";
+import { Session } from "azos/session";
 
 /** Define a keyboard shortcut */
 export class KeyboardShortcut {
@@ -79,6 +81,8 @@ export class Command {
   #enabled = true;
   #readonly = false;
 
+  #permissions = null;
+
   #shortcut;
   #value;
   #handler;
@@ -106,6 +110,11 @@ export class Command {
     if (nsh instanceof ConfigNode) this.#shortcut = makeNew(KeyboardShortcut, nsh, null, KeyboardShortcut);
     else if (nsh instanceof KeyboardShortcut) this.#shortcut = nsh;
     else this.#shortcut = null;
+
+    const npr = cfg.get("permissions");
+    if (npr) {
+      this.#permissions =[...npr].map(one => Permission.specToPermission(one.val));
+    }
 
     this.#value = cfg.get("value") ?? null;
     this.#handler = aver.isFunctionOrNull(cfg.get("handler"));
@@ -151,27 +160,44 @@ export class Command {
   get shortcut(){ return this.#shortcut; }
   set shortcut(v){ this.#shortcut = aver.isOfOrNull(v, KeyboardShortcut); }
 
+  get permissions() { return this.#permissions; }
+  set permissions(v){ this.#permissions = aver.isArrayOrNull(v); }
+
   get value(){ return this.#value; }
   set value(v){ this.#value = v; }
 
   get handler(){ return this.#handler; }
   set handler(v){ this.#handler = aver.isFunctionOrNull(v); }
 
+  get [Symbol.toStringTag]() { return this.constructor.name; }
 
-  /** Executes the command. Commands return a Promise which completes upon command execution */
-  async exec(sender){
+  toString() { return `${this.constructor.name}('${this.uri}', '${this.title}')`; }
+
+  /** Executes this command. Commands return a Promise which completes upon command execution.
+   *  If this command has a `handler` function - it takes precedence, otherwise the `route` is navigated via a `BrowserRouter` instance if one is configured
+   * @param {Arena} arena required `Arena` instance
+   * @param {any} sender An optional context argument which is supplied into command execution
+   * @param {Session | null} [session=null] an optional session object which should be used for permission check. If null, then current app session is used
+   */
+  async exec(arena, sender = null, session = null) {
+    aver.isOf(arena, Arena);
+
+    session = aver.isOfOrNull(session, Session) ?? arena.app.session;
+
     if (!this.#active) return undefined;
-    if (this.#handler) {
-      return await this.#handler.call(this, sender);
+
+    if (this.#permissions) {
+      Permission.guardAll(session, this.#permissions, "Cmd exec denied", this.toString());
     }
 
-    if (this.#route){
-      const arena = sender instanceof Arena ? sender : sender.arena;
-      if (arena){
-        const router = arena.app.moduleLinker.tryResolve(BrowserRouter);
-        if (router) {
-          return await router.safeHandleUiActionAsync(arena, this.#route);
-        }
+    if (this.#handler) {
+      return await this.#handler.call(this, arena, sender, session);
+    }
+
+    if (this.#route) {
+      const router = arena.app.moduleLinker.tryResolve(BrowserRouter);
+      if (router) {
+        return await router.safeHandleUiActionAsync(arena, this.#route);
       }
     }
 
