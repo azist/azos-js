@@ -15,7 +15,7 @@ import { iconStyles } from "./parts/styles.js";
 import { ARENA_STYLES } from "./arena.css.js";
 import { Applet } from "./applet.js";
 import { ModalDialog } from "./modal-dialog.js";
-import { dflt, isEmpty } from "azos/strings";
+import { isEmpty } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
 import "./launcher.js";
