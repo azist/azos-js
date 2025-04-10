@@ -363,13 +363,71 @@ describe("ConfigNode", function() {
     aver.throws(() => cfg.root.nav("paths").get("a"), "recursive ref to path");
   });
 
-  it("flatten-simple",  function() {
-    const cfg = sut.config({ a: 1, b: 2 });
 
-    const got = cfg.root.flatten();
-    aver.isObject(got);
-    aver.areEqual(1, got.a);
-    aver.areEqual(1, got.b);
+  describe("Flatten", function(){
+
+    it("map-simple",  function() {
+      const cfg = sut.config({ a: 1, b: 2, s: "hello" });
+
+      const got = cfg.root.flatten();
+      aver.isObject(got);
+      aver.areEqual(1, got.a);
+      aver.areEqual(2, got.b);
+      aver.areEqual("hello", got.s);
+    });
+
+    it("map-simple-var",  function() {
+      const cfg = sut.config({ a: 1, b: 2, c: "$(b)-$(a)" });
+
+      const got = cfg.root.flatten();
+      aver.isObject(got);
+      aver.areEqual(1, got.a);
+      aver.areEqual(2, got.b);
+      aver.areEqual("2-1", got.c);
+    });
+
+    it("map-simple-var-verbatim",  function() {
+      const cfg = sut.config({ a: 1, b: 2, c: "$(b)-$(a)" });
+
+      const got = cfg.root.flatten(true);
+      aver.isObject(got);
+      aver.areEqual(1, got.a);
+      aver.areEqual(2, got.b);
+      aver.areEqual("$(b)-$(a)", got.c);
+    });
+
+    it("array-simple",  function() {
+      const cfg = sut.config({d: [1, 2, "hello"]});
+
+      const got = cfg.root.get("d").flatten();
+      aver.isArray(got);
+      aver.areEqual(1, got[0]);
+      aver.areEqual(2, got[1]);
+      aver.areEqual("hello", got[2]);
+    });
+
+    it("array-simple-var",  function() {
+      const cfg = sut.config({d: [1, 2, "$(1)-$(0)"]});
+
+      const got = cfg.root.get("d").flatten();
+      aver.isArray(got);
+      aver.areEqual(1, got[0]);
+      aver.areEqual(2, got[1]);
+      aver.areEqual("2-1", got[2]);
+    });
+
+    it("array-simple-var-verbatim",  function() {
+      const cfg = sut.config({d: [1, 2, "$(1)-$(0)"]});
+
+      const got = cfg.root.get("d").flatten(true);
+      aver.isArray(got);
+      aver.areEqual(1, got[0]);
+      aver.areEqual(2, got[1]);
+      aver.areEqual("$(1)-$(0)", got[2]);
+    });
+
+
+
   });
 
 

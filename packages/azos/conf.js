@@ -253,7 +253,7 @@ export class ConfigNode{
     } else { //SECTION
       const map = this.#value;
       const result = { };
-      for(const k of map.keys()) {
+      for(const k in map) {
         let v = map[k];
         if (!verbatim) v = this.evaluate(v);
         if (v instanceof ConfigNode) v = v.flatten(verbatim);
@@ -311,7 +311,7 @@ export class ConfigNode{
 
         //20250319 DKh Special case - another node reference
         //When a variable can be treated as a non-string rather as an object if there is nothing else to interpolate
-        if (val.length > 3 && val.startsWith("$(") && val.charAt(val.length-1) === ")"){
+        if (val.length > 3 && val.startsWith("$(") && val.indexOf(")") === val.length-1){
           return vmap(null, val.substring(2, val.length-1));
         }
         //20250319 DKh -------------------------------------
