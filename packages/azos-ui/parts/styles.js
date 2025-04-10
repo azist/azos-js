@@ -145,7 +145,7 @@ button{ display: inline-block; }
  * using scale to make icon bigger without affecting the button size
  */
 button .icon {
-  --icon-stroke: var(--ink);
+  --icon-stroke: currentColor;
   --icon-size: 1em; 
   scale: 1.4; 
   margin-inline-end: .5ch;
