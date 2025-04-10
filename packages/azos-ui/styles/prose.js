@@ -1,7 +1,7 @@
 import { css } from "../ui";
  
 /**
- * Provides a basic prose (opinionated typography) style that can be imported and used in other components.
+ * Provides a basic prose (opinionated typography) style
  * Must wrap content with .prose class
  */
 const STL_PROSE = css`

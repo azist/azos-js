@@ -1,8 +1,7 @@
-import { css } from "../ui";
- 
+import { css } from "../ui"; 
+import { BREAKPOINT_SM } from "./breakpoints";
 /**
- * Provides a basic grid system that can be imported and used in other components.
- * See saga-form.js for an example of how to use this.
+ * Provides a basic grid system
  */
 const STL_GRID = css`
   .grid {
@@ -39,7 +38,7 @@ const STL_GRID = css`
     grid-column: span 4;
   }
  
-  @media (max-width: 600px) {
+  @media (max-width: ${BREAKPOINT_SM}px) {
     .cols2, .cols3, .cols4 {
       grid-template-columns: repeat(1, 1fr);
     }

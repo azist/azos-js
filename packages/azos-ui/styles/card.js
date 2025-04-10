@@ -1,7 +1,7 @@
 import { css } from "../ui";
 
 /**
- * Provides a basic card style that can be imported and used in other components.
+ * Provides a basic card style
  */
 const STL_CARD = css`
   .card {
