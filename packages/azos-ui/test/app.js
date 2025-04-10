@@ -79,14 +79,14 @@ const appMenu = {
   hint: "This is just a root menu item",
   menu: [
     "Section A",
-    {title: "Showcase", icon: "svg://azos.ico.database", route: "/examples/showcase"},
+    {title: "Showcase", icon: "svg://azos.ico.database", route: "/examples/showcase", Xpermissions: [{ns: "System", name: "UserManager", level: 0}]},
     {title: "Something Else", icon: "svg://azos.ico.category"},
     "Examples",
     {title: "Feature A", route: "/examples/featurea"},
     {title: "Feature B", route: "/examples/featureb"},
     {title: "Subsection...", icon: "svg://azos.ico.category", menu: [
-      {title: "A"},
-      {title: "B"}
+      {title: "A", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 3}]},
+      {title: "B", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 4}]}
     ]},
     {title: "Item D"},
     null,//divider
