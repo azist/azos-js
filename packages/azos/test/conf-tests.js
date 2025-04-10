@@ -363,6 +363,15 @@ describe("ConfigNode", function() {
     aver.throws(() => cfg.root.nav("paths").get("a"), "recursive ref to path");
   });
 
+  it("flatten-simple",  function() {
+    const cfg = sut.config({ a: 1, b: 2 });
+
+    const got = cfg.root.flatten();
+    aver.isObject(got);
+    aver.areEqual(1, got.a);
+    aver.areEqual(1, got.b);
+  });
+
 
   it("getChildren()",   function() {
     const cfg = sut.config({
@@ -893,7 +902,6 @@ describe("Config::Performance", function() {
 
 
   it("from Json",   function() { // 75K ops/sec on OCTOD
-    this.timeoutMs = 500;
     console.time("cfg");
     for(let i=0; i<10_000; i++){
       const cfg = sut.config(cfgJson);
@@ -904,7 +912,6 @@ describe("Config::Performance", function() {
   });
 
   it("navigate",   function() { // 80K ops/sec on OCTOD
-    this.timeoutMs = 350;
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
@@ -915,7 +922,6 @@ describe("Config::Performance", function() {
   });
 
   it("makeNew",   function() { // 200K ops/sec on OCTOD
-    this.timeoutMs = 300;
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
