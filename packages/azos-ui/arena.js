@@ -508,7 +508,7 @@ ${footer}
     }
   }
 
-  async #toolbarClick(){ await this.exec(this); }
+  async #toolbarClick(arena){ await this.exec(arena, this /*sender*/); }
 
   #renderToolbar(commands){
     const divToolbar = this.#getRefToolbar(this).value;
@@ -518,7 +518,7 @@ ${footer}
 
     let i=0;
     for(let cmd of commands){
-      const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${this.#toolbarClick.bind(cmd)}">
+      const one = html`<div class="strip-btn" id="divToolbar_${i++}" @click="${this.#toolbarClick.bind(cmd, this)}">
         ${cmd.provideMarkup(this, this)}
       </div>`;
       itemContent.push(one);
