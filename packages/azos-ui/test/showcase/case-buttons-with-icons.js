@@ -8,6 +8,7 @@ import { html } from "../../ui";
 import { CaseBase } from "./case-base";
 
 import "../../parts/button";
+import { BREAKPOINT_SM } from "../../styles/breakpoints";
 
 export class CaseButtons extends CaseBase {
   renderControl() {
@@ -51,6 +52,16 @@ export class CaseButtons extends CaseBase {
   <az-button icon="svg://azos.ico.add" title="Large" rank="large"></az-button>
   <az-button icon="svg://azos.ico.checkmark" title="Huge" rank="huge"></az-button>
 </div>
+
+<div class="strip-h">
+<h4>Shrink Button</h4>
+<p>Lower window size to less than ${BREAKPOINT_SM}px</p>
+  <az-button shrink icon="svg://azos.ico.search" title="Search"></az-button>
+  <az-button shrink icon="svg://azos.ico.filter" title="Filter"></az-button>
+  <az-button shrink icon="svg://azos.ico.close" title="Clear"></az-button>
+  <az-button shrink icon="svg://azos.ico.category" title="View"></az-button>
+</div>
+
 
 <div class="strip-h">
   <h4>Disabled buttons</h4>

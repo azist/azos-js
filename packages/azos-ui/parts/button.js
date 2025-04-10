@@ -1,4 +1,3 @@
-
 /*<FILE_LICENSE>
  * Azos (A to Z Application Operating System) Framework
  * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
@@ -17,15 +16,18 @@ export class Button extends Part {
     type: { type: String },
     icon: { type: String },
     iconOpts: { type: Object },
+    shrink: { type: Boolean }
   };
 
   constructor() {
     super();
     this.type = "";
+    this.shrink = false;
   }
 
   renderPart() {
-    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)} ${this.shrink ? "shrink" : ""}`;
+
     return html`<button class="${cls}" type="${this.type}" .disabled=${this.isDisabled}>
       ${this.renderIcon()}
       <span class="title">${this.title}</span>
