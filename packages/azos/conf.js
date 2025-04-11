@@ -233,6 +233,36 @@ export class ConfigNode{
     };
   }
 
+  /** Returns this `ConfigNode` as a flat object copy, that is: this node is copied as a new object, its non-ConfigNode properties are assigned
+   * to the new object, whereas ConfigNode properties are flattened.
+   * Sections are flattened into JS plain object maps, and arrays are flattened into plain JS arrays
+   * @param {boolean} [verbatim=false] True to bypass variable evaluation, false by default
+   * @returns {map | Array} a map with a copy of this and possibly child nodes (if any exist) flattened as well
+   */
+  flatten(verbatim = false){
+    if (types.isArray(this.#value)) { //ARRAY
+      const arr = this.#value;
+      const result = [ ];
+      for(let i = 0; i < arr.length; i++) {
+        let v = arr[i];
+        if (!verbatim) v = this.evaluate(v);
+        if (v instanceof ConfigNode) v = v.flatten(verbatim);
+        result.push(v);
+      }
+      return result;
+    } else { //SECTION
+      const map = this.#value;
+      const result = { };
+      for(const k in map) {
+        let v = map[k];
+        if (!verbatim) v = this.evaluate(v);
+        if (v instanceof ConfigNode) v = v.flatten(verbatim);
+        result[k] = v;
+      }
+      return result;
+    }
+  }
+
   /** Iterates over a section: map or array
    * Returning KVP {key, idx, value}; index is -1 for object elements
   */
@@ -281,14 +311,14 @@ export class ConfigNode{
 
         //20250319 DKh Special case - another node reference
         //When a variable can be treated as a non-string rather as an object if there is nothing else to interpolate
-        if (val.length > 3 && val.startsWith("$(") && val.charAt(val.length-1) === ")"){
+        if (val.length > 3 && val.startsWith("$(") && val.indexOf(")") === val.length-1){
           return vmap(null, val.substring(2, val.length-1));
         }
         //20250319 DKh -------------------------------------
 
         const result = val.replace(REXP_VAR_DECL, vmap);//REXP has a `/g` flag for global replace all
         return result;
-    }finally{
+    } finally {
       stack._level--;
       if (stack._level === 0) ConfigNode.#evalStack = null;
     }
@@ -305,6 +335,17 @@ export class ConfigNode{
     const vv = this.getVerbatim(...names);
     const result = this.evaluate(vv);
     return result;
+  }
+
+  /**
+   * Returns a flattened child `ConfigNode` element copy by the first matching name for map or index for an array.
+   * The names are coalesced from left to right - the first matching element is returned.
+   * Returns null for non-existing elements or non-`ConfigNode` elements.
+   * @returns {undefined | ConfigNode | object} element value which
+   */
+  getFlatNode(...names){
+    const got = this.get(names);
+    return got instanceof ConfigNode ? got.flatten() : null;
   }
 
   /**

@@ -173,6 +173,20 @@ export class Command {
 
   toString() { return `${this.constructor.name}('${this.uri}', '${this.title}')`; }
 
+  /** Returns true when this or child commands have anything authorized for execution, as dictated by their `permissions` specification collection.
+   * This is typically used to hide parent menu items which do not have any authorized children or sub menus under them
+   */
+  isAnythingAuthorized(session){
+    aver.isOf(session, Session);
+
+    if (this.#permissions) {
+      return Permission.allAuthorized(session, this.#permissions);
+    }
+
+    return true;
+  }
+
+
   /** Executes this command. Commands return a Promise which completes upon command execution.
    *  If this command has a `handler` function - it takes precedence, otherwise the `route` is navigated via a `BrowserRouter` instance if one is configured
    * @param {Arena} arena required `Arena` instance
@@ -265,4 +279,19 @@ export class MenuCommand extends Command{
 
   /** Returns an array of menu items: each item is either a Command, a String section name or a null which represents a divider. */
   get menu(){ return [...this.#menu]; }
+
+  /** Returns true when this is authorized and some child commands or their child commands recursively have anything authorized for execution, as dictated by their `permissions` specification collection.
+   * This is typically used to hide parent menu items which do not have any authorized children or sub menus under them
+   */
+  isAnythingAuthorized(session){
+    let result = super.isAnythingAuthorized(session);
+    if (!result) return false;
+
+    for(let one of this.#menu){
+      if (one.isAnythingAuthorized(session)) return true;
+    }
+
+    return false;
+  }
+
 }

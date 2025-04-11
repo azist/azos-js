@@ -364,6 +364,133 @@ describe("ConfigNode", function() {
   });
 
 
+  describe("Flatten", function(){
+
+    it("map-simple",  function() {
+      const cfg = sut.config({ a: 1, b: 2, s: "hello" });
+
+      const got = cfg.root.flatten();
+      aver.isObject(got);
+      aver.areEqual(1, got.a);
+      aver.areEqual(2, got.b);
+      aver.areEqual("hello", got.s);
+    });
+
+    it("map-simple-var",  function() {
+      const cfg = sut.config({ a: 1, b: 2, c: "$(b)-$(a)" });
+
+      const got = cfg.root.flatten();
+      aver.isObject(got);
+      aver.areEqual(1, got.a);
+      aver.areEqual(2, got.b);
+      aver.areEqual("2-1", got.c);
+    });
+
+    it("map-simple-var-verbatim",  function() {
+      const cfg = sut.config({ a: 1, b: 2, c: "$(b)-$(a)" });
+
+      const got = cfg.root.flatten(true);
+      aver.isObject(got);
+      aver.areEqual(1, got.a);
+      aver.areEqual(2, got.b);
+      aver.areEqual("$(b)-$(a)", got.c);
+    });
+
+    it("array-simple",  function() {
+      const cfg = sut.config({d: [1, 2, "hello"]});
+
+      const got = cfg.root.get("d").flatten();
+      aver.isArray(got);
+      aver.areEqual(1, got[0]);
+      aver.areEqual(2, got[1]);
+      aver.areEqual("hello", got[2]);
+    });
+
+    it("array-simple-var",  function() {
+      const cfg = sut.config({d: [1, 2, "$(1)-$(0)"]});
+
+      const got = cfg.root.get("d").flatten();
+      aver.isArray(got);
+      aver.areEqual(1, got[0]);
+      aver.areEqual(2, got[1]);
+      aver.areEqual("2-1", got[2]);
+    });
+
+    it("array-simple-var-verbatim",  function() {
+      const cfg = sut.config({d: [1, 2, "$(1)-$(0)"]});
+
+      const got = cfg.root.get("d").flatten(true);
+      aver.isArray(got);
+      aver.areEqual(1, got[0]);
+      aver.areEqual(2, got[1]);
+      aver.areEqual("$(1)-$(0)", got[2]);
+    });
+
+
+    it("complex",  function() {
+      const cfg = sut.config({
+         a: 10,
+         b: -275,
+         s: "helloS",
+         chain: {a: 1, inner: {a: 2, inner: {a: 3, inner: null}}},
+         d: {
+          q: 120,
+          pizza: { xyz: -789, topping: "bacon", boris:  {error: "none", b: -785.328}},
+          z: [-1.34, {a: true, b: -789.234}]
+        }
+      });
+
+      aver.isOf(cfg.root.get("d").get("z").get("1"), sut.ConfigNode);
+      aver.areEqual(-789.234, cfg.root.get("d").get("z").get("1").get("b"));
+
+      const got = cfg.root.flatten();
+      console.info(JSON.stringify(got, null, 2));
+      aver.isObject(got);
+      aver.areEqual(10, got.a);
+      aver.areEqual(-275, got.b);
+      aver.areEqual("helloS", got.s);
+
+      aver.areEqual(3, got.chain.inner.inner.a);
+      aver.areEqual(null, got.chain.inner.inner.inner);
+
+      aver.areEqual(2, got.d.z.length);
+      aver.areEqual(-1.34, got.d.z[0]);
+
+      aver.areEqual("bacon", got.d.pizza.topping);
+      aver.areEqual(-785.328, got.d.pizza.boris.b);
+      aver.areEqual(-789.234, got.d.z[1].b);
+    });
+
+    it("complex-getFlatNode()",  function() {
+      const cfg = sut.config({
+         a: 10,
+         b: -275,
+         s: "helloS",
+         chain: {a: 1, inner: {a: 2, inner: {a: 3, inner: null}}},
+         d: {
+          q: 120,
+          pizza: { xyz: -789, topping: "bacon", boris:  {error: "none", b: -785.328}},
+          z: [-1.34, {a: true, b: -789.234}]
+        }
+      });
+
+      aver.areEqual(null, cfg.root.getFlatNode("doesnotexist"));
+
+      const got = cfg.root.getFlatNode("d");
+      console.info(JSON.stringify(got, null, 2));
+
+      aver.areEqual(2, got.z.length);
+      aver.areEqual(-1.34, got.z[0]);
+
+      aver.areEqual(120, got.q);
+      aver.areEqual("bacon", got.pizza.topping);
+      aver.areEqual(-785.328, got.pizza.boris.b);
+      aver.areEqual(-789.234, got.z[1].b);
+    });
+
+  });
+
+
   it("getChildren()",   function() {
     const cfg = sut.config({
       a: {x: 123},
@@ -893,7 +1020,6 @@ describe("Config::Performance", function() {
 
 
   it("from Json",   function() { // 75K ops/sec on OCTOD
-    this.timeoutMs = 500;
     console.time("cfg");
     for(let i=0; i<10_000; i++){
       const cfg = sut.config(cfgJson);
@@ -904,7 +1030,6 @@ describe("Config::Performance", function() {
   });
 
   it("navigate",   function() { // 80K ops/sec on OCTOD
-    this.timeoutMs = 350;
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
@@ -915,7 +1040,6 @@ describe("Config::Performance", function() {
   });
 
   it("makeNew",   function() { // 200K ops/sec on OCTOD
-    this.timeoutMs = 300;
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){

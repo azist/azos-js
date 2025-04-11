@@ -150,7 +150,9 @@ li{
   renderHead(){
     const menus = [this.#menu, ...this.#ranks].slice(1);//skip root
     const children = [];
+    const session = this.arena.app.session;
     for(const one of menus){
+      if (!one.isAnythingAuthorized(session)) continue;
       const ico = one.icon ? this.renderImageSpec(one.icon).html : noContent;
       children.push(html`<li class="menu-header" @click="${() => { this.#onClickHeader(one);} }">${ico} ${one.title}</li>`);
     }
@@ -159,6 +161,7 @@ li{
 
   renderMenu(){
    const children = [];
+   const session = this.arena.app.session;
    for(const one of this.current.menu){
 
      if (!one){ //menu divider
@@ -167,6 +170,7 @@ li{
      }
 
      if (one instanceof Command){
+       if (!one.isAnythingAuthorized(session)) continue;
        const ico = one.icon ? this.renderImageSpec(one.icon).html : noContent;
        children.push(html`<li class="menu-command" @click="${() => { this.#onClickItem(one);} }">${ico} ${one.title}</li>`);
        continue;

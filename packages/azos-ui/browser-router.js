@@ -174,7 +174,7 @@ export class AppletLaunchActionHandler extends ActionHandler{
     super(router, cfg, path, parent);
     this.#applet = isSubclassOf(cfg.get("applet"), Applet);
     this.#force = cfg.getBool("force", false);
-    this.#args = cfg.get("args") ?? null;//TODO: We need a getter which return Plain value like: cfg.getPlain("aaa"); which returns object or array or primitive, not config node
+    this.#args = cfg.getFlatNode("args");
     this.#history = cfg.getBool("history", true);
   }
 

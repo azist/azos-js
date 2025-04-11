@@ -81,7 +81,8 @@
       "vmap",
       "whitespaces",
       "xffffn",
-      "xffn"
+      "xffn",
+      "Xpermissions"
     ],
     "files.eol": "\n",
     "javascript.preferences.autoImportFileExcludePatterns": [

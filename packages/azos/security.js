@@ -288,10 +288,20 @@ export class Permission {
     aver.isOf(session, Session);
     aver.isIterable(permissionSpecs);
     for(const one of permissionSpecs){
-      const perm = this.specToPermission(one);
+      const perm = Permission.specToPermission(one);
       if (!perm.check(session)) return perm;
     }
     return null;
+  }
+
+  /**
+   *  Returns true when all permissions are checked and authorized
+   * @param {Session} session security context for the call
+   * @param {Iterable<Permission | Configuration | ConfigNode | string>} permissionSpecs - iterable of permission specifiers
+   * @returns {boolean} true if all permissions are authorized
+  */
+  static allAuthorized(session, permissionSpecs){
+     return null === Permission.findFirstFailing(session, permissionSpecs);
   }
 
   /**
@@ -305,7 +315,7 @@ export class Permission {
     aver.isOf(session, Session);
     aver.isIterable(permissionSpecs);
     for(const one of permissionSpecs){
-      const perm = this.specToPermission(one);
+      const perm = Permission.specToPermission(one);
       perm.guard(session, message, from);
     }
   }
