@@ -461,7 +461,32 @@ describe("ConfigNode", function() {
       aver.areEqual(-789.234, got.d.z[1].b);
     });
 
+    it("complex-getFlatNode()",  function() {
+      const cfg = sut.config({
+         a: 10,
+         b: -275,
+         s: "helloS",
+         chain: {a: 1, inner: {a: 2, inner: {a: 3, inner: null}}},
+         d: {
+          q: 120,
+          pizza: { xyz: -789, topping: "bacon", boris:  {error: "none", b: -785.328}},
+          z: [-1.34, {a: true, b: -789.234}]
+        }
+      });
 
+      aver.areEqual(null, cfg.root.getFlatNode("doesnotexist"));
+
+      const got = cfg.root.getFlatNode("d");
+      console.info(JSON.stringify(got, null, 2));
+
+      aver.areEqual(2, got.z.length);
+      aver.areEqual(-1.34, got.z[0]);
+
+      aver.areEqual(120, got.q);
+      aver.areEqual("bacon", got.pizza.topping);
+      aver.areEqual(-785.328, got.pizza.boris.b);
+      aver.areEqual(-789.234, got.z[1].b);
+    });
 
   });
 
