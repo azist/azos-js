@@ -288,7 +288,7 @@ export class MenuCommand extends Command{
     if (!result) return false;
 
     for(let one of this.#menu){
-      if (one.isAnythingAuthorized(session)) return true;
+      if (one instanceof Command && one.isAnythingAuthorized(session)) return true;
     }
 
     return false;
