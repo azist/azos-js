@@ -11,7 +11,7 @@
     "newLineKind": "lf",
     "useBraces": "preferNone",
     "bracePosition": "sameLine",
-    "singleBodyPosition": "sameLine",
+    "singleBodyPosition": "maintain",
     "nextControlFlowPosition": "sameLine",
     "trailingCommas": "onlyMultiLine",
     "operatorPosition": "nextLine",
