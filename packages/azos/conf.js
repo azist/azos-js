@@ -539,3 +539,31 @@ export function makeNew(base, cfg, dir = null, tdflt = null, cargs = null){
     throw new ConfigError(`Factory "makeNew(${base.name ?? UNKNOWN}, ${argDescr})" error: ${e.message}`, "makeNew()", e);
   }
 }
+
+/**
+ * Takes either a `ConfigNode` attribute value by name, or uses the literal value if it is NOT
+ * either a `ConfigNode` or `Configuration`
+ * @param {any | Configuration | ConfigNode} cfgOrValue - any value or ConfigNode or Configuration
+ * @param {string[]} atrNames - required string attribute names which are used when configuration or config node is passed for value
+ * @returns {*} if you pass configuration or config node then takes its attribute by name, otherwise returns the value itself
+ */
+export function getNodeAttrOrValue(cfgOrValue, ...atrNames){
+  let cfg = cfgOrValue;
+  if (cfg instanceof Configuration) cfg = cfg.root;
+  if (cfg instanceof ConfigNode) return cfg.get(...atrNames);
+  return cfgOrValue;
+}
+
+/**
+ * Takes either a `ConfigNode` attribute verbatim value by name, or uses the literal value if it is NOT
+ * either a `ConfigNode` or `Configuration`
+ * @param {any | Configuration | ConfigNode} cfgOrValue - any value or ConfigNode or Configuration
+ * @param {string[]} atrNames - required string attribute name which is used when configuration or config node is passed for value
+ * @returns {*} if you pass configuration or config node then takes its attribute verbatim value by name, otherwise returns the value itself
+ */
+export function getVerbatimNodeAttrOrValue(cfgOrValue, ...atrNames){
+  let cfg = cfgOrValue;
+  if (cfg instanceof Configuration) cfg = cfg.root;
+  if (cfg instanceof ConfigNode) return cfg.getVerbatim(...atrNames);
+  return cfgOrValue;
+}

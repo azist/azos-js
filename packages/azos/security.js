@@ -7,7 +7,7 @@
 import * as types from "./types.js";
 import * as strings from "./strings.js";
 import * as aver from "./aver.js";
-import { config, ConfigNode, Configuration, GET_CONFIG_VERBATIM_VALUE, makeNew } from "./conf.js";
+import { config, ConfigNode, Configuration, GET_CONFIG_VERBATIM_VALUE, getNodeAttrOrValue, makeNew } from "./conf.js";
 import { Session } from "./session.js";
 
 
@@ -215,6 +215,9 @@ export class User {
   /** Returns true when user status is `SYSTEM` @returns {boolean}*/
   get isSystem() { return this.#status === USER_STATUS.System; }
 
+  /** Returns true when user status is `ADMIN` or `SYSTEM` @returns {boolean}*/
+  get isAdminOrSystem() { return this.#status === USER_STATUS.Admin || this.#status === USER_STATUS.System; }
+
   /** Returns user auth token, such as OAuth refresh token @returns {string} */
   get authToken(){return this.#authToken; }
 
@@ -341,7 +344,7 @@ export class Permission {
       const cfg = nsOrCfg;
       ns = cfg.getString("ns", null);
       name = cfg.getString("name", null);
-      level = cfg.getInt("level", 0);
+      level = cfg.getInt(CONFIG_LEVEL_ATTR, 0);
     }
 
     aver.isNonEmptyString(ns);
@@ -403,3 +406,11 @@ export class Permission {
   }
 }
 
+/**
+ * Checks that user is authenticated with Administrator status (user.Status=Admin) and has the specified access level.
+ * The validation fails for plain User statuses regardless of their ACL level.
+ */
+export class SystemAdminPermission extends Permission {
+  constructor(cfgOrLevel){ super("/Azos/Security", "SystemAdmin", getNodeAttrOrValue(cfgOrLevel, CONFIG_LEVEL_ATTR)); }
+  _doCheck(session, user, descriptor){ return user.isAdminOrSystem && super._doCheck(session, user, descriptor); }
+}
