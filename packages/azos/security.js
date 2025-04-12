@@ -411,6 +411,7 @@ export class Permission {
   }
 }
 
+//#region Azos permissions
 /**
  * Checks that user is authenticated and does not care about access level to any specific permission beyond that,
  * consequently this permission skips authorization altogether.
@@ -431,3 +432,4 @@ export class SystemAdminPermission extends Permission {
   constructor(cfgOrLevel){ super(NS_AZOS_SECURITY, "SystemAdmin", getNodeAttrOrValue(cfgOrLevel, CONFIG_LEVEL_ATTR)); }
   _doCheck(session, user, descriptor){ return user.isAdminOrSystem && super._doCheck(session, user, descriptor); }
 }
+//#endregion
