@@ -48,7 +48,7 @@
     "test": "node  packages/azos/test/app.mjs -- --filter",
     "--test-azos": "npm test -workspace=azos",
     "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/test/index.htm\"",
-    "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\"",
+    "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\""
   },
   "devDependencies": {
     "eslint": "^8.50.0",
