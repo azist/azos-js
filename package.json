@@ -49,15 +49,8 @@
     "--test-azos": "npm test -workspace=azos",
     "test-bro": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos/test/index.htm\"",
     "ui": "parcel --no-cache --dist-dir \"./out/www\" \"./packages/azos-ui/test/index.htm\"",
-
-    "--": "https://dprint.dev/cli/",
-    "fmt": "dprint fmt ./packages/azos/security.js",
-    "fmt-check": "dprint check",
-    "fmt-show":  "dprint output-resolved-config",
-    "fmt-clear": "dprint clear-cache"
   },
   "devDependencies": {
-    "dprint": "^0.49.1",
     "eslint": "^8.50.0",
     "parcel": "^2.13.3"
   }
