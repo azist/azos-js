@@ -18,7 +18,6 @@ export class Router extends Module{
   #graph;//ConfigNode
   #errorPath;
 
-
   constructor(dir, cfg){
     super(dir, cfg);
     this.#graph = aver.isOf(cfg.get("graph"), ConfigNode);
@@ -105,7 +104,6 @@ export class RouteHandler{
   #segment;
   #nextPath;
   #parent;
-  #permissions; //TODO: Implement sec in general - assertion script
 
   constructor(router, graph, path, parent){
     this.#router = aver.isOf(router, Router);
@@ -156,30 +154,12 @@ export class RouteHandler{
 
   /** Returns the next/child handler or NULL if this handler is the terminal/leaf action handler*/
   next(){ throw ABSTRACT("RouteHandler.next()"); }
-
-  /** Passes or fails with AuthorizationException/403. It checks permissions on the whole ancestry chain leading up to this handler (all parents) */
-  checkPermissionChain(session){
-    aver.isOf(session, Session);
-    let node = this;
-    while(node){
-      node.checkPermissions(session);
-      node = node.parent;
-    }
-  }
-
-  /** Checks permissions defined on this level */
-  checkPermissions(session){
-    aver.isOf(session, Session);
-    // TODO: Implement!!!!!!!!!!
-  }
-
 }
 
+/** Represents a section of a route (like a file path folder), contrast with ActionHandler which is a terminal action handler */
 export class SectionHandler extends RouteHandler{
 
-  constructor(router, cfg, path, parent){
-    super(router, cfg, path, parent);
-  }
+  constructor(router, cfg, path, parent){ super(router, cfg, path, parent); }
 
   next(){
     //Section or Action default type
@@ -203,15 +183,13 @@ export class ActionHandler extends RouteHandler{
   /** The Leaf node which performs an action. Returns NULL for action nodes as here is nothing next in the chain*/
   next(){ return null; }
 
-  /** Performs the actual work after checking permissions if a user session object is passed
+  /** Performs the actual work
    * @param {*} context execution context, e.g. for browser routing we would pass arena
    * @param {*} args arguments for action execution
-   * @param {Session} session session which execution is under
+   * @param {Session} session session which execution is under, this may be needed changing security context
    */
   async execActionAsync(context, args, session = null){
-    //Validate permissions from top to bottom
     aver.isOfOrNull(session, Session);
-    if (session) this.checkPermissions(session);
     return await this._doExecActionAsync(context, args, session);
   }
 
@@ -225,42 +203,3 @@ export class ActionHandler extends RouteHandler{
     throw ABSTRACT("execActionAsync()");
   }
 }
-
-
-
-/*
-- Applet - add launch arguments - a map. Routing positional arguments are supplied like: {@route: ["a", 2, true]}
-- arena.appletOpen(..[args])
-
-
-Need a catch all/default bucket
-Routes are stored in a config node tree in memory.
-  routeSectionA/
-     routeSectionB/
-           handler ->
-           appletLaunchHandler ->  AppletAClass, optionalPermissions, launch parameters(they supersede what is passed)
-           shortcutB ->  AppletBClass, .............................
-
-  {
-    company: {
-      maintenance: {
-        // company/maintenance/masterdata/orders/order-no/233676
-        masterData: {applet: MasterDataSetup, args: {a: 1, b: 2} binder: function(p,args){ }} // binder is a function which takes request, and args which it populates, by default positionalBinder
-        masterData: {applet: MasterDataSetup, args: {all: "@@"}} // all: [orders,order-no,233676]
-      },
-      setup: "$(./maintenance)", //shortcut to 'maintenance'
-      reports: {
-      },
-      about: {applet: AboutUsApplet, args: {}},
-      help: {type: "PageTemplateHandler", page: "help.html"}
-    }
-  }
-
-
-
-
-  navigate(path, params);
-  router.nav("#routeSectionA/routeSectionB/shortcutA/byId/1234").go();
-
-
-*/

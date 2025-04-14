@@ -15,6 +15,7 @@ import { Session } from "../session.js";
 import { Localizer } from "../localization.js";
 import { Linker } from "../linker.js";
 import { AppComponent } from "../components.js";
+import { SecurityManager } from "../secman.js";
 
 unit("Application", function () {
 
@@ -45,23 +46,29 @@ unit("Application", function () {
       isNotNull(app.instanceId);
       isNotNull(app.startTime);
 
-      areEqual(1, app.components.length);
+      areEqual(2, app.components.length);
       isOf(app.components[0], ConLog);
 
-      areEqual(1, app.rootComponents.length);
+      areEqual(2, app.rootComponents.length);
       isOf(app.rootComponents[0], ConLog);
+      isOf(app.rootComponents[1], SecurityManager);
 
       areEqual(1, app.modules.length);
       isOf(app.modules[0], ConLog);
 
       let clist = AppComponent.getAllApplicationComponents(app);
-      areEqual(1,  clist.length);
+      areEqual(2,  clist.length);
       areEqual(app, clist[0].director);
-      isTrue(clist[0].isDirectedByApp)
+      isTrue(clist[0].isDirectedByApp);
+      areEqual(app, clist[1].director);
+      isTrue(clist[1].isDirectedByApp);
+
       clist = AppComponent.getRootApplicationComponents(app);
-      areEqual(1,  clist.length);
+      areEqual(2,  clist.length);
       areEqual(app, clist[0].director);
-      isTrue(clist[0].isDirectedByApp)
+      isTrue(clist[0].isDirectedByApp);
+      areEqual(app, clist[1].director);
+      isTrue(clist[1].isDirectedByApp);
 
       isOf(app.log, ILog);
       areEqual(LOG_TYPE.DEBUG, app.logLevel);

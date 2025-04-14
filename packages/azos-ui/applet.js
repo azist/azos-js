@@ -7,6 +7,8 @@
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { AzosElement } from "./ui.js";
 import { dflt } from "azos/strings";
+import { isOfOrNull } from "azos/aver";
+import { Session } from "azos/session";
 
 /**
  * Defines a root UI element which represents an Applet - a part of application.
@@ -15,6 +17,7 @@ import { dflt } from "azos/strings";
 export class Applet extends AzosElement {
 
   #args;
+  #session;
 
   /** Returns a STATIC iterable/array of permission specifiers which this applet CLASS requires for activation
    * Arena checks this permissions BEFORE activating the desired applet type.
@@ -34,6 +37,13 @@ export class Applet extends AzosElement {
   get args(){return this.#args;}
   /** Arguments which are assigned at applet launch. You can pass parameters such as deep links into the applet  */
   set args(v){ this.#args = v ?? null; }
+
+  /** Session object which describes among other things, User security principal, set by arena at launch.
+   * You should use this for checking security within your applet, and not rely on global app session
+  */
+  get session(){return this.#session ?? null;}
+  /** Session object which describes among other things, User security principal, set by arena at launch*/
+  set session(v){this.#session = isOfOrNull(v, Session);}
 
   /** Returns the name of the applet displayed in the Arena title bar */
   get title() { return this.constructor.name; }

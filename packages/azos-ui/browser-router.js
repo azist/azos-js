@@ -4,16 +4,16 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isNonEmptyString, isOf, isString, isSubclassOf } from "../azos/aver";
-import { ConfigNode, makeNew } from "../azos/conf";
-import { Router, RouteHandler, ActionHandler, SectionHandler } from "../azos/router";
-import { DESTRUCTOR_METHOD, isSubclassOf as types_isSubclassOf } from "../azos/types";
-import { Arena } from "./arena";
-import { Applet } from "./applet";
-import { showMsg } from "./msg-box";
-import { isNullOrWhiteSpace } from "azos/strings";
-import { LOG_TYPE } from "azos/log";
-import { MenuCommand } from "./cmd";
+import { isNonEmptyString, isOf, isString, isSubclassOf } from "../azos/aver.js";
+import { ConfigNode, makeNew } from "../azos/conf.js";
+import { Router, RouteHandler, ActionHandler, SectionHandler } from "../azos/router.js";
+import { DESTRUCTOR_METHOD, isSubclassOf as types_isSubclassOf } from "../azos/types.js";
+import { Arena } from "./arena.js";
+import { Applet } from "./applet.js";
+import { showMsg } from "./msg-box.js";
+import { isNullOrWhiteSpace } from "azos/strings.js";
+import { LOG_TYPE } from "azos/log.js";
+import { MenuCommand } from "./cmd.js";
 
 /** Provides routing services in the context of a UI in a browser (such as Chrome or Firefox) user agent */
 export class BrowserRouter extends Router{
@@ -194,7 +194,7 @@ export class AppletLaunchActionHandler extends ActionHandler{
   async _doExecActionAsync(context, args, session){
     const arena = isOf(context, Arena, `${this.constructor.name} requires Arena context`);
     const launchArgs = {...this.requestContext["args"], ...this.#args, ...args};//mix-in args
-    const result = await arena.appletOpen(this.#applet, launchArgs, this.#force);
+    const result = await arena.appletOpen(this.#applet, launchArgs, this.#force, session);
 
     if (result)
       this.router.notifyRouteChanged(this.rootPath, this.#history);
