@@ -196,13 +196,15 @@ export class Command {
   async exec(arena, sender = null, session = null) {
     aver.isOf(arena, Arena);
 
-    session = aver.isOfOrNull(session, Session) ?? arena.app.session;
 
     if (!this.#active) return undefined;
 
+    //---- SECURITY CHECK ----
+    session = aver.isOfOrNull(session, Session) ?? arena.app.session;
     if (this.#permissions) {
       Permission.guardAll(session, this.#permissions, "Cmd exec denied", this.toString());
     }
+    //------------------------
 
     if (this.#handler) {
       return await this.#handler.call(this, arena, sender, session);
