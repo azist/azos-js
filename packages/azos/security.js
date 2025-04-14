@@ -59,7 +59,7 @@ export const ACCESS_LEVEL = Object.freeze({
   /** All access denied */
   DENIED: 0,
 
-  /** View only access */
+  /** View only access. This is the minimum access level above DENIED */
   VIEW: 1,
 
   /** View and change access */
@@ -121,6 +121,32 @@ export function parseJwtToken(jwt){
   } catch(cause) {
     throw new SecurityError("Unparsable JWT", "parseJwtToken()", cause);
   }
+}
+
+/**
+ * Represents an access level tuple: `(User, Permission, ConfigNode)`
+ * which is a calculated by {@link SecurityManager}
+ */
+export class AccessLevel {
+  #user;
+  #permission;
+  #descriptor;
+
+  constructor(user, permission, descriptor){
+    this.#user = aver.isOf(user, User);
+    this.#permission = aver.isOf(permission, Permission);
+    this.#descriptor = aver.isOf(descriptor, ConfigNode);
+  }
+
+  get user()      { return this.#user; }
+  get permission(){ return this.#permission; }
+  get descriptor(){ return this.#descriptor; }
+
+  /** Returns access level property of descriptor */
+  get level() { return this.#descriptor.getInt(CONFIG_LEVEL_ATTR, ACCESS_LEVEL.DENIED);}
+
+  /** Returns true if level is less than the minimum grant, which is VIEW, effectively meaning that access is denied */
+  get denied(){ return this.level < ACCESS_LEVEL.VIEW; }
 }
 
 
@@ -382,12 +408,10 @@ export class Permission {
   /** Returns true/false if permission check passes or fails in the context of a given session */
   check(session){
     aver.isOf(session, Session);
-    const user = session.user;
-    const rights = user.rights;
-    //The descriptor is taken from user rights ACL and it MUST BE a config section
-    const descriptor = rights.nav(this.path);
-    if (!(descriptor instanceof ConfigNode) || !descriptor.isSection) return false;// no security descriptor in the ACL was found = failed authorization
-    const result = this._doCheck(session, user, descriptor);
+    const secman = session.app.security;
+    const acl = secman.getAccessLevel(session.user, this);
+    if (!acl) return false;
+    const result = this._doCheck(session, acl);
     return result;
   }
 
@@ -397,17 +421,14 @@ export class Permission {
     if (!pass) throw new AuthorizationError(this, message, from);
   }
 
-
   /**
    * Protected method which performs authorization assertion check. The default one check the access level
    * @param {Session} session session context
-   * @param {User} user user principal object as extracted from the session context
-   * @param {ConfigNode} descriptor security descriptor config section as gotten from this permission path
+   * @param {AccessLevel} accessLevel access level object for this permission check
    */
   // eslint-disable-next-line no-unused-vars
-  _doCheck(session, user, descriptor){
-    const aclLevel = descriptor.getInt(CONFIG_LEVEL_ATTR, ACCESS_LEVEL.DENIED);
-    return aclLevel >= this.#level;
+  _doCheck(session, accessLevel){
+    return accessLevel.level >= this.#level;
   }
 }
 
@@ -421,7 +442,7 @@ export class Permission {
 export class AuthenticatedUserPermission extends Permission {
   constructor(){ super(NS_AZOS_SECURITY, "AuthenticatedUser", 0); }
   // eslint-disable-next-line no-unused-vars
-  _doCheck(session, user, descriptor){ return user.isValid; }
+  _doCheck(session, accessLevel){ return session.user.isValid; }
 }
 
 /**
@@ -430,6 +451,6 @@ export class AuthenticatedUserPermission extends Permission {
  */
 export class SystemAdminPermission extends Permission {
   constructor(cfgOrLevel){ super(NS_AZOS_SECURITY, "SystemAdmin", getNodeAttrOrValue(cfgOrLevel, CONFIG_LEVEL_ATTR)); }
-  _doCheck(session, user, descriptor){ return user.isAdminOrSystem && super._doCheck(session, user, descriptor); }
+  _doCheck(session, accessLevel){ return session.user.isAdminOrSystem && super._doCheck(session, accessLevel); }
 }
 //#endregion

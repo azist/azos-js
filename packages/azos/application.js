@@ -9,6 +9,7 @@ import * as aver from "./aver.js";
 import { $ } from "./linq.js";
 import { Configuration, ConfigNode, makeNew, config } from "./conf.js";
 import { Session } from "./session.js";
+import { SecurityManager } from "./secman.js";
 import { AppComponent } from "./components.js";
 import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
@@ -71,6 +72,7 @@ export class Application extends types.DisposableObject{
   #startTime;
 
   #session;
+  #security;
   #localizer;
   #moduleLinker;
   #dfltLog;
@@ -102,6 +104,7 @@ export class Application extends types.DisposableObject{
     this.#dfltLog = new ConLog(this, config({name: "log", [types.ORDER_PROP]: -1_000_000}).root);
 
     this.#session = this._makeSession(root.get("session"));
+    this.#security = this._makeSecurity(root.get("security"));
     this.#localizer = this._makeLocalizer(root.get("localizer"));
 
     this.#moduleLinker = new ModuleLinker();
@@ -210,7 +213,6 @@ export class Application extends types.DisposableObject{
    */
   get effectiveLogLevel(){ return this.logLevel; }
 
-
   /**
    * Returns the app-level session which is used in browser/ui and other apps
    * which do not support per-logical-flow sessions
@@ -218,15 +220,33 @@ export class Application extends types.DisposableObject{
    */
   get session(){ return this.#session; }
 
+  /**
+   * Returns the {@link SecurityManager} for this application
+   * @returns {SecurityManager}
+   */
+  get security(){ return this.#security; }
+
   /** Factory method used to allocate sessions from config object
    * @param {ConfigNode} cfg configuration node
    * @returns {Session}
-  */
+   */
   _makeSession(cfg){
     if (types.isAssigned(cfg)) {
        return makeNew(Session, cfg, this);
     } else {
        return new Session(this, null);//empty session
+    }
+  }
+
+   /** Factory method used to allocate SecurityManager
+   * @param {ConfigNode} cfg configuration node
+   * @returns {SecurityManager}
+   */
+   _makeSecurity(cfg){
+    if (types.isAssigned(cfg)) {
+       return makeNew(SecurityManager, cfg, this, SecurityManager);
+    } else {
+       return new SecurityManager(this, null);//default
     }
   }
 
