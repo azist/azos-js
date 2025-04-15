@@ -4,12 +4,14 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { IClient } from "../../client.js";
-import { isObject, isString, isStringOrNull } from "../../aver.js";
-import { isInsertForm } from "../../types.js";
-import { dflt } from "../../strings.js";
+import { isObject, isOf, isString, isStringOrNull } from "../../aver.js";
 import { CONTENT_TYPE, HEADERS } from "../../coreconsts.js";
-
+import { ATM_SCH_GDID } from "../../canonical.js";
+import { IClient } from "../../client.js";
+import { EntityId } from "../../entity-id.js";
+import { dflt } from "../../strings.js";
+import { isInsertForm, isNonEmptyString } from "../../types.js";
+import { ATM_ETP_USER, ATM_SYS_AUTHKIT, EID_ROOT_USER } from "./constraints.js";
 
 /** Provides functionality for consuming `Sky.AuthKit` admin services by adhering to `IIdpUserAdminLogic` et.al. server contracts */
 export class IdpAdminClient extends IClient {
@@ -53,5 +55,21 @@ export class IdpAdminClient extends IClient {
   async setLockStatusAsync(status, realm) {
     const got = await this.put("lock", { lockStatus: isObject(status) }, this.#makeHeaders(realm));
     return got;
+  }
+
+  createLockStatusBody(targetEID, lockInfo, currentUserGdid) {
+    if (!isNonEmptyString(lockInfo?.LockActor))
+      lockInfo.LockActor = (currentUserGdid ? new EntityId(ATM_SYS_AUTHKIT, ATM_ETP_USER, ATM_SCH_GDID, currentUserGdid) : EID_ROOT_USER).toString();
+
+    const status = {
+      TargetEntity: isOf(targetEID, EntityId).toString(),
+      LockSpanUtc: {
+        start: lockInfo.LockSpanUtc.start ?? null,
+        end: lockInfo.LockSpanUtc.end ?? null,
+      },
+      LockActor: lockInfo.LockActor,
+      LockNote: lockInfo.LockNote ?? null,
+    };
+    return status;
   }
 }

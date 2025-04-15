@@ -795,7 +795,7 @@ export function asDate(v, canUndef = false, fromUTC = false) {
   else if (isIntValue(v)) d = new Date(asInt(v));
   else if (isString(v) && !isNaN((ts = Date.parse(v)))) d = new Date(ts);
   else throw new AzosError(CAST_ERROR + `asDate("${strings.describe(v)}")`);
-  if (!fromUTC) return d;
+  if (!fromUTC || !d) return d;
   return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
 }
 
