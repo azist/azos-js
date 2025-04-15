@@ -1,7 +1,6 @@
-import { Permission } from "azos/security";
-import { Applet } from "../../applet";
-import { html } from "../../ui";
-
+//import { Permission } from "azos/security";
+import { Applet } from "../../applet.js";
+import { html } from "../../ui.js";
 
 export class ExampleFeatureBApplet extends Applet{
 
