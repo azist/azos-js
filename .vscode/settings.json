@@ -109,5 +109,6 @@
       "titleBar.inactiveForeground": "#c0c0a0",
       "statusBar.background": "#3a2a20",
       "statusBar.foreground": "#c0c0a0",
-    }
+    },
+    "javascript.preferences.importModuleSpecifierEnding": "js"
 }
