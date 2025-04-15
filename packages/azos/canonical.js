@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Atom } from "./atom";
+import { Atom } from "./atom.js";
 
 
 export const ATM_SCH_GDID = Atom.encode("gdid");
