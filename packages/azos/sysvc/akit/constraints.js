@@ -1,5 +1,11 @@
-import { Atom } from "../../atom";
-import { EntityId } from "../../entity-id";
+/*<FILE_LICENSE>
+ * Azos (A to Z Application Operating System) Framework
+ * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
+ * See the LICENSE file in the project root for more information.
+</FILE_LICENSE>*/
+
+import { Atom } from "../../atom.js";
+import { EntityId } from "../../entity-id.js";
 
 export const EID_ROOT_USER = EntityId.parse("usrn@idp::root");
 
