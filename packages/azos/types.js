@@ -40,6 +40,18 @@ export const DIRTY_PROP = Symbol("dirty");
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
 
 /**
+ * Establishes a "IData" protocol - an entity provides getting and possibly setting its data under this name aka "field name"
+ */
+export const DATA_NAME_PROP = Symbol("data-name");
+
+/**
+ * Establishes a "IData" protocol - an entity provides getting and possibly setting its data as a primitive value (e.g. such as a string for text fields)
+ * or plan objects: arrays or maps for blocks and forms having its field names represent `Azos.Data.Doc` data document field values.
+ */
+export const DATA_VALUE_PROP = Symbol("data-value");
+
+
+/**
  * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context, scope): error | null`.
  * Performs validation logic returning an error object if validation fails
  */

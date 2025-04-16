@@ -6,6 +6,7 @@
 
 import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
 import { Control, css } from "./ui.js";
+import { FieldPart } from "./parts/field-part.js";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
@@ -40,6 +41,21 @@ export class Block extends Control {
    * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
    */
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
+
+
+  // // // // /** Returns data contained in this block: an object (map) containing named fields with their data,
+  // // // //  * the default implementation harvests the data from field parts using their field name property
+  // // // //  */
+  // // // // getData(){
+  // // // //   const result = { };
+
+  // // // //   for(const one of childElements){
+  // // // //     if (one instanceof FieldPart)
+  // // // //     result[]
+  // // // //   }
+
+  // // // //   return result;
+  // // // // }
 
 }//Block
 
