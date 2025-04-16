@@ -6,12 +6,12 @@
 
 import { isObject, isOf, isString, isStringOrNull } from "../../aver.js";
 import { CONTENT_TYPE, HEADERS } from "../../coreconsts.js";
-import { ATM_SCH_GDID } from "../../canonical.js";
+import { ofUserGdid } from "../../canonical.js";
 import { IClient } from "../../client.js";
 import { EntityId } from "../../entity-id.js";
 import { dflt } from "../../strings.js";
 import { isInsertForm, isNonEmptyString } from "../../types.js";
-import { ATM_ETP_USER, ATM_SYS_AUTHKIT, EID_ROOT_USER } from "./constraints.js";
+import { EID_ROOT_USER } from "./constraints.js";
 
 /** Provides functionality for consuming `Sky.AuthKit` admin services by adhering to `IIdpUserAdminLogic` et.al. server contracts */
 export class IdpAdminClient extends IClient {
@@ -38,17 +38,17 @@ export class IdpAdminClient extends IClient {
     return got;
   }
 
-  async saveUserAsync(user, realm) {
+  async saveUserAsync({ mode, ...user }, realm) {
     isObject(user);
-    const method = isInsertForm(user) ? this.post : this.put;
+    const method = isInsertForm({ mode }) ? this.post : this.put;
     const got = await method.call(this, "user", { user: user }, this.#makeHeaders(realm));
     return got;
   }
 
-  async saveLoginAsync(login) {
+  async saveLoginAsync({ mode, ...login }, realm) {
     isObject(login);
-    const method = isInsertForm(login) ? this.post : this.put;
-    const got = await method.call(this, "login", { login: login });
+    const method = isInsertForm({ mode }) ? this.post : this.put;
+    const got = await method.call(this, "login", { login: login }, this.#makeHeaders(realm));
     return got;
   }
 
@@ -59,7 +59,7 @@ export class IdpAdminClient extends IClient {
 
   createLockStatusBody(targetEID, lockInfo, currentUserGdid) {
     if (!isNonEmptyString(lockInfo?.LockActor))
-      lockInfo.LockActor = (currentUserGdid ? new EntityId(ATM_SYS_AUTHKIT, ATM_ETP_USER, ATM_SCH_GDID, currentUserGdid) : EID_ROOT_USER).toString();
+      lockInfo.LockActor = (currentUserGdid ? ofUserGdid(currentUserGdid) : EID_ROOT_USER).toString();
 
     const status = {
       TargetEntity: isOf(targetEID, EntityId).toString(),
