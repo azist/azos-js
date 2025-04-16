@@ -38,17 +38,17 @@ export class IdpAdminClient extends IClient {
     return got;
   }
 
-  async saveUserAsync(user, realm) {
+  async saveUserAsync({ mode, ...user }, realm) {
     isObject(user);
-    const method = isInsertForm(user) ? this.post : this.put;
+    const method = isInsertForm({ mode }) ? this.post : this.put;
     const got = await method.call(this, "user", { user: user }, this.#makeHeaders(realm));
     return got;
   }
 
-  async saveLoginAsync(login) {
+  async saveLoginAsync({ mode, ...login }, realm) {
     isObject(login);
-    const method = isInsertForm(login) ? this.post : this.put;
-    const got = await method.call(this, "login", { login: login });
+    const method = isInsertForm({ mode }) ? this.post : this.put;
+    const got = await method.call(this, "login", { login: login }, this.#makeHeaders(realm));
     return got;
   }
 

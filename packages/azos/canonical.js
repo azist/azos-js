@@ -6,7 +6,7 @@
 
 import { Atom } from "./atom.js";
 import { EntityId } from "./entity-id.js";
-import { ETP_USER, SYS_AUTHKIT } from "./sysvc/akit/constraints.js";
+import { ETP_LOGIN, ETP_USER, SYS_AUTHKIT } from "./sysvc/akit/constraints.js";
 import { isNonEmptyString } from "./types.js";
 
 export const ADDRESS_INVALID = "[n/a]";
@@ -32,4 +32,9 @@ export function ofUserName(name) {
 export function ofUserGdid(gdid) {
   if (!isNonEmptyString(gdid)) return new EntityId(SYS_IDP, ETP_INVALID, Atom.ZERO, ADDRESS_INVALID);
   return new EntityId(SYS_AUTHKIT, ETP_USER, SCH_GDID, gdid);
+}
+
+export function ofLoginGdid(gdid) {
+  if (!isNonEmptyString(gdid)) return new EntityId(SYS_IDP, ETP_INVALID, Atom.ZERO, ADDRESS_INVALID);
+  return new EntityId(SYS_AUTHKIT, ETP_LOGIN, SCH_GDID, gdid);
 }

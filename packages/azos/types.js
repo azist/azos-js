@@ -8,9 +8,14 @@ import { Atom } from "./atom.js";
 import * as CC from "./coreconsts.js";
 import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
-
-import { isDate as aver_isDate, isNonEmptyString as aver_isNonEmptyString, isStringOrNull as aver_isStringOrNull, isNotNull as aver_isNotNull, isFunction as aver_isFunction } from "./aver.js";
-
+import {
+  isDate as aver_isDate,
+  isNonEmptyString as aver_isNonEmptyString,
+  isStringOrNull as aver_isStringOrNull,
+  isNotNull as aver_isNotNull,
+  isFunction as aver_isFunction,
+  isObject as aver_isObject
+} from "./aver.js";
 
 /**
  * Establishes a "director" protocol - an entity which implements such property returns it's director -
@@ -620,12 +625,12 @@ export const DATA_KIND = Object.freeze({
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
 
 export const FORM_MODE = Object.freeze({
-  UNSPECIFIED: "Unspecified",
-  INSERT: "Insert",
-  UPDATE: "Update",
-  DELETE: "Delete",
+  UNSPECIFIED: "unspecified",
+  INSERT: "insert",
+  UPDATE: "update",
+  DELETE: "delete",
 });
-//const ALL_FORM_MODES = allObjectValues(FORM_MODE);
+const ALL_FORM_MODES = allObjectValues(FORM_MODE);
 
 /**
  * Converts value to CHAR_CASE coercing it to lowercase string if needed
@@ -638,7 +643,6 @@ export function asCharCase(v) {
   return CHAR_CASE.ASIS;
 }
 
-
 /**
  * Converts value to DATA_KIND coercing it to lowercase string if needed
  * @param {*} v value to convert
@@ -650,27 +654,20 @@ export function asDataKind(v) {
   return DATA_KIND.TEXT;
 }
 
-export function getFormMode(f) {
-  isObject(f);
-
-  // function parseFormMode(str) {
-  //   return FORM_MODE[str]
-  // }
-  let mode = f["mode"]?.toLowerCase(); // TODO: parseFormMode(f["mode"])
-  switch (mode) {
-    case FORM_MODE.INSERT.toLowerCase(): return FORM_MODE.INSERT;
-    case FORM_MODE.UPDATE.toLocaleLowerCase(): return FORM_MODE.UPDATE;
-    case FORM_MODE.DELETE.toLowerCase(): return FORM_MODE.DELETE;
-    default: return FORM_MODE.UNSPECIFIED;
-  }
+/**
+ * Converts value to FORM_MODE coercing it to lowercase string if needed
+ * @param {*} v value to convert
+ * @returns {FORM_MODE}
+ */
+export function asFormMode(v) {
+  v = strings.asString(v).toLowerCase();
+  if (strings.isOneOf(v, ALL_FORM_MODES, true)) return FORM_MODE[v];
+  return FORM_MODE.UNSPECIFIED;
 }
 
-export function isInsertForm(f) { return getFormMode(f) === FORM_MODE.INSERT; }
-
-export function isUpdateForm(f) { return getFormMode(f) === FORM_MODE.UPDATE; }
-
-export function isDeleteForm(f) { return getFormMode(f) === FORM_MODE.DELETE; }
-
+export function isInsertForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.INSERT; }
+export function isUpdateForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.UPDATE; }
+export function isDeleteForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.DELETE; }
 
 export const AS_BOOLEAN_FUN = Symbol("asBoolean");
 const TRUISMS = Object.freeze(["true", "t", "yes", "1", "ok"]);
