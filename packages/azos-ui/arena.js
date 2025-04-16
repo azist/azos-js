@@ -22,6 +22,7 @@ import "./launcher.js";
 import { BrowserRouter } from "./browser-router.js";
 import { showObject } from "./object-inspector-modal.js";
 import { Permission } from "azos/security";
+import { Session } from "azos/session";
 
 //todo Move outside of here
 function getUserInitials(user) {
@@ -262,19 +263,25 @@ export class Arena extends AzosElement {
    * @param {function} tapplet a type of applet which you want to launch. It has to be a derivative of Applet class
    * @param {*} [args=null] an any object which serves as launch parameter, such as a deep link or other startup params
    * @param {boolean} [force=false] if you pass true, instructs the already open current applet (if any) to disregard close query circuit, effectively forcing current applet close
+   * @param {Session} [session=null] optional {@link Session} reference which is used for impersonation, if not passed then defaults to app session
    * @returns {bool} true if requested applet was launched, or false if existing applet prevented the operation because of the close query abort
    */
-  async appletOpen(tapplet, args = null, force = false){
+  async appletOpen(tapplet, args = null, force = false, session = null){
     aver.isSubclassOf(tapplet, Applet);
+    aver.isOfOrNull(session, Session);
     const tagName = customElements.getName(tapplet);
-    aver.isNotNull(tagName);
+    aver.isNotNull(tagName, "Required applet component tag name");
 
-    //Check permissions
+
+    //-------------- SECURITY CHECK  -----------------
+    if (!session) session = this.app.session;//there is always session
+
     const permissions = tapplet.permissions;
-    if (permissions){
-      //This throws
-      Permission.guardAll(this.app.session, permissions, `Launching '${tapplet.constructor.name}'`, `arn.appletOpen()`);
+    if (permissions) {
+      //This throws `AuthorizationError` when access denied
+      Permission.guardAll(session, permissions, `Launching '${tapplet.constructor.name}'`, `arn.appletOpen(<${tagName}>)`);
     }
+    //------------------------------------------------
 
     //Try to close the current one is loaded
     const closed = await this.appletClose(force);
@@ -285,7 +292,9 @@ export class Arena extends AzosElement {
     this.update();//synchronous update including DOM rebuild
     this.updateToolbar();
     this.#applet = this.shadowRoot.getElementById("elmActiveApplet");
+    aver.isOf(this.#applet, Applet, "Arena requires applet component subclass");//safeguard
     this.#applet.args = args;//pass launch args
+    this.#applet.session = session;//pass effective session context
     this.requestUpdate();
     return true;
   }

@@ -364,6 +364,27 @@ describe("ConfigNode", function() {
   });
 
 
+  it("getNodeAttrOrValue()",   function() {
+    aver.areEqual(1, sut.getNodeAttrOrValue(1, "a"));
+    aver.areEqual("yes no", sut.getNodeAttrOrValue("yes no", "a"));
+    aver.areEqual(-897.12, sut.getNodeAttrOrValue(sut.config({a: -897.12}), "a"));
+    aver.areEqual(-897.13, sut.getNodeAttrOrValue(sut.config({a: -897.13}).root, "a"));
+    aver.areEqual(undefined, sut.getNodeAttrOrValue(sut.config({a: -897.13}).root, "b"));
+    aver.areEqual("zzz", sut.getNodeAttrOrValue(sut.config({a: "$(b)", b: "zzz"}), "a"));
+    aver.areEqual("zzz", sut.getNodeAttrOrValue(sut.config({a: "$(b)", b: "zzz"}), "no", "cant", "a"));
+  });
+
+  it("getVerbatimNodeAttrOrValue()",   function() {
+    aver.areEqual(1, sut.getVerbatimNodeAttrOrValue(1, "a"));
+    aver.areEqual("yes no", sut.getVerbatimNodeAttrOrValue("yes no", "a"));
+    aver.areEqual(-897.12, sut.getVerbatimNodeAttrOrValue(sut.config({a: -897.12}), "a"));
+    aver.areEqual(-897.13, sut.getVerbatimNodeAttrOrValue(sut.config({a: -897.13}).root, "a"));
+    aver.areEqual(undefined, sut.getVerbatimNodeAttrOrValue(sut.config({a: -897.13}).root, "b"));
+    aver.areEqual("$(b)", sut.getVerbatimNodeAttrOrValue(sut.config({a: "$(b)", b: "zzz"}), "a"));
+    aver.areEqual("$(b)", sut.getVerbatimNodeAttrOrValue(sut.config({a: "$(b)", b: "zzz"}), "no", "cant", "a"));
+  });
+
+
   describe("Flatten", function(){
 
     it("map-simple",  function() {
