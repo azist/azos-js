@@ -55,6 +55,12 @@ export const DATA_NAME_PROP = Symbol("data-name");
  */
 export const DATA_VALUE_PROP = Symbol("data-value");
 
+/**
+ * Establishes a "IData" protocol - an entity optionally implementing this interface yields an enumeration of its child entities, such as fields
+ * which are grouped together in a block such as a composite data control or a data form.
+ */
+export const DATA_BLOCK_PROP = Symbol("data-block");
+
 
 /**
  * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context, scope): error | null`.
