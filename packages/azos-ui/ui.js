@@ -17,7 +17,8 @@ import { AzosError,
          isNonEmptyString as types_isNonEmptyString,
          DATA_NAME_PROP,
          DATA_VALUE_PROP,
-         sortDataFields
+         sortDataFields,
+         supportsDataProtocol
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
@@ -468,19 +469,23 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
 /**
  * Takes HtmlElement and returns an array of {@link AzosElement} child instances which support IData protocol
  * characterized by the presence of {@link DATA_NAME_PROP} and {@link DATA_VALUE_PROP} properties.
- * @param {HTMLElement} element required UI element as of which to search for child elements
- * @param {boolean} [deep=true] true to consider child sub-elements, false to only scan the immediate children of this element
- * @returns {AzosElement[]} array of data-aware elements which support IData protocol; empty array for null/undefined/unsupported elements
+ * @param {HTMLElement} element required UI element as of which to search for child `AzosElement` derivatives
+ * @param {boolean} [deep=true] true to consider child sub-elements, false to only scan the immediate children of this element.
+ *                              Note: Only non-shadow sub elements (not web components) are searched, e.g. things like "span/div/section" which are in the same DOM
+ *                              are considered to be on the same logical level, but shadow DOM is NOT pierced, as web components should encapsulate their own child fields
+ * @returns {AzosElement[]} array of data-aware elements which support IData protocol; empty array for null/undefined/unsupported elements;
+ *                          If you pass `deep` then the child elements are also searched
  **/
-export function getDataMembers(element, deep = true){
+export function getChildDataMembers(element, deep = true){
   let result = [];
 
   if (element && element.children){
     for(const one of element.children){
-      if (one instanceof AzosElement && one[DATA_NAME_PROP] && one[DATA_VALUE_PROP]){
-        result.add(one);
+      if (one instanceof AzosElement){
+        //Does it support data protocol
+        if (supportsDataProtocol(one)) result.add(one);
       } else { //I am another element
-        const sub = getDataMembers(one, deep);
+        const sub = getChildDataMembers(one, deep);
         result = result.concat(sub);
       }
     }
@@ -492,6 +497,29 @@ export function getDataMembers(element, deep = true){
 }
 
 /**
+ * Helper method which harvests data from {@link AzosElement} children of the specified element,
+ * using their {@link DATA_NAME_PROP} and  {@link DATA_VALUE_PROP} properties.
+ * @param {HTMLElement} element required UI element as of which to search for child `AzosElement` derivatives
+ * @param {bool} asArray true to get data as an array instead of a map
+ * @returns {array | object} an array or object populated with data e.g. `["James", "Bond"]` or `{"LastName": "Bond", "FirstName": "James"}`
+ */
+export function getBlockDataValue(element, asArray = false){
+  const fields = getChildDataMembers(element, true);
+
+  if (asArray){
+    const result = [ ];
+    for(const fld of fields) result.push(fld[DATA_VALUE_PROP]);
+    return result;
+  } else { //map
+    const result = { };
+    let i = 0;
+    for(const fld of fields) result[fld[DATA_NAME_PROP] ?? `?noname_${i++}`] = fld[DATA_VALUE_PROP];
+    return result;
+  }
+}
+
+
+/**
  * Helper method which uses default strategy to setting {@link DATA_VALUE_PROP}
  * on named fields on a BLOCK field-composite element by applying a field assignment vector which is either:
  *   a). an array containing field values matched by their ordinal array position, e.g. `["James", "Bond"]`
@@ -501,9 +529,9 @@ export function getDataMembers(element, deep = true){
  * @param {Array | Object} v either array or object representing field assignment vector, e.g. `{FirstName: "James", LastName: "Bond"}`
  * @returns {boolean} true if at least a single set operation was applied - fields were found by name or by index; false when nothing was found
  */
-export function setDataValue(element, v){
+export function setBlockDataValue(element, v){
   let result = false;
-  const fields = getDataMembers(element, true);
+  const fields = getChildDataMembers(element, true);
 
   if (types_isString(v)) v = JSON.parse(v);
 

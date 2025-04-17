@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, isArray, isObject, isString } from "azos/types";
-import { Control, css, getDataMembers, setDataValue } from "./ui.js";
+import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, isArray, isObject, isString } from "azos/types";
+import { Control, css, getBlockDataValue, getChildDataMembers, setBlockDataValue } from "./ui.js";
 import { FieldPart } from "./parts/field-part.js";
 
 /**
@@ -23,6 +23,7 @@ export class Block extends Control {
    * Reactive properties
    */
   static properties = {
+    name: { type: String },
     title: { type: String },
     description: { type: String }
   };
@@ -43,33 +44,19 @@ export class Block extends Control {
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
 
-  get [DATA_NAME_PROP](){ return null;}
-  set [DATA_NAME_PROP](v){}
+  get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
 
-  get [DATA_VALUE_PROP](){
-    return {};
-  }
+  get [DATA_NAME_PROP](){ return this.name; }
+  set [DATA_NAME_PROP](v){ this.name = v;}
 
+  get [DATA_VALUE_PROP](){ return getBlockDataValue(this, false); }
   set [DATA_VALUE_PROP](v){
-    const anythingApplied = setDataValue(this, v);
+    const anythingApplied = setBlockDataValue(this, v);
     if (anythingApplied) this.requestUpdate();
   }
 
-
-
-  // // // // /** Returns data contained in this block: an object (map) containing named fields with their data,
-  // // // //  * the default implementation harvests the data from field parts using their field name property
-  // // // //  */
-  // // // // getData(){
-  // // // //   const result = { };
-
-  // // // //   for(const one of childElements){
-  // // // //     if (one instanceof FieldPart)
-  // // // //     result[]
-  // // // //   }
-
-  // // // //   return result;
-  // // // // }
+  //todo: Validate children
+  //todo: FormMode which is taken from parent
 
 }//Block
 
@@ -82,9 +69,5 @@ export class Block extends Control {
 export class Form extends Block {
 
   constructor() { super(); }
-
-  //TODO: this is where we will set Model context
-  //get model(){}
-  //set model(){}
 
 }//Form

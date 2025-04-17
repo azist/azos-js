@@ -351,11 +351,11 @@ export class FieldPart extends Part{
     minLength: { type: Number, reflect: false },
 
 
-     /** If defined, adds minimum value constraint */
-     minValue: { type: String, reflect: false },
+    /** If defined, adds minimum value constraint */
+    minValue: { type: String, reflect: false },
 
-     /** If defined, adds maximum value constraint */
-     maxValue: { type: String, reflect: false },
+    /** If defined, adds maximum value constraint */
+    maxValue: { type: String, reflect: false },
 
 
     /** When set, prevents the field from validating upon input change. */

@@ -1053,6 +1053,13 @@ export function minutesBetweenAbs(date1, date2) { return secondsBetweenAbs(date1
 export function secondsBetween(date1, date2) { return (aver_isDate(date2) - aver_isDate(date1)) / 1000; }
 export function secondsBetweenAbs(date1, date2) { return Math.abs(aver_isDate(date2) - aver_isDate(date1)) / 1000; }
 
+/**
+ * Returns true if the passed-in entity is non-null/undefined and it supports Data protocol, that is:
+ *  it has both {@link DATA_NAME_PROP} and {@link DATA_VALUE_PROP} properties
+ */
+export function supportsDataProtocol(v){
+  return v && (DATA_NAME_PROP in v) && (DATA_VALUE_PROP in v);
+}
 
 /**
  *  Comparer function which sorts data field objects according to their properties:
@@ -1061,11 +1068,11 @@ export function secondsBetweenAbs(date1, date2) { return Math.abs(aver_isDate(da
 export function sortDataFields(a, b){
   if (!a) return -1;
   if (!b) return +1;
-  if (a[ORDER_PROP]) a = a[ORDER_PROP];
-  else if (a[DATA_NAME_PROP]) a = a[DATA_NAME_PROP];
+  if (ORDER_PROP in a) a = a[ORDER_PROP];
+  else if (DATA_NAME_PROP in a) a = a[DATA_NAME_PROP];
 
-  if (b[ORDER_PROP]) b = b[ORDER_PROP];
-  else if (b[DATA_NAME_PROP]) b = b[DATA_NAME_PROP]
+  if (ORDER_PROP in b) b = b[ORDER_PROP];
+  else if (DATA_NAME_PROP in b) b = b[DATA_NAME_PROP];
 
   if (a < b) return -1;
   if (a > b) return +1;
