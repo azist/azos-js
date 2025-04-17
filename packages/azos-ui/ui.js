@@ -12,12 +12,16 @@ import { link as linkModule } from "azos/linker.js";
 import { AzosError,
          isNumber as types_isNumber,
          isString as types_isString,
-         isNonEmptyString as types_isNonEmptyString
+         isArray as types_isArray,
+         isObject as types_isObject,
+         isNonEmptyString as types_isNonEmptyString,
+         DATA_NAME_PROP,
+         DATA_VALUE_PROP,
+         sortDataFields
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
-import { isFunctionOrNull, isOfOrNull, isStringOrNull } from "azos/aver";
-import { LOG_TYPE } from "azos/log";
+import { AVERMENT_FAILURE, isOfOrNull, isStringOrNull } from "azos/aver";
 import { CONTENT_TYPE } from "azos/coreconsts";
 
 /** CSS template processing pragma: css`p{color: blue}` */
@@ -255,7 +259,7 @@ export class AzosElement extends LitElement {
 
   /**
      * Writes to log if current component effective level permits, returning guid of newly written message
-     * @param {string} type an enumerated type {@link log.LOG_TYPE}
+     * @param {string} type an enumerated type `LOG_TYPE`
      * @param {string} text message text
      * @param {Error} ex optional exception object
      * @param {object | null} params optional parameters
@@ -461,5 +465,66 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
   return { html: content, attrs: got.attrs };
 }
 
+/**
+ * Takes HtmlElement and returns an array of {@link AzosElement} child instances which support IData protocol
+ * characterized by the presence of {@link DATA_NAME_PROP} and {@link DATA_VALUE_PROP} properties.
+ * @param {HTMLElement} element required UI element as of which to search for child elements
+ * @param {boolean} [deep=true] true to consider child sub-elements, false to only scan the immediate children of this element
+ * @returns {AzosElement[]} array of data-aware elements which support IData protocol; empty array for null/undefined/unsupported elements
+ **/
+export function getDataMembers(element, deep = true){
+  let result = [];
+
+  if (element && element.children){
+    for(const one of element.children){
+      if (one instanceof AzosElement && one[DATA_NAME_PROP] && one[DATA_VALUE_PROP]){
+        result.add(one);
+      } else { //I am another element
+        const sub = getDataMembers(one, deep);
+        result = result.concat(sub);
+      }
+    }
+  }
+
+  result.sort(sortDataFields);
+
+  return result;
+}
+
+/**
+ * Helper method which uses default strategy to setting {@link DATA_VALUE_PROP}
+ * on named fields on a BLOCK field-composite element by applying a field assignment vector which is either:
+ *   a). an array containing field values matched by their ordinal array position, e.g. `["James", "Bond"]`
+ *   b). or an object having key names equal data field names of child fields, e.g. `{FirstName: "James", LastName: "Bond"}`
+ * Field name bindings are case-INSENSITIVE
+ * @param {HTMLElement} element whose child fields need to be set
+ * @param {Array | Object} v either array or object representing field assignment vector, e.g. `{FirstName: "James", LastName: "Bond"}`
+ * @returns {boolean} true if at least a single set operation was applied - fields were found by name or by index; false when nothing was found
+ */
+export function setDataValue(element, v){
+  let result = false;
+  const fields = getDataMembers(element, true);
+
+  if (types_isString(v)) v = JSON.parse(v);
+
+  if (types_isArray(v)){
+    for(let i = 0; i < v.length; i++ ){
+      if (i < fields.length){
+        fields[i][DATA_VALUE_PROP] = v[i];
+        result = true;
+      }
+    }
+  } else if (types_isObject(v)){
+    for(const [k, v] of Object.entries(v)){
+      const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === k.toLowerCase());
+      if (fld) {
+        fld[DATA_VALUE_PROP] = v;
+        result = true;
+      }
+    }
+  } else throw AVERMENT_FAILURE("Expecting data assignment either [] or {} vector", "setDataValue()");
+
+  return result;
+}
 
 

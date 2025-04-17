@@ -56,11 +56,10 @@ export const DATA_NAME_PROP = Symbol("data-name");
 export const DATA_VALUE_PROP = Symbol("data-value");
 
 /**
- * Establishes a "IData" protocol - an entity optionally implementing this interface yields an enumeration of its child entities, such as fields
- * which are grouped together in a block such as a composite data control or a data form.
+ * An optional part of "IData" protocol - an entity optionally implementing this interface yields an enumeration of its child entities, such as fields
+ * grouped together under a block, blocks such as a composite data controls or forms.
  */
 export const DATA_BLOCK_PROP = Symbol("data-block");
-
 
 /**
  * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context, scope): error | null`.
@@ -85,7 +84,6 @@ export const CHECK_MIN_LENGTH_METHOD = Symbol("checkMinLength");
  * Returns true if the implementing object logically has the value of at most the required length, false otherwise
  */
 export const CHECK_MAX_LENGTH_METHOD = Symbol("checkMaxLength");
-
 
 
 /**
@@ -1054,3 +1052,22 @@ export function minutesBetweenAbs(date1, date2) { return secondsBetweenAbs(date1
 
 export function secondsBetween(date1, date2) { return (aver_isDate(date2) - aver_isDate(date1)) / 1000; }
 export function secondsBetweenAbs(date1, date2) { return Math.abs(aver_isDate(date2) - aver_isDate(date1)) / 1000; }
+
+
+/**
+ *  Comparer function which sorts data field objects according to their properties:
+ *   {@link ORDER_PROP} if it is present or {@link DATA_NAME_PROP}
+ */
+export function sortDataFields(a, b){
+  if (!a) return -1;
+  if (!b) return +1;
+  if (a[ORDER_PROP]) a = a[ORDER_PROP];
+  else if (a[DATA_NAME_PROP]) a = a[DATA_NAME_PROP];
+
+  if (b[ORDER_PROP]) b = b[ORDER_PROP];
+  else if (b[DATA_NAME_PROP]) b = b[DATA_NAME_PROP]
+
+  if (a < b) return -1;
+  if (a > b) return +1;
+  return 0;
+}

@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
-import { Control, css } from "./ui.js";
+import { CLOSE_QUERY_METHOD, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, isArray, isObject, isString } from "azos/types";
+import { Control, css, getDataMembers, setDataValue } from "./ui.js";
 import { FieldPart } from "./parts/field-part.js";
 
 /**
@@ -41,6 +41,20 @@ export class Block extends Control {
    * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
    */
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
+
+
+  get [DATA_NAME_PROP](){ return null;}
+  set [DATA_NAME_PROP](v){}
+
+  get [DATA_VALUE_PROP](){
+    return {};
+  }
+
+  set [DATA_VALUE_PROP](v){
+    const anythingApplied = setDataValue(this, v);
+    if (anythingApplied) this.requestUpdate();
+  }
+
 
 
   // // // // /** Returns data contained in this block: an object (map) containing named fields with their data,
