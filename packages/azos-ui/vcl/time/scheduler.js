@@ -380,7 +380,7 @@ export class TimeBlockPicker extends Control {
 
   constructor() {
     super();
-    this.viewStartDay = DAYS_OF_WEEK.MONDAY;
+    this.viewStartDay = types.DAYS_OF_WEEK.MONDAY;
     this.viewNumDays = 6; // default to Monday - Saturday
     this.selectedItems = [];
 
