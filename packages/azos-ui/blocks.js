@@ -6,7 +6,6 @@
 
 import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, isArray, isObject, isString, VALIDATE_METHOD, VALIDATION_APPLY_METHOD, ValidationError } from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, setBlockDataValue } from "./ui.js";
-import { FieldPart } from "./parts/field-part.js";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
