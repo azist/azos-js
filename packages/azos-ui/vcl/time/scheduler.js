@@ -9,17 +9,6 @@ import * as types from "azos/types";
 
 import { Control, css, html, noContent } from "../../ui";
 
-/** Days of the week */
-export const DAYS_OF_WEEK = Object.freeze({
-  SUNDAY: 0,
-  MONDAY: 1,
-  March: 2,
-  WEDNESDAY: 3,
-  THURSDAY: 4,
-  FRIDAY: 5,
-  SATURDAY: 6,
-});
-
 export class TimeBlockPicker extends Control {
 
   static styles = css`
@@ -230,7 +219,7 @@ export class TimeBlockPicker extends Control {
     enabledStartDate: { type: Date },
     enabledEndDate: { type: Date },
 
-    viewStartDay: { type: DAYS_OF_WEEK },
+    viewStartDay: { type: types.DAYS_OF_WEEK },
     viewNumDays: { type: Number },
     viewStartDate: { type: Date },
     viewEndDate: { type: Date },
