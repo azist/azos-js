@@ -24,7 +24,7 @@ export class ExampleFeatureBApplet extends Applet{
   #btnSetDataClick(){
     this.blkPerson[DATA_VALUE_PROP] = {
       FirstName: "Sam",
-      MiddleName: "X",
+      MiddleName: "Xzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
       LastName: "Popoff"
     };
   }

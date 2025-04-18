@@ -13,9 +13,9 @@ export class PersonBlock extends Block{
   render(){
     return html`
     <h3>Person Block</h3>
-      <az-text scope="this" id="tbFirstName"  name="FirstName" title="First Name" maxLength=10 required></az-text>
-      <az-text scope="this" id="tbMiddleName" name="MiddleName" title="Middle Name" ></az-text>
-      <az-text scope="this" id="tbLastName"   name="LastName" title="Last Name" maxLength=16 required></az-text>
+      <az-text scope="this" id="tbFirstName"  name="FirstName" title="First Name" maxLength=10 isrequired></az-text>
+      <az-text scope="this" id="tbMiddleName" name="MiddleName" title="Middle Name" maxLength=5 ></az-text>
+      <az-text scope="this" id="tbLastName"   name="LastName" title="Last Name" maxLength=16 isrequired></az-text>
     `;
   }
 }
