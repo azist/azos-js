@@ -4,13 +4,14 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asTypeMoniker,
-         cast,
-         asObject,
-         CLIENT_MESSAGE_PROP,
-         VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
-         DATA_KIND, asDataKind,
-         isAssigned,
+import {
+  asTypeMoniker,
+  cast,
+  asObject,
+  CLIENT_MESSAGE_PROP,
+  VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
+  DATA_KIND, asDataKind,
+  isAssigned,
   isString,
   DATA_VALUE_PROP,
   DATA_NAME_PROP,
