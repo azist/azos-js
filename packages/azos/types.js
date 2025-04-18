@@ -237,7 +237,7 @@ export class ValidationError extends AzosError {
    * @param {String} message - required validation message. Clients get shown `clientMessage` unless it is not supplied then this one is used
    * @param {String} clientMessage - an optional user-friendly client UI display message
    * @param {String} from - optional. What sub/component generated the error
-   * @param {object} cause - optional. Inner causing exception (if any)
+   * @param {object | array} cause - optional. Inner causing exception (if any), such as Validation error batch
    */
   constructor(schema, field, scope, message, clientMessage = null, from = null, cause = null) {
     super(message, from, cause, 400);

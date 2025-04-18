@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, isArray, isObject, isString } from "azos/types";
+import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, isArray, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, setBlockDataValue } from "./ui.js";
 import { FieldPart } from "./parts/field-part.js";
 
@@ -43,7 +43,6 @@ export class Block extends Control {
    */
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
-
   get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
 
   get [DATA_NAME_PROP](){ return this.name; }
@@ -54,6 +53,40 @@ export class Block extends Control {
     const anythingApplied = setBlockDataValue(this, v);
     if (anythingApplied) this.requestUpdate();
   }
+
+  /**
+   * `[VALIDATE_METHOD](context, scope): error | null`.
+   */
+  [VALIDATE_METHOD](context, scope){
+    const items = this[DATA_BLOCK_PROP];
+
+    var errorBatch = [];
+
+    for(const item of items){
+      const vm = item[VALIDATE_METHOD];
+      if (vm){
+        const ve = vm.call(item, context, scope);
+        errorBatch.push(ve);
+      }
+    }
+
+    this._doValidate(errorBatch, context, scope);
+
+    if (errorBatch.length === 0) return null;//no errors
+
+    //Return a validation batch: an error with an array of errors in its `cause`
+    return new ValidationError(this.constructor.name, this.name, scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
+  }
+
+  /**
+   * Override to perform block-level validation, such as cross-field validation.
+   * This gets called after all fields have validated individually, having existing errors (if any) passed-in via `errorBatch`
+   * @param {Error[]} errorBatch - an array of errors which have already been detected during validation. You add more errors via `errorBatch.push(...)`
+   * @param {*} context optional validation context
+   * @param {*} scope scoping specifier
+   */
+  // eslint-disable-next-line no-unused-vars
+  _doValidate(errorBatch, context, scope){ }
 
   //todo: Validate children
   //todo: FormMode which is taken from parent
