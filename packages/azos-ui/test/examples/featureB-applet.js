@@ -8,10 +8,11 @@
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
 import { html } from "../../ui.js";
+import { DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
 import "./person-data.js";
 import "../../parts/button.js";
-import { DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
+import "../../modal-dialog.js";
 
 export class ExampleFeatureBApplet extends Applet{
 
@@ -38,6 +39,12 @@ export class ExampleFeatureBApplet extends Applet{
     };
   }
 
+  async #btnModalClick(){
+    this.blockPerson2[DATA_VALUE_PROP] = this.blockPerson[DATA_VALUE_PROP];
+    await this.dlgPerson.show();
+    this.blockPerson[DATA_VALUE_PROP] = this.blockPerson2[DATA_VALUE_PROP];
+  }
+
   render(){
    return html`
      This is feature B
@@ -45,6 +52,22 @@ export class ExampleFeatureBApplet extends Applet{
      <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Block Data"></az-button>
      <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Fill block"></az-button>
      <az-button id="btnValidate" scope="this" @click="${this.#btnValidateClick}" title="Validate block"></az-button>
+     <az-button id="btnValidate" scope="this" @click="${this.#btnModalClick}" title="Show Modal"></az-button>
+
+ <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
+  <div slot="body">
+    <p>
+     It is a long established fact that <strong>a reader will be distracted</strong> by the readable content of a page when looking at its layout.
+     The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here',
+     making it look like readable English. Many desktop publishing packages and web page editors now use <strong>Lorem Ipsum</strong> as their default model text,
+     and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident,
+     sometimes on purpose (injected humour and the like). Yes
+    </p>
+    <examples-person-block scope="this" id="blockPerson2"></examples-person-block>
+    <az-button @click="${() => this.dlgPerson.close()}" title="Close" style="float: right;"></az-button>
+  </div>
+</az-modal-dialog>
+
    `;
   }
 }
