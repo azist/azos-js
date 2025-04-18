@@ -483,7 +483,7 @@ export function getChildDataMembers(element, deep = true){
     for(const one of element.children){
       if (one instanceof AzosElement){
         //Does it support data protocol
-        if (supportsDataProtocol(one)) result.add(one);
+        if (supportsDataProtocol(one)) result.push(one);
       } else { //I am another element
         const sub = getChildDataMembers(one, deep);
         result = result.concat(sub);
@@ -543,10 +543,10 @@ export function setBlockDataValue(element, v){
       }
     }
   } else if (types_isObject(v)){
-    for(const [k, v] of Object.entries(v)){
-      const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === k.toLowerCase());
+    for(const [pk, pv] of Object.entries(v)){
+      const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
       if (fld) {
-        fld[DATA_VALUE_PROP] = v;
+        fld[DATA_VALUE_PROP] = pv;
         result = true;
       }
     }

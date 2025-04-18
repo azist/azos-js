@@ -82,8 +82,9 @@ const appMenu = {
     {title: "Showcase", icon: "svg://azos.ico.database", route: "/examples/showcase", Xpermissions: [{ns: "System", name: "UserManager", level: 0}]},
     {title: "Something Else", icon: "svg://azos.ico.category"},
     "Examples",
-    {title: "Feature A", route: "/examples/featurea"},
-    {title: "Feature B", route: "/examples/featureb"},
+    {title: "Home", icon: "svg://azos.ico.home", route: "/examples/home"},
+    {title: "Feature A", icon: "svg://azos.ico.draft", route: "/examples/featurea"},
+    {title: "Feature B", icon: "svg://azos.ico.draft", route: "/examples/featureb"},
     {title: "Subsection...", icon: "svg://azos.ico.category", menu: [
       {title: "A", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 3}]},
       {title: "B", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 4}]}

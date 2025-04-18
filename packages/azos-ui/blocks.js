@@ -43,14 +43,14 @@ export class Block extends Control {
    */
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
-  get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
+  get [DATA_BLOCK_PROP](){ return getChildDataMembers(this.shadowRoot, true); }
 
   get [DATA_NAME_PROP](){ return this.name; }
   set [DATA_NAME_PROP](v){ this.name = v;}
 
-  get [DATA_VALUE_PROP](){ return getBlockDataValue(this, false); }
+  get [DATA_VALUE_PROP](){ return getBlockDataValue(this.shadowRoot, false); }
   set [DATA_VALUE_PROP](v){
-    const anythingApplied = setBlockDataValue(this, v);
+    const anythingApplied = setBlockDataValue(this.shadowRoot, v);
     if (anythingApplied) this.requestUpdate();
   }
 
