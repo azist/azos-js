@@ -877,6 +877,18 @@ export function asEntityId(v, canUndef = false) {
   }
 }
 
+/** Days of the week */
+export const DAYS_OF_WEEK = Object.freeze({
+  SUNDAY: 0,
+  MONDAY: 1,
+  TUESDAY: 2,
+  WEDNESDAY: 3,
+  THURSDAY: 4,
+  FRIDAY: 5,
+  SATURDAY: 6,
+});
+// const ALL_DAYS_OF_WEEK = allObjectValues(DAYS_OF_WEEK);
+
 /** Data Type Monikers */
 export const TYPE_MONIKER = Object.freeze({
   STRING: "str",

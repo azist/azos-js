@@ -14,7 +14,7 @@ import { iconStyles } from "../../parts/styles";
 export class TabView extends Control {
 
   static styles = [iconStyles, css`
-:host{ display: block; margin-top: 1.0em; }
+:host{ display: block; margin-top: 1.0em; scroll-margin-top: calc(var(--arn-hdr-height) + 1em); }
 .icon{
   --icon-stroke: var(--vcl-tabview-svg-stroke);
   --icon-stroke-width: var(--vcl-tabview-svg-stroke-width);
@@ -248,6 +248,7 @@ export class TabView extends Control {
     this.#activeTab = newTab;
     this.update({ "activeTab": oldTab, "activeTabIndex": oldIndex });
     this.#scrollTabBtnIntoView(newTab);
+    this.scrollIntoView();
     if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: newTab }, bubbles: true }));
   }
 
