@@ -11,7 +11,7 @@ import { html } from "../../ui.js";
 
 import "./person-data.js";
 import "../../parts/button.js";
-import { DATA_VALUE_PROP } from "azos/types";
+import { DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
 export class ExampleFeatureBApplet extends Applet{
 
@@ -21,10 +21,19 @@ export class ExampleFeatureBApplet extends Applet{
   get title(){ return "Feature B"; }
 
 
-  #btnSetDataClick(){
-    this.blkPerson[DATA_VALUE_PROP] = {
+  #btnGetClick(){
+    console.dir(this.blockPerson[DATA_VALUE_PROP]);
+  }
+
+  #btnValidateClick(){
+    console.dir(this.blockPerson[VALIDATE_METHOD]());
+  }
+
+
+  #btnSetClick(){
+    this.blockPerson[DATA_VALUE_PROP] = {
       FirstName: "Sam",
-      MiddleName: "Xzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+      MiddleName: "X",
       LastName: "Popoff"
     };
   }
@@ -32,8 +41,10 @@ export class ExampleFeatureBApplet extends Applet{
   render(){
    return html`
      This is feature B
-     <examples-person-block scope="this" id="blkPerson"></examples-person-block>
-     <az-button id="btnSetData" scope="this" @click="${this.#btnSetDataClick}" title="Fill block"></az-button>
+     <examples-person-block scope="this" id="blockPerson"></examples-person-block>
+     <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Block Data"></az-button>
+     <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Fill block"></az-button>
+     <az-button id="btnValidate" scope="this" @click="${this.#btnValidateClick}" title="Validate block"></az-button>
    `;
   }
 }

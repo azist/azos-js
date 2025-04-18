@@ -4,8 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, isArray, isObject, isString, VALIDATE_METHOD, VALIDATION_APPLY_METHOD, ValidationError } from "azos/types";
+import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, setBlockDataValue } from "./ui.js";
+import { dflt } from "azos/strings";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
@@ -68,7 +69,7 @@ export class Block extends Control {
         const vm = item[VALIDATE_METHOD];
         if (vm){
           const ve = vm.call(item, context, scope, apply);
-          errorBatch.push(ve);
+          if (ve) errorBatch.push(ve);
         }
       }
 
@@ -77,7 +78,7 @@ export class Block extends Control {
       if (errorBatch.length === 0) return null;//no errors
 
       //Return a validation batch: an error with an array of errors in its `cause`
-      const result = new ValidationError(this.constructor.name, this.name, scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
+      const result = new ValidationError(this.constructor.name, dflt(this.name, "<noname>"), scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
 
       if (apply){
         this.error = result;

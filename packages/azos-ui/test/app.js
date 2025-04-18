@@ -123,4 +123,4 @@ window.ARENA = arena;
 app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 //Wire up app closing events and global error handlers
-addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
+addAppBoilerplate(arena, (e) => errorMsg("Errors", e?.message));
