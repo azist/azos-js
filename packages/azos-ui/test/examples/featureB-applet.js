@@ -26,7 +26,7 @@ export class ExampleFeatureBApplet extends Applet{
   }
 
   #btnValidateClick(){
-    console.dir(this.blockPerson[VALIDATE_METHOD]());
+    console.dir(this.blockPerson[VALIDATE_METHOD](null, "", true));
   }
 
 
