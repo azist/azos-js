@@ -34,6 +34,18 @@ export const NAME_PROP = Symbol("name");
 export const ORDER_PROP = Symbol("order");
 
 /**
+ * Targets specify what system various logic should be applied to, for example
+ * in validation, you pass the target Id of a system which validation is performed for, the system then
+ * applies relevant rules for that named target
+ */
+export const TARGET_PROP = Symbol("target");
+
+/**
+ * Uniform protocol for storing and getting errors, such as validation errors
+ */
+export const ERROR_PROP = Symbol("error");
+
+/**
  * Establishes a "IDirty" protocol - an entity that needs to be saved before disposal
  */
 export const DIRTY_PROP = Symbol("dirty");
@@ -62,10 +74,12 @@ export const DATA_VALUE_PROP = Symbol("data-value");
 export const DATA_BLOCK_PROP = Symbol("data-block");
 
 /**
- * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context, scope): error | null`.
- * Performs validation logic returning an error object if validation fails
+ * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context: any, scope: string, apply: bool): error | null`.
+ * Performs validation logic returning an error object if validation fails.
+ * Context object may include `[TARGET_PROP]` by convention to specify the validation target system id
  */
 export const VALIDATE_METHOD = Symbol("validate");
+
 
 /**
  * Establishes required value check protocol: a function of signature: `[CHECK_REQUIRED_METHOD](context): bool`.

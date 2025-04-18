@@ -12,6 +12,10 @@ import { asTypeMoniker,
          DATA_KIND, asDataKind,
          isAssigned,
   isString,
+  DATA_VALUE_PROP,
+  DATA_NAME_PROP,
+  ERROR_PROP,
+  NAME_PROP
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, noContent } from "../ui";
@@ -108,9 +112,21 @@ export class FieldPart extends Part{
     }
   }
 
+  get [DATA_VALUE_PROP](){ return this.value; }
+  set [DATA_VALUE_PROP](v){ this.setValueFromInput(v); }
+
   /** Performs field validation, returning validation error if any for the specified context */
-  // eslint-disable-next-line no-unused-vars
-  [VALIDATE_METHOD](context, scope = null){
+  [VALIDATE_METHOD](context, scope = null, apply = false){
+    return apply ? this.validate(context, scope) : this._doValidate(context, scope);
+  }
+
+  /**
+   * Override to perform validation
+   * @param {*} context optional context such as an object with `[TARGET_PROP]`
+   * @param {*} scope optional subscript describing data member being validated such as `doctors[3]`
+   * @returns {Error | null} returns validation error or null
+   */
+  _doValidate(context, scope){
     const val = this.value;
     let error = this._validateRequired(context, val, scope);
     if (error) return error;
@@ -129,6 +145,7 @@ export class FieldPart extends Part{
     error = this._validateValueList(context, val, scope);
     if (error) return error;
 
+//todo: Where is iterable validation? (would need cyclical ref suppression)
     return null;
   }
 
@@ -212,16 +229,16 @@ export class FieldPart extends Part{
   }
 
 
-  /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
+  /** Calls {@link _doValidate()} capturing any errors in the {@link error} property */
   validate(context, scope = null){
-    try{
-      this.error = this[VALIDATE_METHOD](context, scope);
-    }catch(e){
+    try {
+      this.error = this._doValidate(context, scope);
+    } catch(e) {
       this.error = e;
     }
     this.requestUpdate();
+    return this.error;
   }
-
 
 
   /**
@@ -258,6 +275,10 @@ export class FieldPart extends Part{
    * You can also pass a string containing objects JSON which will be parsed as object
    */
   set error(v) { this.#error = asObject(v, true); }
+
+
+  get [ERROR_PROP](){ return this.error; }
+  set [ERROR_PROP](v){ this.error = v; }
 
 
   /**
@@ -363,6 +384,9 @@ export class FieldPart extends Part{
 
     lookupId: { type: String },
   }
+
+  get [NAME_PROP](){ return this.name; }
+  get [DATA_NAME_PROP](){ return this.name; }
 
   /** True for field parts which have a preset/pre-defined content area layout by design, for example:
    *  checkboxes, switches, and radios have a pre-determined content area layout */

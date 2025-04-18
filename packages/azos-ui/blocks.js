@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, isArray, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
+import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, isArray, isObject, isString, VALIDATE_METHOD, VALIDATION_APPLY_METHOD, ValidationError } from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, setBlockDataValue } from "./ui.js";
 import { FieldPart } from "./parts/field-part.js";
 
@@ -19,19 +19,20 @@ export class Block extends Control {
 
   static styles = [css`:host{ display: block }`];
 
-  /**
-   * Reactive properties
-   */
   static properties = {
-    name: { type: String },
-    title: { type: String },
-    description: { type: String }
+    name:        { type: String },
+    title:       { type: String },
+    description: { type: String },
+    error:       { type: Object }
   };
 
   constructor() {
     super();
     this.title = this.constructor.name;
   }
+
+  get[ERROR_PROP](){ return this.error; }
+  set[ERROR_PROP](v){ this.error = v; }
 
   /** Override to return true when this app has unsaved data */
   get [DIRTY_PROP]() { return false; }
@@ -55,27 +56,42 @@ export class Block extends Control {
   }
 
   /**
-   * `[VALIDATE_METHOD](context, scope): error | null`.
+   * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context: any, scope: string, apply: bool): error | null`.
+   * Performs validation logic returning an error object if validation fails.
+   * Context object may include `[TARGET_PROP]` by convention to specify the validation target system id
    */
-  [VALIDATE_METHOD](context, scope){
-    const items = this[DATA_BLOCK_PROP];
+  [VALIDATE_METHOD](context, scope, apply = false){
+    try{
+      const items = this[DATA_BLOCK_PROP];
+      var errorBatch = [];
 
-    var errorBatch = [];
-
-    for(const item of items){
-      const vm = item[VALIDATE_METHOD];
-      if (vm){
-        const ve = vm.call(item, context, scope);
-        errorBatch.push(ve);
+      for(const item of items){
+        const vm = item[VALIDATE_METHOD];
+        if (vm){
+          const ve = vm.call(item, context, scope, apply);
+          errorBatch.push(ve);
+        }
       }
+
+      this._doValidate(errorBatch, context, scope);
+
+      if (errorBatch.length === 0) return null;//no errors
+
+      //Return a validation batch: an error with an array of errors in its `cause`
+      const result = new ValidationError(this.constructor.name, this.name, scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
+
+      if (apply){
+        this.error = result;
+        this.requestUpdate();
+      }
+
+      return result;
+
+    } catch(e) {
+      this.error = e;
+      this.requestUpdate();
+      return e;
     }
-
-    this._doValidate(errorBatch, context, scope);
-
-    if (errorBatch.length === 0) return null;//no errors
-
-    //Return a validation batch: an error with an array of errors in its `cause`
-    return new ValidationError(this.constructor.name, this.name, scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
   }
 
   /**
@@ -88,7 +104,7 @@ export class Block extends Control {
   // eslint-disable-next-line no-unused-vars
   _doValidate(errorBatch, context, scope){ }
 
-  //todo: Validate children
+
   //todo: FormMode which is taken from parent
 
 }//Block
