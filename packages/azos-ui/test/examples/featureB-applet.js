@@ -29,9 +29,9 @@ export class ExampleFeatureBApplet extends Applet{
 
   #btnSetClick(){
     this.blockPerson[DATA_VALUE_PROP] = {
-      FirstName: "Sam",
-      MiddleName: "X",
-      LastName: "Popoff",
+      FirstName: "James",
+      MiddleName: "L",
+      LastName: "Cooper Fraud",
       Registered: false,
       Smoker: true
     };
