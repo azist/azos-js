@@ -8,15 +8,41 @@ import { Block } from "../../blocks.js";
 import { html } from "../../ui.js";
 
 import "../../parts/text-field.js";
+import "../../parts/check-field.js"
+import { isOneOf } from "azos/strings";
+import { ValidationError } from "azos/types";
 
 export class PersonBlock extends Block{
   render(){
+
+    let errors = [];//error summary
+
+    if (this.error){
+       errors.push(html`<h4 style="color: red">Block validation has errors:</h4>`);
+       if (this.error.cause){
+         for(const one of this.error.cause){
+          errors.push(html`<div style="color: #ff8010">'${one.field}': ${one.message}</div>`);
+         }
+       }
+    }
+
     return html`
     <h3>Person Block</h3>
-      <az-text scope="this" id="tbFirstName"  name="FirstName" title="First Name" maxLength=10 isrequired></az-text>
-      <az-text scope="this" id="tbMiddleName" name="MiddleName" title="Middle Name" maxLength=5 ></az-text>
-      <az-text scope="this" id="tbLastName"   name="LastName" title="Last Name" maxLength=16 isrequired></az-text>
+      ${errors}
+      <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
+      <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q" ></az-text>
+      <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
+      <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
+      <az-check scope="this" id="chkSmoker"      name="Smoker" title="Former Smoker"  isrequired value="false"></az-check>
     `;
+  }
+
+  //Add cross-field validation
+  _doValidate(errorBatch, context, scope){
+    super._doValidate(errorBatch, context, scope);
+    if (this.chkSmoker.value && isOneOf(this.tbLastName.value, "Mozart;Bach")){
+      errorBatch.push(new ValidationError("PersonBlock", "Smoker", scope, "Neither Bach nor Mozart are allowed to smoke in this system"));
+    }
   }
 }
 

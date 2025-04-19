@@ -75,7 +75,10 @@ export class Block extends Control {
 
       this._doValidate(errorBatch, context, scope);
 
-      if (errorBatch.length === 0) return null;//no errors
+      if (errorBatch.length === 0) {
+        if (apply) this.error = null;
+        return null;//no errors
+      }
 
       //Return a validation batch: an error with an array of errors in its `cause`
       const result = new ValidationError(this.constructor.name, dflt(this.name, "<noname>"), scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
