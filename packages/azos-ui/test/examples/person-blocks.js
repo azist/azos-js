@@ -81,8 +81,13 @@ export class PersonField extends FieldPart {
     window.queueMicrotask(() =>  block[DATA_VALUE_PROP] = this.value);
   }
 
+  #blockChanged(e){
+    this.setValueFromInput(e.target[DATA_VALUE_PROP]);
+    this.inputChanged();
+  }
+
   renderInput(){
-    return html`<examples-person-block id="blockData" .blockData=${this.value}></examples-person-block>`
+    return html`<examples-person-block id="blockData" .blockData=${this.value} @change=${this.#blockChanged}></examples-person-block>`
   }
 }
 

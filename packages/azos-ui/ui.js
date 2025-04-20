@@ -18,7 +18,8 @@ import { AzosError,
          DATA_NAME_PROP,
          DATA_VALUE_PROP,
          sortDataFields,
-         supportsDataProtocol
+         supportsDataProtocol,
+         DATA_BLOCK_PROP
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
@@ -495,6 +496,30 @@ export function getChildDataMembers(element, deep = true){
 
   return result;
 }
+
+/**
+ * Returns a parent node which supports {@link DATA_BLOCK_PROP} (such as a {@link Block})
+ * which this element is a member of. Note: this does NOT pierce shadow dom of upper element by design,
+ * so it searches for IMMEDIATE AzosElement with data protocol containing this element
+ * @param {AzosElement} element required element reference
+ * @returns {AzosElement | null} parent element or null
+ */
+export function getDataParentOfMember(element){
+  isOfOrNull(element, AzosElement);
+  if (!element) return null;
+  const sr = element.shadowRoot;
+  if (!sr) return null;
+  let parent = sr.parentElement;
+  while(parent !== null){
+    if (parent instanceof AzosElement) {
+      if (DATA_BLOCK_PROP in parent) return parent;
+      return null;
+    }
+    parent = parent.parentElement;
+  }
+}
+
+
 
 /**
  * Helper method which harvests data from {@link AzosElement} children of the specified element,

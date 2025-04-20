@@ -74,6 +74,13 @@ export const DATA_VALUE_PROP = Symbol("data-value");
 export const DATA_BLOCK_PROP = Symbol("data-block");
 
 /**
+ * An optional part of "IData" protocol - an implementing entity receives a post-factum notification of data change
+ * made to constituent fields
+ */
+export const DATA_BLOCK_CHANGED_METHOD = Symbol("data-block-changed");
+
+
+/**
  * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context: any, scope: string, apply: bool): error | null`.
  * Performs validation logic returning an error object if validation fails.
  * Context object may include `[TARGET_PROP]` by convention to specify the validation target system id

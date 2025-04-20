@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
-import { Control, css, getBlockDataValue, getChildDataMembers, setBlockDataValue } from "./ui.js";
+import { CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
+import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
 
 /**
@@ -45,6 +45,22 @@ export class Block extends Control {
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
   get [DATA_BLOCK_PROP](){ return getChildDataMembers(this.shadowRoot, true); }
+
+  /**
+   * Override to trigger `change` event dispatch after value changes DUE to user input.
+   * The "value" of the block is taken from its constituent fields/parts which are children of the block {@link DATA_BLOCK_PROP}
+   */
+  [DATA_BLOCK_CHANGED_METHOD](){
+    const evt = new Event("change", { bubbles: true, composed: true, cancelable: false });
+    const proceed = this.dispatchEvent(evt);
+
+    if (proceed){
+      const parent = getDataParentOfMember(this);
+      if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){
+        parent[DATA_BLOCK_CHANGED_METHOD]();
+      }
+    }
+  }
 
   get [DATA_NAME_PROP](){ return this.name; }
   set [DATA_NAME_PROP](v){ this.name = v;}
@@ -113,6 +129,10 @@ export class Block extends Control {
    */
   // eslint-disable-next-line no-unused-vars
   _doValidate(errorBatch, context, scope){ }
+
+
+
+
 
   //todo: FormMode which is taken from parent
 

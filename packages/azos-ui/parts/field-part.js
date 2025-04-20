@@ -16,10 +16,11 @@ import {
   DATA_VALUE_PROP,
   DATA_NAME_PROP,
   ERROR_PROP,
-  NAME_PROP
+  NAME_PROP,
+  DATA_BLOCK_CHANGED_METHOD
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
-import { POSITION, STATUS, noContent } from "../ui";
+import { POSITION, STATUS, getDataParentOfMember, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
 
@@ -439,10 +440,20 @@ export class FieldPart extends Part{
   /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField */
   renderInput(){ return noContent; }
 
+
+  [DATA_BLOCK_CHANGED_METHOD](){ this.inputChanged(); }
+
   /** Override to trigger `change` event dispatch after value changes DUE to user input */
   inputChanged(){
-    const evt = new Event("change", { bubbles: true, composed: true, cancelable: false });
-    this.dispatchEvent(evt);
+    const evt = new Event("change", { bubbles: true, composed: true, cancelable: true });
+    const proceed = this.dispatchEvent(evt);
+
+    if (proceed){
+      const parent = getDataParentOfMember(this);
+      if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){
+        parent[DATA_BLOCK_CHANGED_METHOD]();
+      }
+    }
   }
 
   /** @param {any} value the value to feed to the lookup */
