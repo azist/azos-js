@@ -499,12 +499,12 @@ export function getChildDataMembers(element, deep = true){
 
 
 /**
- * Returns the immediate (the innermost) parent of type `AzosElement` for the supplied `AzosElement`
+ * Returns the immediate (the innermost) parent of type `AzosElement` for the supplied html element
  * @param {AzosElement} element
  * @returns {AzosElement | null} Immediate parent or null if not AzosElement
  */
 export function getImmediateParentAzosElement(element){
-  isOfOrNull(element, AzosElement);
+  isOfOrNull(element, HTMLElement);
 
   while(element){
     const host = element.host;
