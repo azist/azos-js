@@ -55,6 +55,9 @@ export class Block extends Control {
     if (anythingApplied) this.requestUpdate();
   }
 
+  get blockData(){ return this[DATA_VALUE_PROP]; }
+  set blockData(v){ this[DATA_VALUE_PROP] = v; }
+
   /**
    * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context: any, scope: string, apply: bool): error | null`.
    * Performs validation logic returning an error object if validation fails.
@@ -110,7 +113,6 @@ export class Block extends Control {
    */
   // eslint-disable-next-line no-unused-vars
   _doValidate(errorBatch, context, scope){ }
-
 
   //todo: FormMode which is taken from parent
 

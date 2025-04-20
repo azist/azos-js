@@ -10,9 +10,10 @@ import { html } from "../../ui.js";
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
 import { isOneOf } from "azos/strings";
-import { ValidationError } from "azos/types";
+import { DATA_VALUE_PROP, isObject, isString, ValidationError } from "azos/types";
+import { FieldPart } from "../../parts/field-part.js";
 
-export class PersonBlock extends Block{
+export class PersonBlock extends Block {
   render(){
 
     let errors = [];//error summary
@@ -50,7 +51,7 @@ export class PersonBlock extends Block{
   }
 }
 
-export class StatusBlock extends Block{
+export class StatusBlock extends Block {
   render(){
     return html`
       <az-text scope="this"  id="tbStatus"    name="Status"  title="Status"  maxLength=10 isrequired value="Init"></az-text>
@@ -60,5 +61,33 @@ export class StatusBlock extends Block{
   }
 }
 
+export class PersonField extends FieldPart {
+
+  castValue(v){
+    if (isObject(v)) return v;
+    if (isString(v)) return JSON.parse(v);
+    throw new ValidationError("PersonField", "value", "", "Invalid value", "Bad value");
+  }
+
+  focus(){
+    const t = this.$("blockData");
+    if (!t) return;
+    window.queueMicrotask(() => t.focus());
+  }
+
+  firstUpdated(){
+    const block = this.$("blockData");
+    if (!block) return;
+    window.queueMicrotask(() =>  block[DATA_VALUE_PROP] = this.value);
+  }
+
+  renderInput(){
+    return html`<examples-person-block id="blockData" .blockData=${this.value}></examples-person-block>`
+  }
+}
+
+
+
 window.customElements.define("examples-person-block", PersonBlock);
 window.customElements.define("examples-status-block", StatusBlock);
+window.customElements.define("examples-person-field", PersonField);

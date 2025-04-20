@@ -90,10 +90,14 @@ export class FieldPart extends Part{
    * which will capture cast exception as a field error
    */
   set value(v){
-    this.#rawValue = v;
-    this.#value = undefined;
-    this.requestUpdate();
-    this.#value = this.castValue(v);
+    try {
+      this.#rawValue = v;
+      this.#value = undefined;
+      this.#value = this.castValue(v);
+      this.requestUpdate();
+    } finally {
+      this._afterValueSet(false);
+    }
   }
 
   /**
@@ -101,17 +105,25 @@ export class FieldPart extends Part{
    * which needs to be stripped prior to assignment into data value
    */
   setValueFromInput(v){
-    this.#rawValue = v;
-    this.#value = undefined; //the value is `undefined` because error may be thrown at conversion below
-    this.requestUpdate();//async schedule update even if error gets thrown
-    try{
-      v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
-      this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
-      this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
-    }catch(e){
-      this.error = e;
+    try {
+      this.#rawValue = v;
+      this.#value = undefined; //the value is `undefined` because error may be thrown at conversion below
+      this.requestUpdate();//async schedule update even if error gets thrown
+      try{
+        v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
+        this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
+        this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
+      } catch(e) {
+        this.error = e;
+      }
+    } finally {
+      this._afterValueSet(true);
     }
   }
+
+  /** Override to react to value change */
+  // eslint-disable-next-line no-unused-vars
+  _afterValueSet(fromInput){  }
 
   get [DATA_VALUE_PROP](){ return this.value; }
   set [DATA_VALUE_PROP](v){ this.setValueFromInput(v); }

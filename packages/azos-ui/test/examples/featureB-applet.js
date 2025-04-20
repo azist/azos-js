@@ -86,6 +86,11 @@ export class ExampleFeatureBApplet extends Applet{
   </div>
 </az-modal-dialog>
 
+<hr>
+
+<examples-person-field id="fldPerson" scope="this" title="My Field is below" value='{"FirstName": "Jack", "LastName": "AAA"}'></examples-person-field>
+<az-button @click="${() => console.log(this.fldPerson.value)}" title="Dump fldPerson.value" style="float: right;"></az-button>
+
    `;
   }
 }
