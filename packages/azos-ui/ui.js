@@ -497,6 +497,30 @@ export function getChildDataMembers(element, deep = true){
   return result;
 }
 
+
+/**
+ * Returns the immediate (the innermost) parent of type `AzosElement` for the supplied `AzosElement`
+ * @param {AzosElement} element
+ * @returns {AzosElement | null} Immediate parent or null if not AzosElement
+ */
+export function getImmediateParentAzosElement(element){
+  isOfOrNull(element, AzosElement);
+
+  while(element){
+    const host = element.host;
+    if (host){
+      if (host instanceof AzosElement) return host;
+      element = host;
+      continue;
+    }
+    element = element.parentNode;
+  }
+
+  return null;
+}
+
+window.az_GetImmediateParentAzosElement = getImmediateParentAzosElement;
+
 /**
  * Returns a parent node which supports {@link DATA_BLOCK_PROP} (such as a {@link Block})
  * which this element is a member of. Note: this does NOT pierce shadow dom of upper element by design,
@@ -505,20 +529,11 @@ export function getChildDataMembers(element, deep = true){
  * @returns {AzosElement | null} parent element or null
  */
 export function getDataParentOfMember(element){
-  isOfOrNull(element, AzosElement);
-  if (!element) return null;
-  const sr = element.shadowRoot;
-  if (!sr) return null;
-  let parent = sr.parentElement;
-  while(parent !== null){
-    if (parent instanceof AzosElement) {
-      if (DATA_BLOCK_PROP in parent) return parent;
-      return null;
-    }
-    parent = parent.parentElement;
-  }
+  const parent = getImmediateParentAzosElement(element);
+  if (!parent) return null;
+  if (DATA_BLOCK_PROP in parent) return parent;
+  return null;
 }
-
 
 
 /**
