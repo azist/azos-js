@@ -10,7 +10,7 @@ import { Applet } from "../../applet.js";
 import { html } from "../../ui.js";
 import { DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
-import "./person-data.js";
+import "./person-blocks.js";
 import "../../parts/button.js";
 import "../../modal-dialog.js";
 import { showMsg } from "../../msg-box.js";
@@ -33,7 +33,13 @@ export class ExampleFeatureBApplet extends Applet{
       MiddleName: "L",
       LastName: "Cooper Fraud",
       Registered: false,
-      Smoker: true
+      Smoker: true,
+      ProcessStatus: {
+        Status: "Extern",
+        Description: "Set externally",
+        Approved: null
+      },
+      PayoutStatus: undefined
     };
   }
 
@@ -49,8 +55,15 @@ export class ExampleFeatureBApplet extends Applet{
 
   render(){
    return html`
-     This is feature B
+     <h2>This is feature B</h2>
+     <p>
+     There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form,
+     by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of
+     Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.
+     </p>
+
      <examples-person-block scope="this" id="blockPerson"></examples-person-block>
+
      <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Block Data"></az-button>
      <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Set block"></az-button>
      <az-button id="btnValidate" scope="this" @click="${this.#btnValidateClick}" title="Validate block"></az-button>

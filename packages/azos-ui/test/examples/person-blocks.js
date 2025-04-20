@@ -33,7 +33,7 @@ export class PersonBlock extends Block{
       <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q" ></az-text>
       <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
       <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
-      <az-check scope="this" id="chkSmoker"      name="Smoker" title="Former Smoker"  isrequired value="false"></az-check>
+      <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
       <h4>Processing Status</h4>
       <examples-status-block scope="this" id="blockProcessStatus" name="ProcessStatus"></examples-status-block>
       <h4>Payout Status</h4>

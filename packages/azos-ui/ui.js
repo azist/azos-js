@@ -531,7 +531,14 @@ export function getBlockDataValue(element, asArray = false){
  */
 export function setBlockDataValue(element, v){
   let result = false;
+
   const fields = getChildDataMembers(element, true);
+
+
+  if (v === undefined || v === null) {
+    for(const fld of fields) fld[DATA_VALUE_PROP] = null;
+    return true;
+  }
 
   if (types_isString(v)) v = JSON.parse(v);
 
