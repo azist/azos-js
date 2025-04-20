@@ -36,7 +36,7 @@ class MyLogic extends Module {
   }
 
   _appAfterLoad() {
-    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 25_000);
+    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 300_000);
   }
 
   _appBeforeCleanup() {

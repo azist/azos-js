@@ -64,6 +64,7 @@ export class StatusBlock extends Block {
 export class PersonField extends FieldPart {
 
   castValue(v){
+    if (v === null || v === undefined) return null;
     if (isObject(v)) return v;
     if (isString(v)) return JSON.parse(v);
     throw new ValidationError("PersonField", "value", "", "Invalid value", "Bad value");
