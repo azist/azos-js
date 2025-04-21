@@ -291,20 +291,6 @@ export class AzosElement extends LitElement {
   render() { return html`>>AZOS ELEMENT<<`; }
 }
 
-//FIXME: What is this used by? Remove/test
-export function isRectInViewport(rect) {
-  let bounds = rect.getBoundingClientRect();
-  let viewWidth = document.documentElement.clientWidth;
-  let viewHeight = document.documentElement.clientHeight;
-
-  if (bounds['left'] < 0) return false;
-  if (bounds['top'] < 0) return false;
-  if (bounds['right'] > viewWidth) return false;
-  if (bounds['bottom'] > viewHeight) return false;
-
-  return true;
-}
-
 /** Controls are components with interact-ability properties like
  *  `disabled`, `visible`, `absent`, `applicable`, and `readonly`
  */
