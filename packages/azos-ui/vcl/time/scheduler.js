@@ -7,205 +7,26 @@
 import * as aver from "azos/aver";
 import * as types from "azos/types";
 
-import { Control, css, html, noContent } from "../../ui";
+import { Control, css, html, noContent } from "../../ui.js";
+import { schedulerStyles } from "../../parts/styles.js";
 
 export class TimeBlockPicker extends Control {
 
-  static styles = css`
-:host{display:block;margin-top:1em;margin-bottom:1em;}
-.nav {
-  grid-row: 1;
-  grid-column: 2 / span max;
-  display: flex;
-  align-items: center;
-  gap: 1ch;
-  margin-bottom: 0.5ch;
-}
-.todayBtn, .viewBtn{
-  margin: 0;
-  padding: 0.5cap;
-  box-sizing: content-box;
-}
-.todayBtn, .todayBtn svg, .viewBtn, .viewBtn svg{
-  height: var(--height);
-  line-height: var(--height);
-}
-.viewBtn.prev svg{margin-left:-0.2ch;margin-right:0.2ch;}
-.viewBtn.next svg{margin-left:0.2ch;margin-right:-0.2ch;}
-.todayBtn {
-  --height: 2.25cap;
-  font-size: 0.8em;
-  font-weight: bolder;
-  display: inline-flex;
-  border-radius: 8px;
-  color: var(--ink);
-  border: 1px solid #ccc;
-  padding: 0.75ch 2ch 0.75ch 1.4ch;
-  gap: 0.5ch;
-}
-.viewBtn {
-  --height: 3cap;
-  border-radius: 50%;
-  background-color: hsl(from var(--paper) h s max(calc(l - 10), 10));
-  color: var(--ink);
-  border: none;
-}
-.todayBtn:hover, .viewBtn:hover {
-  filter: brightness(90%);
-  cursor: pointer;
-}
+  constructor() {
+    super();
+    this.viewStartDay = types.DAYS_OF_WEEK.MONDAY;
+    this.viewNumDays = 6; // default to Monday - Saturday
+    this.selectedItems = [];
 
-.daysContainer {
-  display: grid;
-  grid-template-columns: 6ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
-  grid-template-rows: auto auto repeat(var(--rows, 31), minmax(3ch, 0.35fr));
-  column-gap: 1px;
-}
+    this.use24HourTime = false;
+    this.timeViewRenderOffMins = 60;
+    this.#timeViewGranularityMins = 30;
+    this.maxSelectedItems = 2;
 
-.dayColumn {
-  display: grid;
-  grid-template-rows: subgrid;
-  grid-row: 2 / span max;
-  overflow: hidden;
-}
+    this.#setViewPropertiesForRecompute();
+  }
 
-/** background */
-:not(.legend) > .dayLabel div, .timeLabel.inView { background-color: #d0d0d0; }
-.timeSlot { background-color: #e8e8e8; }
-.timeSlot:not(.inView) { background-color: #bbb; }
-
-/** column-gap handles vertical lines, these are the horizontal */
-.timeCell { border-top: 1px dashed #ccc; }
-.timeCell:not(.inView) { border-top-color: #ccc; }
-.timeCell.onTheHour { border-top: 1px solid #aaa; }
-.timeCell.onTheHour:not(.inView) { border-top-color: #aaa; }
-.timeLabel.inView { border-left: 1px solid #aaa; }
-.timeLabel:not(.onTheHour) { border-top-color: #e5e5e5; }
-.timeLabel:not(.inView), .dayLabel + .timeCell { border-top: revert; }
-.timeLabel:nth-last-child(3) { border-bottom: 1px solid #aaa; }
-
-.dayLabel {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  justify-content: end;
-  user-select
-  : none;
-}
-
-.dayLabel .year {
-  font-weight: bold;
-  writing-mode: tb;
-  rotate: 180deg;
-  position: absolute;
-  left: 0.2em;
-  bottom: 0.1em;
-  background: none!important;
-  color: #989898;
-}
-
-.dayLabel .month {
-  width: 100%;
-  font-weight: bold;
-  font-variant: all-small-caps;
-  border-radius: 10px 10px 0 0;
-}
-
-.dayLabel .dayDate {
-  font-variant: all-small-caps;
-  padding-bottom: 0.2em;
-}
-
-.timeCell {
-  container-type: size;
-  grid-row: span 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  overflow: hidden;
-}
-
-.timeLabel:not(.onTheHour) {
-  color: #bebebe;
-  font-size: 0.9em;
-}
-
-.timeLabel .meridiemIndicator {
-  color: #929292;
-  font-size: 0.8em;
-  font-variant: small-caps;
-}
-
-.timeSlot.available {
-  padding: 0 4px 4px 0;
-  overflow: hidden;
-}
-
-.timeSlot.available .item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(0deg, #10a0ff, #20ceff);
-  color: #fff;
-  border-left: 4px solid #2080e8;
-  border-radius: 5px;
-  box-shadow: 0 0 6px  #a0a0a0;
-  font-size: clamp(10px, 15cqmin, 18px);
-  text-align: center;
-}
-
-.available .item.selected {
-  background: #30d000;
-  border-radius: 5px;
-}
-
-.available .item.selected .icon {
-  position: absolute;
-  bottom: 0.2em;
-  left: 0.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0px 0px 6px #caffc5;
-  background-color: green;
-  height: 1.2em;
-  width: 1.2em;
-  color: #caffc5;
-  fill: #caffc5;
-  font-weight: bold;
-  opacity: 0.75;
-}
-
-.timeSlot.available:hover .item {
-  cursor: pointer;
-  filter: brightness(1.1);
-}
-
-.r1 { font-size: var(--r1-fs);}
-.r2 { font-size: var(--r2-fs);}
-.r3 { font-size: var(--r3-fs);}
-.r4 { font-size: var(--r4-fs);}
-.r5 { font-size: var(--r5-fs);}
-.r6 { font-size: var(--r6-fs);}
-
-.ok-tab-btn { color: var(--s-ok-fg-ctl);  border-color: var(--s-ok-bor-color-ctl);}
-.info-tab-btn { color: var(--s-info-fg-ctl); border-color: var(--s-info-bor-color-ctl);}
-.warning-tab-btn { color: var(--s-warn-fg-ctl); border-color: var(--s-warn-bor-color-ctl);}
-.alert-tab-btn { color: var(--s-alert-fg-ctl); border-color: var(--s-alert-bor-color-ctl);}
-.error-tab-btn { color: var(--s-error-fg-ctl); border-color: var(--s-error-bor-color-ctl);}
-
-@media only screen and (max-width: 700px) {
-  .timeLabel:not(.onTheHour) { color: #d0d0d0 !important; }
-  .year { display: none; }
-  .month { border-radius: 5px 5px 0 0 !important;}
-}
-`;
+  static styles = [schedulerStyles, css``];
 
   /**
    * Effective Dates: If null, provides the start/end dates of the provided data.
@@ -378,20 +199,6 @@ export class TimeBlockPicker extends Control {
   get itemsByDay() { return this.#itemsByDay; }
   get items() { return this.#itemsByDay.flatMap(({ items }) => items); }
 
-  constructor() {
-    super();
-    this.viewStartDay = types.DAYS_OF_WEEK.MONDAY;
-    this.viewNumDays = 6; // default to Monday - Saturday
-    this.selectedItems = [];
-
-    this.use24HourTime = false;
-    this.timeViewRenderOffMins = 60;
-    this.#timeViewGranularityMins = 30;
-    this.maxSelectedItems = 2;
-
-    this.#setViewPropertiesForRecompute();
-  }
-
   #setViewPropertiesForRecompute() {
     this.#daysView = null;
     this.#timeSlotsView = null;
@@ -442,31 +249,35 @@ export class TimeBlockPicker extends Control {
   }
 
   /**
-   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
-   *  - (1380, true, false) => 11 pm
+   * If use24HourTime is true, formats time as 23:00, omitMeridianSuffix is ignored.
+   * Given (23:00, {use24HourTime, omitMinutesForWholeHours, omitMeridianSuffix}), yields:
+   *  - (1380, false, false, false) => 11 pm
+   *  - (1380, true, false, true) => 23:00
    *  - (1380, false, false) => 11:00 pm
    *  - (1380, true, true) => 11
    *  - (1380, false, true) => 11:00
    * @param {Number} mins, mins time of day
    * @param {Object} options
+   *          -> when use24HourTime=true, uses 23:00 (force-omits meridian suffix, forces minutes for whole hours)
    *          -> when omitMinutesForWholeHours=true omits minutes when 0
    *          -> when omitMeridianSuffix=true, omits am/pm
-   *          -> when use24HourTime=true, uses 23:00; 11:00 otherwise
    * @returns a formatted time string
    */
-  #formatTime(minsOfDay, { omitMinutesForWholeHours = false, omitMeridianSuffix = false, use24HourTime = false } = {}) {
+  #formatTime(minsOfDay, { use24HourTime = false, omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
     let mins = minsOfDay % 60;
     let hour = Math.floor(minsOfDay / 60);
     let timeString;
 
     if (use24HourTime) {
-      timeString = `${hour.toString().padStart(2, "0")}`;
-      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+      timeString = html`${hour.toString().padStart(2, "0")}`;
+      omitMeridianSuffix = true; // 24-hour time does not use am/pm
+      omitMinutesForWholeHours = false; // 24-hour time always shows minutes
     } else {
-      timeString = `${hour % 12 || 12}`;
-      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
-      if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
+      timeString = html`${hour % 12 || 12}`;
     }
+
+    if (!omitMinutesForWholeHours) timeString = html`${timeString}:${mins.toString().padStart(2, "0")}`;
+    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
 
     return timeString;
   }
