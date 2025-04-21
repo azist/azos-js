@@ -88,7 +88,13 @@ export class ExampleFeatureBApplet extends Applet{
 
 <hr>
 
-<examples-person-field id="fldPerson" scope="this" title="My Field is below" value='{"FirstName": "Jack", "LastName": "AAA"}'></examples-person-field>
+<examples-person-field
+     id="fldPerson"
+     scope="this"
+     title="My Field is below"
+     value='{"FirstName": "Jack", "LastName": "AAA"}'
+     @datachange=${(e) => console.info(`PersonField data changed on(${e.currentTarget.tagName}): ` + JSON.stringify(e.target[DATA_VALUE_PROP], null, 2))}> </examples-person-field>
+
 <az-button @click="${() => console.log(this.fldPerson.value)}" title="Dump fldPerson.value" style="float: right;"></az-button>
 
    `;

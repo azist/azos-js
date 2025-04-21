@@ -51,9 +51,12 @@ export class Block extends Control {
    * The "value" of the block is taken from its constituent fields/parts which are children of the block {@link DATA_BLOCK_PROP}
    */
   [DATA_BLOCK_CHANGED_METHOD](){
-    const evt = new Event("change", { bubbles: true, composed: true, cancelable: false });
+
+    //Data events are not bubbling and not composed and CANCEL-able
+    const evt = new Event("datachange", { bubbles: false, composed: false, cancelable: true });
     const proceed = this.dispatchEvent(evt);
 
+    //we need to manually propagate them to parents
     if (proceed){
       const parent = getDataParentOfMember(this);
       if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){
@@ -129,10 +132,6 @@ export class Block extends Control {
    */
   // eslint-disable-next-line no-unused-vars
   _doValidate(errorBatch, context, scope){ }
-
-
-
-
 
   //todo: FormMode which is taken from parent
 

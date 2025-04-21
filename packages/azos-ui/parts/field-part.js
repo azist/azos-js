@@ -445,9 +445,14 @@ export class FieldPart extends Part{
 
   /** Override to trigger `change` event dispatch after value changes DUE to user input */
   inputChanged(){
-    const evt = new Event("change", { bubbles: true, composed: true, cancelable: true });
-    const proceed = this.dispatchEvent(evt);
+    const evtChange = new Event("change", { bubbles: true, composed: true, cancelable: false });
+    this.dispatchEvent(evtChange);
 
+    //Data events are not bubbling and not composed and CANCEL-able
+    const evtDataChange = new Event("datachange", { bubbles: false, composed: false, cancelable: true });
+    const proceed = this.dispatchEvent(evtDataChange);
+
+    //We need to propagate data events manually
     if (proceed){
       const parent = getDataParentOfMember(this);
       if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){

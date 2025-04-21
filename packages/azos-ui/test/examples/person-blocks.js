@@ -10,7 +10,7 @@ import { html } from "../../ui.js";
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
 import { isOneOf } from "azos/strings";
-import { DATA_VALUE_PROP, isObject, isString, ValidationError } from "azos/types";
+import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
 import { FieldPart } from "../../parts/field-part.js";
 
 export class PersonBlock extends Block {
@@ -82,13 +82,22 @@ export class PersonField extends FieldPart {
     window.queueMicrotask(() =>  block[DATA_VALUE_PROP] = this.value);
   }
 
-  #blockChanged(e){
+  #blockDataChange(e){
     this.setValueFromInput(e.target[DATA_VALUE_PROP]);
     this.inputChanged();
   }
 
+  _doValidate(context, scope){
+    let result = super._doValidate(context, scope);
+    if (result) return result;
+
+    const block = this.$("blockData");
+    if (!block) return;
+    return block[VALIDATE_METHOD](context, scope, true);
+  }
+
   renderInput(){
-    return html`<examples-person-block id="blockData" .blockData=${this.value} @change=${this.#blockChanged}></examples-person-block>`
+    return html`<examples-person-block id="blockData" .blockData=${this.value} @datachange=${this.#blockDataChange}></examples-person-block>`
   }
 }
 
