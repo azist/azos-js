@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
-import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, setBlockDataValue } from "./ui.js";
+import { asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
+import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getImmediateParentAzosElement, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
 
 /**
@@ -43,6 +43,7 @@ export class Block extends Control {
    * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
    */
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
+
 
   get [DATA_BLOCK_PROP](){ return getChildDataMembers(this.shadowRoot, true); }
 
@@ -145,6 +146,24 @@ export class Block extends Control {
  */
 export class Form extends Block {
 
+  #dataMode;
+
+  get dataMode(){ return this.#dataMode; }
+  set dataMode(v){
+    this.#dataMode = asDataMode(v);
+    this.requestUpdate();
+  }
+
+  get [DATA_MODE_PROP](){ return this.#dataMode; }
+
+  static properties = {
+    dataMode:   { type: String }
+  };
+
   constructor() { super(); }
+
+
+  /** Override to return a different data mode */
+  get [DATA_MODE_PROP](){ return undefined; }
 
 }//Form
