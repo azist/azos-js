@@ -30,7 +30,7 @@ export class RadioGroupField extends FieldPart{
   get isPredefinedContentLayout(){ return true; }
 
   #radioChange(e){
-    this.value = e.target.value;
+    this.setValueFromInput(e.target.value);
     this.inputChanged();
   }
 

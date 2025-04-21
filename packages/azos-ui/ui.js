@@ -12,12 +12,18 @@ import { link as linkModule } from "azos/linker.js";
 import { AzosError,
          isNumber as types_isNumber,
          isString as types_isString,
-         isNonEmptyString as types_isNonEmptyString
+         isArray as types_isArray,
+         isObject as types_isObject,
+         isNonEmptyString as types_isNonEmptyString,
+         DATA_NAME_PROP,
+         DATA_VALUE_PROP,
+         sortDataFields,
+         supportsDataProtocol,
+         DATA_BLOCK_PROP
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
-import { isFunctionOrNull, isOfOrNull, isStringOrNull } from "azos/aver";
-import { LOG_TYPE } from "azos/log";
+import { AVERMENT_FAILURE, isOfOrNull, isStringOrNull } from "azos/aver";
 import { CONTENT_TYPE } from "azos/coreconsts";
 
 /** CSS template processing pragma: css`p{color: blue}` */
@@ -255,7 +261,7 @@ export class AzosElement extends LitElement {
 
   /**
      * Writes to log if current component effective level permits, returning guid of newly written message
-     * @param {string} type an enumerated type {@link log.LOG_TYPE}
+     * @param {string} type an enumerated type `LOG_TYPE`
      * @param {string} text message text
      * @param {Error} ex optional exception object
      * @param {object | null} params optional parameters
@@ -461,5 +467,139 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
   return { html: content, attrs: got.attrs };
 }
 
+/**
+ * Takes HtmlElement and returns an array of {@link AzosElement} child instances which support IData protocol
+ * characterized by the presence of {@link DATA_NAME_PROP} and {@link DATA_VALUE_PROP} properties.
+ * @param {HTMLElement} element required UI element as of which to search for child `AzosElement` derivatives
+ * @param {boolean} [deep=true] true to consider child sub-elements, false to only scan the immediate children of this element.
+ *                              Note: Only non-shadow sub elements (not web components) are searched, e.g. things like "span/div/section" which are in the same DOM
+ *                              are considered to be on the same logical level, but shadow DOM is NOT pierced, as web components should encapsulate their own child fields
+ * @returns {AzosElement[]} array of data-aware elements which support IData protocol; empty array for null/undefined/unsupported elements;
+ *                          If you pass `deep` then the child elements are also searched
+ **/
+export function getChildDataMembers(element, deep = true){
+  let result = [];
+
+  if (element && element.children){
+    for(const one of element.children){
+      if (one instanceof AzosElement){
+        //Does it support data protocol
+        if (supportsDataProtocol(one)) result.push(one);
+      } else { //I am another element
+        const sub = getChildDataMembers(one, deep);
+        result = result.concat(sub);
+      }
+    }
+  }
+
+  result.sort(sortDataFields);
+
+  return result;
+}
+
+
+/**
+ * Returns the immediate (the innermost) parent of type `AzosElement` for the supplied html element
+ * @param {AzosElement} element
+ * @returns {AzosElement | null} Immediate parent or null if not AzosElement
+ */
+export function getImmediateParentAzosElement(element){
+  isOfOrNull(element, HTMLElement);
+
+  while(element){
+    const host = element.host;
+    if (host){
+      if (host instanceof AzosElement) return host;
+      element = host;
+      continue;
+    }
+    element = element.parentNode;
+  }
+
+  return null;
+}
+
+window.az_GetImmediateParentAzosElement = getImmediateParentAzosElement;
+
+/**
+ * Returns a parent node which supports {@link DATA_BLOCK_PROP} (such as a {@link Block})
+ * which this element is a member of. Note: this does NOT pierce shadow dom of upper element by design,
+ * so it searches for IMMEDIATE AzosElement with data protocol containing this element
+ * @param {AzosElement} element required element reference
+ * @returns {AzosElement | null} parent element or null
+ */
+export function getDataParentOfMember(element){
+  const parent = getImmediateParentAzosElement(element);
+  if (!parent) return null;
+  if (DATA_BLOCK_PROP in parent) return parent;
+  return null;
+}
+
+
+/**
+ * Helper method which harvests data from {@link AzosElement} children of the specified element,
+ * using their {@link DATA_NAME_PROP} and  {@link DATA_VALUE_PROP} properties.
+ * @param {HTMLElement} element required UI element as of which to search for child `AzosElement` derivatives
+ * @param {bool} asArray true to get data as an array instead of a map
+ * @returns {array | object} an array or object populated with data e.g. `["James", "Bond"]` or `{"LastName": "Bond", "FirstName": "James"}`
+ */
+export function getBlockDataValue(element, asArray = false){
+  const fields = getChildDataMembers(element, true);
+
+  if (asArray){
+    const result = [ ];
+    for(const fld of fields) result.push(fld[DATA_VALUE_PROP]);
+    return result;
+  } else { //map
+    const result = { };
+    let i = 0;
+    for(const fld of fields) result[fld[DATA_NAME_PROP] ?? `?noname_${i++}`] = fld[DATA_VALUE_PROP];
+    return result;
+  }
+}
+
+
+/**
+ * Helper method which uses default strategy to setting {@link DATA_VALUE_PROP}
+ * on named fields on a BLOCK field-composite element by applying a field assignment vector which is either:
+ *   a). an array containing field values matched by their ordinal array position, e.g. `["James", "Bond"]`
+ *   b). or an object having key names equal data field names of child fields, e.g. `{FirstName: "James", LastName: "Bond"}`
+ * Field name bindings are case-INSENSITIVE
+ * @param {HTMLElement} element whose child fields need to be set
+ * @param {Array | Object} v either array or object representing field assignment vector, e.g. `{FirstName: "James", LastName: "Bond"}`
+ * @returns {boolean} true if at least a single set operation was applied - fields were found by name or by index; false when nothing was found
+ */
+export function setBlockDataValue(element, v){
+  let result = false;
+
+  const fields = getChildDataMembers(element, true);
+
+
+  if (v === undefined || v === null) {
+    for(const fld of fields) fld[DATA_VALUE_PROP] = null;
+    return true;
+  }
+
+  if (types_isString(v)) v = JSON.parse(v);
+
+  if (types_isArray(v)){
+    for(let i = 0; i < v.length; i++ ){
+      if (i < fields.length){
+        fields[i][DATA_VALUE_PROP] = v[i];
+        result = true;
+      }
+    }
+  } else if (types_isObject(v)){
+    for(const [pk, pv] of Object.entries(v)){
+      const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
+      if (fld) {
+        fld[DATA_VALUE_PROP] = pv;
+        result = true;
+      }
+    }
+  } else throw AVERMENT_FAILURE("Expecting data assignment either [] or {} vector", "setDataValue()");
+
+  return result;
+}
 
 

@@ -36,7 +36,7 @@ export class CheckField extends FieldPart{
   get isPredefinedContentLayout(){ return true; }
 
   #chkChange(e){
-    this.value = e.target.checked;
+    this.setValueFromInput(e.target.checked);
     this.inputChanged();
   }
 
@@ -55,7 +55,7 @@ export class CheckField extends FieldPart{
         checkTypeStyle = 'cross';
       } else {
         checkTypeStyle = this.checkType;
-      } 
+      }
     }
 
     return html`
