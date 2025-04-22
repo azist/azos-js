@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
+import { asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, FORM_MODE_JSON_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getImmediateParentAzosElement, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
 
@@ -162,8 +162,10 @@ export class Form extends Block {
 
   constructor() { super(); }
 
-
-  /** Override to return a different data mode */
-  get [DATA_MODE_PROP](){ return undefined; }
+  get [DATA_VALUE_PROP](){
+    const got = super[DATA_VALUE_PROP];
+    got[FORM_MODE_JSON_PROP] = this.dataMode; //add form mode tag
+    return got;
+  }
 
 }//Form

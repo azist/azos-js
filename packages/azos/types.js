@@ -13,9 +13,12 @@ import {
   isNonEmptyString as aver_isNonEmptyString,
   isStringOrNull as aver_isStringOrNull,
   isNotNull as aver_isNotNull,
-  isFunction as aver_isFunction,
-  isObject as aver_isObject
+  isFunction as aver_isFunction
 } from "./aver.js";
+
+
+/** MUST MATCH server stack. DO NOT LOCALIZE. Marker property for form submission */
+export const FORM_MODE_JSON_PROP = "__FormMode";
 
 /**
  * Establishes a "director" protocol - an entity which implements such property returns it's director -
@@ -711,6 +714,13 @@ export function asDataMode(v) {
   if (strings.isOneOf(v, ALL_DATA_MODES, true)) return v;
   return DATA_MODE.UNSPECIFIED;
 }
+
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.INSERT` */
+export function isInsertMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.INSERT; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.UPDATE` */
+export function isUpdateMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.UPDATE; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.DELETE` */
+export function isDeleteMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.DELETE; }
 
 export const AS_BOOLEAN_FUN = Symbol("asBoolean");
 const TRUISMS = Object.freeze(["true", "t", "yes", "1", "ok"]);
