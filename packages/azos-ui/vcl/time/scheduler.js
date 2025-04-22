@@ -266,18 +266,17 @@ export class TimeBlockPicker extends Control {
   }
 
   /**
-   * If use24HourTime is true, formats time as 23:00, omitMeridianSuffix is ignored.
-   * Given (23:00, {use24HourTime, omitMinutesForWholeHours, omitMeridianSuffix}), yields:
-   *  - (1380, false, false, false) => 11 pm
-   *  - (1380, true, false, true) => 23:00
+   * If use24HourTime is true, formats 1380 as 23:00.
+   * Otherwise, given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
    *  - (1380, false, false) => 11:00 pm
-   *  - (1380, true, true) => 11
+   *  - (1380, true, false) => 11 pm
    *  - (1380, false, true) => 11:00
-   * @param {Number} mins, mins time of day
-   * @param {Object} options
-   *          -> when use24HourTime=true, uses 23:00 (force-omits meridian suffix, forces minutes for whole hours)
-   *          -> when omitMinutesForWholeHours=true omits minutes when 0
-   *          -> when omitMeridianSuffix=true, omits am/pm
+   *  - (1380, true, true) => 11 (bad practice, but supported)
+   * @param {number} mins, mins time of day
+   * @param {object} [options={}] (optional) The options for formatting the time
+   * @property {boolean} [options.use24HourTime=false] (optional) If true, formats 1380 as 23:00 (force-omits meridian suffix, forces minutes for whole hours)
+   * @property {boolean} [options.omitMinutesForWholeHours=false] (optional) If true, omits minutes when 0 (e.g., 11:00 becomes 11)
+   * @property {boolean} [options.omitMeridianSuffix=false] (optional) If true, omits am/pm suffix (e.g., 11:00 becomes 11:00)
    * @returns a formatted time string
    */
   #formatTime(minsOfDay, { use24HourTime = false, omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
