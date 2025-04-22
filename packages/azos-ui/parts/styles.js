@@ -865,11 +865,13 @@ export const iconStyles = css`
   stroke-width: var(--icon-stroke-width);
   fill: var(--icon-fill);
   vertical-align: middle;
+
+  &, svg{ /* sometimes, svg is wrapped */
+    width: var(--icon-size);
+    padding: 0;
+    margin: 0;
+  }
+
+  &.fas{ fill: var(--icon-stroke) }
 }
-.icon, .icon svg{ /* sometimes, svg is wrapped */
-  width: var(--icon-size);
-  padding: 0;
-  margin: 0;
-}
-.icon.fas{ fill: var(--icon-stroke) }
 `;
