@@ -6,6 +6,7 @@
 
 import * as aver from "azos/aver";
 import * as types from "azos/types";
+import { isOneOf } from "azos/strings";
 
 import { Control, css, html, noContent } from "../../ui.js";
 import { schedulerStyles } from "../../parts/styles.js";
@@ -19,8 +20,7 @@ export class TimeBlockPicker extends Control {
     this.selectedItems = [];
 
     this.use24HourTime = false;
-    this.timeViewRenderOffMins = 60;
-    this.#timeViewGranularityMins = 30;
+    this.timeViewGranularityMins = 30;
     this.maxSelectedItems = 2;
 
     this.#setViewPropertiesForRecompute();
@@ -40,7 +40,7 @@ export class TimeBlockPicker extends Control {
     enabledStartDate: { type: Date },
     enabledEndDate: { type: Date },
 
-    viewStartDay: { type: types.DAYS_OF_WEEK },
+    viewStartDay: { type: Number },
     viewNumDays: { type: Number },
     viewStartDate: { type: Date },
     viewEndDate: { type: Date },
@@ -54,7 +54,12 @@ export class TimeBlockPicker extends Control {
 
   #timeViewGranularityMins = null;
   get timeViewGranularityMins() { return this.#timeViewGranularityMins; }
-  set timeViewGranularityMins(v) { throw Error("Unimplemented--anything outside of 30 min causes infinite loop.") }
+  set timeViewGranularityMins(v) {
+    const oldValue = this.#timeViewGranularityMins;
+    this.#timeViewGranularityMins = isOneOf(aver.isNumber(v), [15, 30, 60]) ? v : 30;
+    this.timeViewRenderOffMins = this.#timeViewGranularityMins * 2;
+    this.requestUpdate("timeViewGranularityMins", oldValue);
+  }
 
   /** The date of the first scheduling item or "today" if no items. */
   #effectiveStartDate = null;
@@ -108,12 +113,25 @@ export class TimeBlockPicker extends Control {
     this.requestUpdate();
   }
 
+  #viewNumDays = null;
+  get viewNumDays() { return this.#viewNumDays; }
+  set viewNumDays(v) {
+    console.debug("Setting viewNumDays", v);
+    aver.isTrue(v >= 5 && v <= 7, "viewNumDays should be between 5 and 7");
+    const oldValue = this.#viewNumDays;
+    this.#viewNumDays = v;
+    this.#setViewPropertiesForRecompute();
+    this.requestUpdate("viewNumDays", oldValue);
+  }
+
   #viewStartDay = null;
   get viewStartDay() { return this.#viewStartDay; }
   set viewStartDay(v) {
-    aver.isTrue(v >= 0 && v < 7);
+    aver.isTrue(v >= 0 && v < 7, "viewStartDay should be between 0 (Sunday) and 6 (Saturday)");
+    const oldValue = this.#viewStartDay;
     this.#viewStartDay = v;
-    this.requestUpdate();
+    this.#setViewPropertiesForRecompute();
+    this.requestUpdate("viewStartDay", oldValue);
   }
 
   #viewStartDate = null;
@@ -127,7 +145,6 @@ export class TimeBlockPicker extends Control {
   set viewStartDate(v) {
     aver.isDate(v);
     v.setHours(0, 0, 0, 0);
-    aver.isTrue(v.getDay() === this.viewStartDay, `Start Date should start on ${this.viewStartDay}, but was ${v.getDay()}`);
     this.#setViewPropertiesForRecompute();
 
     this.#viewStartDate = v;
@@ -387,26 +404,33 @@ export class TimeBlockPicker extends Control {
    * @param {Number} > 0 moves next, < 0 move previous
    */
   changeViewPage(count = 1, force = false) {
-    let newViewStartDate;
+    let nextViewStartDate;
     if (count === 0)
-      newViewStartDate = this.#calculateViewStartDate(new Date());
+      nextViewStartDate = this.#calculateViewStartDate(new Date());
     else {
-      newViewStartDate = new Date(this.viewStartDate);
-      newViewStartDate.setDate(newViewStartDate.getDate() + (7 * count));
+      nextViewStartDate = new Date(this.viewStartDate);
+      let nextStartDate;
+      switch (true) {
+        case this.viewStartDay === types.DAYS_OF_WEEK.SUNDAY: nextStartDate = 7; break;
+        case this.viewStartDay === types.DAYS_OF_WEEK.MONDAY && this.viewNumDays >= 5: nextStartDate = 7; break;
+        default: nextStartDate = this.viewNumDays; break;
+      }
+      nextStartDate *= count;
+      nextViewStartDate.setDate(nextViewStartDate.getDate() + nextStartDate);
 
       if (!force) {
         let filter;
         if (count < 0)
-          filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
+          filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() > this.enabledStartDate.getTime();
         else
-          filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
+          filter = ({ day }) => day.getTime() >= nextViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
 
         if (!this.itemsByDay.some(filter)) return;
       }
     }
 
     this.#setViewPropertiesForRecompute();
-    this.viewStartDate = newViewStartDate;
+    this.viewStartDate = nextViewStartDate;
   }
 
   /** Remove all items and reset view */
@@ -441,18 +465,18 @@ export class TimeBlockPicker extends Control {
     today.setHours(0, 0, 0, 0);
 
     let rec;
-    if (today > this.viewEndDate) rec = this.renderImageSpec("svg://azos.ico.arrowRight");
-    else if (today < this.viewStartDate) rec = this.renderImageSpec("svg://azos.ico.arrowLeft");
-    else rec = this.renderImageSpec("svg://azos.ico.calendarToday");
+    if (today > this.viewEndDate) rec = this.renderImageSpec("svg://azos.ico.arrowRight", { wrapImage: false });
+    else if (today < this.viewStartDate) rec = this.renderImageSpec("svg://azos.ico.arrowLeft", { wrapImage: false });
+    else rec = this.renderImageSpec("svg://azos.ico.calendarToday", { wrapImage: false });
     return rec.html;
   }
 
   renderNavigationControls() {
     return html`
 <div class="nav">
-  <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">${this.renderImageSpec("svg://azos.ico.caretLeft").html}</button>
+  <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">${this.renderImageSpec("svg://azos.ico.caretLeft", { wrapImage: false }).html}</button>
   <button @click="${() => this.changeViewPage(0)}" class="viewing todayBtn">${this.todaySymbol} <span>Today</span></button>
-  <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">${this.renderImageSpec("svg://azos.ico.caretRight").html}</button>
+  <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">${this.renderImageSpec("svg://azos.ico.caretRight", { wrapImage: false }).html}</button>
   ${this.renderViewSpanLabel(this.viewStartDate, this.viewEndDate, true)}
 </div>
     `;
@@ -567,6 +591,11 @@ export class TimeBlockPicker extends Control {
   renderSchedulingItem(schItem, rowSpan) {
     let iconContent = noContent;
     let cls = ["item"];
+    if (schItem.data.status) {
+      console.log("status:", schItem.data.status);
+      cls.push(`${schItem.data.status}`);
+    }
+    // console.log("renderSchedulingItem", schItem);
     const eventSelectedIndex = this.selectedItems.indexOf(schItem);
     if (eventSelectedIndex > -1) {
       cls.push("selected");
