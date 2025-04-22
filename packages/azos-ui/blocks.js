@@ -170,7 +170,7 @@ export class Form extends Block {
 
   set [DATA_VALUE_PROP](v){
     super[DATA_VALUE_PROP] = v;
-    const got = v[FORM_MODE_JSON_PROP];
+    const got = v?.[FORM_MODE_JSON_PROP];
     if (got) this.dataMode = asDataMode(got);// init form mode from set data
   }
 }//Form
