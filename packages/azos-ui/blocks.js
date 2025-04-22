@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, FORM_MODE_JSON_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
-import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getImmediateParentAzosElement, setBlockDataValue } from "./ui.js";
+import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getImmediateParentAzosElement, html, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
 
 /**
@@ -154,7 +154,8 @@ export class Form extends Block {
     this.requestUpdate();
   }
 
-  get [DATA_MODE_PROP](){ return this.#dataMode; }
+  get [DATA_MODE_PROP](){ return this.dataMode; }
+  set [DATA_MODE_PROP](v){ this.dataMode = v; }
 
   static properties = {
     dataMode:   { type: String }
@@ -168,4 +169,17 @@ export class Form extends Block {
     return got;
   }
 
+  set [DATA_VALUE_PROP](v){
+    super[DATA_VALUE_PROP] = v;
+    const got = v?.[FORM_MODE_JSON_PROP];
+    if (got) this.dataMode = asDataMode(got);// init form mode from set data
+  }
+
+
+  renderControl(){
+    return html`<slot></slot>`;
+  }
+
 }//Form
+
+window.customElements.define("az-form", Form);
