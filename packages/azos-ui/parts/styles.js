@@ -146,15 +146,15 @@ button{ display: inline-block; }
  */
 button .icon {
   --icon-stroke: currentColor;
-  --icon-size: 1em; 
-  scale: 1.4; 
+  --icon-size: 1em;
+  scale: 1.4;
   margin-inline-end: .5ch;
   margin-inline-start: -.5ch;
 }
 button:has(i) {
   display: inline-flex;
   &.shrink {
-    @media (max-width: ${BREAKPOINT_SM}px) { 
+    @media (max-width: ${BREAKPOINT_SM}px) {
       padding: .5em;
       .title {display: none }
       .icon { margin: 0 }
@@ -643,6 +643,214 @@ li+li{
   animation: loader 1s ease infinite;
 }
 @keyframes loader{ to{ transform: rotate(1turn); }}
+`;
+
+export const schedulerStyles = css`
+:host{ display: block; margin-top: 1em; margin-bottom: 1em; }
+.nav{
+  grid-row: 1;
+  grid-column: 2 / span max;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  margin-bottom: 0.5ch;
+}
+
+.todayBtn, .viewBtn{
+  margin: 0;
+  padding: 0.5cap;
+  box-sizing: content-box;
+  color: var(--ink);
+  &, svg{
+    height: var(--height);
+    line-height: var(--height);
+  }
+
+  &:hover{
+    filter: brightness(90%);
+    cursor: pointer;
+  }
+}
+
+.todayBtn {
+  --height: 2.25cap;
+  font-size: 0.8em;
+  font-weight: bolder;
+  display: inline-flex;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.75ch 2ch 0.75ch 1.4ch;
+  gap: 0.5ch;
+}
+
+.viewBtn {
+  --height: 3cap;
+  border: none;
+  border-radius: 50%;
+  background-color: hsl(from var(--paper) h s max(calc(l - 10), 10));
+
+  &.prev svg{ margin-right: 0.2ch; }
+  &.next svg{ margin-left: 0.2ch; }
+}
+
+.daysContainer {
+  display: grid;
+  grid-template-columns: 6ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
+  grid-template-rows: auto auto repeat(var(--rows, 31), minmax(3ch, 0.35fr));
+  column-gap: 1px;
+}
+
+.dayColumn {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: 2 / span max;
+  overflow: hidden;
+}
+
+/** background */
+:not(.legend) > .dayLabel div, .timeLabel.inView{ background-color: #d0d0d0; }
+
+/** column-gap handles vertical lines, these are the horizontal */
+.timeLabel.inView{ border-left: 1px solid #aaa; }
+.timeLabel:not(.onTheHour){ border-top-color: #e5e5e5; }
+.timeLabel:not(.inView), .dayLabel + .timeCell{ border-top: revert; }
+.timeLabel:nth-last-child(3){ border-bottom: 1px solid #aaa; }
+
+.dayLabel {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  justify-content: end;
+  user-select: none;
+
+  .year {
+    font-weight: bold;
+    writing-mode: tb;
+    rotate: 180deg;
+    position: absolute;
+    left: 0.2em;
+    bottom: 0.1em;
+    background: none!important;
+    color: #989898;
+  }
+
+  .month {
+    width: 100%;
+    font-weight: bold;
+    font-variant: all-small-caps;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .dayDate {
+    font-variant: all-small-caps;
+    padding-bottom: 0.2em;
+  }
+}
+
+.timeCell {
+  container-type: size;
+  grid-row: span 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  overflow: hidden;
+}
+
+.timeLabel {
+
+  &:not(.onTheHour) {
+    color: #bebebe;
+    font-size: 0.9em;
+  }
+
+  .meridiemIndicator {
+    color: #929292;
+    font-size: 0.8em;
+    font-variant: small-caps;
+  }
+}
+
+.timeSlot {
+  background-color: #e8e8e8;
+  border-top: 1px dashed #ccc;
+  padding: 1px 4px 4px 1px;
+
+  &:not(.inView){ background-color: #bbb; border-top-color: #ccc; }
+  &.onTheHour{ border-top: 1px solid #aaa; }
+  &.onTheHour:not(.inView){ border-top-color: #aaa; }
+
+  .item {
+    padding: 2px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--vcl-scheduler-default-item-bg-color);
+    color: var(--vcl-scheduler-default-item-fg-color);
+    box-shadow: var(--vcl-scheduler-default-item-box-shadow);
+    font-size: clamp(10px, 15cqmin, 18px);
+    text-align: center;
+    border-left: var(--vcl-scheduler-default-item-bor-ctl);
+    border-radius: 4px;
+
+    &.ok      { border-left-color: var(--vcl-scheduler-ok-bor-color-ctl); }
+    &.info    { border-left-color: var(--vcl-scheduler-info-bor-color-ctl); }
+    &.warning { border-left-color: var(--vcl-scheduler-warn-bor-color-ctl); }
+    &.alert   { border-left-color: var(--vcl-scheduler-alert-bor-color-ctl); }
+    &.error   { border-left-color: var(--vcl-scheduler-error-bor-color-ctl); }
+    &.brand1  { border-left-color: var(--vcl-scheduler-brand1-bor-color-ctl); }
+    &.brand2  { border-left-color: var(--vcl-scheduler-brand2-bor-color-ctl); }
+    &.brand3  { border-left-color: var(--vcl-scheduler-brand3-bor-color-ctl); }
+
+    .caption .timeSpan {
+      .startTime::after {
+        content: "-";
+        display: inline-block;
+        margin: 0 0.2em;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+      filter: brightness(1.1);
+    }
+
+    &.selected {
+      background: var(--vcl-scheduler-selected-item-bg-color);
+      color: var(--vcl-scheduler-selected-item-fg-color);
+
+      .icon {
+        position: absolute;
+        bottom: 0.2em;
+        left: 0.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: var(--vcl-scheduler-selected-badge-box-shadow);
+        background-color: var(--vcl-scheduler-selected-badge-bg-color);
+        height: 1.2em;
+        width: 1.2em;
+        color: var(--vcl-scheduler-selected-badge-fg-color);
+        fill: var(--vcl-scheduler-selected-badge-fg-color);
+        font-weight: bold;
+        opacity: 0.75;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .timeLabel:not(.onTheHour) { color: #d0d0d0 !important; }
+  .year { display: none; }
+  .month { border-radius: 4px 4px 0 0 !important;}
+}
 `;
 
 export const iconStyles = css`
