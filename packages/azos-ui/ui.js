@@ -15,6 +15,7 @@ import { AzosError,
          isArray as types_isArray,
          isObject as types_isObject,
          isNonEmptyString as types_isNonEmptyString,
+         isAssigned as types_isAssigned,
          DATA_NAME_PROP,
          DATA_VALUE_PROP,
          sortDataFields,
@@ -609,3 +610,15 @@ export function getEffectiveDataMode(element){
   return DATA_MODE.UNDEFINED;
 }
 
+/**
+ * Provides access to CSS variables that are defined in the CSS palette.
+ * @param {string} spec a valid CSS specification, e.g., "selected-item-bg-color" or "default-item-fg-color"
+ * @param {string | undefined} prefix optional prefix to use for the CSS variable, default is "pal" (e.g., "pal-selected-item-bg-color")
+ * @returns `var(--{prefix}-{spec})`, e.g., `--var(--pal-selected-item-bg-color)` or `--var(--pal-default-item-fg-color)`;
+ *  unless the {@param spec} starts with `#` or contains `{`, then it is returned as-is, e.g., `#ff0000` or `rgb(255, 0, 0)`.
+ */
+export function getCssPaletteSpec(spec, prefix = "pal") {
+  if (!types_isAssigned(isStringOrNull(spec))) return "";
+  if (spec.startsWith("#") || spec.indexOf("(")) return spec; //already a CSS spec
+  return `var(--${prefix}-${spec})`; //convert to CSS variable
+}
