@@ -6,7 +6,7 @@
 
 import { IClient } from "../../client.js";
 import { isObject, isString } from "../../aver.js";
-import { isInsertForm } from "../../types.js";
+import { isInsertMode } from "../../types.js";
 
 
 /** Provides functionality for consuming Sky.Adlib services*/
@@ -35,7 +35,7 @@ export class AdlibClient extends IClient {
   async saveItem(item) {
     isObject(item);
 
-    const method = isInsertForm(item) ? this.post : this.put;
+    const method = isInsertMode(item) ? this.post : this.put;
     const got = await method("item", item);
     return got;
   }

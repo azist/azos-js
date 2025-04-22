@@ -13,9 +13,12 @@ import {
   isNonEmptyString as aver_isNonEmptyString,
   isStringOrNull as aver_isStringOrNull,
   isNotNull as aver_isNotNull,
-  isFunction as aver_isFunction,
-  isObject as aver_isObject
+  isFunction as aver_isFunction
 } from "./aver.js";
+
+
+/** MUST MATCH server stack. DO NOT LOCALIZE. Marker property for form submission */
+export const FORM_MODE_JSON_PROP = "__FormMode";
 
 /**
  * Establishes a "director" protocol - an entity which implements such property returns it's director -
@@ -55,6 +58,12 @@ export const DIRTY_PROP = Symbol("dirty");
  *  such as a file view can be closed if there are no changes to be saved.
  */
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
+
+/**
+ * Establishes a "IData" protocol for blocks such as forms: Insert|Update|Delete flag
+ */
+export const DATA_MODE_PROP = Symbol("data-mode");
+
 
 /**
  * Establishes a "IData" protocol - an entity provides getting and possibly setting its data under this name aka "field name"
@@ -661,13 +670,13 @@ export const DATA_KIND = Object.freeze({
 });
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
 
-export const FORM_MODE = Object.freeze({
+export const DATA_MODE = Object.freeze({
   UNSPECIFIED: "unspecified",
   INSERT: "insert",
   UPDATE: "update",
   DELETE: "delete",
 });
-const ALL_FORM_MODES = allObjectValues(FORM_MODE);
+const ALL_DATA_MODES = allObjectValues(DATA_MODE);
 
 /**
  * Converts value to CHAR_CASE coercing it to lowercase string if needed
@@ -692,19 +701,26 @@ export function asDataKind(v) {
 }
 
 /**
- * Converts value to FORM_MODE coercing it to lowercase string if needed
- * @param {*} v value to convert
- * @returns {FORM_MODE}
+ * Converts value to DATA_MODE or if it has a property `DATA_MODE_PROP` gets the value from it
+ * @param {String | Object} v a string value to convert or a complex value with a `DATA_MODE_PROP`
+ * @returns {DATA_MODE} data mode value
  */
-export function asFormMode(v) {
+export function asDataMode(v) {
+  if (v === undefined || v === null) return DATA_MODE.UNSPECIFIED;
+
+  if (DATA_MODE_PROP in v) v = v[DATA_MODE_PROP];
+
   v = strings.asString(v).toLowerCase();
-  if (strings.isOneOf(v, ALL_FORM_MODES, true)) return FORM_MODE[v];
-  return FORM_MODE.UNSPECIFIED;
+  if (strings.isOneOf(v, ALL_DATA_MODES, true)) return v;
+  return DATA_MODE.UNSPECIFIED;
 }
 
-export function isInsertForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.INSERT; }
-export function isUpdateForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.UPDATE; }
-export function isDeleteForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.DELETE; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.INSERT` */
+export function isInsertMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.INSERT; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.UPDATE` */
+export function isUpdateMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.UPDATE; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.DELETE` */
+export function isDeleteMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.DELETE; }
 
 export const AS_BOOLEAN_FUN = Symbol("asBoolean");
 const TRUISMS = Object.freeze(["true", "t", "yes", "1", "ok"]);
