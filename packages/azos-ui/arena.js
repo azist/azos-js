@@ -68,22 +68,24 @@ export function addAppBoilerplate(arena, fError = null){
   window.addEventListener("pagehide", () => dispose(app));
 
   window.addEventListener("error", function (e) {
+    if (!e) return;
     app.log.write({
       type: logging.LOG_TYPE.EMERGENCY,
       topic: "ui",
       from: "app.js",
-      text:  `Unhandled: ${e.error.constructor.name} ${e.error.message}`,
+      text:  `Unhandled: ${e?.error?.constructor?.name} ${e?.error?.message}`,
       exception: e.error
     });
     fError?.call(app, e.error);
   });
 
   window.addEventListener('unhandledrejection', function (e) {
+    if (!e) return;
     app.log.write({
       type: logging.LOG_TYPE.EMERGENCY,
       topic: "ui",
       from: "app.js",
-      text:  `Unhandled rejection: ${e.reason.constructor.name} ${e.reason.message}`,
+      text:  `Unhandled rejection: ${e?.reason?.constructor?.name} ${e?.reason?.message}`,
       exception: e.reason
     });
     fError?.call(app, e.reason);

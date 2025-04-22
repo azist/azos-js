@@ -23,6 +23,7 @@ import "../vcl/util/img-registry-browser";
 import { ExampleHomeApplet } from "./examples/home-applet";
 import { ExampleFeatureAApplet } from "./examples/featureA-applet";
 import { ExampleFeatureBApplet } from "./examples/featureB-applet";
+import { ExampleFeatureCApplet } from "./examples/featureC-applet";
 import { ShowcaseApplet } from "./examples/showcase-applet";
 import { MruLogic } from "../mru";
 import { BrowserStorage } from "azos/storage";
@@ -36,7 +37,7 @@ class MyLogic extends Module {
   }
 
   _appAfterLoad() {
-    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 25_000);
+    this.#tmr = setInterval(() => this.writeLog(LOG_TYPE.WARNING, "This message comes from within a module every X seconds"), 300_000);
   }
 
   _appBeforeCleanup() {
@@ -60,6 +61,7 @@ const appRoutes = {
     home:  {applet: ExampleHomeApplet, args: {displayMethod: 0}},
     featurea:  {applet: ExampleFeatureAApplet, args: {displayMethod: 0}},
     featureb: {applet: ExampleFeatureBApplet, args: {displayMethod: 1}},
+    featurec: {applet: ExampleFeatureCApplet, args: {displayMethod: 2}},
     showcase: {applet: ShowcaseApplet},
   },
   help: {
@@ -82,8 +84,10 @@ const appMenu = {
     {title: "Showcase", icon: "svg://azos.ico.database", route: "/examples/showcase", Xpermissions: [{ns: "System", name: "UserManager", level: 0}]},
     {title: "Something Else", icon: "svg://azos.ico.category"},
     "Examples",
-    {title: "Feature A", route: "/examples/featurea"},
-    {title: "Feature B", route: "/examples/featureb"},
+    {title: "Home", icon: "svg://azos.ico.home", route: "/examples/home"},
+    {title: "Feature A", icon: "svg://azos.ico.draft", route: "/examples/featurea"},
+    {title: "Feature B", icon: "svg://azos.ico.draft", route: "/examples/featureb"},
+    {title: "Feature C", icon: "svg://azos.ico.draft", route: "/examples/featurec"},
     {title: "Subsection...", icon: "svg://azos.ico.category", menu: [
       {title: "A", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 3}]},
       {title: "B", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 4}]}
@@ -122,4 +126,4 @@ window.ARENA = arena;
 app.log.write({ type: LOG_TYPE.DEBUG, text: "...arena launched" });
 
 //Wire up app closing events and global error handlers
-addAppBoilerplate(arena, (e) => errorMsg("Errors", e.message));
+addAppBoilerplate(arena, (e) => errorMsg("Errors", e?.message));

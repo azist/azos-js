@@ -13,9 +13,12 @@ import {
   isNonEmptyString as aver_isNonEmptyString,
   isStringOrNull as aver_isStringOrNull,
   isNotNull as aver_isNotNull,
-  isFunction as aver_isFunction,
-  isObject as aver_isObject
+  isFunction as aver_isFunction
 } from "./aver.js";
+
+
+/** MUST MATCH server stack. DO NOT LOCALIZE. Marker property for form submission */
+export const FORM_MODE_JSON_PROP = "__FormMode";
 
 /**
  * Establishes a "director" protocol - an entity which implements such property returns it's director -
@@ -34,6 +37,18 @@ export const NAME_PROP = Symbol("name");
 export const ORDER_PROP = Symbol("order");
 
 /**
+ * Targets specify what system various logic should be applied to, for example
+ * in validation, you pass the target Id of a system which validation is performed for, the system then
+ * applies relevant rules for that named target
+ */
+export const TARGET_PROP = Symbol("target");
+
+/**
+ * Uniform protocol for storing and getting errors, such as validation errors
+ */
+export const ERROR_PROP = Symbol("error");
+
+/**
  * Establishes a "IDirty" protocol - an entity that needs to be saved before disposal
  */
 export const DIRTY_PROP = Symbol("dirty");
@@ -45,10 +60,42 @@ export const DIRTY_PROP = Symbol("dirty");
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
 
 /**
- * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context, scope): error | null`.
- * Performs validation logic returning an error object if validation fails
+ * Establishes a "IData" protocol for blocks such as forms: Insert|Update|Delete flag
+ */
+export const DATA_MODE_PROP = Symbol("data-mode");
+
+
+/**
+ * Establishes a "IData" protocol - an entity provides getting and possibly setting its data under this name aka "field name"
+ */
+export const DATA_NAME_PROP = Symbol("data-name");
+
+/**
+ * Establishes a "IData" protocol - an entity provides getting and possibly setting its data as a primitive value (e.g. such as a string for text fields)
+ * or plan objects: arrays or maps for blocks and forms having its field names represent `Azos.Data.Doc` data document field values.
+ */
+export const DATA_VALUE_PROP = Symbol("data-value");
+
+/**
+ * An optional part of "IData" protocol - an entity optionally implementing this interface yields an enumeration of its child entities, such as fields
+ * grouped together under a block, blocks such as a composite data controls or forms.
+ */
+export const DATA_BLOCK_PROP = Symbol("data-block");
+
+/**
+ * An optional part of "IData" protocol - an implementing entity receives a post-factum notification of data change
+ * made to constituent fields
+ */
+export const DATA_BLOCK_CHANGED_METHOD = Symbol("data-block-changed");
+
+
+/**
+ * Establishes data validation protocol: a function of signature: `[VALIDATE_METHOD](context: any, scope: string, apply: bool): error | null`.
+ * Performs validation logic returning an error object if validation fails.
+ * Context object may include `[TARGET_PROP]` by convention to specify the validation target system id
  */
 export const VALIDATE_METHOD = Symbol("validate");
+
 
 /**
  * Establishes required value check protocol: a function of signature: `[CHECK_REQUIRED_METHOD](context): bool`.
@@ -67,7 +114,6 @@ export const CHECK_MIN_LENGTH_METHOD = Symbol("checkMinLength");
  * Returns true if the implementing object logically has the value of at most the required length, false otherwise
  */
 export const CHECK_MAX_LENGTH_METHOD = Symbol("checkMaxLength");
-
 
 
 /**
@@ -221,7 +267,7 @@ export class ValidationError extends AzosError {
    * @param {String} message - required validation message. Clients get shown `clientMessage` unless it is not supplied then this one is used
    * @param {String} clientMessage - an optional user-friendly client UI display message
    * @param {String} from - optional. What sub/component generated the error
-   * @param {object} cause - optional. Inner causing exception (if any)
+   * @param {object | array} cause - optional. Inner causing exception (if any), such as Validation error batch
    */
   constructor(schema, field, scope, message, clientMessage = null, from = null, cause = null) {
     super(message, from, cause, 400);
@@ -624,13 +670,13 @@ export const DATA_KIND = Object.freeze({
 });
 const ALL_DATA_KINDS = allObjectValues(DATA_KIND);
 
-export const FORM_MODE = Object.freeze({
+export const DATA_MODE = Object.freeze({
   UNSPECIFIED: "unspecified",
   INSERT: "insert",
   UPDATE: "update",
   DELETE: "delete",
 });
-const ALL_FORM_MODES = allObjectValues(FORM_MODE);
+const ALL_DATA_MODES = allObjectValues(DATA_MODE);
 
 /**
  * Converts value to CHAR_CASE coercing it to lowercase string if needed
@@ -655,19 +701,26 @@ export function asDataKind(v) {
 }
 
 /**
- * Converts value to FORM_MODE coercing it to lowercase string if needed
- * @param {*} v value to convert
- * @returns {FORM_MODE}
+ * Converts value to DATA_MODE or if it has a property `DATA_MODE_PROP` gets the value from it
+ * @param {String | Object} v a string value to convert or a complex value with a `DATA_MODE_PROP`
+ * @returns {DATA_MODE} data mode value
  */
-export function asFormMode(v) {
+export function asDataMode(v) {
+  if (v === undefined || v === null) return DATA_MODE.UNSPECIFIED;
+
+  if (isObject(v) && DATA_MODE_PROP in v) v = v[DATA_MODE_PROP];
+
   v = strings.asString(v).toLowerCase();
-  if (strings.isOneOf(v, ALL_FORM_MODES, true)) return FORM_MODE[v];
-  return FORM_MODE.UNSPECIFIED;
+  if (strings.isOneOf(v, ALL_DATA_MODES, true)) return v;
+  return DATA_MODE.UNSPECIFIED;
 }
 
-export function isInsertForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.INSERT; }
-export function isUpdateForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.UPDATE; }
-export function isDeleteForm(f) { return asFormMode(aver_isObject(f).mode) === FORM_MODE.DELETE; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.INSERT` */
+export function isInsertMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.INSERT; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.UPDATE` */
+export function isUpdateMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.UPDATE; }
+/** Returns true in an entity has a {@link FORM_MODE_JSON_PROP} set to `DATA_MODE.DELETE` */
+export function isDeleteMode(e){ return e && e[FORM_MODE_JSON_PROP] === DATA_MODE.DELETE; }
 
 export const AS_BOOLEAN_FUN = Symbol("asBoolean");
 const TRUISMS = Object.freeze(["true", "t", "yes", "1", "ok"]);
@@ -861,6 +914,18 @@ export function asEntityId(v, canUndef = false) {
   }
 }
 
+/** Days of the week */
+export const DAYS_OF_WEEK = Object.freeze({
+  SUNDAY: 0,
+  MONDAY: 1,
+  TUESDAY: 2,
+  WEDNESDAY: 3,
+  THURSDAY: 4,
+  FRIDAY: 5,
+  SATURDAY: 6,
+});
+// const ALL_DAYS_OF_WEEK = allObjectValues(DAYS_OF_WEEK);
+
 /** Data Type Monikers */
 export const TYPE_MONIKER = Object.freeze({
   STRING: "str",
@@ -1036,3 +1101,29 @@ export function minutesBetweenAbs(date1, date2) { return secondsBetweenAbs(date1
 
 export function secondsBetween(date1, date2) { return (aver_isDate(date2) - aver_isDate(date1)) / 1000; }
 export function secondsBetweenAbs(date1, date2) { return Math.abs(aver_isDate(date2) - aver_isDate(date1)) / 1000; }
+
+/**
+ * Returns true if the passed-in entity is non-null/undefined and it supports Data protocol, that is:
+ *  it has both {@link DATA_NAME_PROP} and {@link DATA_VALUE_PROP} properties
+ */
+export function supportsDataProtocol(v){
+  return v && (DATA_NAME_PROP in v) && (DATA_VALUE_PROP in v);
+}
+
+/**
+ *  Comparer function which sorts data field objects according to their properties:
+ *   {@link ORDER_PROP} if it is present or {@link DATA_NAME_PROP}
+ */
+export function sortDataFields(a, b){
+  if (!a) return -1;
+  if (!b) return +1;
+  if (ORDER_PROP in a) a = a[ORDER_PROP];
+  else if (DATA_NAME_PROP in a) a = a[DATA_NAME_PROP];
+
+  if (ORDER_PROP in b) b = b[ORDER_PROP];
+  else if (DATA_NAME_PROP in b) b = b[DATA_NAME_PROP];
+
+  if (a < b) return -1;
+  if (a > b) return +1;
+  return 0;
+}

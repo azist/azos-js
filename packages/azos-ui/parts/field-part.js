@@ -4,17 +4,23 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asTypeMoniker,
-         cast,
-         asObject,
-         CLIENT_MESSAGE_PROP,
-         VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
-         DATA_KIND, asDataKind,
-         isAssigned,
+import {
+  asTypeMoniker,
+  cast,
+  asObject,
+  CLIENT_MESSAGE_PROP,
+  VALIDATE_METHOD, ValidationError, CHECK_MIN_LENGTH_METHOD, CHECK_MAX_LENGTH_METHOD, CHECK_REQUIRED_METHOD,
+  DATA_KIND, asDataKind,
+  isAssigned,
   isString,
+  DATA_VALUE_PROP,
+  DATA_NAME_PROP,
+  ERROR_PROP,
+  NAME_PROP,
+  DATA_BLOCK_CHANGED_METHOD
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
-import { POSITION, STATUS, noContent } from "../ui";
+import { POSITION, STATUS, getDataParentOfMember, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
 
@@ -85,10 +91,14 @@ export class FieldPart extends Part{
    * which will capture cast exception as a field error
    */
   set value(v){
-    this.#rawValue = v;
-    this.#value = undefined;
-    this.requestUpdate();
-    this.#value = this.castValue(v);
+    try {
+      this.#rawValue = v;
+      this.#value = undefined;
+      this.#value = this.castValue(v);
+      this.requestUpdate();
+    } finally {
+      this._afterValueSet(false);
+    }
   }
 
   /**
@@ -96,21 +106,41 @@ export class FieldPart extends Part{
    * which needs to be stripped prior to assignment into data value
    */
   setValueFromInput(v){
-    this.#rawValue = v;
-    this.#value = undefined; //the value is `undefined` because error may be thrown at conversion below
-    this.requestUpdate();//async schedule update even if error gets thrown
-    try{
-      v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
-      this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
-      this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
-    }catch(e){
-      this.error = e;
+    try {
+      this.#rawValue = v;
+      this.#value = undefined; //the value is `undefined` because error may be thrown at conversion below
+      this.requestUpdate();//async schedule update even if error gets thrown
+      try{
+        v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
+        this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
+        this.error = this.noAutoValidate ? null : this[VALIDATE_METHOD](null);
+      } catch(e) {
+        this.error = e;
+      }
+    } finally {
+      this._afterValueSet(true);
     }
   }
 
-  /** Performs field validation, returning validation error if any for the specified context */
+  /** Override to react to value change */
   // eslint-disable-next-line no-unused-vars
-  [VALIDATE_METHOD](context, scope = null){
+  _afterValueSet(fromInput){  }
+
+  get [DATA_VALUE_PROP](){ return this.value; }
+  set [DATA_VALUE_PROP](v){ this.setValueFromInput(v); }
+
+  /** Performs field validation, returning validation error if any for the specified context */
+  [VALIDATE_METHOD](context, scope = null, apply = false){
+    return apply ? this.validate(context, scope) : this._doValidate(context, scope);
+  }
+
+  /**
+   * Override to perform validation
+   * @param {*} context optional context such as an object with `[TARGET_PROP]`
+   * @param {*} scope optional subscript describing data member being validated such as `doctors[3]`
+   * @returns {Error | null} returns validation error or null
+   */
+  _doValidate(context, scope){
     const val = this.value;
     let error = this._validateRequired(context, val, scope);
     if (error) return error;
@@ -129,6 +159,7 @@ export class FieldPart extends Part{
     error = this._validateValueList(context, val, scope);
     if (error) return error;
 
+//todo: Where is iterable validation? (would need cyclical ref suppression)
     return null;
   }
 
@@ -212,16 +243,16 @@ export class FieldPart extends Part{
   }
 
 
-  /** Calls {@link VALIDATE_METHOD} capturing any errors in the {@link error} property */
+  /** Calls {@link _doValidate()} capturing any errors in the {@link error} property */
   validate(context, scope = null){
-    try{
-      this.error = this[VALIDATE_METHOD](context, scope);
-    }catch(e){
+    try {
+      this.error = this._doValidate(context, scope);
+    } catch(e) {
       this.error = e;
     }
     this.requestUpdate();
+    return this.error;
   }
-
 
 
   /**
@@ -258,6 +289,10 @@ export class FieldPart extends Part{
    * You can also pass a string containing objects JSON which will be parsed as object
    */
   set error(v) { this.#error = asObject(v, true); }
+
+
+  get [ERROR_PROP](){ return this.error; }
+  set [ERROR_PROP](v){ this.error = v; }
 
 
   /**
@@ -351,11 +386,11 @@ export class FieldPart extends Part{
     minLength: { type: Number, reflect: false },
 
 
-     /** If defined, adds minimum value constraint */
-     minValue: { type: String, reflect: false },
+    /** If defined, adds minimum value constraint */
+    minValue: { type: String, reflect: false },
 
-     /** If defined, adds maximum value constraint */
-     maxValue: { type: String, reflect: false },
+    /** If defined, adds maximum value constraint */
+    maxValue: { type: String, reflect: false },
 
 
     /** When set, prevents the field from validating upon input change. */
@@ -363,6 +398,9 @@ export class FieldPart extends Part{
 
     lookupId: { type: String },
   }
+
+  get [NAME_PROP](){ return this.name; }
+  get [DATA_NAME_PROP](){ return this.name; }
 
   /** True for field parts which have a preset/pre-defined content area layout by design, for example:
    *  checkboxes, switches, and radios have a pre-determined content area layout */
@@ -402,10 +440,25 @@ export class FieldPart extends Part{
   /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField */
   renderInput(){ return noContent; }
 
+
+  [DATA_BLOCK_CHANGED_METHOD](){ this.inputChanged(); }
+
   /** Override to trigger `change` event dispatch after value changes DUE to user input */
   inputChanged(){
-    const evt = new Event("change", { bubbles: true, composed: true, cancelable: false });
-    this.dispatchEvent(evt);
+    const evtChange = new Event("change", { bubbles: true, composed: true, cancelable: false });
+    this.dispatchEvent(evtChange);
+
+    //Data events are not bubbling and not composed and CANCEL-able
+    const evtDataChange = new Event("datachange", { bubbles: false, composed: false, cancelable: true });
+    const proceed = this.dispatchEvent(evtDataChange);
+
+    //We need to propagate data events manually
+    if (proceed){
+      const parent = getDataParentOfMember(this);
+      if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){
+        parent[DATA_BLOCK_CHANGED_METHOD]();
+      }
+    }
   }
 
   /** @param {any} value the value to feed to the lookup */
