@@ -708,7 +708,7 @@ export function asDataKind(v) {
 export function asDataMode(v) {
   if (v === undefined || v === null) return DATA_MODE.UNSPECIFIED;
 
-  if (DATA_MODE_PROP in v) v = v[DATA_MODE_PROP];
+  if (isObject(v) && DATA_MODE_PROP in v) v = v[DATA_MODE_PROP];
 
   v = strings.asString(v).toLowerCase();
   if (strings.isOneOf(v, ALL_DATA_MODES, true)) return v;
