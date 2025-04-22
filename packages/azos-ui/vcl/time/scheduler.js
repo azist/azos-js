@@ -454,7 +454,7 @@ export class TimeBlockPicker extends Control {
   renderControl() {
     return html`
 <div class="scheduler" @keydown="${this.#onKeyDown}">
-  ${this.renderTimeSlots()}
+  ${this.renderDaysContainer()}
 </div>
     `;
   }
@@ -501,7 +501,7 @@ export class TimeBlockPicker extends Control {
     return viewSpanLabel;
   }
 
-  renderTimeSlots() {
+  renderDaysContainer() {
     return html`
 <div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length}">
   ${this.renderNavigationControls()}
@@ -522,7 +522,6 @@ export class TimeBlockPicker extends Control {
     return this.timeSlotsView.map(([mins, inView]) => {
       const onTheHour = mins % 60 === 0;
       const cls = [
-        "timeCell",
         "timeLabel",
         inView ? "inView" : "",
         onTheHour ? "onTheHour" : "",
@@ -542,36 +541,34 @@ export class TimeBlockPicker extends Control {
     <div class="month">${monthName}</div>
     <div class="dayDate">${dayName} ${dayNumber}</div>
   </div>
-  ${this.renderTimeCells(date)}
+  ${this.renderTimeSlots(date)}
 </div>
     `)
   }
 
-  renderTimeCells(day) {
+  renderTimeSlots(day) {
     const thisDayItems = this.itemsByDay.find(one => one.day.toLocaleDateString() === day.toLocaleDateString())?.items;
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
       const [slotMins, inView] = this.timeSlotsView[i];
-      let cellContent = noContent;
+      let timeSlotContent = noContent;
       let stl = noContent;
-      let cls = ["timeCell", "timeSlot"];
+      let cls = ["timeSlot"];
       let rowSpan;
       let foundItem;
 
       if (slotMins % 60 === 0) cls.push("onTheHour");
-      if (inView && this.#isDateWithinEnabledRange(day)) {
+      if (inView && thisDayItems?.length > 0 && this.#isDateWithinEnabledRange(day)) {
         cls.push("inView");
 
-        foundItem = thisDayItems?.find(item => item.startTimeMins === slotMins);
+        foundItem = thisDayItems.find(item => item.startTimeMins === slotMins);
         if (foundItem) {
           // console.log("found:", foundItem);
           rowSpan = Math.floor(foundItem.durationMins / this.timeViewGranularityMins);
           i += rowSpan - 1;
           stl = `grid-row: span ${rowSpan};`;
-          cls.push("available");
-          if (rowSpan > 1) cls.push("spanned");
-          cellContent = this.renderSchedulingItem(foundItem, rowSpan);
+          timeSlotContent = this.renderSchedulingItem(foundItem, rowSpan);
         }
       }
 
@@ -580,7 +577,7 @@ export class TimeBlockPicker extends Control {
   @click="${foundItem ? () => this.#onSelectItem(foundItem) : () => { }}"
   @mouseover="${() => this.#onSlotHover(day, slotMins)}"
   @mouseout="${() => this.#onSlotHoverOut()}">
-  ${cellContent}
+  ${timeSlotContent}
 </div>
     `);
     }
@@ -588,7 +585,8 @@ export class TimeBlockPicker extends Control {
   }
 
   renderSchedulingItem(schItem, rowSpan) {
-    let iconContent = noContent;
+    const [startTime, endTime] = this.formatStartEndTimes(schItem);
+    let selectedIcon = noContent;
     let cls = ["item"];
     if (schItem.data.status) {
       console.log("status:", schItem.data.status);
@@ -598,34 +596,19 @@ export class TimeBlockPicker extends Control {
     const eventSelectedIndex = this.selectedItems.indexOf(schItem);
     if (eventSelectedIndex > -1) {
       cls.push("selected");
-      iconContent = this.selectedItems.length === 1
+      selectedIcon = this.selectedItems.length === 1
         ? html`${this.renderImageSpec("svg://azos.ico.checkmark").html}`
         : html`<span class="icon">${eventSelectedIndex + 1}</span>`;
     }
     return html`
 <div class="${cls.filter(types.isNonEmptyString).join(" ")}" tabIndex="0" @focus="${() => this.itemInFocus = schItem}" @blur="${() => this.itemInFocus = null}" data-id="${schItem.id}">
-  ${this.renderCaption(schItem, rowSpan)}
-  ${iconContent}
+  <div class="caption">
+    <div class="timeSpan"><span class="startTime">${startTime}</span><span class="endTime">${endTime}</span></div>
+    ${rowSpan > 1 && schItem.caption ? html`<div class="custom">${schItem.caption}</div>` : noContent}
+  </div>
+  ${selectedIcon}
 </div>
     `;
-  }
-
-  renderCaption(schItem, rowSpan) {
-    let caption = noContent;
-    if (rowSpan > 1 && schItem.caption)
-      caption = html`<div class="custom">${schItem.caption}</div>`;
-
-    return html`
-  <div class="caption">
-    <div class="timeSpan">${this.renderDefaultCaption(schItem)}</div>
-    ${caption}
-  </div>
-    `;
-  }
-
-  renderDefaultCaption(schItem) {
-    const [startTime, endTime] = this.formatStartEndTimes(schItem);
-    return html`${startTime} <span class="sep">-</span> ${endTime}`;
   }
 }
 
