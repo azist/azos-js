@@ -441,14 +441,15 @@ export class FieldPart extends Part{
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <label class="${clsPosition}">
           <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title}</span>
-          ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput()} ${msg}</div>` : html`${this.renderInput()} ${msg}`}
+          ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput()} ${msg}</div>` : html`${this.renderInput(effectDisabled)} ${msg}`}
         </label>
       </div>
     `;
   }
 
   /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField */
-  renderInput(){ return noContent; }
+  // eslint-disable-next-line no-unused-vars
+  renderInput(effectivelyDisabled){ return noContent; }
 
 
   [DATA_BLOCK_CHANGED_METHOD](){ this.inputChanged(); }

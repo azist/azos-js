@@ -34,7 +34,7 @@ export class RadioGroupField extends FieldPart{
     this.inputChanged();
   }
 
-  renderInput(){
+  renderInput(effectivelyDisabled){
     const clsRank =   `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
 
@@ -51,7 +51,7 @@ export class RadioGroupField extends FieldPart{
             id="${this.id}_${i}"
             name="${this.id}"
             value="${itv}"
-            .disabled=${this.isDisabled}
+            .disabled=${effectivelyDisabled}
             .required=${this.isRequired}
             ?readonly=${this.isReadonly}
             @change="${this.#radioChange}"

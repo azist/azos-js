@@ -20,9 +20,7 @@ import { AzosError,
          sortDataFields,
          supportsDataProtocol,
          DATA_BLOCK_PROP,
-         DATA_MODE,
          DATA_MODE_PROP,
-         asDataMode
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
@@ -613,12 +611,15 @@ export function setBlockDataValue(element, v){
  * @returns {DATA_MODE | undefined}
  */
 export function getEffectiveDataMode(element){
+
+  return "unspecified";
+
   while(element instanceof HTMLElement){
     if (DATA_MODE_PROP in element) {
       const mode = element[DATA_MODE_PROP];
-      if (types_isString(mode)) return asDataMode(mode);
-      element = getImmediateParentAzosElement(element);
+      if (types_isString(mode)) return mode;
     }
+    element = getImmediateParentAzosElement(element);
   }
 
   return undefined;

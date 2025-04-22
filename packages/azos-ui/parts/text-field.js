@@ -74,7 +74,7 @@ export class TextField extends FieldPart {
     return result;
   }
 
-  renderInput() {
+  renderInput(effectivelyDisabled) {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.effectiveStatus, true, "Bg")}`;
 
@@ -96,7 +96,7 @@ export class TextField extends FieldPart {
         placeholder="${this.placeholder}"
         rows="${this.height ? this.height : "4"}"
         .value="${val}"
-        .disabled=${this.isDisabled}
+        .disabled=${effectivelyDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         @change="${this.#tbChange}"
@@ -129,7 +129,7 @@ export class TextField extends FieldPart {
       placeholder="${this.placeholder}"
       type="${tp}"
       .value="${val}"
-      .disabled=${this.isDisabled}
+      .disabled=${effectivelyDisabled}
       .required=${this.isRequired}
       ?readonly=${this.isReadonly}
       @change="${this.#tbChange}"
