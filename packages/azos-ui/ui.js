@@ -25,7 +25,7 @@ import { AzosError,
          DATA_MODE_PROP
        } from "azos/types";
 import { asString } from "azos/strings";
-import { ImageRegistry } from "azos/bcl/img-registry";
+import { ImageRecord, ImageRegistry } from "azos/bcl/img-registry";
 import { AVERMENT_FAILURE, isOfOrNull, isStringOrNull } from "azos/aver";
 import { CONTENT_TYPE } from "azos/coreconsts";
 
