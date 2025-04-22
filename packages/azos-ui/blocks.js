@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, FORM_MODE_JSON_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
-import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getImmediateParentAzosElement, html, setBlockDataValue } from "./ui.js";
+import { asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, FORM_MODE_JSON_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
+import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, html, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
 
 /**
@@ -150,7 +150,7 @@ export class Form extends Block {
 
   get dataMode(){ return this.#dataMode; }
   set dataMode(v){
-    this.#dataMode = asDataMode(v);
+    this.#dataMode = asDataMode(v) ?? DATA_MODE.UNSPECIFIED;
     this.requestUpdate();
   }
 

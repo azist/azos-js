@@ -703,10 +703,10 @@ export function asDataKind(v) {
 /**
  * Converts value to DATA_MODE or if it has a property `DATA_MODE_PROP` gets the value from it
  * @param {String | Object} v a string value to convert or a complex value with a `DATA_MODE_PROP`
- * @returns {DATA_MODE} data mode value
+ * @returns {DATA_MODE | null} data mode value
  */
 export function asDataMode(v) {
-  if (v === undefined || v === null) return DATA_MODE.UNSPECIFIED;
+  if (v === undefined || v === null) return null;
 
   if (isObject(v) && DATA_MODE_PROP in v) v = v[DATA_MODE_PROP];
 

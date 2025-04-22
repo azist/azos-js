@@ -17,10 +17,11 @@ import {
   DATA_NAME_PROP,
   ERROR_PROP,
   NAME_PROP,
-  DATA_BLOCK_CHANGED_METHOD
+  DATA_BLOCK_CHANGED_METHOD,
+  DATA_MODE
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
-import { POSITION, STATUS, getDataParentOfMember, noContent } from "../ui";
+import { POSITION, STATUS, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
 
@@ -410,9 +411,18 @@ export class FieldPart extends Part{
   get isHorizontal(){ return this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT; }
 
   renderPart(){
+
+    let effectDisabled = this.isDisabled || this.isNa;
+    if (!effectDisabled){//disable by data mode
+      const mode = getEffectiveDataMode(this);
+      if (mode){
+        effectDisabled = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
+      }
+    }
+
     const clsRank =     `${parseRank(this.rank, true)}`;
     const clsStatus =   `${parseStatus(this.effectiveStatus, true)}`;
-    const clsDisable =  `${this.isDisabled ? "disabled" : ""}`;
+    const clsDisable =  `${effectDisabled ? "disabled" : ""}`;
     const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
     const isPreContent = this.isPredefinedContentLayout;
