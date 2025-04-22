@@ -116,7 +116,7 @@ export class TimeBlockPicker extends Control {
   #viewNumDays = null;
   get viewNumDays() { return this.#viewNumDays; }
   set viewNumDays(v) {
-    console.debug("Setting viewNumDays", v);
+    // console.debug("Setting viewNumDays", v);
     aver.isTrue(v >= 5 && v <= 7, "viewNumDays should be between 5 and 7");
     const oldValue = this.#viewNumDays;
     this.#viewNumDays = v;
@@ -589,7 +589,7 @@ export class TimeBlockPicker extends Control {
     let selectedIcon = noContent;
     let cls = ["item"];
     if (schItem.data.status) {
-      console.log("status:", schItem.data.status);
+      // console.log("status:", schItem.data.status);
       cls.push(`${schItem.data.status}`);
     }
     // console.log("renderSchedulingItem", schItem);
