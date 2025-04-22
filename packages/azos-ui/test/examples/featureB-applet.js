@@ -62,7 +62,7 @@ export class ExampleFeatureBApplet extends Applet{
      Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.
      </p>
 
-     <examples-person-block scope="this" id="blockPerson"></examples-person-block>
+     <examples-person-block scope="this" id="blockPerson"> </examples-person-block>
 
      <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Block Data"></az-button>
      <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Set block"></az-button>
