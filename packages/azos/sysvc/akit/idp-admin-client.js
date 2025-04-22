@@ -10,7 +10,7 @@ import { ofUserGdid } from "../../canonical.js";
 import { IClient } from "../../client.js";
 import { EntityId } from "../../entity-id.js";
 import { dflt } from "../../strings.js";
-import { isInsertForm, isNonEmptyString } from "../../types.js";
+import { isInsertMode, isNonEmptyString } from "../../types.js";
 import { EID_ROOT_USER } from "./constraints.js";
 
 /** Provides functionality for consuming `Sky.AuthKit` admin services by adhering to `IIdpUserAdminLogic` et.al. server contracts */
@@ -40,14 +40,14 @@ export class IdpAdminClient extends IClient {
 
   async saveUserAsync({ mode, ...user }, realm) {
     isObject(user);
-    const method = isInsertForm({ mode }) ? this.post : this.put;
+    const method = isInsertMode({ mode }) ? this.post : this.put;
     const got = await method.call(this, "user", { user: user }, this.#makeHeaders(realm));
     return got;
   }
 
   async saveLoginAsync({ mode, ...login }, realm) {
     isObject(login);
-    const method = isInsertForm({ mode }) ? this.post : this.put;
+    const method = isInsertMode({ mode }) ? this.post : this.put;
     const got = await method.call(this, "login", { login: login }, this.#makeHeaders(realm));
     return got;
   }
