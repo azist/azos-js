@@ -43,7 +43,7 @@ export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
-    this.selectedCase = "Launcher";
+    this.selectedCase = "Scheduler";
     this.x = 1;
   }
 
@@ -168,7 +168,7 @@ export class ShowcaseApplet extends Applet {
     };
 
     return showcaseMap[showcase] || noContent;
-    
+
   }
 }
 
