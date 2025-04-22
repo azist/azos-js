@@ -6,36 +6,41 @@
 
 import { isOf, isStringOrNull } from "azos/aver";
 import { ImageRegistry } from "azos/bcl/img-registry"
-
-import { AzosElement, css, html, noContent, verbatimHtml } from "../../ui";
-import { Arena } from "../../arena";
-import { ModalDialog } from "../../modal-dialog";
-import { writeToClipboard } from "./clipboard";
 import { matchPattern } from "azos/strings";
-import { toast } from "../../toast";
+
+import { writeToClipboard } from "./clipboard.js";
+import { iconStyles } from "../../parts/styles.js";
+import { AzosElement, css, html, noContent, renderImageSpec } from "../../ui.js";
+import { Arena } from "../../arena.js";
+import { ModalDialog } from "../../modal-dialog.js";
+import { toast } from "../../toast.js";
 
 export class ImageRegistryBrowser extends AzosElement {
 
-  static styles = css`
+  static styles = [iconStyles, css`
 :host {
   display: block;
-  background-color: var(--bgColor);
-  color: var(--svgStrokeColor);
+  background-color: var(--img-registry-bg-color);
+  color: var(--img-registry-icon-stroke-color);
   padding: 1em;
 }
 
 :host-context(dialog), .recInfoBody{
-  border: 1px solid var(--svgStrokeColor);
+  border: 1px solid var(--img-registry-icon-stroke-color);
   border-radius: 0 0 var(--r3-brad-win) var(--r3-brad-win);
 }
-:host-context(dialog) .results {padding: 0;}
+:host-context(dialog) .results { padding: 0; }
+.icon{
+  --icon-stroke: var(--img-registry-icon-stroke-color);
+  --icon-fill: var(--img-registry-icon-fill);
+}
 
 .filter{
   display: flex;
   align-items: flex-end;
   padding-bottom: 1em;
 }
-#tbFilter{flex:1;}
+#tbFilter{ flex:1; }
 
 .suggestion{
   text-decoration: underline;
@@ -48,10 +53,11 @@ export class ImageRegistryBrowser extends AzosElement {
   gap: 5px;
   grid-template-columns: repeat(auto-fill, minmax(50px, 75px));
   grid-template-rows: repeat(auto-fill, minmax(30px, auto));
+
+  h2{ margin-top: 0.5em; margin-bottom: 0.25em; }
+  h2, .noResults{ grid-column: 1 / -1; }
 }
 
-.results h2{margin-top: 0.5em;margin-bottom: 0.25em;}
-.results h2, .noResults{grid-column: 1 / -1;}
 
 .record{
   display: flex;
@@ -59,30 +65,27 @@ export class ImageRegistryBrowser extends AzosElement {
   align-items: center;
   cursor: pointer;
   margin: 0;
-}
-.record:hover{
-  background-color: hsl(from var(--bgColor) h s max(calc(l - 10), 10));
-  border-radius: 5px;
-}
-.record .name{
-  font-size: 10px;
-  text-align: center;
-}
-.record .icon {
-  width: 32px;
-  text-align: center;
-}
-.icon svg{
-  fill: var(--svgFillColor);
-  stroke: var(--svgStrokeColor);
-}
-.icon.fas svg{
-  fill: var(--svgStrokeColor);
+
+  &:hover{
+    background-color: hsl(from var(--img-registry-bg-color) h s max(calc(l - 10), 10));
+    border-radius: 5px;
+  }
+
+  .name{
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .icon{
+    width: 32px;
+    text-align: center;
+    flex: 1;
+  }
 }
 
 .results, .recInfoBody{
-  background-color: var(--bgColor);
-  color: var(--svgStrokeColor);
+  background-color: var(--img-registry-bg-color);
+  color: var(--img-registry-icon-stroke-color);
   padding: 0 1em 1em;
 }
 
@@ -90,25 +93,38 @@ export class ImageRegistryBrowser extends AzosElement {
   display: grid;
   grid-template-columns: repeat(2, auto);
   grid-template-rows: auto;
+
+  figure{
+    grid-column: 1 / span 2;
+    padding: 1em auto;
+
+    &:hover{ cursor: pointer; }
+
+    dt{ font-weight: bold; }
+    dd{ margin-left: 0; }
+    .spec{ text-align: center; }
+
+    .iconWrapper{
+      position: relative;
+
+      .copyIcon{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 32px;
+        height: 32px;
+        background-color: hsl(from var(--img-registry-bg-color) h s max(calc(l - 10), 10));
+        border-radius: 5px;
+      }
+
+      .specIcon{
+        --icon-size: 15em;
+      }
+    }
+  }
 }
-.recInfoBody figure{
-  grid-column: 1 / span 2;
-  padding: 1em auto;
-}
-.recInfoBody figure:hover{cursor: pointer;}
-.recInfoBody .iconWrapper{position: relative;}
-.recInfoBody .iconWrapper .copyIcon{
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 32px;
-  height: 32px;
-  background-color: hsl(from var(--bgColor) h s max(calc(l - 10), 10));
-  border-radius: 5px;
-}
-.recInfoBody dt{font-weight: bold;}
-.recInfoBody dd{margin-left: 0;}
-  `;
+
+  `];
 
   static properties = {
     filter: { type: String },
@@ -200,7 +216,12 @@ export class ImageRegistryBrowser extends AzosElement {
 
   render() {
     return html`
-<style>:host{ --bgColor:${this.bgColor}; --svgStrokeColor:${this.svgStrokeColor}; --svgFillColor:${this.svgFillColor};}
+<style>
+:host{
+  --img-registry-bg-color: ${this.bgColor};
+  --img-registry-icon-stroke-color: ${this.svgStrokeColor};
+  --img-registry-icon-fill: ${this.svgFillColor};
+}
 </style>
 ${this.renderFilterField()}
 ${this.renderResults()}
@@ -236,7 +257,7 @@ ${records.map(({ uri, recName, rec }) => this.renderRecord(uri, recName, rec))}
   renderRecord(uri, recName, rec) {
     return html`
 <div class="record" @click="${e => { e.preventDefault(); this.#showInfo(uri, recName, rec); }}">
-  <div class="icon${rec.attrs.fas ? " fas" : ""}">${verbatimHtml(rec.produceContent().content)}</div>
+  ${renderImageSpec(null, rec, { wrapImage: false }).html}
   <span class="name">${recName}</span>
 </div>
     `;
@@ -260,8 +281,8 @@ ${this.hasSuggestedFilter
     ${uri ? html`
     <figure @click="${() => this.#onCopyClicked(uri, rec)}">
       <div class="iconWrapper">
-        <div class="icon ${rec.attrs.fas ? "fas" : ""}">${verbatimHtml(rec.produceContent().content)}</div>
-        <div class="copyIcon icon fas">${this.renderImageSpec("svg://azos.ico.copy").html}</div>
+        ${renderImageSpec(null, rec, { cls: "specIcon icon", wrapImage: false }).html}
+        ${this.renderImageSpec("svg://azos.ico.copy", { cls: "copyIcon icon", wrapImage: false }).html}</div>
       </div>
       <figCaption id="specValue" scope="this" class="spec">${rec.format}://${uri}</figCaption>
     </figure>
