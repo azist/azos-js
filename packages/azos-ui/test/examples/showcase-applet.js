@@ -5,45 +5,45 @@
 </FILE_LICENSE>*/
 
 //#region IMPORTS
-import { Applet } from "../../applet";
-import { Command } from "../../cmd";
-import { css, html, noContent } from "../../ui";
-import { prompt } from "../../ok-cancel-modal";
+import { Applet } from "../../applet.js";
+import { Command } from "../../cmd.js";
+import { css, html, noContent } from "../../ui.js";
+import { prompt } from "../../ok-cancel-modal.js";
 
-import "../../parts/button";
-import "./xyz-dialog";
-import "../showcase/case-accordion";
-import "../showcase/case-buttons";
-import "../showcase/case-buttons-with-icons";
-import "../showcase/case-checkboxes";
-import "../showcase/case-code-box";
-import "../showcase/case-date-range";
-import "../showcase/case-images";
-import "../showcase/case-input-tests";
-import "../showcase/case-lookup";
-import "../showcase/case-modals";
-import "../showcase/case-object-inspector";
-import "../showcase/case-radios";
-import "../showcase/case-scheduler";
-import "../showcase/case-selects";
-import "../showcase/case-slide-deck";
-import "../showcase/case-switches";
-import "../showcase/case-text-fields";
-import "../showcase/case-sizing";
-import "../showcase/case-tab-view";
-import "../showcase/case-toasts";
-import "../showcase/case-tree-view";
-import "../showcase/case-launcher";
-import "../showcase/case-cards";
-import "../showcase/case-grids";
-import "../showcase/case-prose";
+import "../../parts/button.js";
+import "./xyz-dialog.js";
+import "../showcase/case-accordion.js";
+import "../showcase/case-buttons.js";
+import "../showcase/case-buttons-with-icons.js";
+import "../showcase/case-checkboxes.js";
+import "../showcase/case-code-box.js";
+import "../showcase/case-date-range.js";
+import "../showcase/case-images.js";
+import "../showcase/case-input-tests.js";
+import "../showcase/case-lookup.js";
+import "../showcase/case-modals.js";
+import "../showcase/case-object-inspector.js";
+import "../showcase/case-radios.js";
+import "../showcase/case-scheduler.js";
+import "../showcase/case-selects.js";
+import "../showcase/case-slide-deck.js";
+import "../showcase/case-switches.js";
+import "../showcase/case-text-fields.js";
+import "../showcase/case-sizing.js";
+import "../showcase/case-tab-view.js";
+import "../showcase/case-toasts.js";
+import "../showcase/case-tree-view.js";
+import "../showcase/case-launcher.js";
+import "../showcase/case-cards.js";
+import "../showcase/case-grids.js";
+import "../showcase/case-prose.js";
 //#endregion IMPORTS
 
 export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
-    this.selectedCase = "Launcher";
+    this.selectedCase = "Scheduler";
     this.x = 1;
   }
 
@@ -168,7 +168,7 @@ export class ShowcaseApplet extends Applet {
     };
 
     return showcaseMap[showcase] || noContent;
-    
+
   }
 }
 

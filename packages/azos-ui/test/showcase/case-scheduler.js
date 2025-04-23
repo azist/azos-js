@@ -4,15 +4,15 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "../../ui";
-import { CaseBase } from "./case-base";
 import * as types from "azos/types";
 
-import "../../parts/button";
-import "../../parts/text-field";
+import { html, STATUS } from "../../ui.js";
+import { CaseBase } from "./case-base.js";
+import { getDailyAvailable } from "./fetch-scheduling-data.js";
 
-import "../../vcl/time/scheduler";
-import { getDailyAvailable } from "./fetch-scheduling-data";
+import "../../parts/button.js";
+import "../../parts/text-field.js";
+import "../../vcl/time/scheduler.js";
 
 const rangeData = getDailyAvailable();
 export class CaseScheduler extends CaseBase {
@@ -36,18 +36,25 @@ export class CaseScheduler extends CaseBase {
         if (i === 0) { this.schTest.enabledStartDate = day; }
         for (let j = 0; j < one.hours.parsed.length; j++) {
           const span = one.hours.parsed[j];
-          this.schTest.addItem({
+          const item = {
             id: `n-${i}-${j}`,
             day: day,
-            caption: null,//nothing for now
+            caption: null,
             startTimeMins: span.sta,
             durationMins: span.dur,
-            data: { span, day },
-          });
+            data: { span, day, status: span.status ?? randomizeStatus(i, j), },
+          };
+          // console.log("Adding item", item);
+          this.schTest.addItem(item);
         }
       }
     } finally {
       this.schTest.endChanges();
+    }
+    function randomizeStatus(i, j) {
+      const statuses = Object.values(STATUS);
+      if (j % 3 === 0)
+        return statuses[Math.floor(Math.random() * statuses.length)];
     }
   }
 
@@ -92,6 +99,9 @@ export class CaseScheduler extends CaseBase {
 
 <az-time-block-picker id="schTest" scope="this"
     @selected="${this.schOnSelected}"
+    timeViewGranularityMins="60"
+    viewStartDay="0"
+    viewNumDays="7"
     xenabledStartDate="2024-12-28"
     xenabledEndDate="2025-1-6"
 ></az-time-block-picker>
