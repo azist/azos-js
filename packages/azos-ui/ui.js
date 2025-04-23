@@ -583,9 +583,14 @@ export function setBlockDataValue(element, v){
 
   const fields = getChildDataMembers(element, true);
 
+  const ov = v;
+  const isUi = v instanceof UiInputValue;
+  if (isUi){ //unwrap the value
+    v = v.value;
+  }
 
   if (v === undefined || v === null) {
-    for(const fld of fields) fld[DATA_VALUE_PROP] = null;
+    for(const fld of fields) fld[DATA_VALUE_PROP] = ov;
     return true;
   }
 
@@ -594,7 +599,7 @@ export function setBlockDataValue(element, v){
   if (types_isArray(v)){
     for(let i = 0; i < v.length; i++ ){
       if (i < fields.length){
-        fields[i][DATA_VALUE_PROP] = v[i];
+        fields[i][DATA_VALUE_PROP] = isUi ? new UiInputValue(v[i]) : v[i];
         result = true;
       }
     }
@@ -602,7 +607,7 @@ export function setBlockDataValue(element, v){
     for(const [pk, pv] of Object.entries(v)){
       const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
       if (fld) {
-        fld[DATA_VALUE_PROP] = pv;
+        fld[DATA_VALUE_PROP] = isUi ? new UiInputValue(pv) : pv;
         result = true;
       }
     }

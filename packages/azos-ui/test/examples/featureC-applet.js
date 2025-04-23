@@ -7,7 +7,7 @@
 
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
-import { getChildDataMembers, html } from "../../ui.js";
+import { getChildDataMembers, html, UiInputValue } from "../../ui.js";
 import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
 import "./person-blocks.js";
@@ -20,7 +20,7 @@ export class ExampleFeatureCApplet extends Applet{
  ////Uncommenting this will require user principal to have that permission
   //static permissions = [ new Permission("test", "Master", 5), {ns: "System", name: "UserManager", level: 500}];
 
-  get title(){ return "Feature C- Data Forms"; }
+  get title(){ return "Feature C - Data Forms"; }
 
   firstUpdated(){
     super.firstUpdated();
@@ -91,7 +91,6 @@ export class ExampleFeatureCApplet extends Applet{
        <examples-person-block scope="this" id="blockPerson" name="data"> </examples-person-block>
 
        <az-button id="btnChildren" scope="this" @click="${this.#btnChildrenClick}" title="Children"></az-button>
-
        <az-button id="btnNew" scope="this" @click="${this.#btnNewClick}" title="New"></az-button>
        <az-button id="btnEdit" scope="this" @click="${this.#btnEditClick}" title="Edit"></az-button>
        <az-button id="btnSave" scope="this" @click="${this.#btnSaveClick}" title="Save"></az-button>
