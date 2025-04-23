@@ -42,7 +42,11 @@ export class CaseScheduler extends CaseBase {
             caption: null,
             startTimeMins: span.sta,
             durationMins: span.dur,
-            data: { span, day, status: span.status ?? randomizeStatus(i, j), },
+            data: {
+              span, day,
+              status: span.status ?? randomizeStatus(i, j),
+              ...generateRandomStyleOverride(i, j),
+            },
           };
           // console.log("Adding item", item);
           this.schTest.addItem(item);
@@ -53,8 +57,28 @@ export class CaseScheduler extends CaseBase {
     }
     function randomizeStatus(i, j) {
       const statuses = Object.values(STATUS);
-      if (j % 3 === 0)
-        return statuses[Math.floor(Math.random() * statuses.length)];
+      if (j % 3 === 0) return statuses[Math.floor(Math.random() * statuses.length)];
+      return STATUS.DEFAULT;
+    }
+    function generateRandomStyleOverride() {
+      if (Math.random() > 0.5) {
+        const hue = Math.floor(Math.random() * 360);
+        const sat = () => Math.floor(60 + Math.random() * 20); // 60–80%
+        const light = () => Math.floor(40 + Math.random() * 20); // 40–60%
+
+        const hsl = (h, s, l) => `hsl(${h}, ${s}%, ${l}%)`;
+        const shift = (h, d) => (h + d + 360) % 360;
+
+        return {
+          itemFgColor: hsl(shift(hue, 180), sat(), 95),
+          itemBgColor: hsl(hue, sat(), light()),
+          itemSelectedFgColor: hsl(shift(hue, 180), sat(), 98),
+          itemSelectedBgColor: hsl(shift(hue, 20), sat(), light() - 10),
+          itemSelectedBadgeFgColor: hsl(shift(hue, 180), sat(), 90),
+          itemSelectedBadgeBgColor: hsl(shift(hue, -20), sat(), light() - 15)
+        };
+      }
+      return {};
     }
   }
 
@@ -97,13 +121,18 @@ export class CaseScheduler extends CaseBase {
     <az-button title="Add Item" @click="${() => this.btnAddItem()}"></az-button>
 </div>
 
-<az-time-block-picker id="schTest" scope="this"
+<az-time-block-picker id="schTest" scope="this" style="--pal-test-fg-color: #336699;"
     @selected="${this.schOnSelected}"
-    timeViewGranularityMins="60"
+    maxSelectedItems="1"
+    itemFgColor="#007bff"
+    itemBgColor="#eee"
+    itemSelectedFgColor="#fff"
+    itemSelectedBgColor="test-fg-color"
+    itemSelectedBadgeFgColor="#007bff"
+    itemSelectedBadgeBgColor="#fff"
+    timeViewGranularityMins="30"
     viewStartDay="0"
     viewNumDays="7"
-    xenabledStartDate="2024-12-28"
-    xenabledEndDate="2025-1-6"
 ></az-time-block-picker>
     `;
   }
