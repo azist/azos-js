@@ -22,7 +22,7 @@ import {
   ANNOUNCE_METHOD
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
-import { POSITION, STATUS, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
+import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
 
@@ -129,7 +129,7 @@ export class FieldPart extends Part{
   _afterValueSet(fromInput){  }
 
   get [DATA_VALUE_PROP](){ return this.value; }
-  set [DATA_VALUE_PROP](v){ this.setValueFromInput(v); }
+  set [DATA_VALUE_PROP](v){ v instanceof UiInputValue ? this.setValueFromInput(v.value) : this.value = v; }
 
   /** Performs field validation, returning validation error if any for the specified context */
   [VALIDATE_METHOD](context, scope = null, apply = false){
@@ -414,7 +414,7 @@ export class FieldPart extends Part{
 
   // eslint-disable-next-line no-unused-vars
   [ANNOUNCE_METHOD](sender, from, msg){
-console.log(`Part ${this.tagName} received ${JSON.stringify(msg)}`);
+console.log(`Part ${this.tagName}('${this.name}') received ${JSON.stringify(msg)}`);
     this.requestUpdate();//schedule update regardless
   }
 

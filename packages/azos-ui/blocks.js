@@ -51,7 +51,6 @@ export class Block extends Control {
   // eslint-disable-next-line no-unused-vars
   [ANNOUNCE_METHOD](sender, from, msg){
     const children = this[DATA_BLOCK_PROP];
-console.dir(children);
     for(const one of children){
       const f = one[ANNOUNCE_METHOD];
       if (f) f.call(one, sender, this, msg);
