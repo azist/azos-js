@@ -60,6 +60,26 @@ export const DIRTY_PROP = Symbol("dirty");
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
 
 /**
+ * Establishes a "Visitor" protocol - provides uniform `accept/visit` method: `visit(visitorFunction)`
+ * making implementing entities traversable/"visitable".
+ * Compared to {@link ANNOUNCE_METHOD}, the visitor pattern allows for external function application
+ * to visited objects, which are possibly immutable for extension.
+ * Visitor protocol allows us to apply a function which takes an item being visited, this way we can
+ * apply behaviors from that external function
+ */
+export const VISIT_METHOD = Symbol("visit");
+
+/**
+ * Establishes a notification protocol by "announcing" events by dispatching messages from parent to children chain.
+ * The implementers are expected to react to announcements appropriately - this is a major difference from {@link VISIT_METHOD} pattern.
+ * Method signature is `[ANNOUNCE_METHOD](sender, from, msg)`.
+ * Unlike the visitor pattern which applies an external function, the announcement pattern
+ * is expected not only to traverse its children (possibly re-broadcasting the announcement) but also react to announcement messages.
+ */
+export const ANNOUNCE_METHOD = Symbol("announce");
+
+
+/**
  * Establishes a "IData" protocol for blocks such as forms: Insert|Update|Delete flag
  */
 export const DATA_MODE_PROP = Symbol("data-mode");

@@ -8,7 +8,7 @@ import * as aver from "azos/aver";
 import * as types from "azos/types";
 import { isOneOf } from "azos/strings";
 
-import { Control, css, html, noContent } from "../../ui.js";
+import { Control, css, getCssPaletteSpec, html, noContent } from "../../ui.js";
 
 export class TimeBlockPicker extends Control {
 
@@ -123,7 +123,7 @@ export class TimeBlockPicker extends Control {
   }
 }
 
-.timeCell{
+.timeSlot, .timeLabel{
   container-type: size;
   grid-row: span 1;
   display: flex;
@@ -139,6 +139,11 @@ export class TimeBlockPicker extends Control {
   justify-content: center;
   border-top: 1px solid #aaa;
 
+  /** column-gap handles vertical lines, these are the horizontal */
+  &.inView{ border-left: 1px solid #aaa; }
+  &:not(.onTheHour){ border-top-color: #e5e5e5; }
+  &:nth-last-child(3){ border-bottom: 1px solid #aaa; }
+
   &:not(.onTheHour){
     color: #bebebe;
     font-size: 0.9em;
@@ -151,11 +156,8 @@ export class TimeBlockPicker extends Control {
   }
 }
 
-/** column-gap handles vertical lines, these are the horizontal */
-.timeLabel.inView{ border-left: 1px solid #aaa; }
-.timeLabel:not(.onTheHour){ border-top-color: #e5e5e5; }
-.timeLabel:not(.inView), .dayLabel + .timeCell{ border-top: revert; }
-.timeLabel:nth-last-child(3){ border-bottom: 1px solid #aaa; }
+
+.timeLabel:not(.inView), .dayLabel + .timeSlot{ border-top: revert !important; }
 
 .timeSlot{
   background-color: #e8e8e8;
@@ -260,6 +262,13 @@ export class TimeBlockPicker extends Control {
 
     use24HourTime: { type: Boolean },
     timeViewGranularityMins: { type: Number },
+
+    itemBgColor: { type: String, reflect: true },
+    itemFgColor: { type: String, reflect: true },
+    itemSelectedBgColor: { type: String, reflect: true },
+    itemSelectedFgColor: { type: String, reflect: true },
+    itemSelectedBadgeBgColor: { type: String, reflect: true },
+    itemSelectedBadgeFgColor: { type: String, reflect: true },
   }
 
   #timeViewGranularityMins = null;
@@ -712,8 +721,9 @@ export class TimeBlockPicker extends Control {
   }
 
   renderDaysContainer() {
+    let stl = this.getSchedulingStyles(this);
     return html`
-<div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length}">
+<div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length};${stl}">
   ${this.renderNavigationControls()}
   <div class="dayColumn legend">
     <div class="dayLabel">
@@ -797,11 +807,9 @@ export class TimeBlockPicker extends Control {
   renderSchedulingItem(schItem, rowSpan) {
     const [startTime, endTime] = this.formatStartEndTimes(schItem);
     let selectedIcon = noContent;
+    let stl = this.getSchedulingStyles(schItem.data);
     let cls = ["item"];
-    if (schItem.data.status) {
-      // console.log("status:", schItem.data.status);
-      cls.push(`${schItem.data.status}`);
-    }
+    if (schItem.data.status) cls.push(`${schItem.data.status}`);
     // console.log("renderSchedulingItem", schItem);
     const eventSelectedIndex = this.selectedItems.indexOf(schItem);
     if (eventSelectedIndex > -1) {
@@ -810,8 +818,9 @@ export class TimeBlockPicker extends Control {
         ? html`${this.renderImageSpec("svg://azos.ico.checkmark").html}`
         : html`<span class="icon">${eventSelectedIndex + 1}</span>`;
     }
+    cls = cls.filter(types.isNonEmptyString).join(" ");
     return html`
-<div class="${cls.filter(types.isNonEmptyString).join(" ")}" tabIndex="0" @focus="${() => this.itemInFocus = schItem}" @blur="${() => this.itemInFocus = null}" data-id="${schItem.id}">
+<div class="${cls}" style="${stl}" tabIndex="0" @focus="${() => this.itemInFocus = schItem}" @blur="${() => this.itemInFocus = null}" data-id="${schItem.id}">
   <div class="caption">
     <div class="timeSpan"><span class="startTime">${startTime}</span><span class="endTime">${endTime}</span></div>
     ${rowSpan > 1 && schItem.caption ? html`<div class="custom">${schItem.caption}</div>` : noContent}
@@ -819,6 +828,21 @@ export class TimeBlockPicker extends Control {
   ${selectedIcon}
 </div>
     `;
+  }
+
+  getSchedulingStyles(itemOrScheduler) {
+    const createStyle = (styleProp, value) => value ? `${styleProp}: ${value}` : undefined;
+
+    const styles = [
+      createStyle("--vcl-scheduler-default-item-fg-color", getCssPaletteSpec(itemOrScheduler.itemFgColor)),
+      createStyle("--vcl-scheduler-default-item-bg-color", getCssPaletteSpec(itemOrScheduler.itemBgColor)),
+      createStyle("--vcl-scheduler-selected-item-fg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedFgColor)),
+      createStyle("--vcl-scheduler-selected-item-bg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedBgColor)),
+      createStyle("--vcl-scheduler-selected-badge-fg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedBadgeFgColor)),
+      createStyle("--vcl-scheduler-selected-badge-bg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedBadgeBgColor)),
+    ].filter(types.isNonEmptyString);
+
+    return styles.length ? styles.join(";") : noContent;
   }
 }
 

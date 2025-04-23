@@ -7,8 +7,8 @@
 
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
-import { html } from "../../ui.js";
-import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
+import { css, getChildDataMembers, html } from "../../ui.js";
+import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
 
 import "./person-blocks.js";
 import "../../parts/button.js";
@@ -20,14 +20,26 @@ export class ExampleFeatureCApplet extends Applet{
  ////Uncommenting this will require user principal to have that permission
   //static permissions = [ new Permission("test", "Master", 5), {ns: "System", name: "UserManager", level: 500}];
 
-  get title(){ return "Feature C- Data Forms"; }
+  static styles = css`:host{ padding: 1ch 2ch; display: block; }`;
+
+  get title(){ return "Feature C - Data Forms"; }
+
+  firstUpdated(){
+    super.firstUpdated();
+    this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+    this.#applyInvariants();
+  }
 
   #btnNewClick(){
+    this.frmMain[DATA_VALUE_PROP] = null; //reset all data
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.INSERT;
+
+    this.#applyInvariants();
   }
 
   #btnEditClick(){
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UPDATE;
+    this.#applyInvariants();
   }
 
   #btnSaveClick(){
@@ -41,12 +53,37 @@ export class ExampleFeatureCApplet extends Applet{
     showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.blockPerson[DATA_VALUE_PROP], null, 2), 3, true);
 
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+    this.#applyInvariants();
   }
 
   #btnCancelClick(){
+    this.frmMain[VISIT_METHOD]( one => {
+      if (ERROR_PROP in one) one[ERROR_PROP] = null;
+    });
+
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+
+ //   console.dir( this.frmMain.blockData);
+ //   this.frmMain[DATA_VALUE_PROP] = this.frmMain.blockData;
+    this.#applyInvariants();
   }
 
+  #btnChildrenClick(){
+    let children = getChildDataMembers(this.frmMain, true);
+    console.dir(children);
+    this.#applyInvariants();
+  }
+
+  #applyInvariants(){
+    const mode = this.frmMain[DATA_MODE_PROP];
+    const isView = mode === undefined || mode === DATA_MODE.UNSPECIFIED;
+    this.btnChildren.isEnabled = true;
+    this.btnChildren.status = isView ? "ok" : "alert";
+    this.btnNew.isEnabled = isView;
+    this.btnEdit.isEnabled = isView;
+    this.btnSave.isDisabled = isView;
+    this.btnCancel.isDisabled = isView;
+  }
 
   render(){
    return html`
@@ -57,8 +94,9 @@ export class ExampleFeatureCApplet extends Applet{
 
      <az-form id="frmMain" scope="this">
 
-       <examples-person-block scope="this" id="blockPerson"> </examples-person-block>
+       <examples-person-block scope="this" id="blockPerson" name="data"> </examples-person-block>
 
+       <az-button id="btnChildren" scope="this" @click="${this.#btnChildrenClick}" title="Children"></az-button>
        <az-button id="btnNew" scope="this" @click="${this.#btnNewClick}" title="New"></az-button>
        <az-button id="btnEdit" scope="this" @click="${this.#btnEditClick}" title="Edit"></az-button>
        <az-button id="btnSave" scope="this" @click="${this.#btnSaveClick}" title="Save"></az-button>

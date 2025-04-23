@@ -12,8 +12,12 @@ import "../../parts/check-field.js"
 import { isOneOf } from "azos/strings";
 import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
 import { FieldPart } from "../../parts/field-part.js";
+import STL_GRID from "../../styles/grid.js";
 
 export class PersonBlock extends Block {
+
+  static styles = [...Block.styles, STL_GRID];
+
   render(){
 
     let errors = [];//error summary
@@ -30,11 +34,17 @@ export class PersonBlock extends Block {
     return html`
     <h3>Person Block</h3>
       ${errors}
-      <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
-      <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q" ></az-text>
-      <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
-      <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
-      <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
+      <div class="grid cols3">
+        <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
+        <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q" ></az-text>
+        <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
+      </div>
+      <div class="grid cols3">
+        <az-text scope="this"  id="tbPhone"        name="Phone"      title="Phone"       maxLength=24 isrequired dataKind="tel" value=""></az-text>
+        <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
+        <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
+      </div>
+
       <h4>Processing Status</h4>
       <examples-status-block scope="this" id="blockProcessStatus" name="ProcessStatus"></examples-status-block>
       <h4>Payout Status</h4>
