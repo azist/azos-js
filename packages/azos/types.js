@@ -59,6 +59,14 @@ export const DIRTY_PROP = Symbol("dirty");
  */
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
 
+
+/**
+ * Establishes a notification protocol by "announcing" events by dispatching messages from parent to children chain.
+ * Method signature is `[ANNOUNCE_METHOD](sender, from, msg)`
+ */
+export const ANNOUNCE_METHOD = Symbol("announce");
+
+
 /**
  * Establishes a "IData" protocol for blocks such as forms: Insert|Update|Delete flag
  */

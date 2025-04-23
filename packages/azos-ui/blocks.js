@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, FORM_MODE_JSON_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
+import { ANNOUNCE_METHOD, asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, FORM_MODE_JSON_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, html, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
 
@@ -45,7 +45,18 @@ export class Block extends Control {
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
 
-  get [DATA_BLOCK_PROP](){ return getChildDataMembers(this.shadowRoot, true); }
+  get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
+
+  /** Broadcasts an announcement message to all children */
+  // eslint-disable-next-line no-unused-vars
+  [ANNOUNCE_METHOD](sender, from, msg){
+    const children = this[DATA_BLOCK_PROP];
+console.dir(children);
+    for(const one of children){
+      const f = one[ANNOUNCE_METHOD];
+      if (f) f.call(one, sender, this, msg);
+    }
+  }
 
   /**
    * Override to trigger `change` event dispatch after value changes DUE to user input.
@@ -69,9 +80,9 @@ export class Block extends Control {
   get [DATA_NAME_PROP](){ return this.name; }
   set [DATA_NAME_PROP](v){ this.name = v;}
 
-  get [DATA_VALUE_PROP](){ return getBlockDataValue(this.shadowRoot, false); }
+  get [DATA_VALUE_PROP](){ return getBlockDataValue(this, false); }
   set [DATA_VALUE_PROP](v){
-    const anythingApplied = setBlockDataValue(this.shadowRoot, v);
+    const anythingApplied = setBlockDataValue(this, v);
     if (anythingApplied) this.requestUpdate();
   }
 
@@ -152,6 +163,7 @@ export class Form extends Block {
   set dataMode(v){
     this.#dataMode = asDataMode(v) ?? DATA_MODE.UNSPECIFIED;
     this.requestUpdate();
+    this[ANNOUNCE_METHOD](this, this, {event: "change", what: "DATA_MODE"});
   }
 
   get [DATA_MODE_PROP](){ return this.dataMode; }

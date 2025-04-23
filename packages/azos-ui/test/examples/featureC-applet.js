@@ -7,7 +7,7 @@
 
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
-import { html } from "../../ui.js";
+import { getChildDataMembers, html } from "../../ui.js";
 import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
 import "./person-blocks.js";
@@ -50,6 +50,10 @@ export class ExampleFeatureCApplet extends Applet{
  //   this.frmMain[DATA_VALUE_PROP] = this.frmMain.blockData;
   }
 
+  #btnChildrenClick(){
+    let children = getChildDataMembers(this.frmMain, true);
+    console.dir(children);
+  }
 
   render(){
    return html`
@@ -61,6 +65,8 @@ export class ExampleFeatureCApplet extends Applet{
      <az-form id="frmMain" scope="this">
 
        <examples-person-block scope="this" id="blockPerson" name="data"> </examples-person-block>
+
+       <az-button id="btnChildren" scope="this" @click="${this.#btnChildrenClick}" title="Children"></az-button>
 
        <az-button id="btnNew" scope="this" @click="${this.#btnNewClick}" title="New"></az-button>
        <az-button id="btnEdit" scope="this" @click="${this.#btnEditClick}" title="Edit"></az-button>

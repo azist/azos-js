@@ -18,7 +18,8 @@ import {
   ERROR_PROP,
   NAME_PROP,
   DATA_BLOCK_CHANGED_METHOD,
-  DATA_MODE
+  DATA_MODE,
+  ANNOUNCE_METHOD
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
@@ -409,6 +410,13 @@ export class FieldPart extends Part{
 
   /** True if part's title position is middle left or middle right (i.e. field has horizontal orientation) */
   get isHorizontal(){ return this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT; }
+
+
+  // eslint-disable-next-line no-unused-vars
+  [ANNOUNCE_METHOD](sender, from, msg){
+console.log(`Part ${this.tagName} received ${JSON.stringify(msg)}`);
+    this.requestUpdate();//schedule update regardless
+  }
 
   renderPart(){
 

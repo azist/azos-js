@@ -476,17 +476,23 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
 export function getChildDataMembers(element, deep = true){
   let result = [];
 
-  if (element && element.children){
-    for(const one of element.children){
-      if (one instanceof AzosElement){
-        //Does it support data protocol
-        if (supportsDataProtocol(one)) result.push(one);
-      } else { //I am another element
-        const sub = getChildDataMembers(one, deep);
-        result = result.concat(sub);
+  function traverse(elm){
+    if (elm && elm.children){
+      for(const one of elm.children){
+        if (one instanceof AzosElement){
+          //Does it support data protocol
+          if (supportsDataProtocol(one)) result.push(one);
+        } else { //I am another element
+          const sub = getChildDataMembers(one, deep);
+          result = result.concat(sub);
+        }
       }
     }
   }
+
+  //We may need to traverse "slotted" element and the ones with shadow dom
+  traverse(element);
+  if (element.shadowRoot) traverse(element.shadowRoot);
 
   result.sort(sortDataFields);
 
@@ -614,9 +620,9 @@ export function setBlockDataValue(element, v){
  * @returns {DATA_MODE | undefined}
  */
 export function getEffectiveDataMode(element){
- console.log(`-------------------------------`);
+// console.log(`-------------------------------`);
   while(element instanceof HTMLElement){
- console.log(`     tag: ${element.tagName}`);
+// console.log(`     tag: ${element.tagName}`);
     if (DATA_MODE_PROP in element) {
       const mode = element[DATA_MODE_PROP];
       if (types_isString(mode)) return mode;
