@@ -40,7 +40,7 @@ export class CheckField extends FieldPart{
     this.inputChanged();
   }
 
-  renderInput(){
+  renderInput(effectivelyDisabled){
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
     const checkboxStyles = this.isCheck ? "check" : "switch";
@@ -64,7 +64,7 @@ export class CheckField extends FieldPart{
         class="${checkTypeStyle} ${checkboxStyles} ${clsRank} ${clsStatusBg}"
         id="${this.id}"
         name="${this.id}"
-        .disabled=${this.isDisabled}
+        .disabled=${effectivelyDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
         .checked=${this.value}
