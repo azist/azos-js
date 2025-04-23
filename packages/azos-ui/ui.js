@@ -657,7 +657,7 @@ export class UiInputValue {
  *  unless the {@param spec} starts with `#` or contains `{`, then it is returned as-is, e.g., `#ff0000` or `rgb(255, 0, 0)`.
  */
 export function getCssPaletteSpec(spec, prefix = "pal") {
-  if (!types_isAssigned(isStringOrNull(spec))) return "";
-  if (spec.startsWith("#") || spec.indexOf("(")) return spec; //already a CSS spec
+  if (!types_isAssigned(isStringOrNull(spec))) return undefined;
+  if (spec.startsWith("#") || spec.indexOf("(") > -1) return spec; //already a CSS spec
   return `var(--${prefix}-${spec})`; //convert to CSS variable
 }
