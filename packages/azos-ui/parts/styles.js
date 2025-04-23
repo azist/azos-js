@@ -146,15 +146,15 @@ button{ display: inline-block; }
  */
 button .icon {
   --icon-stroke: currentColor;
-  --icon-size: 1em; 
-  scale: 1.4; 
+  --icon-size: 1em;
+  scale: 1.4;
   margin-inline-end: .5ch;
   margin-inline-start: -.5ch;
 }
 button:has(i) {
   display: inline-flex;
   &.shrink {
-    @media (max-width: ${BREAKPOINT_SM}px) { 
+    @media (max-width: ${BREAKPOINT_SM}px) {
       padding: .5em;
       .title {display: none }
       .icon { margin: 0 }
@@ -657,11 +657,13 @@ export const iconStyles = css`
   stroke-width: var(--icon-stroke-width);
   fill: var(--icon-fill);
   vertical-align: middle;
+
+  &, svg{ /* sometimes, svg is wrapped */
+    width: var(--icon-size);
+    padding: 0;
+    margin: 0;
+  }
+
+  &.fas{ fill: var(--icon-stroke) }
 }
-.icon, .icon svg{ /* sometimes, svg is wrapped */
-  width: var(--icon-size);
-  padding: 0;
-  margin: 0;
-}
-.icon.fas{ fill: var(--icon-stroke) }
 `;
