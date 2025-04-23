@@ -15,6 +15,7 @@ import { AzosError,
          isArray as types_isArray,
          isObject as types_isObject,
          isNonEmptyString as types_isNonEmptyString,
+         isAssigned as types_isAssigned,
          DATA_NAME_PROP,
          DATA_VALUE_PROP,
          sortDataFields,
@@ -23,7 +24,7 @@ import { AzosError,
          DATA_MODE_PROP,
        } from "azos/types";
 import { asString } from "azos/strings";
-import { ImageRegistry } from "azos/bcl/img-registry";
+import { ImageRecord, ImageRegistry } from "azos/bcl/img-registry";
 import { AVERMENT_FAILURE, isOfOrNull, isStringOrNull } from "azos/aver";
 import { CONTENT_TYPE } from "azos/coreconsts";
 
@@ -292,20 +293,6 @@ export class AzosElement extends LitElement {
   render() { return html`>>AZOS ELEMENT<<`; }
 }
 
-//FIXME: What is this used by? Remove/test
-export function isRectInViewport(rect) {
-  let bounds = rect.getBoundingClientRect();
-  let viewWidth = document.documentElement.clientWidth;
-  let viewHeight = document.documentElement.clientHeight;
-
-  if (bounds['left'] < 0) return false;
-  if (bounds['top'] < 0) return false;
-  if (bounds['right'] > viewWidth) return false;
-  if (bounds['bottom'] > viewHeight) return false;
-
-  return true;
-}
-
 /** Controls are components with interact-ability properties like
  *  `disabled`, `visible`, `absent`, `applicable`, and `readonly`
  */
@@ -405,24 +392,32 @@ export function resolveImageSpec(reg, spec, iso = null, theme = null) {
   return rec.produceContent();
 }
 
-/** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
+/**
+ * This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
  * returning it as a tuple along with optional image attributes. Other params include:
- * @param spec {string} - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print`
- * @param  options {object} - optional object with the following properties:
- *  - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
- *  - iso {string} - optional system-wide ISO code to use when resolving the image spec, default is null
- *  - ox {string | number} - optional X offset to apply to the image, default is unset
- *  - oy {string | number} - optional Y offset to apply to the image, default is unset
- *  - scale {number} - optional scale factor to apply to the image, default is unset
- *  - theme {string} - optional system-wide theme to use when resolving the image spec, default is null
- *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
- * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
+ * @param {ImageRegistry} reg - required ImageRegistry instance to use for resolving the image spec
+ * @param {string|ImageRecord} spec  - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print` or ImageRecord
+ * @param {object} options - optional object with the following properties:
+ * @param {string} [options.cls] - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
+ * @param {string} [options.iso]  - optional system-wide ISO code to use when resolving the image spec, default is null
+ * @param {string | number} [options.ox] - optional X offset to apply to the image, default is unset
+ * @param {string | number} [options.oy] - optional Y offset to apply to the image, default is unset
+ * @param {number} [options.scale] - optional scale factor to apply to the image, default is unset
+ * @param {string} [options.theme] - optional system-wide theme to use when resolving the image spec, default is null
+ * @param {boolean} [options.wrapImage] - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
+ * @returns {tuple} {html: VerbatimHtml, attrs: {}}
  */
 export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
   cls ??= "icon";
   wrapImage ??= true;
 
-  const got = resolveImageSpec(reg, spec, iso, theme);
+  let got;
+  if (spec instanceof ImageRecord) {
+    // reg can be null if spec is an ImageRecord
+    got = spec.produceContent();
+  } else {
+    got = resolveImageSpec(reg, spec, iso, theme);
+  }
 
   scale ??= got?.attrs?.scale;
   ox ??= got?.attrs?.ox;
@@ -632,3 +627,15 @@ export function getEffectiveDataMode(element){
   return undefined;
 }
 
+/**
+ * Provides access to CSS variables that are defined in the CSS palette.
+ * @param {string} spec a valid CSS specification, e.g., "selected-item-bg-color" or "default-item-fg-color"
+ * @param {string | undefined} prefix optional prefix to use for the CSS variable, default is "pal" (e.g., "pal-selected-item-bg-color")
+ * @returns `var(--{prefix}-{spec})`, e.g., `--var(--pal-selected-item-bg-color)` or `--var(--pal-default-item-fg-color)`;
+ *  unless the {@param spec} starts with `#` or contains `{`, then it is returned as-is, e.g., `#ff0000` or `rgb(255, 0, 0)`.
+ */
+export function getCssPaletteSpec(spec, prefix = "pal") {
+  if (!types_isAssigned(isStringOrNull(spec))) return "";
+  if (spec.startsWith("#") || spec.indexOf("(")) return spec; //already a CSS spec
+  return `var(--${prefix}-${spec})`; //convert to CSS variable
+}
