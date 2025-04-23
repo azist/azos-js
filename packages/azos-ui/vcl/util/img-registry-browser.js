@@ -76,10 +76,14 @@ export class ImageRegistryBrowser extends AzosElement {
     text-align: center;
   }
 
-  .icon{
-    width: 32px;
-    text-align: center;
+  .iconWrapper{
     flex: 1;
+    place-content: center;
+
+    .icon{
+      width: 32px;
+      text-align: center;
+    }
   }
 }
 
@@ -257,7 +261,7 @@ ${records.map(({ uri, recName, rec }) => this.renderRecord(uri, recName, rec))}
   renderRecord(uri, recName, rec) {
     return html`
 <div class="record" @click="${e => { e.preventDefault(); this.#showInfo(uri, recName, rec); }}">
-  ${renderImageSpec(null, rec, { wrapImage: false }).html}
+  <div class="iconWrapper">${renderImageSpec(null, rec, { wrapImage: false }).html}</div>
   <span class="name">${recName}</span>
 </div>
     `;
