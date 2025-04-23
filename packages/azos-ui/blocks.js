@@ -4,9 +4,25 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { ANNOUNCE_METHOD, asDataMode, CLOSE_QUERY_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_BLOCK_PROP, DATA_MODE, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, FORM_MODE_JSON_PROP, VALIDATE_METHOD, ValidationError } from "azos/types";
+import {
+  VISIT_METHOD,
+  ANNOUNCE_METHOD,
+  asDataMode,
+  CLOSE_QUERY_METHOD,
+  DATA_BLOCK_CHANGED_METHOD,
+  DATA_BLOCK_PROP,
+  DATA_MODE,
+  DATA_MODE_PROP,
+  DATA_NAME_PROP,
+  DATA_VALUE_PROP,
+  DIRTY_PROP,
+  ERROR_PROP,
+  FORM_MODE_JSON_PROP,
+  VALIDATE_METHOD,
+  ValidationError } from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, html, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
+import { isFunction as aver_isFunction } from "azos/aver";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
@@ -17,7 +33,7 @@ import { dflt } from "azos/strings";
  */
 export class Block extends Control {
 
-  static styles = [css`:host{ display: block }`];
+  static styles = [css`:host{ display: block; }`];
 
   static properties = {
     name:        { type: String },
@@ -52,8 +68,7 @@ export class Block extends Control {
   [ANNOUNCE_METHOD](sender, from, msg){
     const children = this[DATA_BLOCK_PROP];
     for(const one of children){
-      const f = one[ANNOUNCE_METHOD];
-      if (f) f.call(one, sender, this, msg);
+      one[ANNOUNCE_METHOD]?.(sender, this, msg);
     }
   }
 
@@ -144,7 +159,20 @@ export class Block extends Control {
   // eslint-disable-next-line no-unused-vars
   _doValidate(errorBatch, context, scope){ }
 
-  //todo: FormMode which is taken from parent
+  /**
+   * Visits this object by applying a supplied function to this block and its data members
+   * @param {Function} fVisitor required visitor body function
+   */
+  [VISIT_METHOD](fVisitor){
+    aver_isFunction(fVisitor);
+
+    fVisitor(this); //visit self
+    //visit children
+    const items = this[DATA_BLOCK_PROP];
+    for(const item of items){
+      item[VISIT_METHOD]?.(fVisitor);
+    }
+  }
 
 }//Block
 

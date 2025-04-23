@@ -7,8 +7,8 @@
 
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
-import { getChildDataMembers, html, UiInputValue } from "../../ui.js";
-import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
+import { css, getChildDataMembers, html } from "../../ui.js";
+import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
 
 import "./person-blocks.js";
 import "../../parts/button.js";
@@ -19,6 +19,8 @@ export class ExampleFeatureCApplet extends Applet{
 
  ////Uncommenting this will require user principal to have that permission
   //static permissions = [ new Permission("test", "Master", 5), {ns: "System", name: "UserManager", level: 500}];
+
+  static styles = css`:host{ padding: 1ch 2ch; display: block; }`;
 
   get title(){ return "Feature C - Data Forms"; }
 
@@ -55,6 +57,10 @@ export class ExampleFeatureCApplet extends Applet{
   }
 
   #btnCancelClick(){
+    this.frmMain[VISIT_METHOD]( one => {
+      if (ERROR_PROP in one) one[ERROR_PROP] = null;
+    });
+
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
 
  //   console.dir( this.frmMain.blockData);

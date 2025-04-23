@@ -19,7 +19,8 @@ import {
   NAME_PROP,
   DATA_BLOCK_CHANGED_METHOD,
   DATA_MODE,
-  ANNOUNCE_METHOD
+  ANNOUNCE_METHOD,
+  VISIT_METHOD
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
@@ -130,6 +131,25 @@ export class FieldPart extends Part{
 
   get [DATA_VALUE_PROP](){ return this.value; }
   set [DATA_VALUE_PROP](v){ v instanceof UiInputValue ? this.setValueFromInput(v.value) : this.value = v; }
+
+
+  /**
+   * Visits this field by applying a supplied function to itself.
+   * Compare to Announce: announcements require implementing objects to respond to messages - requiring to
+   * implement code inside of the object, whereas Visitors allow to apply an outside extension "visitor"
+   * to the already existing and possibly immutable object structure
+   * @param {Function} fVisitor required visitor body function
+   */
+  [VISIT_METHOD](fVisitor){ fVisitor?.(this); }//visit self
+
+  /**
+   * Reacts to message announcements by the parent
+   */
+  // eslint-disable-next-line no-unused-vars
+  [ANNOUNCE_METHOD](sender, from, msg){
+   // console.log(`Part ${this.tagName}('${this.name}') received ${JSON.stringify(msg)}`);
+    this.requestUpdate();//schedule update regardless of message type
+  }
 
   /** Performs field validation, returning validation error if any for the specified context */
   [VALIDATE_METHOD](context, scope = null, apply = false){
@@ -412,11 +432,7 @@ export class FieldPart extends Part{
   get isHorizontal(){ return this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT; }
 
 
-  // eslint-disable-next-line no-unused-vars
-  [ANNOUNCE_METHOD](sender, from, msg){
-console.log(`Part ${this.tagName}('${this.name}') received ${JSON.stringify(msg)}`);
-    this.requestUpdate();//schedule update regardless
-  }
+
 
   renderPart(){
 
