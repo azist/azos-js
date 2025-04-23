@@ -20,8 +20,7 @@ import { AzosError,
          sortDataFields,
          supportsDataProtocol,
          DATA_BLOCK_PROP,
-         DATA_MODE,
-         DATA_MODE_PROP
+         DATA_MODE_PROP,
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
@@ -509,6 +508,14 @@ export function getImmediateParentAzosElement(element){
   isOfOrNull(element, HTMLElement);
 
   while(element){
+    const slot = element.assignedSlot;
+    if (slot){
+      const shadow = slot.getRootNode();
+      if (shadow){
+        element = shadow;
+      } else return null;
+    }
+
     const host = element.host;
     if (host){
       if (host instanceof AzosElement) return host;
@@ -607,19 +614,21 @@ export function setBlockDataValue(element, v){
 /**
  * Computes the effective data mode for this element: if this element has {@link DATA_MODE_PROP}
  * it gets it, and if it is set with non-null/undef value returns it, otherwise continues the search up the parent chain of
- * AzosElements until the `DATA_MODE_PROP` returns real {@link DATA_MODE} value. If non found, then returns `UNSPECIFIED` data mode
+ * AzosElements until the `DATA_MODE_PROP` returns real {@link DATA_MODE} value. If non found, then returns undefined data mode
  * @param {HTMLElement} element required HTML element
- * @returns {DATA_MODE}
+ * @returns {DATA_MODE | undefined}
  */
 export function getEffectiveDataMode(element){
+ console.log(`-------------------------------`);
   while(element instanceof HTMLElement){
+ console.log(`     tag: ${element.tagName}`);
     if (DATA_MODE_PROP in element) {
       const mode = element[DATA_MODE_PROP];
       if (types_isString(mode)) return mode;
-      element = getImmediateParentAzosElement(element);
     }
+    element = getImmediateParentAzosElement(element);
   }
 
-  return DATA_MODE.UNDEFINED;
+  return undefined;
 }
 

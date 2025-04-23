@@ -34,7 +34,7 @@ export class SelectField extends FieldPart {
     this.inputChanged();
   }
 
-  renderInput() {
+  renderInput(effectivelyDisabled) {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
 
@@ -53,7 +53,7 @@ export class SelectField extends FieldPart {
         id="${this.id}"
         name="${this.id}"
         value="${this.value}"
-        .disabled=${this.isDisabled}
+        .disabled=${effectivelyDisabled}
         .multiple=${this.isMultiple}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
