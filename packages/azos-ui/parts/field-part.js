@@ -441,7 +441,7 @@ export class FieldPart extends Part{
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <label class="${clsPosition}">
           <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title}</span>
-          ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput()} ${msg}</div>` : html`${this.renderInput(effectDisabled)} ${msg}`}
+          ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput(effectDisabled)} ${msg}</div>` : html`${this.renderInput(effectDisabled)} ${msg}`}
         </label>
       </div>
     `;

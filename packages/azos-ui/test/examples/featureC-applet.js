@@ -45,6 +45,9 @@ export class ExampleFeatureCApplet extends Applet{
 
   #btnCancelClick(){
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+
+ //   console.dir( this.frmMain.blockData);
+ //   this.frmMain[DATA_VALUE_PROP] = this.frmMain.blockData;
   }
 
 
@@ -57,7 +60,7 @@ export class ExampleFeatureCApplet extends Applet{
 
      <az-form id="frmMain" scope="this">
 
-       <examples-person-block scope="this" id="blockPerson"> </examples-person-block>
+       <examples-person-block scope="this" id="blockPerson" name="data"> </examples-person-block>
 
        <az-button id="btnNew" scope="this" @click="${this.#btnNewClick}" title="New"></az-button>
        <az-button id="btnEdit" scope="this" @click="${this.#btnEditClick}" title="Edit"></az-button>
