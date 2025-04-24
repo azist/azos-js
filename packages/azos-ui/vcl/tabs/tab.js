@@ -21,7 +21,7 @@ export class Tab extends Block {
     minWidth: { type: Number },
     maxWidth: { type: Number },
     canClose: { type: Boolean },
-    iconPath: { type: String },
+    icon: { type: String },
     slot: { type: String, reflect: true },
     data: { type: Object },
   };
@@ -29,9 +29,9 @@ export class Tab extends Block {
   #sid;
   get sid() { return this.#sid; }
 
-  #iconPath;
-  get iconPath() { return this.#iconPath; }
-  set iconPath(v) { this.#iconPath = v; }
+  #icon;
+  get icon() { return this.#icon; }
+  set icon(v) { this.#icon = v; }
 
   #isAbsent = false;
   get isAbsent() { return this.#isAbsent; }

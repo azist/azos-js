@@ -16,9 +16,9 @@ export class CaseTabView extends CaseBase {
 <h2>Tab View</h2>
 
 <az-tab-view title="Draggable TabView" activeTabIndex="2" isDraggable>
-  <az-tab title="Users List" .canClose="${false}" iconPath="svg://azos.ico.user">Users List</az-tab>
-  <az-tab title="User Groups" .canClose="${false}" iconPath="svg://azos.ico.userGroup">User Groups</az-tab>
-  <az-tab title="User Admins" .canClose="${false}" iconPath="svg://azos.ico.userSupervisor">User Admins</az-tab>
+  <az-tab title="Users List" .canClose="${false}" icon="svg://azos.ico.user">Users List</az-tab>
+  <az-tab title="User Groups" .canClose="${false}" icon="svg://azos.ico.userGroup">User Groups</az-tab>
+  <az-tab title="User Admins" .canClose="${false}" icon="svg://azos.ico.userSupervisor">User Admins</az-tab>
   <az-tab title="Tab 4">Tab 4 Content</az-tab>
   <az-tab title="Tab 5">Tab 5 Content</az-tab>
   <az-tab title="Tab 6">Tab 6 Content</az-tab>

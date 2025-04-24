@@ -523,7 +523,7 @@ export class TabView extends Control {
             @dragstart="${evt => this.#onDragStart(evt, index)}"
             @dragend="${this.#onDragEnd}"
             >
-            ${tab.iconPath ? this.renderImageSpec(tab.iconPath, { wrapImage: false }).html : noContent}
+            ${tab.icon ? this.renderImageSpec(tab.icon, { wrapImage: false }).html : noContent}
             <span class="${tab.active ? "active-tab-title" : ""}">${tab.title}</span>
             <span class="dirty-ind">·</span>
             ${tab.canClose ? html`<div class="close-ind" @click="${evt => this.#onCloseTabClick(evt, tab)}">&times;</div>` : noContent}
