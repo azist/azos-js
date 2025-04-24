@@ -50,7 +50,7 @@ export class ExampleFeatureCApplet extends Applet{
        return;
     }
 
-    showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.blockPerson[DATA_VALUE_PROP], null, 2), 3, true);
+    showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.frmMain[DATA_VALUE_PROP], null, 2), 3, true);
 
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
     this.#applyInvariants();

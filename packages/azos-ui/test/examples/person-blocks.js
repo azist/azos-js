@@ -18,6 +18,12 @@ export class PersonBlock extends Block {
 
   static styles = [...Block.styles, STL_GRID];
 
+
+  static properties = {
+    otherStatuses: {type: Array}
+  };
+
+
   render(){
 
     let errors = [];//error summary
@@ -47,8 +53,15 @@ export class PersonBlock extends Block {
 
       <h4>Processing Status</h4>
       <examples-status-block scope="this" id="blockProcessStatus" name="ProcessStatus"></examples-status-block>
+
       <h4>Payout Status</h4>
       <examples-status-block scope="this" id="blockPayoutStatus" name="PayoutStatus"></examples-status-block>
+
+      <h4>Other Statuses</h4>
+      <!-- notice how both fields map to the same field by name effectively creating an array -->
+      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses"></examples-status-block>
+      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses"></examples-status-block>
+      ${this.otherStatuses}
     `;
   }
 

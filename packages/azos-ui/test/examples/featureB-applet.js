@@ -8,12 +8,13 @@
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
 import { html, UiInputValue } from "../../ui.js";
-import { DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
+import { DATA_NAME_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
 import "./person-blocks.js";
 import "../../parts/button.js";
 import "../../modal-dialog.js";
 import { showMsg } from "../../msg-box.js";
+import { StatusBlock } from "./person-blocks.js";
 
 export class ExampleFeatureBApplet extends Applet{
 
@@ -23,24 +24,68 @@ export class ExampleFeatureBApplet extends Applet{
   get title(){ return "Feature B"; }
 
 
+  #btnListFieldsClick(){
+    console.log("------------- blockPerson fields --------------")
+    for(const one of this.blockPerson){
+      console.log(`  -> Field '${one[DATA_NAME_PROP]}' embodied by '${one.tagName}#${one.id}'. Value is: '${one[DATA_VALUE_PROP]}'`);
+    }
+  }
+
   #btnGetClick(){
     showMsg("ok", "Person Block Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.blockPerson[DATA_VALUE_PROP], null, 2), 3, true);
   }
 
-  #btnSetClick(){
+  async #btnSetClick(){
+
+    this.blockPerson.otherStatuses = [
+      Object.assign(new StatusBlock(), { name: "OtherStatuses"}),
+      Object.assign(new StatusBlock(), { name: "OtherStatuses"}),
+      Object.assign(new StatusBlock(), { name: "OtherStatuses"}),
+    ];
+
+    await this.blockPerson.updateComplete;
+
     this.blockPerson[DATA_VALUE_PROP] = {
-      FirstName: "James",
-      MiddleName: "L",
-      LastName: "Cooper Fraud",
-      Phone: new UiInputValue("8002345678"),
-      Registered: false,
-      Smoker: true,
-      ProcessStatus: {
-        Status: "Extern",
-        Description: "Set externally",
-        Approved: null
+      "FirstName": "James",
+      "LastName": "Cooper Fraud",
+      "MiddleName": "L",
+      "OtherStatuses": [
+        {
+          "Approved": false,
+          "Description": "First item",
+          "Status": "Init First"
+        },
+        {
+          "Approved": false,
+          "Description": "Second one",
+          "Status": "Init Second"
+        },
+        {
+          "Approved": true,
+          "Description": "THird one",
+          "Status": "No3"
+        },
+        {
+          "Approved": true,
+          "Description": "Forth",
+          "Status": "Forth field"
+        },
+        {
+          "Approved": true,
+          "Description": "Fifth",
+          "Status": "Snaky"
+        }
+
+      ],
+      "PayoutStatus": {},
+      "Phone": "(800) 234-5678",
+      "ProcessStatus": {
+        "Approved": false,
+        "Description": "Set externally",
+        "Status": "Extern"
       },
-      PayoutStatus: undefined
+      "Registered": false,
+      "Smoker": true
     };
   }
 
@@ -65,6 +110,7 @@ export class ExampleFeatureBApplet extends Applet{
 
      <examples-person-block scope="this" id="blockPerson"> </examples-person-block>
 
+     <az-button id="btnListFields" scope="this" @click="${this.#btnListFieldsClick}" title="List Block Fields"></az-button>
      <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Block Data"></az-button>
      <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Set block"></az-button>
      <az-button id="btnValidate" scope="this" @click="${this.#btnValidateClick}" title="Validate block"></az-button>

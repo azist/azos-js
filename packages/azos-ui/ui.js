@@ -562,7 +562,17 @@ export function getBlockDataValue(element, asArray = false){
   } else { //map
     const result = { };
     let i = 0;
-    for(const fld of fields) result[fld[DATA_NAME_PROP] ?? `?noname_${i++}`] = fld[DATA_VALUE_PROP];
+    for(const fld of fields){
+      const pn = fld[DATA_NAME_PROP] ?? `?noname_${i++}`;
+      const pv = result[pn];
+      if (pv !== undefined){ //if the value is already set
+        if (types_isArray(pv)){ //and it is an array
+          pv.push(fld[DATA_VALUE_PROP]);//add to existing array
+        } else {
+          result[pn] = [pv, fld[DATA_VALUE_PROP]];//wrap existing value in array and add new value to that array
+        }
+      } else result[pn] = fld[DATA_VALUE_PROP];//assign value in a new key
+    }
     return result;
   }
 }
@@ -605,10 +615,18 @@ export function setBlockDataValue(element, v){
     }
   } else if (types_isObject(v)){
     for(const [pk, pv] of Object.entries(v)){
-      const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
-      if (fld) {
-        fld[DATA_VALUE_PROP] = isUi ? new UiInputValue(pv) : pv;
-        result = true;
+      const flds = fields.filter(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
+      if (flds.length === 0) continue;
+      if (types_isArray(pv)){
+        for(let i=0; i < pv.length && i < flds.length; i++){
+          flds[i][DATA_VALUE_PROP] = isUi ? new UiInputValue(pv[i]) : pv[i];
+          result = true;
+        }
+      } else {
+        for(const one of flds){
+          one[DATA_VALUE_PROP] = isUi ? new UiInputValue(pv) : pv;
+          result = true;
+        }
       }
     }
   } else throw AVERMENT_FAILURE("Expecting data assignment either [] or {} vector", "setDataValue()");
