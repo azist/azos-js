@@ -468,7 +468,7 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
  * characterized by the presence of {@link DATA_NAME_PROP} and {@link DATA_VALUE_PROP} properties.
  * @param {HTMLElement} element required UI element as of which to search for child `AzosElement` derivatives
  * @param {boolean} [deep=true] true to consider child sub-elements, false to only scan the immediate children of this element.
- *                              Note: Only non-shadow sub elements (not web components) are searched, e.g. things like "span/div/section" which are in the same DOM
+ *                              Note: Only non-shadowed sub elements (not web components) are searched, e.g. things like "span/div/section" which are in the same DOM
  *                              are considered to be on the same logical level, but shadow DOM is NOT pierced, as web components should encapsulate their own child fields
  * @returns {AzosElement[]} array of data-aware elements which support IData protocol; empty array for null/undefined/unsupported elements;
  *                          If you pass `deep` then the child elements are also searched
@@ -476,17 +476,22 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
 export function getChildDataMembers(element, deep = true){
   let result = [];
 
-  if (element && element.children){
-    for(const one of element.children){
+  function traverse(elm){
+    if (!elm || !elm.children) return;
+    for(const one of elm.children){
       if (one instanceof AzosElement){
         //Does it support data protocol
         if (supportsDataProtocol(one)) result.push(one);
-      } else { //I am another element
+      } else if (deep) { //I am another element
         const sub = getChildDataMembers(one, deep);
         result = result.concat(sub);
       }
     }
   }
+
+  //We may need to traverse "slotted" element and the ones with shadow dom
+  traverse(element);
+  if (element?.shadowRoot) traverse(element.shadowRoot);
 
   result.sort(sortDataFields);
 
@@ -578,9 +583,14 @@ export function setBlockDataValue(element, v){
 
   const fields = getChildDataMembers(element, true);
 
+  const ov = v;
+  const isUi = v instanceof UiInputValue;
+  if (isUi){ //unwrap the value
+    v = v.value;
+  }
 
   if (v === undefined || v === null) {
-    for(const fld of fields) fld[DATA_VALUE_PROP] = null;
+    for(const fld of fields) fld[DATA_VALUE_PROP] = ov;
     return true;
   }
 
@@ -589,7 +599,7 @@ export function setBlockDataValue(element, v){
   if (types_isArray(v)){
     for(let i = 0; i < v.length; i++ ){
       if (i < fields.length){
-        fields[i][DATA_VALUE_PROP] = v[i];
+        fields[i][DATA_VALUE_PROP] = isUi ? new UiInputValue(v[i]) : v[i];
         result = true;
       }
     }
@@ -597,7 +607,7 @@ export function setBlockDataValue(element, v){
     for(const [pk, pv] of Object.entries(v)){
       const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
       if (fld) {
-        fld[DATA_VALUE_PROP] = pv;
+        fld[DATA_VALUE_PROP] = isUi ? new UiInputValue(pv) : pv;
         result = true;
       }
     }
@@ -614,9 +624,9 @@ export function setBlockDataValue(element, v){
  * @returns {DATA_MODE | undefined}
  */
 export function getEffectiveDataMode(element){
- console.log(`-------------------------------`);
+// console.log(`-------------------------------`);
   while(element instanceof HTMLElement){
- console.log(`     tag: ${element.tagName}`);
+// console.log(`     tag: ${element.tagName}`);
     if (DATA_MODE_PROP in element) {
       const mode = element[DATA_MODE_PROP];
       if (types_isString(mode)) return mode;
@@ -626,6 +636,18 @@ export function getEffectiveDataMode(element){
 
   return undefined;
 }
+
+/**
+ *  Decorator pattern which signifies that the encapsulated passed value is the value coming from an UI input entry action and
+ *  consequently it needs to be treated as such at the data buffer level, e.g. prepared before assignment into `.value` property
+ */
+export class UiInputValue {
+  #value;
+  get value(){ return this.#value; }
+  set value(v){ this.#value = v; }
+  constructor(v){ this.#value = v; }
+}
+
 
 /**
  * Provides access to CSS variables that are defined in the CSS palette.

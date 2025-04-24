@@ -7,7 +7,7 @@
 
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
-import { html } from "../../ui.js";
+import { html, UiInputValue } from "../../ui.js";
 import { DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
 import "./person-blocks.js";
@@ -32,6 +32,7 @@ export class ExampleFeatureBApplet extends Applet{
       FirstName: "James",
       MiddleName: "L",
       LastName: "Cooper Fraud",
+      Phone: new UiInputValue("8002345678"),
       Registered: false,
       Smoker: true,
       ProcessStatus: {
