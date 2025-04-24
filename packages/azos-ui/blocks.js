@@ -161,17 +161,23 @@ export class Block extends Control {
 
   /**
    * Visits this object by applying a supplied function to this block and its data members
-   * @param {Function} fVisitor required visitor body function
+   * @param {Function} fVisitor required visitor body function `f(): bool` returning a truthy value to stop the traversal
+   * @returns {boolean} true when traversal has stopped and should not be continued further
    */
   [VISIT_METHOD](fVisitor){
     aver_isFunction(fVisitor);
 
-    fVisitor(this); //visit self
+    const stop = fVisitor(this); //visit self
+
+    if (stop) return true;
+
     //visit children
     const items = this[DATA_BLOCK_PROP];
     for(const item of items){
-      item[VISIT_METHOD]?.(fVisitor);
+      if (item[VISIT_METHOD]?.(fVisitor)) return true;
     }
+
+    return false;
   }
 
 }//Block

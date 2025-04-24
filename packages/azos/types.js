@@ -65,7 +65,9 @@ export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
  * Compared to {@link ANNOUNCE_METHOD}, the visitor pattern allows for external function application
  * to visited objects, which are possibly immutable for extension.
  * Visitor protocol allows us to apply a function which takes an item being visited, this way we can
- * apply behaviors from that external function
+ * apply behaviors from that external function.
+ * @param {Function} visitorFunctor - a function of signature: `f(): bool` returning true to stop the traversal
+ * @returns {boolean} true when traversal has stopped and should not be continued further
  */
 export const VISIT_METHOD = Symbol("visit");
 

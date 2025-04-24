@@ -140,7 +140,7 @@ export class FieldPart extends Part{
    * to the already existing and possibly immutable object structure
    * @param {Function} fVisitor required visitor body function
    */
-  [VISIT_METHOD](fVisitor){ fVisitor?.(this); }//visit self
+  [VISIT_METHOD](fVisitor){ return fVisitor?.(this); }//visit self
 
   /**
    * Reacts to message announcements by the parent
