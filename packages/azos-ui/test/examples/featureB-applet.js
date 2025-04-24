@@ -14,6 +14,7 @@ import "./person-blocks.js";
 import "../../parts/button.js";
 import "../../modal-dialog.js";
 import { showMsg } from "../../msg-box.js";
+import { StatusBlock } from "./person-blocks.js";
 
 export class ExampleFeatureBApplet extends Applet{
 
@@ -34,20 +35,57 @@ export class ExampleFeatureBApplet extends Applet{
     showMsg("ok", "Person Block Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.blockPerson[DATA_VALUE_PROP], null, 2), 3, true);
   }
 
-  #btnSetClick(){
+  async #btnSetClick(){
+
+    this.blockPerson.otherStatuses = [
+      Object.assign(new StatusBlock(), { name: "OtherStatuses"}),
+      Object.assign(new StatusBlock(), { name: "OtherStatuses"}),
+      Object.assign(new StatusBlock(), { name: "OtherStatuses"}),
+    ];
+
+    await this.blockPerson.updateComplete;
+
     this.blockPerson[DATA_VALUE_PROP] = {
-      FirstName: "James",
-      MiddleName: "L",
-      LastName: "Cooper Fraud",
-      Phone: new UiInputValue("8002345678"),
-      Registered: false,
-      Smoker: true,
-      ProcessStatus: {
-        Status: "Extern",
-        Description: "Set externally",
-        Approved: null
+      "FirstName": "James",
+      "LastName": "Cooper Fraud",
+      "MiddleName": "L",
+      "OtherStatuses": [
+        {
+          "Approved": false,
+          "Description": "First item",
+          "Status": "Init First"
+        },
+        {
+          "Approved": false,
+          "Description": "Second one",
+          "Status": "Init Second"
+        },
+        {
+          "Approved": true,
+          "Description": "THird one",
+          "Status": "No3"
+        },
+        {
+          "Approved": true,
+          "Description": "Forth",
+          "Status": "Forth field"
+        },
+        {
+          "Approved": true,
+          "Description": "Fifth",
+          "Status": "Snaky"
+        }
+
+      ],
+      "PayoutStatus": {},
+      "Phone": "(800) 234-5678",
+      "ProcessStatus": {
+        "Approved": false,
+        "Description": "Set externally",
+        "Status": "Extern"
       },
-      PayoutStatus: undefined
+      "Registered": false,
+      "Smoker": true
     };
   }
 
