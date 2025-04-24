@@ -102,7 +102,7 @@ az-code-box {
 
   constructor() {
     super();
-    this.iconPath = "https://www.shareicon.net/download/2015/03/16/7846_database.ico";
+    this.icon = "https://www.shareicon.net/download/2015/03/16/7846_database.ico";
   }
 
   async #onExecuteClick() {

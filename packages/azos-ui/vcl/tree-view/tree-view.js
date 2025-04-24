@@ -299,8 +299,8 @@ export class TreeView extends Control {
   }
 
   renderIcon(node) {
-    if (node.iconPath === null) return '';
-    if (node.iconPath) return this.renderImageSpec(node.iconPath, { wrapImage: false }).html;
+    if (node.icon === null) return '';
+    if (node.icon) return this.renderImageSpec(node.icon, { wrapImage: false }).html;
     else return node.isOpened ? this._folderOpen : this._folder; // default when undefined
   }
 

@@ -21,7 +21,7 @@ export class AdlibSpaceTab extends Tab {
 
   constructor() {
     super();
-    this.iconPath = "https://www.shareicon.net/download/2015/12/28/218240_network.ico";
+    this.icon = "https://www.shareicon.net/download/2015/12/28/218240_network.ico";
   }
 
 }

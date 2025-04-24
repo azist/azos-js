@@ -76,7 +76,7 @@ az-tree-view::part(tree) {
     if (!dataLoaded) {
       const root = this.treeView.root;
       this.#spacesData.forEach(name => root.addChild(name, {
-        iconPath: "https://www.shareicon.net/download/2015/12/28/218240_network.ico",
+        icon: "https://www.shareicon.net/download/2015/12/28/218240_network.ico",
         data: { type: "space", },
       }));
     }
@@ -106,7 +106,7 @@ az-tree-view::part(tree) {
           .forEach(name => node.addChild(name, {
             canClose: false,
             canOpen: false,
-            iconPath: "https://www.shareicon.net/download/2015/03/16/7846_database.ico",
+            icon: "https://www.shareicon.net/download/2015/03/16/7846_database.ico",
             data: { type: "collection" }
           }));
         this.treeView.requestUpdate();
