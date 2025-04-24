@@ -60,7 +60,14 @@ export class Block extends Control {
    */
   async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
 
+  /**
+   * Allows to iterate over data members (e.g. data fields) contained by this block
+   */
+  *[Symbol.iterator](){ for(const one of this[DATA_BLOCK_PROP]) yield one;  }
 
+  /**
+   * Allows to iterate over data members (e.g. data fields) contained by this block
+   */
   get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
 
   /** Broadcasts an announcement message to all children */

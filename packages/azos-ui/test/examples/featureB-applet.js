@@ -8,7 +8,7 @@
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
 import { html, UiInputValue } from "../../ui.js";
-import { DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
+import { DATA_NAME_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 
 import "./person-blocks.js";
 import "../../parts/button.js";
@@ -22,6 +22,13 @@ export class ExampleFeatureBApplet extends Applet{
 
   get title(){ return "Feature B"; }
 
+
+  #btnListFieldsClick(){
+    console.log("------------- blockPerson fields --------------")
+    for(const one of this.blockPerson){
+      console.log(`  -> Field '${one[DATA_NAME_PROP]}' embodied by '${one.tagName}#${one.id}'. Value is: '${one[DATA_VALUE_PROP]}'`);
+    }
+  }
 
   #btnGetClick(){
     showMsg("ok", "Person Block Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.blockPerson[DATA_VALUE_PROP], null, 2), 3, true);
@@ -65,6 +72,7 @@ export class ExampleFeatureBApplet extends Applet{
 
      <examples-person-block scope="this" id="blockPerson"> </examples-person-block>
 
+     <az-button id="btnListFields" scope="this" @click="${this.#btnListFieldsClick}" title="List Block Fields"></az-button>
      <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Block Data"></az-button>
      <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Set block"></az-button>
      <az-button id="btnValidate" scope="this" @click="${this.#btnValidateClick}" title="Validate block"></az-button>
