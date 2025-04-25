@@ -93,6 +93,7 @@ export const baseStyles = css`
   display:block;
   border:none !important;
   background-color:unset !important;
+  transition: 0.15s ease-out;
 }
 `;
 

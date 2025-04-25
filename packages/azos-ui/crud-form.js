@@ -26,10 +26,15 @@ export class CrudForm extends Form {
   flex-direction: row;
   gap: 0.25em;
   justify-content: right;
+  place-items: center;
   margin: 0.25em 0.25em;
 }
 
-hr{ border: 1px solid #00000020; }
+.commit{ width: 12ch; }
+
+hr{ border: 1px solid var(--ink); opacity: 0.15; }
+
+
 
   `];
 
@@ -160,8 +165,9 @@ hr{ border: 1px solid #00000020; }
     <div class="toolbar">
        <az-button id="btnNew" scope="this" @click="${this.#btnNewClick}" title="New"></az-button>
        <az-button id="btnEdit" scope="this" @click="${this.#btnEditClick}" title="Edit"></az-button>
-       <az-button id="btnSave" scope="this" @click="${this.#btnSaveClick}" title="Save"></az-button>
-       <az-button id="btnCancel" scope="this" @click="${this.#btnCancelClick}" title="Cancel"></az-button>
+       <div style="width: 4ch"></div>
+       <az-button id="btnSave" scope="this" @click="${this.#btnSaveClick}" title="Save" class="commit"></az-button>
+       <az-button id="btnCancel" scope="this" @click="${this.#btnCancelClick}" title="Cancel" class="commit"></az-button>
     </div>`;
   }
 
