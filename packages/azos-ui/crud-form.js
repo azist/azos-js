@@ -8,7 +8,7 @@ import { asString, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, isArr
 import { Form, Block } from "./blocks.js";
 import { css, html, noContent } from "./ui.js";
 import { showMsg } from "./msg-box.js";
-import { isOneOf } from "azos/strings";
+import { isEmpty, isOneOf } from "azos/strings";
 import { isFunctionOrNull, isNotNull, isObjectOrNull } from "azos/aver";
 
 /**
@@ -44,7 +44,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   get isNewSupported()    { return this.isCapabilitySupported("new"); }
   get isEditSupported()   { return this.isCapabilitySupported("edit"); }
   get isRefreshSupported(){ return this.isCapabilitySupported("refresh"); }
-  get isSaveSupported()   { return this.isNewSupported || this.isEditSupported; }
+  get isSaveSupported()   { return this.isNewSupported || this.isEditSupported || this.isCapabilitySupported("save"); }
   get isCancelSupported() { return this.isSaveSupported; }
 
   #data = null;
@@ -53,10 +53,10 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   #capabilities;
 
   get capabilities(){ return this.#capabilities ? this.#capabilities.join(" ") : null; }
-  set capabilities(v){ this.#capabilities = asString(v, false).toLowerCase().split(" "); }
+  set capabilities(v){ this.#capabilities = asString(v, false).toLowerCase().split(" ").filter(one => !isEmpty(one)); }
 
   isCapabilitySupported(cap){
-    if (!types_isArray(this.#capabilities)) return true;
+    if (!types_isArray(this.#capabilities) || this.#capabilities.length === 0) return true;
     return this.#capabilities.some(one => one === cap);
   }
 
