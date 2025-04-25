@@ -8,11 +8,13 @@
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
 import { css, html } from "../../ui.js";
+import { Command } from "../../cmd.js";
 
 import "./person-blocks.js";
 import "../../parts/button.js";
 import "../../modal-dialog.js";
 import "../../crud-form.js";
+import "../../modal-dialog.js";
 
 export class ExampleFeatureDApplet extends Applet{
 
@@ -24,17 +26,40 @@ export class ExampleFeatureDApplet extends Applet{
   get title(){ return "Feature D - CRUD Data Forms"; }
 
 
+  #cmdModal = new Command(this, {
+    icon: "svg://azos.ico.openInNew",
+    handler: function(arena, cmd){
+      cmd.ctx.dlgPerson.show();
+    }
+  });
+
+
+  connectedCallback(){
+    super.connectedCallback();
+    this.arena.installToolbarCommands([this.#cmdModal]);
+  }
+
+
   async #handleSaveAsync(frm){
     alert("SAVING FORM");
   }
 
   render(){
    return html`
-     <az-crud-form id="frmMain" scope="this" toolbar="below" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+    <az-crud-form id="frmMain" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
-       <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
+      <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
 
-     </az-crud-form>
+    </az-crud-form>
+
+
+    <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
+      <div slot="body">
+        <az-crud-form id="frmDlg" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+          <examples-person-block scope="this" id="blockModalPerson" name="person"> </examples-person-block>
+        </az-crud-form>
+      </div>
+    </az-modal-dialog>
    `;
   }
 }

@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
+import { asString, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, isArray as types_isArray, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
 import { Form, Block } from "./blocks.js";
-import { css, html } from "./ui.js";
+import { css, html, noContent } from "./ui.js";
 import { showMsg } from "./msg-box.js";
 import { isOneOf } from "azos/strings";
 import { isFunctionOrNull, isNotNull, isObjectOrNull } from "azos/aver";
@@ -29,20 +29,36 @@ export class CrudForm extends Form {
   margin: 0.25em 0.25em;
 }
 
+.cmd{  }
 .commit{ width: 12ch; }
 
 hr{ border: 1px solid var(--ink); opacity: 0.15; }
 `];
 
   static properties = {
-    toolbar: {type: String},
+    toolbar: { type: String },
+    capabilities: { type: String }
   };
 
-  get isToolbarAbove(){ return isOneOf(this.toolbar, ["top", "above"]); }
+  get isToolbarAbove()    { return isOneOf(this.toolbar, ["top", "above"]); }
+  get isNewSupported()    { return this.isCapabilitySupported("new"); }
+  get isEditSupported()   { return this.isCapabilitySupported("edit"); }
+  get isRefreshSupported(){ return this.isCapabilitySupported("refresh"); }
+  get isSaveSupported()   { return this.isNewSupported || this.isEditSupported; }
+  get isCancelSupported() { return this.isSaveSupported; }
 
   #data = null;
   #saveResult;
   #saveAsyncHandler;
+  #capabilities;
+
+  get capabilities(){ return this.#capabilities ? this.#capabilities.join(" ") : null; }
+  set capabilities(v){ this.#capabilities = asString(v, false).toLowerCase().split(" "); }
+
+  isCapabilitySupported(cap){
+    if (!types_isArray(this.#capabilities)) return true;
+    return this.#capabilities.some(one => one === cap);
+  }
 
 
   /** Gets form data buffer as set before a NEW or EDIT, or after a SAVE */
@@ -70,6 +86,10 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
       this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
       this.applyInvariants();
     });
+  }
+
+  #btnRefreshClick(){
+    this.applyInvariants();
   }
 
   #btnNewClick(){
@@ -138,6 +158,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   applyInvariants(){
     const mode = this[DATA_MODE_PROP];
     const isView = mode === undefined || mode === DATA_MODE.UNSPECIFIED;
+    this.btnRefresh.isEnabled = isView;
     this.btnNew.isEnabled = isView;
     this.btnEdit.isEnabled = isView && this.data;
     this.btnSave.isDisabled = isView;
@@ -159,11 +180,47 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   renderToolbar(){
     return html`
     <div class="toolbar">
-       <az-button id="btnNew" scope="this" @click="${this.#btnNewClick}" title="New"></az-button>
-       <az-button id="btnEdit" scope="this" @click="${this.#btnEditClick}" title="Edit"></az-button>
-       <div style="width: 4ch"></div>
-       <az-button id="btnSave" scope="this" @click="${this.#btnSaveClick}" title="Save" class="commit"></az-button>
-       <az-button id="btnCancel" scope="this" @click="${this.#btnCancelClick}" title="Cancel" class="commit"></az-button>
+
+      <az-button id="btnRefresh" scope="this"
+        @click="${this.#btnRefreshClick}"
+        title="Refresh"
+        shrink
+        class="cmd"
+        icon="svg://azos.ico.refresh"
+        .isAbsent=${!this.isRefreshSupported}></az-button>
+
+      <az-button id="btnNew" scope="this"
+        @click="${this.#btnNewClick}"
+        title="New"
+        shrink
+        class="cmd"
+        icon="svg://azos.ico.draft"
+        .isAbsent=${!this.isNewSupported}></az-button>
+
+      <az-button id="btnEdit" scope="this"
+        @click="${this.#btnEditClick}"
+        title="Edit"
+        shrink
+        class="cmd"
+        icon="svg://azos.ico.edit"
+        .isAbsent=${!this.isEditSupported}></az-button>
+
+      ${this.isSaveSupported ? html`<div style="width: 4ch"></div>` : noContent}
+
+      <az-button id="btnSave" scope="this"
+        @click="${this.#btnSaveClick}"
+        title="Save"
+        class="commit"
+        icon="svg://azos.ico.checkmark"
+        .isAbsent=${!this.isSaveSupported}></az-button>
+
+      <az-button id="btnCancel" scope="this"
+        @click="${this.#btnCancelClick}"
+        title="Cancel"
+        class="commit"
+        icon="svg://azos.ico.close"
+        .isAbsent=${!this.isCancelSupported}></az-button>
+
     </div>`;
   }
 
