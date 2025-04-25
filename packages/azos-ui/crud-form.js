@@ -9,23 +9,46 @@ import { Form, Block } from "./blocks.js";
 import { css, html } from "./ui.js";
 import { showMsg } from "./msg-box.js";
 import { isOneOf } from "azos/strings";
+import { isFunctionOrNull, isNotNull, isObjectOrNull } from "azos/aver";
 
 /**
- * Provides {@link Form} specialization for CRUD -related data functionality
+ * Provides {@link Form} specialization for CRUD -related data functionality.
+ * You either subclass this form and override `_doSaveAsync()` method which saves the data OR
+ * use this type as it takes the inner content via a built-in `slot`, in which case you need to
+ * set `.saveAsyncHandler` function which is a delegate pattern implemented by the consumer of the form.
  **/
 export class CrudForm extends Form {
 
-  //todo: Work with Arron to use his universal block/form styles
-  static styles = [Block.styles, css``];
+  static styles = [Block.styles, css`
+.toolbar{
+  display: flex;
+  flex-direction: row;
+  gap: 0.25em;
+  justify-content: right;
+  place-items: center;
+  margin: 0.25em 0.25em;
+}
+
+.commit{ width: 12ch; }
+
+hr{ border: 1px solid var(--ink); opacity: 0.15; }
+`];
 
   static properties = {
-    toolbar: {type: String}
+    toolbar: {type: String},
   };
 
   get isToolbarAbove(){ return isOneOf(this.toolbar, ["top", "above"]); }
 
   #data = null;
   #saveResult;
+  #saveAsyncHandler;
+
+
+  /** Gets form data buffer as set before a NEW or EDIT, or after a SAVE */
+  get data(){ return this.#data; }
+  /** Sets form data buffer as set before a NEW or EDIT, or after a SAVE */
+  set data(v){ this.#data = isObjectOrNull(v); }
 
 
   /** Captures an object (if any) returned upon save */
@@ -34,10 +57,19 @@ export class CrudForm extends Form {
   set saveResult(v){ this.#saveResult = v; }
 
 
+  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
+  get saveAsyncHandler(){ return this.#saveAsyncHandler; }
+  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
+  set saveAsyncHandler(v){ this.#saveAsyncHandler = isFunctionOrNull(v); }
+
+
   firstUpdated(){
     super.firstUpdated();
-    this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
-    this.applyInvariants();
+    queueMicrotask(() => {
+      this[DATA_VALUE_PROP] = this.data;
+      this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+      this.applyInvariants();
+    });
   }
 
   #btnNewClick(){
@@ -63,9 +95,9 @@ export class CrudForm extends Form {
 
     showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this[DATA_VALUE_PROP], null, 2), 3, true);
 
-    this.#saveResult = await this._doSave();
+    this.#saveResult = await this._doSaveAsync();
 
-    this.#data = this[DATA_VALUE_PROP];//commit data into the buffer
+    this.data = this[DATA_VALUE_PROP];//commit data into the buffer
     this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
     this.applyInvariants();
   }
@@ -77,8 +109,10 @@ export class CrudForm extends Form {
    * property -  this way you can pass extra data back, such as server-assigned GDID or save message
    * @returns {any} saveResult object, such as save message etc...
    * */
-  async _doSave(){
-
+  async _doSaveAsync(){
+     //Data events are not bubbling and not composed and CANCEL-able
+     isNotNull(this.#saveAsyncHandler, "CrudForm.saveAsyncHandler function");
+     return await this.#saveAsyncHandler.call(this);
   }
 
   async #btnCancelClick(){
@@ -91,8 +125,8 @@ export class CrudForm extends Form {
     });
 
     //set back to "View"
-    this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
     this[DATA_VALUE_PROP] = this.#data;
+    this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
 
     this.applyInvariants();
   }
@@ -105,17 +139,21 @@ export class CrudForm extends Form {
     const mode = this[DATA_MODE_PROP];
     const isView = mode === undefined || mode === DATA_MODE.UNSPECIFIED;
     this.btnNew.isEnabled = isView;
-    this.btnEdit.isEnabled = isView;
+    this.btnEdit.isEnabled = isView && this.data;
     this.btnSave.isDisabled = isView;
     this.btnSave.status = isView ? "default" : "info";
     this.btnCancel.isDisabled = isView;
     this.btnCancel.status = isView ? "default" : "alert";
   }
 
+  updated(){
+    super.updated();
+    this.applyInvariants();
+  }
 
   renderControl(){
-    return this.isToolbarAbove ? html` ${this.renderToolbar()} ${this.renderFormBody()} `
-                               : html` ${this.renderFormBody()} ${this.renderToolbar()} `;
+    return this.isToolbarAbove ? html` ${this.renderToolbar()} <hr> ${this.renderFormBody()} <br>`
+                               : html` ${this.renderFormBody()} <br> <hr> ${this.renderToolbar()} `;
   }
 
   renderToolbar(){
@@ -123,8 +161,9 @@ export class CrudForm extends Form {
     <div class="toolbar">
        <az-button id="btnNew" scope="this" @click="${this.#btnNewClick}" title="New"></az-button>
        <az-button id="btnEdit" scope="this" @click="${this.#btnEditClick}" title="Edit"></az-button>
-       <az-button id="btnSave" scope="this" @click="${this.#btnSaveClick}" title="Save"></az-button>
-       <az-button id="btnCancel" scope="this" @click="${this.#btnCancelClick}" title="Cancel"></az-button>
+       <div style="width: 4ch"></div>
+       <az-button id="btnSave" scope="this" @click="${this.#btnSaveClick}" title="Save" class="commit"></az-button>
+       <az-button id="btnCancel" scope="this" @click="${this.#btnCancelClick}" title="Cancel" class="commit"></az-button>
     </div>`;
   }
 
