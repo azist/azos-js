@@ -195,6 +195,7 @@ export class Block extends Control {
  * Forms may have service/backend logic association and provide data models context -
  * this makes forms more specific than blocks as forms provide data schema via metadata for contained detail fields
  * and/or sub-blocks (which in turn may have child fields and/or sub-blocks etc.)
+ * You may want to derive from a more specialized `CrudForm` if you need standard CRUD buttons (New/Edit/Save/Cancel) etc.
  */
 export class Form extends Block {
 
