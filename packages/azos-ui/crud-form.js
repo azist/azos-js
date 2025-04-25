@@ -19,7 +19,6 @@ import { isFunctionOrNull, isNotNull, isObjectOrNull } from "azos/aver";
  **/
 export class CrudForm extends Form {
 
-  //TODO: Work with Arron to use his universal block/form styles
   static styles = [Block.styles, css`
 .toolbar{
   display: flex;
@@ -33,10 +32,7 @@ export class CrudForm extends Form {
 .commit{ width: 12ch; }
 
 hr{ border: 1px solid var(--ink); opacity: 0.15; }
-
-
-
-  `];
+`];
 
   static properties = {
     toolbar: {type: String},
