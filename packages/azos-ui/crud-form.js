@@ -20,7 +20,18 @@ import { isFunctionOrNull, isNotNull, isObjectOrNull } from "azos/aver";
 export class CrudForm extends Form {
 
   //TODO: Work with Arron to use his universal block/form styles
-  static styles = [Block.styles, css``];
+  static styles = [Block.styles, css`
+.toolbar{
+  display: flex;
+  flex-direction: row;
+  gap: 0.25em;
+  justify-content: right;
+  margin: 0.25em 0.25em;
+}
+
+hr{ border: 1px solid #00000020; }
+
+  `];
 
   static properties = {
     toolbar: {type: String},
@@ -53,12 +64,11 @@ export class CrudForm extends Form {
 
   firstUpdated(){
     super.firstUpdated();
-    this[DATA_VALUE_PROP] = this.data;
-    this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
-    this.applyInvariants();
-
-    console.dir(this.data);
-    console.dir(this[DATA_VALUE_PROP]);
+    queueMicrotask(() => {
+      this[DATA_VALUE_PROP] = this.data;
+      this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+      this.applyInvariants();
+    });
   }
 
   #btnNewClick(){
@@ -135,10 +145,14 @@ export class CrudForm extends Form {
     this.btnCancel.status = isView ? "default" : "alert";
   }
 
+  updated(){
+    super.updated();
+    this.applyInvariants();
+  }
 
   renderControl(){
-    return this.isToolbarAbove ? html` ${this.renderToolbar()} ${this.renderFormBody()} `
-                               : html` ${this.renderFormBody()} ${this.renderToolbar()} `;
+    return this.isToolbarAbove ? html` ${this.renderToolbar()} <hr> ${this.renderFormBody()} <br>`
+                               : html` ${this.renderFormBody()} <br> <hr> ${this.renderToolbar()} `;
   }
 
   renderToolbar(){
