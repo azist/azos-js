@@ -30,7 +30,7 @@ export class ExampleFeatureDApplet extends Applet{
 
   render(){
    return html`
-     <az-crud-form id="frmMain" scope="this" toolbar="below" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+     <az-crud-form id="frmMain" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
        <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
 
