@@ -23,11 +23,16 @@ export class ExampleFeatureDApplet extends Applet{
 
   get title(){ return "Feature D - CRUD Data Forms"; }
 
+
+  async #handleSaveAsync(frm){
+    alert("SAVING FORM");
+  }
+
   render(){
    return html`
-     <az-crud-form id="frmMain" scope="this" toolbar="below" >
+     <az-crud-form id="frmMain" scope="this" toolbar="below" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
-       <examples-person-block scope="this" id="blockPerson" name="data"> </examples-person-block>
+       <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
 
      </az-crud-form>
    `;
