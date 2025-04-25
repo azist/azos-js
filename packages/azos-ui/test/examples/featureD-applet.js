@@ -46,20 +46,20 @@ export class ExampleFeatureDApplet extends Applet{
 
   render(){
    return html`
-     <az-crud-form id="frmMain" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+    <az-crud-form id="frmMain" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
-       <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
+      <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
 
-     </az-crud-form>
+    </az-crud-form>
 
-      <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
-        <div slot="body">
-          <az-crud-form id="frmDlg" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
-            <examples-person-block scope="this" id="blockModalPerson" name="person"> </examples-person-block>
-          </az-crud-form>
-        </div>
-      </az-modal-dialog>
 
+    <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
+      <div slot="body">
+        <az-crud-form id="frmDlg" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+          <examples-person-block scope="this" id="blockModalPerson" name="person"> </examples-person-block>
+        </az-crud-form>
+      </div>
+    </az-modal-dialog>
    `;
   }
 }
