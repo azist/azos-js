@@ -79,7 +79,8 @@ export const baseStyles = css`
 @media screen and (max-width: 360px){
   .mid-right, .mid-left{ flex-direction: column; }
 }
-.msg { font-size: .85em; opacity: .8; margin: .33em; }
+.msg { font-size: .0em; opacity: .1; margin: .33em; transition: 0.35s; }
+.msg-filled { font-size: 0.85em; opacity: .8; }
 .requiredTitle::after{
   content: var(--ctl-req-sym);
   margin-left: 3px;

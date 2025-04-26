@@ -477,7 +477,8 @@ export class FieldPart extends Part{
     const stlContentWidth = isHorizon && !isPreContent ? css`width: ${this.contentWidth}%;` : "";
 
     const em = this.effectiveMessage;
-    const msg = em ? html`<p class="msg">${em}</p>` : '';
+   ////// const msg = em ? html`<p class="msg">${em}</p>` : '';
+    const msg = html`<p class="msg ${em ? "msg-filled" : ""}">${em ?? ""}</p>`;
 
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
