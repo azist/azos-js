@@ -8,7 +8,7 @@
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
 import { html, UiInputValue } from "../../ui.js";
-import { DATA_NAME_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
+import { DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, RESET_DIRTY_METHOD, VALIDATE_METHOD } from "azos/types";
 
 import "./person-blocks.js";
 import "../../parts/button.js";
@@ -23,6 +23,8 @@ export class ExampleFeatureBApplet extends Applet{
 
   get title(){ return "Feature B"; }
 
+
+  get [DIRTY_PROP](){ return false; }
 
   #btnListFieldsClick(){
     console.log("------------- blockPerson fields --------------")

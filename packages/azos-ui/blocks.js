@@ -19,8 +19,9 @@ import {
   ERROR_PROP,
   FORM_MODE_JSON_PROP,
   VALIDATE_METHOD,
-  ValidationError } from "azos/types";
-import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, html, setBlockDataValue } from "./ui.js";
+  ValidationError,
+  RESET_DIRTY_METHOD} from "azos/types";
+import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getEffectiveDataMode, html, setBlockDataValue } from "./ui.js";
 import { dflt } from "azos/strings";
 import { isFunction as aver_isFunction } from "azos/aver";
 
@@ -50,20 +51,25 @@ export class Block extends Control {
   get[ERROR_PROP](){ return this.error; }
   set[ERROR_PROP](v){ this.error = v; }
 
-  /** Override to return true when this app has unsaved data */
-  get [DIRTY_PROP]() { return false; }
+  /** Checks whether any children have unsaved changes (dirty) */
+  get [DIRTY_PROP]() {
+    const mode = getEffectiveDataMode(this);
+    if (mode && mode !== DATA_MODE.UNSPECIFIED) return true;//Must be in View mode not to be "dirty"
+    return this[DATA_BLOCK_PROP].some(one => one[DIRTY_PROP] === true);
+  }
 
-  /** Override to prompt the user on Close, e.g. if your Applet is "dirty"/contains unsaved changes
-   * you may pop-up a confirmation box. Return "true" to allow close, false to prevent it.
-   * The method is called by arena before evicting this applet and replacing it with a new one.
-   * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
-   */
-  async [CLOSE_QUERY_METHOD]() { return !this[DIRTY_PROP]; }
+  /** Resets dirty flag by going through all child data members and calling reset dirty on each */
+  [RESET_DIRTY_METHOD](){
+    for(const one of this[DATA_BLOCK_PROP]){
+      one[RESET_DIRTY_METHOD]?.();
+    }
+    this.requestUpdate();
+  }
 
   /**
    * Allows to iterate over data members (e.g. data fields) contained by this block
    */
-  *[Symbol.iterator](){ for(const one of this[DATA_BLOCK_PROP]) yield one;  }
+  *[Symbol.iterator](){ yield* this[DATA_BLOCK_PROP];  }
 
   /**
    * Allows to iterate over data members (e.g. data fields) contained by this block

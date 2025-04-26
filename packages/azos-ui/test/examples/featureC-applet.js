@@ -7,8 +7,8 @@
 
 //import { Permission } from "azos/security";
 import { Applet } from "../../applet.js";
-import { css, getChildDataMembers, html } from "../../ui.js";
-import { DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
+import { css, getChildDataMembers, getEffectiveDataMode, html } from "../../ui.js";
+import { DATA_BLOCK_PROP, DATA_MODE, DATA_MODE_PROP, DATA_NAME_PROP, DATA_VALUE_PROP, DIRTY_PROP, ERROR_PROP, RESET_DIRTY_METHOD, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
 
 import "./person-blocks.js";
 import "../../parts/button.js";
@@ -27,18 +27,21 @@ export class ExampleFeatureCApplet extends Applet{
   firstUpdated(){
     super.firstUpdated();
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
-    this.#applyInvariants();
+    //queueMicrotask(() => this.frmMain[RESET_DIRTY_METHOD]());///this does not work because children have not all loaded
+    //setTimeout(() => this.frmMain[RESET_DIRTY_METHOD](), 250); //this works, but what interval do we use?
+    this.blockPerson.updateComplete.then(() => { this.frmMain[RESET_DIRTY_METHOD](); console.log("Reset dirty on Form Boot"); this.#applyInvariants(); });
   }
 
   #btnNewClick(){
     this.frmMain[DATA_VALUE_PROP] = null; //reset all data
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.INSERT;
-
+    this.frmMain[RESET_DIRTY_METHOD]();
     this.#applyInvariants();
   }
 
   #btnEditClick(){
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UPDATE;
+    this.frmMain[RESET_DIRTY_METHOD]();
     this.#applyInvariants();
   }
 
@@ -53,6 +56,7 @@ export class ExampleFeatureCApplet extends Applet{
     showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.frmMain[DATA_VALUE_PROP], null, 2), 3, true);
 
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+    this.frmMain[RESET_DIRTY_METHOD]();
     this.#applyInvariants();
   }
 
@@ -62,6 +66,7 @@ export class ExampleFeatureCApplet extends Applet{
     });
 
     this.frmMain[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+    this.frmMain[RESET_DIRTY_METHOD]();
 
  //   console.dir( this.frmMain.blockData);
  //   this.frmMain[DATA_VALUE_PROP] = this.frmMain.blockData;
@@ -69,8 +74,19 @@ export class ExampleFeatureCApplet extends Applet{
   }
 
   #btnChildrenClick(){
-    let children = getChildDataMembers(this.frmMain, true);
-    console.dir(children);
+
+    function level(elm, indent){
+      let children = getChildDataMembers(elm, true);
+      for(const one of children){
+        console.log(`.${indent}Member ${one.tagName}.'${one[DATA_NAME_PROP]}'   Dirty: [[${one[DIRTY_PROP]}]]   mode: ${getEffectiveDataMode(one)}`);
+        if (DATA_BLOCK_PROP in one) level(one, indent + "  ");
+      }
+    }
+
+
+    console.log("----------------------------------------");
+    level(this, "");
+
     this.#applyInvariants();
   }
 
