@@ -842,7 +842,7 @@ export class TimeBlockPicker extends Control {
       createStyle("--vcl-scheduler-selected-badge-bg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedBadgeBgColor)),
     ].filter(types.isNonEmptyString);
 
-    return styles.length ? styles.join(";") : noContent;
+    return styles.length ? styles.join(";") : "";
   }
 }
 
