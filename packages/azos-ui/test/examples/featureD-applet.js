@@ -16,6 +16,9 @@ import "../../modal-dialog.js";
 import "../../crud-form.js";
 import "../../modal-dialog.js";
 
+let COUNTER = 0;
+
+
 export class ExampleFeatureDApplet extends Applet{
 
  ////Uncommenting this will require user principal to have that permission
@@ -40,13 +43,18 @@ export class ExampleFeatureDApplet extends Applet{
   }
 
 
+  async #handleLoadAsync(isRefresh){
+    console.log("LOADING DATA....");
+    return {person: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`}};
+  }
+
   async #handleSaveAsync(frm){
     alert("SAVING FORM");
   }
 
   render(){
    return html`
-    <az-crud-form id="frmMain" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+    <az-crud-form id="frmMain" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
       <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
 
@@ -55,7 +63,7 @@ export class ExampleFeatureDApplet extends Applet{
 
     <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
       <div slot="body">
-        <az-crud-form id="frmDlg" scope="this" toolbar="above" .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+        <az-crud-form id="frmDlg" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
           <examples-person-block scope="this" id="blockModalPerson" name="person"> </examples-person-block>
         </az-crud-form>
       </div>

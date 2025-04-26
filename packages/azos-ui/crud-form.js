@@ -26,7 +26,7 @@ export class CrudForm extends Form {
   gap: 0.25em;
   justify-content: right;
   place-items: center;
-  margin: 0.25em 0.25em;
+  margin: 0.50em 0.25em;
 }
 
 .cmd{  }
@@ -36,8 +36,9 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
 `];
 
   static properties = {
-    toolbar: { type: String },
-    capabilities: { type: String }
+    toolbar:      { type: String },
+    capabilities: { type: String },
+    noAutoLoad:   { type: Boolean }
   };
 
   get isToolbarAbove()    { return isOneOf(this.toolbar, ["top", "above"]); }
@@ -47,12 +48,19 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   get isSaveSupported()   { return this.isNewSupported || this.isEditSupported || this.isCapabilitySupported("save"); }
   get isCancelSupported() { return this.isSaveSupported; }
 
+  get isViewMode() {
+    const mode = this[DATA_MODE_PROP];
+    return  mode === undefined || mode === DATA_MODE.UNSPECIFIED;
+  }
+
+
   #data = null;
   #saveResult;
   #saveAsyncHandler;
+  #loadAsyncHandler;
   #capabilities;
 
-  get capabilities(){ return this.#capabilities ? this.#capabilities.join(" ") : null; }
+  get capabilities() { return this.#capabilities ? this.#capabilities.join(" ") : null; }
   set capabilities(v){ this.#capabilities = asString(v, false).toLowerCase().split(" ").filter(one => !isEmpty(one)); }
 
   isCapabilitySupported(cap){
@@ -78,36 +86,88 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
   set saveAsyncHandler(v){ this.#saveAsyncHandler = isFunctionOrNull(v); }
 
+  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
+  get loadAsyncHandler(){ return this.#loadAsyncHandler; }
+  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
+  set loadAsyncHandler(v){ this.#loadAsyncHandler = isFunctionOrNull(v); }
+
 
   firstUpdated(){
     super.firstUpdated();
-    queueMicrotask(() => {
-      this[DATA_VALUE_PROP] = this.data;
+
+    if (this.noAutoLoad){
+      queueMicrotask(() => {
+        this[DATA_VALUE_PROP] = this.data;
+        this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+        this.applyInvariants();
+      });
+    } else {
       this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
       this.applyInvariants();
-    });
+      this.formLoad();//not awaiting on purpose
+    }
   }
 
-  #btnRefreshClick(){
+  /**
+   * Loads form data in the form buffer. If you have prefetched data you can optionally
+   * pass it in.
+   * @param {Object | null} [prefetched=null] optionally prefetched data
+   */
+  async formLoad(prefetched = null){
+    //TODO: Must be view
+
+    if (prefetched) {
+      this.data = prefetched;
+    } else {
+      this.data = await this._doLoadAsync(false);
+      this[DATA_VALUE_PROP] = this.data;
+      this.applyInvariants();
+    }
+  }
+
+
+  //do NOT replace this with event lambda
+  async #btnRefreshClick(){ this.formRefresh(); }
+  async formRefresh(){
+    //TODO: Must be VIEW
+    this.data = await this._doLoadAsync(true);
+    this[DATA_VALUE_PROP] = this.data;
     this.applyInvariants();
   }
 
-  #btnNewClick(){
+  /**
+   * Override to perform data loading from storage, such as the one called on Refresh (if enabled).
+   * @param {boolean} isRefresh true if it is a refresh and not an original load call
+   * @returns {Promise<Object>} data from storage or null to signify absence of data
+   * */
+  // eslint-disable-next-line no-unused-vars
+  async _doLoadAsync(isRefresh){
+    //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
+    isNotNull(this.#loadAsyncHandler, "CrudForm.loadAsyncHandler function");
+    return await this.#loadAsyncHandler.call(this, isRefresh);
+  }
+
+  //do NOT replace this with event lambda
+  #btnNewClick(){ this.formNew(); }
+  formNew(){
     this[DATA_VALUE_PROP] = null; //todo:  SET DEFAULT here
     this[DATA_MODE_PROP] = DATA_MODE.INSERT;
     this.applyInvariants();
   }
 
-  #btnEditClick(){
+  //do NOT replace this with event lambda
+  #btnEditClick(){ this.formEdit(); }
+  formEdit(){
     this[DATA_MODE_PROP] = DATA_MODE.UPDATE;
     this.applyInvariants();
   }
 
-
-  async #btnSaveClick(){
+  //do NOT replace this with event lambda
+  async #btnSaveClick(){ this.formSave(); }
+  async formSave(){
     const errors = this[VALIDATE_METHOD]({}, null, true);
 
-    //todo: Create a usable Validation Summary browser
+    //TODO: Create a usable Validation Summary browser
     if (errors) {
       showMsg("error", "Validation Errors", "Error list: \n\n" +JSON.stringify(errors, null, 2), 3, true);
       return;
@@ -127,15 +187,17 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
    * The data is already client-validated before this call
    * Important: upon a successful save you can return/set some values into hidden fields, or `saveResult`
    * property -  this way you can pass extra data back, such as server-assigned GDID or save message
-   * @returns {any} saveResult object, such as save message etc...
+   * @returns {Promise<any>} saveResult object, such as save message etc...
    * */
   async _doSaveAsync(){
-     //Data events are not bubbling and not composed and CANCEL-able
+     //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
      isNotNull(this.#saveAsyncHandler, "CrudForm.saveAsyncHandler function");
      return await this.#saveAsyncHandler.call(this);
   }
 
-  async #btnCancelClick(){
+  //do NOT replace this with event lambda
+  async #btnCancelClick(){ this.formCancel(); }
+  async formCancel(){
 
     //todo:  Query isDirty and abort if there are changes
 
@@ -156,8 +218,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
    * This method is called on every form mode transition, such as the one after NEW/EDIT/SAVE/CANCEL button clicks
    */
   applyInvariants(){
-    const mode = this[DATA_MODE_PROP];
-    const isView = mode === undefined || mode === DATA_MODE.UNSPECIFIED;
+    const isView = this.isViewMode;
     this.btnRefresh.isEnabled = isView;
     this.btnNew.isEnabled = isView;
     this.btnEdit.isEnabled = isView && this.data;
@@ -168,7 +229,6 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   }
 
   updated(){
-    super.updated();
     this.applyInvariants();
   }
 
