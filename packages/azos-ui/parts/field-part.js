@@ -20,7 +20,9 @@ import {
   DATA_BLOCK_CHANGED_METHOD,
   DATA_MODE,
   ANNOUNCE_METHOD,
-  VISIT_METHOD
+  VISIT_METHOD,
+  DIRTY_PROP,
+  RESET_DIRTY_METHOD
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
 import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
@@ -50,6 +52,20 @@ export class FieldPart extends Part{
 
   /** Gets effective field name by coalescing `name`,`id`,`constructor.name` properties */
   get effectiveName(){ return dflt(this.name, this.id, this.constructor.name); }
+
+
+  #dirty = false;
+  /** Returns true when this field was modified after a call to reset dirty */
+  get dirty(){ return this.#dirty; }
+  /** Returns true when this field was modified after a call to reset dirty */
+  get [DIRTY_PROP](){ return this.#dirty; }
+
+  /** Resets dirty flag to false */
+  [RESET_DIRTY_METHOD](){
+    const was = this.#dirty;
+    this.#dirty = false;
+    if (was) this.requestUpdate();
+  }
 
   #contentWidth;
   get contentWidth() { return this.#contentWidth; }
@@ -98,21 +114,21 @@ export class FieldPart extends Part{
       this.#rawValue = v;
       this.#value = undefined;
       this.#value = this.castValue(v);
-      this.requestUpdate();
     } finally {
+      this.#dirty = true;
+      this.requestUpdate();
       this._afterValueSet(false);
     }
   }
 
   /**
    * Sets the value as entered through the input/inputs, for example a value may contain extra formatting
-   * which needs to be stripped prior to assignment into data value
+   * which needs to be stripped prior to assignment into data value buffer
    */
   setValueFromInput(v){
     try {
       this.#rawValue = v;
       this.#value = undefined; //the value is `undefined` because error may be thrown at conversion below
-      this.requestUpdate();//async schedule update even if error gets thrown
       try{
         v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
         this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
@@ -121,6 +137,8 @@ export class FieldPart extends Part{
         this.error = e;
       }
     } finally {
+      this.#dirty = true;
+      this.requestUpdate();//async schedule update even if error gets thrown
       this._afterValueSet(true);
     }
   }

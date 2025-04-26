@@ -37,6 +37,7 @@ import "../showcase/case-launcher.js";
 import "../showcase/case-cards.js";
 import "../showcase/case-grids.js";
 import "../showcase/case-prose.js";
+import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
 export class ShowcaseApplet extends Applet {
@@ -94,6 +95,8 @@ export class ShowcaseApplet extends Applet {
     super.connectedCallback();
     this.#toggleToolbarButton();
   }
+
+  get [DIRTY_PROP](){ return false; }
 
   render() {
     return html`

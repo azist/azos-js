@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, isArray as types_isArray, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
+import { asString, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, RESET_DIRTY_METHOD, isArray as types_isArray, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
 import { Form, Block } from "./blocks.js";
 import { css, html, noContent } from "./ui.js";
 import { showMsg } from "./msg-box.js";
@@ -99,11 +99,11 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
       queueMicrotask(() => {
         this[DATA_VALUE_PROP] = this.data;
         this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+        this[RESET_DIRTY_METHOD]();
         this.applyInvariants();
       });
     } else {
       this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
-      this.applyInvariants();
       this.formLoad();//not awaiting on purpose
     }
   }
@@ -118,11 +118,14 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
 
     if (prefetched) {
       this.data = prefetched;
+      this[RESET_DIRTY_METHOD]();
     } else {
       this.data = await this._doLoadAsync(false);
       this[DATA_VALUE_PROP] = this.data;
-      this.applyInvariants();
+      this[RESET_DIRTY_METHOD]();
     }
+
+    this.applyInvariants();
   }
 
 
@@ -132,6 +135,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     //TODO: Must be VIEW
     this.data = await this._doLoadAsync(true);
     this[DATA_VALUE_PROP] = this.data;
+    this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
   }
 
@@ -152,6 +156,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   formNew(){
     this[DATA_VALUE_PROP] = null; //todo:  SET DEFAULT here
     this[DATA_MODE_PROP] = DATA_MODE.INSERT;
+    this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
   }
 
@@ -159,6 +164,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   #btnEditClick(){ this.formEdit(); }
   formEdit(){
     this[DATA_MODE_PROP] = DATA_MODE.UPDATE;
+    this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
   }
 
@@ -179,6 +185,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
 
     this.data = this[DATA_VALUE_PROP];//commit data into the buffer
     this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+    this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
   }
 
@@ -209,6 +216,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     //set back to "View"
     this[DATA_VALUE_PROP] = this.#data;
     this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+    this[RESET_DIRTY_METHOD]();
 
     this.applyInvariants();
   }

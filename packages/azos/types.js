@@ -54,6 +54,11 @@ export const ERROR_PROP = Symbol("error");
 export const DIRTY_PROP = Symbol("dirty");
 
 /**
+ * Establishes a "IDirty" protocol - an entity can reset its dirty status to false
+ */
+export const RESET_DIRTY_METHOD = Symbol("resetDirty");
+
+/**
  * Establishes a "closeQuery" - part of the IDirty protocol. Determines if an entity can be logically disposed
  *  such as a file view can be closed if there are no changes to be saved.
  */

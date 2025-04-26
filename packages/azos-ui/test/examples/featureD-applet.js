@@ -42,7 +42,6 @@ export class ExampleFeatureDApplet extends Applet{
     this.arena.installToolbarCommands([this.#cmdModal]);
   }
 
-
   async #handleLoadAsync(isRefresh){
     console.log("LOADING DATA....");
     return {person: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`}};
