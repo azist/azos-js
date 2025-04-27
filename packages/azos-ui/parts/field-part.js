@@ -22,9 +22,10 @@ import {
   ANNOUNCE_METHOD,
   VISIT_METHOD,
   DIRTY_PROP,
-  RESET_DIRTY_METHOD
+  RESET_DIRTY_METHOD,
+  DATA_MODE_PROP
 } from "azos/types";
-import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, isOneOf } from "azos/strings";
 import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
@@ -437,6 +438,10 @@ export class FieldPart extends Part{
     noAutoValidate: { type: Boolean, reflect: false },
 
     lookupId: { type: String },
+
+    whenView:   {type: String},
+    whenInsert: {type: String},
+    whenUpdate: {type: String}
   }
 
   get [NAME_PROP](){ return this.name; }
@@ -450,15 +455,37 @@ export class FieldPart extends Part{
   get isHorizontal(){ return this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT; }
 
 
+  calcHostStyles(effectiveAbsent){
+    if (!effectiveAbsent && (this.whenView || this.whenInsert || this.whenUpdate)){
 
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+
+      if (mode){
+        const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
+        effectiveAbsent = isOneOf(spec, ["absent", "remove"], false);
+      }
+    }
+
+    return super.calcHostStyles(effectiveAbsent);
+  }
 
   renderPart(){
-
     let effectDisabled = this.isDisabled || this.isNa;
-    if (!effectDisabled){//disable by data mode
-      const mode = getEffectiveDataMode(this);
+
+    if (!effectDisabled || this.whenView || this.whenInsert || this.whenUpdate){
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
       if (mode){
         effectDisabled = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
+        if (!effectDisabled){
+          const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
+          effectDisabled = isOneOf(spec, ["na", "disable", "disabled"], false);
+        }
       }
     }
 

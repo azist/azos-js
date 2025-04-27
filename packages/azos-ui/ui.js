@@ -155,7 +155,7 @@ export class AzosElement extends LitElement {
     status: { type: String, reflect: true },
     rank: { type: String, reflect: true },
     scope: { type: String, reflect: false },
-    schema: { type: String, reflect: false}
+    schema: { type: String, reflect: false }
   };
 
   #arena = null;
@@ -192,8 +192,10 @@ export class AzosElement extends LitElement {
     return this.#arena;
   }
 
-  /** Returns schema name from this or parent control chain.
-   * If none define schema name, then it is taken from the applet name */
+  /** Returns (data) schema name from this or parent control chain.
+   * If none define schema name, then it is taken from the applet name
+   * Fields are identified by name inside of a schema
+   */
   get effectiveSchema(){
     let schema = this.schema;
     if (schema) return schema;
@@ -296,7 +298,7 @@ export class AzosElement extends LitElement {
 /** Controls are components with interact-ability properties like
  *  `disabled`, `visible`, `absent`, `applicable`, and `readonly`
  */
-export class Control extends AzosElement{
+export class Control extends AzosElement {
 
   static properties = {
     /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see the reversed accessors below */
@@ -328,22 +330,49 @@ export class Control extends AzosElement{
   set isVisible(v) { this.isHidden = !v; }
 
 
-  /** Override to calculate styles based on current state, the dflt implementation emits css for invisible and non-displayed items.
-   * The styles are applied to root element being rendered via a `style` which overrides the default classes
+  /**
+   * Override to calculate styles based on current state which we applied to element host, the dflt implementation emits css for invisible and non-displayed items.
+   * The styles are applied to the HOST element being rendered via an inline `<style>` which overrides the default classes.
+   * Note: this is called during rendering so you may take advantage of cached values in `renderState` bag
+   * @param {Boolean} effectiveAbsent pass true to make element disappear
    */
-  calcStyles(){
+  calcHostStyles(effectiveAbsent){
     let stl = "";
     if (this.isHidden) stl += "visibility:hidden!important;";
-    if (this.isAbsent) stl += "display:none!important;";
+    if (effectiveAbsent || this.isAbsent) stl += "display:none!important;";
     return stl;
+  }
+
+  #renderState;
+
+  /** True when render state object was already allocated.
+   * You may query this property before using `renderState` which allocates state
+   * if it has not been yet allocated. Sometimes this may need to be avoided.
+   * Note: render state gets reset for EVERY new render call
+   * @returns {Boolean}
+   */
+  get hasRenderState(){ return !!this.#renderState; }
+
+  /**
+   * Lazily allocates an object which is used as an ephemeral bag to cache/carry-over possibly expensive
+   * operation results between different phases of element rendering.
+   * For example: you may get an effective data entry mode for some partial rendering call,
+   * then when you may need the data entry mode again later, you may take it from cache not to re-compute again.
+   * The object gets lazily allocated, and it gets reset on EVERY re-render.
+   * @returns {Object}
+  */
+  get renderState(){
+    if (!this.#renderState) this.#renderState = { };
+    return this.#renderState;
   }
 
   //https://www.oddbird.net/2023/11/17/components/
   //https://frontendmasters.com/blog/light-dom-only/
   /** Descendants should override `renderControl()` instead */
   render(){
-    const stl = this.calcStyles();
-    return stl ? html`<style>:host{ ${stl}}</style> ${this.renderControl()}` : this.renderControl();
+    this.#renderState = null;//start every render from scratch
+    const stlHost = this.calcHostStyles();
+    return stlHost ? html`<style>:host{ ${stlHost}}</style> ${this.renderControl()}` : this.renderControl();
   }
 
   /** Override to render your specific control */

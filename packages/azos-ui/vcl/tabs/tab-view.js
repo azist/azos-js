@@ -512,7 +512,7 @@ export class TabView extends Control {
       const stl = [
         tab.minWidth ? `min-width: ${tab.minWidth}ch` : (this.defaultMinTabWidth ? `min-width: ${this.defaultMinTabWidth}ch` : ``),
         tab.maxWidth ? `max-width: ${tab.maxWidth}ch` : (this.defaultMaxTabWidth ? `max-width: ${this.defaultMaxTabWidth}ch` : ``),
-        tab.calcStyles(),
+        tab.calcHostStyles(),
       ].filter(item => item !== "").join(";");
 
       return html`
