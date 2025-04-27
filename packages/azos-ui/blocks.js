@@ -8,7 +8,6 @@ import {
   VISIT_METHOD,
   ANNOUNCE_METHOD,
   asDataMode,
-  CLOSE_QUERY_METHOD,
   DATA_BLOCK_CHANGED_METHOD,
   DATA_BLOCK_PROP,
   DATA_MODE,
@@ -22,7 +21,7 @@ import {
   ValidationError,
   RESET_DIRTY_METHOD} from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getEffectiveDataMode, html, setBlockDataValue } from "./ui.js";
-import { dflt } from "azos/strings";
+import { dflt, isOneOf } from "azos/strings";
 import { isFunction as aver_isFunction } from "azos/aver";
 
 /**
@@ -40,7 +39,11 @@ export class Block extends Control {
     name:        { type: String },
     title:       { type: String },
     description: { type: String },
-    error:       { type: Object }
+    error:       { type: Object },
+
+    whenView:   {type: String},
+    whenInsert: {type: String},
+    whenUpdate: {type: String}
   };
 
   constructor() {
@@ -192,6 +195,23 @@ export class Block extends Control {
 
     return false;
   }
+
+  calcHostStyles(effectiveAbsent){
+    if (!effectiveAbsent && (this.whenView || this.whenInsert || this.whenUpdate)){//try to hide the element IF it is not demanded to be hidden already
+
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+      if (mode){
+        const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
+        effectiveAbsent = isOneOf(spec, ["absent", "remove"], false);
+      }
+    }
+
+    return super.calcHostStyles(effectiveAbsent);
+  }
+
 
 }//Block
 

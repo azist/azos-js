@@ -701,7 +701,7 @@ export const DATA_MODE = Object.freeze({
   UNSPECIFIED: "unspecified",
   INSERT: "insert",
   UPDATE: "update",
-  DELETE: "delete",
+  DELETE: "delete"
 });
 const ALL_DATA_MODES = allObjectValues(DATA_MODE);
 
