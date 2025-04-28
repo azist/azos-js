@@ -17,6 +17,7 @@ import "../showcase/case-buttons.js";
 import "../showcase/case-buttons-with-icons.js";
 import "../showcase/case-checkboxes.js";
 import "../showcase/case-code-box.js";
+import "../showcase/case-error-box.js";
 import "../showcase/case-date-range.js";
 import "../showcase/case-images.js";
 import "../showcase/case-input-tests.js";
@@ -44,7 +45,7 @@ export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
-    this.selectedCase = "Scheduler";
+    this.selectedCase = "ErrorBox";
     this.x = 1;
   }
 
@@ -110,6 +111,7 @@ export class ShowcaseApplet extends Applet {
       <option value="ButtonsWithIcons">Buttons With Icons</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
+      <option value="ErrorBox">Error Box</option>
       <option value="DateRange">Date Range</option>
       <option value="Images">Images</option>
       <option value="InputTests">Input Tests</option>
@@ -147,6 +149,7 @@ export class ShowcaseApplet extends Applet {
       ButtonsWithIcons: html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`,
       Checkboxes: html`<az-case-checkboxes></az-case-checkboxes>`,
       CodeBox: html`<az-case-code-box></az-case-code-box>`,
+      ErrorBox: html`<az-case-error-box></az-case-error-box>`,
       DateRange: html`<az-case-date-range></az-case-date-range>`,
       Images: html`<az-case-images></az-case-images>`,
       InputTests: html`<az-case-input-tests></az-case-input-tests>`,
