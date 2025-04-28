@@ -4,12 +4,12 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, RESET_DIRTY_METHOD, isArray as types_isArray, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
+import { asString, CLOSE_QUERY_METHOD, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, RESET_DIRTY_METHOD, isArray, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
 import { Form, Block } from "./blocks.js";
 import { css, html, noContent } from "./ui.js";
 import { showMsg } from "./msg-box.js";
 import { isEmpty, isOneOf } from "azos/strings";
-import { isFunctionOrNull, isNotNull, isObjectOrNull } from "azos/aver";
+import * as aver from "azos/aver";
 
 /**
  * Provides {@link Form} specialization for CRUD -related data functionality.
@@ -48,12 +48,6 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   get isSaveSupported()   { return this.isNewSupported || this.isEditSupported || this.isCapabilitySupported("save"); }
   get isCancelSupported() { return this.isSaveSupported; }
 
-  get isViewMode() {
-    const mode = this[DATA_MODE_PROP];
-    return  mode === undefined || mode === DATA_MODE.UNSPECIFIED;
-  }
-
-
   #data = null;
   #saveResult;
   #saveAsyncHandler;
@@ -64,7 +58,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   set capabilities(v){ this.#capabilities = asString(v, false).toLowerCase().split(" ").filter(one => !isEmpty(one)); }
 
   isCapabilitySupported(cap){
-    if (!types_isArray(this.#capabilities) || this.#capabilities.length === 0) return true;
+    if (!isArray(this.#capabilities) || this.#capabilities.length === 0) return true;
     return this.#capabilities.some(one => one === cap);
   }
 
@@ -72,7 +66,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   /** Gets form data buffer as set before a NEW or EDIT, or after a SAVE */
   get data(){ return this.#data; }
   /** Sets form data buffer as set before a NEW or EDIT, or after a SAVE */
-  set data(v){ this.#data = isObjectOrNull(v); }
+  set data(v){ this.#data = aver.isObjectOrNull(v); }
 
 
   /** Captures an object (if any) returned upon save */
@@ -84,12 +78,12 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
   get saveAsyncHandler(){ return this.#saveAsyncHandler; }
   /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
-  set saveAsyncHandler(v){ this.#saveAsyncHandler = isFunctionOrNull(v); }
+  set saveAsyncHandler(v){ this.#saveAsyncHandler = aver.isFunctionOrNull(v); }
 
   /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
   get loadAsyncHandler(){ return this.#loadAsyncHandler; }
   /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
-  set loadAsyncHandler(v){ this.#loadAsyncHandler = isFunctionOrNull(v); }
+  set loadAsyncHandler(v){ this.#loadAsyncHandler = aver.isFunctionOrNull(v); }
 
 
   firstUpdated(){
@@ -114,7 +108,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
    * @param {Object | null} [prefetched=null] optionally prefetched data
    */
   async formLoad(prefetched = null){
-    //TODO: Must be view
+    aver.isTrue(this.isViewMode, `${this.constructor.name}(view).formLoad()`);
 
     if (prefetched) {
       this.data = prefetched;
@@ -132,7 +126,8 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   //do NOT replace this with event lambda
   async #btnRefreshClick(){ this.formRefresh(); }
   async formRefresh(){
-    //TODO: Must be VIEW
+    aver.isTrue(this.isViewMode, `${this.constructor.name}(view).formRefresh()`);
+
     this.data = await this._doLoadAsync(true);
     this[DATA_VALUE_PROP] = this.data;
     this[RESET_DIRTY_METHOD]();
@@ -147,14 +142,16 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   // eslint-disable-next-line no-unused-vars
   async _doLoadAsync(isRefresh){
     //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
-    isNotNull(this.#loadAsyncHandler, "CrudForm.loadAsyncHandler function");
+    aver.isNotNull(this.#loadAsyncHandler, "CrudForm.loadAsyncHandler function");
     return await this.#loadAsyncHandler.call(this, isRefresh);
   }
 
   //do NOT replace this with event lambda
   #btnNewClick(){ this.formNew(); }
-  formNew(){
-    this[DATA_VALUE_PROP] = null; //todo:  SET DEFAULT here
+  formNew(defaults = null){
+    aver.isTrue(this.isViewMode, `${this.constructor.name}(view).formNew()`);
+
+    this[DATA_VALUE_PROP] = defaults ?? null;
     this[DATA_MODE_PROP] = DATA_MODE.INSERT;
     this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
@@ -163,6 +160,8 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   //do NOT replace this with event lambda
   #btnEditClick(){ this.formEdit(); }
   formEdit(){
+    aver.isTrue(this.isViewMode, `${this.constructor.name}(view).formEdit()`);
+
     this[DATA_MODE_PROP] = DATA_MODE.UPDATE;
     this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
@@ -171,6 +170,8 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   //do NOT replace this with event lambda
   async #btnSaveClick(){ this.formSave(); }
   async formSave(){
+    aver.isTrue(!this.isViewMode, `${this.constructor.name}(!view).formSave()`);
+
     const errors = this[VALIDATE_METHOD]({}, null, true);
 
     //TODO: Create a usable Validation Summary browser
@@ -198,15 +199,15 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
    * */
   async _doSaveAsync(){
      //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
-     isNotNull(this.#saveAsyncHandler, "CrudForm.saveAsyncHandler function");
+     aver.isNotNull(this.#saveAsyncHandler, "CrudForm.saveAsyncHandler function");
      return await this.#saveAsyncHandler.call(this);
   }
 
   //do NOT replace this with event lambda
   async #btnCancelClick(){ this.formCancel(); }
   async formCancel(){
-
-    //todo:  Query isDirty and abort if there are changes
+    aver.isTrue(!this.isViewMode, `${this.constructor.name}(!view).formCancel()`);
+    if (!(await this[CLOSE_QUERY_METHOD]())) return false;
 
     //reset errors which do not matter as we cancel
     this[VISIT_METHOD]( one => {
@@ -219,6 +220,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     this[RESET_DIRTY_METHOD]();
 
     this.applyInvariants();
+    return true;
   }
 
   /**

@@ -19,10 +19,12 @@ import {
   FORM_MODE_JSON_PROP,
   VALIDATE_METHOD,
   ValidationError,
-  RESET_DIRTY_METHOD} from "azos/types";
+  RESET_DIRTY_METHOD,
+  CLOSE_QUERY_METHOD} from "azos/types";
 import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getEffectiveDataMode, html, setBlockDataValue } from "./ui.js";
 import { dflt, isOneOf } from "azos/strings";
 import { isFunction as aver_isFunction } from "azos/aver";
+import { prompt } from "./ok-cancel-modal.js";
 
 /**
  * A higher order component which represents a grouping of user interface elements which are
@@ -236,6 +238,18 @@ export class Form extends Block {
 
   get [DATA_MODE_PROP](){ return this.dataMode; }
   set [DATA_MODE_PROP](v){ this.dataMode = v; }
+
+  get isViewMode() {
+    const mode = this[DATA_MODE_PROP];
+    return  mode === undefined || mode === DATA_MODE.UNSPECIFIED;
+  }
+
+  async [CLOSE_QUERY_METHOD](){
+    if (!this[DIRTY_PROP]) return true;
+
+    const result = await prompt("Discard data changes in progress?", {title: "Cancel Form", ok: "Discard", cancel: "No, go back", status: "warning", okBtnStatus: "error", rank: "normal"});
+    return !!(result?.modalResult?.response);
+   }
 
   static properties = {
     dataMode:   { type: String }
