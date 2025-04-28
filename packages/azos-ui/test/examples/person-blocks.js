@@ -42,8 +42,8 @@ export class PersonBlock extends Block {
       ${errors}
       <div class="grid cols3">
         <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
-        <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q" ></az-text>
-        <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage" whenInsert="absent" whenUpdate="disable"></az-text>
+        <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q"  whenInsert="absent" whenUpdate="disable"></az-text>
+        <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
       </div>
       <div class="grid cols3">
         <az-text scope="this"  id="tbPhone"        name="Phone"      title="Phone"       maxLength=24 isrequired dataKind="tel" value=""></az-text>

@@ -42,7 +42,7 @@ export const DEFAULT_CONTENT_WIDTH_PCT = 40;
 export const DEFAULT_TITLE_WIDTH_PCT = 40;
 
 
-export class FieldPart extends Part{
+export class FieldPart extends Part {
 
   constructor(){
     super();

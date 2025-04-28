@@ -47,7 +47,7 @@ export class ExampleFeatureBApplet extends Applet{
 
     await this.blockPerson.updateComplete;
 
-    this.blockPerson[DATA_VALUE_PROP] = {
+    this.blockPerson[DATA_VALUE_PROP] = new UiInputValue({
       "FirstName": "James",
       "LastName": "Cooper Fraud",
       "MiddleName": "L",
@@ -80,7 +80,7 @@ export class ExampleFeatureBApplet extends Applet{
 
       ],
       "PayoutStatus": {},
-      "Phone": "(800) 234-5678",
+      "Phone": "4444",  //"(800) 234-5678",
       "ProcessStatus": {
         "Approved": false,
         "Description": "Set externally",
@@ -88,7 +88,7 @@ export class ExampleFeatureBApplet extends Applet{
       },
       "Registered": false,
       "Smoker": true
-    };
+    });
   }
 
   #btnValidateClick(){
