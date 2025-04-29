@@ -26,20 +26,9 @@ export class PersonBlock extends Block {
 
   render(){
 
-    let errors = [];//error summary
-
-    if (this.error){
-       errors.push(html`<h4 style="color: red">Block validation has errors:</h4>`);
-       if (this.error.cause){
-         for(const one of this.error.cause){
-          errors.push(html`<div style="color: #ff8010">'${one.field}': ${one.message}</div>`);
-         }
-       }
-    }
 
     return html`
     <h3>Person Block</h3>
-      ${errors}
       <div class="grid cols3">
         <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
         <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q"  whenInsert="absent" whenUpdate="disable"></az-text>

@@ -10,6 +10,7 @@ import { css, html, noContent } from "./ui.js";
 import { showMsg } from "./msg-box.js";
 import { isEmpty, isOneOf } from "azos/strings";
 import * as aver from "azos/aver";
+import "./vcl/util/error-box.js";
 
 /**
  * Provides {@link Form} specialization for CRUD -related data functionality.
@@ -295,7 +296,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   }
 
   renderFormBody(){
-    return html`<div class="form-body"> <slot>  </slot> </div>`;
+    return html`<div class="form-body"> <az-error-box .data=${this.error}> </az-error-box> <slot>  </slot> </div>`;
   }
 
 }
