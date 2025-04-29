@@ -28,9 +28,39 @@ export class ErrorBox extends Control {
   .level{
     margin: 0.5lh 0em 0.5lh 0em;
     display: block;
+    padding: 0.25em;
   }
 
+  .num{
+   display: inline-block;
+   border: none;
+   color: var(--s-error-fg);
+   background: var(--s-error-bg);
+   padding: 0.4em;
+   border-radius: 0.2em;
+  }
+
+  .exception{
+    display: inline;
+    padding-left: 0.5em;
+    color: var(--s-error-bg);
+  }
+
+  .message{
+    display: inline;
+    padding-left: 0.5em;
+    color: var(--s-error-bg);
+  }
+
+  .unspecified{
+    display: inline;
+    padding-left: 0.5em;
+    color: var(--s-alert-bg);
+  }
+
+
   .code{
+    margin: 1.5em;
     font-family: var(--vcl-codebox-ffamily);
     font-size: 0.75em;
     white-space: pre-wrap;
@@ -38,10 +68,8 @@ export class ErrorBox extends Control {
     overflow: auto;
     color: var(--vcl-codebox-fg);
     background: var(--vcl-codebox-bg);
-    padding: 0.5em;
-    max-width: inherit;
-    max-height: inherit;
-    margin: inherit;
+    padding: 1.0em;
+    border-radius: 0.25em;
   }
   `;
 
@@ -54,27 +82,33 @@ export class ErrorBox extends Control {
     return html`<div class="errorbox ${parseRank(this.rank, true)}">   ${content}   </div>`;
   }
 
-  renderLevel(data, indent){
+  renderLevel(data, indent, num = 1){
     if (!data) return noContent;
 
     let content;
     if (isArray(data)){
       content = [];
-      for(const one of this.data){
-        content.push(this.renderLevel(one, indent + 1));
+      for(const one of data){
+        content.push(this.renderLevel(one, indent + 1, num++));
       }
     } else {
-      content = this.renderObject(this.data, indent + 1);
+      content = this.renderObject(data, indent + 1);
     }
 
-    return html`<div class="level" style="padding-left: ${8 * indent}px">  ${content}  </div>`;
+    const numTag = indent > 1 ? html`<div class="num">${num}</div>` : noContent;
+
+    return html`<div class="level" style="padding-left: ${2 * indent}px"> ${numTag} ${content}  </div>`;
   }
 
   renderObject(data, indent){
     if (!data) return noContent;
+
     if (isString(data)) return html`<div class="message">${data}</div>`;
+
     if (data instanceof Error) return this.renderError(data, indent);
+
     if (CLIENT_MESSAGE_PROP in data) return html`<div class="message">${data[CLIENT_MESSAGE_PROP]}</div>`;
+
     if (ERROR_PROP in data) return this.renderObject(data[ERROR_PROP], indent);
 
     return html`<div class="unspecified"> Unspecified <div class="code">${JSON.stringify(data, null, 2)}</div> </div>`;
@@ -84,6 +118,7 @@ export class ErrorBox extends Control {
     return html`
     <div class="exception">
       Error: ${data.name} ${data.message}
+      ${this.renderLevel(data?.cause, indent+1, 0)}
     </div>`;
   }
 

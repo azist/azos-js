@@ -7,6 +7,7 @@
 import { html } from "../../ui";
 import { CaseBase } from "./case-base";
 import "../../vcl/util/error-box.js";
+import { CLIENT_MESSAGE_PROP } from "azos/types";
 
 export class CaseErrorBox extends CaseBase {
 
@@ -16,7 +17,7 @@ export class CaseErrorBox extends CaseBase {
 
 <h2> VCL / Errorbox</h2>
 
-<az-button title="Set Data" @click=${() => this.errorBox1.data = [new Error("Whats up?"), "Error string 2", "Crash!" ]}> </az-button>
+<az-button title="Set Data" @click=${() => this.errorBox1.data = [new Error("Whats up?"), "Error string 2", "Crash!", {[CLIENT_MESSAGE_PROP]: "Custom error provider,"}, {x: 1, b: -234} ]}> </az-button>
 
 <az-error-box id="errorBox1" scope="this"></az-error-box>
 
