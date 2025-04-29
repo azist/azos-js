@@ -4,8 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { dflt } from "azos/strings";
 import { Control, css, html, parseRank, noContent } from "../../ui";
-import { CLIENT_MESSAGE_PROP, ERROR_PROP, isArray, isString } from "azos/types";
+import { CLIENT_MESSAGE_PROP, DATA_NAME_PROP, ERROR_PROP, isArray, isString } from "azos/types";
 
 /** Provides error/exception display functionality with optional details */
 export class ErrorBox extends Control {
@@ -26,9 +27,15 @@ export class ErrorBox extends Control {
   }
 
   .level{
-    margin: 0.5lh 0em 0.5lh 0em;
+    margin: 0.25lh 0em 0.25lh 0em;
     display: block;
-    padding: 0.25em;
+    border-left: 1px dotted var(--s-error-bg);
+    padding-left: 2ch;
+
+    &.top{
+      padding-left: 0px;
+      border-left: none;
+    }
   }
 
   .num{
@@ -38,26 +45,39 @@ export class ErrorBox extends Control {
    background: var(--s-error-bg);
    padding: 0.4em;
    border-radius: 0.2em;
+   font-size: 0.75em;
   }
 
   .exception{
     display: inline;
-    padding-left: 0.5em;
+    padding-left: 0.15em;
     color: var(--s-error-bg);
   }
 
   .message{
     display: inline;
-    padding-left: 0.5em;
-    color: var(--s-error-bg);
+    padding-left: 0.15em;
+    color: var(--ink);
   }
 
   .unspecified{
     display: inline;
-    padding-left: 0.5em;
-    color: var(--s-alert-bg);
+    padding-left: 0.15em;
+    color: var(--s-ink);
   }
 
+  .schema{
+    display: inline;
+    font-family: var(--vcl-codebox-ffamily);
+    font-size: 0.75em;
+    color: var(--s-warn-fg);
+    background: var(--s-warn-bg);
+    padding: 0.35em;
+    border-radius: 4px;
+    box-shadow: 0px 1px 4px #2020204E;
+    opacity: 0.85;
+    vertical-align: middle;
+  }
 
   .code{
     margin: 1.5em;
@@ -74,7 +94,8 @@ export class ErrorBox extends Control {
   `;
 
   static properties = {
-    data:  {type: Object}
+    data:  {type: Object},
+    verbosity: {type: Number}
   };
 
   renderControl(){
@@ -82,22 +103,24 @@ export class ErrorBox extends Control {
     return html`<div class="errorbox ${parseRank(this.rank, true)}">   ${content}   </div>`;
   }
 
-  renderLevel(data, indent, num = 1){
+  renderLevel(data, indent, num = -1){
     if (!data) return noContent;
 
     let content;
     if (isArray(data)){
       content = [];
+      num = 0;
       for(const one of data){
-        content.push(this.renderLevel(one, indent + 1, num++));
+        content.push(this.renderLevel(one, indent + 1, ++num));
       }
+      num = 0;
     } else {
-      content = this.renderObject(data, indent + 1);
+      content = this.renderObject(data, indent);
     }
 
-    const numTag = indent > 1 ? html`<div class="num">${num}</div>` : noContent;
+    const numTag = num > 0 ? html`<div class="num">${indent}.${num}</div>` : noContent;
 
-    return html`<div class="level" style="padding-left: ${2 * indent}px"> ${numTag} ${content}  </div>`;
+    return html`<div class="level ${indent < 2 ? "top" : "" }"> ${numTag} ${content}  </div>`;
   }
 
   renderObject(data, indent){
@@ -115,10 +138,15 @@ export class ErrorBox extends Control {
   }
 
   renderError(data, indent){
+
+    const nm = this.verbosity > 2 ? data.name : noContent;
+    const msg = dflt(data[CLIENT_MESSAGE_PROP], data.message);
+    const fldTag = DATA_NAME_PROP in data ? html`<div class="schema">${data[DATA_NAME_PROP]}:</div>` : null;
+
     return html`
     <div class="exception">
-      Error: ${data.name} ${data.message}
-      ${this.renderLevel(data?.cause, indent+1, 0)}
+      <strong>${data.constructor.name}</strong> ${nm} ${fldTag} &nbsp;&nbsp; ${msg}
+      ${this.renderLevel(data?.cause, indent + 1)}
     </div>`;
   }
 
