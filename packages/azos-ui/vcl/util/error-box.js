@@ -24,18 +24,23 @@ export class ErrorBox extends Control {
   .errorbox{
     display: block;
     padding: 0.5em;
+    transition: 0.5s;
+    font-size: 1em;
+    opacity: 1;
+    @starting-style{
+        font-size: 0em;
+        opacity: 0;
+    }
   }
 
-  .level{
-    margin: 0.25lh 0em 0.25lh 0em;
-    display: block;
-    border-left: 1px dotted var(--s-error-bg);
-    padding-left: 2ch;
 
-    &.top{
-      padding-left: 0px;
-      border-left: none;
-    }
+  .level{
+    margin: 0.25lh 0em 0.25lh 0.75em;
+    display: block;
+  }
+
+  .errorbox > .level{
+    margin: 0.25lh 0em 0.25lh 0em;
   }
 
   .num{
@@ -98,29 +103,29 @@ export class ErrorBox extends Control {
     verbosity: {type: Number}
   };
 
+  #itemNum;
+
   renderControl(){
+    this.#itemNum = 0;
     let content = this.renderLevel(this.data, 0);
     return html`<div class="errorbox ${parseRank(this.rank, true)}">   ${content}   </div>`;
   }
 
-  renderLevel(data, indent, num = -1){
+  renderLevel(data, indent){
     if (!data) return noContent;
 
-    let content;
     if (isArray(data)){
-      content = [];
-      num = 0;
+      const content = [];
       for(const one of data){
-        content.push(this.renderLevel(one, indent + 1, ++num));
+        content.push(this.renderLevel(one, indent));
       }
-      num = 0;
-    } else {
-      content = this.renderObject(data, indent);
+      return html`<div class="level"> ${content} </div>`;
     }
 
-    const numTag = num > 0 ? html`<div class="num">${indent}.${num}</div>` : noContent;
-
-    return html`<div class="level ${indent < 2 ? "top" : "" }"> ${numTag} ${content}  </div>`;
+    const numTag = html`<div class="num">${indent}.${this.#itemNum++}</div>`;
+    const content = this.renderObject(data, indent);
+    const result = html`<div class="level"> ${numTag} ${content}  </div>`;
+    return result;
   }
 
   renderObject(data, indent){
