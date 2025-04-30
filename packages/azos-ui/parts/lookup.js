@@ -284,7 +284,7 @@ export class Lookup extends Part {
   }
 
   #repositionPopover() {
-    const owner = this.owner;
+    const owner = this.owner.shadowRoot?.querySelector("input") || this.owner;
     const popover = this.popover;
 
     if (!this.isOpen || !owner || !popover) return;
