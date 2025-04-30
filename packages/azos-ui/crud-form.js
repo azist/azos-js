@@ -4,13 +4,14 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, CLOSE_QUERY_METHOD, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, RESET_DIRTY_METHOD, isArray, VALIDATE_METHOD, VISIT_METHOD } from "azos/types";
+import { asString, CLOSE_QUERY_METHOD, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, RESET_DIRTY_METHOD, isArray, VALIDATE_METHOD, VISIT_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_NAME_PROP } from "azos/types";
 import { Form, Block } from "./blocks.js";
 import { css, html, noContent } from "./ui.js";
 import { showMsg } from "./msg-box.js";
 import { isEmpty, isOneOf } from "azos/strings";
 import * as aver from "azos/aver";
 import "./vcl/util/error-box.js";
+import { toast } from "./toast.js";
 
 /**
  * Provides {@link Form} specialization for CRUD -related data functionality.
@@ -175,9 +176,8 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
 
     const errors = this[VALIDATE_METHOD]({}, null, true);
 
-    //TODO: Create a usable Validation Summary browser
-    if (errors) {
-      showMsg("error", "Validation Errors", "Error list: \n\n" +JSON.stringify(errors, null, 2), 3, true);
+    if (errors){
+      toast("Please fix data validation errors", {status: "error"});
       return;
     }
 
@@ -241,6 +241,14 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
 
   updated(){
     this.applyInvariants();
+  }
+
+  [DATA_BLOCK_CHANGED_METHOD](sender){
+    super[DATA_BLOCK_CHANGED_METHOD]();
+    console.log(`FORM data changed called: ${sender[DATA_NAME_PROP]}`);
+    if (!this.isViewMode){
+      this.error = null; //TODO: maybe revalidate instead
+    }
   }
 
   renderControl(){

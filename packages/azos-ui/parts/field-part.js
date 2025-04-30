@@ -530,14 +530,14 @@ export class FieldPart extends Part {
     this.dispatchEvent(evtChange);
 
     //Data events are not bubbling and not composed and CANCEL-able
-    const evtDataChange = new Event("datachange", { bubbles: false, composed: false, cancelable: true });
+    const evtDataChange = new CustomEvent("datachange", { bubbles: false, composed: false, cancelable: true, detail: { sender: this } });
     const proceed = this.dispatchEvent(evtDataChange);
 
     //We need to propagate data events manually
     if (proceed){
       const parent = getDataParentOfMember(this);
       if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){
-        parent[DATA_BLOCK_CHANGED_METHOD]();
+        parent[DATA_BLOCK_CHANGED_METHOD](this);//sender = self
       }
     }
   }
