@@ -116,7 +116,7 @@ export class Lookup extends Part {
    * @param {any} choice the selection from among {@link #results}
    */
   _select(choice) {
-    isTrue(this.results.includes(choice));
+    if (!this.results.includes(choice)) return;
     this.#result = choice;
     this.#resolve(choice);
 
