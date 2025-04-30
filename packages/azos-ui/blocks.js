@@ -94,17 +94,17 @@ export class Block extends Control {
    * Override to trigger `change` event dispatch after value changes DUE to user input.
    * The "value" of the block is taken from its constituent fields/parts which are children of the block {@link DATA_BLOCK_PROP}
    */
-  [DATA_BLOCK_CHANGED_METHOD](){
+  [DATA_BLOCK_CHANGED_METHOD](sender){
 
     //Data events are not bubbling and not composed and CANCEL-able
-    const evt = new Event("datachange", { bubbles: false, composed: false, cancelable: true });
+    const evt = new CustomEvent("datachange", { bubbles: false, composed: false, cancelable: true, detail: {sender: sender} });
     const proceed = this.dispatchEvent(evt);
 
     //we need to manually propagate them to parents
     if (proceed){
       const parent = getDataParentOfMember(this);
       if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){
-        parent[DATA_BLOCK_CHANGED_METHOD]();
+        parent[DATA_BLOCK_CHANGED_METHOD](sender);
       }
     }
   }

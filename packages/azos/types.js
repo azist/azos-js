@@ -111,7 +111,7 @@ export const DATA_BLOCK_PROP = Symbol("data-block");
 
 /**
  * An optional part of "IData" protocol - an implementing entity receives a post-factum notification of data change
- * made to constituent fields
+ * made to constituent fields. A `sender` contains an entity (such as a field) which triggered the change
  */
 export const DATA_BLOCK_CHANGED_METHOD = Symbol("data-block-changed");
 
@@ -315,6 +315,8 @@ export class ValidationError extends AzosError {
 
   /** Name of the field sub-scope, such as an array/collection subscript e.g. Field: `Doctors`, Scope: `[3]` */
   get scope() { return this.#scope; }
+
+  get [DATA_NAME_PROP]() { return `${this.schema}.${this.field}${this.scope ?? ""}`; }
 
   /** Allows to provide a user-friendly message which is shown in the UI */
   get clientMessage() { return this.#clientMessage; }
