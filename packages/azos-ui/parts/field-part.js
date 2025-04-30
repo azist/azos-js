@@ -551,17 +551,6 @@ export class FieldPart extends Part {
 
     const lookup = scope[this.lookupId];
     if (!lookup) return; // FUTURE: maybe create it here
-
-    const evt = new CustomEvent("lookupFeed", {
-      bubbles: true,
-      cancelable: true,
-      detail: { owner: this, value, }
-    });
-    lookup.dispatchEvent(evt);
-
-    if (evt.defaultPrevented) return;
-
-    console.warn(`'lookupFeed' event was not canceled--feeding manually`);
     lookup.feed(this, value);
   }
 

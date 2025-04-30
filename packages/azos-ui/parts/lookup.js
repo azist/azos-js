@@ -52,7 +52,6 @@ export class Lookup extends Part {
   #reject;
 
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
-  #bound_onFeed = this.#onFeed.bind(this);
   #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
   #bound_debouncedRepositionPopover = this.#debounced_repositionPopover.bind(this);
@@ -203,12 +202,6 @@ export class Lookup extends Part {
       return;
     }
     this._cancel();
-  }
-
-  #onFeed(evt) {
-    evt.preventDefault();
-    const { owner, value } = evt.detail;
-    this.feed(owner, value);
   }
 
   #onKeydown(evt) {
@@ -408,16 +401,6 @@ export class Lookup extends Part {
     this._connectListeners();
 
     return true;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.addEventListener("lookupFeed", this.#bound_onFeed);
-  }
-
-  disconnectedCallback() {
-    this.removeEventListener("lookupFeed", this.#bound_onFeed);
-    super.disconnectedCallback();
   }
 
   renderPart() {
