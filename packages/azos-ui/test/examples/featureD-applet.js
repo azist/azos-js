@@ -56,7 +56,7 @@ export class ExampleFeatureDApplet extends Applet{
    return html`
     <az-crud-form id="frmMain" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
-      <examples-person-block scope="this" id="blockPerson" name="person"> </examples-person-block>
+      <examples-person-block scope="this" id="blockPerson" name="person" @datachange=${() => console.log("INNER SLOTTED BLOCK DATA CHANGE")}  > </examples-person-block>
 
     </az-crud-form>
 

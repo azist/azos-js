@@ -111,7 +111,7 @@ export const DATA_BLOCK_PROP = Symbol("data-block");
 
 /**
  * An optional part of "IData" protocol - an implementing entity receives a post-factum notification of data change
- * made to constituent fields
+ * made to constituent fields. A `sender` contains an entity (such as a field) which triggered the change
  */
 export const DATA_BLOCK_CHANGED_METHOD = Symbol("data-block-changed");
 
