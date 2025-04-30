@@ -213,11 +213,14 @@ export class Lookup extends Part {
         this._cancel();
         break;
       case "Tab":
-        if (this.results.length) {
-          this.#advanceSoftFocus(!evt.shiftKey);
-        } else {
+        if (!this.results.length) {
           preventDefault = false;
           if (this.isOpen) this._cancel();
+        } else if (this.results.length === 1) {
+          this._select(this.selectedResult);
+          preventDefault = false;
+        } else {
+          this.#advanceSoftFocus(!evt.shiftKey);
         }
         break;
       case "ArrowUp":
