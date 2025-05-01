@@ -44,7 +44,7 @@ export class ExampleFeatureDApplet extends Applet{
   }
 
   async #handleLoadAsync(isRefresh){
-    console.log(`LOADING DATA.... Refresh: ${isRefresh}`);
+    console.log(`LOADING DATA.... ${COUNTER}  Refresh: ${isRefresh}`);
     return {person: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "8", Description: "Eats mice"} ]}};
   }
 
@@ -54,7 +54,7 @@ export class ExampleFeatureDApplet extends Applet{
 
   render(){
    return html`
-    <az-crud-form id="frmMain" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+    <az-crud-form id="frmMain" scope="this" sticky toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
       <examples-person-block scope="this" id="blockPerson" name="person" @datachange=${() => console.log("INNER SLOTTED BLOCK DATA CHANGE")}  > </examples-person-block>
 

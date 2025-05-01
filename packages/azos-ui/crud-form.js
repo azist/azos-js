@@ -29,7 +29,21 @@ export class CrudForm extends Form {
   justify-content: right;
   place-items: center;
   margin: 0.50em 0.25em;
+ }
+
+.sticky{
+  position: fixed;
+  margin: 0.5em 0;
+  background: white;
+  z-index: 10;
+  box-shadow: 0 2px 8px #20202080;
+  border-radius: 0.5em;
+  padding: 0.5em;
+  right: 1em;
+  opacity: 0.85;
 }
+
+.bottom{ bottom: 1em; }
 
 .cmd{  }
 .commit{ width: 12ch; }
@@ -38,9 +52,10 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
 `];
 
   static properties = {
-    toolbar:      { type: String },
-    capabilities: { type: String },
-    noAutoLoad:   { type: Boolean }
+    toolbar:      { type: String  },
+    capabilities: { type: String  },
+    noAutoLoad:   { type: Boolean },
+    sticky:       { type: Boolean }
   };
 
   get isToolbarAbove()    { return isOneOf(this.toolbar, ["top", "above"]); }
@@ -137,7 +152,6 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
    * @param {boolean} isRefresh true if it is a refresh and not an original load call
    * @returns {Promise<Object>} data from storage or null to signify absence of data
    * */
-  // eslint-disable-next-line no-unused-vars
   async _doLoadAsync(isRefresh){
     //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
     aver.isNotNull(this.#loadAsyncHandler, "CrudForm.loadAsyncHandler function");
@@ -177,6 +191,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
       return;
     }
 
+    //Temp
     showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this[DATA_VALUE_PROP], null, 2), 3, true);
 
     this.#saveResult = await this._doSaveAsync();
@@ -248,13 +263,18 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   }
 
   renderControl(){
-    return this.isToolbarAbove ? html` ${this.renderToolbar()} <hr> ${this.renderFormBody()} <br>`
-                               : html` ${this.renderFormBody()} <br> <hr> ${this.renderToolbar()} `;
+    const st = this.sticky;
+    return this.isToolbarAbove ? html` ${this.renderToolbar()} ${st ? noContent : html`<hr>`} ${this.renderFormBody()} <br>`
+                               : html` ${this.renderFormBody()} ${st ? noContent : html`<br> <hr>`} ${this.renderToolbar()} `;
   }
 
   renderToolbar(){
+
+    let cls = this.sticky ? "sticky" : "" ;
+    if (!this.isToolbarAbove) cls += " bottom";
+
     return html`
-    <div class="toolbar">
+    <div class="toolbar ${cls}">
 
       <az-button id="btnRefresh" scope="this"
         @click="${this.#btnRefreshClick}"
