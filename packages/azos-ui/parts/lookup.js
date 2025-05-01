@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf, isOfOrNull } from "azos/aver";
+import * as aver from "azos/aver";
 import { Part, css, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
 import { isEmpty, matchPattern } from "azos/strings";
@@ -230,7 +230,7 @@ export class Lookup extends Part {
 
   get owner() { return this.#owner; }
   set owner(v) {
-    isOfOrNull(v, Part);
+    aver.isOfOrNull(v, Part);
     const oldValue = this.#owner;
     this.#owner = v;
     this.requestUpdate("owner", oldValue);
@@ -339,7 +339,7 @@ export class Lookup extends Part {
   #scrollResultIntoView(result) {
     if (!result) return;
 
-    isOf(result, HTMLLIElement);
+    aver.isOf(result, HTMLLIElement);
     const resultBounds = result.getBoundingClientRect();
     const popoverBounds = this.popover.getBoundingClientRect();
 
