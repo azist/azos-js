@@ -428,26 +428,24 @@ export function resolveImageSpec(reg, spec, iso = null, theme = null) {
  * @param {string|ImageRecord} spec  - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print` or ImageRecord
  * @param {object} options - optional object with the following properties:
  * @param {string} [options.cls] - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
- * @param {string} [options.iso]  - optional system-wide ISO code to use when resolving the image spec, default is null
  * @param {string | number} [options.ox] - optional X offset to apply to the image, default is unset
  * @param {string | number} [options.oy] - optional Y offset to apply to the image, default is unset
  * @param {number} [options.scale] - optional scale factor to apply to the image, default is unset
- * @param {string} [options.theme] - optional system-wide theme to use when resolving the image spec, default is null
  * @param {boolean} [options.wrapImage] - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
+ * @param {string} [options.iso]  - optional system-wide ISO code to use when resolving the image spec, default is null
+ * @param {string} [options.theme] - optional system-wide theme to use when resolving the image spec, default is null
  * @returns {tuple} {html: VerbatimHtml, attrs: {}}
  */
-export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
+export function renderImageSpec(reg, spec, { cls, ox, oy, scale, wrapImage, iso, theme, } = {}) {
+  const content = resolveImageSpec(reg, spec, iso, theme);
+  return renderImageRecord(content, { cls, scale, ox, oy, wrapImage });
+}
+
+export function renderImageRecord(got, { cls, ox, oy, scale, wrapImage, } = {}) {
+  if (got instanceof ImageRecord) got = got.produceContent();
+
   cls ??= "icon";
   wrapImage ??= true;
-
-  let got;
-  if (spec instanceof ImageRecord) {
-    // reg can be null if spec is an ImageRecord
-    got = spec.produceContent();
-  } else {
-    got = resolveImageSpec(reg, spec, iso, theme);
-  }
-
   scale ??= got?.attrs?.scale;
   ox ??= got?.attrs?.ox;
   oy ??= got?.attrs?.oy;

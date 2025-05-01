@@ -10,7 +10,7 @@ import { matchPattern } from "azos/strings";
 
 import { writeToClipboard } from "./clipboard.js";
 import { iconStyles } from "../../parts/styles.js";
-import { AzosElement, css, html, noContent, renderImageSpec } from "../../ui.js";
+import { AzosElement, css, html, noContent, renderImageRecord } from "../../ui.js";
 import { Arena } from "../../arena.js";
 import { ModalDialog } from "../../modal-dialog.js";
 import { toast } from "../../toast.js";
@@ -236,7 +236,7 @@ ${this.renderInfoDialog()}
   renderFilterField() {
     return html`
 <div class="filter">
-  <az-text class="tbFilter" title="Filter" placeholder="*checkmark*" @change="${e => this.filter = e.target.value ?? null}" value="${this.filter}"></az-text>
+  <az-text class="tbFilter" title="Filter" placeholder="*checkmark*" @change="${e => this.filter = e.target.value ?? null}" .value="${this.filter}"></az-text>
   <az-text class="tbBg" title="BG Color" dataKind="color" @change="${e => this.bgColor = e.target.value}" value="${this.bgColor}"></az-text>
   <az-text class="tbStroke" title="SVG Stroke" dataKind="color" @change="${e => this.svgStrokeColor = e.target.value}" value="${this.svgStrokeColor}"></az-text>
   <az-text class="tbFill" title="SVG Fill" dataKind="color" @change="${e => { this.svgFillColor = e.target.value }}" value="${this.svgFillColor}"></az-text>
@@ -261,7 +261,7 @@ ${records.map(({ uri, recName, rec }) => this.renderRecord(uri, recName, rec))}
   renderRecord(uri, recName, rec) {
     return html`
 <div class="record" @click="${e => { e.preventDefault(); this.#showInfo(uri, recName, rec); }}">
-  <div class="iconWrapper">${renderImageSpec(null, rec, { wrapImage: false }).html}</div>
+  <div class="iconWrapper">${renderImageRecord(rec, { wrapImage: false }).html}</div>
   <span class="name">${recName}</span>
 </div>
     `;
@@ -285,7 +285,7 @@ ${this.hasSuggestedFilter
     ${uri ? html`
     <figure @click="${() => this.#onCopyClicked(uri, rec)}">
       <div class="iconWrapper">
-        ${renderImageSpec(null, rec, { cls: "specIcon icon", wrapImage: false }).html}
+        ${renderImageRecord(rec, { cls: "specIcon icon", wrapImage: false }).html}
         ${this.renderImageSpec("svg://azos.ico.copy", { cls: "copyIcon icon", wrapImage: false }).html}</div>
       </div>
       <figCaption id="specValue" scope="this" class="spec">${rec.format}://${uri}</figCaption>

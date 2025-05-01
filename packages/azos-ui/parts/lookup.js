@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf, isTrue } from "azos/aver";
+import { isOf } from "azos/aver";
 import { Part, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
@@ -52,7 +52,6 @@ export class Lookup extends Part {
   #reject;
 
   #bound_onDocumentClick = this.#onDocumentClick.bind(this);
-  #bound_onFeed = this.#onFeed.bind(this);
   #bound_onKeydown = this.#onKeydown.bind(this);
   #bound_onOwnerBlur = this.#onOwnerBlur.bind(this);
   #bound_debouncedRepositionPopover = this.#debounced_repositionPopover.bind(this);
@@ -117,7 +116,7 @@ export class Lookup extends Part {
    * @param {any} choice the selection from among {@link #results}
    */
   _select(choice) {
-    isTrue(this.results.includes(choice));
+    if (!this.results.includes(choice)) return;
     this.#result = choice;
     this.#resolve(choice);
 
@@ -205,12 +204,6 @@ export class Lookup extends Part {
     this._cancel();
   }
 
-  #onFeed(evt) {
-    evt.preventDefault();
-    const { owner, value } = evt.detail;
-    this.feed(owner, value);
-  }
-
   #onKeydown(evt) {
     if (!this.isOpen) return;
 
@@ -220,11 +213,14 @@ export class Lookup extends Part {
         this._cancel();
         break;
       case "Tab":
-        if (this.results.length) {
-          this.#advanceSoftFocus(!evt.shiftKey);
-        } else {
+        if (!this.results.length) {
           preventDefault = false;
           if (this.isOpen) this._cancel();
+        } else if (this.results.length === 1) {
+          this._select(this.selectedResult);
+          preventDefault = false;
+        } else {
+          this.#advanceSoftFocus(!evt.shiftKey);
         }
         break;
       case "ArrowUp":
@@ -291,7 +287,7 @@ export class Lookup extends Part {
   }
 
   #repositionPopover() {
-    const owner = this.owner;
+    const owner = this.owner.shadowRoot?.querySelector("input") || this.owner;
     const popover = this.popover;
 
     if (!this.isOpen || !owner || !popover) return;
@@ -408,16 +404,6 @@ export class Lookup extends Part {
     this._connectListeners();
 
     return true;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.addEventListener("lookupFeed", this.#bound_onFeed);
-  }
-
-  disconnectedCallback() {
-    this.removeEventListener("lookupFeed", this.#bound_onFeed);
-    super.disconnectedCallback();
   }
 
   renderPart() {
