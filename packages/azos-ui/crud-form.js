@@ -87,20 +87,16 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
   set loadAsyncHandler(v){ this.#loadAsyncHandler = aver.isFunctionOrNull(v); }
 
-
-  firstUpdated(){
-    super.firstUpdated();
-
+  //** Loads form data
+  async _doLoad(){
     if (this.noAutoLoad){
-      queueMicrotask(() => {
-        this[DATA_VALUE_PROP] = this.data;
-        this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
-        this[RESET_DIRTY_METHOD]();
-        this.applyInvariants();
-      });
+      this[DATA_VALUE_PROP] = this.data;
+      this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
+      this[RESET_DIRTY_METHOD]();
+      this.applyInvariants();
     } else {
       this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;
-      this.formLoad();//not awaiting on purpose
+      await this.formLoad();
     }
   }
 

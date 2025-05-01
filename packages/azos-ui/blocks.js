@@ -53,6 +53,40 @@ export class Block extends Control {
     this.title = this.constructor.name;
   }
 
+  /** Use {@link _doLoad} to write business logic on load, when block and all its child structure has loaded.
+   * This is defined by business rules of every block, as {@link _doAwaitFullStructureLoad} gets implemented accordingly.
+   * Do not override `firstUpdated()` in blocks/forms, override `_doLoad()` instead.
+  */
+  firstUpdated(){
+    super.firstUpdated();
+    //wait forBlock to load
+    queueMicrotask(async () => {
+      await this.updateComplete; //override getUpdateComplete() to determine what "loaded block" means,
+                                 //e.g. wait for the "business last" element to appear
+      await this._doLoad();
+    });
+  }
+
+  /** Returns a promise which indicates the completion of block loading when all child data entities (such as a sub-block or a field) load
+   * Do not override this method, instead override {@link _doAwaitFullStructureLoad} to define what child fields/structures
+   * comprise this block
+   */
+  async getUpdateComplete(){
+    const result = await super.getUpdateComplete();
+    await this._doAwaitFullStructureLoad();
+    return result;
+  }
+
+  /** Override to complete only after your children have loaded -as dictated by business logic for your specific block */
+  async _doAwaitFullStructureLoad(){
+    //await this.tbMyField1.updateComplete;
+    //await this.tbMyOtherField.updateComplete;
+  }
+
+  /** Override to perform actions on load, such as load initial data. Do not use `firstUpdated` */
+  async _doLoad(){ }
+
+
   get[ERROR_PROP](){ return this.error; }
   set[ERROR_PROP](v){ this.error = v; }
 
@@ -118,7 +152,9 @@ export class Block extends Control {
     if (anythingApplied) this.requestUpdate();
   }
 
+  //** Non-symbol named property shortcut to data protocol prop {@link DATA_VALUE_PROP} */
   get blockData(){ return this[DATA_VALUE_PROP]; }
+  //** Non-symbol named property shortcut to data protocol prop {@link DATA_VALUE_PROP} */
   set blockData(v){ this[DATA_VALUE_PROP] = v; }
 
   /**
