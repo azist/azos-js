@@ -551,6 +551,17 @@ export class FieldPart extends Part {
 
     const lookup = scope[this.lookupId];
     if (!lookup) return; // FUTURE: maybe create it here
+
+    // A listener can prevent feeding the lookup by calling evt.preventDefault() on @lookupFeed event
+    const evt = new CustomEvent("lookupFeed", {
+      bubbles: true,
+      cancelable: true,
+      detail: { owner: this, value, }
+    });
+    this.dispatchEvent(evt);
+
+    if (evt.defaultPrevented) return;
+
     lookup.feed(this, value);
   }
 

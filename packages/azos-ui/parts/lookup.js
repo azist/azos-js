@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf, isTrue } from "azos/aver";
+import { isOf } from "azos/aver";
 import { Part, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { lookupStyles } from "./styles";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
