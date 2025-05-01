@@ -4,9 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOf } from "azos/aver";
-import { Part, html, parseRank, parseStatus, verbatimHtml } from "../ui";
-import { lookupStyles } from "./styles";
+import { isOf, isOfOrNull } from "azos/aver";
+import { Part, css, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
 import { isEmpty, matchPattern } from "azos/strings";
 import { LOG_TYPE } from "azos/log";
@@ -25,7 +24,82 @@ import { ABORT_ERROR_NAME, ABSTRACT } from "azos/coreconsts";
  */
 export class Lookup extends Part {
 
-  static styles = [lookupStyles];
+  static styles = [css`
+    .hidden{ display: none !important; }
+    #pop{
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      min-width: 200px;
+      max-width: 80vw;
+      max-height: 80vh;
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      box-shadow: 1px 4px 10px #585858;
+      border: 1px solid #c2c2c2;
+      border-radius: 10px;
+      border-top-left-radius: 0;
+      border-top-width: 1px;
+      color: #656565;
+      scrollbar-width: none;
+      overflow-y: auto;
+
+      &.onTop.onLeft{
+        border-radius: 10px;
+        border-bottom-right-radius: 0;
+      }
+      &.onTop{
+        border-radius: 10px;
+        border-bottom-left-radius: 0;
+      }
+      &.onLeft{
+        border-radius: 10px;
+        border-top-right-radius: 0;
+      }
+      &:not(.hasOwner){
+        margin: revert;
+        position: revert;
+      }
+    }
+    ul{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li, #pop > span.noResults{
+      padding: 0.5em 1em;
+    }
+    li{
+      &:focus-visible,
+      &.focused{
+        cursor: pointer;
+        outline: 0;
+        background: #ccc;
+      }
+      &+li{
+        border-top: 1px solid #eee;
+      }
+    }
+    .highlight{
+      background-color: var(--vcl-codebox-hi-string-hover);
+    }
+    .loading .loader{
+      display: flex;
+      margin: 1ch;
+    }
+    .loader::after{
+      --size: 2ch;
+      content: "";
+      width: var(--size);
+      height: var(--size);
+      border: 4px solid #dddddd;
+      border-top-color: #336699;
+      border-radius: 50%;
+      animation: loader 1s ease infinite;
+    }
+    @keyframes loader{ to{ transform: rotate(1turn); }}
+    `];
 
   static properties = {
     dataContext: { type: Object },
@@ -156,7 +230,7 @@ export class Lookup extends Part {
 
   get owner() { return this.#owner; }
   set owner(v) {
-    isOf(v, Part);
+    isOfOrNull(v, Part);
     const oldValue = this.#owner;
     this.#owner = v;
     this.requestUpdate("owner", oldValue);
@@ -287,7 +361,7 @@ export class Lookup extends Part {
   }
 
   #repositionPopover() {
-    const owner = this.owner.shadowRoot?.querySelector("input") || this.owner;
+    const owner = this.owner?.shadowRoot?.querySelector("input") || this.owner;
     const popover = this.popover;
 
     if (!this.isOpen || !owner || !popover) return;
@@ -341,7 +415,7 @@ export class Lookup extends Part {
     if (this.#ownerSetup) return;
     this.#ownerSetup = true;
     this.owner = owner;
-    this.owner.addEventListener("blur", this.#bound_onOwnerBlur);
+    if (this.owner) this.owner.addEventListener("blur", this.#bound_onOwnerBlur);
   }
 
   #teardownOwner() {
