@@ -24,7 +24,7 @@ export class PersonBlock extends Block {
   };
 
 
-  render(){
+  renderControl(){
 
 
     return html`
@@ -64,7 +64,7 @@ export class PersonBlock extends Block {
 }
 
 export class StatusBlock extends Block {
-  render(){
+  renderControl(){
     return html`
       <az-text scope="this"  id="tbStatus"    name="Status"  title="Status"  maxLength=10 isrequired value="Init"></az-text>
       <az-text scope="this"  id="tbDescription"   name="Description" title="Description" maxLength=25  value="Initital" ></az-text>

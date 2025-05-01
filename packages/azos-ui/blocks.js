@@ -61,7 +61,7 @@ export class Block extends Control {
     super.firstUpdated();
     //wait forBlock to load
     queueMicrotask(async () => {
-      await this.updateComplete; //override getUpdateComplete() to determine what "loaded block" means,
+      await this.updateComplete; //override _doAwaitFullStructureLoad() to determine what "loaded block" means,
                                  //e.g. wait for the "business last" element to appear
       await this._doLoad();
     });
@@ -77,7 +77,7 @@ export class Block extends Control {
     return result;
   }
 
-  /** Override to complete only after your children have loaded -as dictated by business logic for your specific block */
+  /** Override to complete only after your children have loaded - as dictated by business logic for your specific block */
   async _doAwaitFullStructureLoad(){
     //await this.tbMyField1.updateComplete;
     //await this.tbMyOtherField.updateComplete;

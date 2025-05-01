@@ -44,7 +44,7 @@ export class ExampleFeatureDApplet extends Applet{
   }
 
   async #handleLoadAsync(isRefresh){
-    console.log(`LOADING DATA.... Refresh: ${isRefresh}`);
+    console.log(`LOADING DATA.... ${COUNTER}  Refresh: ${isRefresh}`);
     return {person: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "8", Description: "Eats mice"} ]}};
   }
 
@@ -63,7 +63,7 @@ export class ExampleFeatureDApplet extends Applet{
 
     <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
       <div slot="body">
-        <az-crud-form id="frmDlg" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+        <az-crud-form id="frmDlg" scope="this" sticky toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
           <examples-person-block scope="this" id="blockModalPerson" name="person"> </examples-person-block>
         </az-crud-form>
       </div>
