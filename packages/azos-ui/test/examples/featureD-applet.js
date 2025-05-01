@@ -54,7 +54,7 @@ export class ExampleFeatureDApplet extends Applet{
 
   render(){
    return html`
-    <az-crud-form id="frmMain" scope="this" sticky toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+    <az-crud-form id="frmMain" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
 
       <examples-person-block scope="this" id="blockPerson" name="person" @datachange=${() => console.log("INNER SLOTTED BLOCK DATA CHANGE")}  > </examples-person-block>
 
@@ -63,7 +63,7 @@ export class ExampleFeatureDApplet extends Applet{
 
     <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
       <div slot="body">
-        <az-crud-form id="frmDlg" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+        <az-crud-form id="frmDlg" scope="this" sticky toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
           <examples-person-block scope="this" id="blockModalPerson" name="person"> </examples-person-block>
         </az-crud-form>
       </div>

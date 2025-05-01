@@ -258,14 +258,14 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     super[DATA_BLOCK_CHANGED_METHOD]();
     console.log(`FORM data changed called: ${sender[DATA_NAME_PROP]}`);
     if (!this.isViewMode){
-      this.error = null; //TODO: maybe revalidate instead
+      this.error = null; //TODO: maybe revalidate instead???
     }
   }
 
   renderControl(){
     const st = this.sticky;
-    return this.isToolbarAbove ? html` ${this.renderToolbar()} ${st ? noContent : html`<hr>`} ${this.renderFormBody()} <br>`
-                               : html` ${this.renderFormBody()} ${st ? noContent : html`<br> <hr>`} ${this.renderToolbar()} `;
+    return this.isToolbarAbove ? html` ${this.renderToolbar()} ${st ? noContent : html`<hr>`} <br> ${this.renderFormHeader()}  ${this.renderFormBody()} ${this.renderFormFooter()}`
+                               : html`${this.renderFormHeader()}  ${this.renderFormBody()}  ${this.renderFormFooter()} ${st ? noContent : html`<br> <hr>`} ${this.renderToolbar()} `;
   }
 
   renderToolbar(){
@@ -319,10 +319,14 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     </div>`;
   }
 
-  renderFormBody(){
-    return html`<div class="form-body"> <az-error-box .data=${this.error}> </az-error-box> <slot>  </slot> </div>`;
-  }
+  /** Override to render before the form b ody, the default renders error summary */
+  renderFormHeader(){ return html`<az-error-box id="boxErrorSummary" scope="this" .data=${this.error}> </az-error-box>  `; }
 
+  /** Override to render the form body, the default uses a slot, but you can override with concrete fields to build your form */
+  renderFormBody(){ return html`<div class="form-body"> <slot>     </slot> </div>`; }
+
+  /** Override to render after the form body, the default renders error summary */
+  renderFormFooter(){ return null; }
 }
 
 window.customElements.define("az-crud-form", CrudForm);
