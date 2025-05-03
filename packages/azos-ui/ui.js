@@ -22,11 +22,12 @@ import { AzosError,
          supportsDataProtocol,
          DATA_BLOCK_PROP,
          DATA_MODE_PROP,
+         DATA_SCHEMA_PROP,
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRecord, ImageRegistry } from "azos/bcl/img-registry";
 import { AVERMENT_FAILURE, isOfOrNull, isStringOrNull } from "azos/aver";
-import { CONTENT_TYPE } from "azos/coreconsts";
+import { CONTENT_TYPE, UNKNOWN } from "azos/coreconsts";
 
 /** CSS template processing pragma: css`p{color: blue}` */
 export const css = lit_css;
@@ -155,7 +156,6 @@ export class AzosElement extends LitElement {
     status: { type: String, reflect: true },
     rank: { type: String, reflect: true },
     scope: { type: String, reflect: false },
-    schema: { type: String, reflect: false }
   };
 
   #arena = null;
@@ -190,21 +190,6 @@ export class AzosElement extends LitElement {
       this.#arena = n.arena;
     }
     return this.#arena;
-  }
-
-  /** Returns (data) schema name from this or parent control chain.
-   * If none define schema name, then it is taken from the applet name
-   * Fields are identified by name inside of a schema
-   */
-  get effectiveSchema(){
-    let schema = this.schema;
-    if (schema) return schema;
-
-    let n = this.parentNode;
-    while (typeof n.effectiveSchema === 'undefined') {
-       n = (n.parentNode ?? n.host);
-    }
-    return n.effectiveSchema;
   }
 
   /** Returns custom HTML element tag name for this element type registered with `customElements` collection */
@@ -669,9 +654,7 @@ export function setBlockDataValue(element, v){
  * @returns {DATA_MODE | undefined}
  */
 export function getEffectiveDataMode(element){
-// console.log(`-------------------------------`);
   while(element instanceof HTMLElement){
-// console.log(`     tag: ${element.tagName}`);
     if (DATA_MODE_PROP in element) {
       const mode = element[DATA_MODE_PROP];
       if (types_isString(mode)) return mode;
@@ -681,6 +664,27 @@ export function getEffectiveDataMode(element){
 
   return undefined;
 }
+
+/**
+ * Computes the effective schema for this element: if this element has {@link DATA_SCHEMA_PROP}
+ * it gets it, and if it is set with non-null/undef value returns it, otherwise continues the search up the parent chain of
+ * AzosElements until the `DATA_SCHEMA_PROP` returns a real string value. If non found, then returns undefined
+ * @param {HTMLElement} element required HTML element
+ * @param {String} dflt - optional string default used for undefined schemas
+ * @returns {String | undefined}
+ */
+export function getEffectiveSchema(element, dflt){
+  while(element instanceof HTMLElement){
+    if (DATA_SCHEMA_PROP in element) {
+      const schema = element[DATA_SCHEMA_PROP];
+      if (types_isString(schema)) return schema ?? dflt ?? UNKNOWN;
+    }
+    element = getImmediateParentAzosElement(element);
+  }
+
+  return dflt ?? UNKNOWN;
+}
+
 
 /**
  *  Decorator pattern which signifies that the encapsulated passed value is the value coming from an UI input entry action and

@@ -6,7 +6,7 @@
 
 import * as types from "azos/types";
 
-import { html, STATUS } from "../../ui.js";
+import { getEffectiveSchema, html, STATUS } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
 import { getDailyAvailable } from "./fetch-scheduling-data.js";
 
@@ -87,7 +87,7 @@ export class CaseScheduler extends CaseBase {
     const endTimeMins = this.fin.value.split(":").map(Number).reduce((p, c, i) => p += i === 0 ? c * 60 : c, 0);
     const duration = endTimeMins - startTimeMins;
     if (duration <= 0) {
-      this.fin.error = new types.ValidationError(this.effectiveSchema, "EndTime", null, "End time should be after start time");
+      this.fin.error = new types.ValidationError(getEffectiveSchema(this), "EndTime", null, "End time should be after start time");
       return;
     }
     const caption = this.caption.value || null;

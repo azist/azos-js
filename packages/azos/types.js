@@ -85,11 +85,16 @@ export const VISIT_METHOD = Symbol("visit");
  */
 export const ANNOUNCE_METHOD = Symbol("announce");
 
-
 /**
  * Establishes a "IData" protocol for blocks such as forms: Insert|Update|Delete flag
- */
+*/
 export const DATA_MODE_PROP = Symbol("data-mode");
+
+/**
+ * Establishes a "IData" protocol for blocks such as forms - provides name of the schema
+ * under which fields are identified by name
+ */
+export const DATA_SCHEMA_PROP = Symbol("data-schema");
 
 
 /**
@@ -288,7 +293,7 @@ export class ValidationError extends AzosError {
 
   /**
    * Creates an instance of ValidationError capturing (`schema`, `field`, `scope`, `message`, `clientMessage`, `from`, and `cause`) parameters
-   * @param {String} schema - required schema name. In the UI code this is typically passed from an `azElm.effectiveSchema` property
+   * @param {String} schema - required schema name. In the UI code this is typically passed from an `getEffectiveSchema(element)` call
    * @param {String} field - required field name within a schema
    * @param {String} scope - optional field subscript, for example an array indexer, which tells what entity instance generated an error; or null
    * @param {String} message - required validation message. Clients get shown `clientMessage` unless it is not supplied then this one is used

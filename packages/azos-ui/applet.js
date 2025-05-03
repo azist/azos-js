@@ -4,10 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
+import { CLOSE_QUERY_METHOD, DATA_SCHEMA_PROP, DIRTY_PROP } from "azos/types";
 import { AzosElement, getChildDataMembers } from "./ui.js";
 import { toast } from "./toast.js";
-import { dflt } from "azos/strings";
 import { isOfOrNull } from "azos/aver";
 import { Session } from "azos/session";
 
@@ -73,13 +72,10 @@ export class Applet extends AzosElement {
       toast(`Please Save or Cancel changes in:  ${this.title}`, {timeout: 5000, status: "error"});
       return false;
     }
-
     return true;
   }
 
-
-
-  /** Returns schema name set by this applet or applet class name as a default one */
-  get effectiveSchema(){ return dflt(this.schema, this.constructor.name);  }
+  /** Returns a logical schema name for the applet, which is used as a default if no inner schemas are defined */
+  get [DATA_SCHEMA_PROP](){ return `${this.constructor.name}`; }
 
 }//Applet

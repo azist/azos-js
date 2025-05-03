@@ -22,14 +22,12 @@ export class ErrorBox extends Control {
     @starting-style{
       opacity: 0;
       transform: rotateX(-15deg);
-      font-size: 0.99em!important;
     }
   }
 
   .away{
-    opacity: 0;
+    opacity: .35;
     transform: rotateX(-15deg);
-    font-size: 0.99em!important;
   }
 
   .level{

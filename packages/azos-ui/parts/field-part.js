@@ -26,7 +26,7 @@ import {
   DATA_MODE_PROP
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, isOneOf } from "azos/strings";
-import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, noContent } from "../ui";
+import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, getEffectiveSchema, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
 
@@ -50,6 +50,9 @@ export class FieldPart extends Part {
     this.titleWidth = DEFAULT_TITLE_WIDTH_PCT;
     this.titlePosition = POSITION.TOP_LEFT;
   }
+
+  /** Gets the effective schema name for this part. Default implementation uses `getEffectiveSchema(this)` */
+  get effectiveSchema(){ return getEffectiveSchema(this); }
 
   /** Gets effective field name by coalescing `name`,`id`,`constructor.name` properties */
   get effectiveName(){ return dflt(this.name, this.id, this.constructor.name); }
