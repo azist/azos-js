@@ -14,25 +14,23 @@ export class ErrorBox extends Control {
   static styles = css`
   :host{ display: block; }
 
-  .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl);}
-  .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-ctl);}
-  .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-ctl);}
-  .r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-ctl);}
-  .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-ctl);}
-  .r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl);}
-
   .errorbox{
     display: block;
     padding: 0.5em;
-    transition: 0.5s;
-    font-size: 1em;
+    transition: 0.5s ease-out;
     opacity: 1;
     @starting-style{
-        font-size: 0em;
-        opacity: 0;
+      opacity: 0;
+      transform: rotateX(-15deg);
+      font-size: 0.99em!important;
     }
   }
 
+  .away{
+    opacity: 0;
+    transform: rotateX(-15deg);
+    font-size: 0.99em!important;
+  }
 
   .level{
     margin: 0.25lh 0em 0.25lh 0.75em;
@@ -96,19 +94,38 @@ export class ErrorBox extends Control {
     padding: 1.0em;
     border-radius: 0.25em;
   }
+
+  .r1 { font-size: var(--r1-fs); border-radius: var(--r1-brad-ctl);}
+  .r2 { font-size: var(--r2-fs); border-radius: var(--r2-brad-ctl);}
+  .r3 { font-size: var(--r3-fs); border-radius: var(--r3-brad-ctl);}
+  .r4 { font-size: var(--r4-fs); border-radius: var(--r4-brad-ctl);}
+  .r5 { font-size: var(--r5-fs); border-radius: var(--r5-brad-ctl);}
+  .r6 { font-size: var(--r6-fs); border-radius: var(--r6-brad-ctl);}
   `;
 
   static properties = {
-    data:  {type: Object},
+    data:  {type: Object },
     verbosity: {type: Number}
   };
 
+  #data;
+  #dataJustSet;
   #itemNum;
+
+  get data(){ return this.#data; }
+  set data(v){
+    this.#data = v;
+    this.#dataJustSet = true;
+    setTimeout(() => {
+      this.#dataJustSet = false;
+      this.requestUpdate();
+    }, 350);
+  }
 
   renderControl(){
     this.#itemNum = 0;
     let content = this.renderLevel(this.data, 0);
-    return html`<div class="errorbox ${parseRank(this.rank, true)}">   ${content}   </div>`;
+    return html`<div class="errorbox ${parseRank(this.rank, true)} ${this.#dataJustSet ? "away" : ""}">   ${content}   </div>`;
   }
 
   renderLevel(data, indent){
