@@ -258,7 +258,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     super[DATA_BLOCK_CHANGED_METHOD]();
     console.log(`FORM data changed called: ${sender[DATA_NAME_PROP]}`);
     if (!this.isViewMode){
-      this.error = null; //TODO: maybe revalidate instead???
+      this.error = null;
     }
   }
 

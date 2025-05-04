@@ -20,8 +20,10 @@ import {
   VALIDATE_METHOD,
   ValidationError,
   RESET_DIRTY_METHOD,
-  CLOSE_QUERY_METHOD} from "azos/types";
-import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getEffectiveDataMode, html, setBlockDataValue } from "./ui.js";
+  CLOSE_QUERY_METHOD,
+  DATA_SCHEMA_PROP,
+  isNonEmptyString} from "azos/types";
+import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getEffectiveDataMode, getEffectiveSchema, getImmediateParentAzosElement, html, setBlockDataValue } from "./ui.js";
 import { dflt, isOneOf } from "azos/strings";
 import { isFunction as aver_isFunction } from "azos/aver";
 import { prompt } from "./ok-cancel-modal.js";
@@ -42,6 +44,7 @@ export class Block extends Control {
     title:       { type: String },
     description: { type: String },
     error:       { type: Object },
+    schema:      { type: String },
 
     whenView:   {type: String},
     whenInsert: {type: String},
@@ -108,7 +111,7 @@ export class Block extends Control {
   /**
    * Allows to iterate over data members (e.g. data fields) contained by this block
    */
-  *[Symbol.iterator](){ yield* this[DATA_BLOCK_PROP];  }
+  *[Symbol.iterator](){ yield* this[DATA_BLOCK_PROP]; }
 
   /**
    * Allows to iterate over data members (e.g. data fields) contained by this block
@@ -142,6 +145,9 @@ export class Block extends Control {
       }
     }
   }
+
+  /** Returns a logical schema name for this data block */
+  get [DATA_SCHEMA_PROP](){ return isNonEmptyString(this.schema) ? `${this.constructor.name}('${this.schema}')` : `${this.constructor.name}`; }
 
   get [DATA_NAME_PROP](){ return this.name; }
   set [DATA_NAME_PROP](v){ this.name = v;}
@@ -186,7 +192,7 @@ export class Block extends Control {
       }
 
       //Return a validation batch: an error with an array of errors in its `cause`
-      const result = new ValidationError(this.constructor.name, dflt(this.name, "<noname>"), scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
+      const result = new ValidationError(getEffectiveSchema(getImmediateParentAzosElement(this)), dflt(this.name, "*"), scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
 
       if (apply) {
         this.error = result;
