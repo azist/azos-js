@@ -6,7 +6,7 @@
 
 import { dflt } from "azos/strings";
 import { Control, css, html, parseRank, noContent } from "../../ui";
-import { CLIENT_MESSAGE_PROP, DATA_NAME_PROP, ERROR_PROP, isArray, isString } from "azos/types";
+import { CLIENT_MESSAGE_PROP, DATA_NAME_PROP, ERROR_PROP, isArray, isString, ValidationError } from "azos/types";
 
 /** Provides error/exception display functionality with optional details */
 export class ErrorBox extends Control {
@@ -81,15 +81,16 @@ export class ErrorBox extends Control {
   }
 
   .code{
-    margin: 1.5em;
+    display: inline;
+    vertical-align: middle;
+    margin: 0.5em;
     font-family: var(--vcl-codebox-ffamily);
     font-size: 0.75em;
-    white-space: pre-wrap;
-    word-break: break-all;
+    /*white-space: pre-wrap; word-break: break-all; */
     overflow: auto;
     color: var(--vcl-codebox-fg);
     background: var(--vcl-codebox-bg);
-    padding: 1.0em;
+    padding: 0.5em;
     border-radius: 0.25em;
   }
 
@@ -154,18 +155,22 @@ export class ErrorBox extends Control {
 
     if (ERROR_PROP in data) return this.renderObject(data[ERROR_PROP], indent);
 
-    return html`<div class="unspecified"> Unspecified <div class="code">${JSON.stringify(data, null, 2)}</div> </div>`;
+    return html`<div class="unspecified"> Unspecified <div class="code">${JSON.stringify(data)}</div> </div>`;
   }
 
   renderError(data, indent){
+    const en = data.constructor === ValidationError ? noContent : data.constructor.name;
 
     const nm = this.verbosity > 2 ? data.name : noContent;
-    const msg = dflt(data[CLIENT_MESSAGE_PROP], data.message);
-    const fldTag = DATA_NAME_PROP in data ? html`<div class="schema">${data[DATA_NAME_PROP]}:</div>` : null;
+    let msg = dflt(data[CLIENT_MESSAGE_PROP], data.message);
+
+    if (!data.cause) msg = html`<strong>${msg}</strong>`;
+
+    const fldTag = DATA_NAME_PROP in data ? html`<div class="schema">${data[DATA_NAME_PROP]}</div>` : null;
 
     return html`
     <div class="exception">
-      <strong>${data.constructor.name}</strong> ${nm} ${fldTag} &nbsp;&nbsp; ${msg}
+      <strong>${en}</strong> ${nm} ${fldTag} &nbsp;&nbsp; ${msg}
       ${this.renderLevel(data?.cause, indent + 1)}
     </div>`;
   }
