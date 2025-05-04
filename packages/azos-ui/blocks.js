@@ -23,7 +23,7 @@ import {
   CLOSE_QUERY_METHOD,
   DATA_SCHEMA_PROP,
   isNonEmptyString} from "azos/types";
-import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getEffectiveDataMode, getEffectiveSchema, html, setBlockDataValue } from "./ui.js";
+import { Control, css, getBlockDataValue, getChildDataMembers, getDataParentOfMember, getEffectiveDataMode, getEffectiveSchema, getImmediateParentAzosElement, html, setBlockDataValue } from "./ui.js";
 import { dflt, isOneOf } from "azos/strings";
 import { isFunction as aver_isFunction } from "azos/aver";
 import { prompt } from "./ok-cancel-modal.js";
@@ -192,7 +192,7 @@ export class Block extends Control {
       }
 
       //Return a validation batch: an error with an array of errors in its `cause`
-      const result = new ValidationError(getEffectiveSchema(this), dflt(this.name, "<data>"), scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
+      const result = new ValidationError(getEffectiveSchema(getImmediateParentAzosElement(this)), dflt(this.name, "*"), scope, "Validation errors", "Errors", this.constructor.name, errorBatch);
 
       if (apply) {
         this.error = result;
