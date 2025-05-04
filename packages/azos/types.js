@@ -54,15 +54,47 @@ export const ERROR_PROP = Symbol("error");
 export const DIRTY_PROP = Symbol("dirty");
 
 /**
+ * Establishes a "IDirty" protocol - an entity can reset its dirty status to false
+ */
+export const RESET_DIRTY_METHOD = Symbol("resetDirty");
+
+/**
  * Establishes a "closeQuery" - part of the IDirty protocol. Determines if an entity can be logically disposed
  *  such as a file view can be closed if there are no changes to be saved.
  */
 export const CLOSE_QUERY_METHOD = Symbol("closeQuery");
 
 /**
- * Establishes a "IData" protocol for blocks such as forms: Insert|Update|Delete flag
+ * Establishes a "Visitor" protocol - provides uniform `accept/visit` method: `visit(visitorFunction)`
+ * making implementing entities traversable/"visitable".
+ * Compared to {@link ANNOUNCE_METHOD}, the visitor pattern allows for external function application
+ * to visited objects, which are possibly immutable for extension.
+ * Visitor protocol allows us to apply a function which takes an item being visited, this way we can
+ * apply behaviors from that external function.
+ * @param {Function} visitorFunctor - a function of signature: `f(): bool` returning true to stop the traversal
+ * @returns {boolean} true when traversal has stopped and should not be continued further
  */
+export const VISIT_METHOD = Symbol("visit");
+
+/**
+ * Establishes a notification protocol by "announcing" events by dispatching messages from parent to children chain.
+ * The implementers are expected to react to announcements appropriately - this is a major difference from {@link VISIT_METHOD} pattern.
+ * Method signature is `[ANNOUNCE_METHOD](sender, from, msg)`.
+ * Unlike the visitor pattern which applies an external function, the announcement pattern
+ * is expected not only to traverse its children (possibly re-broadcasting the announcement) but also react to announcement messages.
+ */
+export const ANNOUNCE_METHOD = Symbol("announce");
+
+/**
+ * Establishes a "IData" protocol for blocks such as forms: Insert|Update|Delete flag
+*/
 export const DATA_MODE_PROP = Symbol("data-mode");
+
+/**
+ * Establishes a "IData" protocol for blocks such as forms - provides name of the schema
+ * under which fields are identified by name
+ */
+export const DATA_SCHEMA_PROP = Symbol("data-schema");
 
 
 /**
@@ -84,7 +116,7 @@ export const DATA_BLOCK_PROP = Symbol("data-block");
 
 /**
  * An optional part of "IData" protocol - an implementing entity receives a post-factum notification of data change
- * made to constituent fields
+ * made to constituent fields. A `sender` contains an entity (such as a field) which triggered the change
  */
 export const DATA_BLOCK_CHANGED_METHOD = Symbol("data-block-changed");
 
@@ -261,7 +293,7 @@ export class ValidationError extends AzosError {
 
   /**
    * Creates an instance of ValidationError capturing (`schema`, `field`, `scope`, `message`, `clientMessage`, `from`, and `cause`) parameters
-   * @param {String} schema - required schema name. In the UI code this is typically passed from an `azElm.effectiveSchema` property
+   * @param {String} schema - required schema name. In the UI code this is typically passed from an `getEffectiveSchema(element)` call
    * @param {String} field - required field name within a schema
    * @param {String} scope - optional field subscript, for example an array indexer, which tells what entity instance generated an error; or null
    * @param {String} message - required validation message. Clients get shown `clientMessage` unless it is not supplied then this one is used
@@ -288,6 +320,8 @@ export class ValidationError extends AzosError {
 
   /** Name of the field sub-scope, such as an array/collection subscript e.g. Field: `Doctors`, Scope: `[3]` */
   get scope() { return this.#scope; }
+
+  get [DATA_NAME_PROP]() { return `${this.schema}.${this.field}${this.scope ?? ""}`; }
 
   /** Allows to provide a user-friendly message which is shown in the UI */
   get clientMessage() { return this.#clientMessage; }
@@ -674,7 +708,7 @@ export const DATA_MODE = Object.freeze({
   UNSPECIFIED: "unspecified",
   INSERT: "insert",
   UPDATE: "update",
-  DELETE: "delete",
+  DELETE: "delete"
 });
 const ALL_DATA_MODES = allObjectValues(DATA_MODE);
 
@@ -703,10 +737,10 @@ export function asDataKind(v) {
 /**
  * Converts value to DATA_MODE or if it has a property `DATA_MODE_PROP` gets the value from it
  * @param {String | Object} v a string value to convert or a complex value with a `DATA_MODE_PROP`
- * @returns {DATA_MODE} data mode value
+ * @returns {DATA_MODE | null} data mode value
  */
 export function asDataMode(v) {
-  if (v === undefined || v === null) return DATA_MODE.UNSPECIFIED;
+  if (v === undefined || v === null) return null;
 
   if (isObject(v) && DATA_MODE_PROP in v) v = v[DATA_MODE_PROP];
 

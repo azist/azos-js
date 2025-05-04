@@ -171,7 +171,7 @@ body {
   --s-error-bor-color-ctl: #f89052;
   --s-error-bor-ctl: 1.2px solid var(--s-error-bor-color-ctl);
   --s-error-bg-ctl-btn: #ffa0a0;
-  --s-alert-fg-ctl-btn: #955050;
+  --s-error-fg-ctl-btn: #955050;
   --s-error-bor-ctl-btn: 1px solid #e59090;
   --s-error-fg-hcontrast: #ffa0a0;
   --s-error-bg-hcontrast: #3e2121;
@@ -297,6 +297,26 @@ body {
   --vcl-treeview-svg-stroke-width: var(--arn-mnu-svg-stroke-width);
   --vcl-treeview-svg-size: 2.5ex;
   --vcl-treeview-svg-fill: none;
+
+  --vcl-scheduler-default-item-fg-color: var(--paper);
+  --vcl-scheduler-default-item-bg-color: linear-gradient(0deg, #10a0ff, #20ceff);
+  --vcl-scheduler-default-item-bor-color-ctl: #2080e8;
+  --vcl-scheduler-default-item-bor-ctl: 4px solid var(--vcl-scheduler-default-item-bor-color-ctl);
+  --vcl-scheduler-default-item-box-shadow: 0 0 6px #a0a0a0;
+  --vcl-scheduler-selected-item-fg-color: var(--paper);
+  --vcl-scheduler-selected-item-bg-color: #30d000;
+  --vcl-scheduler-selected-badge-fg-color: #caffc5;
+  --vcl-scheduler-selected-badge-bg-color: green;
+  --vcl-scheduler-selected-badge-box-shadow: 0px 0px 6px var(--vcl-scheduler-selected-badge-fg-color);
+
+  --vcl-scheduler-ok-bor-color-ctl: var(--s-ok-bor-color-ctl);
+  --vcl-scheduler-info-bor-color-ctl: var(--s-info-bor-color-ctl);
+  --vcl-scheduler-warn-bor-color-ctl: var(--s-warn-bor-color-ctl);
+  --vcl-scheduler-alert-bor-color-ctl: var(--s-alert-bor-color-ctl);
+  --vcl-scheduler-error-bor-color-ctl: var(--s-error-bor-color-ctl);
+  --vcl-scheduler-brand1-bor-color-ctl: var(--s-brand1-bor-color-ctl);
+  --vcl-scheduler-brand2-bor-color-ctl: var(--s-brand2-bor-color-ctl);
+  --vcl-scheduler-brand3-bor-color-ctl: var(--s-brand3-bor-color-ctl);
 }
 
 

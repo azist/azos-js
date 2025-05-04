@@ -55,7 +55,7 @@ export class SliderField extends FieldPart{
   /** True if orientation is vertical */
   get isVertical(){ return isOneOf(this.orientation,["v","vertical","tall"]); }
 
-  renderInput(){
+  renderInput(effectivelyDisabled){
     const clsRank     = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status,true,"Bg")}`;
 
@@ -87,7 +87,7 @@ export class SliderField extends FieldPart{
         step="${this.rangeStep ? this.rangeStep : noContent}"
         value="${this.value ? this.value : range / 2}"
         style="${stlVertical}"
-        .disabled=${this.isDisabled}
+        .disabled=${effectivelyDisabled}
         .required=${this.isRequired}
         ?readonly=${this.isReadonly}
       >

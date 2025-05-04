@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { CLOSE_QUERY_METHOD, DIRTY_PROP } from "azos/types";
-import { AzosElement } from "./ui.js";
-import { dflt } from "azos/strings";
+import { CLOSE_QUERY_METHOD, DATA_SCHEMA_PROP, DIRTY_PROP } from "azos/types";
+import { AzosElement, getChildDataMembers } from "./ui.js";
+import { toast } from "./toast.js";
 import { isOfOrNull } from "azos/aver";
 import { Session } from "azos/session";
 
@@ -54,18 +54,28 @@ export class Applet extends AzosElement {
   /** Returns the prefix used for local storage key names */
   get localStoragePrefix() { return `${this.arena.app.id}::${this.constructor.name}`; }
 
-  /** Override to return true when this applet has unsaved data */
-  get [DIRTY_PROP]() { return false; }
+  /** Override to return true when this applet has unsaved data.
+   * The default implementation trips on a first child data member which returns true
+   */
+  get [DIRTY_PROP]() {
+    const fields = getChildDataMembers(this, true);
+    return fields.some(one => one[DIRTY_PROP] === true);
+  }
 
   /** Override to prompt the user on Close, e.g. if your Applet is "dirty"/contains unsaved changes
    * you may pop-up a confirmation box. Return "true" to allow close, false to prevent it.
    * The method is called by arena before evicting this applet and replacing it with a new one.
    * Returns a bool promise. The default impl returns `!this.dirty` which you can elect to override instead
    */
-  [CLOSE_QUERY_METHOD](){ return !this[DIRTY_PROP]; }
+  [CLOSE_QUERY_METHOD](){
+    if (this[DIRTY_PROP]){
+      toast(`Please Save or Cancel changes in:  ${this.title}`, {timeout: 5000, status: "error"});
+      return false;
+    }
+    return true;
+  }
 
-
-  /** Returns schema name set by this applet or applet class name as a default one */
-  get effectiveSchema(){ return dflt(this.schema, this.constructor.name);  }
+  /** Returns a logical schema name for the applet, which is used as a default if no inner schemas are defined */
+  get [DATA_SCHEMA_PROP](){ return `${this.constructor.name}`; }
 
 }//Applet

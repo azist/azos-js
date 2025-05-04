@@ -239,11 +239,11 @@ ${this.showTabbed ? html`
 </div>
 
 <az-tab-view id="tabView" scope="this" .isModern="${false}" @tabClosing="${(tab) => console.log(tab)}" .isDraggable="${true}">
-  <az-tab title="Slide Deck (WIP)" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSlideDeckContent()} </az-tab>
+  <az-tab title="Slide Deck (WIP)" .canClose=${false} icon="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderSlideDeckContent()} </az-tab>
   <az-tab title="Scheduler (WIP)" .canClose=${false}> ${this.renderSchedulerContent()} </az-tab>
   <az-tab title="Accordion (WIP)" .canClose=${false}> ${this.renderAccordionContent()} </az-tab>
   <az-tab title="Tree View" .canClose=${false}> ${this.renderTreeViewContent()} </az-tab>
-  <az-tab title="Buttons" .canClose=${false} iconPath="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderButtonContent()} </az-tab>
+  <az-tab title="Buttons" .canClose=${false} icon="https://www.shareicon.net/download/2015/12/12/204044_angel.ico"> ${this.renderButtonContent()} </az-tab>
   <az-tab title="Input Test" .canClose=${false}> ${this.renderInputContent()} </az-tab>
   <az-tab title="VCL / Codebox" .canClose=${false} status="ok"> ${this.renderCodeboxContent()} </az-tab>
   <az-tab title="Radios" .canClose=${false}> ${this.renderRadiosContent()} </az-tab>

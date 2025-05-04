@@ -29,15 +29,15 @@ export class $LINQ{
   get source(){ return this.#src;}
 
   [Symbol.iterator](){
-    return this.#src[Symbol.iterator](); 
+    return this.#src[Symbol.iterator]();
   }
 
 
   /** Materializes the sequence into an array */
   toArray(){ return [...this.#src]; }
 
-  /** 
-   * Maps values 
+  /**
+   * Maps values
    * @param {function} f Mapper, if not a function returns this
    */
   select(f){
@@ -53,8 +53,8 @@ export class $LINQ{
     return new $LINQ(it);
   }
 
-  /** 
-   * Filters values 
+  /**
+   * Filters values
    * @param {function} f Predicate, if not a function returns this
    */
   where(f){
@@ -81,7 +81,7 @@ export class $LINQ{
           if (cnt===n) break;
           yield e;
           cnt++;
-        } 
+        }
       }
     };
 
@@ -98,17 +98,17 @@ export class $LINQ{
         for(let e of self.#src) {
           if (cnt>=n) yield e;
           cnt++;
-        } 
+        }
       }
     };
 
     return new $LINQ(it);
   }
 
-  /** 
+  /**
    * Orders(sorts) by function. This materializes all data for sorting to take place
-   * @param {function} [f] Optional comparator (a,b): int 
-   * 
+   * @param {function} [f] Optional comparator (a,b): int
+   *
   */
   orderBy(f){
     let arr = this.toArray();
@@ -119,7 +119,7 @@ export class $LINQ{
 
   /**
    * Counts elements optionally applying predicate
-   * @param {function} [f] Optional bool predicate 
+   * @param {function} [f] Optional bool predicate
    */
   count(f){
     const ass = types.isFunction(f);
@@ -131,7 +131,7 @@ export class $LINQ{
 
   /**
    * Returns true if sequence has any elemnts optionally applying predicate
-   * @param {function} [f] Optional bool predicate 
+   * @param {function} [f] Optional bool predicate
    */
   any(f){
     const ass = types.isFunction(f);
@@ -142,7 +142,7 @@ export class $LINQ{
 
   /**
    * Returns true if all sequence elemnts satisfy predicate
-   * @param {function} [f] Optional bool predicate, if not supplied true returned right away 
+   * @param {function} [f] Optional bool predicate, if not supplied true returned right away
    */
   all(f){
     if (!types.isFunction(f)) return true;
@@ -160,7 +160,7 @@ export class $LINQ{
     const ass = types.isFunction(f);
     for(let e of this.#src)
       if (!ass || f(e)) return {ok: true, value: e};
-    
+
     return {ok: false, value: undefined};
   }
 
@@ -184,17 +184,18 @@ export class $LINQ{
    */
   isEquivalentTo(other, f = null){
     if (!types.isIterable(other)) return false;
-   
+
     const ass = types.isFunction(f);
     const it1 = this[Symbol.iterator]();
     const it2 = other[Symbol.iterator]();
 
+    // eslint-disable-next-line no-constant-condition
     while(true){
       const r1 = it1.next();
       const r2 = it2.next();
       if (r1.done!=r2.done) break;
       if (r1.done) return true;
-      
+
       const eq = ass ? f(r1.value, r2.value)===true : r1.value === r2.value;
       if (!eq) break;
     }
@@ -204,7 +205,7 @@ export class $LINQ{
 
   /**
    * Concatenates other sequence with this one
-   * @param {Iterable<*>} other another sequence to add to this one 
+   * @param {Iterable<*>} other another sequence to add to this one
    */
   concat(other){
     if (!types.isIterable(other)) return this;
@@ -222,7 +223,7 @@ export class $LINQ{
 
   /**
    * Returns distinct values - removes repetition, takes optional key selector function
-   * @param {function} [f] Optional selector 
+   * @param {function} [f] Optional selector
    */
   distinct(f){
     const ass = types.isFunction(f);
@@ -236,7 +237,7 @@ export class $LINQ{
           set.add(key);
           yield e;
         }
-        
+
       }
     };
 

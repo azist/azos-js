@@ -15,18 +15,19 @@ import { AzosError,
          isArray as types_isArray,
          isObject as types_isObject,
          isNonEmptyString as types_isNonEmptyString,
+         isAssigned as types_isAssigned,
          DATA_NAME_PROP,
          DATA_VALUE_PROP,
          sortDataFields,
          supportsDataProtocol,
          DATA_BLOCK_PROP,
-         DATA_MODE,
-         DATA_MODE_PROP
+         DATA_MODE_PROP,
+         DATA_SCHEMA_PROP,
        } from "azos/types";
 import { asString } from "azos/strings";
-import { ImageRegistry } from "azos/bcl/img-registry";
+import { ImageRecord, ImageRegistry } from "azos/bcl/img-registry";
 import { AVERMENT_FAILURE, isOfOrNull, isStringOrNull } from "azos/aver";
-import { CONTENT_TYPE } from "azos/coreconsts";
+import { CONTENT_TYPE, UNKNOWN } from "azos/coreconsts";
 
 /** CSS template processing pragma: css`p{color: blue}` */
 export const css = lit_css;
@@ -155,7 +156,6 @@ export class AzosElement extends LitElement {
     status: { type: String, reflect: true },
     rank: { type: String, reflect: true },
     scope: { type: String, reflect: false },
-    schema: { type: String, reflect: false}
   };
 
   #arena = null;
@@ -190,19 +190,6 @@ export class AzosElement extends LitElement {
       this.#arena = n.arena;
     }
     return this.#arena;
-  }
-
-  /** Returns schema name from this or parent control chain.
-   * If none define schema name, then it is taken from the applet name */
-  get effectiveSchema(){
-    let schema = this.schema;
-    if (schema) return schema;
-
-    let n = this.parentNode;
-    while (typeof n.effectiveSchema === 'undefined') {
-       n = (n.parentNode ?? n.host);
-    }
-    return n.effectiveSchema;
   }
 
   /** Returns custom HTML element tag name for this element type registered with `customElements` collection */
@@ -293,24 +280,10 @@ export class AzosElement extends LitElement {
   render() { return html`>>AZOS ELEMENT<<`; }
 }
 
-//FIXME: What is this used by? Remove/test
-export function isRectInViewport(rect) {
-  let bounds = rect.getBoundingClientRect();
-  let viewWidth = document.documentElement.clientWidth;
-  let viewHeight = document.documentElement.clientHeight;
-
-  if (bounds['left'] < 0) return false;
-  if (bounds['top'] < 0) return false;
-  if (bounds['right'] > viewWidth) return false;
-  if (bounds['bottom'] > viewHeight) return false;
-
-  return true;
-}
-
 /** Controls are components with interact-ability properties like
  *  `disabled`, `visible`, `absent`, `applicable`, and `readonly`
  */
-export class Control extends AzosElement{
+export class Control extends AzosElement {
 
   static properties = {
     /* HTML ELEMENTS may NOT have FALSE bool attributes which is very inconvenient, see the reversed accessors below */
@@ -342,22 +315,49 @@ export class Control extends AzosElement{
   set isVisible(v) { this.isHidden = !v; }
 
 
-  /** Override to calculate styles based on current state, the dflt implementation emits css for invisible and non-displayed items.
-   * The styles are applied to root element being rendered via a `style` which overrides the default classes
+  /**
+   * Override to calculate styles based on current state which we applied to element host, the dflt implementation emits css for invisible and non-displayed items.
+   * The styles are applied to the HOST element being rendered via an inline `<style>` which overrides the default classes.
+   * Note: this is called during rendering so you may take advantage of cached values in `renderState` bag
+   * @param {Boolean} effectiveAbsent pass true to make element disappear
    */
-  calcStyles(){
+  calcHostStyles(effectiveAbsent){
     let stl = "";
     if (this.isHidden) stl += "visibility:hidden!important;";
-    if (this.isAbsent) stl += "display:none!important;";
+    if (effectiveAbsent || this.isAbsent) stl += "display:none!important;";
     return stl;
+  }
+
+  #renderState;
+
+  /** True when render state object was already allocated.
+   * You may query this property before using `renderState` which allocates state
+   * if it has not been yet allocated. Sometimes this may need to be avoided.
+   * Note: render state gets reset for EVERY new render call
+   * @returns {Boolean}
+   */
+  get hasRenderState(){ return !!this.#renderState; }
+
+  /**
+   * Lazily allocates an object which is used as an ephemeral bag to cache/carry-over possibly expensive
+   * operation results between different phases of element rendering.
+   * For example: you may get an effective data entry mode for some partial rendering call,
+   * then when you may need the data entry mode again later, you may take it from cache not to re-compute again.
+   * The object gets lazily allocated, and it gets reset on EVERY re-render.
+   * @returns {Object}
+  */
+  get renderState(){
+    if (!this.#renderState) this.#renderState = { };
+    return this.#renderState;
   }
 
   //https://www.oddbird.net/2023/11/17/components/
   //https://frontendmasters.com/blog/light-dom-only/
   /** Descendants should override `renderControl()` instead */
   render(){
-    const stl = this.calcStyles();
-    return stl ? html`<style>:host{ ${stl}}</style> ${this.renderControl()}` : this.renderControl();
+    this.#renderState = null;//start every render from scratch
+    const stlHost = this.calcHostStyles();
+    return stlHost ? html`<style>:host{ ${stlHost}}</style> ${this.renderControl()}` : this.renderControl();
   }
 
   /** Override to render your specific control */
@@ -406,25 +406,31 @@ export function resolveImageSpec(reg, spec, iso = null, theme = null) {
   return rec.produceContent();
 }
 
-/** This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
+/**
+ * This is a {@link resolveImageSpec} helper function wrapping A STRING (such as SVG) {@link ImageRecord.content} with {@link verbatimHtml}
  * returning it as a tuple along with optional image attributes. Other params include:
- * @param spec {string} - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print`
- * @param  options {object} - optional object with the following properties:
- *  - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
- *  - iso {string} - optional system-wide ISO code to use when resolving the image spec, default is null
- *  - ox {string | number} - optional X offset to apply to the image, default is unset
- *  - oy {string | number} - optional Y offset to apply to the image, default is unset
- *  - scale {number} - optional scale factor to apply to the image, default is unset
- *  - theme {string} - optional system-wide theme to use when resolving the image spec, default is null
- *  - wrapImage {boolean} - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
- * @returns {tuple} - {html: VerbatimHtml, attrs: {}}
+ * @param {ImageRegistry} reg - required ImageRegistry instance to use for resolving the image spec
+ * @param {string|ImageRecord} spec  - image specifier such as `svg://azos.ico.help?iso=deu&theme=bananas&media=print` or ImageRecord
+ * @param {object} options - optional object with the following properties:
+ * @param {string} [options.cls] - cls {string} - optional CSS class name (or names, separated by space) or an array of class names to apply to the image
+ * @param {string | number} [options.ox] - optional X offset to apply to the image, default is unset
+ * @param {string | number} [options.oy] - optional Y offset to apply to the image, default is unset
+ * @param {number} [options.scale] - optional scale factor to apply to the image, default is unset
+ * @param {boolean} [options.wrapImage] - optional flag to indicate if the image should be wrapped in a `<i>` tag, default is true
+ * @param {string} [options.iso]  - optional system-wide ISO code to use when resolving the image spec, default is null
+ * @param {string} [options.theme] - optional system-wide theme to use when resolving the image spec, default is null
+ * @returns {tuple} {html: VerbatimHtml, attrs: {}}
  */
-export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wrapImage } = {}) {
+export function renderImageSpec(reg, spec, { cls, ox, oy, scale, wrapImage, iso, theme, } = {}) {
+  const content = resolveImageSpec(reg, spec, iso, theme);
+  return renderImageRecord(content, { cls, scale, ox, oy, wrapImage });
+}
+
+export function renderImageRecord(got, { cls, ox, oy, scale, wrapImage, } = {}) {
+  if (got instanceof ImageRecord) got = got.produceContent();
+
   cls ??= "icon";
   wrapImage ??= true;
-
-  const got = resolveImageSpec(reg, spec, iso, theme);
-
   scale ??= got?.attrs?.scale;
   ox ??= got?.attrs?.ox;
   oy ??= got?.attrs?.oy;
@@ -474,7 +480,7 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
  * characterized by the presence of {@link DATA_NAME_PROP} and {@link DATA_VALUE_PROP} properties.
  * @param {HTMLElement} element required UI element as of which to search for child `AzosElement` derivatives
  * @param {boolean} [deep=true] true to consider child sub-elements, false to only scan the immediate children of this element.
- *                              Note: Only non-shadow sub elements (not web components) are searched, e.g. things like "span/div/section" which are in the same DOM
+ *                              Note: Only non-shadowed sub elements (not web components) are searched, e.g. things like "span/div/section" which are in the same DOM
  *                              are considered to be on the same logical level, but shadow DOM is NOT pierced, as web components should encapsulate their own child fields
  * @returns {AzosElement[]} array of data-aware elements which support IData protocol; empty array for null/undefined/unsupported elements;
  *                          If you pass `deep` then the child elements are also searched
@@ -482,17 +488,22 @@ export function renderImageSpec(reg, spec, { cls, iso, ox, oy, scale, theme, wra
 export function getChildDataMembers(element, deep = true){
   let result = [];
 
-  if (element && element.children){
-    for(const one of element.children){
+  function traverse(elm){
+    if (!elm || !elm.children) return;
+    for(const one of elm.children){
       if (one instanceof AzosElement){
         //Does it support data protocol
         if (supportsDataProtocol(one)) result.push(one);
-      } else { //I am another element
+      } else if (deep) { //I am another element
         const sub = getChildDataMembers(one, deep);
         result = result.concat(sub);
       }
     }
   }
+
+  //We may need to traverse "slotted" element and the ones with shadow dom
+  traverse(element);
+  if (element?.shadowRoot) traverse(element.shadowRoot);
 
   result.sort(sortDataFields);
 
@@ -509,6 +520,14 @@ export function getImmediateParentAzosElement(element){
   isOfOrNull(element, HTMLElement);
 
   while(element){
+    const slot = element.assignedSlot;
+    if (slot){
+      const shadow = slot.getRootNode();
+      if (shadow){
+        element = shadow;
+      } else return null;
+    }
+
     const host = element.host;
     if (host){
       if (host instanceof AzosElement) return host;
@@ -555,7 +574,17 @@ export function getBlockDataValue(element, asArray = false){
   } else { //map
     const result = { };
     let i = 0;
-    for(const fld of fields) result[fld[DATA_NAME_PROP] ?? `?noname_${i++}`] = fld[DATA_VALUE_PROP];
+    for(const fld of fields){
+      const pn = fld[DATA_NAME_PROP] ?? `?noname_${i++}`;
+      const pv = result[pn];
+      if (pv !== undefined){ //if the value is already set
+        if (types_isArray(pv)){ //and it is an array
+          pv.push(fld[DATA_VALUE_PROP]);//add to existing array
+        } else {
+          result[pn] = [pv, fld[DATA_VALUE_PROP]];//wrap existing value in array and add new value to that array
+        }
+      } else result[pn] = fld[DATA_VALUE_PROP];//assign value in a new key
+    }
     return result;
   }
 }
@@ -576,9 +605,14 @@ export function setBlockDataValue(element, v){
 
   const fields = getChildDataMembers(element, true);
 
+  const ov = v;
+  const isUi = v instanceof UiInputValue;
+  if (isUi){ //unwrap the value
+    v = v.value;
+  }
 
   if (v === undefined || v === null) {
-    for(const fld of fields) fld[DATA_VALUE_PROP] = null;
+    for(const fld of fields) fld[DATA_VALUE_PROP] = ov;
     return true;
   }
 
@@ -587,16 +621,24 @@ export function setBlockDataValue(element, v){
   if (types_isArray(v)){
     for(let i = 0; i < v.length; i++ ){
       if (i < fields.length){
-        fields[i][DATA_VALUE_PROP] = v[i];
+        fields[i][DATA_VALUE_PROP] = isUi ? new UiInputValue(v[i]) : v[i];
         result = true;
       }
     }
   } else if (types_isObject(v)){
     for(const [pk, pv] of Object.entries(v)){
-      const fld = fields.find(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
-      if (fld) {
-        fld[DATA_VALUE_PROP] = pv;
-        result = true;
+      const flds = fields.filter(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
+      if (flds.length === 0) continue;
+      if (types_isArray(pv)){
+        for(let i=0; i < pv.length && i < flds.length; i++){
+          flds[i][DATA_VALUE_PROP] = isUi ? new UiInputValue(pv[i]) : pv[i];
+          result = true;
+        }
+      } else {
+        for(const one of flds){
+          one[DATA_VALUE_PROP] = isUi ? new UiInputValue(pv) : pv;
+          result = true;
+        }
       }
     }
   } else throw AVERMENT_FAILURE("Expecting data assignment either [] or {} vector", "setDataValue()");
@@ -607,19 +649,64 @@ export function setBlockDataValue(element, v){
 /**
  * Computes the effective data mode for this element: if this element has {@link DATA_MODE_PROP}
  * it gets it, and if it is set with non-null/undef value returns it, otherwise continues the search up the parent chain of
- * AzosElements until the `DATA_MODE_PROP` returns real {@link DATA_MODE} value. If non found, then returns `UNSPECIFIED` data mode
+ * AzosElements until the `DATA_MODE_PROP` returns real {@link DATA_MODE} value. If non found, then returns undefined data mode
  * @param {HTMLElement} element required HTML element
- * @returns {DATA_MODE}
+ * @returns {DATA_MODE | undefined}
  */
 export function getEffectiveDataMode(element){
   while(element instanceof HTMLElement){
     if (DATA_MODE_PROP in element) {
       const mode = element[DATA_MODE_PROP];
       if (types_isString(mode)) return mode;
-      element = getImmediateParentAzosElement(element);
     }
+    element = getImmediateParentAzosElement(element);
   }
 
-  return DATA_MODE.UNDEFINED;
+  return undefined;
 }
 
+/**
+ * Computes the effective schema for this element: if this element has {@link DATA_SCHEMA_PROP}
+ * it gets it, and if it is set with non-null/undef value returns it, otherwise continues the search up the parent chain of
+ * AzosElements until the `DATA_SCHEMA_PROP` returns a real string value. If non found, then returns undefined
+ * @param {HTMLElement} element required HTML element
+ * @param {String} dflt - optional string default used for undefined schemas
+ * @returns {String | undefined}
+ */
+export function getEffectiveSchema(element, dflt){
+  while(element instanceof HTMLElement){
+    if (DATA_SCHEMA_PROP in element) {
+      const schema = element[DATA_SCHEMA_PROP];
+      if (types_isString(schema)) return schema ?? dflt ?? UNKNOWN;
+    }
+    element = getImmediateParentAzosElement(element);
+  }
+
+  return dflt ?? UNKNOWN;
+}
+
+
+/**
+ *  Decorator pattern which signifies that the encapsulated passed value is the value coming from an UI input entry action and
+ *  consequently it needs to be treated as such at the data buffer level, e.g. prepared before assignment into `.value` property
+ */
+export class UiInputValue {
+  #value;
+  get value(){ return this.#value; }
+  set value(v){ this.#value = v; }
+  constructor(v){ this.#value = v; }
+}
+
+
+/**
+ * Provides access to CSS variables that are defined in the CSS palette.
+ * @param {string} spec a valid CSS specification, e.g., "selected-item-bg-color" or "default-item-fg-color"
+ * @param {string | undefined} prefix optional prefix to use for the CSS variable, default is "pal" (e.g., "pal-selected-item-bg-color")
+ * @returns `var(--{prefix}-{spec})`, e.g., `--var(--pal-selected-item-bg-color)` or `--var(--pal-default-item-fg-color)`;
+ *  unless the {@param spec} starts with `#` or contains `{`, then it is returned as-is, e.g., `#ff0000` or `rgb(255, 0, 0)`.
+ */
+export function getCssPaletteSpec(spec, prefix = "pal") {
+  if (!types_isAssigned(isStringOrNull(spec))) return undefined;
+  if (spec.startsWith("#") || spec.indexOf("(") > -1) return spec; //already a CSS spec
+  return `var(--${prefix}-${spec})`; //convert to CSS variable
+}

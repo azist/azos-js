@@ -12,33 +12,45 @@ import "../../parts/check-field.js"
 import { isOneOf } from "azos/strings";
 import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
 import { FieldPart } from "../../parts/field-part.js";
+import STL_GRID from "../../styles/grid.js";
 
 export class PersonBlock extends Block {
-  render(){
 
-    let errors = [];//error summary
+  static styles = [...Block.styles, STL_GRID];
 
-    if (this.error){
-       errors.push(html`<h4 style="color: red">Block validation has errors:</h4>`);
-       if (this.error.cause){
-         for(const one of this.error.cause){
-          errors.push(html`<div style="color: #ff8010">'${one.field}': ${one.message}</div>`);
-         }
-       }
-    }
+
+  static properties = {
+    otherStatuses: {type: Array}
+  };
+
+
+  renderControl(){
+
 
     return html`
     <h3>Person Block</h3>
-      ${errors}
-      <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
-      <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q" ></az-text>
-      <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
-      <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
-      <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
+      <div class="grid cols3">
+        <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
+        <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q"  whenInsert="absent" whenUpdate="disable"></az-text>
+        <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
+      </div>
+      <div class="grid cols3">
+        <az-text scope="this"  id="tbPhone"        name="Phone"      title="Phone"       maxLength=24 isrequired dataKind="tel" value=""></az-text>
+        <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
+        <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
+      </div>
+
       <h4>Processing Status</h4>
       <examples-status-block scope="this" id="blockProcessStatus" name="ProcessStatus"></examples-status-block>
+
       <h4>Payout Status</h4>
       <examples-status-block scope="this" id="blockPayoutStatus" name="PayoutStatus"></examples-status-block>
+
+      <h4>Other Statuses</h4>
+      <!-- notice how both fields map to the same field by name effectively creating an array -->
+      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses"></examples-status-block>
+      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses"></examples-status-block>
+      ${this.otherStatuses}
     `;
   }
 
@@ -52,7 +64,7 @@ export class PersonBlock extends Block {
 }
 
 export class StatusBlock extends Block {
-  render(){
+  renderControl(){
     return html`
       <az-text scope="this"  id="tbStatus"    name="Status"  title="Status"  maxLength=10 isrequired value="Init"></az-text>
       <az-text scope="this"  id="tbDescription"   name="Description" title="Description" maxLength=25  value="Initital" ></az-text>

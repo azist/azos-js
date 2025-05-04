@@ -6,14 +6,28 @@
 
 import * as aver from "azos/aver";
 import * as types from "azos/types";
+import { isOneOf } from "azos/strings";
 
-import { Control, css, html, noContent } from "../../ui";
+import { Control, css, getCssPaletteSpec, html, noContent } from "../../ui.js";
 
 export class TimeBlockPicker extends Control {
 
-  static styles = css`
-:host{display:block;margin-top:1em;margin-bottom:1em;}
-.nav {
+  constructor() {
+    super();
+    this.viewStartDay = types.DAYS_OF_WEEK.MONDAY;
+    this.viewNumDays = 6; // default to Monday - Saturday
+    this.selectedItems = [];
+
+    this.use24HourTime = false;
+    this.timeViewGranularityMins = 30;
+    this.maxSelectedItems = 2;
+
+    this.#setViewPropertiesForRecompute();
+  }
+
+  static styles = [css`
+:host{ display: block; margin-top: 1em; margin-bottom: 1em; }
+.nav{
   grid-row: 1;
   grid-column: 2 / span max;
   display: flex;
@@ -21,48 +35,53 @@ export class TimeBlockPicker extends Control {
   gap: 1ch;
   margin-bottom: 0.5ch;
 }
+
 .todayBtn, .viewBtn{
   margin: 0;
   padding: 0.5cap;
   box-sizing: content-box;
+  color: var(--ink);
+
+  &, svg{
+    height: var(--height);
+    line-height: var(--height);
+  }
+
+  &:hover{
+    filter: brightness(90%);
+    cursor: pointer;
+  }
 }
-.todayBtn, .todayBtn svg, .viewBtn, .viewBtn svg{
-  height: var(--height);
-  line-height: var(--height);
-}
-.viewBtn.prev svg{margin-left:-0.2ch;margin-right:0.2ch;}
-.viewBtn.next svg{margin-left:0.2ch;margin-right:-0.2ch;}
-.todayBtn {
+
+.todayBtn{
   --height: 2.25cap;
   font-size: 0.8em;
   font-weight: bolder;
   display: inline-flex;
-  border-radius: 8px;
-  color: var(--ink);
   border: 1px solid #ccc;
+  border-radius: 8px;
   padding: 0.75ch 2ch 0.75ch 1.4ch;
   gap: 0.5ch;
 }
-.viewBtn {
+
+.viewBtn{
   --height: 3cap;
+  border: none;
   border-radius: 50%;
   background-color: hsl(from var(--paper) h s max(calc(l - 10), 10));
-  color: var(--ink);
-  border: none;
-}
-.todayBtn:hover, .viewBtn:hover {
-  filter: brightness(90%);
-  cursor: pointer;
+
+  &.prev svg{ margin-right: 0.2ch; }
+  &.next svg{ margin-left: 0.2ch; }
 }
 
-.daysContainer {
+.daysContainer{
   display: grid;
   grid-template-columns: 6ch repeat(calc(var(--columns, 7) - 1), minmax(0, 1fr));
   grid-template-rows: auto auto repeat(var(--rows, 31), minmax(3ch, 0.35fr));
   column-gap: 1px;
 }
 
-.dayColumn {
+.dayColumn{
   display: grid;
   grid-template-rows: subgrid;
   grid-row: 2 / span max;
@@ -70,54 +89,41 @@ export class TimeBlockPicker extends Control {
 }
 
 /** background */
-:not(.legend) > .dayLabel div, .timeLabel.inView { background-color: #d0d0d0; }
-.timeSlot { background-color: #e8e8e8; }
-.timeSlot:not(.inView) { background-color: #bbb; }
+:not(.legend) > .dayLabel div, .timeLabel.inView{ background-color: #d0d0d0; }
 
-/** column-gap handles vertical lines, these are the horizontal */
-.timeCell { border-top: 1px dashed #ccc; }
-.timeCell:not(.inView) { border-top-color: #ccc; }
-.timeCell.onTheHour { border-top: 1px solid #aaa; }
-.timeCell.onTheHour:not(.inView) { border-top-color: #aaa; }
-.timeLabel.inView { border-left: 1px solid #aaa; }
-.timeLabel:not(.onTheHour) { border-top-color: #e5e5e5; }
-.timeLabel:not(.inView), .dayLabel + .timeCell { border-top: revert; }
-.timeLabel:nth-last-child(3) { border-bottom: 1px solid #aaa; }
-
-.dayLabel {
+.dayLabel{
   text-align: center;
   display: flex;
   flex-direction: column;
   position: relative;
   justify-content: end;
-  user-select
-  : none;
+  user-select: none;
+
+  .year{
+    font-weight: bold;
+    writing-mode: tb;
+    rotate: 180deg;
+    position: absolute;
+    left: 0.2em;
+    bottom: 0.1em;
+    background: none!important;
+    color: #989898;
+  }
+
+  .month{
+    width: 100%;
+    font-weight: bold;
+    font-variant: all-small-caps;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .dayDate{
+    font-variant: all-small-caps;
+    padding-bottom: 0.2em;
+  }
 }
 
-.dayLabel .year {
-  font-weight: bold;
-  writing-mode: tb;
-  rotate: 180deg;
-  position: absolute;
-  left: 0.2em;
-  bottom: 0.1em;
-  background: none!important;
-  color: #989898;
-}
-
-.dayLabel .month {
-  width: 100%;
-  font-weight: bold;
-  font-variant: all-small-caps;
-  border-radius: 10px 10px 0 0;
-}
-
-.dayLabel .dayDate {
-  font-variant: all-small-caps;
-  padding-bottom: 0.2em;
-}
-
-.timeCell {
+.timeSlot, .timeLabel{
   container-type: size;
   grid-row: span 1;
   display: flex;
@@ -127,85 +133,112 @@ export class TimeBlockPicker extends Control {
   overflow: hidden;
 }
 
-.timeLabel:not(.onTheHour) {
-  color: #bebebe;
-  font-size: 0.9em;
-}
-
-.timeLabel .meridiemIndicator {
-  color: #929292;
-  font-size: 0.8em;
-  font-variant: small-caps;
-}
-
-.timeSlot.available {
-  padding: 0 4px 4px 0;
-  overflow: hidden;
-}
-
-.timeSlot.available .item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(0deg, #10a0ff, #20ceff);
-  color: #fff;
-  border-left: 4px solid #2080e8;
-  border-radius: 5px;
-  box-shadow: 0 0 6px  #a0a0a0;
-  font-size: clamp(10px, 15cqmin, 18px);
-  text-align: center;
-}
-
-.available .item.selected {
-  background: #30d000;
-  border-radius: 5px;
-}
-
-.available .item.selected .icon {
-  position: absolute;
-  bottom: 0.2em;
-  left: 0.2em;
+.timeLabel{
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0px 0px 6px #caffc5;
-  background-color: green;
-  height: 1.2em;
-  width: 1.2em;
-  color: #caffc5;
-  fill: #caffc5;
-  font-weight: bold;
-  opacity: 0.75;
+  border-top: 1px solid #aaa;
+
+  /** column-gap handles vertical lines, these are the horizontal */
+  &.inView{ border-left: 1px solid #aaa; }
+  &:not(.onTheHour){ border-top-color: #e5e5e5; }
+  &:nth-last-child(3){ border-bottom: 1px solid #aaa; }
+
+  &:not(.onTheHour){
+    color: #bebebe;
+    font-size: 0.9em;
+  }
+
+  .meridiemIndicator{
+    color: #929292;
+    font-size: 0.8em;
+    font-variant: small-caps;
+  }
 }
 
-.timeSlot.available:hover .item {
-  cursor: pointer;
-  filter: brightness(1.1);
+
+.timeLabel:not(.inView), .dayLabel + .timeSlot{ border-top: revert !important; }
+
+.timeSlot{
+  background-color: #e8e8e8;
+  border-top: 1px dashed #ccc;
+  padding: 1px 4px 4px 1px;
+
+  &:not(.inView){ background-color: #bbb; border-top-color: #ccc; }
+  &.onTheHour{ border-top: 1px solid #aaa; }
+  &.onTheHour:not(.inView){ border-top-color: #aaa; }
+
+  .item{
+    padding: 2px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--vcl-scheduler-default-item-bg-color);
+    color: var(--vcl-scheduler-default-item-fg-color);
+    box-shadow: var(--vcl-scheduler-default-item-box-shadow);
+    font-size: clamp(10px, 15cqmin, 18px);
+    text-align: center;
+    border-left: var(--vcl-scheduler-default-item-bor-ctl);
+    border-radius: 4px;
+
+    &.ok      { border-left-color: var(--vcl-scheduler-ok-bor-color-ctl); }
+    &.info    { border-left-color: var(--vcl-scheduler-info-bor-color-ctl); }
+    &.warning { border-left-color: var(--vcl-scheduler-warn-bor-color-ctl); }
+    &.alert   { border-left-color: var(--vcl-scheduler-alert-bor-color-ctl); }
+    &.error   { border-left-color: var(--vcl-scheduler-error-bor-color-ctl); }
+    &.brand1  { border-left-color: var(--vcl-scheduler-brand1-bor-color-ctl); }
+    &.brand2  { border-left-color: var(--vcl-scheduler-brand2-bor-color-ctl); }
+    &.brand3  { border-left-color: var(--vcl-scheduler-brand3-bor-color-ctl); }
+
+    .caption .timeSpan{
+      .startTime::after{
+        content: "-";
+        display: inline-block;
+        margin: 0 0.2em;
+      }
+    }
+
+    &:hover{
+      cursor: pointer;
+      filter: brightness(1.1);
+    }
+
+    &.selected{
+      background: var(--vcl-scheduler-selected-item-bg-color);
+      color: var(--vcl-scheduler-selected-item-fg-color);
+
+      .icon{
+        position: absolute;
+        bottom: 0.2em;
+        left: 0.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: var(--vcl-scheduler-selected-badge-box-shadow);
+        background-color: var(--vcl-scheduler-selected-badge-bg-color);
+        height: 1.2em;
+        width: 1.2em;
+        color: var(--vcl-scheduler-selected-badge-fg-color);
+        fill: var(--vcl-scheduler-selected-badge-fg-color);
+        font-weight: bold;
+        opacity: 0.75;
+      }
+    }
+  }
 }
-
-.r1 { font-size: var(--r1-fs);}
-.r2 { font-size: var(--r2-fs);}
-.r3 { font-size: var(--r3-fs);}
-.r4 { font-size: var(--r4-fs);}
-.r5 { font-size: var(--r5-fs);}
-.r6 { font-size: var(--r6-fs);}
-
-.ok-tab-btn { color: var(--s-ok-fg-ctl);  border-color: var(--s-ok-bor-color-ctl);}
-.info-tab-btn { color: var(--s-info-fg-ctl); border-color: var(--s-info-bor-color-ctl);}
-.warning-tab-btn { color: var(--s-warn-fg-ctl); border-color: var(--s-warn-bor-color-ctl);}
-.alert-tab-btn { color: var(--s-alert-fg-ctl); border-color: var(--s-alert-bor-color-ctl);}
-.error-tab-btn { color: var(--s-error-fg-ctl); border-color: var(--s-error-bor-color-ctl);}
 
 @media only screen and (max-width: 700px) {
-  .timeLabel:not(.onTheHour) { color: #d0d0d0 !important; }
-  .year { display: none; }
-  .month { border-radius: 5px 5px 0 0 !important;}
+  .timeLabel:not(.onTheHour){ color: #d0d0d0 !important; }
+  .year{ display: none; }
+  .month{ border-radius: 4px 4px 0 0 !important;}
 }
-`;
+  `];
 
   /**
    * Effective Dates: If null, provides the start/end dates of the provided data.
@@ -219,7 +252,7 @@ export class TimeBlockPicker extends Control {
     enabledStartDate: { type: Date },
     enabledEndDate: { type: Date },
 
-    viewStartDay: { type: types.DAYS_OF_WEEK },
+    viewStartDay: { type: Number },
     viewNumDays: { type: Number },
     viewStartDate: { type: Date },
     viewEndDate: { type: Date },
@@ -229,11 +262,23 @@ export class TimeBlockPicker extends Control {
 
     use24HourTime: { type: Boolean },
     timeViewGranularityMins: { type: Number },
+
+    itemBgColor: { type: String, reflect: true },
+    itemFgColor: { type: String, reflect: true },
+    itemSelectedBgColor: { type: String, reflect: true },
+    itemSelectedFgColor: { type: String, reflect: true },
+    itemSelectedBadgeBgColor: { type: String, reflect: true },
+    itemSelectedBadgeFgColor: { type: String, reflect: true },
   }
 
   #timeViewGranularityMins = null;
   get timeViewGranularityMins() { return this.#timeViewGranularityMins; }
-  set timeViewGranularityMins(v) { throw Error("Unimplemented--anything outside of 30 min causes infinite loop.") }
+  set timeViewGranularityMins(v) {
+    const oldValue = this.#timeViewGranularityMins;
+    this.#timeViewGranularityMins = isOneOf(aver.isNumber(v), [15, 30, 60]) ? v : 30;
+    this.timeViewRenderOffMins = this.#timeViewGranularityMins * 2;
+    this.requestUpdate("timeViewGranularityMins", oldValue);
+  }
 
   /** The date of the first scheduling item or "today" if no items. */
   #effectiveStartDate = null;
@@ -287,12 +332,25 @@ export class TimeBlockPicker extends Control {
     this.requestUpdate();
   }
 
+  #viewNumDays = null;
+  get viewNumDays() { return this.#viewNumDays; }
+  set viewNumDays(v) {
+    // console.debug("Setting viewNumDays", v);
+    aver.isTrue(v >= 5 && v <= 7, "viewNumDays should be between 5 and 7");
+    const oldValue = this.#viewNumDays;
+    this.#viewNumDays = v;
+    this.#setViewPropertiesForRecompute();
+    this.requestUpdate("viewNumDays", oldValue);
+  }
+
   #viewStartDay = null;
   get viewStartDay() { return this.#viewStartDay; }
   set viewStartDay(v) {
-    aver.isTrue(v >= 0 && v < 7);
+    aver.isTrue(v >= 0 && v < 7, "viewStartDay should be between 0 (Sunday) and 6 (Saturday)");
+    const oldValue = this.#viewStartDay;
     this.#viewStartDay = v;
-    this.requestUpdate();
+    this.#setViewPropertiesForRecompute();
+    this.requestUpdate("viewStartDay", oldValue);
   }
 
   #viewStartDate = null;
@@ -306,7 +364,6 @@ export class TimeBlockPicker extends Control {
   set viewStartDate(v) {
     aver.isDate(v);
     v.setHours(0, 0, 0, 0);
-    aver.isTrue(v.getDay() === this.viewStartDay, `Start Date should start on ${this.viewStartDay}, but was ${v.getDay()}`);
     this.#setViewPropertiesForRecompute();
 
     this.#viewStartDate = v;
@@ -378,20 +435,6 @@ export class TimeBlockPicker extends Control {
   get itemsByDay() { return this.#itemsByDay; }
   get items() { return this.#itemsByDay.flatMap(({ items }) => items); }
 
-  constructor() {
-    super();
-    this.viewStartDay = types.DAYS_OF_WEEK.MONDAY;
-    this.viewNumDays = 6; // default to Monday - Saturday
-    this.selectedItems = [];
-
-    this.use24HourTime = false;
-    this.timeViewRenderOffMins = 60;
-    this.#timeViewGranularityMins = 30;
-    this.maxSelectedItems = 2;
-
-    this.#setViewPropertiesForRecompute();
-  }
-
   #setViewPropertiesForRecompute() {
     this.#daysView = null;
     this.#timeSlotsView = null;
@@ -442,31 +485,34 @@ export class TimeBlockPicker extends Control {
   }
 
   /**
-   * Given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
-   *  - (1380, true, false) => 11 pm
+   * If use24HourTime is true, formats 1380 as 23:00.
+   * Otherwise, given (23:00, omitMinutesForWholeHours, omitMeridianSuffix), yields:
    *  - (1380, false, false) => 11:00 pm
-   *  - (1380, true, true) => 11
+   *  - (1380, true, false) => 11 pm
    *  - (1380, false, true) => 11:00
-   * @param {Number} mins, mins time of day
-   * @param {Object} options
-   *          -> when omitMinutesForWholeHours=true omits minutes when 0
-   *          -> when omitMeridianSuffix=true, omits am/pm
-   *          -> when use24HourTime=true, uses 23:00; 11:00 otherwise
+   *  - (1380, true, true) => 11 (bad practice, but supported)
+   * @param {number} mins, mins time of day
+   * @param {object} [options={}] (optional) The options for formatting the time
+   * @property {boolean} [options.use24HourTime=false] (optional) If true, formats 1380 as 23:00 (force-omits meridian suffix, forces minutes for whole hours)
+   * @property {boolean} [options.omitMinutesForWholeHours=false] (optional) If true, omits minutes when 0 (e.g., 11:00 becomes 11)
+   * @property {boolean} [options.omitMeridianSuffix=false] (optional) If true, omits am/pm suffix (e.g., 11:00 becomes 11:00)
    * @returns a formatted time string
    */
-  #formatTime(minsOfDay, { omitMinutesForWholeHours = false, omitMeridianSuffix = false, use24HourTime = false } = {}) {
+  #formatTime(minsOfDay, { use24HourTime = false, omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
     let mins = minsOfDay % 60;
     let hour = Math.floor(minsOfDay / 60);
     let timeString;
 
     if (use24HourTime) {
-      timeString = `${hour.toString().padStart(2, "0")}`;
-      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
+      timeString = html`${hour.toString().padStart(2, "0")}`;
+      omitMeridianSuffix = true; // 24-hour time does not use am/pm
+      omitMinutesForWholeHours = false; // 24-hour time always shows minutes
     } else {
-      timeString = `${hour % 12 || 12}`;
-      if (!(omitMinutesForWholeHours && mins === 0)) timeString += `:${mins.toString().padStart(2, "0")}`;
-      if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
+      timeString = html`${hour % 12 || 12}`;
     }
+
+    if (!omitMinutesForWholeHours) timeString = html`${timeString}:${mins.toString().padStart(2, "0")}`;
+    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
 
     return timeString;
   }
@@ -576,26 +622,33 @@ export class TimeBlockPicker extends Control {
    * @param {Number} > 0 moves next, < 0 move previous
    */
   changeViewPage(count = 1, force = false) {
-    let newViewStartDate;
+    let nextViewStartDate;
     if (count === 0)
-      newViewStartDate = this.#calculateViewStartDate(new Date());
+      nextViewStartDate = this.#calculateViewStartDate(new Date());
     else {
-      newViewStartDate = new Date(this.viewStartDate);
-      newViewStartDate.setDate(newViewStartDate.getDate() + (7 * count));
+      nextViewStartDate = new Date(this.viewStartDate);
+      let nextStartDate;
+      switch (true) {
+        case this.viewStartDay === types.DAYS_OF_WEEK.SUNDAY: nextStartDate = 7; break;
+        case this.viewStartDay === types.DAYS_OF_WEEK.MONDAY && this.viewNumDays >= 5: nextStartDate = 7; break;
+        default: nextStartDate = this.viewNumDays; break;
+      }
+      nextStartDate *= count;
+      nextViewStartDate.setDate(nextViewStartDate.getDate() + nextStartDate);
 
       if (!force) {
         let filter;
         if (count < 0)
-          filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() >= this.enabledStartDate.getTime();
+          filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() > this.enabledStartDate.getTime();
         else
-          filter = ({ day }) => day.getTime() >= newViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
+          filter = ({ day }) => day.getTime() >= nextViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
 
         if (!this.itemsByDay.some(filter)) return;
       }
     }
 
     this.#setViewPropertiesForRecompute();
-    this.viewStartDate = newViewStartDate;
+    this.viewStartDate = nextViewStartDate;
   }
 
   /** Remove all items and reset view */
@@ -620,7 +673,7 @@ export class TimeBlockPicker extends Control {
   renderControl() {
     return html`
 <div class="scheduler" @keydown="${this.#onKeyDown}">
-  ${this.renderTimeSlots()}
+  ${this.renderDaysContainer()}
 </div>
     `;
   }
@@ -630,18 +683,18 @@ export class TimeBlockPicker extends Control {
     today.setHours(0, 0, 0, 0);
 
     let rec;
-    if (today > this.viewEndDate) rec = this.renderImageSpec("svg://azos.ico.arrowRight");
-    else if (today < this.viewStartDate) rec = this.renderImageSpec("svg://azos.ico.arrowLeft");
-    else rec = this.renderImageSpec("svg://azos.ico.calendarToday");
+    if (today > this.viewEndDate) rec = this.renderImageSpec("svg://azos.ico.arrowRight", { wrapImage: false });
+    else if (today < this.viewStartDate) rec = this.renderImageSpec("svg://azos.ico.arrowLeft", { wrapImage: false });
+    else rec = this.renderImageSpec("svg://azos.ico.calendarToday", { wrapImage: false });
     return rec.html;
   }
 
   renderNavigationControls() {
     return html`
 <div class="nav">
-  <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">${this.renderImageSpec("svg://azos.ico.caretLeft").html}</button>
+  <button @click="${() => this.changeViewPage(-1, false)}" class="prev viewBtn">${this.renderImageSpec("svg://azos.ico.caretLeft", { wrapImage: false }).html}</button>
   <button @click="${() => this.changeViewPage(0)}" class="viewing todayBtn">${this.todaySymbol} <span>Today</span></button>
-  <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">${this.renderImageSpec("svg://azos.ico.caretRight").html}</button>
+  <button @click="${() => this.changeViewPage(1, false)}" class="next viewBtn">${this.renderImageSpec("svg://azos.ico.caretRight", { wrapImage: false }).html}</button>
   ${this.renderViewSpanLabel(this.viewStartDate, this.viewEndDate, true)}
 </div>
     `;
@@ -667,9 +720,10 @@ export class TimeBlockPicker extends Control {
     return viewSpanLabel;
   }
 
-  renderTimeSlots() {
+  renderDaysContainer() {
+    let stl = this.getSchedulingStyles(this);
     return html`
-<div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length}">
+<div class="daysContainer" style="--columns:${this.viewNumDays + 1};--rows:${this.timeSlotsView.length};${stl}">
   ${this.renderNavigationControls()}
   <div class="dayColumn legend">
     <div class="dayLabel">
@@ -688,7 +742,6 @@ export class TimeBlockPicker extends Control {
     return this.timeSlotsView.map(([mins, inView]) => {
       const onTheHour = mins % 60 === 0;
       const cls = [
-        "timeCell",
         "timeLabel",
         inView ? "inView" : "",
         onTheHour ? "onTheHour" : "",
@@ -708,36 +761,34 @@ export class TimeBlockPicker extends Control {
     <div class="month">${monthName}</div>
     <div class="dayDate">${dayName} ${dayNumber}</div>
   </div>
-  ${this.renderTimeCells(date)}
+  ${this.renderTimeSlots(date)}
 </div>
     `)
   }
 
-  renderTimeCells(day) {
+  renderTimeSlots(day) {
     const thisDayItems = this.itemsByDay.find(one => one.day.toLocaleDateString() === day.toLocaleDateString())?.items;
 
     let toRender = [];
     for (let i = 0; i < this.timeSlotsView.length; i++) {
       const [slotMins, inView] = this.timeSlotsView[i];
-      let cellContent = noContent;
+      let timeSlotContent = noContent;
       let stl = noContent;
-      let cls = ["timeCell", "timeSlot"];
+      let cls = ["timeSlot"];
       let rowSpan;
       let foundItem;
 
       if (slotMins % 60 === 0) cls.push("onTheHour");
-      if (inView && this.#isDateWithinEnabledRange(day)) {
+      if (inView && thisDayItems?.length > 0 && this.#isDateWithinEnabledRange(day)) {
         cls.push("inView");
 
-        foundItem = thisDayItems?.find(item => item.startTimeMins === slotMins);
+        foundItem = thisDayItems.find(item => item.startTimeMins === slotMins);
         if (foundItem) {
           // console.log("found:", foundItem);
           rowSpan = Math.floor(foundItem.durationMins / this.timeViewGranularityMins);
           i += rowSpan - 1;
           stl = `grid-row: span ${rowSpan};`;
-          cls.push("available");
-          if (rowSpan > 1) cls.push("spanned");
-          cellContent = this.renderSchedulingItem(foundItem, rowSpan);
+          timeSlotContent = this.renderSchedulingItem(foundItem, rowSpan);
         }
       }
 
@@ -746,7 +797,7 @@ export class TimeBlockPicker extends Control {
   @click="${foundItem ? () => this.#onSelectItem(foundItem) : () => { }}"
   @mouseover="${() => this.#onSlotHover(day, slotMins)}"
   @mouseout="${() => this.#onSlotHoverOut()}">
-  ${cellContent}
+  ${timeSlotContent}
 </div>
     `);
     }
@@ -754,39 +805,44 @@ export class TimeBlockPicker extends Control {
   }
 
   renderSchedulingItem(schItem, rowSpan) {
-    let iconContent = noContent;
+    const [startTime, endTime] = this.formatStartEndTimes(schItem);
+    let selectedIcon = noContent;
+    let stl = this.getSchedulingStyles(schItem.data);
     let cls = ["item"];
+    if (schItem.data.status) cls.push(`${schItem.data.status}`);
+    // console.log("renderSchedulingItem", schItem);
     const eventSelectedIndex = this.selectedItems.indexOf(schItem);
     if (eventSelectedIndex > -1) {
       cls.push("selected");
-      iconContent = this.selectedItems.length === 1
+      selectedIcon = this.selectedItems.length === 1
         ? html`${this.renderImageSpec("svg://azos.ico.checkmark").html}`
         : html`<span class="icon">${eventSelectedIndex + 1}</span>`;
     }
+    cls = cls.filter(types.isNonEmptyString).join(" ");
     return html`
-<div class="${cls.filter(types.isNonEmptyString).join(" ")}" tabIndex="0" @focus="${() => this.itemInFocus = schItem}" @blur="${() => this.itemInFocus = null}" data-id="${schItem.id}">
-  ${this.renderCaption(schItem, rowSpan)}
-  ${iconContent}
+<div class="${cls}" style="${stl}" tabIndex="0" @focus="${() => this.itemInFocus = schItem}" @blur="${() => this.itemInFocus = null}" data-id="${schItem.id}">
+  <div class="caption">
+    <div class="timeSpan"><span class="startTime">${startTime}</span><span class="endTime">${endTime}</span></div>
+    ${rowSpan > 1 && schItem.caption ? html`<div class="custom">${schItem.caption}</div>` : noContent}
+  </div>
+  ${selectedIcon}
 </div>
     `;
   }
 
-  renderCaption(schItem, rowSpan) {
-    let caption = noContent;
-    if (rowSpan > 1 && schItem.caption)
-      caption = html`<div class="custom">${schItem.caption}</div>`;
+  getSchedulingStyles(itemOrScheduler) {
+    const createStyle = (styleProp, value) => value ? `${styleProp}: ${value}` : undefined;
 
-    return html`
-  <div class="caption">
-    <div class="timeSpan">${this.renderDefaultCaption(schItem)}</div>
-    ${caption}
-  </div>
-    `;
-  }
+    const styles = [
+      createStyle("--vcl-scheduler-default-item-fg-color", getCssPaletteSpec(itemOrScheduler.itemFgColor)),
+      createStyle("--vcl-scheduler-default-item-bg-color", getCssPaletteSpec(itemOrScheduler.itemBgColor)),
+      createStyle("--vcl-scheduler-selected-item-fg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedFgColor)),
+      createStyle("--vcl-scheduler-selected-item-bg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedBgColor)),
+      createStyle("--vcl-scheduler-selected-badge-fg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedBadgeFgColor)),
+      createStyle("--vcl-scheduler-selected-badge-bg-color", getCssPaletteSpec(itemOrScheduler.itemSelectedBadgeBgColor)),
+    ].filter(types.isNonEmptyString);
 
-  renderDefaultCaption(schItem) {
-    const [startTime, endTime] = this.formatStartEndTimes(schItem);
-    return html`${startTime} <span class="sep">-</span> ${endTime}`;
+    return styles.length ? styles.join(";") : "";
   }
 }
 

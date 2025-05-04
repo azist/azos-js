@@ -13,7 +13,7 @@ export class TreeNode extends DisposableObject {
 
   #treeNodeId;
   #title;
-  #iconPath;
+  #icon;
   #parent;
   #treeView;
   #children;
@@ -34,8 +34,8 @@ export class TreeNode extends DisposableObject {
   get title() { return this.#title; }
   set title(v) { this.#title = v; }
 
-  get iconPath() { return this.#iconPath; }
-  set iconPath(v) { this.#iconPath = v; }
+  get icon() { return this.#icon; }
+  set icon(v) { this.#icon = v; }
 
   get checked() { return this.#state; }
   get isChecked() { return !!this.#state; }
@@ -81,14 +81,14 @@ export class TreeNode extends DisposableObject {
 
   get isRoot() { return this.#parent === null; }
 
-  constructor(treeView, parent, title, { iconPath, checkable, canClose, canOpen, nodeVisible, opened, showPath, data } = {}) {
+  constructor(treeView, parent, title, { icon, checkable, canClose, canOpen, nodeVisible, opened, showPath, data } = {}) {
     super();
     this.#treeView = isOf(treeView, TreeView);
     this.#parent = isOfOrNull(parent, TreeNode);
 
     this.#treeNodeId = TreeNode.#treeNodeIdSeed++;
     this.#title = isStringOrNull(title);
-    this.#iconPath = iconPath; // need to account for null (don't show) and undefined (show default)
+    this.#icon = icon; // need to account for null (don't show) and undefined (show default)
     this.#checkable = checkable ?? false; // todo: Implement a checkmark
     this.#nodeVisible = nodeVisible ?? true;
 

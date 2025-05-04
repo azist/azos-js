@@ -28,9 +28,11 @@ export class OkCancelModal extends ModalDialog {
    * @param {Object} modalOptions title=modal title (dflt: "Confirm"), ok=btn title (dflt: "Ok"), cancel=btn title (dflt: "Cancel")
    * @param {Object} inputOptions doPromptUserInput=produces `<az-text value='currentValue' (dflt: null) title='inputTitle' (dflt: null)></az-text>`
    */
-  constructor(okCancelPrompt, { title, ok, cancel, okBtnStatus } = {}, { doPromptUserInput, currentValue, inputTitle } = {}) {
+  constructor(okCancelPrompt, { title, ok, cancel, okBtnStatus, status, rank } = {}, { doPromptUserInput, currentValue, inputTitle } = {}) {
     super();
     this.title = dflt(title, "Confirm");
+    this.status = dflt(status, "default");
+    this.rank = dflt(rank, "normal");
     this.okBtnTitle = dflt(ok, "Ok");
     this.okBtnStatus = dflt(okBtnStatus, "ok");
     this.cancelBtnTitle = dflt(cancel, "Cancel");
@@ -83,8 +85,8 @@ ${this.doPromptUserInput ? html`
  * @param {Object} inputOptions do prompt for user input, value will be added to modalResult
  * @returns
  */
-export async function prompt(okCancelPrompt, { title, ok, cancel, okBtnStatus } = {}, { doPromptUserInput, currentValue, title: inputTitle } = {}) {
-  const modal = new OkCancelModal(okCancelPrompt, { title, ok, cancel, okBtnStatus }, { doPromptUserInput, currentValue, inputTitle });
+export async function prompt(okCancelPrompt, { title, ok, cancel, okBtnStatus, status, rank } = {}, { doPromptUserInput, currentValue, title: inputTitle } = {}) {
+  const modal = new OkCancelModal(okCancelPrompt, { title, ok, cancel, okBtnStatus, status, rank }, { doPromptUserInput, currentValue, inputTitle });
   document.body.appendChild(modal);
   modal.update();
   try {

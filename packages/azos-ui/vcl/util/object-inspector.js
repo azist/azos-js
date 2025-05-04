@@ -89,7 +89,7 @@ ol{
         const objectOrArray = isObjectOrArray(value);
         const options = {
           canOpen: objectOrArray ? true : false,
-          iconPath: null, // {open: svg://azos.ico.folder-open, close: svg://azos.ico.folder-close}
+          icon: null, // {open: svg://azos.ico.folder-open, close: svg://azos.ico.folder-close}
           showPath: false,
           data: {
             key,

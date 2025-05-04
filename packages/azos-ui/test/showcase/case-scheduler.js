@@ -4,15 +4,15 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { html } from "../../ui";
-import { CaseBase } from "./case-base";
 import * as types from "azos/types";
 
-import "../../parts/button";
-import "../../parts/text-field";
+import { getEffectiveSchema, html, STATUS } from "../../ui.js";
+import { CaseBase } from "./case-base.js";
+import { getDailyAvailable } from "./fetch-scheduling-data.js";
 
-import "../../vcl/time/scheduler";
-import { getDailyAvailable } from "./fetch-scheduling-data";
+import "../../parts/button.js";
+import "../../parts/text-field.js";
+import "../../vcl/time/scheduler.js";
 
 const rangeData = getDailyAvailable();
 export class CaseScheduler extends CaseBase {
@@ -36,18 +36,49 @@ export class CaseScheduler extends CaseBase {
         if (i === 0) { this.schTest.enabledStartDate = day; }
         for (let j = 0; j < one.hours.parsed.length; j++) {
           const span = one.hours.parsed[j];
-          this.schTest.addItem({
+          const item = {
             id: `n-${i}-${j}`,
             day: day,
-            caption: null,//nothing for now
+            caption: null,
             startTimeMins: span.sta,
             durationMins: span.dur,
-            data: { span, day },
-          });
+            data: {
+              span, day,
+              status: span.status ?? randomizeStatus(i, j),
+              ...generateRandomStyleOverride(i, j),
+            },
+          };
+          // console.log("Adding item", item);
+          this.schTest.addItem(item);
         }
       }
     } finally {
       this.schTest.endChanges();
+    }
+    function randomizeStatus(i, j) {
+      const statuses = Object.values(STATUS);
+      if (j % 3 === 0) return statuses[Math.floor(Math.random() * statuses.length)];
+      return STATUS.DEFAULT;
+    }
+    function generateRandomStyleOverride() {
+      if (Math.random() > 0.5) {
+        const hue = Math.floor(Math.random() * 360);
+        const sat = () => Math.floor(60 + Math.random() * 20); // 60–80%
+        const light = () => Math.floor(40 + Math.random() * 20); // 40–60%
+
+        const hsl = (h, s, l) => `hsl(${h}, ${s}%, ${l}%)`;
+        const shift = (h, d) => (h + d + 360) % 360;
+
+        return {
+          itemFgColor: hsl(shift(hue, 180), sat(), 95),
+          itemBgColor: hsl(hue, sat(), light()),
+          itemSelectedFgColor: hsl(shift(hue, 180), sat(), 98),
+          itemSelectedBgColor: hsl(shift(hue, 20), sat(), light() - 10),
+          itemSelectedBadgeFgColor: hsl(shift(hue, 180), sat(), 90),
+          itemSelectedBadgeBgColor: hsl(shift(hue, -20), sat(), light() - 15)
+        };
+      }
+      return {};
     }
   }
 
@@ -56,7 +87,7 @@ export class CaseScheduler extends CaseBase {
     const endTimeMins = this.fin.value.split(":").map(Number).reduce((p, c, i) => p += i === 0 ? c * 60 : c, 0);
     const duration = endTimeMins - startTimeMins;
     if (duration <= 0) {
-      this.fin.error = new types.ValidationError(this.effectiveSchema, "EndTime", null, "End time should be after start time");
+      this.fin.error = new types.ValidationError(getEffectiveSchema(this), "EndTime", null, "End time should be after start time");
       return;
     }
     const caption = this.caption.value || null;
@@ -90,10 +121,18 @@ export class CaseScheduler extends CaseBase {
     <az-button title="Add Item" @click="${() => this.btnAddItem()}"></az-button>
 </div>
 
-<az-time-block-picker id="schTest" scope="this"
+<az-time-block-picker id="schTest" scope="this" style="--pal-test-fg-color: #336699;"
     @selected="${this.schOnSelected}"
-    xenabledStartDate="2024-12-28"
-    xenabledEndDate="2025-1-6"
+    maxSelectedItems="1"
+    itemFgColor="#007bff"
+    itemBgColor="#eee"
+    itemSelectedFgColor="#fff"
+    itemSelectedBgColor="test-fg-color"
+    itemSelectedBadgeFgColor="#007bff"
+    itemSelectedBadgeBgColor="#fff"
+    timeViewGranularityMins="30"
+    viewStartDay="0"
+    viewNumDays="7"
 ></az-time-block-picker>
     `;
   }

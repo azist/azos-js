@@ -17,10 +17,16 @@ import {
   DATA_NAME_PROP,
   ERROR_PROP,
   NAME_PROP,
-  DATA_BLOCK_CHANGED_METHOD
+  DATA_BLOCK_CHANGED_METHOD,
+  DATA_MODE,
+  ANNOUNCE_METHOD,
+  VISIT_METHOD,
+  DIRTY_PROP,
+  RESET_DIRTY_METHOD,
+  DATA_MODE_PROP
 } from "azos/types";
-import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty } from "azos/strings";
-import { POSITION, STATUS, getDataParentOfMember, noContent } from "../ui";
+import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, isOneOf } from "azos/strings";
+import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, getEffectiveSchema, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
 
 
@@ -36,7 +42,7 @@ export const DEFAULT_CONTENT_WIDTH_PCT = 40;
 export const DEFAULT_TITLE_WIDTH_PCT = 40;
 
 
-export class FieldPart extends Part{
+export class FieldPart extends Part {
 
   constructor(){
     super();
@@ -45,8 +51,25 @@ export class FieldPart extends Part{
     this.titlePosition = POSITION.TOP_LEFT;
   }
 
+  /** Gets the effective schema name for this part. Default implementation uses `getEffectiveSchema(this)` */
+  get effectiveSchema(){ return getEffectiveSchema(this); }
+
   /** Gets effective field name by coalescing `name`,`id`,`constructor.name` properties */
   get effectiveName(){ return dflt(this.name, this.id, this.constructor.name); }
+
+
+  #dirty = false;
+  /** Returns true when this field was modified after a call to reset dirty */
+  get dirty(){ return this.#dirty; }
+  /** Returns true when this field was modified after a call to reset dirty */
+  get [DIRTY_PROP](){ return this.#dirty; }
+
+  /** Resets dirty flag to false */
+  [RESET_DIRTY_METHOD](){
+    const was = this.#dirty;
+    this.#dirty = false;
+    if (was) this.requestUpdate();
+  }
 
   #contentWidth;
   get contentWidth() { return this.#contentWidth; }
@@ -95,21 +118,21 @@ export class FieldPart extends Part{
       this.#rawValue = v;
       this.#value = undefined;
       this.#value = this.castValue(v);
-      this.requestUpdate();
     } finally {
+      this.#dirty = true;
+      this.requestUpdate();
       this._afterValueSet(false);
     }
   }
 
   /**
    * Sets the value as entered through the input/inputs, for example a value may contain extra formatting
-   * which needs to be stripped prior to assignment into data value
+   * which needs to be stripped prior to assignment into data value buffer
    */
   setValueFromInput(v){
     try {
       this.#rawValue = v;
       this.#value = undefined; //the value is `undefined` because error may be thrown at conversion below
-      this.requestUpdate();//async schedule update even if error gets thrown
       try{
         v = this.prepareInputValue(v);//prepare Input value first - this may throw (if user entered crap)
         this.#value = this.castValue(v);//cast data type - this may throw on invalid cast
@@ -118,6 +141,8 @@ export class FieldPart extends Part{
         this.error = e;
       }
     } finally {
+      this.#dirty = true;
+      this.requestUpdate();//async schedule update even if error gets thrown
       this._afterValueSet(true);
     }
   }
@@ -127,7 +152,26 @@ export class FieldPart extends Part{
   _afterValueSet(fromInput){  }
 
   get [DATA_VALUE_PROP](){ return this.value; }
-  set [DATA_VALUE_PROP](v){ this.setValueFromInput(v); }
+  set [DATA_VALUE_PROP](v){ v instanceof UiInputValue ? this.setValueFromInput(v.value) : this.value = v; }
+
+
+  /**
+   * Visits this field by applying a supplied function to itself.
+   * Compare to Announce: announcements require implementing objects to respond to messages - requiring to
+   * implement code inside of the object, whereas Visitors allow to apply an outside extension "visitor"
+   * to the already existing and possibly immutable object structure
+   * @param {Function} fVisitor required visitor body function
+   */
+  [VISIT_METHOD](fVisitor){ return fVisitor?.(this); }//visit self
+
+  /**
+   * Reacts to message announcements by the parent
+   */
+  // eslint-disable-next-line no-unused-vars
+  [ANNOUNCE_METHOD](sender, from, msg){
+   // console.log(`Part ${this.tagName}('${this.name}') received ${JSON.stringify(msg)}`);
+    this.requestUpdate();//schedule update regardless of message type
+  }
 
   /** Performs field validation, returning validation error if any for the specified context */
   [VALIDATE_METHOD](context, scope = null, apply = false){
@@ -397,6 +441,10 @@ export class FieldPart extends Part{
     noAutoValidate: { type: Boolean, reflect: false },
 
     lookupId: { type: String },
+
+    whenView:   {type: String},
+    whenInsert: {type: String},
+    whenUpdate: {type: String}
   }
 
   get [NAME_PROP](){ return this.name; }
@@ -409,10 +457,44 @@ export class FieldPart extends Part{
   /** True if part's title position is middle left or middle right (i.e. field has horizontal orientation) */
   get isHorizontal(){ return this.titlePosition === POSITION.MIDDLE_LEFT || this.titlePosition === POSITION.MIDDLE_RIGHT; }
 
+
+  calcHostStyles(effectiveAbsent){
+    if (!effectiveAbsent && (this.whenView || this.whenInsert || this.whenUpdate)){
+
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+
+      if (mode){
+        const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
+        effectiveAbsent = isOneOf(spec, ["absent", "remove"], false);
+      }
+    }
+
+    return super.calcHostStyles(effectiveAbsent);
+  }
+
   renderPart(){
+    let effectDisabled = this.isDisabled || this.isNa;
+
+    if (!effectDisabled || this.whenView || this.whenInsert || this.whenUpdate){
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+      if (mode){
+        effectDisabled = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
+        if (!effectDisabled){
+          const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
+          effectDisabled = isOneOf(spec, ["na", "disable", "disabled"], false);
+        }
+      }
+    }
+
     const clsRank =     `${parseRank(this.rank, true)}`;
     const clsStatus =   `${parseStatus(this.effectiveStatus, true)}`;
-    const clsDisable =  `${this.isDisabled ? "disabled" : ""}`;
+    const clsDisable =  `${effectDisabled ? "disabled" : ""}`;
     const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
     const isPreContent = this.isPredefinedContentLayout;
@@ -425,20 +507,22 @@ export class FieldPart extends Part{
     const stlContentWidth = isHorizon && !isPreContent ? css`width: ${this.contentWidth}%;` : "";
 
     const em = this.effectiveMessage;
-    const msg = em ? html`<p class="msg">${em}</p>` : '';
+   ////// const msg = em ? html`<p class="msg">${em}</p>` : '';
+    const msg = html`<p class="msg ${em ? "msg-filled" : ""}">${em ?? ""}</p>`;
 
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <label class="${clsPosition}">
           <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title}</span>
-          ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput()} ${msg}</div>` : html`${this.renderInput()} ${msg}`}
+          ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput(effectDisabled)} ${msg}</div>` : html`${this.renderInput(effectDisabled)} ${msg}`}
         </label>
       </div>
     `;
   }
 
   /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField */
-  renderInput(){ return noContent; }
+  // eslint-disable-next-line no-unused-vars
+  renderInput(effectivelyDisabled){ return noContent; }
 
 
   [DATA_BLOCK_CHANGED_METHOD](){ this.inputChanged(); }
@@ -449,14 +533,14 @@ export class FieldPart extends Part{
     this.dispatchEvent(evtChange);
 
     //Data events are not bubbling and not composed and CANCEL-able
-    const evtDataChange = new Event("datachange", { bubbles: false, composed: false, cancelable: true });
+    const evtDataChange = new CustomEvent("datachange", { bubbles: false, composed: false, cancelable: true, detail: { sender: this } });
     const proceed = this.dispatchEvent(evtDataChange);
 
     //We need to propagate data events manually
     if (proceed){
       const parent = getDataParentOfMember(this);
       if (parent && parent[DATA_BLOCK_CHANGED_METHOD]){
-        parent[DATA_BLOCK_CHANGED_METHOD]();
+        parent[DATA_BLOCK_CHANGED_METHOD](this);//sender = self
       }
     }
   }
@@ -471,16 +555,16 @@ export class FieldPart extends Part{
     const lookup = scope[this.lookupId];
     if (!lookup) return; // FUTURE: maybe create it here
 
+    // A listener can prevent feeding the lookup by calling evt.preventDefault() on @lookupFeed event
     const evt = new CustomEvent("lookupFeed", {
       bubbles: true,
       cancelable: true,
       detail: { owner: this, value, }
     });
-    lookup.dispatchEvent(evt);
+    this.dispatchEvent(evt);
 
     if (evt.defaultPrevented) return;
 
-    console.warn(`'lookupFeed' event was not canceled--feeding manually`);
     lookup.feed(this, value);
   }
 

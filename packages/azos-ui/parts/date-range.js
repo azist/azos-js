@@ -120,7 +120,7 @@ export class DateRangeField extends FieldPart {
     return this.arena.app.localizer.formatDateTime({ dt: asDate(v, true) });
   }
 
-  renderInput() {
+  renderInput(effectivelyDisabled) {
     const cls = [
       parseRank(this.rank, true),
       parseStatus(this.effectiveStatus, true, "Bg"),
@@ -147,7 +147,7 @@ export class DateRangeField extends FieldPart {
           placeholder="${this.placeholder}"
           type="text"
           .value="${startValue}"
-          .disabled=${this.isDisabled}
+          .disabled=${effectivelyDisabled}
           .required=${!this.optionalStart}
           ?readonly=${this.isReadonly}
           @change="${e => this.#dateChanged(e, "start")}"
