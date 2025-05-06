@@ -209,7 +209,7 @@ export class TabView extends Control {
   get [DIRTY_PROP]() { return this.tabs.some(one => one[DIRTY_PROP]); }
   async [CLOSE_QUERY_METHOD]() {
     for (let one of this.tabs) {
-      if (!(await one[CLOSE_QUERY_METHOD]())) return false;
+      if (one[CLOSE_QUERY_METHOD] && !(await one[CLOSE_QUERY_METHOD]())) return false;
     }
     return true;
   }
@@ -443,7 +443,7 @@ export class TabView extends Control {
    */
   async closeTab(tab, force = false) {
     if (!force) {
-      if (!await tab[CLOSE_QUERY_METHOD]()) return false;
+      if (tab[CLOSE_QUERY_METHOD] && !(await tab[CLOSE_QUERY_METHOD]())) return false;
       this.dispatchEvent(new CustomEvent("tabClosing", { detail: { tab }, cancelable: true, bubbles: true }));
     }
     if (tab.active && !this.unselectActiveTab()) return false;

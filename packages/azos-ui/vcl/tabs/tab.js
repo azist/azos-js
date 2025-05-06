@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import * as types from "azos/types";
+import { CLOSE_QUERY_METHOD } from "azos/types";
 
 import { Block } from "../../blocks";
 import { html } from "../../ui";
@@ -26,27 +26,16 @@ export class Tab extends Block {
     data: { type: Object },
   };
 
+  [CLOSE_QUERY_METHOD]() {
+    return this.canClose;
+  }
+
   #sid;
   get sid() { return this.#sid; }
 
   #icon;
   get icon() { return this.#icon; }
   set icon(v) { this.#icon = v; }
-
-  #isAbsent = false;
-  get isAbsent() { return this.#isAbsent; }
-  set isAbsent(v) {
-    v = types.asBool(v);
-    if (this.#isAbsent === v) return;
-    const tabView = this.tabView;
-    if (!v) {
-      this.#isAbsent = false;
-    } else {
-      if (this.active && !(tabView?.unselectActiveTab())) return;
-      this.#isAbsent = true;
-    }
-    tabView?.requestUpdate();
-  }
 
   #canClose = true;
   get canClose() { return this.#canClose; }
