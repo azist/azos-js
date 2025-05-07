@@ -92,14 +92,14 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   set saveResult(v){ this.#saveResult = v; }
 
 
-  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
+  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync(frm)` method  */
   get saveAsyncHandler(){ return this.#saveAsyncHandler; }
-  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
+  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync(frm)` method  */
   set saveAsyncHandler(v){ this.#saveAsyncHandler = aver.isFunctionOrNull(v); }
 
-  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
+  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync(frm, isRefresh)` method  */
   get loadAsyncHandler(){ return this.#loadAsyncHandler; }
-  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
+  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync(frm, isRefresh)` method  */
   set loadAsyncHandler(v){ this.#loadAsyncHandler = aver.isFunctionOrNull(v); }
 
   //** Loads form data
@@ -155,7 +155,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   async _doLoadAsync(isRefresh){
     //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
     aver.isNotNull(this.#loadAsyncHandler, "CrudForm.loadAsyncHandler function");
-    return await this.#loadAsyncHandler.call(this, isRefresh);
+    return await this.#loadAsyncHandler(this, isRefresh);
   }
 
   //do NOT replace this with event lambda
@@ -190,6 +190,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
 
     valError = await this._doAfterValidateOnSave(valCtx, valError);
 
+    this.error = valError;//it may have been changed/reset in prior method
 
     if (valError){
       toast("Please fix data validation errors", {status: "error"});
@@ -240,7 +241,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   async _doSaveAsync(){
      //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
      aver.isNotNull(this.#saveAsyncHandler, "CrudForm.saveAsyncHandler function");
-     return await this.#saveAsyncHandler.call(this);
+     return await this.#saveAsyncHandler(this);
   }
 
   //do NOT replace this with event lambda

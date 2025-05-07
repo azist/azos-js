@@ -44,12 +44,14 @@ export class ExampleFeatureDApplet extends Applet{
     this.arena.installToolbarCommands([this.#cmdModal]);
   }
 
-  async #handleLoadAsync(isRefresh){
+  async #handleLoadAsync(frm, isRefresh){
     console.log(`LOADING DATA.... ${COUNTER}  Refresh: ${isRefresh}`);
+    console.dir(frm);
     return {person: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "8", Description: "Eats mice"} ]}};
   }
 
   async #handleSaveAsync(frm){
+    console.dir(frm);
     showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP/blockData]: \n\n" + JSON.stringify(frm.blockData, null, 2), 3, true);
   }
 
