@@ -15,6 +15,7 @@ import "../../parts/button.js";
 import "../../modal-dialog.js";
 import "../../crud-form.js";
 import "../../modal-dialog.js";
+import { showMsg } from "../../msg-box.js";
 //import { Permission } from "azos/security";
 
 let COUNTER = 0;
@@ -49,14 +50,19 @@ export class ExampleFeatureDApplet extends Applet{
   }
 
   async #handleSaveAsync(frm){
-    alert("SAVING FORM");
+    showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP/blockData]: \n\n" + JSON.stringify(frm.blockData, null, 2), 3, true);
   }
 
   render(){
    return html`
-    <az-crud-form id="frmMain" scope="this" toolbar="above" .loadAsyncHandler=${this.#handleLoadAsync} .saveAsyncHandler=${this.#handleSaveAsync} .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}} >
+    <az-crud-form id="frmMain" scope="this" toolbar="above"
+      .loadAsyncHandler=${this.#handleLoadAsync}
+      .saveAsyncHandler=${this.#handleSaveAsync}
+      .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}}
+      @datachange=${(e) => console.log(`CRUD FORM @datachange EVENT: ${e.detail.sender.name} = ${e.detail.sender.value}`)}
+      >
 
-      <examples-person-block scope="this" id="blockPerson" name="person" @datachange=${() => console.log("INNER SLOTTED BLOCK DATA CHANGE")}  > </examples-person-block>
+      <examples-person-block scope="this" id="blockPerson" name="person" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
 
     </az-crud-form>
 

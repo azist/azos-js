@@ -184,15 +184,19 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   async formSave(){
     aver.isTrue(!this.isViewMode, `${this.constructor.name}(!view).formSave()`);
 
-    const errors = this[VALIDATE_METHOD]({}, null, true);
+    const valCtx = (await this._doBeforeValidateOnSave()) ?? { };
 
-    if (errors){
+    let valError = this[VALIDATE_METHOD](valCtx, null, true);
+
+    valError = await this._doAfterValidateOnSave(valCtx, valError);
+
+
+    if (valError){
       toast("Please fix data validation errors", {status: "error"});
       return;
     }
 
-    //Temp
-    showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this[DATA_VALUE_PROP], null, 2), 3, true);
+    await this._doBeforeSave(valCtx);
 
     this.#saveResult = await this._doSaveAsync();
 
@@ -201,6 +205,30 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
   }
+
+
+  /**
+   *  Override to perform pre-validate step on Save(). This can be used to default required field values among other things.
+   * @returns {map} optional validation context
+   * */
+  async _doBeforeValidateOnSave(){ return null; }
+
+  /**
+   * Override to perform post-validate step on Save(). For example, you can mask/disregard validation error by returning a null or a different error
+   * @param {any} ctx validation context object
+   * @param {Error} error validation error or null if there is none. You can return this or modified error object
+   * @returns {Error} validation error or null if there is none
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _doAfterValidateOnSave(ctx, error){ return error; }
+
+  /**
+   * Override to perform post-successful-validate pre-save step on Save().
+   * @param {*} ctx validation context object
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _doBeforeSave(ctx){  }
+
 
   /**
    * Override to perform actual work, such as service client or logic call.
@@ -255,8 +283,8 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   }
 
   [DATA_BLOCK_CHANGED_METHOD](sender){
-    super[DATA_BLOCK_CHANGED_METHOD]();
-    console.log(`FORM data changed called: ${sender[DATA_NAME_PROP]}`);
+    super[DATA_BLOCK_CHANGED_METHOD](sender);
+    ////console.log(`FORM data changed called: ${sender[DATA_NAME_PROP]}`);
     if (!this.isViewMode){
       this.error = null;
     }
