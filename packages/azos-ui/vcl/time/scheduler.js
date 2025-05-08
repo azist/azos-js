@@ -584,7 +584,7 @@ export class TimeBlockPicker extends Control {
         items: [],
       };
       this.itemsByDay.push(found);
-      this.itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
+      // this.itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
     }
 
     if (!types.isArray(found.items)) found.items = [];
@@ -597,6 +597,7 @@ export class TimeBlockPicker extends Control {
     }
 
     found.items.push(item);
+    // found.items.sort((a, b) => a.startTimeMins - b.startTimeMins);
     return item;
   }
 
@@ -666,6 +667,10 @@ export class TimeBlockPicker extends Control {
   /** Commit the edits and re-render the view */
   endChanges() {
     this.editMode = false;
+    // console.dir(this.itemsByDay);
+    this.#itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
+    this.itemsByDay.forEach(({ items }) => items.sort((a, b) => a.startTimeMins - b.startTimeMins));
+    // console.dir(this.itemsByDay);
     this.#setViewPropertiesForRecompute();
     this.requestUpdate();
   }
