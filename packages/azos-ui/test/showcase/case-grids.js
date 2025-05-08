@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 import { STL_CARD, STL_INLINE_GRID } from "../../styles";
-import { html } from "../../ui";
-import { CaseBase } from "./case-base";
+import { html } from "../../ui.js";
+import { CaseBase } from "./case-base.js";
 
 export class CaseGrids extends CaseBase {
 
