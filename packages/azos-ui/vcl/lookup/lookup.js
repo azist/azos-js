@@ -509,7 +509,6 @@ export class Lookup extends Part {
    * @returns render `noResults` or results mapped to {@link renderResult}
    */
   renderBody() {
-    if (this.#isLoadingData) return html`<div class="loader">Loading...</div>`;
     if (!this.results || !this.results.length) return html`<span class="noResults">No results</span>`;
     return html`
 <ul class="results" @mouseover="${evt => this.#onMouseOver(evt)}" @click="${evt => this.#onResultsClick(evt)}">
