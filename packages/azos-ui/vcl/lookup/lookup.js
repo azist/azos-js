@@ -85,23 +85,6 @@ export class Lookup extends Part {
     .highlight{
       background-color: var(--vcl-codebox-hi-string-hover);
     }
-    .loading .loader{
-      display: flex;
-      margin: 1ch;
-      align-items: center;
-      column-gap: 1ch;
-    }
-    .loader::after{
-      --size: 2ch;
-      content: "";
-      width: var(--size);
-      height: var(--size);
-      border: 4px solid #dddddd;
-      border-top-color: #336699;
-      border-radius: 50%;
-      animation: loader 1s ease infinite;
-    }
-    @keyframes loader{ to{ transform: rotate(1turn); }}
     `];
 
   static properties = {
@@ -150,11 +133,11 @@ export class Lookup extends Part {
     this._lookupCompleted(isCancel);
     this._disconnectListeners();
     this.#teardownOwner();
-    this.#promise = null;
+    this.#promise = this.#resolve = this.reject = null;
     this.#focusedResultElm = null;
+    this.#isLoadingData = false;
     this.searchPattern = null;
     this.results = null;
-    this.#isLoadingData = false;
     this.update();//sync update dom build
     this.popover.hidePopover();
     console.groupEnd();
