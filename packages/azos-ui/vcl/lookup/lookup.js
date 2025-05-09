@@ -121,7 +121,7 @@ export class Lookup extends Part {
   #focusedResultElm;
   #owner = null;
   #ownerSetup = false;
-  #loadingData = false;
+  #isLoadingData = false;
   #result;
 
   #promise;
@@ -154,7 +154,7 @@ export class Lookup extends Part {
     this.#focusedResultElm = null;
     this.searchPattern = null;
     this.results = null;
-    this.#loadingData = false;
+    this.#isLoadingData = false;
     this.update();//sync update dom build
     this.popover.hidePopover();
     console.groupEnd();
@@ -162,11 +162,11 @@ export class Lookup extends Part {
 
   /** The debounced method to prepareAndGetData */
   async _debouncedFeed(searchPattern) {
-    this.#loadingData = true;
+    this.#isLoadingData = true;
     this.focusedResultElm = null;
     this.open();
     const results = await this.prepareAndGetData(searchPattern);
-    this.#loadingData = false;
+    this.#isLoadingData = false;
     if (!results) return;
 
     this.results = results;
@@ -285,7 +285,7 @@ export class Lookup extends Part {
   }
 
   #onKeydown(evt) {
-    if (!this.isOpen) return;
+    if (!this.isOpen || this.#isLoadingData) return;
 
     let preventDefault = true;
     switch (evt.key) {
@@ -492,7 +492,7 @@ export class Lookup extends Part {
       parseStatus(this.status, true),
       this.isOpen ? "" : "hidden",
       this.owner ? "hasOwner" : "",
-      this.#loadingData ? "loading" : "",
+      this.#isLoadingData ? "loading" : "",
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
@@ -509,7 +509,7 @@ export class Lookup extends Part {
    * @returns render `noResults` or results mapped to {@link renderResult}
    */
   renderBody() {
-    if (this.#loadingData) return html`<div class="loader">Loading...</div>`;
+    if (this.#isLoadingData) return html`<div class="loader">Loading...</div>`;
     if (!this.results || !this.results.length) return html`<span class="noResults">No results</span>`;
     return html`
 <ul class="results" @mouseover="${evt => this.#onMouseOver(evt)}" @click="${evt => this.#onResultsClick(evt)}">
