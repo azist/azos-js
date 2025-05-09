@@ -34,7 +34,7 @@ export class XYZAddressLookup extends ExternalCallLookup {
     let filtered = this.data;
 
     await new Promise((resolve, reject) => {
-      const timeout = setTimeout(resolve, 1000);
+      const timeout = setTimeout(resolve, 100);
       signal.addEventListener("abort", () => {
         clearTimeout(timeout);
         reject({ cause: signal.reason });
