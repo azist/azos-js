@@ -14,7 +14,7 @@ This is **not** the place for individual Parts/Widget/Controls or specific contr
 ## How to use
 Import whichever CSS classes you need for your components.
 ```
-import { STL_CARD, STL_INLINE_GRID , STL_PROSE } from '@azos-ui/styles';
+import { STL_CARD, STL_INLINE_GRID , STL_PROSE } from 'azos-ui/styles';
 ```
 
 
@@ -22,7 +22,7 @@ import { STL_CARD, STL_INLINE_GRID , STL_PROSE } from '@azos-ui/styles';
 ```
 <div class-"card">
     <div class="card-title">I have specific styles</div>
-    <div class="caerd-id">I have specific styles</div>
+    <div class="card-id">I have specific styles</div>
 </div>
 ```
 

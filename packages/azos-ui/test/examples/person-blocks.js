@@ -4,15 +4,16 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { isOneOf } from "azos/strings";
+import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
+
 import { Block } from "../../blocks.js";
 import { html } from "../../ui.js";
+import { FieldPart } from "../../parts/field-part.js";
+import { STL_INLINE_GRID } from "../../styles";
 
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
-import { isOneOf } from "azos/strings";
-import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
-import { FieldPart } from "../../parts/field-part.js";
-import STL_INLINE_GRID from "../../styles/grid.js";
 
 export class PersonBlock extends Block {
 
