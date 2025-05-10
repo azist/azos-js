@@ -4,19 +4,17 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { isNonEmptyString } from "azos/types";
 import { matchPattern } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
-import { css, html, verbatimHtml } from "../../ui";
-import { Lookup } from "../../parts/lookup";
-import { CaseBase } from "./case-base";
+import { css, html, verbatimHtml } from "../../ui.js";
+import { ExternalCallLookup } from "../../vcl/lookup/lookup.js";
+import { CaseBase } from "./case-base.js";
 
-import "../../parts/button";
-import { isNonEmptyString } from "azos/types";
+import "../../parts/button.js";
 
-
-
-export class XYZAddressLookup extends Lookup {
+export class XYZAddressLookup extends ExternalCallLookup {
   constructor({ debounceMs } = {}) {
     super({ debounceMs });
 
@@ -30,9 +28,18 @@ export class XYZAddressLookup extends Lookup {
 
   #ref = { imgRegistry: ImageRegistry };
 
-  async getData() {
+  async _doCall(abortController) {
     const searchPattern = `*${this.searchPattern}*`;
+    const signal = abortController.signal;
     let filtered = this.data;
+
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(resolve, 100);
+      signal.addEventListener("abort", () => {
+        clearTimeout(timeout);
+        reject({ cause: signal.reason });
+      });
+    });
 
     try {
       filtered = this.data.filter(one => ["street1", "street2", "city", "state", "zip"]
