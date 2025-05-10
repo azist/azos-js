@@ -4,14 +4,28 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, CLOSE_QUERY_METHOD, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, RESET_DIRTY_METHOD, isArray, VALIDATE_METHOD, VISIT_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_NAME_PROP } from "azos/types";
+import {
+  asString,
+  CLOSE_QUERY_METHOD,
+  DATA_MODE,
+  DATA_MODE_PROP,
+  DATA_VALUE_PROP,
+  ERROR_PROP,
+  RESET_DIRTY_METHOD,
+  isArray,
+  VALIDATE_METHOD,
+  VISIT_METHOD,
+  DATA_BLOCK_CHANGED_METHOD
+} from "azos/types";
+
+import * as aver from "azos/aver";
+
 import { Form, Block } from "./blocks.js";
 import { css, html, noContent } from "./ui.js";
-import { showMsg } from "./msg-box.js";
 import { isEmpty, isOneOf } from "azos/strings";
-import * as aver from "azos/aver";
-import "./vcl/util/error-box.js";
 import { toast } from "./toast.js";
+
+import "./vcl/util/error-box.js";
 
 /**
  * Provides {@link Form} specialization for CRUD -related data functionality.
