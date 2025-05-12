@@ -10,7 +10,7 @@ import { isEmpty, matchPattern } from "azos/strings";
 import { LOG_TYPE } from "azos/log";
 import { ABORT_ERROR_NAME, ABSTRACT } from "azos/coreconsts";
 
-import { Part, css, html, parseRank, parseStatus, verbatimHtml } from "../../ui.js";
+import { Part, css, html, parseRank, parseStatus, verbatimHtml } from "../ui.js";
 
 
 /**
@@ -104,7 +104,6 @@ export class Lookup extends Part {
   #focusedResultElm;
   #owner = null;
   #ownerSetup = false;
-  #isLoadingData = false;
   #result;
 
   #promise;
@@ -135,7 +134,7 @@ export class Lookup extends Part {
     this.#teardownOwner();
     this.#promise = this.#resolve = this.reject = null;
     this.#focusedResultElm = null;
-    this.#isLoadingData = false;
+    if (this.owner) this.owner.isBusy = false;
     this.searchPattern = null;
     this.results = null;
     this.update();//sync update dom build
@@ -145,11 +144,17 @@ export class Lookup extends Part {
 
   /** The debounced method to prepareAndGetData */
   async _debouncedFeed(searchPattern) {
-    this.#isLoadingData = true;
-    this.focusedResultElm = null;
-    this.open();
-    const results = await this.prepareAndGetData(searchPattern);
-    this.#isLoadingData = false;
+    let results;
+    const owner = this.owner;
+    try {
+      if (owner) owner.isBusy = true;
+      this.focusedResultElm = null;
+      this.open();
+      results = await this.prepareAndGetData(searchPattern);
+    } finally {
+      if (owner) owner.isBusy = false;
+    }
+
     if (!results) return;
 
     this.results = results;
@@ -268,7 +273,7 @@ export class Lookup extends Part {
   }
 
   #onKeydown(evt) {
-    if (!this.isOpen || this.#isLoadingData) return;
+    if (!this.isOpen || this.owner?.isBusy) return;
 
     let preventDefault = true;
     switch (evt.key) {
@@ -475,7 +480,7 @@ export class Lookup extends Part {
       parseStatus(this.status, true),
       this.isOpen ? "" : "hidden",
       this.owner ? "hasOwner" : "",
-      this.#isLoadingData ? "loading" : "",
+      this.owner?.isBusy ? "loading" : "",
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
