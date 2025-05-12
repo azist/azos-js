@@ -104,7 +104,6 @@ export class Lookup extends Part {
   #focusedResultElm;
   #owner = null;
   #ownerSetup = false;
-  #isBusy = false;
   #result;
 
   #promise;
@@ -135,7 +134,7 @@ export class Lookup extends Part {
     this.#teardownOwner();
     this.#promise = this.#resolve = this.reject = null;
     this.#focusedResultElm = null;
-    this.#isBusy = false;
+    if (this.owner) this.owner.isBusy = false;
     this.searchPattern = null;
     this.results = null;
     this.update();//sync update dom build
@@ -145,11 +144,16 @@ export class Lookup extends Part {
 
   /** The debounced method to prepareAndGetData */
   async _debouncedFeed(searchPattern) {
-    this.#isBusy = true;
-    this.focusedResultElm = null;
-    this.open();
-    const results = await this.prepareAndGetData(searchPattern);
-    this.#isBusy = false;
+    let results;
+    try {
+      if (this.owner) this.owner.isBusy = true;
+      this.focusedResultElm = null;
+      this.open();
+      results = await this.prepareAndGetData(searchPattern);
+    } finally {
+      if (this.owner) this.owner.isBusy = false;
+    }
+
     if (!results) return;
 
     this.results = results;
@@ -268,7 +272,7 @@ export class Lookup extends Part {
   }
 
   #onKeydown(evt) {
-    if (!this.isOpen || this.#isBusy) return;
+    if (!this.isOpen || this.owner?.isBusy) return;
 
     let preventDefault = true;
     switch (evt.key) {
@@ -475,7 +479,7 @@ export class Lookup extends Part {
       parseStatus(this.status, true),
       this.isOpen ? "" : "hidden",
       this.owner ? "hasOwner" : "",
-      this.#isBusy ? "loading" : "",
+      this.owner?.isBusy ? "loading" : "",
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
