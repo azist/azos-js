@@ -9,7 +9,7 @@ import { matchPattern } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
 import { css, html, verbatimHtml } from "../../ui.js";
-import { ExternalCallLookup } from "../../vcl/lookup/lookup.js";
+import { ExternalCallLookup } from "../../parts/lookup.js";
 import { CaseBase } from "./case-base.js";
 
 import "../../parts/button.js";
