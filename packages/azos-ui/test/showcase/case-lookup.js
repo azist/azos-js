@@ -23,6 +23,9 @@ export class XYZAddressLookup extends ExternalCallLookup {
       { street1: "700 Highland Rd", city: "Macedonia", state: "OH", zip: "44056", country: "USA" },
       { street1: "600 Biscayne Blvd NW", city: "Miami", state: "FL", zip: "33132", country: "USA" },
       { street1: "2 15th St NW", city: "Washington", state: "DC", zip: "20024", country: "CN" },
+      { street1: "23900 Commerce", city: "Beach Drive", state: "OH", zip: "44124", country: "USA" },
+      { street1: "900 Lamp drive", city: "Sunshine Cove", state: "CA", zip: "91606", country: "USA" },
+      { street1: "890 Parl Lane", city: "Shady Knolls", state: "GA", zip: "30309", country: "USA" },
     ];
   }
 
@@ -82,7 +85,7 @@ export class CaseLookup extends CaseBase {
 
   selectAddress(event) {
     if (event.cancelable) event.preventDefault();
-    console.log(event.detail.value);
+    console.log(`selectAddress was called with this: ${JSON.stringify(event.detail.value)}`);
     const { street1, street2, city, state, zip, country } = event.detail.value;
     this.tbStreet1.setValueFromInput(street1);
     this.tbStreet2.setValueFromInput(street2);
@@ -90,7 +93,7 @@ export class CaseLookup extends CaseBase {
     this.tbState.setValueFromInput(state);
     this.tbZip.setValueFromInput(zip);
     this.tbCountry.setValueFromInput(country);
-    this.requestUpdate();
+    // //this.requestUpdate();
   }
 
   renderControl() {
