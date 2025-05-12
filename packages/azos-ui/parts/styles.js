@@ -96,6 +96,25 @@ export const baseStyles = css`
   background-color:unset !important;
   transition: 0.15s ease-out;
 }
+
+.busy{
+  display: inline-block;
+  vertical-align: super;
+  width: .35em;
+  height: .35em;
+  background: var(--ink);
+  border-radius: 25%;
+  animation: busyPulse 1s infinite alternate;
+  margin-left: 0.2ch;
+}
+
+@keyframes busyPulse {
+  to {
+    transform: scale(1.5) rotate(360deg) translateX(-0.1em);
+    opacity: 0.15;
+    border-radius: 50%;
+  }
+}
 `;
 
 export const buttonStyles = css`

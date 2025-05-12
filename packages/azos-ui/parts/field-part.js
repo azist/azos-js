@@ -444,7 +444,10 @@ export class FieldPart extends Part {
 
     whenView:   {type: String},
     whenInsert: {type: String},
-    whenUpdate: {type: String}
+    whenUpdate: {type: String},
+
+    /** When set shows some kind of animation to indicate bg work */
+    isBusy: {type: Boolean, reflect: true}
   }
 
   get [NAME_PROP](){ return this.name; }
@@ -510,10 +513,12 @@ export class FieldPart extends Part {
    ////// const msg = em ? html`<p class="msg">${em}</p>` : '';
     const msg = html`<p class="msg ${em ? "msg-filled" : ""}">${em ?? ""}</p>`;
 
+    const busy = this.isBusy ? html`<span class="busy"></span>` : null;
+
     return html`
       <div class="${clsRank} ${clsStatus} ${clsDisable} field">
         <label class="${clsPosition}">
-          <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title}</span>
+          <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title} ${busy}</span>
           ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput(effectDisabled)} ${msg}</div>` : html`${this.renderInput(effectDisabled)} ${msg}`}
         </label>
       </div>
