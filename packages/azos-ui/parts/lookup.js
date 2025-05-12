@@ -145,13 +145,14 @@ export class Lookup extends Part {
   /** The debounced method to prepareAndGetData */
   async _debouncedFeed(searchPattern) {
     let results;
+    const owner = this.owner;
     try {
-      if (this.owner) this.owner.isBusy = true;
+      if (owner) owner.isBusy = true;
       this.focusedResultElm = null;
       this.open();
       results = await this.prepareAndGetData(searchPattern);
     } finally {
-      if (this.owner) this.owner.isBusy = false;
+      if (owner) owner.isBusy = false;
     }
 
     if (!results) return;
