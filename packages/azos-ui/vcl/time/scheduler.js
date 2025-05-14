@@ -498,23 +498,24 @@ export class TimeBlockPicker extends Control {
    * @property {boolean} [options.omitMeridianSuffix=false] (optional) If true, omits am/pm suffix (e.g., 11:00 becomes 11:00)
    * @returns a formatted time string
    */
-  #formatTime(minsOfDay, { use24HourTime = false, omitMinutesForWholeHours = false, omitMeridianSuffix = false } = {}) {
+  #formatTime(minsOfDay, { use24HourTime = false, omitMinutesForWholeHours = false, omitMeridianSuffix = false, asString = false } = {}) {
     let mins = minsOfDay % 60;
     let hour = Math.floor(minsOfDay / 60);
-    let timeString;
+    let hourString, minString, meridiemIndicatorString;
 
     if (use24HourTime) {
-      timeString = html`${hour.toString().padStart(2, "0")}`;
+      hourString = `${hour.toString().padStart(2, "0")}`;
       omitMeridianSuffix = true; // 24-hour time does not use am/pm
       omitMinutesForWholeHours = false; // 24-hour time always shows minutes
     } else {
-      timeString = html`${hour % 12 || 12}`;
+      hourString = `${hour % 12 || 12}`;
     }
 
-    if (!omitMinutesForWholeHours) timeString = html`${timeString}:${mins.toString().padStart(2, "0")}`;
-    if (!omitMeridianSuffix) timeString = html`${timeString}&nbsp;<span class="meridiemIndicator">${hour < 12 ? "am" : "pm"}</span>`
+    if (!omitMinutesForWholeHours) minString = `:${mins.toString().padStart(2, "0")}`;
+    if (!omitMeridianSuffix) meridiemIndicatorString = `${hour < 12 ? "am" : "pm"}`;
 
-    return timeString;
+    if (asString) return `${hourString}${minString}${meridiemIndicatorString ?? ""}`;
+    return html`${hourString}${minString} ${meridiemIndicatorString ? html`<span class="meridiemIndicator">${meridiemIndicatorString}</span>` : ""}`;
   }
 
   /* TODO: Implement highlighting of rows and columns */
@@ -552,9 +553,9 @@ export class TimeBlockPicker extends Control {
    *  NOTE: endTime is calculated from start + duration since endTime from server is typically endTime - 1 inclusive,
    *    rather than endTime exclusive (2:29 inclusive, 2:30 exclusive)
    */
-  formatStartEndTimes({ startTimeMins, durationMins } = {}) {
-    const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime });
-    const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime });
+  formatStartEndTimes({ startTimeMins, durationMins } = {}, asString = false) {
+    const startTime = this.#formatTime(startTimeMins, { use24HourTime: this.use24HourTime, asString });
+    const endTime = this.#formatTime(startTimeMins + durationMins, { use24HourTime: this.use24HourTime, asString });
     return [startTime, endTime];
   }
 
@@ -591,7 +592,7 @@ export class TimeBlockPicker extends Control {
 
     const timeFoundIndex = found.items.findIndex(one => (item.startTimeMins >= one.startTimeMins && item.startTimeMins <= one.endTimeMins) || (item.endTimeMins >= one.startTimeMins && item.endTimeMins <= one.endTimeMins));
     if (timeFoundIndex > -1) {
-      const [startTime, endTime] = this.formatStartEndTimes(found.items[timeFoundIndex]).map(t => types.isString(t) ? t : t.values.join(""));
+      const [startTime, endTime] = this.formatStartEndTimes(found.items[timeFoundIndex], true);
       this.writeLog("Error", `An item already exists from ${startTime} - ${endTime} on ${found.items[timeFoundIndex].day.toLocaleDateString()}.`);
       return;
     }
