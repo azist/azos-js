@@ -4,11 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { css, html } from "../../ui";
-import { CaseBase } from "./case-base";
-import "../../parts/text-field";
-import "../../parts/date-range";
-import "../../vcl/util/code-box";
+import { css, html } from "../../ui.js";
+import { CaseBase } from "./case-base.js";
+import "../../parts/text-field.js";
+import "../../parts/date-range-field.js";
+import "../../vcl/util/code-box.js";
 
 export class CaseDateRange extends CaseBase {
   constructor() { super(); }
