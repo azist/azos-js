@@ -9,18 +9,26 @@ import { CaseBase } from "./case-base.js";
 import "../../bit.js";
 
 export class CaseBit extends CaseBase {
-
-
   renderControl() {
     return html`
 
 <h2> UI Bits (Fragments)</h2>
 
-<az-bit id="bitAboutUs" scope="this">
+<p> This is a sample content which is placed outside of bits. </p>
+
+<az-bit id="bitAboutus" scope="this">
+  <p>
   About us paragraph content goes here. It is really
   slotted into the bit. You can use the az-bit tag to place
   content inside the bit. The az-bit tag is a custom element
   that is used to create a bit. And this content is placed in a default slot.
+  </p>
+
+  <p>
+  Notice, that you can place any content into the bit. For example, you can surround a
+  block of data fields with a bit, or surround other bits with this bit, this way you can create a hierarchical
+  structure of bits.
+  </p>
 </az-bit>
     `;
   }

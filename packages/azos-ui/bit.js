@@ -5,7 +5,26 @@
 </FILE_LICENSE>*/
 
 import { asBool } from 'azos/types';
-import { Control, html } from './ui.js';
+import { Control, css, html } from './ui.js';
+
+
+export const STL_BIT = css`
+  :host{ display: block; padding: 0em; box-sizing: border-box; }
+
+  .details{
+    display: block;
+    border: 1px solid red;
+    border-radius: 0.5em;
+    background: none;
+    transition: all 0.2s ease-in-out;
+    overflow: hidden;
+    opacity: 1;
+    height: auto;
+
+    &.collapsed{ height: 0px; opacity: 0; }
+
+  }
+`;
 
 /*
   Provides a collapsible summary view of a UI fragment. Bits allow us to save screen space by collapsing the details into
@@ -16,6 +35,8 @@ import { Control, html } from './ui.js';
   of the `az-bit` tags as `Bit` by default uses a `slot` to render its details.
 */
 export class Bit extends Control {
+
+  static styles = [STL_BIT];
 
   static properties = {
     isExpanded: { type: Boolean, reflect: true },
@@ -40,7 +61,7 @@ export class Bit extends Control {
    * The summary toggle button calls this method to expand/collapse the details
    * @returns {boolean} - true if the toggle was successful, false if it was cancelled by an event handler
   */
-  toggle() {
+  toggle(){
     const evt = new CustomEvent("beforeExpandToggle", { bubbles: false, cancelable: true, composed: false, detail: { isExpanded: this.isExpanded } });
     this.dispatchEvent(evt);
     if (evt.defaultPrevented) return false; // Cancelled by the event handler
@@ -86,16 +107,18 @@ export class Bit extends Control {
 </section>`;
   }
 
-  renderSummaryExpander(data){ return html`<div class="summary-expander" @click=${this.#onSummaryExpanderClick}></div>`; }
+  renderSummaryExpander(){ return html`<div class="summary-expander" @click=${this.#onSummaryExpanderClick}></div>`; }
   renderSummaryTitle(data){ return html`<h2>${data.title}</h2>`; }
   renderSummarySubtitle(data){ return html`<div>${data.subtitle}</div>`; }
   renderSummaryToolbar(data){ return html`<div class="summary-toolbar">${data.subtitle}</div>`; }
 
   renderDetails(){
-    return html`<section id="sectDetails"> ${this.renderDetailContent()}</section>`;
+    return html`<section id="sectDetails" class="details"> ${this.renderDetailContent()}</section>`;
   }
 
   renderDetailContent(){ return html`<slot>  </slot>`; }
 }
+
+
 
 window.customElements.define("az-bit", Bit);
