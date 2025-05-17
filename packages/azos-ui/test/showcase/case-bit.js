@@ -30,6 +30,15 @@ export class CaseBit extends CaseBase {
   structure of bits.
   </p>
 </az-bit>
+
+
+<p>
+  Another Content outside. We are going to generate some test content here, which will span multiple lines.
+  For some reason, we need to generate a lot of text here.
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+</p>
+
     `;
   }
 }

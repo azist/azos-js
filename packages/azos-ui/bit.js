@@ -9,21 +9,73 @@ import { Control, css, html } from './ui.js';
 
 
 export const STL_BIT = css`
-  :host{ display: block; padding: 0em; box-sizing: border-box; }
+:host{
+  display: block;
+  padding: 0em;
+  box-sizing: border-box;
+}
 
-  .details{
-    display: block;
-    border: 1px solid red;
-    border-radius: 0.5em;
-    background: none;
-    transition: all 0.2s ease-in-out;
-    overflow: hidden;
-    opacity: 1;
-    height: auto;
+.summary{
+  border-bottom: none;
 
-    &.collapsed{ height: 0px; opacity: 0; }
+  &.collapsed{ border-bottom: 1px dotted #20202060; }
 
+  .expander{
+    display: inline;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
   }
+
+  .title{
+    display: inline;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0.1em;
+    z-index: 10;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .subtitle{
+    display: inline;
+    font-size: 1em;
+    font-weight: normal;
+    color: #a0a0a0;
+    margin-bottom: 0.1em;
+  }
+
+  .toolbar{
+    position: relative;
+    top: -1.2em;
+    margin-bottom: -1.0em;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.35em;
+    z-index: 0;
+    cursor: pointer;
+  }
+}
+
+.details{
+  display: block;
+  Xborder: 1px solid red;
+  border-radius: 1em;
+  background: var(--paper2);
+  transition: height,opacity 0.55s ease-in-out;
+  overflow: hidden;
+  opacity: 1;
+  height: auto;
+
+  box-shadow: 0px 0px 8px #20202020;
+  padding: .75em;
+
+  border-top: 1px dotted #20202020;
+  border-bottom: 1px dotted #20202020;
+
+  &.collapsed{ border-top: none; height: 0; opacity: 0; }
+}
 `;
 
 /*
@@ -45,10 +97,7 @@ export class Bit extends Control {
 
   #isExpanded = false;
   get isExpanded() { return this.#isExpanded; }
-  set isExpanded(value) {
-    this.#isExpanded = asBool(value);
-   // this.requestUpdate();
-  }
+  set isExpanded(value) { this.#isExpanded = asBool(value); }
 
   /** Expands the detail section. This DOES NOT call an event */
   expand()  { this.isExpanded = true; }
@@ -98,8 +147,9 @@ export class Bit extends Control {
   }
 
   renderSummary(data){
+    const cls = this.isExpanded ? "" : "collapsed";
     return html`
-<section id="sectSummary">
+<section id="sectSummary" class="summary ${cls}">
     ${this.renderSummaryExpander(data)}
     ${this.renderSummaryTitle(data)}
     ${this.renderSummaryToolbar(data)}
@@ -107,13 +157,14 @@ export class Bit extends Control {
 </section>`;
   }
 
-  renderSummaryExpander(){ return html`<div class="summary-expander" @click=${this.#onSummaryExpanderClick}></div>`; }
-  renderSummaryTitle(data){ return html`<h2>${data.title}</h2>`; }
-  renderSummarySubtitle(data){ return html`<div>${data.subtitle}</div>`; }
-  renderSummaryToolbar(data){ return html`<div class="summary-toolbar">${data.subtitle}</div>`; }
+  renderSummaryExpander(){ return html`<div class="expander" @click=${this.#onSummaryExpanderClick}>${this.isExpanded ? "-" : "+"}</div>`; }
+  renderSummaryTitle(data){ return html`<div class="title" @click=${this.#onSummaryExpanderClick}>${data.title}</div>`; }
+  renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle}</div>`; }
+  renderSummaryToolbar(data){ return html`<div class="toolbar"> <div>[A]</div> <div>[B]</div> </div>`; }
 
   renderDetails(){
-    return html`<section id="sectDetails" class="details"> ${this.renderDetailContent()}</section>`;
+    const cls = this.isExpanded ? "" : "collapsed";
+    return html`<section id="sectDetails" class="details ${cls}"> ${this.renderDetailContent()}</section>`;
   }
 
   renderDetailContent(){ return html`<slot>  </slot>`; }
