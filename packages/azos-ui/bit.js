@@ -11,14 +11,20 @@ import { Control, css, html } from './ui.js';
 export const STL_BIT = css`
 :host{
   display: block;
-  padding: 0em;
   box-sizing: border-box;
+
+  border: var(--s-default-bor-ctl);
+  background-color:  var(--s-default-bg-ctl);
+  color: var(--s-default-fg-ctl);
+  padding: 0.55em 0.75em 0.55em 0.75em;
+  border-radius: .5em;
+  box-shadow: var(--ctl-box-shadow);
 }
 
 .summary{
   border-bottom: none;
 
-  &.collapsed{ border-bottom: 1px dotted #20202060; }
+  &.collapsed{ border-bottom: 1px solid #20202060; }
 
   .expander{
     display: inline;
@@ -74,7 +80,7 @@ export const STL_BIT = css`
   border-top: 1px dotted #20202020;
   border-bottom: 1px dotted #20202060;
 
-  &.collapsed{ border-top: none; height: 0; opacity: 0; }
+  &.collapsed{ border-top: none; height: 0; opacity: 0; padding: 0;}
 }
 `;
 
@@ -143,7 +149,7 @@ export class Bit extends Control {
 
   renderControl(){
     const summary = this._buildSummaryData();
-    return html` ${this.renderSummary(summary)} ${this.renderDetails()}`;
+    return html`<div id="divRoot" class="root"> ${this.renderSummary(summary)} ${this.renderDetails()} </div>`;
   }
 
   renderSummary(data){
