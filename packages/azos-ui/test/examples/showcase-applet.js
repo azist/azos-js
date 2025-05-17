@@ -56,6 +56,9 @@ export class ShowcaseApplet extends Applet {
   }
 
   static styles = [css`
+
+:host { display: block; padding: 0.75em; }
+
 #caseSelect{
   width: calc(100% - 2em);
   margin: 1em;

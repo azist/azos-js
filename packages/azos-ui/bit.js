@@ -72,7 +72,7 @@ export const STL_BIT = css`
   padding: .75em;
 
   border-top: 1px dotted #20202020;
-  border-bottom: 1px dotted #20202020;
+  border-bottom: 1px dotted #20202060;
 
   &.collapsed{ border-top: none; height: 0; opacity: 0; }
 }
