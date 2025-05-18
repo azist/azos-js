@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asBool } from 'azos/types';
-import { Control, css, html, parseRank, parseStatus } from './ui.js';
+import { asBool, DATA_BLOCK_PROP } from 'azos/types';
+import { Control, css, getChildDataMembers, html, parseRank, parseStatus } from './ui.js';
 
 
 export const STL_BIT = css`
@@ -25,7 +25,7 @@ export const STL_BIT = css`
 .summary{
   border-bottom: none;
 
-  &.collapsed{ border-bottom: 1px solid #20202040; }
+  &.collapsed{ border-bottom: 1px dotted #20202040; }
 
   .expander{
     display: inline;
@@ -70,19 +70,19 @@ export const STL_BIT = css`
   display: block;
   border-radius: 0.75em;
   background: #f4f4f4a0;
-  transition: height,opacity 0.55s ease-in-out;
-  transition-behavior: allow-discrete;
+  transition: 0.25s ease-in-out;
   overflow: hidden;
   opacity: 1;
   height: calc-size(auto, size);
 
   box-shadow: 0px 0px 8px #20202020;
-  margin-top: 0.25em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
   padding: .75em;
 
   border: 1px solid #20202010;
 
-  &.collapsed{ margin-top: 0; height: 0; opacity: 0; padding: 0; visibility: hidden; }
+  &.collapsed{ margin-top: 0; margin-bottom: 0; height: 0; opacity: 0; padding: 0; visibility: hidden; }
 }
 
 .r1 { font-size: var(--r1-fs); }
@@ -141,6 +141,13 @@ export class Bit extends Control {
     this.isExpanded = !this.isExpanded;
     return true;
   }
+
+  /**
+   * Allows to iterate over data members (e.g. data fields) contained by this bit.
+   * Note: bit is not a block, it is merely a UI grouper, so its "internal fields" are included in a linear data fashion
+   * as if they were part of the parent outside of this Bit
+  */
+  get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
 
 
 
