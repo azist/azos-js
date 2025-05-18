@@ -5,20 +5,27 @@
 </FILE_LICENSE>*/
 
 import { asBool } from 'azos/types';
-import { Control, css, html } from './ui.js';
+import { Control, css, html, parseRank, parseStatus } from './ui.js';
 
 
 export const STL_BIT = css`
-:host{
-  display: block;
-  padding: 0em;
-  box-sizing: border-box;
+:host{ display: block; box-sizing: border-box; }
+
+.control{
+  border: var(--s-default-bor-ctl);
+  background-color:  var(--s-default-bg-ctl);
+  color: var(--s-default-fg-ctl);
+  padding: 0.55em 0.75em 0.55em 0.75em;
+  border-radius: 0.75em;
+  box-shadow: var(--ctl-box-shadow);
+
+  &:focus-within{ outline: 2px solid var(--focus-ctl-selected-color); }
 }
 
 .summary{
   border-bottom: none;
 
-  &.collapsed{ border-bottom: 1px dotted #20202060; }
+  &.collapsed{ border-bottom: 1px solid #20202040; }
 
   .expander{
     display: inline;
@@ -38,11 +45,12 @@ export const STL_BIT = css`
   }
 
   .subtitle{
-    display: inline;
+    display: block;
     font-size: 1em;
     font-weight: normal;
-    color: #a0a0a0;
-    margin-bottom: 0.1em;
+    padding: 0.25em;
+    padding-left: 1ch;
+    opacity: 0.75;
   }
 
   .toolbar{
@@ -60,22 +68,38 @@ export const STL_BIT = css`
 
 .details{
   display: block;
-  Xborder: 1px solid red;
-  border-radius: 1em;
-  background: var(--paper2);
+  border-radius: 0.75em;
+  background: #f4f4f4a0;
   transition: height,opacity 0.55s ease-in-out;
+  transition-behavior: allow-discrete;
   overflow: hidden;
   opacity: 1;
-  height: auto;
+  height: calc-size(auto, size);
 
   box-shadow: 0px 0px 8px #20202020;
+  margin-top: 0.25em;
   padding: .75em;
 
-  border-top: 1px dotted #20202020;
-  border-bottom: 1px dotted #20202060;
+  border: 1px solid #20202010;
 
-  &.collapsed{ border-top: none; height: 0; opacity: 0; }
+  &.collapsed{ margin-top: 0; height: 0; opacity: 0; padding: 0; visibility: hidden; }
 }
+
+.r1 { font-size: var(--r1-fs); }
+.r2 { font-size: var(--r2-fs); }
+.r3 { font-size: var(--r3-fs); }
+.r4 { font-size: var(--r4-fs); }
+.r5 { font-size: var(--r5-fs); }
+.r6 { font-size: var(--r6-fs); }
+
+.ok      { background: var(--s-ok-bg-ctl);     color: var(--s-ok-ink-ctl);     border: var(--s-ok-bor-ctl);}
+.info    { background: var(--s-info-bg-ctl);   color: var(--s-info-ink-ctl);   border: var(--s-info-bor-ctl);}
+.warning { background: var(--s-warn-bg-ctl);   color: var(--s-warn-ink-ctl);   border: var(--s-warn-bor-ctl);}
+.alert   { background: var(--s-alert-bg-ctl);  color: var(--s-alert-ink-ctl);  border: var(--s-alert-bor-ctl);}
+.error   { background: var(--s-error-bg-ctl);  color: var(--s-error-ink-ctl);  border: var(--s-error-bor-ctl);}
+.brand1  { background: var(--s-brand1-bg-ctl); color: var(--s-brand1-ink-ctl); border: var(--s-brand1-bor-ctl);}
+.brand2  { background: var(--s-brand2-bg-ctl); color: var(--s-brand2-ink-ctl); border: var(--s-brand2-bor-ctl);}
+.brand3  { background: var(--s-brand3-bg-ctl); color: var(--s-brand3-ink-ctl); border: var(--s-brand3-bor-ctl);}
 `;
 
 /*
@@ -142,8 +166,9 @@ export class Bit extends Control {
 
 
   renderControl(){
+    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     const summary = this._buildSummaryData();
-    return html` ${this.renderSummary(summary)} ${this.renderDetails()}`;
+    return html`<div id="divControl" class="control ${cls}"> ${this.renderSummary(summary)} ${this.renderDetails()} </div>`;
   }
 
   renderSummary(data){

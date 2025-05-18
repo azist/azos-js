@@ -63,6 +63,9 @@ export class CaseBit extends CaseBase {
       that is used to create a bit. And this content is placed in a default slot.
       </p>
 
+      <az-text title="First Name" isrequired></az-text>
+      <az-text title="Last Name" isrequired></az-text>
+
       <p>
       Notice, that you can place any content into the bit. For example, you can surround a
       block of data fields with a bit, or surround other bits with this bit, this way you can create a hierarchical
