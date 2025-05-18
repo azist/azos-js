@@ -71,9 +71,10 @@ export const STL_BIT = css`
   border-radius: 0.75em;
   background: #f4f4f4a0;
   transition: height,opacity 0.55s ease-in-out;
+  transition-behavior: allow-discrete;
   overflow: hidden;
   opacity: 1;
-  height: auto;
+  height: calc-size(auto, size);
 
   box-shadow: 0px 0px 8px #20202020;
   margin-top: 0.25em;
@@ -81,7 +82,7 @@ export const STL_BIT = css`
 
   border: 1px solid #20202010;
 
-  &.collapsed{ margin-top: 0; height: 0; opacity: 0; padding: 0;}
+  &.collapsed{ margin-top: 0; height: 0; opacity: 0; padding: 0; visibility: hidden; }
 }
 
 .r1 { font-size: var(--r1-fs); }
