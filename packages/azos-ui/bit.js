@@ -11,6 +11,7 @@ import { Control, css, getChildDataMembers, html, parseRank, parseStatus } from 
 export const STL_BIT = css`
 :host{ display: block; box-sizing: border-box; }
 
+
 .control{
   border: var(--s-default-bor-ctl);
   background-color:  var(--s-default-bg-ctl);
@@ -28,10 +29,19 @@ export const STL_BIT = css`
   &.collapsed{ border-bottom: 1px dotted #20202040; }
 
   .expander{
-    display: inline;
-    font-size: 1.2em;
-    font-weight: bold;
-    cursor: pointer;
+    display: inline-block;
+    border-radius: 50%;
+    width: 3ch;
+    height: 3ch;
+    background: #20202030;
+    opacity: 0.45;
+    border: 1px solid #20202040;
+    transition: 0.35s ease-in-out;
+    transform: rotate(-180deg);
+    vertical-align: sub;
+
+    .ico{ svg{ height: 1.2lh; position: relative; top: 0.25em; left: 0.13em;} }
+    &.collapsed{ transform: rotate(0deg); opacity: 0.85; }
   }
 
   .title{
@@ -189,7 +199,14 @@ export class Bit extends Control {
 </section>`;
   }
 
-  renderSummaryExpander(){ return html`<div class="expander" @click=${this.#onSummaryExpanderClick}>${this.isExpanded ? "-" : "+"}</div>`; }
+  //renderSummaryExpander(){ return html`<div class="expander" @click=${this.#onSummaryExpanderClick}>${this.isExpanded ? "-" : "+"}</div>`; }
+
+  renderSummaryExpander(){
+    const cls = this.isExpanded ? "" : "collapsed";
+    return html`<div class="expander ${cls}" @click=${this.#onSummaryExpanderClick}>${this.renderImageSpec("svg://azos.ico.caretDown", {cls: "ico"}).html}</div>`;
+  }
+
+
   renderSummaryTitle(data){ return html`<div class="title" @click=${this.#onSummaryExpanderClick}>${data.title}</div>`; }
   renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle}</div>`; }
   renderSummaryToolbar(data){ return html`<div class="toolbar"> <div>[A]</div> <div>[B]</div> </div>`; }
