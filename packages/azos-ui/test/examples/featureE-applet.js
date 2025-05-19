@@ -67,8 +67,15 @@ export class ExampleFeatureEApplet extends Applet{
       @datachange=${(e) => console.log(`CRUD FORM @datachange EVENT: ${e.detail.sender.name} = ${e.detail.sender.value}`)}
       >
 
+<az-bit id="bitFirst" scope="this">
+<az-bit id="bitFirst" scope="this">
+<az-bit id="bitFirst" scope="this">
+
       <az-bit id="bitFirst" scope="this">
         <examples-person-block scope="this" id="blockPerson" name="first" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
+      </az-bit>
+      </az-bit>
+      </az-bit>
       </az-bit>
 
       <br>
