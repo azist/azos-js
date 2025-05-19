@@ -55,7 +55,7 @@ export class CaseBit extends CaseBase {
   content inside the bit. The az-bit tag is a custom element
   that is used to create a bit. And this content is placed in a default slot.
   </p>
-    <az-bit id="bitAboutusInner1" scope="this" status="warning" statusFlag="alert" rank="small">
+    <az-bit id="bitAboutusInner1" scope="this" status="warning" statusFlag="alert" rank="small" @getSummaryDataHandler="${(bit) => bit.summaryTitle=this.tbLastName.value}"
       <p>
       About us paragraph content goes here. It is really
       slotted into the bit. You can use the az-bit tag to place
@@ -63,8 +63,8 @@ export class CaseBit extends CaseBase {
       that is used to create a bit. And this content is placed in a default slot.
       </p>
 
-      <az-text title="First Name" isrequired></az-text>
-      <az-text title="Last Name" isrequired></az-text>
+      <az-text id="tbFirstName" scope="this" title="First Name" isrequired @change="${() => this.bitAboutusInner1.requestUpdate()}"></az-text>
+      <az-text id="tbLastName" scope="this" title="Last Name" isrequired></az-text>
 
       <p>
       Notice, that you can place any content into the bit. For example, you can surround a
