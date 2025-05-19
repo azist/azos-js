@@ -4,12 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, isOneOf } from 'azos/strings';
+import { asString, isEmpty } from 'azos/strings';
 import { html, parseRank, parseStatus } from '../ui.js';
 import { baseStyles, dateRangeStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { asDate, asObject, isNonEmptyString, isObject, VALIDATE_METHOD, ValidationError } from 'azos/types';
-import { isTrue } from 'azos/aver';
+import { asDate, isNonEmptyString, isString, ValidationError } from 'azos/types';
 
 export class DateRangeField extends FieldPart {
   static properties = {
@@ -27,14 +26,17 @@ export class DateRangeField extends FieldPart {
   }
 
   focus() {
-    const t = this.$("tbStartDate");
+    const t = this.$("tbStart");
     if (!t) return;
     window.queueMicrotask(() => t.focus());
   }
 
   castValue(v) {
     if (v === null || v === undefined || v === "") return null;
-    return { start: asDate(v.start, true), end: asDate(v.end, true) };
+    let { start, end } = v;
+    if (isEmpty(start)) start = undefined;
+    if (isEmpty(end)) end = undefined;
+    return { start: asDate(start, true), end: asDate(end, true) };
   }
 
   prepareValueForInput(v, isRawValue = false) {
@@ -47,8 +49,26 @@ export class DateRangeField extends FieldPart {
   #tbChange() {
     const tbStart = this.$("tbStart");
     const tbEnd = this.$("tbEnd");
-    this.setValueFromInput({start: tbStart.value, end: tbEnd.value});//this may cause validation error but will set this.rawValue
+    this.setValueFromInput({ start: tbStart.value, end: tbEnd.value });//this may cause validation error but will set this.rawValue
     this.inputChanged();
+  }
+
+  _doValidate(context, scope) {
+    const { start: startVal, end: endVal } = this.value;
+    if (this.$("tbStart").required && (startVal === null || startVal === undefined || (isString(startVal) && isEmpty(startVal)))) {
+      return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date is required");
+    }
+
+    if (this.$("tbEnd").required && (endVal === null || endVal === undefined || (isString(endVal) && isEmpty(endVal)))) {
+      return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "End date is required");
+    }
+
+    const startDate = asDate(startVal, true);
+    const endDate = asDate(endVal, true);
+    if (startDate && endDate && startDate >= endDate) {
+      return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date must be less than end date");
+    }
+
   }
 
 
@@ -75,29 +95,25 @@ export class DateRangeField extends FieldPart {
       <div class="inputs ${cls}">
         <input
           id="tbStart"
-          class="${this.error ? "error" : ""}"
           placeholder="${this.placeholder}"
           type="text"
           .value="${startValue}"
-          .disabled=${effectivelyDisabled}
-          .required=${!this.optionalStart}
+          ?disabled=${effectivelyDisabled}
+          ?required=${!this.optionalStart}
           ?readonly=${this.isReadonly}
           @change="${this.#tbChange}"
-          part="start-date"
           autocomplete="off"
         />
         <span class="dash">&mdash;</span>
         <input
           id="tbEnd"
-          class="${this.error ? "error" : ""}"
           placeholder="${this.placeholder}"
           type="text"
           .value="${endValue}"
-          .disabled=${this.isDisabled}
-          .required=${!this.optionalEnd}
+          ?disabled=${this.isDisabled}
+          ?required=${!this.optionalEnd}
           ?readonly=${this.isReadonly}
           @change="${this.#tbChange}"
-          part="end-date"
           autocomplete="off"
         />
       </div>
