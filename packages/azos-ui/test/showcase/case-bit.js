@@ -55,7 +55,7 @@ export class CaseBit extends CaseBase {
   content inside the bit. The az-bit tag is a custom element
   that is used to create a bit. And this content is placed in a default slot.
   </p>
-    <az-bit id="bitAboutus" scope="this">
+    <az-bit id="bitAboutusInner" scope="this" statusFlag="alert">
       <p>
       About us paragraph content goes here. It is really
       slotted into the bit. You can use the az-bit tag to place
