@@ -4,8 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asBool, DATA_BLOCK_PROP } from 'azos/types';
+import { asBool, DATA_BLOCK_PROP } from 'azos/types.js';
 import { Control, css, getChildDataMembers, html, parseRank, parseStatus } from './ui.js';
+import * as aver from 'azos/aver.js';
 
 
 export const STL_BIT = css`
@@ -173,6 +174,14 @@ export class Bit extends Control {
   get statusFlag() { return this.#statusFlag; }
   set statusFlag(v) { this.#statusFlag = v ? parseStatus(v) : null; }
 
+
+  #getSummaryDataHandler = null;
+  /** A reference to a function which handles data extraction to get summary data. You can also override `_getSummaryData()` if you subclass  */
+  get getSummaryDataHandler(){ return this.#getSummaryDataHandler; }
+  set getSummaryDataHandler(v){ this.#getSummaryDataHandler = aver.isFunctionOrNull(v); }
+
+
+
   /** Expands the detail section. This DOES NOT call an event */
   expand()  { this.isExpanded = true; }
 
@@ -201,17 +210,22 @@ export class Bit extends Control {
 
 
 
-  /** Override to extract tuple of (title: string, subtitle: string, commands: Cmd[])
+  /** Override to extract tuple of (title: string | html, subtitle: string | html, commands: Cmd[])
    * This method gets called on every render. You can also add additional props for your custom rendering
    * of the summary section
   */
   _buildSummaryData(){
-    let title = null;
-    let subtitle = null;
+    if (this.#getSummaryDataHandler){
+      return this.#getSummaryDataHandler(this);
+    }
+
+    let title = this.summaryTitle ?? `${this.constructor.name}#${this.id}`;
+    let subtitle = this.summarySubtitle;
     let toolbarCmds = [
       { text: "Edit", icon: "edit", cmd: "edit" },
       { text: "Delete", icon: "delete", cmd: "delete" }
     ];
+
     return { title, subtitle, toolbarCmds };
   }
 
@@ -252,8 +266,8 @@ export class Bit extends Control {
   }
 
 
-  renderSummaryTitle(data){ return html`<div class="title" @click=${this.#onSummaryExpanderClick}>${data.title ?? this.summaryTitle ?? `${this.constructor.name}#${this.id}`}</div>`; }
-  renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle ?? this.summarySubtitle ?? "...subtitle"}</div>`; }
+  renderSummaryTitle(data){ return html`<div class="title" @click=${this.#onSummaryExpanderClick}>${data.title}</div>`; }
+  renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle}</div>`; }
   renderSummaryToolbar(data){ return html`<div class="toolbar"> <div>[A]</div> <div>[B]</div> </div>`; }
 
   renderDetails(){
