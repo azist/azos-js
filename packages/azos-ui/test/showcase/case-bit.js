@@ -16,7 +16,7 @@ export class CaseBit extends CaseBase {
 
 <p> This is a sample content which is placed outside of bits. </p>
 
-<az-bit id="bitAboutus" scope="this">
+<az-bit id="bitAboutus" scope="this" summaryTitle="About Us" summarySubtitle="A line describing this title">
   <p>
   About us paragraph content goes here. It is really
   slotted into the bit. You can use the az-bit tag to place
@@ -55,7 +55,7 @@ export class CaseBit extends CaseBase {
   content inside the bit. The az-bit tag is a custom element
   that is used to create a bit. And this content is placed in a default slot.
   </p>
-    <az-bit id="bitAboutusInner" scope="this" statusFlag="alert">
+    <az-bit id="bitAboutusInner1" scope="this" status="warning" statusFlag="alert" rank="small">
       <p>
       About us paragraph content goes here. It is really
       slotted into the bit. You can use the az-bit tag to place
@@ -70,6 +70,36 @@ export class CaseBit extends CaseBase {
       Notice, that you can place any content into the bit. For example, you can surround a
       block of data fields with a bit, or surround other bits with this bit, this way you can create a hierarchical
       structure of bits.
+      </p>
+    </az-bit>
+
+    <br>
+    <az-bit id="bitAboutusInner2" scope="this" status="ok" statusFlag="error" rank="small">
+      <p>
+      About us paragraph content goes here. It is really
+      slotted into the bit. You can use the az-bit tag to place
+      content inside the bit. The az-bit tag is a custom element
+      that is used to create a bit. And this content is placed in a default slot.
+      </p>
+    </az-bit>
+
+    <br>
+    <az-bit id="bitAboutusInner3" scope="this" status="default" statusFlag="default" rank="small">
+      <p>
+      About us paragraph content goes here. It is really
+      slotted into the bit. You can use the az-bit tag to place
+      content inside the bit. The az-bit tag is a custom element
+      that is used to create a bit. And this content is placed in a default slot.
+      </p>
+    </az-bit>
+
+    <br>
+    <az-bit id="bitAboutusInner4" scope="this" status="info" rank="small">
+      <p>
+      About us paragraph content goes here. It is really
+      slotted into the bit. You can use the az-bit tag to place
+      content inside the bit. The az-bit tag is a custom element
+      that is used to create a bit. And this content is placed in a default slot.
       </p>
     </az-bit>
   <p>

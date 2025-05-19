@@ -22,7 +22,8 @@ export const STL_BIT = css`
   box-shadow: var(--ctl-box-shadow);
   overflow: hidden;
 
-  &:focus-within{ outline: 2px solid var(--focus-ctl-selected-color); }
+  &:focus-within{ outline: 3px solid var(--focus-ctl-selected-color); }
+
   .flag{
     display: block;
     position: absolute;
@@ -159,7 +160,9 @@ export class Bit extends Control {
 
   static properties = {
     isExpanded: { type: Boolean, reflect: true },
-    statusFlag: { type: String, reflect: true }
+    statusFlag: { type: String, reflect: true },
+    summaryTitle: { type: String },
+    summarySubtitle: { type: String }
   };
 
   #isExpanded = false;
@@ -203,8 +206,8 @@ export class Bit extends Control {
    * of the summary section
   */
   _buildSummaryData(){
-    let title = "Bit Title";
-    let subtitle = html`Bit <strong>subtitle</strong> string`;
+    let title = null;
+    let subtitle = null;
     let toolbarCmds = [
       { text: "Edit", icon: "edit", cmd: "edit" },
       { text: "Delete", icon: "delete", cmd: "delete" }
@@ -249,8 +252,8 @@ export class Bit extends Control {
   }
 
 
-  renderSummaryTitle(data){ return html`<div class="title" @click=${this.#onSummaryExpanderClick}>${data.title}</div>`; }
-  renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle}</div>`; }
+  renderSummaryTitle(data){ return html`<div class="title" @click=${this.#onSummaryExpanderClick}>${data.title ?? this.summaryTitle ?? `${this.constructor.name}#${this.id}`}</div>`; }
+  renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle ?? this.summarySubtitle ?? "...subtitle"}</div>`; }
   renderSummaryToolbar(data){ return html`<div class="toolbar"> <div>[A]</div> <div>[B]</div> </div>`; }
 
   renderDetails(){
