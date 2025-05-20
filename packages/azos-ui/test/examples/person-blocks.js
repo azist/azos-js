@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf } from "azos/strings";
+import { dfltObject, isOneOf } from "azos/strings";
 import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
 
 import { Block } from "../../blocks.js";
@@ -14,6 +14,7 @@ import { STL_INLINE_GRID } from "../../styles";
 
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
+import { Bit } from "../../bit.js";
 
 export class PersonBlock extends Block {
 
@@ -49,8 +50,9 @@ export class PersonBlock extends Block {
 
       <h4>Other Statuses</h4>
       <!-- notice how both fields map to the same field by name effectively creating an array -->
-      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses"></examples-status-block>
-      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses"></examples-status-block>
+      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses" rank="small"></examples-status-block>
+      <br>
+      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses" rank="small"></examples-status-block>
       ${this.otherStatuses}
     `;
   }
@@ -64,8 +66,13 @@ export class PersonBlock extends Block {
   }
 }
 
-export class StatusBlock extends Block {
-  renderControl(){
+export class StatusBlock extends Bit {
+
+  _getSummaryData(){
+    return {title: dfltObject(this.tbStatus?.value, html`<span style="color: var(--ghost)">Status</span>`), subtitle: this.tbDescription?.value};
+  }
+
+  renderDetailContent(){
     return html`
       <az-text scope="this"  id="tbStatus"    name="Status"  title="Status"  maxLength=10 isrequired value="Init"></az-text>
       <az-text scope="this"  id="tbDescription"   name="Description" title="Description" maxLength=25  value="Initital" ></az-text>

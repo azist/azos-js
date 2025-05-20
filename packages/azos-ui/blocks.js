@@ -133,6 +133,8 @@ export class Block extends Control {
    */
   [DATA_BLOCK_CHANGED_METHOD](sender){
 
+    this.requestUpdate();
+
     //Data events are not bubbling and not composed and CANCEL-able
     const evt = new CustomEvent("datachange", { bubbles: false, composed: false, cancelable: true, detail: {sender: sender} });
     const proceed = this.dispatchEvent(evt);

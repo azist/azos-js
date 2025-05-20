@@ -205,7 +205,7 @@ export class Bit extends Block {
    * This method gets called on every render. You can also add additional props for your custom rendering
    * of the summary section
   */
-  _buildSummaryData(){
+  _getSummaryData(){
     if (this.#getSummaryDataHandler){
       return this.#getSummaryDataHandler(this);
     }
@@ -231,7 +231,7 @@ export class Bit extends Block {
     if (this.noSummary) return this.renderDetailContent();
 
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-    const summary = this._buildSummaryData();
+    const summary = this._getSummaryData();
     return html`<div id="divControl" class="control ${cls}"> ${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()} </div>`;
   }
 

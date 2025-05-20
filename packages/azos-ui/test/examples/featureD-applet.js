@@ -45,9 +45,21 @@ export class ExampleFeatureDApplet extends Applet{
   }
 
   async #handleLoadAsync(frm, isRefresh){
-    console.log(`LOADING DATA.... ${COUNTER}  Refresh: ${isRefresh}`);
+    const ctr = COUNTER++;
+    console.log(`LOADING DATA.... ${ctr}  Refresh: ${isRefresh}`);
     console.dir(frm);
-    return {person: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "8", Description: "Eats mice"} ]}};
+    return {
+      person: {
+        LastName: `Abramovich_${ctr}`,
+        FirstName: `Snaker_${10 * ctr}`,
+        PayoutStatus: {Status: `PAY-${ctr}-A08`, Description: `Paid $${ctr*8726}`},
+        ProcessStatus: {Status: `DONE-${ctr}`, Description: `Batch #${ctr*1234567}`},
+        OtherStatuses: [
+          {Status: `S8-${ctr}`, Description: `Loves ${ctr} cats at a time`},
+          {Status: `Z1-${ctr}`, Description: `Z updated ${ctr} times`}
+        ]
+      }
+    };
   }
 
   async #handleSaveAsync(frm){
