@@ -7,6 +7,7 @@
 import { asBool, DATA_BLOCK_PROP } from 'azos/types.js';
 import { Control, css, getChildDataMembers, html, parseRank, parseStatus } from './ui.js';
 import * as aver from 'azos/aver.js';
+import { Block } from './blocks.js';
 
 
 export const STL_BIT = css`
@@ -155,19 +156,18 @@ export const STL_BIT = css`
   You either sub-class a `Bit` to wrap a piece of UI, or use delegation via handler functions while putting your content inside
   of the `az-bit` tags as `Bit` by default uses a `slot` to render its details.
 */
-export class Bit extends Control {
+export class Bit extends Block {
 
   static styles = [STL_BIT];
 
   static properties = {
     isExpanded: { type: Boolean, reflect: true },
     statusFlag: { type: String, reflect: true },
-    summaryTitle: { type: String },
-    summarySubtitle: { type: String }
+    noSummary:  { type: Boolean, reflect: true }
   };
 
   #isExpanded = false;
-  get isExpanded() { return this.#isExpanded; }
+  get isExpanded() { return this.noSummary || this.#isExpanded; }
   set isExpanded(value) { this.#isExpanded = asBool(value); }
 
   #statusFlag = null;
@@ -201,12 +201,12 @@ export class Bit extends Control {
     return true;
   }
 
-  /**
-   * Allows to iterate over data members (e.g. data fields) contained by this bit.
-   * Note: bit is not a block, it is merely a UI grouper, so its "internal fields" are included in a linear data fashion
-   * as if they were part of the parent outside of this Bit
-  */
-  get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
+  // // // /**
+  // // //  * Allows to iterate over data members (e.g. data fields) contained by this bit.
+  // // //  * Note: bit is not a block, it is merely a UI grouper, so its "internal fields" are included in a linear data fashion
+  // // //  * as if they were part of the parent outside of this Bit
+  // // // */
+  // // // get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
 
 
 
@@ -219,8 +219,8 @@ export class Bit extends Control {
       return this.#getSummaryDataHandler(this);
     }
 
-    let title = this.summaryTitle ?? `${this.constructor.name}#${this.id}`;
-    let subtitle = this.summarySubtitle;
+    let title = this.title ?? `${this.constructor.name}#${this.id}`;
+    let subtitle = this.description;
     let toolbarCmds = [
       { text: "Edit", icon: "edit", cmd: "edit" },
       { text: "Delete", icon: "delete", cmd: "delete" }
@@ -237,15 +237,17 @@ export class Bit extends Control {
 
 
   renderControl(){
+    if (this.noSummary) return this.renderDetailContent();
+
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
     const summary = this._buildSummaryData();
     return html`<div id="divControl" class="control ${cls}"> ${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()} </div>`;
-
   }
 
   renderStatusFlag(){
-    if (!this.statusFlag) return null;
-    const cls = parseStatus(this.statusFlag, true);
+    const flag = this.error ? "error" : this.statusFlag;
+    if (!flag) return null;
+    const cls = parseStatus(flag, true);
     return html`<div class="flag ${cls}">  </div>`;
   }
 

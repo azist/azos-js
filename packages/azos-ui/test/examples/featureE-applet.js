@@ -71,7 +71,7 @@ export class ExampleFeatureEApplet extends Applet{
   <xaz-bit>
     <xaz-bit>
 
-      <az-bit id="bitFirst" scope="this">
+      <az-bit id="bitFirst" scope="this"  name="gagarin" title="First Bit" description="This is a first bit">
         <examples-person-block scope="this" id="blockFirstPerson" name="first"
            @datachange=${(e) => {
             console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`);
@@ -86,7 +86,7 @@ export class ExampleFeatureEApplet extends Applet{
 
       <br>
 
-      <az-bit id="bitSecond" scope="this">
+      <az-bit id="bitSecond" scope="this" title="Second Bit" description="This is asecond bit">
         <examples-person-block scope="this" id="blockSecondPerson" name="second" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
       </az-bit>
 

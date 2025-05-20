@@ -16,7 +16,7 @@ export class CaseBit extends CaseBase {
 
 <p> This is a sample content which is placed outside of bits. </p>
 
-<az-bit id="bitAboutus" scope="this" summaryTitle="About Us" summarySubtitle="A line describing this title">
+<az-bit id="bitAboutus" scope="this" title="About Us" description="A line describing this title">
   <p>
   About us paragraph content goes here. It is really
   slotted into the bit. You can use the az-bit tag to place
@@ -48,7 +48,7 @@ export class CaseBit extends CaseBase {
   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 </p>
 
-<az-bit id="bitAboutus" scope="this">
+<az-bit id="bitAboutus" scope="this" title="Another Title" description="another line">
   <p>
   About us paragraph content goes here. It is really
   slotted into the bit. You can use the az-bit tag to place
