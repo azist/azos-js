@@ -5,11 +5,12 @@
 </FILE_LICENSE>*/
 
 import * as aver from "azos/aver";
-import { Part, css, html, parseRank, parseStatus, verbatimHtml } from "../ui";
 import { isAssigned, isNonEmptyString, isString } from "azos/types";
 import { isEmpty, matchPattern } from "azos/strings";
 import { LOG_TYPE } from "azos/log";
 import { ABORT_ERROR_NAME, ABSTRACT } from "azos/coreconsts";
+
+import { Part, css, html, parseRank, parseStatus, verbatimHtml } from "../ui.js";
 
 
 /**
@@ -84,21 +85,6 @@ export class Lookup extends Part {
     .highlight{
       background-color: var(--vcl-codebox-hi-string-hover);
     }
-    .loading .loader{
-      display: flex;
-      margin: 1ch;
-    }
-    .loader::after{
-      --size: 2ch;
-      content: "";
-      width: var(--size);
-      height: var(--size);
-      border: 4px solid #dddddd;
-      border-top-color: #336699;
-      border-radius: 50%;
-      animation: loader 1s ease infinite;
-    }
-    @keyframes loader{ to{ transform: rotate(1turn); }}
     `];
 
   static properties = {
@@ -118,7 +104,6 @@ export class Lookup extends Part {
   #focusedResultElm;
   #owner = null;
   #ownerSetup = false;
-  // #loadingData = false;
   #result;
 
   #promise;
@@ -147,9 +132,11 @@ export class Lookup extends Part {
     this._lookupCompleted(isCancel);
     this._disconnectListeners();
     this.#teardownOwner();
-    this.#promise = null;
+    this.#promise = this.#resolve = this.reject = null;
     this.#focusedResultElm = null;
+    if (this.owner) this.owner.isBusy = false;
     this.searchPattern = null;
+    this.results = null;
     this.update();//sync update dom build
     this.popover.hidePopover();
     console.groupEnd();
@@ -157,14 +144,21 @@ export class Lookup extends Part {
 
   /** The debounced method to prepareAndGetData */
   async _debouncedFeed(searchPattern) {
-    // this.#loadingData = true;
-    this.open();
-    const results = await this.prepareAndGetData(searchPattern);
+    let results;
+    const owner = this.owner;
+    try {
+      if (owner) owner.isBusy = true;
+      this.focusedResultElm = null;
+      this.open();
+      results = await this.prepareAndGetData(searchPattern);
+    } finally {
+      if (owner) owner.isBusy = false;
+    }
+
     if (!results) return;
 
     this.results = results;
     this.update();
-    // this.#loadingData = false;
     this.#repositionPopover();
     if (!this.focusedResultElm) this.focusedResultElm = this.resultElms[0] ?? null;
   }
@@ -279,7 +273,7 @@ export class Lookup extends Part {
   }
 
   #onKeydown(evt) {
-    if (!this.isOpen) return;
+    if (!this.isOpen || this.owner?.isBusy) return;
 
     let preventDefault = true;
     switch (evt.key) {
@@ -486,7 +480,7 @@ export class Lookup extends Part {
       parseStatus(this.status, true),
       this.isOpen ? "" : "hidden",
       this.owner ? "hasOwner" : "",
-      // this.#loadingData ? "loading" : "",
+      this.owner?.isBusy ? "loading" : "",
     ].filter(isNonEmptyString).join(" ");
 
     const stl = [
@@ -503,7 +497,6 @@ export class Lookup extends Part {
    * @returns render `noResults` or results mapped to {@link renderResult}
    */
   renderBody() {
-    // if (this.#loadingData) return html`<div class="loader"></div>`;
     if (!this.results || !this.results.length) return html`<span class="noResults">No results</span>`;
     return html`
 <ul class="results" @mouseover="${evt => this.#onMouseOver(evt)}" @click="${evt => this.#onResultsClick(evt)}">

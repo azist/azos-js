@@ -3,26 +3,26 @@
  * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
-import { STL_CARD, STL_GRID } from "../../styles";
-import { html } from "../../ui";
-import { CaseBase } from "./case-base";
+import { STL_CARD, STL_INLINE_GRID } from "../../styles";
+import { html } from "../../ui.js";
+import { CaseBase } from "./case-base.js";
 
 export class CaseGrids extends CaseBase {
 
-  static styles = [...this.styles, STL_GRID, STL_CARD];
+  static styles = [...this.styles, STL_INLINE_GRID, STL_CARD];
   renderControl() {
     return html`
     <h2>Grids</h2>
 
     <h3>Basic 1-Column Grid</h3>
-    <div class="grid cols1">
+    <div class="row cols1">
       <div class="card">Item 1</div>
       <div class="card">Item 2</div>
       <div class="card">Item 3</div>
     </div>
 
     <h3>2-Column Grid</h3>
-    <div class="grid cols2">
+    <div class="row cols2">
       <div class="card">Item 1</div>
       <div class="card">Item 2</div>
       <div class="card">Item 3</div>
@@ -30,7 +30,7 @@ export class CaseGrids extends CaseBase {
     </div>
 
     <h3>3-Column Grid</h3>
-    <div class="grid cols3">
+    <div class="row cols3">
       <div class="card">Item 1</div>
       <div class="card">Item 2</div>
       <div class="card">Item 3</div>
@@ -40,7 +40,7 @@ export class CaseGrids extends CaseBase {
     </div>
 
     <h3>4-Column Grid</h3>
-    <div class="grid cols4">
+    <div class="row cols4">
       <div class="card">Item 1</div>
       <div class="card">Item 2</div>
       <div class="card">Item 3</div>
@@ -52,7 +52,7 @@ export class CaseGrids extends CaseBase {
     </div>
 
     <h3>Grid with Spanning Items</h3>
-    <div class="grid cols4">
+    <div class="row cols4">
       <div class="card span2">Span 2 columns</div>
       <div class="card">Normal item</div>
       <div class="card">Normal item</div>
@@ -62,7 +62,7 @@ export class CaseGrids extends CaseBase {
     </div>
 
     <h3>Form-like Layout</h3>
-    <div class="grid cols2">
+    <div class="row cols2">
       <az-text title="First Name"></az-text>
       <az-text title="Last Name"></az-text>
       <az-text class="span2" title="Address"></az-text>

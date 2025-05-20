@@ -15,11 +15,11 @@ export class CaseTabView extends CaseBase {
     return html`
 <h2>Tab View</h2>
 
-<az-tab-view title="Draggable TabView" activeTabIndex="2" isDraggable>
+<az-tab-view title="Draggable TabView" activeTabIndex="3" isDraggable>
   <az-tab title="Users List" .canClose="${false}" icon="svg://azos.ico.user">Users List</az-tab>
   <az-tab title="User Groups" .canClose="${false}" icon="svg://azos.ico.userGroup">User Groups</az-tab>
   <az-tab title="User Admins" .canClose="${false}" icon="svg://azos.ico.userSupervisor">User Admins</az-tab>
-  <az-tab title="Tab 4">Tab 4 Content</az-tab>
+  <az-tab title="Tab 4"><az-text id="testValue" .value=${"This is the rhythm of the night"}></az-tab>
   <az-tab title="Tab 5">Tab 5 Content</az-tab>
   <az-tab title="Tab 6">Tab 6 Content</az-tab>
   <az-tab title="Tab 7">Tab 7 Content</az-tab>

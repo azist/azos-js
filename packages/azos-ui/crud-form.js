@@ -4,14 +4,28 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, CLOSE_QUERY_METHOD, DATA_MODE, DATA_MODE_PROP, DATA_VALUE_PROP, ERROR_PROP, RESET_DIRTY_METHOD, isArray, VALIDATE_METHOD, VISIT_METHOD, DATA_BLOCK_CHANGED_METHOD, DATA_NAME_PROP } from "azos/types";
+import {
+  asString,
+  CLOSE_QUERY_METHOD,
+  DATA_MODE,
+  DATA_MODE_PROP,
+  DATA_VALUE_PROP,
+  ERROR_PROP,
+  RESET_DIRTY_METHOD,
+  isArray,
+  VALIDATE_METHOD,
+  VISIT_METHOD,
+  DATA_BLOCK_CHANGED_METHOD
+} from "azos/types";
+
+import * as aver from "azos/aver";
+
 import { Form, Block } from "./blocks.js";
 import { css, html, noContent } from "./ui.js";
-import { showMsg } from "./msg-box.js";
 import { isEmpty, isOneOf } from "azos/strings";
-import * as aver from "azos/aver";
-import "./vcl/util/error-box.js";
 import { toast } from "./toast.js";
+
+import "./vcl/util/error-box.js";
 
 /**
  * Provides {@link Form} specialization for CRUD -related data functionality.
@@ -92,14 +106,14 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   set saveResult(v){ this.#saveResult = v; }
 
 
-  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
+  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync(frm)` method  */
   get saveAsyncHandler(){ return this.#saveAsyncHandler; }
-  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync()` method  */
+  /** A reference to an asynchronous function which handles data save operation. Required if you did not override the `_doSaveAsync(frm)` method  */
   set saveAsyncHandler(v){ this.#saveAsyncHandler = aver.isFunctionOrNull(v); }
 
-  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
+  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync(frm, isRefresh)` method  */
   get loadAsyncHandler(){ return this.#loadAsyncHandler; }
-  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync()` method  */
+  /** A reference to an asynchronous function which handles data load operation. Required if you did not override the `_doLoadAsync(frm, isRefresh)` method  */
   set loadAsyncHandler(v){ this.#loadAsyncHandler = aver.isFunctionOrNull(v); }
 
   //** Loads form data
@@ -155,7 +169,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   async _doLoadAsync(isRefresh){
     //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
     aver.isNotNull(this.#loadAsyncHandler, "CrudForm.loadAsyncHandler function");
-    return await this.#loadAsyncHandler.call(this, isRefresh);
+    return await this.#loadAsyncHandler(this, isRefresh);
   }
 
   //do NOT replace this with event lambda
@@ -184,15 +198,20 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   async formSave(){
     aver.isTrue(!this.isViewMode, `${this.constructor.name}(!view).formSave()`);
 
-    const errors = this[VALIDATE_METHOD]({}, null, true);
+    const valCtx = (await this._doBeforeValidateOnSave()) ?? { };
 
-    if (errors){
+    let valError = this[VALIDATE_METHOD](valCtx, null, true);
+
+    valError = await this._doAfterValidateOnSave(valCtx, valError);
+
+    this.error = valError;//it may have been changed/reset in prior method
+
+    if (valError){
       toast("Please fix data validation errors", {status: "error"});
       return;
     }
 
-    //Temp
-    showMsg("ok", "Saved Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this[DATA_VALUE_PROP], null, 2), 3, true);
+    await this._doBeforeSave(valCtx);
 
     this.#saveResult = await this._doSaveAsync();
 
@@ -201,6 +220,30 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
     this[RESET_DIRTY_METHOD]();
     this.applyInvariants();
   }
+
+
+  /**
+   *  Override to perform pre-validate step on Save(). This can be used to default required field values among other things.
+   * @returns {map} optional validation context
+   * */
+  async _doBeforeValidateOnSave(){ return null; }
+
+  /**
+   * Override to perform post-validate step on Save(). For example, you can mask/disregard validation error by returning a null or a different error
+   * @param {any} ctx validation context object
+   * @param {Error} error validation error or null if there is none. You can return this or modified error object
+   * @returns {Error} validation error or null if there is none
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _doAfterValidateOnSave(ctx, error){ return error; }
+
+  /**
+   * Override to perform post-successful-validate pre-save step on Save().
+   * @param {*} ctx validation context object
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _doBeforeSave(ctx){  }
+
 
   /**
    * Override to perform actual work, such as service client or logic call.
@@ -212,7 +255,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   async _doSaveAsync(){
      //Do not confuse handlers and events. Handlers are function pointers and must be asynchronous (alike events)
      aver.isNotNull(this.#saveAsyncHandler, "CrudForm.saveAsyncHandler function");
-     return await this.#saveAsyncHandler.call(this);
+     return await this.#saveAsyncHandler(this);
   }
 
   //do NOT replace this with event lambda
@@ -255,8 +298,8 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   }
 
   [DATA_BLOCK_CHANGED_METHOD](sender){
-    super[DATA_BLOCK_CHANGED_METHOD]();
-    console.log(`FORM data changed called: ${sender[DATA_NAME_PROP]}`);
+    super[DATA_BLOCK_CHANGED_METHOD](sender);
+    ////console.log(`FORM data changed called: ${sender[DATA_NAME_PROP]}`);
     if (!this.isViewMode){
       this.error = null;
     }

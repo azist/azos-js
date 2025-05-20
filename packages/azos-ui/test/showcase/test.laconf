@@ -1,0 +1,11 @@
+app
+{
+  log
+  {
+    //you should see syntax highlighting if you installed Azos Package
+    name="logger1"
+    type="CsvFileSink"
+    path="./"
+    pattern="mmddyyyy"
+  }
+}

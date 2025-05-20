@@ -493,7 +493,13 @@ export function getChildDataMembers(element, deep = true){
     for(const one of elm.children){
       if (one instanceof AzosElement){
         //Does it support data protocol
-        if (supportsDataProtocol(one)) result.push(one);
+        if (supportsDataProtocol(one)){
+          result.push(one);
+        } else if (DATA_BLOCK_PROP in one){
+          //If it is a block, we need to get its children
+          const sub = one[DATA_BLOCK_PROP];
+          result = result.concat(sub);
+        }
       } else if (deep) { //I am another element
         const sub = getChildDataMembers(one, deep);
         result = result.concat(sub);

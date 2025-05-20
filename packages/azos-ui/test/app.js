@@ -25,6 +25,7 @@ import { ExampleFeatureAApplet } from "./examples/featureA-applet";
 import { ExampleFeatureBApplet } from "./examples/featureB-applet";
 import { ExampleFeatureCApplet } from "./examples/featureC-applet";
 import { ExampleFeatureDApplet } from "./examples/featureD-applet";
+import { ExampleFeatureEApplet } from "./examples/featureE-applet";
 import { ShowcaseApplet } from "./examples/showcase-applet";
 import { MruLogic } from "../mru";
 import { BrowserStorage } from "azos/storage";
@@ -64,6 +65,7 @@ const appRoutes = {
     featureb: {applet: ExampleFeatureBApplet, args: {displayMethod: 1}},
     featurec: {applet: ExampleFeatureCApplet, args: {displayMethod: 2}},
     featured: {applet: ExampleFeatureDApplet, args: {displayMethod: 2}},
+    featuree: {applet: ExampleFeatureEApplet, args: {displayMethod: 2}},
     showcase: {applet: ShowcaseApplet},
   },
   help: {
@@ -91,6 +93,7 @@ const appMenu = {
     {title: "Feature B", icon: "svg://azos.ico.draft", route: "/examples/featureb"},
     {title: "Feature C", icon: "svg://azos.ico.draft", route: "/examples/featurec"},
     {title: "Feature D", icon: "svg://azos.ico.draft", route: "/examples/featured"},
+    {title: "Feature E", icon: "svg://azos.ico.draft", route: "/examples/featuree"},
     {title: "Subsection...", icon: "svg://azos.ico.category", menu: [
       {title: "A", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 3}]},
       {title: "B", Xpermissions: [{ns: "Testing", name: "FeatureChecker", level: 4}]}

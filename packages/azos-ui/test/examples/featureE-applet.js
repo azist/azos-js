@@ -21,14 +21,14 @@ import { showMsg } from "../../msg-box.js";
 let COUNTER = 0;
 
 
-export class ExampleFeatureDApplet extends Applet{
+export class ExampleFeatureEApplet extends Applet{
 
  ////Uncommenting this will require user principal to have that permission
   //static permissions = [ new Permission("test", "Master", 5), {ns: "System", name: "UserManager", level: 500}];
 
   static styles = css`:host{ padding: 1ch 2ch; display: block; }`;
 
-  get title(){ return "Feature D - CRUD Data Forms"; }
+  get title(){ return "Feature E - CRUD Data with Bits"; }
 
 
   #cmdModal = new Command(this, {
@@ -45,20 +45,11 @@ export class ExampleFeatureDApplet extends Applet{
   }
 
   async #handleLoadAsync(frm, isRefresh){
-    const ctr = COUNTER++;
-    console.log(`LOADING DATA.... ${ctr}  Refresh: ${isRefresh}`);
+    console.log(`LOADING DATA.... ${COUNTER}  Refresh: ${isRefresh}`);
     console.dir(frm);
     return {
-      person: {
-        LastName: `Abramovich_${ctr}`,
-        FirstName: `Snaker_${10 * ctr}`,
-        PayoutStatus: {Status: `PAY-${ctr}-A08`, Description: `Paid $${ctr*8726}`},
-        ProcessStatus: {Status: `DONE-${ctr}`, Description: `Batch #${ctr*1234567}`},
-        OtherStatuses: [
-          {Status: `S8-${ctr}`, Description: `Loves ${ctr} cats at a time`},
-          {Status: `Z1-${ctr}`, Description: `Z updated ${ctr} times`}
-        ]
-      }
+      first: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "8", Description: "Eats mice"} ]},
+      second: {LastName: `Bramovich_${COUNTER}`, FirstName: `Baker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "9", Description: "Eats lard"} ]}
     };
   }
 
@@ -72,11 +63,32 @@ export class ExampleFeatureDApplet extends Applet{
     <az-crud-form id="frmMain" scope="this" toolbar="above"
       .loadAsyncHandler=${this.#handleLoadAsync}
       .saveAsyncHandler=${this.#handleSaveAsync}
-      .data=${{person: { LastName: "Camefrom", FirstName: "Server" }}}
+      .data=${{first: { LastName: "Camefrom", FirstName: "Server" }, second: { LastName: "Stackman", FirstName: "Queue" }}}
       @datachange=${(e) => console.log(`CRUD FORM @datachange EVENT: ${e.detail.sender.name} = ${e.detail.sender.value}`)}
       >
 
-      <examples-person-block scope="this" id="blockPerson" name="person" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
+<xaz-bit>
+  <xaz-bit>
+    <xaz-bit>
+
+      <az-bit id="bitFirst" scope="this"  name="gagarin" title="First Bit" description="This is a first bit">
+        <examples-person-block scope="this" id="blockFirstPerson" name="first"
+           @datachange=${(e) => {
+            console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`);
+            this.bitFirst.summaryTitle = this.blockFirstPerson.tbLastName.value;
+          }}>
+        </examples-person-block>
+      </az-bit>
+
+    </xaz-bit>
+  </xaz-bit>
+</xaz-bit>
+
+      <br>
+
+      <az-bit id="bitSecond" scope="this" title="Second Bit" description="This is asecond bit">
+        <examples-person-block scope="this" id="blockSecondPerson" name="second" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
+      </az-bit>
 
     </az-crud-form>
 
@@ -92,4 +104,4 @@ export class ExampleFeatureDApplet extends Applet{
   }
 }
 
-window.customElements.define("examples-featured-applet", ExampleFeatureDApplet);
+window.customElements.define("examples-featuree-applet", ExampleFeatureEApplet);

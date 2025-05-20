@@ -4,19 +4,17 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { isNonEmptyString } from "azos/types";
 import { matchPattern } from "azos/strings";
 import { ImageRegistry } from "azos/bcl/img-registry";
 
-import { css, html, verbatimHtml } from "../../ui";
-import { Lookup } from "../../parts/lookup";
-import { CaseBase } from "./case-base";
+import { css, html, verbatimHtml } from "../../ui.js";
+import { ExternalCallLookup } from "../../parts/lookup.js";
+import { CaseBase } from "./case-base.js";
 
-import "../../parts/button";
-import { isNonEmptyString } from "azos/types";
+import "../../parts/button.js";
 
-
-
-export class XYZAddressLookup extends Lookup {
+export class XYZAddressLookup extends ExternalCallLookup {
   constructor({ debounceMs } = {}) {
     super({ debounceMs });
 
@@ -25,14 +23,26 @@ export class XYZAddressLookup extends Lookup {
       { street1: "700 Highland Rd", city: "Macedonia", state: "OH", zip: "44056", country: "USA" },
       { street1: "600 Biscayne Blvd NW", city: "Miami", state: "FL", zip: "33132", country: "USA" },
       { street1: "2 15th St NW", city: "Washington", state: "DC", zip: "20024", country: "CN" },
+      { street1: "23900 Commerce", city: "Beach Drive", state: "OH", zip: "44124", country: "USA" },
+      { street1: "900 Lamp drive", city: "Sunshine Cove", state: "CA", zip: "91606", country: "USA" },
+      { street1: "890 Parl Lane", city: "Shady Knolls", state: "GA", zip: "30309", country: "USA" },
     ];
   }
 
   #ref = { imgRegistry: ImageRegistry };
 
-  async getData() {
+  async _doCall(abortController) {
     const searchPattern = `*${this.searchPattern}*`;
+    const signal = abortController.signal;
     let filtered = this.data;
+
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(resolve, 2500);
+      signal.addEventListener("abort", () => {
+        clearTimeout(timeout);
+        reject({ cause: signal.reason });
+      });
+    });
 
     try {
       filtered = this.data.filter(one => ["street1", "street2", "city", "state", "zip"]
@@ -75,7 +85,7 @@ export class CaseLookup extends CaseBase {
 
   selectAddress(event) {
     if (event.cancelable) event.preventDefault();
-    console.log(event.detail.value);
+    console.log(`selectAddress was called with this: ${JSON.stringify(event.detail.value)}`);
     const { street1, street2, city, state, zip, country } = event.detail.value;
     this.tbStreet1.setValueFromInput(street1);
     this.tbStreet2.setValueFromInput(street2);
@@ -83,7 +93,7 @@ export class CaseLookup extends CaseBase {
     this.tbState.setValueFromInput(state);
     this.tbZip.setValueFromInput(zip);
     this.tbCountry.setValueFromInput(country);
-    this.requestUpdate();
+    // //this.requestUpdate();
   }
 
   renderControl() {

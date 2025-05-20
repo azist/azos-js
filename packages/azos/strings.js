@@ -34,6 +34,20 @@ export function dflt(str, ...dflt) {
 }
 
 /**
+ * Returns either a string or dflt object (whatever is passed without string conversion) if empty. Coerces other types of value only (not defaults)
+ */
+export function dfltObject(str, ...dflt) {
+  str = asString(str);
+  if (isEmpty(str)) {
+    for (let ds of dflt) {
+      if (ds) return ds;
+    }
+  }
+  return str;
+}
+
+
+/**
  * Ensures that the result is always a string representation of a primitive v, an empty one for null or undefined (unless canUndef is true).
  * Non-string values are coerced using v.toString(), objects are NOT JSONized
  * @param {*} v Value

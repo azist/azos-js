@@ -4,19 +4,21 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { dfltObject, isOneOf } from "azos/strings";
+import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
+
 import { Block } from "../../blocks.js";
 import { html } from "../../ui.js";
+import { FieldPart } from "../../parts/field-part.js";
+import { STL_INLINE_GRID } from "../../styles";
 
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
-import { isOneOf } from "azos/strings";
-import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
-import { FieldPart } from "../../parts/field-part.js";
-import STL_GRID from "../../styles/grid.js";
+import { Bit } from "../../bit.js";
 
 export class PersonBlock extends Block {
 
-  static styles = [...Block.styles, STL_GRID];
+  static styles = [...Block.styles, STL_INLINE_GRID];
 
 
   static properties = {
@@ -29,12 +31,12 @@ export class PersonBlock extends Block {
 
     return html`
     <h3>Person Block</h3>
-      <div class="grid cols3">
+      <div class="row cols3">
         <az-text scope="this"  id="tbFirstName"    name="FirstName"  title="First Name"  maxLength=10 isrequired value="William"></az-text>
         <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q"  whenInsert="absent" whenUpdate="disable"></az-text>
         <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
       </div>
-      <div class="grid cols3">
+      <div class="row cols3">
         <az-text scope="this"  id="tbPhone"        name="Phone"      title="Phone"       maxLength=24 isrequired dataKind="tel" value=""></az-text>
         <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
         <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
@@ -48,8 +50,9 @@ export class PersonBlock extends Block {
 
       <h4>Other Statuses</h4>
       <!-- notice how both fields map to the same field by name effectively creating an array -->
-      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses"></examples-status-block>
-      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses"></examples-status-block>
+      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses" rank="small"></examples-status-block>
+      <br>
+      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses" rank="small"></examples-status-block>
       ${this.otherStatuses}
     `;
   }
@@ -63,8 +66,13 @@ export class PersonBlock extends Block {
   }
 }
 
-export class StatusBlock extends Block {
-  renderControl(){
+export class StatusBlock extends Bit {
+
+  _getSummaryData(){
+    return {title: dfltObject(this.tbStatus?.value, html`<span style="color: var(--ghost)">Status</span>`), subtitle: this.tbDescription?.value};
+  }
+
+  renderDetailContent(){
     return html`
       <az-text scope="this"  id="tbStatus"    name="Status"  title="Status"  maxLength=10 isrequired value="Init"></az-text>
       <az-text scope="this"  id="tbDescription"   name="Description" title="Description" maxLength=25  value="Initital" ></az-text>
