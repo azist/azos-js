@@ -14,6 +14,7 @@ import { STL_INLINE_GRID } from "../../styles";
 
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
+import { Bit } from "../../bit.js";
 
 export class PersonBlock extends Block {
 
@@ -64,8 +65,14 @@ export class PersonBlock extends Block {
   }
 }
 
-export class StatusBlock extends Block {
-  renderControl(){
+export class StatusBlock extends Bit {
+
+  _getSummaryData(){
+    console.log("StatusBlock._getSummaryData");
+    return {title: this.tbStatus?.value, subtitle: this.tbDescription?.value};
+  }
+
+  renderDetailContent(){
     return html`
       <az-text scope="this"  id="tbStatus"    name="Status"  title="Status"  maxLength=10 isrequired value="Init"></az-text>
       <az-text scope="this"  id="tbDescription"   name="Description" title="Description" maxLength=25  value="Initital" ></az-text>
