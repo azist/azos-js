@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf } from "azos/strings";
+import { dfltObject, isOneOf } from "azos/strings";
 import { DATA_VALUE_PROP, isObject, isString, VALIDATE_METHOD, ValidationError } from "azos/types";
 
 import { Block } from "../../blocks.js";
@@ -50,8 +50,9 @@ export class PersonBlock extends Block {
 
       <h4>Other Statuses</h4>
       <!-- notice how both fields map to the same field by name effectively creating an array -->
-      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses"></examples-status-block>
-      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses"></examples-status-block>
+      <examples-status-block scope="this" id="blockOtherStatus0" name="OtherStatuses" rank="small"></examples-status-block>
+      <br>
+      <examples-status-block scope="this" id="blockOtherStatus1" name="OtherStatuses" rank="small"></examples-status-block>
       ${this.otherStatuses}
     `;
   }
@@ -68,8 +69,7 @@ export class PersonBlock extends Block {
 export class StatusBlock extends Bit {
 
   _getSummaryData(){
-    console.log("StatusBlock._getSummaryData");
-    return {title: this.tbStatus?.value, subtitle: this.tbDescription?.value};
+    return {title: dfltObject(this.tbStatus?.value, html`<span style="color: var(--ghost)">Status</span>`), subtitle: this.tbDescription?.value};
   }
 
   renderDetailContent(){
