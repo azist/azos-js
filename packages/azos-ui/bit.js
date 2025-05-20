@@ -4,9 +4,9 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asBool, DATA_BLOCK_PROP } from 'azos/types.js';
-import { Control, css, getChildDataMembers, html, parseRank, parseStatus } from './ui.js';
 import * as aver from 'azos/aver.js';
+import { asBool  } from 'azos/types.js';
+import { css, html, parseRank, parseStatus } from './ui.js';
 import { Block } from './blocks.js';
 
 
@@ -200,15 +200,6 @@ export class Bit extends Block {
     this.isExpanded = !this.isExpanded;
     return true;
   }
-
-  // // // /**
-  // // //  * Allows to iterate over data members (e.g. data fields) contained by this bit.
-  // // //  * Note: bit is not a block, it is merely a UI grouper, so its "internal fields" are included in a linear data fashion
-  // // //  * as if they were part of the parent outside of this Bit
-  // // // */
-  // // // get [DATA_BLOCK_PROP](){ return getChildDataMembers(this, true); }
-
-
 
   /** Override to extract tuple of (title: string | html, subtitle: string | html, commands: Cmd[])
    * This method gets called on every render. You can also add additional props for your custom rendering
