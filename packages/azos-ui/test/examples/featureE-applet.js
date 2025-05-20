@@ -67,21 +67,27 @@ export class ExampleFeatureEApplet extends Applet{
       @datachange=${(e) => console.log(`CRUD FORM @datachange EVENT: ${e.detail.sender.name} = ${e.detail.sender.value}`)}
       >
 
-<az-bit id="bitFirst" scope="this">
-<az-bit id="bitFirst" scope="this">
-<az-bit id="bitFirst" scope="this">
+<xaz-bit>
+  <xaz-bit>
+    <xaz-bit>
 
       <az-bit id="bitFirst" scope="this">
-        <examples-person-block scope="this" id="blockPerson" name="first" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
+        <examples-person-block scope="this" id="blockFirstPerson" name="first"
+           @datachange=${(e) => {
+            console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`);
+            this.bitFirst.summaryTitle = this.blockFirstPerson.tbLastName.value;
+          }}>
+        </examples-person-block>
       </az-bit>
-      </az-bit>
-      </az-bit>
-      </az-bit>
+
+    </xaz-bit>
+  </xaz-bit>
+</xaz-bit>
 
       <br>
 
       <az-bit id="bitSecond" scope="this">
-        <examples-person-block scope="this" id="blockPerson" name="second" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
+        <examples-person-block scope="this" id="blockSecondPerson" name="second" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
       </az-bit>
 
     </az-crud-form>

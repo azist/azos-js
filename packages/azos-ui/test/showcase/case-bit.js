@@ -55,7 +55,8 @@ export class CaseBit extends CaseBase {
   content inside the bit. The az-bit tag is a custom element
   that is used to create a bit. And this content is placed in a default slot.
   </p>
-    <az-bit id="bitAboutusInner1" scope="this" status="warning" statusFlag="alert" rank="small" @getSummaryDataHandler="${(bit) => bit.summaryTitle=this.tbLastName.value}"
+    <az-bit id="bitAboutusInner1" scope="this" status="warning" statusFlag="alert" rank="small"
+      .getSummaryDataHandler="${() => ({title: this.tbLastName.value, subtitle: this.tbFirstName.value})}">
       <p>
       About us paragraph content goes here. It is really
       slotted into the bit. You can use the az-bit tag to place
@@ -64,7 +65,7 @@ export class CaseBit extends CaseBase {
       </p>
 
       <az-text id="tbFirstName" scope="this" title="First Name" isrequired @change="${() => this.bitAboutusInner1.requestUpdate()}"></az-text>
-      <az-text id="tbLastName" scope="this" title="Last Name" isrequired></az-text>
+      <az-text id="tbLastName" scope="this" title="Last Name" isrequired @change="${() => this.bitAboutusInner1.requestUpdate()}"></az-text>
 
       <p>
       Notice, that you can place any content into the bit. For example, you can surround a
@@ -101,6 +102,7 @@ export class CaseBit extends CaseBase {
       content inside the bit. The az-bit tag is a custom element
       that is used to create a bit. And this content is placed in a default slot.
       </p>
+      <az-text id="tbTitle" scope="this" title="Title of the bit" isrequired @change="${(e) => this.bitAboutusInner4.summaryTitle = e.target.value}"></az-text>
     </az-bit>
   <p>
   Notice, that you can place any content into the bit. For example, you can surround a

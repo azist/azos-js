@@ -98,7 +98,7 @@ export const STL_BIT = css`
 
   .toolbar{
     position: relative;
-    top: -1.2em;
+    top: -1.75em;
     margin-bottom: -1.0em;
     display: flex;
     flex-direction: row;
