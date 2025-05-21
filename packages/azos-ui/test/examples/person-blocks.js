@@ -15,6 +15,7 @@ import { STL_INLINE_GRID } from "../../styles";
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
 import { Bit } from "../../bit.js";
+import { Command } from "../../cmd.js";
 
 export class PersonBlock extends Block {
 
@@ -68,8 +69,34 @@ export class PersonBlock extends Block {
 
 export class StatusBlock extends Bit {
 
+  #cmdAbout = new Command(this, {
+    icon: "svg://azos.ico.database",
+    handler: function(arena, cmd){
+      alert("About Command!!!");
+    }
+  });
+
+  #cmdTest = new Command(this, {
+    icon: "svg://azos.ico.category",
+    handler: function(arena, cmd){
+      alert("Test Command!!!");
+    }
+  });
+
+  #cmdCalendar = new Command(this, {
+    icon: "svg://azos.ico.calendarToday",
+    handler: function(arena, cmd){
+      alert("Calendar");
+    }
+  });
+
+
   _getSummaryData(){
-    return {title: dfltObject(this.tbStatus?.value, html`<span style="color: var(--ghost)">Status</span>`), subtitle: this.tbDescription?.value};
+    return {
+      title: dfltObject(this.tbStatus?.value, html`<span style="color: var(--ghost)">Status</span>`),
+      subtitle: this.tbDescription?.value,
+      commands: [this.#cmdTest, this.tbStatus?.value.indexOf("book") >= 0  ? this.#cmdCalendar : null, this.#cmdAbout]
+    };
   }
 
   renderDetailContent(){
