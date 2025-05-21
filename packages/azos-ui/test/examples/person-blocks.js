@@ -95,7 +95,7 @@ export class StatusBlock extends Bit {
     return {
       title: dfltObject(this.tbStatus?.value, html`<span style="color: var(--ghost)">Status</span>`),
       subtitle: this.tbDescription?.value,
-      commands: [this.#cmdTest, this.tbStatus?.value.indexOf("book") >= 0  ? this.#cmdCalendar : null, this.#cmdAbout]
+      commands: [this.#cmdTest, (this.tbStatus?.value?.indexOf("book") ?? -1) >= 0  ? this.#cmdCalendar : null, this.#cmdAbout]
     };
   }
 
