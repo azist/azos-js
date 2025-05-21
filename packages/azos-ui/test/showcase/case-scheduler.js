@@ -22,11 +22,6 @@ export class CaseScheduler extends CaseBase {
     this.#loadSchedulingItems();
   }
 
-  refresh() {
-    this.schTest.purge();
-    this.#loadSchedulingItems();
-  }
-
   #loadSchedulingItems() {
     this.schTest.beginChanges();
     try {
