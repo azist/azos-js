@@ -526,6 +526,7 @@ export class TimeBlockPicker extends Control {
   #onSlotHoverOut() { }
 
   #onSelectItem(item) {
+    if (this.maxSelectedItems === 0) return;
     const itemIndex = this.selectedItems.indexOf(item);
     if (itemIndex > -1) this.selectedItems.splice(itemIndex, 1);
     else {
