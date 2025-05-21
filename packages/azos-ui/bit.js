@@ -8,6 +8,7 @@ import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
 import { css, html, parseRank, parseStatus } from './ui.js';
 import { Block } from './blocks.js';
+import { Command } from './cmd.js';
 
 
 export const STL_BIT = css`
@@ -99,8 +100,8 @@ export const STL_BIT = css`
 
   .toolbar{
     position: relative;
-    top: -1.75em;
-    margin-bottom: -1.0em;
+    top: -2.2em;
+    margin-bottom: -2.2em;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -145,6 +146,14 @@ export const STL_BIT = css`
 .brand2  { background: var(--s-brand2-bg-ctl); color: var(--s-brand2-ink-ctl); border: var(--s-brand2-bor-ctl);}
 .brand3  { background: var(--s-brand3-bg-ctl); color: var(--s-brand3-ink-ctl); border: var(--s-brand3-bor-ctl);}
 
+.command-icon{
+  display: inline-block;
+  width: 2.0em;
+  height: 2.0em;
+  stroke: var(--ink);
+}
+
+.fas{ fill: var(--ink); }
 
 `;
 
@@ -231,7 +240,9 @@ export class Bit extends Block {
     if (this.noSummary) return this.renderDetailContent();
 
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+
     const summary = this._getSummaryData();
+
     return html`<div id="divControl" class="control ${cls}"> ${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()} </div>`;
   }
 
@@ -242,6 +253,7 @@ export class Bit extends Block {
     return html`<div class="flag ${cls}">  </div>`;
   }
 
+  /** Renders the whole summary section */
   renderSummary(data){
     const cls = this.isExpanded ? "" : "collapsed";
     return html`
@@ -253,21 +265,43 @@ export class Bit extends Block {
 </section>`;
   }
 
+  /** Renders summary/detail expander button (up/down) */
   renderSummaryExpander(){
     const cls = this.isExpanded ? "" : "collapsed";
     return html`<div class="expander ${cls}" @click=${this.#onSummaryExpanderClick}>${this.renderImageSpec("svg://azos.ico.caretDown", {cls: "ico"}).html}</div>`;
   }
 
-
+  /** Renders the summary title. Must include its own div */
   renderSummaryTitle(data){ return html`<div class="title" @click=${this.#onSummaryExpanderClick}>${data.title}</div>`; }
-  renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle}</div>`; }
-  renderSummaryToolbar(data){ return html`<div class="toolbar"> <div>[A]</div> <div>[B]</div> </div>`; }
 
+  /** Renders subtitle. Must include its own div */
+  renderSummarySubtitle(data){ return html`<div class="subtitle">${data.subtitle}</div>`; }
+
+  /** Renders the summary toolbar with commands. The commands are passed as an array of Command objects  */
+  renderSummaryToolbar(data){
+    const commands = data.commands;
+    if (!commands) return null;
+    const bar = [];
+    const arena = this.arena;
+
+    for(const cmd of commands){
+      if (!(cmd instanceof Command)) continue;
+      if (!cmd.visible) continue;
+
+      const mkp = cmd.provideMarkup(arena, this);
+      bar.push(html`<div class="cmd" @click=${() => cmd.exec(arena, this)}>${mkp}</div>`);
+    }
+
+    return html`<div class="toolbar"> ${bar} </div>`;
+  }
+
+  /** Render details section with appropriate classes */
   renderDetails(){
     const cls = this.isExpanded ? "" : "collapsed";
     return html`<section id="sectDetails" class="details ${cls}"> ${this.renderDetailContent()}</section>`;
   }
 
+  /** Renders the content in the details section itself, this is what you override in derived class */
   renderDetailContent(){ return html`<slot>  </slot>`; }
 }
 
