@@ -7,20 +7,43 @@
 import * as aver from "./aver.js";
 import { Module } from "./modules.js";
 
+/** UTC time zone name. The instance of {@link TimeZone} with this name is ALWAYS present in {@link TimeZoneManager} registry */
+export const TZ_UTC = "UTC";
+
+
 /** Provides named time zone information along with ability to convert UTC timestamps to local (as of timezone) components and back */
 export class TimeZone {
 
   #name;
   #description;
-  #ianaName;
-  #windowsName;
+  #iana;
+  #windows;
+  #baseOffsetMs;
 
   constructor(cfg){
-
+    this.#name         = cfg.getString("name", null);
+    aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name");
+    this.#description  = cfg.getString("name", this.constructor.name);
+    this.#iana         = cfg.getString("iana", null);
+    this.#windows      = cfg.getString("windows", null);
+    this.#baseOffsetMs = cfg.getInt("baseOffsetMs", 0);
   }
 
+  /** Gets the unique id/name of this time zone. This is the field which time zones are keyed on */
+  get name(){ return this.#name; }
+
+  /** Gets the description of this time zone */
+  get description(){ return this.#description; }
+
+  /** Gets the IANA name of this time zone */
+  get iana(){ return this.#iana; }
+
+  /** Gets the Windows name of this time zone */
+  get windows(){ return this.#windows; }
+
+
   /** Gets standard offset of this time zone relative to UTC */
-  get standardBaseOffsetMs(){ return 0; }
+  get standardBaseOffsetMs(){ return this.#baseOffsetMs; }
 
   /**
    * Returns the millisecond offset of this timezone relative to UTC as of the specified UTC timestamp
@@ -157,7 +180,7 @@ export class UsStandardTimeZone extends TimeZone {
  */
 export class TimeZoneManager extends Module {
   #map;
-  constructor() {
+  constructor(dir, cfg) {
     super();
     this.#map = new Map();
   }
