@@ -19,6 +19,7 @@ export class TimeBlockPicker extends Control {
     this.use24HourTime = false;
     this.timeViewGranularityMins = 30;
     this.maxSelectedItems = 2;
+    queueMicrotask(() => this.#recomputeViewProperties());
   }
 
   static styles = [css`
