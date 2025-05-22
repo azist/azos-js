@@ -14,8 +14,6 @@ export class TimeBlockPicker extends Control {
 
   constructor() {
     super();
-    this.viewStartDay = types.DAYS_OF_WEEK.MONDAY;
-    this.viewNumDays = 6; // default to Monday - Saturday
     this.selectedItems = [];
 
     this.use24HourTime = false;
@@ -252,8 +250,8 @@ export class TimeBlockPicker extends Control {
 
     viewStartDay: { type: Number },
     viewNumDays: { type: Number },
-    viewStartDate: { type: Date },
-    viewEndDate: { type: Date },
+    viewStartDate: { state: true },
+    viewEndDate: { state: true },
 
     maxSelectedItems: { type: Number },
     selectedItems: { type: Array },
@@ -272,82 +270,69 @@ export class TimeBlockPicker extends Control {
   #timeViewGranularityMins = null;
   get timeViewGranularityMins() { return this.#timeViewGranularityMins; }
   set timeViewGranularityMins(v) {
-    const oldValue = this.#timeViewGranularityMins;
     this.#timeViewGranularityMins = isOneOf(aver.isNumber(v), [15, 30, 60]) ? v : 30;
     this.timeViewRenderOffMins = this.#timeViewGranularityMins * 2;
-    this.requestUpdate("timeViewGranularityMins", oldValue);
+    if (this.hasUpdated) this.#recomputeViewProperties();
   }
 
   /** The date of the first scheduling item or "today" if no items. */
   #effectiveStartDate = null;
-  get effectiveStartDate() { return this.#effectiveStartDate; }
+  get effectiveStartDate() { return this.#effectiveStartDate ?? this.#defaultEffectiveStartDate; }
   set effectiveStartDate(v) {
-    const oldValue = this.#effectiveStartDate;
     this.#effectiveStartDate = aver.isDate(v);
-    this.requestUpdate("effectiveStartDate", oldValue);
+    if (this.hasUpdated) this.#recomputeViewProperties();
   }
 
   #enabledStartDate = null;
-  get enabledStartDate() { return this.#enabledStartDate; }
+  get enabledStartDate() { return this.#enabledStartDate ?? this.#defaultEnabledStartDate; }
   set enabledStartDate(v) {
     if (types.isString(v)) v = this.#formatStrToDate(v);
-    const oldValue = this.#enabledStartDate;
     this.#enabledStartDate = aver.isDate(v);
-    this.requestUpdate("enabledStartDate", oldValue);
+    if (this.hasUpdated) this.#recomputeViewProperties();
   }
 
   #enabledEndDate = null;
-  get enabledEndDate() { return this.#enabledEndDate; }
+  get enabledEndDate() { return this.#enabledEndDate ?? this.#defaultEnabledEndDate; }
   set enabledEndDate(v) {
     if (types.isString(v)) v = this.#formatStrToDate(v);
-    const oldValue = this.#enabledEndDate;
     this.#enabledEndDate = aver.isDate(v);
-    this.requestUpdate("enabledEndDate", oldValue);
+    if (this.hasUpdated) this.#recomputeViewProperties();
   }
 
   /** The date of the last scheduling item or "today" if no items. */
   #effectiveEndDate = null;
-  get effectiveEndDate() { return this.#effectiveEndDate; }
+  get effectiveEndDate() { return this.#effectiveEndDate ?? this.#defaultEffectiveEndDate; }
   set effectiveEndDate(v) {
-    const oldValue = this.#effectiveEndDate;
     this.#effectiveEndDate = aver.isDate(v);
-    this.requestUpdate("effectiveEndDate", oldValue);
+    if (this.hasUpdated) this.#recomputeViewProperties();
   }
 
   #viewNumDays = null;
-  get viewNumDays() { return this.#viewNumDays; }
+  get viewNumDays() { return this.#viewNumDays ?? this.#defaultViewNumDays; }
   set viewNumDays(v) {
     aver.isTrue(v >= 5 && v <= 7, "viewNumDays should be between 5 and 7");
-    const oldValue = this.#viewNumDays;
     this.#viewNumDays = v;
-    this.requestUpdate("viewNumDays", oldValue);
+    if (this.hasUpdated) this.#recomputeViewProperties();
   }
 
   #viewStartDay = null;
-  get viewStartDay() { return this.#viewStartDay; }
+  get viewStartDay() { return this.#viewStartDay ?? this.#defaultViewStartDay; }
   set viewStartDay(v) {
     aver.isTrue(v >= 0 && v < 7, "viewStartDay should be between 0 (Sunday) and 6 (Saturday)");
-    const oldValue = this.#viewStartDay;
     this.#viewStartDay = v;
-    this.requestUpdate("viewStartDay", oldValue);
+    if (this.hasUpdated) this.#recomputeViewProperties();
   }
 
   #viewStartDate = null;
   get viewStartDate() { return this.#viewStartDate; }
-  set viewStartDate(v) {
-    const oldValue = this.#viewStartDate;
-    aver.isDate(v);
-    v.setHours(0, 0, 0, 0);
-
-    this.#viewStartDate = v;
-    this.requestUpdate("viewStartDate", oldValue);
-  }
 
   /** The View's Ending Date Taking into account effect end date ending mid-week */
   get viewEndDate() {
     const endOfWeek = new Date(this.viewStartDate);
     endOfWeek.setHours(23, 59, 59, 99);
-    endOfWeek.setDate(this.viewStartDate.getDate() + this.viewNumDays);
+    // 2/16/25 + 7 days = 2/23/25; however, view range should exclude 2/23/25, hence - 1.
+    const LAST_DAY_EXCLUSIVE = 1;
+    endOfWeek.setDate(this.viewStartDate.getDate() + this.viewNumDays - LAST_DAY_EXCLUSIVE);
     return endOfWeek;
   }
 
@@ -362,16 +347,25 @@ export class TimeBlockPicker extends Control {
   get itemsByDay() { return this.#itemsByDay; }
   get items() { return this.#itemsByDay.flatMap(({ items }) => items); }
 
+  /** These values represent the defaults when a user-provided value is not set */
+  #defaultEffectiveStartDate; // #effectiveStartDate could be set by the user
+  #defaultEffectiveEndDate;   // #effectiveEndDate could be set by the user
+  #defaultEnabledStartDate;   // #enabledStartDate could be set by the user
+  #defaultEnabledEndDate;     // #enabledEndDate could be set by the user
+  #defaultViewNumDays;        // #viewNumDays could be set by the user
+  #defaultViewStartDay;       // #viewStartDay could be set by the user
+
   #recomputeViewProperties(viewStartDate = null) {
+    this.#defaultEffectiveStartDate = this.itemsByDay.length ? this.itemsByDay[0].day : new Date();
+    this.#defaultEffectiveEndDate = this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : new Date();
 
-    this.#effectiveStartDate = this.itemsByDay.length ? this.itemsByDay[0].day : new Date();
-    this.#effectiveEndDate = this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : new Date();
+    this.#defaultEnabledStartDate = this.itemsByDay.length ? this.itemsByDay[0].day : new Date();
+    this.#defaultEnabledEndDate = this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : null;
 
-    this.#enabledStartDate = this.#enabledStartDate ?? new Date();
-    this.#enabledEndDate = this.#enabledEndDate ?? this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : null;
+    this.#defaultViewNumDays = 7;
+    this.#defaultViewStartDay = types.DAYS_OF_WEEK.MONDAY;
 
     this.#viewStartDate = viewStartDate ?? this.#calculateViewStartDate(this.effectiveStartDate);
-
     this.#daysView = this.#calculateDaysView();
     this.#timeSlotsView = this.#calculateTimeSlotsView();
     this.update();
@@ -624,7 +618,7 @@ export class TimeBlockPicker extends Control {
         if (count < 0)
           filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() > this.enabledStartDate.getTime();
         else
-          filter = ({ day }) => day.getTime() >= nextViewStartDate.getTime() && day.getTime() <= this.#enabledEndDate.getTime();
+          filter = ({ day }) => day.getTime() >= nextViewStartDate.getTime() && day.getTime() <= this.enabledEndDate.getTime();
 
         if (!this.itemsByDay.some(filter)) return;
       }

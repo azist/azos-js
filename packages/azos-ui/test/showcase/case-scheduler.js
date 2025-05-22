@@ -28,7 +28,6 @@ export class CaseScheduler extends CaseBase {
       for (let i = 0; i < rangeData.length; i++) {
         const one = rangeData[i];
         const day = types.asDate(one.day, false, true);
-        if (i === 0) { this.schTest.enabledStartDate = day; }
         for (let j = 0; j < one.hours.parsed.length; j++) {
           const span = one.hours.parsed[j];
           const item = {
