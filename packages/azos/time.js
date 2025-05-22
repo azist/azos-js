@@ -5,7 +5,9 @@
 </FILE_LICENSE>*/
 
 import * as aver from "./aver.js";
+import { config, makeNew } from "./conf.js";
 import { Module } from "./modules.js";
+import { AzosError } from "./types.js";
 
 /** UTC time zone name. The instance of {@link TimeZone} with this name is ALWAYS present in {@link TimeZoneManager} registry */
 export const TZ_UTC = "UTC";
@@ -35,12 +37,11 @@ export class TimeZone {
   /** Gets the description of this time zone */
   get description(){ return this.#description; }
 
-  /** Gets the IANA name of this time zone */
+  /** Gets the IANA name of this time zone if it has one (standard timezones do) */
   get iana(){ return this.#iana; }
 
-  /** Gets the Windows name of this time zone */
+  /** Gets the Windows name of this time zone if it has one (standard timezones do) */
   get windows(){ return this.#windows; }
-
 
   /** Gets standard offset of this time zone relative to UTC */
   get standardBaseOffsetMs(){ return this.#baseOffsetMs; }
@@ -99,8 +100,6 @@ export class TimeZone {
     const offset = this.getOffsetMsAsOfLocal(ts, isDST);
     return ts - offset;// e.g. CLE is -5:0, so we subtract -5 hours from LOCAL to get to UTC
   }
-
-
 }
 
 /** Encapsulates general US and Canada Daylight savings conversion rules */
@@ -174,27 +173,44 @@ export class UsStandardTimeZone extends TimeZone {
   }
 }
 
-
 /**
  * Provides a module which provides a registry of named {@link TimeZone} instances}
  */
 export class TimeZoneManager extends Module {
+
   #map;
+
   constructor(dir, cfg) {
-    super();
+    super(dir, cfg);
     this.#map = new Map();
+
+    //UTC is always there
+    this.#map.set(TZ_UTC, new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root));
+
+    const cfgZones = cfg.get("zones", "zone");
+    if (cfgZones){
+      for(const cfgZone of cfgZones.getChildren(false)){
+        const zone = makeNew(TimeZone, cfgZone, null, TimeZone);
+        if (this.#map.has(zone.name)) {
+          throw new AzosError(`TimeZone '${zone.name}' already registered`, "tzm.ctor()");
+        }
+        this.#map.set(zone.name, zone);
+      }
+    }
   }
 
+  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found */
   getZone(zone){
     const result = this.tryGetZone(zone);
-    if (result === null) {
-      throw new Error(`TimeZone ${zone} not found`);
-    }
+    if (!result) throw new AzosError(`TimeZone '${zone}' not found`, "tzm.getZone()");
     return result;
   }
 
+  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found */
   tryGetZone(zone){
-    return null;
+    aver.isNonEmptyString(zone, "zone");
+    const result = this.#map.get(zone);
+    return result ?? null;
   }
 }
 
