@@ -51,7 +51,8 @@ export class TimeZone {
    * @param {number| Date} ts number or date UTC timestamp
    * @returns {number} offset in milliseconds
   */
-  getOffsetMsAsOfUtc(ts){ return 0; }
+  // eslint-disable-next-line no-unused-vars
+  getOffsetMsAsOfUtc(ts){ return this.standardBaseOffsetMs; }
 
   /**
    * Returns the millisecond offset of this timezone relative to UTC as of LOCAL (for this zone) timestamp with explicit DST flag
@@ -59,7 +60,8 @@ export class TimeZone {
    * @param {Boolean} isDST true when the date is in Daylight Saving Time mode
    * @returns {number} offset in milliseconds
   */
-  getOffsetMsAsOfLocal(ts, isDST){ return 0; }
+  // eslint-disable-next-line no-unused-vars
+  getOffsetMsAsOfLocal(ts, isDST){ return this.standardBaseOffsetMs; }
 
 
   /** Extracts components out of UTC timestamp as of THIS timezone,
