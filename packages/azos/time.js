@@ -189,7 +189,7 @@ export class TimeZoneManager extends Module {
     //UTC is always there
     this.#map.set(TZ_UTC, new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root));
 
-    const cfgZones = cfg.get("zones", "zone");
+    const cfgZones = cfg.get("zones");
     if (cfgZones){
       for(const cfgZone of cfgZones.getChildren(false)){
         const zone = makeNew(TimeZone, cfgZone, null, TimeZone);
