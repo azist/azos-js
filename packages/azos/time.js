@@ -214,6 +214,9 @@ export class TimeZoneManager extends Module {
     const result = this.#map.get(zone);
     return result ?? null;
   }
+
+  /** Gets an array of all zones in the registry */
+  getAllZones(){ return [...this.#map.values()]; }
 }
 
 

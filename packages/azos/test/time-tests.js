@@ -91,6 +91,15 @@ unit("Time", function () {
         const tz2 = tzm.getZone("t2");
         aver.isOf(tz2, TeztTimeZone, "UTC is a TimeZone");
 
+        const allZones = tzm.getAllZones();
+        aver.isArray(allZones, "getAllZones");
+        aver.areEqual(3, allZones.length, "getAllZones has more than 2 zones");
+
+        aver.isTrue(allZones.indexOf(utc) >= 0, "getAllZones has UTC");
+        aver.isTrue(allZones.indexOf(tz1) >= 0, "getAllZones has tz1");
+        aver.isTrue(allZones.indexOf(tz2) >= 0, "getAllZones has tz2");
+
+
         const originalTs = Date.UTC(1980, 0, 1, 14, 23, 41, 345);
 
         const got1 = tz1.extractComponents(originalTs);
@@ -112,10 +121,8 @@ unit("Time", function () {
         aver.areEqual(41,   got2.second, "second");
         aver.areEqual(345,  got2.millisecond, "millisecond");
 
-
         aver.areEqual(originalTs, tz1.combineComponents({ year: 1980, month: 1, day: 1, hour: 16,  minute: 23, second: 41, millisecond: 345}));
         aver.areEqual(originalTs, tz2.combineComponents({ year: 1980, month: 1, day: 1, hour: 13,  minute: 23, second: 41, millisecond: 345}));
-
       });
     });
 
