@@ -20,6 +20,7 @@ import "./app-lifecycle.js";
 import "./app-mod-tests.js";
 import "./linker-tests.js";
 import "./linker-tests2.js";
+import "./time-tests.js";
 import "./router-tests.js";
 import "./img-registry-tests.js";
 import "./app-log-tests.js";
