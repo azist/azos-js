@@ -127,7 +127,7 @@ unit("Time", function () {
     });
 
 
-    cs("us-standard-timezone", function () {
+    cs("us-standard-timezones-and-daylight-savings", function () {
       doUsing(apps.application({
         modules: [{name: "tzm", type: TimeZoneManager,
           zones: [
@@ -181,7 +181,43 @@ unit("Time", function () {
 
         aver.areEqual(stdOriginal, ct.combineComponents({ year: 1980, month: 1, day: 1, hour: 8,  minute: 23, second: 41, millisecond: 345}));
 
+        //DST======================================================
 
+        const gotDstUtc = utc.extractComponents(dstOriginal);
+
+        aver.areEqual(1980, gotDstUtc.year, "year");
+        aver.areEqual(7,    gotDstUtc.month, "month");
+        aver.areEqual(4,    gotDstUtc.day, "day");
+        aver.areEqual(14,   gotDstUtc.hour, "hour");
+        aver.areEqual(23,   gotDstUtc.minute, "minute");
+        aver.areEqual(41,   gotDstUtc.second, "second");
+        aver.areEqual(345,  gotDstUtc.millisecond, "millisecond");
+
+        aver.areEqual(dstOriginal, utc.combineComponents({ year: 1980, month: 7, day: 4, hour: 14,  minute: 23, second: 41, millisecond: 345}));
+
+        const gotDstEt = et.extractComponents(dstOriginal);
+
+        aver.areEqual(1980, gotDstEt.year, "year");
+        aver.areEqual(7,    gotDstEt.month, "month");
+        aver.areEqual(4,    gotDstEt.day, "day");
+        aver.areEqual(10,   gotDstEt.hour, "hour");
+        aver.areEqual(23,   gotDstEt.minute, "minute");
+        aver.areEqual(41,   gotDstEt.second, "second");
+        aver.areEqual(345,  gotDstEt.millisecond, "millisecond");
+
+        aver.areEqual(dstOriginal, et.combineComponents({ year: 1980, month: 7, day: 4, hour: 10,  minute: 23, second: 41, millisecond: 345}));
+
+        const gotDstCt = ct.extractComponents(dstOriginal);
+
+        aver.areEqual(1980, gotDstCt.year, "year");
+        aver.areEqual(7,    gotDstCt.month, "month");
+        aver.areEqual(4,    gotDstCt.day, "day");
+        aver.areEqual(9,    gotDstCt.hour, "hour");
+        aver.areEqual(23,   gotDstCt.minute, "minute");
+        aver.areEqual(41,   gotDstCt.second, "second");
+        aver.areEqual(345,  gotDstCt.millisecond, "millisecond");
+
+        aver.areEqual(dstOriginal, ct.combineComponents({ year: 1980, month: 7, day: 4, hour: 9,  minute: 23, second: 41, millisecond: 345}));
 
       });
     });

@@ -132,7 +132,7 @@ export class UsStandardTimeZone extends TimeZone {
     let dstEnd = new Date(Date.UTC(ldt.getUTCFullYear(), 11/*November*/, 1, 2, 0, 0));
     while(dstEnd.getUTCDay() !== 0) dstEnd.setUTCDate(dstEnd.getUTCDate() + 1);
 
-    return { start: dstStart, end: dstEnd };
+    return { dstStart, dstEnd };
   }
 
   /**
@@ -147,6 +147,7 @@ export class UsStandardTimeZone extends TimeZone {
     const ldt = new Date(lts);//fake "UTC" since Date does not have an API
 
     let {dstStart, dstEnd} = this.#getDstRange(ldt);
+    ////console.log("fromUTC",ldt, dstStart, dstEnd);
 
     const isDST = ldt >= dstStart && ldt < dstEnd;
     const dstOffset = isDST ? UsStandardTimeZone.DST_OFFSET_MS : 0;
@@ -167,6 +168,7 @@ export class UsStandardTimeZone extends TimeZone {
     const ldt = new Date(lts);//fake "UTC" since Date does not have an API
 
     let {dstStart, dstEnd} = this.#getDstRange(ldt);
+    ////console.log("fromLOCAL",ldt, dstStart, dstEnd);
 
     const isInDstRange = isDst && ldt >= dstStart && ldt < dstEnd;
     const dstOffset = isInDstRange ? UsStandardTimeZone.DST_OFFSET_MS : 0;
