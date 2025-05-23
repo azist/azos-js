@@ -120,17 +120,17 @@ export class UsStandardTimeZone extends TimeZone {
 
 
   #getDstRange(ldt){
-    let dstStart = new Date(DataTransfer.UTC(ldt.getUTCFullYear, 3/*March*/, 1, 2, 0, 0));
+    let dstStart = new Date(Date.UTC(ldt.getUTCFullYear(), 3/*March*/, 1, 2, 0, 0));
     for(let sun = 0;;){
       if (dstStart.getUTCDay() === 0) {//Sunday == 0
         sun++;
       }
-      if (sun == 2) break;
-      dstStart.setDate(dstStart.getDate() + 1);
+      if (sun === 2) break;
+      dstStart.setUTCDate(dstStart.getUTCDate() + 1);
     }
 
-    let dstEnd = new Date(DataTransfer.UTC(ldt.getUTCFullYear, 11/*November*/, 1, 2, 0, 0));
-    while(dstEnd.getUTCDay() !== 0) dstEnd.setDate(dstEnd.getDate() + 1);
+    let dstEnd = new Date(Date.UTC(ldt.getUTCFullYear(), 11/*November*/, 1, 2, 0, 0));
+    while(dstEnd.getUTCDay() !== 0) dstEnd.setUTCDate(dstEnd.getUTCDate() + 1);
 
     return { start: dstStart, end: dstEnd };
   }

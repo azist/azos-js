@@ -7,7 +7,7 @@
 import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "azos/aver";
 import * as apps from "azos/application";
-import { TimeZone, TimeZoneManager, TZ_UTC } from "../time.js";
+import { TimeZone, TimeZoneManager, TZ_UTC, UsStandardTimeZone } from "../time.js";
 import { AzosError, doUsing } from "../types.js";
 
 
@@ -125,6 +125,68 @@ unit("Time", function () {
         aver.areEqual(originalTs, tz2.combineComponents({ year: 1980, month: 1, day: 1, hour: 13,  minute: 23, second: 41, millisecond: 345}));
       });
     });
+
+
+    cs("us-standard-timezone", function () {
+      doUsing(apps.application({
+        modules: [{name: "tzm", type: TimeZoneManager,
+          zones: [
+            {type: UsStandardTimeZone, name: "et", description: "Eastern Time", iana: "America/New_York", windows: "Eastern Standard", baseOffsetMs: -5 * 60 * 60 * 1000},
+            {type: UsStandardTimeZone, name: "ct", description: "Central Time", iana: "America/Indiana/Knox", windows: "Central Standard", baseOffsetMs: -6 * 60 * 60 * 1000}
+          ]
+        }]
+      }), (app) => {
+        const tzm = app.moduleLinker.resolve(TimeZoneManager);
+
+        const utc = tzm.getZone(TZ_UTC);
+        const et = tzm.getZone("et");
+        const ct = tzm.getZone("ct");
+
+        const stdOriginal = Date.UTC(1980, 0, 1, 14, 23, 41, 345);
+        const dstOriginal = Date.UTC(1980, 6, 4, 14, 23, 41, 345);
+
+        const gotStdUtc = utc.extractComponents(stdOriginal);
+
+        aver.areEqual(1980, gotStdUtc.year, "year");
+        aver.areEqual(1,    gotStdUtc.month, "month");
+        aver.areEqual(1,    gotStdUtc.day, "day");
+        aver.areEqual(14,   gotStdUtc.hour, "hour");
+        aver.areEqual(23,   gotStdUtc.minute, "minute");
+        aver.areEqual(41,   gotStdUtc.second, "second");
+        aver.areEqual(345,  gotStdUtc.millisecond, "millisecond");
+
+        aver.areEqual(stdOriginal, utc.combineComponents({ year: 1980, month: 1, day: 1, hour: 14,  minute: 23, second: 41, millisecond: 345}));
+
+        const gotStdEt = et.extractComponents(stdOriginal);
+
+        aver.areEqual(1980, gotStdEt.year, "year");
+        aver.areEqual(1,    gotStdEt.month, "month");
+        aver.areEqual(1,    gotStdEt.day, "day");
+        aver.areEqual(9,    gotStdEt.hour, "hour");
+        aver.areEqual(23,   gotStdEt.minute, "minute");
+        aver.areEqual(41,   gotStdEt.second, "second");
+        aver.areEqual(345,  gotStdEt.millisecond, "millisecond");
+
+        aver.areEqual(stdOriginal, et.combineComponents({ year: 1980, month: 1, day: 1, hour: 9,  minute: 23, second: 41, millisecond: 345}));
+
+        const gotStdCt = ct.extractComponents(stdOriginal);
+
+        aver.areEqual(1980, gotStdCt.year, "year");
+        aver.areEqual(1,    gotStdCt.month, "month");
+        aver.areEqual(1,    gotStdCt.day, "day");
+        aver.areEqual(8,    gotStdCt.hour, "hour");
+        aver.areEqual(23,   gotStdCt.minute, "minute");
+        aver.areEqual(41,   gotStdCt.second, "second");
+        aver.areEqual(345,  gotStdCt.millisecond, "millisecond");
+
+        aver.areEqual(stdOriginal, ct.combineComponents({ year: 1980, month: 1, day: 1, hour: 8,  minute: 23, second: 41, millisecond: 345}));
+
+
+
+      });
+    });
+
+
 
   });
 });
