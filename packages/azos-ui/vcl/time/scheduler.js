@@ -364,7 +364,7 @@ export class TimeBlockPicker extends Control {
     this.#defaultEnabledEndDate = this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : null;
 
     this.#defaultViewNumDays = 7;
-    this.#defaultViewStartDay = types.DAYS_OF_WEEK.MONDAY;
+    this.#defaultViewStartDay = types.DAYS_OF_WEEK.SUNDAY;
 
     this.#viewStartDate = viewStartDate ?? this.#calculateViewStartDate(this.effectiveStartDate);
     this.#daysView = this.#calculateDaysView();
