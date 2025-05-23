@@ -12,6 +12,10 @@ import { AzosError } from "./types.js";
 /** UTC time zone name. The instance of {@link TimeZone} with this name is ALWAYS present in {@link TimeZoneManager} registry */
 export const TZ_UTC = "UTC";
 
+/** Milliseconds in one hour */
+export const ONE_HOUR_MS = 60 * 60 * 1000;
+
+
 
 /** Provides named time zone information along with ability to convert UTC timestamps to local (as of timezone) components and back */
 export class TimeZone {
@@ -104,8 +108,11 @@ export class TimeZone {
   }
 }
 
-/** Encapsulates general US and Canada Daylight savings conversion rules */
-export class UsStandardTimeZone extends TimeZone {
+/** A timezone used in the USA and Canada which does not support DST */
+export class UsTimeZone extends TimeZone { }
+
+/** Encapsulates general US and Canada time zone with Daylight savings conversion rules */
+export class UsStandardTimeZone extends UsTimeZone {
 /*
     United States and Canada
     DST begins at 2:00 a.m. local time on the second Sunday in March.
@@ -221,6 +228,19 @@ export class TimeZoneManager extends Module {
   getAllZones(){ return [...this.#map.values()]; }
 }
 
+
+/** Default config segment which covers US timezones including Alaska, Hawaii and Arizona */
+export const US_STANDARD_TIMEZONES = Object.freeze([
+  {type: UsStandardTimeZone, name: "est",   description: "Eastern Time",  iana: "America/New_York", windows: "Eastern Standard Time",     baseOffsetMs: -5 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "cst",   description: "Central Time",  iana: "America/Chicago",  windows: "Central Standard Time",     baseOffsetMs: -6 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "mst",   description: "Mountain Time", iana: "America/Denver",   windows: "Mountain Standard Time",    baseOffsetMs: -7 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "pst",   description: "Pacific Time",  iana: "America/Los_Angeles", windows: "Pacific Standard Time",  baseOffsetMs: -8 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "akst",  description: "Pacific Time",  iana: "America/Anchorage",   windows: "Alaskan Standard Time",  baseOffsetMs: -9 * ONE_HOUR_MS},
+
+  // --------------------- Non-DST time zones ----------------------
+  {type: UsTimeZone, name: "usmst", description: "US Mountain Time (no DST)", iana: "America/Phoenix", windows: "US Mountain Standard Time", baseOffsetMs: -7 * ONE_HOUR_MS},
+  {type: UsTimeZone, name: "hst",   description: "Hawaiian Time", iana: "Pacific/Honolulu",    windows: "Hawaiian Standard Time", baseOffsetMs: -10 * ONE_HOUR_MS},
+]);
 
 /*
 https://www.webexhibits.org/daylightsaving/b2.html
