@@ -46,29 +46,34 @@ unit("Application", function () {
       isNotNull(app.instanceId);
       isNotNull(app.startTime);
 
-      areEqual(2, app.components.length);
+      areEqual(3, app.components.length);
       isOf(app.components[0], ConLog);
 
-      areEqual(2, app.rootComponents.length);
+      areEqual(3, app.rootComponents.length);
       isOf(app.rootComponents[0], ConLog);
       isOf(app.rootComponents[1], SecurityManager);
 
-      areEqual(1, app.modules.length);
-      isOf(app.modules[0], ConLog);
+      areEqual(2, app.modules.length);
+      isOf(app.modules[0], Localizer);
+      isOf(app.modules[1], ConLog);
 
       let clist = AppComponent.getAllApplicationComponents(app);
-      areEqual(2,  clist.length);
+      areEqual(3,  clist.length);
       areEqual(app, clist[0].director);
       isTrue(clist[0].isDirectedByApp);
       areEqual(app, clist[1].director);
       isTrue(clist[1].isDirectedByApp);
+      areEqual(app, clist[2].director);
+      isTrue(clist[2].isDirectedByApp);
 
       clist = AppComponent.getRootApplicationComponents(app);
-      areEqual(2,  clist.length);
+      areEqual(3,  clist.length);
       areEqual(app, clist[0].director);
       isTrue(clist[0].isDirectedByApp);
       areEqual(app, clist[1].director);
       isTrue(clist[1].isDirectedByApp);
+      areEqual(app, clist[2].director);
+      isTrue(clist[2].isDirectedByApp);
 
       isOf(app.log, ILog);
       areEqual(LOG_TYPE.DEBUG, app.logLevel);

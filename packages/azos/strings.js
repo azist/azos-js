@@ -7,7 +7,6 @@
 import * as CC from "./coreconsts.js";
 import * as types from "./types.js";
 import * as aver from "./aver.js";
-import * as lcl from "./localization.js";
 
 /**
  * Returns true if the argument is an undefined, null, zero length or an empty string.
@@ -241,7 +240,7 @@ export function describe(v, maxLen = 64) {
 
   let d = CC.UNKNOWN;
   if (types.isDate(v))
-    d = lcl.INVARIANT.formatDateTime(v);
+    d = CC.GLOBALS.DEFAULT_INVARIANT.formatDateTime(v);
   else if (types.isString(v))
     d = `"${v}"`;
   else if (types.isObjectOrArray(v))
@@ -270,14 +269,16 @@ export function format(v, args, localizer = null) {
   if (!types.isObjectOrArray(args))
     throw new types.AzosError(".format(args) must be null, object or array", "format()");
 
+  if (!localizer) localizer = CC.GLOBALS.DEFAULT_INVARIANT;
+
   const fmap = (s, token) => {
     let key = token;
     let fmt = "";
     let fmta = null;
     const i = token.indexOf("::");
     if (i > 0) {
-      key = token.substr(0, i);
-      fmt = token.substr(i + 2);
+      key = token.substring(0, i);
+      fmt = token.substring(i + 2);
       const j = fmt.indexOf("{");
       if (j > 1) {
         try {
@@ -285,7 +286,7 @@ export function format(v, args, localizer = null) {
         } catch (e) {
           throw new types.AzosError(`.format('.. ${fmt} ..') Error parsing token format fragment: ${e.message}`, "format()");
         }
-        fmt = fmt.substr(0, j);
+        fmt = fmt.substring(0, j);
       }
     }
 
@@ -296,13 +297,11 @@ export function format(v, args, localizer = null) {
 
     switch (fmt) {
       case "ld": { //localized date-time
-        if (!localizer) localizer = lcl.currentLocalizer();
         if (fmta === null) fmta = {};
         fmta.dt = tv;
         return localizer.formatDateTime(fmta);
       }
       case "lm": { //localized money
-        if (!localizer) localizer = lcl.currentLocalizer();
         if (fmta === null) fmta = {};
         fmta.amt = tv;
         if (isEmpty(fmta.iso)) throw new types.AzosError(".format() is missing currency iso arg: lm{iso: 'currency-code' | '?key'}", "format()");

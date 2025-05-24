@@ -8,12 +8,13 @@
 import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as sut from "../localization.js";
 import * as aver from "../aver.js";
+import { GLOBALS } from "../coreconsts.js";
 
 describe("Localization", function() {
 
   describe("#Localizer", function() {
 
-    const dloc = new sut.Localizer();//Default Localizer
+    const dloc = GLOBALS.DEFAULT_INVARIANT;//Default Localizer
 
 
     describe("#getCurrencySymbols()", function() {

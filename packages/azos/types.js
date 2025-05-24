@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Atom } from "./atom.js";
 import * as CC from "./coreconsts.js";
+import { Atom } from "./atom.js";
 import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
 import {

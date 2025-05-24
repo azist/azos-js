@@ -5,9 +5,9 @@
 </FILE_LICENSE>*/
 
 import * as types from "./types.js";
-import {LclError}  from "./types.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
+import { Module } from "./modules.js";
 
 export const CULTURE_INVARIANT = "*";
 export const CULTURE_US = "us";
@@ -68,18 +68,21 @@ export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => stri
 
 /**
  * Provides default implementation of invariant localizer.
- * Other localizer shall extend this class and inject their instance using
- *  localization.injectLocalizer(new CustomLocalizer(...))
+ * Other localizer shall extend this class and install it as modules.
+ * Any application has a default localizer
  */
-export class Localizer{
+export class Localizer extends Module {
 
   #strings;
 
-  constructor(stringTable){
+  constructor(app, cfg){
+    super(app, cfg);
+    const stringTable = cfg.get("strings");
+
     if (types.isAssigned(stringTable)){
       aver.isObject(stringTable);
       this.#strings = stringTable;
-    } else{
+    } else {
       this.#strings = {
         [ISO_LANG_ENG]: { [ANY_SCHEMA]: {[ANY_FIELD]: {  }} },
         [ISO_LANG_RUS]: { [ANY_SCHEMA]: {[ANY_FIELD]: {"yes":"да", "no":"нет"}}, "tezt": {[ANY_FIELD]: {"yes":"так", "no":"неа"}} },
@@ -105,7 +108,7 @@ export class Localizer{
   formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, utc = false} = {}){
     if (dt===null){
       if (arguments.length==0)
-        throw new LclError("'dt' arg is missing", "formatDateTime()");
+        throw new types.LclError("'dt' arg is missing", "formatDateTime()");
 
       dt = arguments[0];
     }
@@ -297,26 +300,4 @@ export class Localizer{
     return node[value];
   }
 
-
-}
-
-/**
- * Default Invariant Localizer instance
- */
-export const INVARIANT = new Localizer();
-
-let s_Current = INVARIANT;
-
-/**
- * Injects custom localizer, typically this is done in the app.js file for the specific application
- * @param {Localizer} loc
- */
-export function injectLocalizer(loc){
-  aver.isOf(loc, Localizer);
-  s_Current = loc;
-}
-
-/**
- * Returns currently injected localizer
- */
-export function currentLocalizer(){ return s_Current; }
+}//Localizer
