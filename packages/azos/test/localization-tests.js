@@ -9,6 +9,8 @@ import { defineUnit as describe, defineCase as it } from "../run.js";
 import * as sut from "../localization.js";
 import * as aver from "../aver.js";
 import { GLOBALS } from "../coreconsts.js";
+import { TimeZone } from "../time.js";
+import { config } from "../conf.js";
 
 describe("Localization", function() {
 
@@ -72,7 +74,7 @@ describe("Localization", function() {
 
     describe("#formatDateTime()", function() {
 
-      const dt = new Date(2017, 5, 12,  15, 43, 19, 89);// 12/june/2017 = Monday
+      const dt = new Date(Date.UTC(2017, 5, 12,  15, 43, 19, 89));// UTC 12/june/2017 = Monday
 
       it("arg0s", function(){
         let got = dloc.formatDateTime(dt);
@@ -159,10 +161,11 @@ describe("Localization", function() {
         aver.areEqual("Monday, 12 June 2017 15:43:19:089", got);
       });
 
-      it("LONG_WEEK_DATE+HMSM in UTC", function(){
-        let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_WEEK_DATE, tmDetails: sut.TIME_DETAILS.HMSM, utc: true});
+      it("LONG_WEEK_DATE+HMSM in TIme zone", function(){
+        const tzXXX = new TimeZone(config({name: "xxx",   description: "XXX Fake timezone", iana: "xxx", windows: "xxx", baseOffsetMs: -1 * 60 * 60 * 1000}).root);
+        let got = dloc.formatDateTime({dt: dt, dtFormat: sut.DATE_FORMAT.LONG_WEEK_DATE, tmDetails: sut.TIME_DETAILS.HMSM, timeZone: tzXXX});
         console.log( got );
-        aver.areNotEqual("Monday, 12 June 2017 15:43:19:089", got);// the actual time shift depends on the workstation
+        aver.areEqual("Monday, 12 June 2017 14:43:19:089", got);// -1 hr per the fake zone above
       });
 
 

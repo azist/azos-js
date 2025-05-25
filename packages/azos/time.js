@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "./aver.js";
-import { config, makeNew } from "./conf.js";
+import { config, ConfigNode, makeNew } from "./conf.js";
 import { Module } from "./modules.js";
 import { AzosError } from "./types.js";
 
@@ -14,7 +14,6 @@ export const TZ_UTC = "UTC";
 
 /** Milliseconds in one hour */
 export const ONE_HOUR_MS = 60 * 60 * 1000;
-
 
 
 /** Provides named time zone information along with ability to convert UTC timestamps to local (as of timezone) components and back */
@@ -27,6 +26,7 @@ export class TimeZone {
   #baseOffsetMs;
 
   constructor(cfg){
+    aver.isOf(cfg, ConfigNode);
     this.#name         = cfg.getString("name", null);
     aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name");
     this.#description  = cfg.getString("name", this.constructor.name);
@@ -229,8 +229,14 @@ export class TimeZoneManager extends Module {
 }
 
 
+/** Global UTC Time zone */
+export const UTC_TIME_ZONE = Object.freeze(
+  new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root)
+);
+
+
 /** Default config segment which covers US timezones including Alaska, Hawaii and Arizona */
-export const US_STANDARD_TIMEZONES = Object.freeze([
+export const CONFIG_US_STANDARD_TIME_ZONES = Object.freeze([
   {type: UsStandardTimeZone, name: "est",   description: "Eastern Time",  iana: "America/New_York", windows: "Eastern Standard Time",     baseOffsetMs: -5 * ONE_HOUR_MS},
   {type: UsStandardTimeZone, name: "cst",   description: "Central Time",  iana: "America/Chicago",  windows: "Central Standard Time",     baseOffsetMs: -6 * ONE_HOUR_MS},
   {type: UsStandardTimeZone, name: "mst",   description: "Mountain Time", iana: "America/Denver",   windows: "Mountain Standard Time",    baseOffsetMs: -7 * ONE_HOUR_MS},

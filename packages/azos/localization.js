@@ -105,7 +105,7 @@ export class Localizer extends Module {
    * @param {TIME_DETAILS} args.tmDetails Time detail level (NONE= no time)
    * @param {boolean} args.utc Treat date time as UTC value
    */
-  formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, utc = false} = {}){
+  formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, timeZone = null} = {}){
     if (dt===null){
       if (arguments.length==0)
         throw new types.LclError("'dt' arg is missing", "formatDateTime()");
@@ -115,10 +115,13 @@ export class Localizer extends Module {
 
     const v = types.isDate(dt) ? dt : new Date(dt);
 
-    const month   = utc ? v.getUTCMonth()    : v.getMonth();
-    const daym    = utc ? v.getUTCDate()     : v.getDate();
-    const dayw    = utc ? v.getUTCDay()      : v.getDay();
-    const year    = utc ? v.getUTCFullYear() : v.getFullYear();
+    const utc = !timeZone || !timeZone.extractComponents;
+    const cmp = utc ? null : timeZone.extractComponents(v);
+
+    const month   = utc ? v.getUTCMonth()    : cmp.month - 1; //need month INDEX
+    const daym    = utc ? v.getUTCDate()     : cmp.day;
+    const dayw    = utc ? v.getUTCDay()      : cmp.dayw - 1;//need index
+    const year    = utc ? v.getUTCFullYear() : cmp.year;
 
     const d2 = (num) => ("0" + num.toString()).slice(-2);
     const d3 = (num) => ("00" + num.toString()).slice(-3);
@@ -148,16 +151,16 @@ export class Localizer extends Module {
 
     if (tmDetails===TIME_DETAILS.NONE) return result;
 
-    const hours   = utc ? v.getUTCHours()    : v.getHours();
-    const minutes = utc ? v.getUTCMinutes()  : v.getMinutes();
+    const hours   = utc ? v.getUTCHours()    : cmp.hour;
+    const minutes = utc ? v.getUTCMinutes()  : cmp.minute;
 
     if (tmDetails===TIME_DETAILS.HM) return `${result} ${d2(hours)}:${d2(minutes)}`;
 
-    const seconds = utc ? v.getUTCSeconds()  : v.getSeconds();
+    const seconds = utc ? v.getUTCSeconds()  : cmp.second;
 
     if (tmDetails===TIME_DETAILS.HMS) return `${result} ${d2(hours)}:${d2(minutes)}:${d2(seconds)}`;
 
-    const millis =  utc ? v.getUTCMilliseconds()  : v.getMilliseconds();
+    const millis =  utc ? v.getUTCMilliseconds()  : cmp.millisecond;
     return `${result} ${d2(hours)}:${d2(minutes)}:${d2(seconds)}:${d3(millis)}`;
   }
 
