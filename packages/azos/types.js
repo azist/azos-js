@@ -867,11 +867,14 @@ export function asMoney(v, canUndef = false) {
 }
 
 /**
- * Converts value to Date
+ * Converts value to JS Date. Note: No timezone conversion is performed.
+ * If you need to parse date values relative to proper TimeZones, you can obtain one for your user session
+ * or whatever logic may be needed. The API stack in AZOS works using UTC ISO8601 by default so server data
+ * is always in UTC.
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asDate(v, canUndef = false, fromUTC = false) {
+export function asDate(v, canUndef = false) {
   let d, ts;
   if (v === undefined) canUndef ? d = undefined : d = new Date(0);
   else if (v === null) d = new Date(0);
@@ -879,8 +882,7 @@ export function asDate(v, canUndef = false, fromUTC = false) {
   else if (isIntValue(v)) d = new Date(asInt(v));
   else if (isString(v) && !isNaN((ts = Date.parse(v)))) d = new Date(ts);
   else throw new AzosError(CAST_ERROR + `asDate("${strings.describe(v)}")`);
-  if (!fromUTC || !d) return d;
-  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
+  return d;
 }
 
 /**
