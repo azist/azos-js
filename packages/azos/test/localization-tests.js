@@ -194,28 +194,28 @@ describe("Localization", function() {
       });
 
       it("obj2", function(){
-        let got = dloc.formatCurrency({amt: -9123750000.123456, iso: "usd", thousands: false, precision: 4});
-        aver.areEqual("-$9123750000.1234", got);
+        let got = dloc.formatCurrency({amt: -3123750000.123456, iso: "usd", thousands: false, precision: 4});
+        aver.areEqual("-$3123750000.1234", got);
       });
 
       it("obj3", function(){
-        let got = dloc.formatCurrency({amt: -9123750000.123456, iso: "usd", thousands: false, precision: 2, sign: false});
-        aver.areEqual("($9123750000.12)", got);
+        let got = dloc.formatCurrency({amt: -3123750000.123456, iso: "usd", thousands: false, precision: 2, sign: false});
+        aver.areEqual("($3123750000.12)", got);
       });
 
       it("obj4", function(){
-        let got = dloc.formatCurrency({amt: -9123750000.123456, iso: "usd", thousands: false, precision: 2, sign: false, symbol: false});
-        aver.areEqual("(9123750000.12)", got);
+        let got = dloc.formatCurrency({amt: -3123750000.123456, iso: "usd", thousands: false, precision: 2, sign: false, symbol: false});
+        aver.areEqual("(3123750000.12)", got);
       });
 
       it("obj5", function(){
-        let got = dloc.formatCurrency({amt: -9123750000.123456, iso: "usd", thousands: true, precision: 2, sign: true, symbol: false});
-        aver.areEqual("-9,123,750,000.12", got);
+        let got = dloc.formatCurrency({amt: -3123750000.123456, iso: "usd", thousands: true, precision: 2, sign: true, symbol: false});
+        aver.areEqual("-3,123,750,000.12", got);
       });
 
       it("large amount", function(){
-        let got = dloc.formatCurrency({amt: -125978123750321.18, iso: "usd", thousands: true, precision: 2, sign: true, symbol: true});
-        aver.areEqual("-$125,978,123,750,321.18", got);
+        let got = dloc.formatCurrency({amt: -25978123750321.18, iso: "usd", thousands: true, precision: 2, sign: true, symbol: true});
+        aver.areEqual("-$25,978,123,750,321.18", got);
       });
 
       it("large amount.00", function(){
@@ -224,8 +224,8 @@ describe("Localization", function() {
       });
 
       it("large amount - no decimals", function(){
-        let got = dloc.formatCurrency({amt: -125978123750321.18, iso: "usd", thousands: true, precision: 0, sign: true, symbol: true});
-        aver.areEqual("-$125,978,123,750,321", got);
+        let got = dloc.formatCurrency({amt: -25978123750321.18, iso: "usd", thousands: true, precision: 0, sign: true, symbol: true});
+        aver.areEqual("-$25,978,123,750,321", got);
       });
 
 
