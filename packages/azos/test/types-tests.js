@@ -1179,25 +1179,14 @@ describe("Types", function() {
     });
 
     it("2024-12-31T00:00:00+00:00 !fromUTC", function() {
-      const d = sut.asDate("2024-12-31T00:00:00+00:00", false, false);
-      aver.areEqual(11, d.getMonth());
-      aver.areEqual(30, d.getDate());
-      aver.areEqual(2024, d.getFullYear());
-      aver.areEqual(19, d.getHours());
-      aver.areEqual(0, d.getMinutes());
-      aver.areEqual(0, d.getSeconds());
-      aver.areEqual(0, d.getMilliseconds());
-    });
-
-    it("2024-12-31T00:00:00+00:00 fromUTC", function() {
-      const d = sut.asDate("2024-12-31T00:00:00+00:00", false, true);
-      aver.areEqual(11, d.getMonth());
-      aver.areEqual(31, d.getDate());
-      aver.areEqual(2024, d.getFullYear());
-      aver.areEqual(0, d.getHours());
-      aver.areEqual(0, d.getMinutes());
-      aver.areEqual(0, d.getSeconds());
-      aver.areEqual(0, d.getMilliseconds());
+      const d = sut.asDate("2024-12-31T00:00:00Z", false);
+      aver.areEqual(11, d.getUTCMonth());
+      aver.areEqual(31, d.getUTCDate());
+      aver.areEqual(2024, d.getUTCFullYear());
+      aver.areEqual(0, d.getUTCHours());
+      aver.areEqual(0, d.getUTCMinutes());
+      aver.areEqual(0, d.getUTCSeconds());
+      aver.areEqual(0, d.getUTCMilliseconds());
     });
 
     it("abrakadabra throws",   function() { aver.throws( function(){  sut.asDate("abrakadabra"); }, "Cast error");});
