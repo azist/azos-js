@@ -8,6 +8,7 @@ import * as types from "./types.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 import { Module } from "./modules.js";
+import { TimeZone, TimeZoneManager, UTC_TIME_ZONE } from "./time.js";
 
 export const CULTURE_INVARIANT = "*";
 export const CULTURE_US = "us";
@@ -115,13 +116,18 @@ export class Localizer extends Module {
 
     const v = types.isDate(dt) ? dt : new Date(dt);
 
-    const utc = !timeZone || !timeZone.extractComponents;
-    const cmp = utc ? null : timeZone.extractComponents(v);
+    if (!timeZone){ //default to UTC
+      timeZone = UTC_TIME_ZONE;
+    } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
+      timeZone = this.app.moduleLinker.resolve(TimeZoneManager).getZone(timeZone);
+    } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
 
-    const month   = utc ? v.getUTCMonth()    : cmp.month - 1; //need month INDEX
-    const daym    = utc ? v.getUTCDate()     : cmp.day;
-    const dayw    = utc ? v.getUTCDay()      : cmp.dayw - 1;//need index
-    const year    = utc ? v.getUTCFullYear() : cmp.year;
+    const cmp = timeZone.extractComponents(v);
+
+    const month = cmp.month - 1; //need month INDEX
+    const daym  = cmp.day;
+    const dayw  = cmp.dayw - 1;//need index
+    const year  = cmp.year;
 
     const d2 = (num) => ("0" + num.toString()).slice(-2);
     const d3 = (num) => ("00" + num.toString()).slice(-3);
@@ -133,17 +139,17 @@ export class Localizer extends Module {
     let result = "";
 
     switch(dtFormat){
-      case DATE_FORMAT.LONG_WEEK_DATE:   result = `${dnl(dayw)}, ${daym} ${mnl(month)} ${year}`;  break; //  Tuesday, 30 August 2018
-      case DATE_FORMAT.SHORT_WEEK_DATE:  result = `${dns(dayw)}, ${daym} ${mns(month)} ${year}`;  break; //  Tue, 30 Aug 2018
-      case DATE_FORMAT.LONG_DATE:        result = `${daym} ${mnl(month)} ${year}`;  break; //  30 August 2018
-      case DATE_FORMAT.SHORT_DATE:       result = `${daym} ${mns(month)} ${year}`;  break; //  30 Aug 2018
-      case DATE_FORMAT.NUM_DATE:         result = `${d2(month+1)}/${d2(daym)}/${year}`;  break;//  08/30/2018
+      case DATE_FORMAT.LONG_WEEK_DATE:   result = `${dnl(dayw)}, ${daym} ${mnl(month)} ${year}`; break; //  Tuesday, 30 August 2018
+      case DATE_FORMAT.SHORT_WEEK_DATE:  result = `${dns(dayw)}, ${daym} ${mns(month)} ${year}`; break; //  Tue, 30 Aug 2018
+      case DATE_FORMAT.LONG_DATE:        result = `${daym} ${mnl(month)} ${year}`; break; //  30 August 2018
+      case DATE_FORMAT.SHORT_DATE:       result = `${daym} ${mns(month)} ${year}`; break; //  30 Aug 2018
+      case DATE_FORMAT.NUM_DATE:         result = `${d2(month+1)}/${d2(daym)}/${year}`; break;//  08/30/2018
 
-      case DATE_FORMAT.LONG_MONTH:       result = `${mnl(month)} ${year}`;  break;  // August 2018
-      case DATE_FORMAT.SHORT_MONTH:      result = `${mns(month)} ${year}`;  break;  // Aug 2018
-      case DATE_FORMAT.NUM_MONTH:        result = `${d2(month+1)}/${year}`;  break;   // 10/2018
+      case DATE_FORMAT.LONG_MONTH:       result = `${mnl(month)} ${year}`; break;  // August 2018
+      case DATE_FORMAT.SHORT_MONTH:      result = `${mns(month)} ${year}`; break;  // Aug 2018
+      case DATE_FORMAT.NUM_MONTH:        result = `${d2(month+1)}/${year}`; break;   // 10/2018
 
-      case DATE_FORMAT.LONG_DAY_MONTH:   result = `${daym} ${mnl(month)}`;  break;    //  12 August
+      case DATE_FORMAT.LONG_DAY_MONTH:   result = `${daym} ${mnl(month)}`; break;    //  12 August
       case DATE_FORMAT.SHORT_DAY_MONTH:  result = `${daym} ${mns(month)}`; break;     //  12 Aug
       default:
         result = `${daym} ${mnl(month)} ${year}`;
@@ -151,16 +157,16 @@ export class Localizer extends Module {
 
     if (tmDetails===TIME_DETAILS.NONE) return result;
 
-    const hours   = utc ? v.getUTCHours()    : cmp.hour;
-    const minutes = utc ? v.getUTCMinutes()  : cmp.minute;
+    const hours   = cmp.hour;
+    const minutes = cmp.minute;
 
     if (tmDetails===TIME_DETAILS.HM) return `${result} ${d2(hours)}:${d2(minutes)}`;
 
-    const seconds = utc ? v.getUTCSeconds()  : cmp.second;
+    const seconds = cmp.second;
 
     if (tmDetails===TIME_DETAILS.HMS) return `${result} ${d2(hours)}:${d2(minutes)}:${d2(seconds)}`;
 
-    const millis =  utc ? v.getUTCMilliseconds()  : cmp.millisecond;
+    const millis =  cmp.millisecond;
     return `${result} ${d2(hours)}:${d2(minutes)}:${d2(seconds)}:${d3(millis)}`;
   }
 
@@ -214,13 +220,13 @@ export class Localizer extends Module {
   formatCurrency({amt = NaN, iso = null, culture = null,  precision = 2, symbol = true, sign = true, thousands = true} = {}){
     if (isNaN(amt)){
       if (arguments.length<2)
-        throw new LclError("Currency 'amt' and 'iso' args are required", "formatCurrency()");
+        throw new types.LclError("Currency 'amt' and 'iso' args are required", "formatCurrency()");
       amt = arguments[0];
       iso = arguments[1];
     }
 
-    if (isNaN(amt)) throw new LclError("Currency 'amt' isNaN", "formatCurrency()");
-    if (!iso) throw new LclError("Currency 'iso' is required", "formatCurrency()");
+    if (isNaN(amt)) throw new types.LclError("Currency 'amt' isNaN", "formatCurrency()");
+    if (!iso) throw new types.LclError("Currency 'iso' is required", "formatCurrency()");
     if (!culture) culture = CULTURE_INVARIANT;
     const symbols = this.getCurrencySymbols(culture);
     const neg = amt < 0;
