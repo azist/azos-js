@@ -138,7 +138,9 @@ export class Localizer extends AppComponent {
     const v = types.isDate(dt) ? dt : new Date(dt);
 
     if (!timeZone){ //default to UTC
-      timeZone = UTC_TIME_ZONE;
+      const tzn = this.app.session.tzName;
+      if (tzn) timeZone = this.tryGetTimeZone(tzn);
+      if (!timeZone) timeZone = UTC_TIME_ZONE;
     } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
       timeZone = this.getTimeZone(timeZone);
     } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type

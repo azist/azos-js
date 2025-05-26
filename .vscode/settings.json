@@ -114,6 +114,13 @@
       "titleBar.inactiveForeground": "#c0c0a0",
       "statusBar.background": "#3a2a20",
       "statusBar.foreground": "#c0c0a0",
+
+      "editor.selectionBackground": "#2080f0b0",
+      "editor.wordHighlightBackground":"#ffd21025",
+      "editor.wordHighlightTextBorder": "#ffd21018",
+
+      "editorCursor.foreground": "#FFFFFF",
+      "editor.lineHighlightBackground":"#40a0f025"
     },
     "javascript.preferences.importModuleSpecifierEnding": "js"
 }
