@@ -26,21 +26,20 @@ export class Session extends types.DisposableObject{
   #app;
   #user;
   #isoLang;
+  #tzName;
   #theme;
   #culture;
   #settings;
 
 
-
   // eslint-disable-next-line no-unused-vars
-  constructor(app, cfg=null){
+  constructor(app, cfg = null){
     super();
     this.#app = aver.isOf(app, Application);
     this.#user = User.invalid;
   }
 
-  [types.DESTRUCTOR_METHOD](){
-  }
+  [types.DESTRUCTOR_METHOD](){  }
 
   /** @returns {Application} */
   get app(){ return this.#app; }
@@ -64,10 +63,14 @@ export class Session extends types.DisposableObject{
   }
 
   get isoLang(){ return this.#isoLang; }
-  set isoLang(v){ this.#isoLang = v; }
+  set isoLang(v){ this.#isoLang = aver.isStringOrNull(v); }
 
   get theme(){ return this.#theme; }
-  set theme(v){ this.#theme = v; }
+  set theme(v){ this.#theme = aver.isStringOrNull(v); }
+
+  /** TimeZone name. Null = UTC */
+  get tzName(){ return this.#tzName; }
+  set tzName(v){ this.#tzName = aver.isStringOrNull(v); }
 
   /**
    * Internal: Synchronizes this session with another one, e.g. from another browser tab.
@@ -82,6 +85,7 @@ export class Session extends types.DisposableObject{
 
     this.#isoLang = data.isoLang;
     this.#theme = data.theme;
+    this.#tzName = data.tzName;
 
     //TBD: We might need to rise event here about session change
   }

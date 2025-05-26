@@ -11,7 +11,6 @@ import "./types-tests.js";
 import "./aver-tests.js";
 import "./strings-tests.js";
 import "./linq-tests.js";
-import "./localization-tests.js";
 import "./conf-tests.js";
 import "./atom-tests.js";
 import "./entity-id-tests.js";
@@ -25,6 +24,7 @@ import "./router-tests.js";
 import "./img-registry-tests.js";
 import "./app-log-tests.js";
 import "./security-tests.js";
+import "./localization-tests.js";
 
 ////clearSuite();
 
