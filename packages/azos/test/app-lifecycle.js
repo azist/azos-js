@@ -53,9 +53,8 @@ unit("Application", function () {
       isOf(app.rootComponents[0], ConLog);
       isOf(app.rootComponents[1], SecurityManager);
 
-      areEqual(2, app.modules.length);
-      isOf(app.modules[0], Localizer);
-      isOf(app.modules[1], ConLog);
+      areEqual(1, app.modules.length);
+      isOf(app.modules[0], ConLog);
 
       let clist = AppComponent.getAllApplicationComponents(app);
       areEqual(3,  clist.length);
@@ -86,6 +85,11 @@ unit("Application", function () {
 
       dispose(app);
       isTrue(app[DISPOSED_PROP]);
+
+      //all cleaned up after dispose
+      clist = AppComponent.getRootApplicationComponents(app);
+      areEqual(0,  clist.length);
+
     });
   });
 });

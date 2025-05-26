@@ -7,7 +7,9 @@
 import * as types from "./types.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
-import { Module } from "./modules.js";
+import { AppComponent } from "./components.js";
+import { Application } from "./application.js";
+import { ConfigNode } from "./conf.js";
 import { TimeZone, TimeZoneManager, UTC_TIME_ZONE } from "./time.js";
 
 export const CULTURE_INVARIANT = "*";
@@ -72,11 +74,13 @@ export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => stri
  * Other localizer shall extend this class and install it as modules.
  * Any application has a default localizer
  */
-export class Localizer extends Module {
+export class Localizer extends AppComponent {
 
   #strings;
 
   constructor(app, cfg){
+    aver.isOf(app, Application);
+    aver.isOf(cfg, ConfigNode);
     super(app, cfg);
     const stringTable = cfg.get("strings");
 
