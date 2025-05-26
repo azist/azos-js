@@ -142,7 +142,7 @@ export class Localizer extends AppComponent {
       if (tzn) timeZone = this.tryGetTimeZone(tzn);
       if (!timeZone) timeZone = UTC_TIME_ZONE;
     } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
-      timeZone = this.getTimeZone(timeZone);
+      timeZone = this.getTimeZone(timeZone);//throws on not found
     } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
 
     const cmp = timeZone.extractComponents(v);

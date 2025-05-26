@@ -282,7 +282,7 @@ export function format(v, args, localizer = null) {
       const j = fmt.indexOf("{");
       if (j > 1) {
         try {
-          fmta = JSON.parse(fmt.substr(j));
+          fmta = JSON.parse(fmt.substring(j));
         } catch (e) {
           throw new types.AzosError(`.format('.. ${fmt} ..') Error parsing token format fragment: ${e.message}`, "format()");
         }
