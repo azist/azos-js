@@ -11,6 +11,7 @@ import { AppComponent } from "./components.js";
 import { Application } from "./application.js";
 import { config, ConfigNode, makeNew } from "./conf.js";
 import { TimeZone, TZ_UTC, UTC_TIME_ZONE } from "./time.js";
+import { Session } from "./session.js";
 
 export const CULTURE_INVARIANT = "*";
 export const CULTURE_US = "us";
@@ -136,15 +137,7 @@ export class Localizer extends AppComponent {
     }
 
     const v = types.isDate(dt) ? dt : new Date(dt);
-
-    if (!timeZone){ //default to UTC
-      const tzn = this.app.session.tzName;
-      if (tzn) timeZone = this.tryGetTimeZone(tzn);
-      if (!timeZone) timeZone = UTC_TIME_ZONE;
-    } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
-      timeZone = this.getTimeZone(timeZone);//throws on not found
-    } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
-
+    timeZone = this.getEffectiveTimeZone(timeZone);
     const cmp = timeZone.extractComponents(v);
 
     const month = cmp.month - 1; //need month INDEX
@@ -348,5 +341,76 @@ export class Localizer extends AppComponent {
 
   /** Gets an array of all zones in the registry */
   getAllTimeZones(){ return [...this.#tzMap.values()]; }
+
+
+  /** Gets TimeZone by its name if it is passed, or from timezone preference of the session object.
+   * If session not passed then takes session from app session, if such time zone is not found then UTC is defaulted.
+   * Throws if the tz name is explicitly passed and such timezone is not found by name in the localizer timezone stack.
+   * @param {null|string|TimeZone} tzOrName - If supplied, must be an instance of TimeZone or a string. Strings get resolved to
+   * TimeZone by name or exception  thrown if not found.
+   * @param {Session} [session=null] - Session to use for timezone resolution, if not supplied then app session is used.
+   * @returns {TimeZone} - Returns TimeZone instance
+   */
+  getEffectiveTimeZone(tzOrName, session = null){
+    if (!tzOrName){ //default to UTC
+      const tzn =  (aver.isOfOrNull(session, Session) ?? this.app.session).tzName;
+      if (tzn) tzOrName = this.tryGetTimeZone(tzn);
+      if (!tzOrName) tzOrName = UTC_TIME_ZONE;
+    } else if (types.isString(tzOrName)) {//resolve from string name (requires TimeZoneManager)
+      tzOrName = this.getTimeZone(tzOrName);//throws on not found
+    } else aver.isOf(tzOrName, TimeZone);//must be of TimeZone type
+
+    return tzOrName;//which is always tz now
+  }
+
+
+  /**
+   * Returns a vector [Date, TimeZone] having its Date value UTC component offset As-OF the proper time zone supplied.
+   * In other words, this method returns a UTC date which is obtained by converting a LOCAL supplied date into UTC using TimeZone class,
+   * effectively re-coding the supplied local date as of the specified time zone as-if the date was entered in that time zone.
+   * JS Date class respects LOCAL COMPUTER time zone only, which is problematic and not always the desired behavior when the date is entered
+   * by a user in a different time zone.
+   * @param {*} v - Date-convertible value (int, string) or Date Value as is. The value is assumed to be as of JS-LOCAL (per Date class spec) zone
+   * @param {null|string|TimeZone} [timeZone=null] time zone as of which to perform conversion, if null then session is used
+   * @param {null} [session=null] - Session to use for timezone resolution, if not supplied then app session is used.
+   * @param {boolean} [isDST=false] - true if the date is in Daylight Saving Time mode, false otherwise, this is needed for double-hour DST edge cases (research wikipedia)
+   * @returns {[Date, TimeZone]} - Returns a vector [Date, TimeZone] where Date is the UTC date as of the time zone and TimeZone is the effective time zone
+   * @example
+   *  Suppose a user is in New York City, and their computer-local date is 1pm on June 1st,
+   * however the session (or screen-local) time zone is set to "Pacific Time Zone" which is 3 hours behind of New York.
+   * When the user types-in a string "June 1, 2025 1:00pm" the JS Date class parses this as local time which is -4 hrs from UTC in NY, so the Date object is "2025-06-01T17:00:00Z",
+   * HOWEVER this method is sensitive to the time zone which was specified via parameter or session, which is "Pacific Time Zone" in this case,
+   * so really the user meant 1pm in Pacific Time Zone, which is 7 hours behind UTC during DST, so the Date object returned by this method will be "2025-06-01T20:00:00Z"
+   * as-if the user was operating from a computer in "Pacific Time Zone", and the session was set accordingly.
+   * This is especially important when users perform an enterprise-wide data entry tasks which may require display and entry of dates in the branch office-local dates,
+   * effectively user's computer-local dates timezones become completely logically irrelevant.
+  */
+  treatUserDateInput(v, timeZone = null, session = null, isDST = false){
+    timeZone = this.getEffectiveTimeZone(timeZone, session);
+
+    if (!timeZone){ //default to UTC
+      const tzn = this.app.session.tzName;
+      if (tzn) timeZone = this.tryGetTimeZone(tzn);
+      if (!timeZone) timeZone = UTC_TIME_ZONE;
+    } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
+      timeZone = this.getTimeZone(timeZone);//throws on not found
+    } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
+
+
+    const jsLocalDate = types.asDate(v);
+
+    const ts = timeZone.combineComponents({ //convert local date to UTC components
+      year:   jsLocalDate.getFullYear(),
+      month:  jsLocalDate.getMonth() + 1, //getMonth() returns 0-11
+      day:    jsLocalDate.getDate(),
+      hour:   jsLocalDate.getHours(),
+      minute: jsLocalDate.getMinutes(),
+      second: jsLocalDate.getSeconds(),
+      millisecond: jsLocalDate.getMilliseconds(),
+      isDST:  isDST
+    });
+
+    return [new Date(ts), timeZone];
+  }
 
 }//Localizer
