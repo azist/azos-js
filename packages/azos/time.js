@@ -184,49 +184,6 @@ export class UsStandardTimeZone extends UsTimeZone {
   }
 }
 
-/**
- * Provides a module which provides a registry of named {@link TimeZone} instances}
- */
-export class TimeZoneManager extends Module {
-
-  #map;
-
-  constructor(dir, cfg) {
-    super(dir, cfg);
-    this.#map = new Map();
-
-    //UTC is always there
-    this.#map.set(TZ_UTC, new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root));
-
-    const cfgZones = cfg.get("zones");
-    if (cfgZones){
-      for(const cfgZone of cfgZones.getChildren(false)){
-        const zone = makeNew(TimeZone, cfgZone, null, TimeZone);
-        if (this.#map.has(zone.name)) {
-          throw new AzosError(`TimeZone '${zone.name}' already registered`, "tzm.ctor()");
-        }
-        this.#map.set(zone.name, zone);
-      }
-    }
-  }
-
-  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found */
-  getZone(zone){
-    const result = this.tryGetZone(zone);
-    if (!result) throw new AzosError(`TimeZone '${zone}' not found`, "tzm.getZone()");
-    return result;
-  }
-
-  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found */
-  tryGetZone(zone){
-    aver.isNonEmptyString(zone, "zone");
-    const result = this.#map.get(zone);
-    return result ?? null;
-  }
-
-  /** Gets an array of all zones in the registry */
-  getAllZones(){ return [...this.#map.values()]; }
-}
 
 
 /** Global UTC Time zone */

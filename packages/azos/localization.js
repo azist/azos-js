@@ -9,8 +9,8 @@ import * as aver from "./aver.js";
 import * as strings from "./strings.js";
 import { AppComponent } from "./components.js";
 import { Application } from "./application.js";
-import { ConfigNode } from "./conf.js";
-import { TimeZone, TimeZoneManager, UTC_TIME_ZONE } from "./time.js";
+import { config, ConfigNode, makeNew } from "./conf.js";
+import { TimeZone, TZ_UTC, UTC_TIME_ZONE } from "./time.js";
 
 export const CULTURE_INVARIANT = "*";
 export const CULTURE_US = "us";
@@ -71,12 +71,13 @@ export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => stri
 
 /**
  * Provides default implementation of invariant localizer.
- * Other localizer shall extend this class and install it as modules.
- * Any application has a default localizer
+ * Other localizer should extend this class and install it in app chassis.
+ * Any application always has an instance of a default localizer
  */
 export class Localizer extends AppComponent {
 
   #strings;
+  #tzMap;
 
   constructor(app, cfg){
     aver.isOf(app, Application);
@@ -95,6 +96,22 @@ export class Localizer extends AppComponent {
         [ISO_LANG_FRA]: { },
         [ISO_LANG_ESP]: { }
       };
+    }
+
+    this.#tzMap = new Map();
+
+    //UTC is always there
+    this.#tzMap.set(TZ_UTC, new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root));
+
+    const cfgZones = cfg.get("zones", "time-zones");
+    if (cfgZones){
+      for(const cfgZone of cfgZones.getChildren(false)){
+        const zone = makeNew(TimeZone, cfgZone, null, TimeZone);
+        if (this.#tzMap.has(zone.name)) {
+          throw new types.LclError(`TimeZone '${zone.name}' already registered`, "tzm.ctor()");
+        }
+        this.#tzMap.set(zone.name, zone);
+      }
     }
   }
 
@@ -123,7 +140,7 @@ export class Localizer extends AppComponent {
     if (!timeZone){ //default to UTC
       timeZone = UTC_TIME_ZONE;
     } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
-      timeZone = this.app.moduleLinker.resolve(TimeZoneManager).getZone(timeZone);
+      timeZone = this.getTimeZone(timeZone);
     } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
 
     const cmp = timeZone.extractComponents(v);
@@ -312,5 +329,22 @@ export class Localizer extends AppComponent {
     if (!types.hown(node, value)) return value;
     return node[value];
   }
+
+  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found */
+  getTimeZone(zone){
+    const result = this.tryGetTimeZone(zone);
+    if (!result) throw new types.LclError(`TimeZone '${zone}' not found`, "tzm.getZone()");
+    return result;
+  }
+
+  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found */
+  tryGetTimeZone(zone){
+    aver.isNonEmptyString(zone, "zone");
+    const result = this.#tzMap.get(zone);
+    return result ?? null;
+  }
+
+  /** Gets an array of all zones in the registry */
+  getAllTimeZones(){ return [...this.#tzMap.values()]; }
 
 }//Localizer
