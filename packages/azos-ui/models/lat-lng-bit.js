@@ -1,29 +1,29 @@
 import { html } from "../ui.js";
 import { Bit } from "../bit.js";
 
-import {STL_INLINE_GRID} from "../styles";
+import { STL_INLINE_GRID } from "../styles";
 import { dflt, dfltObject } from "azos/strings";
 
 export class LatLngBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
 
   static properties = {
-    captionName:  { type: String },
+    captionName: { type: String },
     captionTitle: { type: String },
   }
 
-  _getSummaryData(){
+  _getSummaryData() {
     const summary = this.captionTitle;
     const subSummary = [this.tbLat?.value, this.tbLng?.value].filter(a => !!a).join(", ");
     return {
-      title:    dfltObject(summary, html`<span style="color: var(--ghost)">Latitude/Longitude</span>`),
+      title: dfltObject(summary, html`<span style="color: var(--ghost)">Latitude/Longitude</span>`),
       subtitle: subSummary,
     }
   }
 
   renderDetailContent() {
     return html`
-    <div class ="row cols4">
+    <div class="row cols4">
       <az-text
         id="tbName"
         scope="this"
