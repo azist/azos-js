@@ -111,7 +111,7 @@ export class Localizer extends AppComponent {
         if (this.#tzMap.has(zone.name)) {
           throw new types.LclError(`TimeZone '${zone.name}' already registered`, "tzm.ctor()");
         }
-        this.#tzMap.set(zone.name, zone);
+        this.#tzMap.set(zone.name.toLowerCase(), zone);
       }
     }
   }
@@ -325,14 +325,15 @@ export class Localizer extends AppComponent {
     return node[value];
   }
 
-  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found */
+  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found. Names are case-insensitive */
   getTimeZone(zone){
-    const result = this.tryGetTimeZone(zone);
+    aver.isNonEmptyString(zone, "zone");
+    const result = this.tryGetTimeZone(zone.toLowerCase());
     if (!result) throw new types.LclError(`TimeZone '${zone}' not found`, "tzm.getZone()");
     return result;
   }
 
-  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found */
+  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found.  Names are case-insensitive  */
   tryGetTimeZone(zone){
     aver.isNonEmptyString(zone, "zone");
     const result = this.#tzMap.get(zone);
@@ -373,7 +374,7 @@ export class Localizer extends AppComponent {
    * @param {*} v - Date-convertible value (int, string) or Date Value as is. The value is assumed to be as of JS-LOCAL (per Date class spec) zone
    * @param {null|string|TimeZone} [timeZone=null] time zone as of which to perform conversion, if null then session is used
    * @param {null} [session=null] - Session to use for timezone resolution, if not supplied then app session is used.
-   * @param {boolean} [isDST=false] - true if the date is in Daylight Saving Time mode, false otherwise, this is needed for double-hour DST edge cases (research wikipedia)
+   * @param {boolean} [isDST=true] - true to enable DST, and in the edge case of the last DST day if the date is in Daylight Saving Time mode, false otherwise, this is needed for double-hour DST edge cases (research wikipedia)
    * @returns {{dt: Date, tz: TimeZone}} - Returns a vector `{dt Date, tz TimeZone}` where Date is the UTC date as of the time zone and TimeZone is the effective time zone
    * @example
    *  Suppose a user is in New York City, and their computer-local date is 1pm on June 1st,
@@ -385,17 +386,8 @@ export class Localizer extends AppComponent {
    * This is especially important when users perform an enterprise-wide data entry tasks which may require display and entry of dates in the branch office-local dates,
    * effectively user's computer-local dates timezones become completely logically irrelevant.
   */
-  treatUserDateInput(v, timeZone = null, session = null, isDST = false){
+  treatUserDateInput(v, timeZone = null, session = null, isDST = true){
     timeZone = this.getEffectiveTimeZone(timeZone, session);
-
-    if (!timeZone){ //default to UTC
-      const tzn = this.app.session.tzName;
-      if (tzn) timeZone = this.tryGetTimeZone(tzn);
-      if (!timeZone) timeZone = UTC_TIME_ZONE;
-    } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
-      timeZone = this.getTimeZone(timeZone);//throws on not found
-    } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
-
 
     const jsLocalDate = types.asDate(v);
 
@@ -410,7 +402,8 @@ export class Localizer extends AppComponent {
       isDST:  isDST
     });
 
-    return {dt: new Date(ts), tz: timeZone};
+    const result = {dt: new Date(ts), tz: timeZone};
+    return result;
   }
 
 }//Localizer

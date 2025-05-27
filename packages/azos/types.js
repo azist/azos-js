@@ -147,6 +147,12 @@ export const CHECK_MIN_LENGTH_METHOD = Symbol("checkMinLength");
  */
 export const CHECK_MAX_LENGTH_METHOD = Symbol("checkMaxLength");
 
+/**
+ * Establishes a "timeZone" protocol - an entity which implements such property returns its time zone or null/undefined
+ * in which case the entity works under the parent/session time zone. The returned value is either a string - a mnemonic time zone name,
+ * recognized by installed localizer, or `TimeZone` object
+ */
+export const TIME_ZONE_PROP = Symbol("timeZone");
 
 /**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -

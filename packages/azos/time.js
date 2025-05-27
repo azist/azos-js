@@ -5,12 +5,10 @@
 </FILE_LICENSE>*/
 
 import * as aver from "./aver.js";
-import { config, ConfigNode, makeNew } from "./conf.js";
-import { Module } from "./modules.js";
-import { AzosError } from "./types.js";
+import { config, ConfigNode } from "./conf.js";
 
 /** UTC time zone name. The instance of {@link TimeZone} with this name is ALWAYS present in {@link TimeZoneManager} registry */
-export const TZ_UTC = "UTC";
+export const TZ_UTC = "utc";
 
 /** Milliseconds in one hour */
 export const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -28,8 +26,8 @@ export class TimeZone {
   constructor(cfg){
     aver.isOf(cfg, ConfigNode);
     this.#name         = cfg.getString("name", null);
-    aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name");
-    this.#description  = cfg.getString("name", this.constructor.name);
+    this.#name = aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name str(2..32) ").toLowerCase();
+    this.#description  = cfg.getString("description", this.constructor.name);
     this.#iana         = cfg.getString("iana", null);
     this.#windows      = cfg.getString("windows", null);
     this.#baseOffsetMs = cfg.getInt("baseOffsetMs", 0);
@@ -126,8 +124,8 @@ export class UsStandardTimeZone extends UsTimeZone {
                           1000; //ms
 
 
-  #getDstRange(ldt){
-    let dstStart = new Date(Date.UTC(ldt.getUTCFullYear(), 3/*March*/, 1, 2, 0, 0));
+  #getDstRange(year){
+    let dstStart = new Date(Date.UTC(year, 2/*March*/, 1, 2, 0, 0));
     for(let sun = 0;;){
       if (dstStart.getUTCDay() === 0) {//Sunday == 0
         sun++;
@@ -136,27 +134,28 @@ export class UsStandardTimeZone extends UsTimeZone {
       dstStart.setUTCDate(dstStart.getUTCDate() + 1);
     }
 
-    let dstEnd = new Date(Date.UTC(ldt.getUTCFullYear(), 11/*November*/, 1, 2, 0, 0));
+    let dstEnd = new Date(Date.UTC(year, 10/*November*/, 1, 2, 0, 0));
     while(dstEnd.getUTCDay() !== 0) dstEnd.setUTCDate(dstEnd.getUTCDate() + 1);
 
-    return { dstStart, dstEnd };
+    //console.log("DST Starts: ", dstStart.toUTCString(), "     DstEnds: ", dstEnd.toUTCString());
+    return { dstStart: dstStart.getTime(), dstEnd: dstEnd.getTime() };
   }
 
   /**
    * Returns the millisecond offset of this timezone relative to UTC as of the specified UTC timestamp
-   * @param {number| Date} ts number or date UTC timestamp
+   * @param {number} ts UTC timestamp
    * @returns {number} offset in milliseconds
   */
   getOffsetMsAsOfUtc(ts){
     const so = this.standardBaseOffsetMs;
 
     const lts = ts + so; // local time
-    const ldt = new Date(lts);//fake "UTC" since Date does not have an API
 
-    let {dstStart, dstEnd} = this.#getDstRange(ldt);
-    ////console.log("fromUTC",ldt, dstStart, dstEnd);
+    let {dstStart, dstEnd} = this.#getDstRange(new Date(lts).getUTCFullYear());
+   // dstStart -= so;
+   // dstEnd -= so;
 
-    const isDST = ldt >= dstStart && ldt < dstEnd;
+    const isDST = lts >= dstStart && lts < dstEnd;
     const dstOffset = isDST ? UsStandardTimeZone.DST_OFFSET_MS : 0;
 
     return so + dstOffset;
@@ -164,7 +163,7 @@ export class UsStandardTimeZone extends UsTimeZone {
 
   /**
    * Returns the millisecond offset of this timezone relative to UTC as of LOCAL (for this zone) timestamp with explicit DST flag
-   * @param {number| Date} ts number or date LOCAL (as of this zone)UTC timestamp
+   * @param {number} ts number (as of this zone)UTC timestamp
    * @param {Boolean} isDST true when the date is in Daylight Saving Time mode
    * @returns {number} offset in milliseconds
   */
@@ -172,12 +171,12 @@ export class UsStandardTimeZone extends UsTimeZone {
     const so = this.standardBaseOffsetMs;
 
     const lts = ts; // already local time
-    const ldt = new Date(lts);//fake "UTC" since Date does not have an API
 
-    let {dstStart, dstEnd} = this.#getDstRange(ldt);
-    ////console.log("fromLOCAL",ldt, dstStart, dstEnd);
+    let {dstStart, dstEnd} = this.#getDstRange(new Date(lts).getUTCFullYear());//fake "UTC" since Date does not have an API
+   // dstStart -= so;
+   // dstEnd -= so;
 
-    const isInDstRange = isDst && ldt >= dstStart && ldt < dstEnd;
+    const isInDstRange = isDst && (lts >= dstStart && lts < dstEnd);
     const dstOffset = isInDstRange ? UsStandardTimeZone.DST_OFFSET_MS : 0;
 
     return so + dstOffset;
