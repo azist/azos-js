@@ -7,6 +7,7 @@
 import { html } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
 import "../../bit.js";
+import "../../../azos-ui/models/lat-lng-bit.js";
 
 export class CaseBit extends CaseBase {
   renderControl() {
@@ -110,6 +111,12 @@ export class CaseBit extends CaseBase {
   structure of bits.
   </p>
 </az-bit>
+
+<az-lat-lng-bit
+  id="bitLatLng"
+  scope="this"
+  description="another line"
+></az-lat-lng-bit>
 
     `;
   }
