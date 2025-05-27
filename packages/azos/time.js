@@ -5,9 +5,7 @@
 </FILE_LICENSE>*/
 
 import * as aver from "./aver.js";
-import { config, ConfigNode, makeNew } from "./conf.js";
-import { Module } from "./modules.js";
-import { AzosError } from "./types.js";
+import { config, ConfigNode } from "./conf.js";
 
 /** UTC time zone name. The instance of {@link TimeZone} with this name is ALWAYS present in {@link TimeZoneManager} registry */
 export const TZ_UTC = "UTC";

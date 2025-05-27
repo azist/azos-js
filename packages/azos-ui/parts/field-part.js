@@ -23,11 +23,14 @@ import {
   VISIT_METHOD,
   DIRTY_PROP,
   RESET_DIRTY_METHOD,
-  DATA_MODE_PROP
+  DATA_MODE_PROP,
+  TIME_ZONE_PROP
 } from "azos/types";
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, isOneOf } from "azos/strings";
 import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, getEffectiveSchema, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
+import { isOfEither, isOfOrNull, isStringOrNull } from "azos/aver";
+import { TimeZone } from "azos/time";
 
 
 function guardWidth(v, d){
@@ -177,6 +180,12 @@ export class FieldPart extends Part {
   [VALIDATE_METHOD](context, scope = null, apply = false){
     return apply ? this.validate(context, scope) : this._doValidate(context, scope);
   }
+
+ #timeZone = null;
+  get [TIME_ZONE_PROP](){ return this.#timeZone; }
+  set [TIME_ZONE_PROP](v){ this.#timeZone = v instanceof TimeZone ? v : isStringOrNull(v); }
+  get timeZone(){ return this[TIME_ZONE_PROP]; }
+  set timeZone(v){ this[TIME_ZONE_PROP] = v; }
 
   /**
    * Override to perform validation
@@ -447,7 +456,10 @@ export class FieldPart extends Part {
     whenUpdate: {type: String},
 
     /** When set shows some kind of animation to indicate bg work */
-    isBusy: {type: Boolean, reflect: true}
+    isBusy: {type: Boolean, reflect: true},
+
+    /** TimeZone or time zone name string, if not set, then parent context is used */
+    timeZone:  {type: Object, reflect: false}
   }
 
   get [NAME_PROP](){ return this.name; }
