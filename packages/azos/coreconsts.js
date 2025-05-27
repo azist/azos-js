@@ -67,3 +67,22 @@ export function ABSTRACT(nm){ return new Error(`Method '${nm ?? UNDEFINED}' is a
 /** Developer helper function: Creates an `Error` exception ready to be thrown indicating that the operation is not implemented */
 export function UNIMPLEMENTED(nm) {return new Error(`Method '${nm ?? UNDEFINED}' is unimplemented`);}
 
+/** Facilitates access to process-global services such as NopApplication without referencing any modules */
+export class GLOBALS {
+  static #nopApplication = null;
+
+  static ____bindGlobalNopApplication(app){ GLOBALS.#nopApplication = app; }
+
+  /** Returns global NopApplication instance */
+  static get NOP_APP(){
+    const nop = GLOBALS.#nopApplication;
+    if (!nop) {
+      throw new Error("NopApplication has not been initialized yet");
+    }
+    return nop;
+  }
+
+  /** Returns default global INVARIANT localizer */
+  static get DEFAULT_INVARIANT(){ return GLOBALS.NOP_APP.localizer; }
+}
+

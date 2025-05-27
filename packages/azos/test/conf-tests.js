@@ -843,12 +843,12 @@ describe("ConfigNode", function() {
 
   it("getDate(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getDate("vUndefined"));
-    aver.areEqual(1980, cfgGetAccessors.getDate("vUndefined", new Date("1980-02-21")).getFullYear());
+    aver.areEqual(1980, cfgGetAccessors.getDate("vUndefined", new Date("1980-02-21")).getUTCFullYear());
   });
 
   it("getDate(null)",   function() {
-    aver.areEqual(1969, cfgGetAccessors.getDate("vNull").getFullYear());
-    aver.areEqual(1969, cfgGetAccessors.getDate("vNull", new Date("1980-02-21")).getFullYear());
+    aver.areEqual(1970, cfgGetAccessors.getDate("vNull").getUTCFullYear());
+    aver.areEqual(1970, cfgGetAccessors.getDate("vNull", new Date("1980-02-21")).getUTCFullYear());
   });
 
   it("getDate('')",   function() {
@@ -863,19 +863,19 @@ describe("ConfigNode", function() {
 
   it("getDate(str1)",   function() {
     aver.areEqual(2021, cfgGetAccessors.getDate("vStringDate1").getFullYear());
-    aver.areEqual(2021, cfgGetAccessors.getDate("vStringDate1", new Date("1980-02-21")).getFullYear());
+    aver.areEqual(2021, cfgGetAccessors.getDate("vStringDate1", new Date("1980-02-21")).getUTCFullYear());
   });
 
   it("getDate(str2)",   function() {
     aver.areEqual(2018, cfgGetAccessors.getDate("vStringDate2").getFullYear());
-    aver.areEqual(2018, cfgGetAccessors.getDate("vStringDate2", new Date("1980-02-21")).getFullYear());
+    aver.areEqual(2018, cfgGetAccessors.getDate("vStringDate2", new Date("1980-02-21")).getUTCFullYear());
   });
 
 
   it("getDate(d1)",   function() {
     //console.dir(cfgGetAccessors.getString("vDate1"));
     aver.areEqual(2017, cfgGetAccessors.getDate("vDate1").getFullYear());
-    aver.areEqual(2017, cfgGetAccessors.getDate("vDate1",  new Date("1980-02-21")).getFullYear());
+    aver.areEqual(2017, cfgGetAccessors.getDate("vDate1",  new Date("1980-02-21")).getUTCFullYear());
   });
 
 

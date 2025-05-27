@@ -5,9 +5,13 @@
 </FILE_LICENSE>*/
 
 import * as types from "./types.js";
-import {LclError}  from "./types.js";
 import * as aver from "./aver.js";
 import * as strings from "./strings.js";
+import { AppComponent } from "./components.js";
+import { Application } from "./application.js";
+import { config, ConfigNode, makeNew } from "./conf.js";
+import { TimeZone, TZ_UTC, UTC_TIME_ZONE } from "./time.js";
+import { Session } from "./session.js";
 
 export const CULTURE_INVARIANT = "*";
 export const CULTURE_US = "us";
@@ -68,18 +72,24 @@ export const INVARIANT_DAY_SHORT_NAMES = INVARIANT_DAY_LONG_NAMES.map( v => stri
 
 /**
  * Provides default implementation of invariant localizer.
- * Other localizer shall extend this class and inject their instance using
- *  localization.injectLocalizer(new CustomLocalizer(...))
+ * Other localizer should extend this class and install it in app chassis.
+ * Any application always has an instance of a default localizer
  */
-export class Localizer{
+export class Localizer extends AppComponent {
 
   #strings;
+  #tzMap;
 
-  constructor(stringTable){
+  constructor(app, cfg){
+    aver.isOf(app, Application);
+    aver.isOf(cfg, ConfigNode);
+    super(app, cfg);
+    const stringTable = cfg.get("strings");
+
     if (types.isAssigned(stringTable)){
       aver.isObject(stringTable);
       this.#strings = stringTable;
-    } else{
+    } else {
       this.#strings = {
         [ISO_LANG_ENG]: { [ANY_SCHEMA]: {[ANY_FIELD]: {  }} },
         [ISO_LANG_RUS]: { [ANY_SCHEMA]: {[ANY_FIELD]: {"yes":"да", "no":"нет"}}, "tezt": {[ANY_FIELD]: {"yes":"так", "no":"неа"}} },
@@ -87,6 +97,22 @@ export class Localizer{
         [ISO_LANG_FRA]: { },
         [ISO_LANG_ESP]: { }
       };
+    }
+
+    this.#tzMap = new Map();
+
+    //UTC is always there
+    this.#tzMap.set(TZ_UTC, new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root));
+
+    const cfgZones = cfg.get("zones", "time-zones");
+    if (cfgZones){
+      for(const cfgZone of cfgZones.getChildren(false)){
+        const zone = makeNew(TimeZone, cfgZone, null, TimeZone);
+        if (this.#tzMap.has(zone.name)) {
+          throw new types.LclError(`TimeZone '${zone.name}' already registered`, "tzm.ctor()");
+        }
+        this.#tzMap.set(zone.name, zone);
+      }
     }
   }
 
@@ -102,20 +128,22 @@ export class Localizer{
    * @param {TIME_DETAILS} args.tmDetails Time detail level (NONE= no time)
    * @param {boolean} args.utc Treat date time as UTC value
    */
-  formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, utc = false} = {}){
+  formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, timeZone = null} = {}){
     if (dt===null){
       if (arguments.length==0)
-        throw new LclError("'dt' arg is missing", "formatDateTime()");
+        throw new types.LclError("'dt' arg is missing", "formatDateTime()");
 
       dt = arguments[0];
     }
 
     const v = types.isDate(dt) ? dt : new Date(dt);
+    timeZone = this.getEffectiveTimeZone(timeZone);
+    const cmp = timeZone.extractComponents(v);
 
-    const month   = utc ? v.getUTCMonth()    : v.getMonth();
-    const daym    = utc ? v.getUTCDate()     : v.getDate();
-    const dayw    = utc ? v.getUTCDay()      : v.getDay();
-    const year    = utc ? v.getUTCFullYear() : v.getFullYear();
+    const month = cmp.month - 1; //need month INDEX
+    const daym  = cmp.day;
+    const dayw  = cmp.dayw - 1;//need index
+    const year  = cmp.year;
 
     const d2 = (num) => ("0" + num.toString()).slice(-2);
     const d3 = (num) => ("00" + num.toString()).slice(-3);
@@ -127,17 +155,17 @@ export class Localizer{
     let result = "";
 
     switch(dtFormat){
-      case DATE_FORMAT.LONG_WEEK_DATE:   result = `${dnl(dayw)}, ${daym} ${mnl(month)} ${year}`;  break; //  Tuesday, 30 August 2018
-      case DATE_FORMAT.SHORT_WEEK_DATE:  result = `${dns(dayw)}, ${daym} ${mns(month)} ${year}`;  break; //  Tue, 30 Aug 2018
-      case DATE_FORMAT.LONG_DATE:        result = `${daym} ${mnl(month)} ${year}`;  break; //  30 August 2018
-      case DATE_FORMAT.SHORT_DATE:       result = `${daym} ${mns(month)} ${year}`;  break; //  30 Aug 2018
-      case DATE_FORMAT.NUM_DATE:         result = `${d2(month+1)}/${d2(daym)}/${year}`;  break;//  08/30/2018
+      case DATE_FORMAT.LONG_WEEK_DATE:   result = `${dnl(dayw)}, ${daym} ${mnl(month)} ${year}`; break; //  Tuesday, 30 August 2018
+      case DATE_FORMAT.SHORT_WEEK_DATE:  result = `${dns(dayw)}, ${daym} ${mns(month)} ${year}`; break; //  Tue, 30 Aug 2018
+      case DATE_FORMAT.LONG_DATE:        result = `${daym} ${mnl(month)} ${year}`; break; //  30 August 2018
+      case DATE_FORMAT.SHORT_DATE:       result = `${daym} ${mns(month)} ${year}`; break; //  30 Aug 2018
+      case DATE_FORMAT.NUM_DATE:         result = `${d2(month+1)}/${d2(daym)}/${year}`; break;//  08/30/2018
 
-      case DATE_FORMAT.LONG_MONTH:       result = `${mnl(month)} ${year}`;  break;  // August 2018
-      case DATE_FORMAT.SHORT_MONTH:      result = `${mns(month)} ${year}`;  break;  // Aug 2018
-      case DATE_FORMAT.NUM_MONTH:        result = `${d2(month+1)}/${year}`;  break;   // 10/2018
+      case DATE_FORMAT.LONG_MONTH:       result = `${mnl(month)} ${year}`; break;  // August 2018
+      case DATE_FORMAT.SHORT_MONTH:      result = `${mns(month)} ${year}`; break;  // Aug 2018
+      case DATE_FORMAT.NUM_MONTH:        result = `${d2(month+1)}/${year}`; break;   // 10/2018
 
-      case DATE_FORMAT.LONG_DAY_MONTH:   result = `${daym} ${mnl(month)}`;  break;    //  12 August
+      case DATE_FORMAT.LONG_DAY_MONTH:   result = `${daym} ${mnl(month)}`; break;    //  12 August
       case DATE_FORMAT.SHORT_DAY_MONTH:  result = `${daym} ${mns(month)}`; break;     //  12 Aug
       default:
         result = `${daym} ${mnl(month)} ${year}`;
@@ -145,16 +173,16 @@ export class Localizer{
 
     if (tmDetails===TIME_DETAILS.NONE) return result;
 
-    const hours   = utc ? v.getUTCHours()    : v.getHours();
-    const minutes = utc ? v.getUTCMinutes()  : v.getMinutes();
+    const hours   = cmp.hour;
+    const minutes = cmp.minute;
 
     if (tmDetails===TIME_DETAILS.HM) return `${result} ${d2(hours)}:${d2(minutes)}`;
 
-    const seconds = utc ? v.getUTCSeconds()  : v.getSeconds();
+    const seconds = cmp.second;
 
     if (tmDetails===TIME_DETAILS.HMS) return `${result} ${d2(hours)}:${d2(minutes)}:${d2(seconds)}`;
 
-    const millis =  utc ? v.getUTCMilliseconds()  : v.getMilliseconds();
+    const millis =  cmp.millisecond;
     return `${result} ${d2(hours)}:${d2(minutes)}:${d2(seconds)}:${d3(millis)}`;
   }
 
@@ -208,13 +236,13 @@ export class Localizer{
   formatCurrency({amt = NaN, iso = null, culture = null,  precision = 2, symbol = true, sign = true, thousands = true} = {}){
     if (isNaN(amt)){
       if (arguments.length<2)
-        throw new LclError("Currency 'amt' and 'iso' args are required", "formatCurrency()");
+        throw new types.LclError("Currency 'amt' and 'iso' args are required", "formatCurrency()");
       amt = arguments[0];
       iso = arguments[1];
     }
 
-    if (isNaN(amt)) throw new LclError("Currency 'amt' isNaN", "formatCurrency()");
-    if (!iso) throw new LclError("Currency 'iso' is required", "formatCurrency()");
+    if (isNaN(amt)) throw new types.LclError("Currency 'amt' isNaN", "formatCurrency()");
+    if (!iso) throw new types.LclError("Currency 'iso' is required", "formatCurrency()");
     if (!culture) culture = CULTURE_INVARIANT;
     const symbols = this.getCurrencySymbols(culture);
     const neg = amt < 0;
@@ -297,26 +325,92 @@ export class Localizer{
     return node[value];
   }
 
+  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found */
+  getTimeZone(zone){
+    const result = this.tryGetTimeZone(zone);
+    if (!result) throw new types.LclError(`TimeZone '${zone}' not found`, "tzm.getZone()");
+    return result;
+  }
 
-}
+  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found */
+  tryGetTimeZone(zone){
+    aver.isNonEmptyString(zone, "zone");
+    const result = this.#tzMap.get(zone);
+    return result ?? null;
+  }
 
-/**
- * Default Invariant Localizer instance
- */
-export const INVARIANT = new Localizer();
+  /** Gets an array of all zones in the registry */
+  getAllTimeZones(){ return [...this.#tzMap.values()]; }
 
-let s_Current = INVARIANT;
 
-/**
- * Injects custom localizer, typically this is done in the app.js file for the specific application
- * @param {Localizer} loc
- */
-export function injectLocalizer(loc){
-  aver.isOf(loc, Localizer);
-  s_Current = loc;
-}
+  /** Gets TimeZone by its name if it is passed, or from timezone preference of the session object.
+   * If session not passed then takes session from app session, if such time zone is not found then UTC is defaulted.
+   * Throws if the tz name is explicitly passed and such timezone is not found by name in the localizer timezone stack.
+   * @param {null|string|TimeZone} tzOrName - If supplied, must be an instance of TimeZone or a string. Strings get resolved to
+   * TimeZone by name or exception  thrown if not found.
+   * @param {Session} [session=null] - Session to use for timezone resolution, if not supplied then app session is used.
+   * @returns {TimeZone} - Returns TimeZone instance
+   */
+  getEffectiveTimeZone(tzOrName, session = null){
+    if (!tzOrName){ //default to UTC
+      const tzn =  (aver.isOfOrNull(session, Session) ?? this.app.session).tzName;
+      if (tzn) tzOrName = this.tryGetTimeZone(tzn);
+      if (!tzOrName) tzOrName = UTC_TIME_ZONE;
+    } else if (types.isString(tzOrName)) {//resolve from string name (requires TimeZoneManager)
+      tzOrName = this.getTimeZone(tzOrName);//throws on not found
+    } else aver.isOf(tzOrName, TimeZone);//must be of TimeZone type
 
-/**
- * Returns currently injected localizer
- */
-export function currentLocalizer(){ return s_Current; }
+    return tzOrName;//which is always tz now
+  }
+
+
+  /**
+   * Returns a vector {dt: Date, tz: TimeZone} having its Date value UTC component offset As-OF the proper time zone supplied.
+   * In other words, this method returns a UTC date which is obtained by converting a LOCAL supplied date into UTC using TimeZone class,
+   * effectively re-coding the supplied local date as of the specified time zone as-if the date was entered in that time zone.
+   * JS Date class respects LOCAL COMPUTER time zone only, which is problematic and not always the desired behavior when the date is entered
+   * by a user in a different time zone.
+   * @param {*} v - Date-convertible value (int, string) or Date Value as is. The value is assumed to be as of JS-LOCAL (per Date class spec) zone
+   * @param {null|string|TimeZone} [timeZone=null] time zone as of which to perform conversion, if null then session is used
+   * @param {null} [session=null] - Session to use for timezone resolution, if not supplied then app session is used.
+   * @param {boolean} [isDST=false] - true if the date is in Daylight Saving Time mode, false otherwise, this is needed for double-hour DST edge cases (research wikipedia)
+   * @returns {{dt: Date, tz: TimeZone}} - Returns a vector `{dt Date, tz TimeZone}` where Date is the UTC date as of the time zone and TimeZone is the effective time zone
+   * @example
+   *  Suppose a user is in New York City, and their computer-local date is 1pm on June 1st,
+   * however the session (or screen-local) time zone is set to "Pacific Time Zone" which is 3 hours behind of New York.
+   * When the user types-in a string "June 1, 2025 1:00pm" the JS Date class parses this as local time which is -4 hrs from UTC in NY, so the Date object is "2025-06-01T17:00:00Z",
+   * HOWEVER this method is sensitive to the time zone which was specified via parameter or session, which is "Pacific Time Zone" in this case,
+   * so really the user meant 1pm in Pacific Time Zone, which is 7 hours behind UTC during DST, so the Date object returned by this method will be "2025-06-01T20:00:00Z"
+   * as-if the user was operating from a computer in "Pacific Time Zone", and the session was set accordingly.
+   * This is especially important when users perform an enterprise-wide data entry tasks which may require display and entry of dates in the branch office-local dates,
+   * effectively user's computer-local dates timezones become completely logically irrelevant.
+  */
+  treatUserDateInput(v, timeZone = null, session = null, isDST = false){
+    timeZone = this.getEffectiveTimeZone(timeZone, session);
+
+    if (!timeZone){ //default to UTC
+      const tzn = this.app.session.tzName;
+      if (tzn) timeZone = this.tryGetTimeZone(tzn);
+      if (!timeZone) timeZone = UTC_TIME_ZONE;
+    } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
+      timeZone = this.getTimeZone(timeZone);//throws on not found
+    } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
+
+
+    const jsLocalDate = types.asDate(v);
+
+    const ts = timeZone.combineComponents({ //convert local date to UTC components
+      year:   jsLocalDate.getFullYear(),
+      month:  jsLocalDate.getMonth() + 1, //getMonth() returns 0-11
+      day:    jsLocalDate.getDate(),
+      hour:   jsLocalDate.getHours(),
+      minute: jsLocalDate.getMinutes(),
+      second: jsLocalDate.getSeconds(),
+      millisecond: jsLocalDate.getMilliseconds(),
+      isDST:  isDST
+    });
+
+    return {dt: new Date(ts), tz: timeZone};
+  }
+
+}//Localizer
