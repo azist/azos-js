@@ -38,15 +38,15 @@ export class LatLngBit extends Bit {
       ></az-text>
 
       <az-text
-        id="tbng"
+        id="tbLng"
         scope="this"
         name="Longitude"
         class="span2"
         title="Longitude"
         .isReadonly="${this.isReadOnly}"
         dataType="real"
-        minValue="-90"
-        maxValue="90"
+        minValue="-180"
+        maxValue="180"
       ></az-text>
     </div>
     `;
