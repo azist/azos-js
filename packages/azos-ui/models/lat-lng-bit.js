@@ -15,7 +15,7 @@ export class LatLngBit extends Bit {
 
   _getSummaryData(){
     const summary = this.title;
-    const subSummary = [this.tbLat?.value, this.tbLng?.value].filter(a => !!a).join(",");
+    const subSummary = [this.tbLat?.value, this.tbLng?.value].filter(a => !!a).join(", ");
     return {
       title:    dfltObject(summary, html`<span style="color: var(--ghost)">Latitude/Longitude</span>`),
       subtitle: subSummary,
@@ -25,6 +25,15 @@ export class LatLngBit extends Bit {
   renderDetailContent() {
     return html`
     <div class ="row cols4">
+      <az-text
+        id="tbName"
+        scope="this"
+        name="Name"
+        class="span4"
+        title="Name"
+        .isReadonly="${this.isReadOnly}"
+      ></az-text>
+
       <az-text
         id="tbLat"
         scope="this"
