@@ -29,7 +29,7 @@ import {
 import { dflt, isValidPhone, isValidEMail, isValidScreenName, isEmpty, isOneOf } from "azos/strings";
 import { POSITION, STATUS, UiInputValue, getDataParentOfMember, getEffectiveDataMode, getEffectiveSchema, noContent } from "../ui";
 import { Part, html, css, parseRank, parseStatus, parsePosition } from '../ui.js';
-import { isOfEither, isOfOrNull, isStringOrNull } from "azos/aver";
+import { isStringOrNull } from "azos/aver";
 import { TimeZone } from "azos/time";
 
 
