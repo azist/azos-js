@@ -25,7 +25,11 @@ export class CaseInputTests extends CaseBase {
 <az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="Patient A"></az-text>
 <az-text id="tbLastName" scope="this" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text>
 
-<az-text id="getADate" scope="this" name="getADate" title="Get a Date" placeholder="2024/01/01" dataKind="text"></az-text>
+<az-text id="tbD1" scope="this" name="d1" title="Date Type" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="text" @change="${this.#onFieldChange}" style="width: 50vw"></az-text>
+<az-text id="tbD2" scope="this" name="d2" title="Date Type with Kind" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="datetime" @change="${this.#onFieldChange}" style="width: 50vw"></az-text>
+<az-text id="tbD3" scope="this" name="d3" title="Date Type with Display Format" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="datetime" displayFormat='My prefix: <<v::ld{"dtFormat": "LongDate", "tmDetails": "NONE"}>>' @change="${this.#onFieldChange}" style="width: 50vw"></az-text>
+
+<az-text id="tbDX" scope="this" name="dx" title="Date Type with Local Kind" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="datetime-local" @change="${this.#onFieldChange}" style="width: 50vw"></az-text>
 
 <az-check id="chkSmokes" scope="this" name="Smokes" title="He smokes" @change="${this.#onFieldChange}"></az-check>
 <az-check id="chkDrinks" scope="this" name="Drinks" title="He drinks hard liquor" @change="${this.#onFieldChange}"></az-check>

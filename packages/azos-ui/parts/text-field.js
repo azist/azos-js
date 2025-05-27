@@ -9,6 +9,7 @@ import { html, parseRank, parseStatus, noContent } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
 import { DATA_KIND } from 'azos/types';
+import { DATE_FORMAT, TIME_DETAILS } from 'azos/localization';
 
 
 export class TextField extends FieldPart {
@@ -57,9 +58,8 @@ export class TextField extends FieldPart {
 
   prepareInputValue(v){
     if (v===null || v===undefined) return null;
-    if (this.dataKind === DATA_KIND.TEL){
-      return normalizeUSPhone(v);
-    }
+    if (this.dataKind === DATA_KIND.TEL) v = normalizeUSPhone(v);
+    else if (this.dataKind === DATA_KIND.DATETIME) v =  this.arena.app.localizer.treatUserDateInput(v).dt;//#278
     return v;
   }
 
@@ -67,8 +67,13 @@ export class TextField extends FieldPart {
   prepareValueForInput(v, isRawValue = false){
     if (v===undefined || v===null) return "";
 
+    if (isRawValue) return asString(v) ?? "";
+
     const df = this.displayFormat;
-    if (!df || isRawValue) return asString(v) ?? "";
+    if (!df) {
+      if (this.dataKind === DATA_KIND.DATETIME) v = this.arena.app.localizer.formatDateTime({dt: v, dtFormat: DATE_FORMAT.NUM_DATE, tmDetails: TIME_DETAILS.HMS});
+      return asString(v) ?? "";
+    }
 
     const result = format(df, {v}, this.arena.app.localizer) ?? "";
     return result;

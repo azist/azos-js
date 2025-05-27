@@ -365,7 +365,7 @@ export class Localizer extends AppComponent {
 
 
   /**
-   * Returns a vector [Date, TimeZone] having its Date value UTC component offset As-OF the proper time zone supplied.
+   * Returns a vector {dt: Date, tz: TimeZone} having its Date value UTC component offset As-OF the proper time zone supplied.
    * In other words, this method returns a UTC date which is obtained by converting a LOCAL supplied date into UTC using TimeZone class,
    * effectively re-coding the supplied local date as of the specified time zone as-if the date was entered in that time zone.
    * JS Date class respects LOCAL COMPUTER time zone only, which is problematic and not always the desired behavior when the date is entered
@@ -374,7 +374,7 @@ export class Localizer extends AppComponent {
    * @param {null|string|TimeZone} [timeZone=null] time zone as of which to perform conversion, if null then session is used
    * @param {null} [session=null] - Session to use for timezone resolution, if not supplied then app session is used.
    * @param {boolean} [isDST=false] - true if the date is in Daylight Saving Time mode, false otherwise, this is needed for double-hour DST edge cases (research wikipedia)
-   * @returns {[Date, TimeZone]} - Returns a vector [Date, TimeZone] where Date is the UTC date as of the time zone and TimeZone is the effective time zone
+   * @returns {{dt: Date, tz: TimeZone}} - Returns a vector `{dt Date, tz TimeZone}` where Date is the UTC date as of the time zone and TimeZone is the effective time zone
    * @example
    *  Suppose a user is in New York City, and their computer-local date is 1pm on June 1st,
    * however the session (or screen-local) time zone is set to "Pacific Time Zone" which is 3 hours behind of New York.
@@ -410,7 +410,7 @@ export class Localizer extends AppComponent {
       isDST:  isDST
     });
 
-    return [new Date(ts), timeZone];
+    return {dt: new Date(ts), tz: timeZone};
   }
 
 }//Localizer
