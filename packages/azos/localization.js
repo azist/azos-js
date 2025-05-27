@@ -374,7 +374,7 @@ export class Localizer extends AppComponent {
    * @param {*} v - Date-convertible value (int, string) or Date Value as is. The value is assumed to be as of JS-LOCAL (per Date class spec) zone
    * @param {null|string|TimeZone} [timeZone=null] time zone as of which to perform conversion, if null then session is used
    * @param {null} [session=null] - Session to use for timezone resolution, if not supplied then app session is used.
-   * @param {boolean} [isDST=false] - true if the date is in Daylight Saving Time mode, false otherwise, this is needed for double-hour DST edge cases (research wikipedia)
+   * @param {boolean} [isDST=true] - true to enable DST, and in the edge case of the last DST day if the date is in Daylight Saving Time mode, false otherwise, this is needed for double-hour DST edge cases (research wikipedia)
    * @returns {{dt: Date, tz: TimeZone}} - Returns a vector `{dt Date, tz TimeZone}` where Date is the UTC date as of the time zone and TimeZone is the effective time zone
    * @example
    *  Suppose a user is in New York City, and their computer-local date is 1pm on June 1st,
@@ -386,7 +386,7 @@ export class Localizer extends AppComponent {
    * This is especially important when users perform an enterprise-wide data entry tasks which may require display and entry of dates in the branch office-local dates,
    * effectively user's computer-local dates timezones become completely logically irrelevant.
   */
-  treatUserDateInput(v, timeZone = null, session = null, isDST = false){
+  treatUserDateInput(v, timeZone = null, session = null, isDST = true){
     timeZone = this.getEffectiveTimeZone(timeZone, session);
 
     const jsLocalDate = types.asDate(v);
@@ -402,7 +402,11 @@ export class Localizer extends AppComponent {
       isDST:  isDST
     });
 
-    return {dt: new Date(ts), tz: timeZone};
+//console.log("GOT TICKS:  "+ts);
+    const result = {dt: new Date(ts), tz: timeZone};
+console.log(result.dt);
+console.dir(result.dt);
+    return result;
   }
 
 }//Localizer
