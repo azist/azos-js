@@ -1,12 +1,54 @@
-import { html } from "../../ui.js";
-import "../../bit.js";
+import { html } from "../ui.js";
+import { Bit } from "../bit.js";
+
+import {STL_INLINE_GRID} from "../styles";
+import { dflt, dfltObject } from "azos/strings";
 
 export class LatLngBit extends Bit {
-  renderControl() {
+  static styles = [...Bit.styles, STL_INLINE_GRID];
+
+  static properties = {
+    captionLat:   { type: String },
+    captionLng:   { type: String },
+    captionName:  { type: String },
+  }
+
+  _getSummaryData(){
+    const summary = this.title;
+    const subSummary = [this.tbLat?.value, this.tbLng?.value].filter(a => !!a).join(",");
+    return {
+      title:    dfltObject(summary, html`<span style="color: var(--ghost)">Latitude/Longitude</span>`),
+      subtitle: subSummary,
+    }
+  }
+
+  renderDetailContent() {
     return html`
+    <div class ="row cols4">
       <az-text
-      
+        id="tbLat"
+        scope="this"
+        name="Latitude"
+        class="span2"
+        title="Latitude"
+        .isReadonly="${this.isReadOnly}"
+        dataType="real"
+        minValue="-90"
+        maxValue="90"
       ></az-text>
+
+      <az-text
+        id="tbng"
+        scope="this"
+        name="Longitude"
+        class="span2"
+        title="Longitude"
+        .isReadonly="${this.isReadOnly}"
+        dataType="real"
+        minValue="-90"
+        maxValue="90"
+      ></az-text>
+    </div>
     `;
   }
 }
