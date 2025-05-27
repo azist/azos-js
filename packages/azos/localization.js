@@ -111,7 +111,7 @@ export class Localizer extends AppComponent {
         if (this.#tzMap.has(zone.name)) {
           throw new types.LclError(`TimeZone '${zone.name}' already registered`, "tzm.ctor()");
         }
-        this.#tzMap.set(zone.name, zone);
+        this.#tzMap.set(zone.name.toLowerCase(), zone);
       }
     }
   }
@@ -325,14 +325,15 @@ export class Localizer extends AppComponent {
     return node[value];
   }
 
-  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found */
+  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found. Names are case-insensitive */
   getTimeZone(zone){
-    const result = this.tryGetTimeZone(zone);
+    aver.isNonEmptyString(zone, "zone");
+    const result = this.tryGetTimeZone(zone.toLowerCase());
     if (!result) throw new types.LclError(`TimeZone '${zone}' not found`, "tzm.getZone()");
     return result;
   }
 
-  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found */
+  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found.  Names are case-insensitive  */
   tryGetTimeZone(zone){
     aver.isNonEmptyString(zone, "zone");
     const result = this.#tzMap.get(zone);
@@ -387,15 +388,6 @@ export class Localizer extends AppComponent {
   */
   treatUserDateInput(v, timeZone = null, session = null, isDST = false){
     timeZone = this.getEffectiveTimeZone(timeZone, session);
-
-    if (!timeZone){ //default to UTC
-      const tzn = this.app.session.tzName;
-      if (tzn) timeZone = this.tryGetTimeZone(tzn);
-      if (!timeZone) timeZone = UTC_TIME_ZONE;
-    } else if (types.isString(timeZone)) {//resolve from string name (requires TimeZoneManager)
-      timeZone = this.getTimeZone(timeZone);//throws on not found
-    } else aver.isOf(timeZone, TimeZone);//must be of TimeZone type
-
 
     const jsLocalDate = types.asDate(v);
 

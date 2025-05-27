@@ -8,6 +8,7 @@ import { html } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
 import "../../parts/text-field.js";
 import "../../parts/date-range-field.js";
+import { TIME_ZONE_PROP } from "azos/types";
 
 export class CaseInputTests extends CaseBase {
 
@@ -16,14 +17,29 @@ export class CaseInputTests extends CaseBase {
     this.tbLastName.status = this.chkDrinks.value ? "alert" : "default";
   }
 
+  #tz;
+  get [TIME_ZONE_PROP]() { return this.#tz; }
+
+  #onTzChange(e) {
+    this.#tz = e.target.value;
+  }
+
   renderControl() {
     return html`
 <h2>Testing @change with az-text and az-check</h2>
+
 
 <az-text id="tbNasa" scope="window" status="info" name="Nasa" title="Nasa Experimentation" placeholder="Hatch diameter inches" @change="${this.#onFieldChange}" datatype="int" value="10"></az-text>
 
 <az-text id="tbFirstName" scope="this" name="FN" title="First Name" placeholder="Patient First Name" @change="${this.#onFieldChange}" value="Patient A"></az-text>
 <az-text id="tbLastName" scope="this" name="LN" title="Last Name" placeholder="Patient Last Name" @change="${this.#onFieldChange}"></az-text>
+
+<az-select id="cboTz" scope="this" @change="${this.#onTzChange}" name="tz" title="Time Zone" value="UTC">
+  <option value="UTC" title="UTC - Universal"></option>
+  <option value="EST" title="EST - Eastern"></option>
+  <option value="CST" title="CST - Central"></option>
+  <option value="PST" title="PST - Pacific"></option>
+</az-select>
 
 <az-text id="tbD1" scope="this" name="d1" title="Date Type" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="text" @change="${this.#onFieldChange}" style="width: 50vw"></az-text>
 <az-text id="tbD2" scope="this" name="d2" title="Date Type with Kind" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="datetime" @change="${this.#onFieldChange}" style="width: 50vw"></az-text>

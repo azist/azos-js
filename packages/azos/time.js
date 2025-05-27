@@ -8,7 +8,7 @@ import * as aver from "./aver.js";
 import { config, ConfigNode } from "./conf.js";
 
 /** UTC time zone name. The instance of {@link TimeZone} with this name is ALWAYS present in {@link TimeZoneManager} registry */
-export const TZ_UTC = "UTC";
+export const TZ_UTC = "utc";
 
 /** Milliseconds in one hour */
 export const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -26,8 +26,8 @@ export class TimeZone {
   constructor(cfg){
     aver.isOf(cfg, ConfigNode);
     this.#name         = cfg.getString("name", null);
-    aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name");
-    this.#description  = cfg.getString("name", this.constructor.name);
+    this.#name = aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name str(2..32) ").toLowerCase();
+    this.#description  = cfg.getString("description", this.constructor.name);
     this.#iana         = cfg.getString("iana", null);
     this.#windows      = cfg.getString("windows", null);
     this.#baseOffsetMs = cfg.getInt("baseOffsetMs", 0);

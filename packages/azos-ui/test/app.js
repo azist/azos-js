@@ -30,6 +30,7 @@ import { ShowcaseApplet } from "./examples/showcase-applet";
 import { MruLogic } from "../mru";
 import { BrowserStorage } from "azos/storage";
 import { TEST_IMAGES } from "./test-images";
+import { CONFIG_US_STANDARD_TIME_ZONES } from "azos/time";
 
 
 class MyLogic extends Module {
@@ -109,6 +110,7 @@ const cfgApp = {
   name: "$(id)",
   description: "Test '$(name)' application",
   copyright: "2018-2025 Azist Group",
+  localizer: { zones: [...CONFIG_US_STANDARD_TIME_ZONES]  },
   modules: [
     { name: "chronClient", type: ChronicleClient, url: "https://hub.g8day-dev.com/chronicle/log", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_CHRON_SECRET },
     { name: "adlibClient", type: AdlibClient, url: "https://hub.g8day-dev.com/adlib/store", useOAuth: false, accessTokenScheme: "Basic", accessToken: process.env.AZ_ADLIB_SECRET },
