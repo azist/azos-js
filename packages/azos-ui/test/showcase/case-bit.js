@@ -115,6 +115,8 @@ export class CaseBit extends CaseBase {
 <az-lat-lng-bit
   id="bitLatLng"
   scope="this"
+  captionTitle="Totally Awesome"
+  captionName="Different Name"
 ></az-lat-lng-bit>
 
     `;
