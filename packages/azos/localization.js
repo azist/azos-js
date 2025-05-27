@@ -402,10 +402,7 @@ export class Localizer extends AppComponent {
       isDST:  isDST
     });
 
-//console.log("GOT TICKS:  "+ts);
     const result = {dt: new Date(ts), tz: timeZone};
-console.log(result.dt);
-console.dir(result.dt);
     return result;
   }
 
