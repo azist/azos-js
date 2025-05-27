@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 import { isOneOf, asString, normalizeUSPhone, format } from 'azos/strings';
-import { html, parseRank, parseStatus, noContent } from '../ui.js';
+import { html, parseRank, parseStatus, noContent, getEffectiveTimeZone } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
 import { DATA_KIND } from 'azos/types';
@@ -59,7 +59,11 @@ export class TextField extends FieldPart {
   prepareInputValue(v){
     if (v===null || v===undefined) return null;
     if (this.dataKind === DATA_KIND.TEL) v = normalizeUSPhone(v);
-    else if (this.dataKind === DATA_KIND.DATETIME) v =  this.arena.app.localizer.treatUserDateInput(v).dt;//#278
+    else if (this.dataKind === DATA_KIND.DATETIME){
+      const session = this.arena.applet.session;
+      const tz = getEffectiveTimeZone(this);
+      v =  this.arena.app.localizer.treatUserDateInput(v, tz, session).dt;//#278
+    }
     return v;
   }
 
@@ -71,7 +75,10 @@ export class TextField extends FieldPart {
 
     const df = this.displayFormat;
     if (!df) {
-      if (this.dataKind === DATA_KIND.DATETIME) v = this.arena.app.localizer.formatDateTime({dt: v, dtFormat: DATE_FORMAT.NUM_DATE, tmDetails: TIME_DETAILS.HMS});
+      if (this.dataKind === DATA_KIND.DATETIME) {
+        const tz = getEffectiveTimeZone(this);
+        v = this.arena.app.localizer.formatDateTime({dt: v, dtFormat: DATE_FORMAT.NUM_DATE, tmDetails: TIME_DETAILS.HMS, timeZone: tz});
+      }
       return asString(v) ?? "";
     }
 

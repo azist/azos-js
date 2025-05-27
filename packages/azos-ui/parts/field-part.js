@@ -451,15 +451,15 @@ export class FieldPart extends Part {
 
     lookupId: { type: String },
 
-    whenView:   {type: String},
-    whenInsert: {type: String},
-    whenUpdate: {type: String},
+    whenView:   { type: String },
+    whenInsert: { type: String },
+    whenUpdate: { type: String },
 
     /** When set shows some kind of animation to indicate bg work */
-    isBusy: {type: Boolean, reflect: true},
+    isBusy: { type: Boolean, reflect: true },
 
     /** TimeZone or time zone name string, if not set, then parent context is used */
-    timeZone:  {type: Object, reflect: false}
+    timeZone:  { type: Object, reflect: false }
   }
 
   get [NAME_PROP](){ return this.name; }

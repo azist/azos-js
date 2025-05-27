@@ -23,11 +23,13 @@ import { AzosError,
          DATA_BLOCK_PROP,
          DATA_MODE_PROP,
          DATA_SCHEMA_PROP,
+         TIME_ZONE_PROP,
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRecord, ImageRegistry } from "azos/bcl/img-registry";
 import { AVERMENT_FAILURE, isOfOrNull, isStringOrNull } from "azos/aver";
 import { CONTENT_TYPE, UNKNOWN } from "azos/coreconsts";
+import { TimeZone } from "azos/time";
 
 /** CSS template processing pragma: css`p{color: blue}` */
 export const css = lit_css;
@@ -655,7 +657,7 @@ export function setBlockDataValue(element, v){
 /**
  * Computes the effective data mode for this element: if this element has {@link DATA_MODE_PROP}
  * it gets it, and if it is set with non-null/undef value returns it, otherwise continues the search up the parent chain of
- * AzosElements until the `DATA_MODE_PROP` returns real {@link DATA_MODE} value. If non found, then returns undefined data mode
+ * AzosElements until the `DATA_MODE_PROP` returns a real {@link DATA_MODE} value. If none found, then returns undefined data mode
  * @param {HTMLElement} element required HTML element
  * @returns {DATA_MODE | undefined}
  */
@@ -664,6 +666,26 @@ export function getEffectiveDataMode(element){
     if (DATA_MODE_PROP in element) {
       const mode = element[DATA_MODE_PROP];
       if (types_isString(mode)) return mode;
+    }
+    element = getImmediateParentAzosElement(element);
+  }
+
+  return undefined;
+}
+
+/**
+ * Computes the effective time zone for this element: if this element has {@link TIME_ZONE_PROP}
+ * it gets it, and if it is set with non-null/undef value returns it, otherwise continues the search up the parent chain of
+ * AzosElements until the `TIME_ZONE_PROP` returns a real {@link TimeZone} or string value (a name of time zone) value.
+ * If none found, then returns undefined time zone
+ * @param {HTMLElement} element required HTML element
+ * @returns {DATA_MODE | undefined}
+ */
+export function getEffectiveTimeZone(element){
+  while(element instanceof HTMLElement){
+    if (TIME_ZONE_PROP in element) {
+      const tz = element[TIME_ZONE_PROP];
+      if (types_isString(tz) || tz instanceof TimeZone) return tz;
     }
     element = getImmediateParentAzosElement(element);
   }
