@@ -8,14 +8,13 @@ export class LatLngBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
 
   static properties = {
-    captionLat:   { type: String },
-    captionLng:   { type: String },
     captionName:  { type: String },
+    captionTitle: { type: String },
   }
 
   _getSummaryData(){
-    const summary = this.title;
-    const subSummary = [this.tbLat?.value, this.tbLng?.value].filter(a => !!a).join(",");
+    const summary = this.captionTitle;
+    const subSummary = [this.tbLat?.value, this.tbLng?.value].filter(a => !!a).join(", ");
     return {
       title:    dfltObject(summary, html`<span style="color: var(--ghost)">Latitude/Longitude</span>`),
       subtitle: subSummary,
@@ -25,6 +24,15 @@ export class LatLngBit extends Bit {
   renderDetailContent() {
     return html`
     <div class ="row cols4">
+      <az-text
+        id="tbName"
+        scope="this"
+        name="Name"
+        class="span4"
+        title="${dflt(this.captionName, "Name")}"
+        .isReadonly="${this.isReadOnly}"
+      ></az-text>
+
       <az-text
         id="tbLat"
         scope="this"
