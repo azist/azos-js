@@ -16,6 +16,8 @@ import { isOneOf } from 'azos/strings';
 export const STL_BIT = css`
 :host{ display: block; box-sizing: border-box; }
 
+.outer{}
+.outer[inert]{ filter: blur(2px) grayscale(0.85);  opacity: 0.75; }
 
 .control{
   position: relative;
@@ -53,11 +55,6 @@ export const STL_BIT = css`
     &.brand2  { background: var(--s-brand2-bg); }
     &.brand3  { background: var(--s-brand3-bg); }
   }
-}
-
-.control[inert]{
-  filter: blur(2px) grayscale(0.85);
-  opacity: 0.75;
 }
 
 .summary{
@@ -259,20 +256,17 @@ export class Bit extends Block {
         }
       }
     }
-
-
-    if (this.noSummary) return this.renderDetailContent();
-
-    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-
-    const summary = this._getSummaryData();
-
-    return html`
-<div id="divControl" class="control ${cls}" ?inert=${effectDisabled}>
-  ${this.renderStatusFlag()}
-  ${this.renderSummary(summary)}
-  ${this.renderDetails()}
-</div>`;
+    // ---------------------------------------------------------------------------
+    if (this.noSummary){
+      let cls = `${parseRank(this.rank, true)}`;
+      const innerContent = this.renderDetailContent();
+      return html`<div id="divControl" class="outer ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
+    } else {
+      let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+      const summary = this._getSummaryData();
+      const innerContent = html`${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()}`;
+      return html`<div id="divControl" class="outer control ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
+    }
   }
 
   renderStatusFlag(){
