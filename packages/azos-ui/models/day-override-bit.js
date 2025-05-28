@@ -49,7 +49,7 @@ export class DayOverrideBit extends Bit {
         class="span2"
         title="Date"
         .isReadonly="${this.isReadOnly}"
-        dataType="date"
+        dataKind="date"
         dataValue="date"
       ></az-text>
 
