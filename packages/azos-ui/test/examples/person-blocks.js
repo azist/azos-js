@@ -38,6 +38,7 @@ export class PersonBlock extends Block {
         <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
       </div>
       <div class="row cols3">
+        <az-text scope="this"  id="tbDOB"          name="DOB"        title="Date of Birth (Chicago)" isrequired dataKind="datetime" value="" timeZone="CST"></az-text>
         <az-text scope="this"  id="tbPhone"        name="Phone"      title="Phone"       maxLength=24 isrequired dataKind="tel" value=""></az-text>
         <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
         <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
