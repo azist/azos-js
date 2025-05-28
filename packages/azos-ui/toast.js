@@ -4,8 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { genGuid } from "azos/types";
-import { AzosElement, html, css, STATUS, RANK, POSITION, parseRank, parseStatus } from "./ui.js";
+import { AzosElement, html, css, POSITION, parseRank, parseStatus, parsePosition, RANK } from "./ui.js";
 import { isString } from "azos/aver";
 
 /**
@@ -14,7 +13,7 @@ import { isString } from "azos/aver";
 export class Toast extends AzosElement {
 
   static styles = css`
-.popover{
+:host([popover]){
   display: block;
   border: 1px solid var(--s-default-bor-hcontrast);
   border-radius: 0.25em;
@@ -23,42 +22,41 @@ export class Toast extends AzosElement {
   overflow: hidden;
   padding: 1em;
   box-shadow: 2px 2px 14px var(--s-default-bg-hcontrast);
+  transition: 0.2s ease-in;
+  transition-behavior: allow-discrete;
   opacity: 0;
 }
 
-.popover:popover-open, .popover[open]{
+:host(:popover-open), :host([open]){
   opacity: 1;
-  transition: 0.2s ease-in;
   inset: unset;
   margin: 0.5em;
 }
 
-@starting-style{.popover:popover-open, .popover[open]{opacity: 0;}}
+:host(:focus-visible), :host(:hover){ outline: none; }
 
+@starting-style{:host(:popover-open), :host([open]){ opacity: 0; }}
 
-.popover:focus-visible, .popover:hover{ outline: none; }
+:host(.r1) { font-size: var(--r1-fs); }
+:host(.r2) { font-size: var(--r2-fs); }
+:host(.r3) { font-size: var(--r3-fs); }
+:host(.r4) { font-size: var(--r4-fs); }
+:host(.r5) { font-size: var(--r5-fs); }
+:host(.r6) { font-size: var(--r6-fs); }
 
-.r1 { font-size: var(--r1-fs); }
-.r2 { font-size: var(--r2-fs); }
-.r3 { font-size: var(--r3-fs); }
-.r4 { font-size: var(--r4-fs); }
-.r5 { font-size: var(--r5-fs); }
-.r6 { font-size: var(--r6-fs); }
-
-.ok { background: var(--s-ok-bg-hcontrast); color: var(--s-ok-fg-hcontrast); border-color: var(--s-ok-bor-hcontrast); box-shadow: 2px 2px 14px var(--s-ok-bg-hcontrast) }
-.info { background: var(--s-info-bg-hcontrast); color: var(--s-info-fg-hcontrast); border-color: var(--s-info-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-info-bg-hcontrast)  }
-.warning { background: var(--s-warn-bg-hcontrast); color: var(--s-warn-fg-hcontrast); border-color: var(--s-warn-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-warn-bg-hcontrast)  }
-.alert { background: var(--s-alert-bg-hcontrast); color: var(--s-alert-fg-hcontrast); border-color: var(--s-alert-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-alert-bg-hcontrast)  }
-.error { background: var(--s-error-bg-hcontrast); color: var(--s-error-fg-hcontrast); border-color: var(--s-error-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-error-bg-hcontrast)  }
+:host(.ok) { background: var(--s-ok-bg-hcontrast); color: var(--s-ok-fg-hcontrast); border-color: var(--s-ok-bor-hcontrast); box-shadow: 2px 2px 14px var(--s-ok-bg-hcontrast) }
+:host(.info) { background: var(--s-info-bg-hcontrast); color: var(--s-info-fg-hcontrast); border-color: var(--s-info-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-info-bg-hcontrast)  }
+:host(.warning) { background: var(--s-warn-bg-hcontrast); color: var(--s-warn-fg-hcontrast); border-color: var(--s-warn-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-warn-bg-hcontrast)  }
+:host(.alert) { background: var(--s-alert-bg-hcontrast); color: var(--s-alert-fg-hcontrast); border-color: var(--s-alert-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-alert-bg-hcontrast)  }
+:host(.error) { background: var(--s-error-bg-hcontrast); color: var(--s-error-fg-hcontrast); border-color: var(--s-error-bor-hcontrast); ; box-shadow: 2px 2px 14px var(--s-error-bg-hcontrast)  }
 `;
 
   static #instances = [];
 
   /** Start the next toast's timer */
   static #nextToast() {
-    if (Toast.instances.length > 0) {
+    if (Toast.instances.length > 0)
       Toast.instances[0].#play();
-    }
   }
 
   /** New toasts naturally are popped over old toasts. Fix that by cascading by FIFO */
@@ -76,54 +74,56 @@ export class Toast extends AzosElement {
    * Construct a new toast message to display on the screen with the given styling
    *  around RANK, STATUS, and POSITION.
    * NOTE: Toasts do not understand rich content.
-   * @param {string|null} msg The message to display in the toast
-   * @param {number} timeout The length of time to display the toast (default: undefined)
-   * @param {RANK} rank The rank
-   * @param {STATUS} status The status
-   * @param {POSITION} position The position for where to display on the screen
-   * @returns The constructed toast added to Toast.#instances
+   * @param {string | null} msg The message to display in the toast
+   * @param {object} options - optional object with the following properties:
+   * @param {number} [options.timeout] The length of time to display the toast (default: 1000 + 180ms per word)
+   * @param {RANK} [options.rank] The rank of the toast (default: RANK.NORMAL)
+   * @param {STATUS} [options.status] The status of the toast (default: STATUS.DEFAULT)
+   * @param {POSITION} [options.position] The position for where to display on the screen (default: POSITION.DEFAULT)
+   * @param {number} timeout The length of time to display the toast (default: 1000 + 180ms per word)
+   * @returns {Toast} The constructed toast added to Toast.#instances
    */
   static toast(msg = null, { timeout, rank, status, position } = {}) {
     isString(msg);
     const toast = new Toast();
 
-    // 1s + 180ms per word
-    timeout = timeout ?? 1_000 + (msg.split(' ').length) * 180;
-    rank = rank ?? RANK.NORMAL;
-    status = status ?? STATUS.DEFAULT;
-    position = position ?? POSITION.DEFAULT;
+    timeout = timeout ?? 1_000 + (msg.split(' ').length) * 180; // 1s + 180ms per word
+    status = parseStatus(status);
+    position = parsePosition(position);
+    rank = parseRank(rank);
+    if (rank === RANK.UNDEFINED) rank = RANK.NORMAL;
 
     toast.#message = msg;
     toast.#timeout = timeout;
-    toast.#rank = rank;
-    toast.#status = status;
     toast.#position = position;
 
-    Toast.#instances.push(toast);
+    toast.rank = rank;
+    toast.status = status;
+
     toast.#show();
 
-    this.#cascadeToasts();
-    this.#instances[0] && this.#instances[0].#play(); // ensure the top-most toast is running
+    if (Toast.#instances.length > 1) Toast.#cascadeToasts();
+    if (Toast.#instances.length > 0) Toast.#instances[0].#play(); // ensure the top-most toast is running
     return toast;
   }
 
-  #guid = null;
+  #toastCountBeforeMe = 0; // How many toasts were shown before this one, used for positioning when multiple toasts are shown
   #tmr = null;
   #message = null;
   #timeout = null;
-  #rank = null;
-  #status = null;
   #position = null;
   #shownPromise = null;
   #shownPromiseResolve = null;
 
-  get guid() { return this.#guid; }
   get isShown() { return this.#shownPromise !== null; }
   get shownPromise() { return this.#shownPromise; }
 
-  // Calculate the position styles for this rendered Toast
-  get #positionStyles() {
-    let offset = (Toast.toastCount - 1) * 5;
+  /**
+   * Calculates the CSS styles for positioning the toast based on its `#position` and `#toastCountBeforeMe`.
+   * @returns {string} The CSS styles for positioning the toast based on its position and count
+   */
+  #getPositionalStyles() {
+    let offset = this.#toastCountBeforeMe * 5;
     switch (this.#position) {
       case POSITION.TOP_LEFT:
         return `top:${offset}px;left:0;`;
@@ -147,11 +147,6 @@ export class Toast extends AzosElement {
     }
   }
 
-  constructor() {
-    super();
-    this.#guid = genGuid();
-  }
-
   // Clear the timer
   #clearTimer() {
     if (!this.#tmr) return;
@@ -165,20 +160,34 @@ export class Toast extends AzosElement {
     this.#tmr = setTimeout(() => this.destroy(), this.#timeout);
   }
 
-  // Hide/Show popover element. Helper to reset z-index of visible toasts.
+  /**
+   * Hide/Show popover element. Helper to reset z-index of visible toasts.
+   */
   #toggle() {
-    const t = this.$(this.guid);
+    if (!this.isShown) return;
 
     // Hide on DOM
-    t.hidePopover();
+    this.hidePopover();
 
     // Show on DOM
-    t.showPopover();
+    this.showPopover();
   }
 
-  // Add element to dom and show
+  /**
+   * Add the toast to the DOM.
+   * @returns {Promise} A promise that resolves when the toast is destroyed.
+   */
   #show() {
     if (this.isShown) return false;
+
+    this.#toastCountBeforeMe = Toast.#instances.length > 0
+      ? Toast.#instances[Toast.#instances.length - 1].#toastCountBeforeMe + 1
+      : 0;
+
+    this.setAttribute("role", "status");
+    this.setAttribute("popover", "manual");
+    this.classList.add(`r${this.rank}`, this.status);
+    this.style.cssText = this.#getPositionalStyles();
 
     // Add to DOM
     document.body.appendChild(this);
@@ -187,42 +196,46 @@ export class Toast extends AzosElement {
     this.update();
 
     // Show on DOM
-    this.$(this.guid).showPopover();
+    this.showPopover();
+
+    Toast.#instances.push(this);
+
     return this.#shownPromise = new Promise(res => this.#shownPromiseResolve = res);
   }
 
-  // Destroy and clean up the toast element. Trigger next toast.
+  /**
+   * Destroy the toast message, removing it from the DOM and clearing any timers.
+   * @returns {boolean} Returns false if the toast is not shown, otherwise cleans up.
+   */
   destroy() {
     if (!this.isShown) return false;
     this.#clearTimer();
 
     // Hide from DOM
-    this.$(this.guid).hidePopover();
+    this.hidePopover();
     this.#shownPromiseResolve();
     this.#shownPromise = null;
 
+    // Allow time for the CSS transition to complete
+    setTimeout(() => {
+      // Remove from DOM
+      document.body.removeChild(this);
 
-    // Remove from DOM
-    document.body.removeChild(this);
+      // Remove instances from cache
+      Toast.#instances.shift();
 
-    // Remove from instances
-    Toast.#instances.shift();
+      // Trigger next
+      Toast.#nextToast();
+    }, 200);
 
-    // Trigger next
-    Toast.#nextToast();
   }
 
   /** Draw the toast message */
-  render() {
-    const rankStyle = parseRank(this.#rank, true);
-    const statusStyle = parseStatus(this.#status, true);
-    const positionStyle = this.#positionStyles;
-    return html`<div id=${this.guid} popover=manual role=status class="popover ${rankStyle} ${statusStyle}" style="${positionStyle}">${this.#message}</div>`;
-  }
+  render() { return html`${this.#message}`; }
 }
 
 /**
- * Shortcut method to Toast.toast(...); {@link Toast.toast}.
+ * Shortcut method to {@link Toast.toast}.
  */
 export const toast = Toast.toast.bind(Toast);
 
