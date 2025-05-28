@@ -6,9 +6,11 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { css, html, parseRank, parseStatus } from './ui.js';
+import { css, getEffectiveDataMode, html, parseRank, parseStatus } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
+import { DATA_MODE_PROP, DATA_MODE } from 'azos/types';
+import { isOneOf } from 'azos/strings';
 
 
 export const STL_BIT = css`
@@ -51,6 +53,11 @@ export const STL_BIT = css`
     &.brand2  { background: var(--s-brand2-bg); }
     &.brand3  { background: var(--s-brand3-bg); }
   }
+}
+
+.control[inert]{
+  filter: blur(2px) grayscale(0.85);
+  opacity: 0.75;
 }
 
 .summary{
@@ -237,13 +244,35 @@ export class Bit extends Block {
 
 
   renderControl(){
+    let effectDisabled = this.isDisabled || this.isNa;
+
+    if (!effectDisabled || this.whenView || this.whenInsert || this.whenUpdate){
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+      if (mode){
+        effectDisabled = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
+        if (!effectDisabled){
+          const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
+          effectDisabled = isOneOf(spec, ["na", "disable", "disabled"], false);
+        }
+      }
+    }
+
+
     if (this.noSummary) return this.renderDetailContent();
 
     let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
 
     const summary = this._getSummaryData();
 
-    return html`<div id="divControl" class="control ${cls}"> ${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()} </div>`;
+    return html`
+<div id="divControl" class="control ${cls}" ?inert=${effectDisabled}>
+  ${this.renderStatusFlag()}
+  ${this.renderSummary(summary)}
+  ${this.renderDetails()}
+</div>`;
   }
 
   renderStatusFlag(){
