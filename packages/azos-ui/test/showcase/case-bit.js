@@ -7,6 +7,9 @@
 import { html } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
 import "../../bit.js";
+import "../../../azos-ui/models/lat-lng-bit.js";
+import "../../../azos-ui/models/span-bit.js";
+import "../../../azos-ui/models/day-override-bit.js";
 
 export class CaseBit extends CaseBase {
   renderControl() {
@@ -110,6 +113,25 @@ export class CaseBit extends CaseBase {
   structure of bits.
   </p>
 </az-bit>
+
+<az-lat-lng-bit
+  id="bitLatLng"
+  scope="this"
+  captionTitle="Totally Awesome"
+  captionName="Different Name"
+></az-lat-lng-bit>
+
+<az-span-bit
+  id="bitSpan"
+  scope="this"
+  captionName="default schedule span"
+  captionRange="open"
+></az-span-bit>
+
+<az-day-override-bit
+  id="bitDayOverride"
+  scope="this"
+></az-day-override-bit>
 
     `;
   }

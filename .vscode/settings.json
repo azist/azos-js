@@ -35,6 +35,8 @@
       "endregion",
       "factum",
       "flds",
+      "fmap",
+      "fmta",
       "fskip",
       "gdid",
       "hcontrast",
@@ -52,6 +54,7 @@
       "LFROM",
       "linq",
       "millis",
+      "MULT",
       "nein",
       "nsplit",
       "nums",
@@ -101,17 +104,26 @@
     "workbench.tree.renderIndentGuides": "always",
     "editor.mouseWheelZoom": true,
     "workbench.colorCustomizations": {
-      "tree.indentGuidesStroke": "#729292",
+      "tree.indentGuidesStroke": "#c48000",
       "editor.background":"#102325",
-      "tab.activeBackground": "#f0e05030",
-      "tab.border": "#303030",
+      "tab.activeBackground": "#c4800060",
+      "tab.border": "#e0e0e028",
 
-      "titleBar.activeBackground": "#402a20",
-      "titleBar.activeForeground": "#e0e0a0",
-      "titleBar.inactiveBackground": "#322a20",
-      "titleBar.inactiveForeground": "#c0c0a0",
-      "statusBar.background": "#3a2a20",
-      "statusBar.foreground": "#c0c0a0",
+      "titleBar.activeBackground": "#181000",
+      "titleBar.activeForeground": "#c48000",
+      "titleBar.inactiveBackground": "#303030",
+      "titleBar.inactiveForeground": "#a08000",
+      "statusBar.background": "#282010",
+      "statusBar.foreground": "#c48000",
+
+      "--sideBar.background": "#181010",
+
+      "editor.selectionBackground": "#2080f0b0",
+      "editor.wordHighlightBackground":"#ffd21025",
+      "editor.wordHighlightTextBorder": "#ffd21018",
+
+      "editorCursor.foreground": "#FFFFFF",
+      "editor.lineHighlightBackground":"#40a0f025"
     },
     "javascript.preferences.importModuleSpecifierEnding": "js"
 }

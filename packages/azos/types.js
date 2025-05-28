@@ -4,8 +4,8 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { Atom } from "./atom.js";
 import * as CC from "./coreconsts.js";
+import { Atom } from "./atom.js";
 import { EntityId } from "./entity-id.js";
 import * as strings from "./strings.js";
 import {
@@ -147,6 +147,12 @@ export const CHECK_MIN_LENGTH_METHOD = Symbol("checkMinLength");
  */
 export const CHECK_MAX_LENGTH_METHOD = Symbol("checkMaxLength");
 
+/**
+ * Establishes a "timeZone" protocol - an entity which implements such property returns its time zone or null/undefined
+ * in which case the entity works under the parent/session time zone. The returned value is either a string - a mnemonic time zone name,
+ * recognized by installed localizer, or `TimeZone` object
+ */
+export const TIME_ZONE_PROP = Symbol("timeZone");
 
 /**
  * Establishes a "dispose" deterministic finalization protocol - an entity which implements such method -
@@ -867,11 +873,14 @@ export function asMoney(v, canUndef = false) {
 }
 
 /**
- * Converts value to Date
+ * Converts value to JS Date. Note: No timezone conversion is performed.
+ * If you need to parse date values relative to proper TimeZones, you can obtain one for your user session
+ * or whatever logic may be needed. The API stack in AZOS works using UTC ISO8601 by default so server data
+ * is always in UTC.
  * @param {*} v value to convert.
  * @param {boolean} [canUndef=false] Whether undefined is allowed
  */
-export function asDate(v, canUndef = false, fromUTC = false) {
+export function asDate(v, canUndef = false) {
   let d, ts;
   if (v === undefined) canUndef ? d = undefined : d = new Date(0);
   else if (v === null) d = new Date(0);
@@ -879,8 +888,7 @@ export function asDate(v, canUndef = false, fromUTC = false) {
   else if (isIntValue(v)) d = new Date(asInt(v));
   else if (isString(v) && !isNaN((ts = Date.parse(v)))) d = new Date(ts);
   else throw new AzosError(CAST_ERROR + `asDate("${strings.describe(v)}")`);
-  if (!fromUTC || !d) return d;
-  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
+  return d;
 }
 
 /**

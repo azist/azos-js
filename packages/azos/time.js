@@ -5,12 +5,13 @@
 </FILE_LICENSE>*/
 
 import * as aver from "./aver.js";
-import { config, makeNew } from "./conf.js";
-import { Module } from "./modules.js";
-import { AzosError } from "./types.js";
+import { config, ConfigNode } from "./conf.js";
 
 /** UTC time zone name. The instance of {@link TimeZone} with this name is ALWAYS present in {@link TimeZoneManager} registry */
-export const TZ_UTC = "UTC";
+export const TZ_UTC = "utc";
+
+/** Milliseconds in one hour */
+export const ONE_HOUR_MS = 60 * 60 * 1000;
 
 
 /** Provides named time zone information along with ability to convert UTC timestamps to local (as of timezone) components and back */
@@ -23,9 +24,10 @@ export class TimeZone {
   #baseOffsetMs;
 
   constructor(cfg){
+    aver.isOf(cfg, ConfigNode);
     this.#name         = cfg.getString("name", null);
-    aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name");
-    this.#description  = cfg.getString("name", this.constructor.name);
+    this.#name = aver.isNonEmptyMinMaxString(this.#name, 2, 32, "valid TZ name str(2..32) ").toLowerCase();
+    this.#description  = cfg.getString("description", this.constructor.name);
     this.#iana         = cfg.getString("iana", null);
     this.#windows      = cfg.getString("windows", null);
     this.#baseOffsetMs = cfg.getInt("baseOffsetMs", 0);
@@ -104,8 +106,11 @@ export class TimeZone {
   }
 }
 
-/** Encapsulates general US and Canada Daylight savings conversion rules */
-export class UsStandardTimeZone extends TimeZone {
+/** A timezone used in the USA and Canada which does not support DST */
+export class UsTimeZone extends TimeZone { }
+
+/** Encapsulates general US and Canada time zone with Daylight savings conversion rules */
+export class UsStandardTimeZone extends UsTimeZone {
 /*
     United States and Canada
     DST begins at 2:00 a.m. local time on the second Sunday in March.
@@ -119,36 +124,38 @@ export class UsStandardTimeZone extends TimeZone {
                           1000; //ms
 
 
-  #getDstRange(ldt){
-    let dstStart = new Date(DataTransfer.UTC(ldt.getUTCFullYear, 3/*March*/, 1, 2, 0, 0));
+  #getDstRange(year){
+    let dstStart = new Date(Date.UTC(year, 2/*March*/, 1, 2, 0, 0));
     for(let sun = 0;;){
       if (dstStart.getUTCDay() === 0) {//Sunday == 0
         sun++;
       }
-      if (sun == 2) break;
-      dstStart.setDate(dstStart.getDate() + 1);
+      if (sun === 2) break;
+      dstStart.setUTCDate(dstStart.getUTCDate() + 1);
     }
 
-    let dstEnd = new Date(DataTransfer.UTC(ldt.getUTCFullYear, 11/*November*/, 1, 2, 0, 0));
-    while(dstEnd.getUTCDay() !== 0) dstEnd.setDate(dstEnd.getDate() + 1);
+    let dstEnd = new Date(Date.UTC(year, 10/*November*/, 1, 2, 0, 0));
+    while(dstEnd.getUTCDay() !== 0) dstEnd.setUTCDate(dstEnd.getUTCDate() + 1);
 
-    return { start: dstStart, end: dstEnd };
+    //console.log("DST Starts: ", dstStart.toUTCString(), "     DstEnds: ", dstEnd.toUTCString());
+    return { dstStart: dstStart.getTime(), dstEnd: dstEnd.getTime() };
   }
 
   /**
    * Returns the millisecond offset of this timezone relative to UTC as of the specified UTC timestamp
-   * @param {number| Date} ts number or date UTC timestamp
+   * @param {number} ts UTC timestamp
    * @returns {number} offset in milliseconds
   */
   getOffsetMsAsOfUtc(ts){
     const so = this.standardBaseOffsetMs;
 
     const lts = ts + so; // local time
-    const ldt = new Date(lts);//fake "UTC" since Date does not have an API
 
-    let {dstStart, dstEnd} = this.#getDstRange(ldt);
+    let {dstStart, dstEnd} = this.#getDstRange(new Date(lts).getUTCFullYear());
+   // dstStart -= so;
+   // dstEnd -= so;
 
-    const isDST = ldt >= dstStart && ldt < dstEnd;
+    const isDST = lts >= dstStart && lts < dstEnd;
     const dstOffset = isDST ? UsStandardTimeZone.DST_OFFSET_MS : 0;
 
     return so + dstOffset;
@@ -156,7 +163,7 @@ export class UsStandardTimeZone extends TimeZone {
 
   /**
    * Returns the millisecond offset of this timezone relative to UTC as of LOCAL (for this zone) timestamp with explicit DST flag
-   * @param {number| Date} ts number or date LOCAL (as of this zone)UTC timestamp
+   * @param {number} ts number (as of this zone)UTC timestamp
    * @param {Boolean} isDST true when the date is in Daylight Saving Time mode
    * @returns {number} offset in milliseconds
   */
@@ -164,61 +171,38 @@ export class UsStandardTimeZone extends TimeZone {
     const so = this.standardBaseOffsetMs;
 
     const lts = ts; // already local time
-    const ldt = new Date(lts);//fake "UTC" since Date does not have an API
 
-    let {dstStart, dstEnd} = this.#getDstRange(ldt);
+    let {dstStart, dstEnd} = this.#getDstRange(new Date(lts).getUTCFullYear());//fake "UTC" since Date does not have an API
+   // dstStart -= so;
+   // dstEnd -= so;
 
-    const isInDstRange = isDst && ldt >= dstStart && ldt < dstEnd;
+    const isInDstRange = isDst && (lts >= dstStart && lts < dstEnd);
     const dstOffset = isInDstRange ? UsStandardTimeZone.DST_OFFSET_MS : 0;
 
     return so + dstOffset;
   }
 }
 
-/**
- * Provides a module which provides a registry of named {@link TimeZone} instances}
- */
-export class TimeZoneManager extends Module {
 
-  #map;
 
-  constructor(dir, cfg) {
-    super(dir, cfg);
-    this.#map = new Map();
+/** Global UTC Time zone */
+export const UTC_TIME_ZONE = Object.freeze(
+  new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root)
+);
 
-    //UTC is always there
-    this.#map.set(TZ_UTC, new TimeZone(config({ name: TZ_UTC, description: "UTC - Coordinated Universal Time Zone", baseOffsetMs: 0 }).root));
 
-    const cfgZones = cfg.get("zones");
-    if (cfgZones){
-      for(const cfgZone of cfgZones.getChildren(false)){
-        const zone = makeNew(TimeZone, cfgZone, null, TimeZone);
-        if (this.#map.has(zone.name)) {
-          throw new AzosError(`TimeZone '${zone.name}' already registered`, "tzm.ctor()");
-        }
-        this.#map.set(zone.name, zone);
-      }
-    }
-  }
+/** Default config segment which covers US timezones including Alaska, Hawaii and Arizona */
+export const CONFIG_US_STANDARD_TIME_ZONES = Object.freeze([
+  {type: UsStandardTimeZone, name: "est",   description: "Eastern Time",  iana: "America/New_York", windows: "Eastern Standard Time",     baseOffsetMs: -5 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "cst",   description: "Central Time",  iana: "America/Chicago",  windows: "Central Standard Time",     baseOffsetMs: -6 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "mst",   description: "Mountain Time", iana: "America/Denver",   windows: "Mountain Standard Time",    baseOffsetMs: -7 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "pst",   description: "Pacific Time",  iana: "America/Los_Angeles", windows: "Pacific Standard Time",  baseOffsetMs: -8 * ONE_HOUR_MS},
+  {type: UsStandardTimeZone, name: "akst",  description: "Pacific Time",  iana: "America/Anchorage",   windows: "Alaskan Standard Time",  baseOffsetMs: -9 * ONE_HOUR_MS},
 
-  /** Gets {@link TimeZone} derivative instance by name or throws an exception  if not found */
-  getZone(zone){
-    const result = this.tryGetZone(zone);
-    if (!result) throw new AzosError(`TimeZone '${zone}' not found`, "tzm.getZone()");
-    return result;
-  }
-
-  /** Tries to get {@link TimeZone} derivative instance by name or `null` if no such named zone was found */
-  tryGetZone(zone){
-    aver.isNonEmptyString(zone, "zone");
-    const result = this.#map.get(zone);
-    return result ?? null;
-  }
-
-  /** Gets an array of all zones in the registry */
-  getAllZones(){ return [...this.#map.values()]; }
-}
-
+  // --------------------- Non-DST time zones ----------------------
+  {type: UsTimeZone, name: "usmst", description: "US Mountain Time (no DST)", iana: "America/Phoenix", windows: "US Mountain Standard Time", baseOffsetMs: -7 * ONE_HOUR_MS},
+  {type: UsTimeZone, name: "hst",   description: "Hawaiian Time", iana: "Pacific/Honolulu",    windows: "Hawaiian Standard Time", baseOffsetMs: -10 * ONE_HOUR_MS},
+]);
 
 /*
 https://www.webexhibits.org/daylightsaving/b2.html

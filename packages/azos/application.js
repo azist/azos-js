@@ -15,6 +15,7 @@ import { Module, ModuleLinker } from "./modules.js";
 import * as lcl from "./localization.js";
 import { asMsgType, LOG_TYPE } from "./log.js";
 import { ILog, ConLog } from "./ilog.js";
+import { GLOBALS } from "./coreconsts.js";
 
 /** Provides uniform base for App chassis related exceptions */
 export class AppError extends types.AzosError {
@@ -261,11 +262,10 @@ export class Application extends types.DisposableObject{
    * @returns {Localizer}
   */
   _makeLocalizer(cfg){
-    if (types.isAssigned(cfg)) {
-       return  makeNew(lcl.Localizer, cfg, this, lcl.Localizer);
-    } else {
-       return lcl.INVARIANT;
-    }
+    if (!types.isAssigned(cfg))
+      cfg = config({name: "localizer", order: -1000}).root;
+
+    return  makeNew(lcl.Localizer, cfg, this, lcl.Localizer);
   }
 
   /**
@@ -299,16 +299,24 @@ const cfgNOP = new Configuration({
   id: "NOP",
   name: "NOP",
   description: "Nop application",
-  envName: "local"
+  envName: "NOP"
 });
 
 /**
- * System stub class which implements an {@link Application} which does nothing
+ * System stub class which implements an {@link Application} which does not
+ * provide any extra modules or services.
+ * This class never gets configured and never gets deterministically disposed
+ * You should use `NopApplication.instance` to get the instance of this class
  */
-export class NopApplication extends Application{
+export class NopApplication extends Application {
   static #instance = new NopApplication();
+
+  /** Static global instance of application which is not configured with any modules/providers a No-operation application */
   static get instance(){ return NopApplication.#instance; }
-  constructor(){ super(cfgNOP); }
+  constructor(){
+    super(cfgNOP);
+    GLOBALS.____bindGlobalNopApplication(this);
+  }
 }
 
 

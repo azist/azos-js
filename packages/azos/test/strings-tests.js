@@ -581,7 +581,7 @@ unit("Strings", function () {
         title: "Mr.",
         lname: "Solomon",
         fname: "Satya",
-        dob: new Date(1980, 0, 2, 13, 44, 12),
+        dob: new Date(Date.UTC(1980, 0, 2, 13, 44, 12)),
         balance: 5123456.89,
         balance_iso: "usd",
         hobbies: [{ id: "run", name: "Running" }, { id: "wld", name: "Welding" }]
