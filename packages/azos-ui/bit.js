@@ -258,7 +258,7 @@ export class Bit extends Block {
     }
     // ---------------------------------------------------------------------------
     if (this.noSummary){
-      let cls = `${parseRank(this.rank, true)}`;
+      let cls = `${parseRank(this.rank, true)}`; //ignore "status" coloring as we do not have the outer frame
       const innerContent = this.renderDetailContent();
       return html`<div id="divControl" class="outer ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
     } else {
