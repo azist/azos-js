@@ -4,12 +4,12 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf, asString, normalizeUSPhone, format, isEmpty } from 'azos/strings';
+import { DATA_KIND } from 'azos/types';
+import { DATE_FORMAT, TIME_DETAILS } from 'azos/localization';
+import { isOneOf, asString, normalizeUSPhone, format } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent, getEffectiveTimeZone } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { DATA_KIND } from 'azos/types';
-import { DATE_FORMAT, TIME_DETAILS } from 'azos/localization';
 
 
 export class TextField extends FieldPart {
