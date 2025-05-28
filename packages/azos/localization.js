@@ -387,6 +387,8 @@ export class Localizer extends AppComponent {
    * effectively user's computer-local dates timezones become completely logically irrelevant.
   */
   treatUserDateInput(v, timeZone = null, session = null, isDST = true){
+    if (strings.isEmpty(v)) return null;
+
     timeZone = this.getEffectiveTimeZone(timeZone, session);
 
     const jsLocalDate = types.asDate(v);

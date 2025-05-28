@@ -459,7 +459,7 @@ export class FieldPart extends Part {
     isBusy: { type: Boolean, reflect: true },
 
     /** TimeZone or time zone name string, if not set, then parent context is used */
-    timeZone:  { type: Object, reflect: false }
+    timeZone:  { type: String, reflect: false }
   }
 
   get [NAME_PROP](){ return this.name; }
