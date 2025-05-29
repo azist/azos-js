@@ -357,6 +357,12 @@ export class TimeBlockPicker extends Control {
   #defaultViewNumDays;        // #viewNumDays could be set by the user
   #defaultViewStartDay;       // #viewStartDay could be set by the user
 
+  #toasts = {
+    "today": null,
+    "back": null,
+    "forward": null,
+  };
+
   #recomputeViewProperties(viewStartDate = null) {
     this.#defaultEffectiveStartDate = this.itemsByDay.length ? this.itemsByDay[0].day : new Date();
     this.#defaultEffectiveEndDate = this.itemsByDay.length ? this.itemsByDay[this.itemsByDay.length - 1].day : new Date();
@@ -525,6 +531,12 @@ export class TimeBlockPicker extends Control {
     }
   }
 
+  #showDirectionalToast(directionName, message, options) {
+    const lastToast = this.#toasts[directionName]?.deref();
+    if (lastToast?.isShown) return;
+    this.#toasts[directionName] = new WeakRef(toast(message, options));
+  }
+
   /**
    * Given {startTimeMins, durationMins}, calculate [startTime, endTime] formatted with {@link use24HourTime}.
    *  NOTE: endTime is calculated from start + duration since endTime from server is typically endTime - 1 inclusive,
@@ -536,76 +548,7 @@ export class TimeBlockPicker extends Control {
     return [startTime, endTime];
   }
 
-  /**
-   * Creates a scheduling item to put on the TimeBlockPicker control.
-   * @param {Object} item An object with keys aligned with {@link SchedulingItem}
-   * @returns a {@link SchedulingItem}
-   */
-  addItem(item) {
-    if (!this.editMode) {
-      this.writeLog("Error", "Please call `beginChanges()` before editing dataset.");
-      return;
-    }
-
-    if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
-    aver.isOf(item, SchedulingItem);
-
-    if (item.startTimeMins % this.timeViewGranularityMins > 0) {
-      this.writeLog("Error", `The item must start on a time block in intervals of ${this.timeViewGranularityMins} mins.`);
-      return;
-    }
-
-    let found = this.itemsByDay.find(d => item.day.toLocaleDateString() === d.day.toLocaleDateString());
-    if (!found) {
-      found = {
-        day: item.day,
-        items: [],
-      };
-      this.itemsByDay.push(found);
-      // this.itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
-    }
-
-    if (!types.isArray(found.items)) found.items = [];
-
-    const timeFoundIndex = found.items.findIndex(one => (item.startTimeMins >= one.startTimeMins && item.startTimeMins <= one.endTimeMins) || (item.endTimeMins >= one.startTimeMins && item.endTimeMins <= one.endTimeMins));
-    if (timeFoundIndex > -1) {
-      const [startTime, endTime] = this.formatStartEndTimes(found.items[timeFoundIndex], true);
-      this.writeLog("Error", `An item already exists from ${startTime} - ${endTime} on ${found.items[timeFoundIndex].day.toLocaleDateString()}.`);
-      return;
-    }
-
-    found.items.push(item);
-    // found.items.sort((a, b) => a.startTimeMins - b.startTimeMins);
-    return item;
-  }
-
-  removeItem(idOrItem) {
-    if (!this.editMode) {
-      this.writeLog("Error", "Please call `beginChanges()` before editing dataset.");
-      return;
-    }
-    if (types.isString(idOrItem) || types.isNumber(idOrItem)) idOrItem = this.findItemById(idOrItem);
-    const item = aver.isOf(idOrItem, SchedulingItem);
-
-    const foundDay = this.itemsByDay.find(one => one.day === item.day);
-
-    const foundIndex = foundDay.items.findIndex(one => one.id === item.id);
-    if (foundIndex === -1) throw types.AzosError(`Unable to find item{${item.id}}`);
-    foundDay.items.splice(foundIndex, 1);
-  }
-
   findItemById(id) { return this.items.find(one => one.id === id); }
-
-  #toasts = {
-    "today": null,
-    "back": null,
-    "forward": null,
-  };
-  #showDirectionalToast(directionName, message, options) {
-    const lastToast = this.#toasts[directionName]?.deref();
-    if (lastToast?.isShown) return;
-    this.#toasts[directionName] = new WeakRef(toast(message, options));
-  }
 
   /**
    * Change the page of the time block picker view. The view is based on the `viewStartDate` and `viewNumDays`.
@@ -653,23 +596,87 @@ export class TimeBlockPicker extends Control {
     this.#recomputeViewProperties(nextViewStartDate);
   }
 
+  /**
+   * Creates a scheduling item to put on the TimeBlockPicker control.
+   * @param {Object} item An object with keys aligned with {@link SchedulingItem}
+   * @returns a {@link SchedulingItem}
+   */
+  addItem(item) {
+    this.beginChanges();
+
+    try {
+      if (types.isObjectOrArray(item)) item = new SchedulingItem(item);
+      aver.isOf(item, SchedulingItem);
+
+      if (item.startTimeMins % this.timeViewGranularityMins > 0) {
+        this.writeLog("Error", `The item must start on a time block in intervals of ${this.timeViewGranularityMins} mins.`);
+        return;
+      }
+
+      let found = this.itemsByDay.find(d => item.day.toLocaleDateString() === d.day.toLocaleDateString());
+      if (!found) {
+        found = {
+          day: item.day,
+          items: [],
+        };
+        this.itemsByDay.push(found);
+        // this.itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
+      }
+
+      if (!types.isArray(found.items)) found.items = [];
+
+      const timeFoundIndex = found.items.findIndex(one => (item.startTimeMins >= one.startTimeMins && item.startTimeMins <= one.endTimeMins) || (item.endTimeMins >= one.startTimeMins && item.endTimeMins <= one.endTimeMins));
+      if (timeFoundIndex > -1) {
+        const [startTime, endTime] = this.formatStartEndTimes(found.items[timeFoundIndex], true);
+        this.writeLog("Error", `An item already exists from ${startTime} - ${endTime} on ${found.items[timeFoundIndex].day.toLocaleDateString()}.`);
+        return;
+      }
+
+      found.items.push(item);
+      // found.items.sort((a, b) => a.startTimeMins - b.startTimeMins);
+      return item;
+    } finally {
+      this.endChanges();
+    }
+  }
+
+  removeItem(idOrItem) {
+    this.beginChanges();
+
+    try {
+      if (types.isString(idOrItem) || types.isNumber(idOrItem)) idOrItem = this.findItemById(idOrItem);
+      const item = aver.isOf(idOrItem, SchedulingItem);
+
+      const foundDay = this.itemsByDay.find(one => one.day === item.day);
+
+      const foundIndex = foundDay.items.findIndex(one => one.id === item.id);
+      if (foundIndex === -1) throw types.AzosError(`Unable to find item{${item.id}}`);
+      foundDay.items.splice(foundIndex, 1);
+    } finally {
+      this.endChanges();
+    }
+  }
+
   /** Remove all items and reset view */
   purge() {
-    if (!this.editMode) {
-      this.writeLog("Error", "Please call `beginChanges()` before editing dataset.");
-      return;
+    this.beginChanges();
+    try {
+      this.#itemsByDay.length = 0;
+    } finally {
+      this.endChanges();
     }
-    this.#itemsByDay.length = 0;
   }
 
   /** Call before making edits that would cause recalculation */
   beginChanges() {
-    this.editMode = true;
+    this.editModeSessions++;
   }
 
   /** Commit the edits and re-render the view */
   endChanges() {
-    this.editMode = false;
+    if (--this.editModeSessions > 0) return;
+
+    this.editModeSessions = 0;
     // console.dir(this.itemsByDay);
     this.#itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
     this.itemsByDay.forEach(({ items }) => items.sort((a, b) => a.startTimeMins - b.startTimeMins));
