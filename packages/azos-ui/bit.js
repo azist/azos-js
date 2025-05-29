@@ -6,14 +6,18 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { css, html, parseRank, parseStatus } from './ui.js';
+import { css, getEffectiveDataMode, html, parseRank, parseStatus } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
+import { DATA_MODE_PROP, DATA_MODE } from 'azos/types';
+import { isOneOf } from 'azos/strings';
 
 
 export const STL_BIT = css`
 :host{ display: block; box-sizing: border-box; }
 
+.outer{}
+.outer[inert]{ filter: blur(2px) grayscale(0.85);  opacity: 0.75; }
 
 .control{
   position: relative;
@@ -237,13 +241,32 @@ export class Bit extends Block {
 
 
   renderControl(){
-    if (this.noSummary) return this.renderDetailContent();
+    let effectDisabled = this.isDisabled || this.isNa;
 
-    let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+    if (!effectDisabled || this.whenView || this.whenInsert || this.whenUpdate){
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
 
-    const summary = this._getSummaryData();
-
-    return html`<div id="divControl" class="control ${cls}"> ${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()} </div>`;
+      if (mode){
+        effectDisabled = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
+        if (!effectDisabled){
+          const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
+          effectDisabled = isOneOf(spec, ["na", "disable", "disabled"], false);
+        }
+      }
+    }
+    // ---------------------------------------------------------------------------
+    if (this.noSummary){
+      let cls = `${parseRank(this.rank, true)}`; //ignore "status" coloring as we do not have the outer frame
+      const innerContent = this.renderDetailContent();
+      return html`<div id="divControl" class="outer ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
+    } else {
+      let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
+      const summary = this._getSummaryData();
+      const innerContent = html`${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()}`;
+      return html`<div id="divControl" class="outer control ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
+    }
   }
 
   renderStatusFlag(){
