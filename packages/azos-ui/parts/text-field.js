@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf, asString, normalizeUSPhone, format, isEmpty } from 'azos/strings';
+import { isOneOf, asString, normalizeUSPhone, format } from 'azos/strings';
 import { html, parseRank, parseStatus, noContent, getEffectiveTimeZone } from '../ui.js';
 import { baseStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
@@ -13,6 +13,7 @@ import { DATE_FORMAT, TIME_DETAILS } from 'azos/localization';
 
 
 export class TextField extends FieldPart {
+
   static properties = {
     /** Aligns input value left, center, or right. Default: left. */
     alignValue: { type: String, reflect: false },
@@ -36,15 +37,15 @@ export class TextField extends FieldPart {
 
   static styles = [baseStyles, textFieldStyles];
 
-  constructor() { super(); }
+  constructor(){ super(); }
 
 
   /** True if alignValue is a valid value */
-  get isValidAlign() { return isOneOf(this.alignValue, ["left", "center", "right"]); }
+  get isValidAlign(){ return isOneOf(this.alignValue, ["left", "center", "right"]); }
 
 
 
-  #tbChange(e) {
+  #tbChange(e){
     const v = e.target.value;
     this.setValueFromInput(v);//this may cause validation error but will set this.rawValue
     this.inputChanged();
@@ -78,7 +79,7 @@ export class TextField extends FieldPart {
     const tz = getEffectiveTimeZone(this);
     const df = this.displayFormat;
     if (!df) {
-      if (this.dataKind === DATA_KIND.DATETIME) {
+      if (this.dataKind === DATA_KIND.DATETIME){
         v = this.arena.app.localizer.formatDateTime({dt: v, dtFormat: DATE_FORMAT.NUM_DATE, tmDetails: TIME_DETAILS.HMS, timeZone: tz});
       }
       return asString(v) ?? "";
@@ -88,7 +89,7 @@ export class TextField extends FieldPart {
     return result;
   }
 
-  renderInput(effectivelyDisabled) {
+  renderInput(effectivelyDisabled){
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.effectiveStatus, true, "Bg")}`;
 
@@ -97,8 +98,6 @@ export class TextField extends FieldPart {
       val = this.prepareValueForInput(this.rawValue, true);
     else
       val = this.prepareValueForInput(val, false);
-
-    ////console.info("Will render this value: " + val);
 
     if (this.multiline){
       return  html`
