@@ -4,11 +4,12 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, isEmpty } from 'azos/strings';
-import { html, parseRank, parseStatus } from '../ui.js';
+import { asString, format, isEmpty } from 'azos/strings';
+import { asDate, isNonEmptyString, isString, ValidationError } from 'azos/types';
+import { getEffectiveTimeZone, html, parseRank, parseStatus } from '../ui.js';
 import { baseStyles, dateRangeStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { asDate, isNonEmptyString, isString, ValidationError } from 'azos/types';
+import { DATE_FORMAT, TIME_DETAILS } from 'azos/localization';
 
 export class DateRangeField extends FieldPart {
   static properties = {
@@ -31,18 +32,49 @@ export class DateRangeField extends FieldPart {
     window.queueMicrotask(() => t.focus());
   }
 
+  // FIXME: What should be done with this method?
   castValue(v) {
-    if (v === null || v === undefined || v === "") return null;
-    let { start, end } = v;
-    if (isEmpty(start)) start = undefined;
-    if (isEmpty(end)) end = undefined;
-    return { start: asDate(start, true), end: asDate(end, true) };
+    return v;
+    // if (v === null || v === undefined || v === "") return null;
+    // let { start, end } = v;
+    // if (isEmpty(start)) start = undefined;
+    // if (isEmpty(end)) end = undefined;
+    // return { start: asDate(start, true), end: asDate(end, true) };
   }
 
+  /**
+   * @param {{ start: String, end: String }} v the value to prepare for use in this DateRangeField.value prop.
+   * @returns {{ start: Date | null, end: Date | null }} an object with start and end dates, or null if the input is empty.
+   */
+  prepareInputValue(v) {
+    if (v === null || v === undefined) return null;
+    let { start, end } = v;
+    const session = this.arena.applet.session;
+    const tz = getEffectiveTimeZone(this);
+    return {
+      start: this.arena.app.localizer.treatUserDateInput(start, tz, session)?.dt ?? null, //#278
+      end: this.arena.app.localizer.treatUserDateInput(end, tz, session)?.dt ?? null, //#278
+    };
+  }
+
+  /**
+   * Prepare the provided individual `v` for use in an input element.
+   * @param {String} v a single string value to format for input (either start or end)
+   * @param {Boolean} isRawValue true if provided `v` is from rawValue, false if from value
+   * @returns a string value formatted for input
+   */
   prepareValueForInput(v, isRawValue = false) {
-    if (v === undefined || v === null) return "";
+    if (v === undefined || v === null || v === "") return "";
+
     if (isRawValue) return asString(v) ?? "";
-    return this.arena.app.localizer.formatDateTime({ dt: asDate(v, true) });
+
+    const tz = getEffectiveTimeZone(this);
+    const df = this.displayFormat;
+    if (df) {
+      return format(df, { v }, this.arena.app.localizer, tz) ?? "";
+    }
+    v = this.arena.app.localizer.formatDateTime({ dt: v, timeZone: tz, dtFormat: DATE_FORMAT.NUM_DATE, tmDetails: TIME_DETAILS.NONE });
+    return asString(v) ?? "";
   }
 
 
