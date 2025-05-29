@@ -79,7 +79,7 @@ export class TextField extends FieldPart {
     const tz = getEffectiveTimeZone(this);
     const df = this.displayFormat;
     if (!df) {
-      if (this.dataKind === DATA_KIND.DATETIME) {
+      if (this.dataKind === DATA_KIND.DATETIME){
         v = this.arena.app.localizer.formatDateTime({dt: v, dtFormat: DATE_FORMAT.NUM_DATE, tmDetails: TIME_DETAILS.HMS, timeZone: tz});
       }
       return asString(v) ?? "";
