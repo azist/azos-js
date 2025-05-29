@@ -4,17 +4,19 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asString, format, isEmpty } from 'azos/strings';
+import { dflt, isEmpty } from 'azos/strings';
 import { asDate, isNonEmptyString, isString, ValidationError } from 'azos/types';
+import { DATE_FORMAT, TIME_DETAILS } from 'azos/localization';
 import { getEffectiveTimeZone, html, parseRank, parseStatus } from '../ui.js';
 import { baseStyles, dateRangeStyles, textFieldStyles } from './styles.js';
 import { FieldPart } from './field-part.js';
-import { DATE_FORMAT, TIME_DETAILS } from 'azos/localization';
 
 export class DateRangeField extends FieldPart {
   static properties = {
     optionalStart: { type: Boolean, reflect: true },
     optionalEnd: { type: Boolean, reflect: true },
+    formatDate: { type: String },
+    formatTime: { type: String },
   }
 
   static styles = [baseStyles, textFieldStyles, dateRangeStyles];
@@ -32,23 +34,46 @@ export class DateRangeField extends FieldPart {
     window.queueMicrotask(() => t.focus());
   }
 
-  // FIXME: What should be done with this method?
   castValue(v) {
-    return v;
-    // if (v === null || v === undefined || v === "") return null;
-    // let { start, end } = v;
-    // if (isEmpty(start)) start = undefined;
-    // if (isEmpty(end)) end = undefined;
-    // return { start: asDate(start, true), end: asDate(end, true) };
+    if (v === null || v === undefined || v === "") return null;
+
+    let start, end;
+    if (isString(v)) {
+      try {
+        ({ start, end } = JSON.parse(v));
+      } catch (e) {
+        // If the value is a string, we assume it is a date range in a specific format.
+        [start, end] = v.split(/[,;:]/).map(p => p.trim());
+      }
+    } else {
+      ({ start, end } = v);
+    }
+
+    // TODO: @Dmitriy
+    let arena;
+    try {
+      arena = this.arena;
+    } catch (e) {
+      return { start, end };
+    }
+
+    const session = arena.applet.session;
+    const tz = getEffectiveTimeZone(this);
+    return {
+      start: arena.app.localizer.treatUserDateInput(start, tz, session)?.dt ?? null, //#278
+      end: arena.app.localizer.treatUserDateInput(end, tz, session)?.dt ?? null, //#278
+    };
   }
 
   /**
+   * TODO: From User Input, this is still wrong. if v.start === 1.1.23 then start = 12.31.22.
    * @param {{ start: String, end: String }} v the value to prepare for use in this DateRangeField.value prop.
    * @returns {{ start: Date | null, end: Date | null }} an object with start and end dates, or null if the input is empty.
    */
   prepareInputValue(v) {
     if (v === null || v === undefined) return null;
     let { start, end } = v;
+
     const session = this.arena.applet.session;
     const tz = getEffectiveTimeZone(this);
     return {
@@ -58,23 +83,28 @@ export class DateRangeField extends FieldPart {
   }
 
   /**
-   * Prepare the provided individual `v` for use in an input element.
+   * Prepare for use in an input element.
    * @param {String} v a single string value to format for input (either start or end)
    * @param {Boolean} isRawValue true if provided `v` is from rawValue, false if from value
    * @returns a string value formatted for input
    */
   prepareValueForInput(v, isRawValue = false) {
-    if (v === undefined || v === null || v === "") return "";
-
-    if (isRawValue) return asString(v) ?? "";
-
-    const tz = getEffectiveTimeZone(this);
-    const df = this.displayFormat;
-    if (df) {
-      return format(df, { v }, this.arena.app.localizer, tz) ?? "";
+    let start, end;
+    if (v === undefined || v === null || v === "") start = end = null;
+    else if (isRawValue && isString(v)) {
+      [start, end] = v.split(/[,;:]/).map(p => p.trim());
+    } else {
+      ({ start, end } = v);
     }
-    v = this.arena.app.localizer.formatDateTime({ dt: v, timeZone: tz, dtFormat: DATE_FORMAT.NUM_DATE, tmDetails: TIME_DETAILS.NONE });
-    return asString(v) ?? "";
+
+    const timeZone = getEffectiveTimeZone(this);
+    const dtFormat = dflt(this.formatDate, DATE_FORMAT.NUM_DATE);
+    const tmDetails = dflt(this.formatTime, TIME_DETAILS.NONE);
+
+    return {
+      start: !start ? "" : this.arena.app.localizer.formatDateTime({ dt: start, timeZone, dtFormat, tmDetails }),
+      end: !end ? "" : this.arena.app.localizer.formatDateTime({ dt: end, timeZone, dtFormat, tmDetails })
+    };
   }
 
 
@@ -87,11 +117,11 @@ export class DateRangeField extends FieldPart {
 
   _doValidate(context, scope) {
     const { start: startVal, end: endVal } = this.value;
-    if (this.$("tbStart").required && (startVal === null || startVal === undefined || (isString(startVal) && isEmpty(startVal)))) {
+    if (this.$("tbStart").required && isEmpty(startVal)) {
       return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "Start date is required");
     }
 
-    if (this.$("tbEnd").required && (endVal === null || endVal === undefined || (isString(endVal) && isEmpty(endVal)))) {
+    if (this.$("tbEnd").required && isEmpty(endVal)) {
       return new ValidationError(this.effectiveSchema, this.effectiveName, scope, "End date is required");
     }
 
@@ -111,17 +141,13 @@ export class DateRangeField extends FieldPart {
       this.isReadonly ? 'readonlyInput' : '',
     ].filter(isNonEmptyString).join(' ');
 
-    let startValue = this.value?.start;
-    if ((startValue === undefined || startValue === null) && this.error)
-      startValue = this.prepareValueForInput(this.rawValue?.start, true);
+    let value = this.value;
+    if ((value === undefined || value === null) && this.error)
+      value = this.prepareValueForInput(this.rawValue, true);
     else
-      startValue = this.prepareValueForInput(startValue, false);
+      value = this.prepareValueForInput(value, false);
 
-    let endValue = this.value?.end;
-    if ((endValue === undefined || endValue === null) && this.error)
-      endValue = this.prepareValueForInput(this.rawValue?.end, true);
-    else
-      endValue = this.prepareValueForInput(endValue, false);
+    const { start, end } = value;
 
     return html`
       <div class="inputs ${cls}">
@@ -129,7 +155,7 @@ export class DateRangeField extends FieldPart {
           id="tbStart"
           placeholder="${this.placeholder}"
           type="text"
-          .value="${startValue}"
+          .value="${start}"
           ?disabled=${effectivelyDisabled}
           ?required=${!this.optionalStart}
           ?readonly=${this.isReadonly}
@@ -141,7 +167,7 @@ export class DateRangeField extends FieldPart {
           id="tbEnd"
           placeholder="${this.placeholder}"
           type="text"
-          .value="${endValue}"
+          .value="${end}"
           ?disabled=${this.isDisabled}
           ?required=${!this.optionalEnd}
           ?readonly=${this.isReadonly}
