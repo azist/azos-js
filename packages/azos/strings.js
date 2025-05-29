@@ -259,11 +259,13 @@ export const REXP_FORMAT = /<<(.*?)>>/g;
  * Expands formatting arguments
  * @param {*} v A format string with tokens: <<path[::format[{format-args-json}]>>. Path is the same as used in types.nav() to address sub/properties of the args object
  * @param {*} args Arguments object: either a map or array
+ * @param {Localizer?} [localizer=null] localizer to use, otherwise default invariant localizer will be used
+ * @param {TimeZone|String|null} [timeZone=null] default time zone
  * @example
  *  format(`DOB is: <<dob::ld{"dtFormat": "'ShortDate"}>> Salary: <<salary::lm{"iso": "?salary_iso"}>>`, {dob: new Date(1980, 1, 1), salary: 120000, salary_iso: "usd"})
  *  returns "DOB is: 01/01/1980 Salary: $120,000.00"
  */
-export function format(v, args, localizer = null) {
+export function format(v, args, localizer = null, timeZone = null) {
   v = asString(v);
   if (!args) return v;
   if (!types.isObjectOrArray(args))
@@ -299,6 +301,7 @@ export function format(v, args, localizer = null) {
       case "ld": { //localized date-time
         if (fmta === null) fmta = {};
         fmta.dt = tv;
+        if (!fmta.timeZone) fmta.timeZone = timeZone;
         return localizer.formatDateTime(fmta);
       }
       case "lm": { //localized money

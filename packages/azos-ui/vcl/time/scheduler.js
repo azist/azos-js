@@ -9,6 +9,7 @@ import * as types from "azos/types";
 import { isOneOf } from "azos/strings";
 
 import { Control, css, getCssPaletteSpec, html, noContent } from "../../ui.js";
+import { toast } from "../../toast.js";
 
 export class TimeBlockPicker extends Control {
 
@@ -595,34 +596,58 @@ export class TimeBlockPicker extends Control {
 
   findItemById(id) { return this.items.find(one => one.id === id); }
 
+  #toasts = {
+    "today": null,
+    "back": null,
+    "forward": null,
+  };
+  #showDirectionalToast(directionName, message, options) {
+    const lastToast = this.#toasts[directionName]?.deref();
+    if (lastToast?.isShown) return;
+    this.#toasts[directionName] = new WeakRef(toast(message, options));
+  }
+
   /**
-   * Show Scheduling items {@link count} week(s) prior to or after current view.
-   * @param {Number} > 0 moves next, < 0 move previous
+   * Change the page of the time block picker view. The view is based on the `viewStartDate` and `viewNumDays`.
+   * @param {Number} pageOffset a negative `pageOffset` will go to the previous page, a positive `pageOffset` will go to the next page.
+   * @param {boolean} [force] if false, checks to see if the next page (via `pageOffset`) has any items to show in the view and if not, returns without changing the view.
+   *  if true, changes the view regardless of whether there are items to show (could result in a view with no available scheduling items to show).
+   * @returns {void}
    */
-  changeViewPage(count = 1, force = false) {
+  changeViewPage(pageOffset = 1, force = false) {
     let nextViewStartDate;
-    if (count === 0)
+    if (pageOffset === 0) // "Today" view
       nextViewStartDate = this.#calculateViewStartDate(new Date());
     else {
       nextViewStartDate = new Date(this.viewStartDate);
-      let nextStartDate;
-      switch (true) {
-        case this.viewStartDay === types.DAYS_OF_WEEK.SUNDAY: nextStartDate = 7; break;
-        case this.viewStartDay === types.DAYS_OF_WEEK.MONDAY && this.viewNumDays >= 5: nextStartDate = 7; break;
-        default: nextStartDate = this.viewNumDays; break;
-      }
-      nextStartDate *= count;
-      nextViewStartDate.setDate(nextViewStartDate.getDate() + nextStartDate);
+      const daysFromCurrentStartDate = pageOffset * (this.#viewNumDays >= 5 ? 7 : this.viewNumDays); // "Week" or "Work Week" view, or other
+      nextViewStartDate.setDate(nextViewStartDate.getDate() + daysFromCurrentStartDate);
+    }
 
-      if (!force) {
-        let filter;
-        if (count < 0)
-          filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() > this.enabledStartDate.getTime();
-        else
-          filter = ({ day }) => day.getTime() >= nextViewStartDate.getTime() && day.getTime() <= this.enabledEndDate.getTime();
+    const nextViewEndDate = new Date(nextViewStartDate);
+    nextViewEndDate.setDate(nextViewEndDate.getDate() + this.viewNumDays - 1);
 
-        if (!this.itemsByDay.some(filter)) return;
+    if (!force) {
+      let filter;
+      let directionName;
+      if (pageOffset === 0) {
+        directionName = "today";
+        filter = ({ day }) => {
+          const dayTime = day.getTime();
+          return dayTime >= nextViewStartDate.getTime() && dayTime <= this.enabledEndDate.getTime()
+            && dayTime <= nextViewEndDate.getTime() && dayTime > this.enabledStartDate.getTime();
+        }
+      } else if (pageOffset < 0) {
+        directionName = "back";
+        filter = ({ day }) => day.getTime() <= this.viewStartDate.getTime() && day.getTime() > this.enabledStartDate.getTime();
+      } else {
+        directionName = "forward";
+        filter = ({ day }) => day.getTime() >= nextViewStartDate.getTime() && day.getTime() <= this.enabledEndDate.getTime();
       }
+
+      if (!this.itemsByDay.some(filter))
+        return this.#showDirectionalToast(directionName, `There is no availability between ${nextViewStartDate.toLocaleDateString()} and ${nextViewEndDate.toLocaleDateString()}.`,
+          { timeout: 4000, status: "warning" });
     }
 
     this.#recomputeViewProperties(nextViewStartDate);
@@ -648,7 +673,7 @@ export class TimeBlockPicker extends Control {
     // console.dir(this.itemsByDay);
     this.#itemsByDay.sort((a, b) => new Date(a.day) - new Date(b.day));
     this.itemsByDay.forEach(({ items }) => items.sort((a, b) => a.startTimeMins - b.startTimeMins));
-    console.dir(this.itemsByDay);
+    // console.dir(this.itemsByDay);
     this.#recomputeViewProperties();
   }
 
@@ -745,7 +770,7 @@ export class TimeBlockPicker extends Control {
   </div>
   ${this.renderTimeSlots(date)}
 </div>
-    `)
+    `);
   }
 
   renderTimeSlots(day) {
