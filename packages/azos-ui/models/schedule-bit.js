@@ -44,7 +44,8 @@ export class ScheduleBit extends Bit {
       ></az-span-bit>
 
       <az-day-override-bit
-        
+        id="bitDayOverride"
+        scope="this"
       ></az-day-override-bit>
 
     </div>
