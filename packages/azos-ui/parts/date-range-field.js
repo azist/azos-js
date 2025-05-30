@@ -42,31 +42,21 @@ export class DateRangeField extends FieldPart {
       try {
         ({ start, end } = JSON.parse(v));
       } catch (e) {
-        // If the value is a string, we assume it is a date range in a specific format.
+        // If the value is a string (and not JSON), we assume it is a date range separated by commas, semicolons, or colons.
         [start, end] = v.split(/[,;:]/).map(p => p.trim());
       }
     } else {
       ({ start, end } = v);
     }
 
-    // TODO: @Dmitriy
-    let arena;
-    try {
-      arena = this.arena;
-    } catch (e) {
-      return { start, end };
-    }
-
-    const session = arena.applet.session;
-    const tz = getEffectiveTimeZone(this);
-    return {
-      start: arena.app.localizer.treatUserDateInput(start, tz, session)?.dt ?? null, //#278
-      end: arena.app.localizer.treatUserDateInput(end, tz, session)?.dt ?? null, //#278
+    const result = {
+      start: asDate(start, true), // true to allow empty string
+      end: asDate(end, true),
     };
+    return result;
   }
 
   /**
-   * TODO: From User Input, this is still wrong. if v.start === 1.1.23 then start = 12.31.22.
    * @param {{ start: String, end: String }} v the value to prepare for use in this DateRangeField.value prop.
    * @returns {{ start: Date | null, end: Date | null }} an object with start and end dates, or null if the input is empty.
    */
@@ -76,10 +66,12 @@ export class DateRangeField extends FieldPart {
 
     const session = this.arena.applet.session;
     const tz = getEffectiveTimeZone(this);
-    return {
-      start: this.arena.app.localizer.treatUserDateInput(start, tz, session)?.dt ?? null, //#278
-      end: this.arena.app.localizer.treatUserDateInput(end, tz, session)?.dt ?? null, //#278
+
+    const result = {
+      start: this.arena.app.localizer.treatUserDateInput(start, tz, session)?.dt ?? undefined, //#278
+      end: this.arena.app.localizer.treatUserDateInput(end, tz, session)?.dt ?? undefined, //#278
     };
+    return result;
   }
 
   /**
@@ -101,10 +93,11 @@ export class DateRangeField extends FieldPart {
     const dtFormat = dflt(this.formatDate, DATE_FORMAT.NUM_DATE);
     const tmDetails = dflt(this.formatTime, TIME_DETAILS.NONE);
 
-    return {
+    const result = {
       start: !start ? "" : this.arena.app.localizer.formatDateTime({ dt: start, timeZone, dtFormat, tmDetails }),
       end: !end ? "" : this.arena.app.localizer.formatDateTime({ dt: end, timeZone, dtFormat, tmDetails })
     };
+    return result;
   }
 
 
