@@ -126,7 +126,7 @@ export class Localizer extends AppComponent {
    * @param {string} args.culture Localization culture id
    * @param {DATE_FORMAT} args.dtFormat Format of date part representation
    * @param {TIME_DETAILS} args.tmDetails Time detail level (NONE= no time)
-   * @param {boolean} args.utc Treat date time as UTC value
+   * @param {String | null | TimeZone} args.timeZone Localized datetime based on passed timeZone value
    */
   formatDateTime({dt = null, culture = null, dtFormat = DATE_FORMAT.NUM_DATE, tmDetails = TIME_DETAILS.NONE, timeZone = null} = {}){
     if (dt===null){
