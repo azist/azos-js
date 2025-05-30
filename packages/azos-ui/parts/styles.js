@@ -90,10 +90,16 @@ export const baseStyles = css`
   color: var(--ctl-req-sym-color);
   text-shadow: var(--ctl-req-sym-text-shadow);
 }
+
+.browse .requiredTitle::after{ color: var(--ghost); font-weight: var(--browse-label-fweight); }
+
+.browse{ opacity: var(--browse-opacity); filter: var(--browse-filter); }
+.browse label > span{ font-weight: var(--browse-label-fweight); }
+
 .field{
-  display:block;
-  border:none !important;
-  background-color:unset !important;
+  display: block;
+  border: none !important;
+  background-color: unset !important;
   transition: 0.15s ease-out;
 }
 

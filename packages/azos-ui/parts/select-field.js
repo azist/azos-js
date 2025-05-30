@@ -34,7 +34,7 @@ export class SelectField extends FieldPart {
     this.inputChanged();
   }
 
-  renderInput(effectivelyDisabled) {
+  renderInput(effectivelyDisabled, effectivelyBrowse) {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
 
@@ -47,20 +47,39 @@ export class SelectField extends FieldPart {
       </option>
     `)}`;
 
+    const rdOnly = this.isReadonly || effectivelyBrowse;
+
+    //HTML SELECT inputs do not support read-only attribute by design
+    if (rdOnly){
+      const valTitle = (allOptions.filter(one => one.value === this.value)?.[0]?.title) ?? "";
+      return html`
+<input
+  class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} readonlyInput"
+  id="tbData"
+  placeholder="${this.placeholder}"
+  .value="${valTitle}"
+  .disabled=${effectivelyDisabled}
+  .required=${this.isRequired}
+  ?readonly=${true}
+  @click="${this.onClick}"
+  part="field"
+  autocomplete="off"
+/>`;
+    }
+
     return html`
-      <select
-        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="${this.id}"
-        name="${this.id}"
-        value="${this.value}"
-        .disabled=${effectivelyDisabled}
-        .multiple=${this.isMultiple}
-        .required=${this.isRequired}
-        ?readonly=${this.isReadonly}
-        @change="${this.#selChange}">
-        ${optionList}
-      </select>
-    `;
+<select
+  class="${clsRank} ${clsStatusBg} ${rdOnly ? 'readonlyInput' : ''}"
+  id="${this.id}"
+  name="${this.id}"
+  value="${this.value}"
+  .disabled=${effectivelyDisabled}
+  .multiple=${this.isMultiple}
+  .required=${this.isRequired}
+  ?readonly=${rdOnly}
+  @change="${this.#selChange}">
+  ${optionList}
+</select>`;
   }
 }
 

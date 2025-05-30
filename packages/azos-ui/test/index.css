@@ -254,6 +254,10 @@ body {
   --modal-spin-backdrop-bg: rgba(100, 100, 100, 0.2);
   --modal-spin-backdrop-filter: grayscale(0.85) blur(1.0px);
 
+  /* Browse */
+  --browse-opacity: 0.75;
+  --browse-filter: grayscale(0.65);
+  --browse-label-fweight: 300;
 
   /* focus */
   --focus-ctl-selected-color: rgba(85, 190, 255, 0.35);
