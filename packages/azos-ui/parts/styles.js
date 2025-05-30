@@ -90,6 +90,9 @@ export const baseStyles = css`
   color: var(--ctl-req-sym-color);
   text-shadow: var(--ctl-req-sym-text-shadow);
 }
+
+.browse .requiredTitle::after{ color: var(--ghost); font-weight: 300; }
+
 .field{
   display:block;
   border:none !important;
@@ -455,6 +458,9 @@ export const textFieldStyles = css`
   }
 
   .readonlyInput{ background: none; }
+
+  .browse{ opacity: 0.75; filter: grayscale(0.65); }
+  .browse label > span{ font-weight: 300; }
 
   select > option { padding: 0.3em 0.35em; }
 `;

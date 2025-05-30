@@ -293,7 +293,8 @@ export class Control extends AzosElement {
     isNa:        {type: Boolean, reflect: true},
     isHidden:    {type: Boolean, reflect: true},
     isAbsent:    {type: Boolean, reflect: true},
-    isReadonly:  {type: Boolean, reflect: true}
+    isReadonly:  {type: Boolean, reflect: true},
+    isBrowse:    {type: Boolean, reflect: true}
   };
 
   constructor(){ super(); }

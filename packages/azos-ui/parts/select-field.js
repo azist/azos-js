@@ -34,7 +34,7 @@ export class SelectField extends FieldPart {
     this.inputChanged();
   }
 
-  renderInput(effectivelyDisabled) {
+  renderInput(effectivelyDisabled, effectivelyBrowse) {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
 
@@ -48,19 +48,18 @@ export class SelectField extends FieldPart {
     `)}`;
 
     return html`
-      <select
-        class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="${this.id}"
-        name="${this.id}"
-        value="${this.value}"
-        .disabled=${effectivelyDisabled}
-        .multiple=${this.isMultiple}
-        .required=${this.isRequired}
-        ?readonly=${this.isReadonly}
-        @change="${this.#selChange}">
-        ${optionList}
-      </select>
-    `;
+<select
+  class="${clsRank} ${clsStatusBg} ${this.isReadonly ? 'readonlyInput' : ''}"
+  id="${this.id}"
+  name="${this.id}"
+  value="${this.value}"
+  .disabled=${effectivelyDisabled}
+  .multiple=${this.isMultiple}
+  .required=${this.isRequired}
+  ?readonly=${this.isReadonly || effectivelyBrowse}
+  @change="${this.#selChange}">
+  ${optionList}
+</select>`;
   }
 }
 
