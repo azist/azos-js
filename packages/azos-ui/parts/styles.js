@@ -91,12 +91,15 @@ export const baseStyles = css`
   text-shadow: var(--ctl-req-sym-text-shadow);
 }
 
-.browse .requiredTitle::after{ color: var(--ghost); font-weight: 300; }
+.browse .requiredTitle::after{ color: var(--ghost); font-weight: var(--browse-label-fweight); }
+
+.browse{ opacity: var(--browse-opacity); filter: var(--browse-filter); }
+.browse label > span{ font-weight: var(--browse-label-fweight); }
 
 .field{
-  display:block;
-  border:none !important;
-  background-color:unset !important;
+  display: block;
+  border: none !important;
+  background-color: unset !important;
   transition: 0.15s ease-out;
 }
 
@@ -458,9 +461,6 @@ export const textFieldStyles = css`
   }
 
   .readonlyInput{ background: none; }
-
-  .browse{ opacity: 0.75; filter: grayscale(0.65); }
-  .browse label > span{ font-weight: 300; }
 
   select > option { padding: 0.3em 0.35em; }
 `;

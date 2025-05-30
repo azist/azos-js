@@ -115,7 +115,6 @@ export class TextField extends FieldPart {
   .required=${this.isRequired}
   ?readonly=${rdOnly}
   @change="${this.#tbChange}"
-  part="field"
   style="resize: ${this.resize}"></textarea>`;
     }
 
@@ -149,7 +148,6 @@ export class TextField extends FieldPart {
   @change="${this.#tbChange}"
   @input="${this.onInput}"
   @click="${this.onClick}"
-  part="field"
   autocomplete="off"
 />`;
   }
