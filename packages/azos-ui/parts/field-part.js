@@ -499,7 +499,6 @@ export class FieldPart extends Part {
                    : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
 
       if (mode){
-      //  effectDisabled = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
         if (!effectDisabled){
           const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
           effectDisabled = isOneOf(spec, ["na", "disable", "disabled"], false);
