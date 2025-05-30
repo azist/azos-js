@@ -356,6 +356,7 @@ export class TimeBlockPicker extends Control {
   #defaultEnabledEndDate;     // #enabledEndDate could be set by the user
   #defaultViewNumDays;        // #viewNumDays could be set by the user
   #defaultViewStartDay;       // #viewStartDay could be set by the user
+  #editModeSessions = 0;
 
   #toasts = {
     "today": null,
@@ -669,12 +670,17 @@ export class TimeBlockPicker extends Control {
 
   /** Call before making edits that would cause recalculation */
   beginChanges() {
-    this.editModeSessions++;
+    this.#editModeSessions++;
+    // if (this.#editModeSessions === 1) {
+    //   console.groupCollapsed("TimeBlockPicker: Transaction");
+    //   console.time("TimeBlockPicker: Transaction");
+    // }
+    // console.log(`Transactions: ${this.#editModeSessions}`);
   }
 
   /** Commit the edits and re-render the view */
   endChanges() {
-    if (--this.editModeSessions > 0) return;
+    if (--this.#editModeSessions > 0) return;
 
     this.editModeSessions = 0;
     // console.dir(this.itemsByDay);
@@ -682,6 +688,9 @@ export class TimeBlockPicker extends Control {
     this.itemsByDay.forEach(({ items }) => items.sort((a, b) => a.startTimeMins - b.startTimeMins));
     // console.dir(this.itemsByDay);
     this.#recomputeViewProperties();
+    // console.log(`Transactions: ${this.#editModeSessions}`);
+    // console.timeEnd("TimeBlockPicker: Transaction");
+    // console.groupEnd();
   }
 
   renderControl() {
