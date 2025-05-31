@@ -37,11 +37,27 @@ export class PersonBlock extends Block {
         <az-text scope="this"  id="tbMiddleName"   name="MiddleName" title="Middle Name" maxLength=5  value="Q"  whenInsert="absent" whenUpdate="disable"></az-text>
         <az-text scope="this"  id="tbLastName"     name="LastName"   title="Last Name"   maxLength=16 isrequired value="Cabbage"></az-text>
       </div>
-      <div class="row cols3">
+      <div class="row cols4">
         <az-text scope="this"  id="tbDOB"          name="DOB"        title="Date of Birth (Chicago)" isrequired dataKind="datetime" value="" timeZone="CST"></az-text>
         <az-text scope="this"  id="tbPhone"        name="Phone"      title="Phone"       maxLength=24 isrequired dataKind="tel" value=""></az-text>
         <az-check scope="this" id="chkRegistered"  name="Registered" title="Registered"  isrequired value="true" ></az-check>
-        <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false"></az-check>
+        <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false" checkType="cross"></az-check>
+      </div>
+
+      <div class="row cols2">
+        <az-radio-group id="rgDrinking" title="Drinking Choices (choose only 1)" status="ok">
+          <item title="Tea" value="tea"></item>
+          <item title="Coke" value="coke"></item>
+          <item title="Coffee" value="cof"></item>
+          <item title="Beer" value="beer"></item>
+        </az-radio-group>
+
+        <az-radio-group id="rgFood" title="Food Preferences (choose only 1)" status="info">
+          <item title="Pork" value="pork"></item>
+          <item title="Beef" value="beef"></item>
+          <item title="Chicken" value="chi"></item>
+          <item title="Fish" value="fish"></item>
+        </az-radio-group>
       </div>
 
       <h4>Processing Status</h4>

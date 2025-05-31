@@ -41,6 +41,9 @@ export class RadioGroupField extends FieldPart{
     const allItems = [...this.getElementsByTagName("item")];
     const v = this.value;
 
+
+    const rdOnly = this.isReadonly || effectivelyBrowse;
+
     const itemList = html`${allItems.map((item, i) => {
       const itv = item.getAttribute('value');
       return  html`
@@ -53,9 +56,10 @@ export class RadioGroupField extends FieldPart{
     value="${itv}"
     .disabled=${effectivelyDisabled}
     .required=${this.isRequired}
-    ?readonly=${this.isReadonly || effectivelyBrowse}
+    ?readonly=${rdOnly}
     @change="${this.#radioChange}"
     .checked=${itv===v}
+    @click="${(e) => { if (rdOnly) e.preventDefault(); }}"
   />
   <span class="radio-item-label">${item.title}</span>
 </label>
