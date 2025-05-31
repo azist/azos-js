@@ -50,6 +50,7 @@ export class SelectField extends FieldPart {
     const rdOnly = this.isReadonly || effectivelyBrowse;
 
     //HTML SELECT inputs do not support read-only attribute by design
+    //that is why we need to emulate it with showing a red-only text input
     if (rdOnly){
       const valTitle = (allOptions.filter(one => one.value === this.value)?.[0]?.title) ?? "";
       return html`

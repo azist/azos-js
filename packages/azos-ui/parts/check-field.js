@@ -61,7 +61,7 @@ export class CheckField extends FieldPart{
     return html`
 <input
   type="checkbox"
-  class="${checkTypeStyle} ${checkboxStyles} ${clsRank} ${clsStatusBg}"
+  class="${checkTypeStyle} ${checkboxStyles} ${clsRank} ${clsStatusBg} ${rdOnly ? 'readonlyInput' : ''}"
   id="${this.id}"
   name="${this.id}"
   .disabled=${effectivelyDisabled}
