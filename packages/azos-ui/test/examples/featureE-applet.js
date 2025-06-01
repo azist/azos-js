@@ -47,10 +47,82 @@ export class ExampleFeatureEApplet extends Applet{
   async #handleLoadAsync(frm, isRefresh){
     console.log(`LOADING DATA.... ${COUNTER}  Refresh: ${isRefresh}`);
     console.dir(frm);
+
+    COUNTER++;
+
     return {
-      first: {LastName: `Abramovich_${COUNTER}`, FirstName: `Snaker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "8", Description: "Eats mice"} ]},
-      second: {LastName: `Bramovich_${COUNTER}`, FirstName: `Baker_${10 * COUNTER++}`, OtherStatuses: [ {Status: "9", Description: "Eats lard"} ]}
-    };
+      "ONE": {
+        "first": {
+          "DOB": "1984-09-09T05:00:00.000Z",
+          "FirstName": `Brent_${COUNTER*10}`,
+          "LastName": `Bunderson_${COUNTER}`,
+          "MiddleName": null,
+          "OtherStatuses": [
+            {
+              "Approved": true,
+              "Description": "meet",
+              "Status": "A3"
+            },
+            {
+              "Approved": true,
+              "Description": "greet",
+              "Status": "B2"
+            }
+          ],
+          "PayoutStatus": {
+            "Approved": false,
+            "Description": "Still processing",
+            "Status": "inPROCESS"
+          },
+          "Phone": "(555) 678-2311",
+          "ProcessStatus": {
+            "Approved": true,
+            "Description": "Done processing",
+            "Status": "DONE"
+          },
+          "Registered": true,
+          "Smoker": true,
+          "drinking": "beer",
+          "food": "beef"
+        }
+      },
+      "TWO": {
+        "second": {
+          "DOB": "1958-05-18T05:00:00.000Z",
+          "FirstName": "Jay",
+          "LastName": "Lenon",
+          "MiddleName": null,
+          "OtherStatuses": [
+            {
+              "Approved": true,
+              "Description": "Warm",
+              "Status": "sunny"
+            },
+            {
+              "Approved": false,
+              "Description": "cold",
+              "Status": "Moony"
+            }
+          ],
+          "PayoutStatus": {
+            "Approved": true,
+            "Description": "paid off",
+            "Status": "PAID"
+          },
+          "Phone": "(781) 323-4511",
+          "ProcessStatus": {
+            "Approved": true,
+            "Description": "got it",
+            "Status": "OK"
+          },
+          "Registered": true,
+          "Smoker": true,
+          "drinking": "cof",
+          "food": "fish"
+        }
+      },
+    //////  "__FormMode": "insert"
+    }
   }
 
   async #handleSaveAsync(frm){
@@ -71,7 +143,7 @@ export class ExampleFeatureEApplet extends Applet{
   <xaz-bit>
     <xaz-bit>
 
-      <az-bit id="bitFirst" scope="this"  name="gagarin" title="First Bit" description="This is a first bit">
+      <az-bit id="bitFirst" scope="this"  name="ONE" title="First Bit" description="This is a first bit">
         <examples-person-block scope="this" id="blockFirstPerson" name="first"
            @datachange=${(e) => {
             console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`);
@@ -86,7 +158,7 @@ export class ExampleFeatureEApplet extends Applet{
 
       <br>
 
-      <az-bit id="bitSecond" scope="this" title="Second Bit" description="This is asecond bit">
+      <az-bit id="bitSecond" scope="this" name="TWO" title="Second Bit" description="This is asecond bit">
         <examples-person-block scope="this" id="blockSecondPerson" name="second" @datachange=${(e) => console.log(`INNER SLOTTED BLOCK @datachange EVENT: ${e.detail.sender.name}`)}  > </examples-person-block>
       </az-bit>
 

@@ -45,14 +45,14 @@ export class PersonBlock extends Block {
       </div>
 
       <div class="row cols2">
-        <az-radio-group id="rgDrinking" title="Drinking Choices (choose only 1)" status="ok">
+        <az-radio-group id="rgDrinking" name="drinking" title="Drinking Choices (choose only 1)" status="ok">
           <item title="Tea" value="tea"></item>
           <item title="Coke" value="coke"></item>
           <item title="Coffee" value="cof"></item>
           <item title="Beer" value="beer"></item>
         </az-radio-group>
 
-        <az-radio-group id="rgFood" title="Food Preferences (choose only 1)" status="info">
+        <az-radio-group id="rgFood" name="food" title="Food Preferences (choose only 1)" status="info">
           <item title="Pork" value="pork"></item>
           <item title="Beef" value="beef"></item>
           <item title="Chicken" value="chi"></item>
