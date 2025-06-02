@@ -8,45 +8,36 @@ const STL_INLINE_GRID = css`
     display: grid;
     gap: 1em;
     margin-bottom: 1em;
+    grid-template-columns: 1fr; /* defaults to 1 column */
 
-    --cols-n: 1;
+    &.cols2{ grid-template-columns: repeat(2, 1fr); }
+    &.cols3{ grid-template-columns: repeat(3, 1fr); }
+    &.cols4{ grid-template-columns: repeat(4, 1fr); }
+    &.cols5{ grid-template-columns: repeat(5, 1fr); }
+    &.cols6{ grid-template-columns: repeat(6, 1fr); }
+    &.cols7{ grid-template-columns: repeat(7, 1fr); }
+    &.cols8{ grid-template-columns: repeat(8, 1fr); }
+    &.cols9{ grid-template-columns: repeat(9, 1fr); }
+    &.cols10{ grid-template-columns: repeat(10, 1fr); }
+    &.cols11{ grid-template-columns: repeat(11, 1fr); }
+    &.cols12{ grid-template-columns: repeat(12, 1fr); }
 
-    grid-template-columns: repeat(var(--cols-n), 1fr);
-
-    .span2, .span3, .span4, .span5, .span6, .span7, .span8, .span9, .span10, .span11, .span12{
-      --span-n: span 1;
-      grid-column: var(--span-n);
-    }
-
-    &.cols1{ --cols-n: 1; }
-    &.cols2{ --cols-n: 2; }
-    &.cols3{ --cols-n: 3; }
-    &.cols4{ --cols-n: 4; }
-    &.cols5{ --cols-n: 5; }
-    &.cols6{ --cols-n: 6; }
-    &.cols7{ --cols-n: 7; }
-    &.cols8{ --cols-n: 8; }
-    &.cols9{ --cols-n: 9; }
-    &.cols10{ --cols-n: 10; }
-    &.cols11{ --cols-n: 11; }
-    &.cols12{ --cols-n: 12; }
-
-    .span2{ --span-n: span 2; }
-    .span3{ --span-n: span 3; }
-    .span4{ --span-n: span 4; }
-    .span5{ --span-n: span 5; }
-    .span6{ --span-n: span 6; }
-    .span7{ --span-n: span 7; }
-    .span8{ --span-n: span 8; }
-    .span9{ --span-n: span 9; }
-    .span10{ --span-n: span 10; }
-    .span11{ --span-n: span 11; }
-    .span12{ --span-n: span 12; }
+    .span2{ grid-column: span 2; }
+    .span3{ grid-column: span 3; }
+    .span4{ grid-column: span 4; }
+    .span5{ grid-column: span 5; }
+    .span6{ grid-column: span 6; }
+    .span7{ grid-column: span 7; }
+    .span8{ grid-column: span 8; }
+    .span9{ grid-column: span 9; }
+    .span10{ grid-column: span 10; }
+    .span11{ grid-column: span 11; }
+    .span12{ grid-column: span 12; }
   }
 
   @media (max-width: ${BREAKPOINT_SM}px) {
-    .row{ --cols-n: 1 !important; }
-    [class^="span"]{ --span-n: span 1 !important; }
+    .row{ grid-template-columns: 1fr !important; }
+    [class*="span"] { grid-column: 1 !important; }
   }
 `;
 
