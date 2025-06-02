@@ -460,7 +460,8 @@ export const textFieldStyles = css`
 `;
 
 export const dateRangeStyles = css`
-:host{ width: 28ch; }
+:host{ --content-width: 26ch; }
+.field{ width: var(--content-width); }
 .inputs{
   display: inline-grid;
   grid-template-columns: 1fr auto 1fr;
@@ -478,23 +479,24 @@ export const dateRangeStyles = css`
   border-radius: var(--r3-brad-ctl);
   box-shadow: var(--ctl-box-shadow);
 }
-.inputs > input{
+.inputs input{
   width: 100%;
   background: none;
   border: none;
   box-shadow: none;
   text-align: center;
 }
-input.error{ border: var(--s-error-bor-ctl) }
 
-.infoBg > input{ color: var(--s-info-fg-ctl) !important; }
-.warningBg > input{ color: var(--s-warn-fg-ctl) !important; }
-.errorBg > input{ color: var(--s-error-fg-ctl) !important; }
-.okBg > input{ color: var(--s-ok-fg-ctl) !important; }
-.alertBg > input{ color: var(--s-alert-fg-ctl) !important; }
+.infoBg    input{ color: var(--s-info-fg-ctl) !important; }
+.warningBg input{ color: var(--s-warn-fg-ctl) !important; }
+.errorBg   input{ color: var(--s-error-fg-ctl) !important; }
+.okBg      input{ color: var(--s-ok-fg-ctl) !important; }
+.alertBg   input{ color: var(--s-alert-fg-ctl) !important; }
 
-#tbStartDate{ border-radius: var(--r3-brad-ctl) 0 0 var(--r3-brad-ctl); }
-#tbEndDate{ border-radius: 0 var(--r3-brad-ctl) var(--r3-brad-ctl) 0; }
+.brand1Bg  input{ color: var(--s-brand1-fg-ctl) !important; }
+.brand2Bg  input{ color: var(--s-brand2-fg-ctl) !important; }
+.brand3Bg  input{ color: var(--s-brand3-fg-ctl) !important; }
+
 `;
 
 export const sliderStyles = css`
