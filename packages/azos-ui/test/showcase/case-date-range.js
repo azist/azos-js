@@ -40,6 +40,7 @@ export class CaseDateRange extends CaseBase {
   async firstUpdated() {
     await this.drProgrammatic.updateComplete;
     this.drProgrammatic.setValueFromInput(this.#dateRangeStartValue);
+    this.drHasObjectValue.value = this.#dateRangeStartValue;
   }
 
   renderControl() {
@@ -54,7 +55,7 @@ export class CaseDateRange extends CaseBase {
 
       <h2>Direct Assignment</h2>
       <h4>Value: '${JSON.stringify(this.#dateRangeStartValue)}'</h4>
-      <az-date-range id="drHasObjectValue" title="As Object via '.value'" .value="${this.#dateRangeStartValue}"></az-date-range>
+      <az-date-range id="drHasObjectValue" scope="this" title="As Object via '.value'"></az-date-range>
       <az-date-range id="drHasJsonValue" title="As Json via 'value'" value="${JSON.stringify(this.#dateRangeStartValue)}"></az-date-range>
 
       <h2>Date Range</h2>

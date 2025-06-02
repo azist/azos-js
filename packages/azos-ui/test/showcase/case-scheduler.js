@@ -88,7 +88,6 @@ export class CaseScheduler extends CaseBase {
     const [year, month, date] = this.date.value.split("-").map(Number)
     const day = new Date(year, month - 1, date);
     day.setHours(0, 0, 0, 0);
-    this.schTest.beginChanges();
     this.schTest.addItem({
       id: Math.random() > 0.5 ? null : `n-${Math.random() * 10}`,
       caption,
@@ -96,7 +95,6 @@ export class CaseScheduler extends CaseBase {
       durationMins: duration,
       day,
     });
-    this.schTest.endChanges();
   }
 
   schOnSelected(evt) {
