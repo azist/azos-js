@@ -10,6 +10,7 @@ import "../../bit.js";
 import "../../../azos-ui/models/lat-lng-bit.js";
 import "../../../azos-ui/models/span-bit.js";
 import "../../../azos-ui/models/day-override-bit.js";
+import "../../../azos-ui/models/adlib-tag-bit.js";
 
 export class CaseBit extends CaseBase {
   renderControl() {
@@ -132,6 +133,17 @@ export class CaseBit extends CaseBase {
   id="bitDayOverride"
   scope="this"
 ></az-day-override-bit>
+
+<az-adlib-tag-bit
+  id="bitTag"
+  scope="this"
+  captionProperty="Item Name"
+  captionValue="Amount"
+  captionTitle="InventoryProps"
+  isNumeric
+  boundsNMin="0"
+  boundsNMax="99"
+></az-adlib-tag-bit>
 
     `;
   }
