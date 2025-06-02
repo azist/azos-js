@@ -45,7 +45,8 @@ const STL_INLINE_GRID = css`
   }
 
   @media (max-width: ${BREAKPOINT_SM}px) {
-    .row{ grid-template-columns: repeat(1, 1fr) !important; }
+    .row{ --cols-n: 1 !important; }
+    [class^="span"]{ --span-n: span 1 !important; }
   }
 `;
 
