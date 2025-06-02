@@ -161,7 +161,7 @@ export class DateRangeField extends FieldPart {
           placeholder="${this.placeholder}"
           type="text"
           .value="${end}"
-          ?disabled=${this.isDisabled}
+          ?disabled=${effectivelyDisabled}
           ?required=${!this.optionalEnd}
           ?readonly=${this.isReadonly || effectivelyBrowse}
           @change="${this.#tbChange}"
