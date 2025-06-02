@@ -89,7 +89,7 @@ export class TextField extends FieldPart {
     return result;
   }
 
-  renderInput(effectivelyDisabled){
+  renderInput(effectivelyDisabled, effectivelyBrowse){
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.effectiveStatus, true, "Bg")}`;
 
@@ -99,23 +99,23 @@ export class TextField extends FieldPart {
     else
       val = this.prepareValueForInput(val, false);
 
+    const rdOnly = this.isReadonly || effectivelyBrowse;
+
     if (this.multiline){
       return  html`
-      <textarea
-        class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-        id="tbData"
-        maxLength="${this.maxLength ? this.maxLength : noContent}"
-        minLength="${this.minLength ? this.minLength : noContent}"
-        placeholder="${this.placeholder}"
-        rows="${this.height ? this.height : "4"}"
-        .value="${val}"
-        .disabled=${effectivelyDisabled}
-        .required=${this.isRequired}
-        ?readonly=${this.isReadonly}
-        @change="${this.#tbChange}"
-        part="field"
-        style="resize: ${this.resize}"
-        ></textarea>`;
+<textarea
+  class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${rdOnly ? 'readonlyInput' : ''}"
+  id="tbData"
+  maxLength="${this.maxLength ? this.maxLength : noContent}"
+  minLength="${this.minLength ? this.minLength : noContent}"
+  placeholder="${this.placeholder}"
+  rows="${this.height ? this.height : "4"}"
+  .value="${val}"
+  .disabled=${effectivelyDisabled}
+  .required=${this.isRequired}
+  ?readonly=${rdOnly}
+  @change="${this.#tbChange}"
+  style="resize: ${this.resize}"></textarea>`;
     }
 
     let tp = "text";
@@ -134,23 +134,22 @@ export class TextField extends FieldPart {
     }
 
     return html`
-    <input
-      class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${this.isReadonly ? 'readonlyInput' : ''}"
-      id="tbData"
-      maxLength="${this.maxLength ? this.maxLength : noContent}"
-      minLength="${this.minLength ? this.minLength : noContent}"
-      placeholder="${this.placeholder}"
-      type="${tp}"
-      .value="${val}"
-      .disabled=${effectivelyDisabled}
-      .required=${this.isRequired}
-      ?readonly=${this.isReadonly}
-      @change="${this.#tbChange}"
-      @input="${this.onInput}"
-      @click="${this.onClick}"
-      part="field"
-      autocomplete="off"
-    />`;
+<input
+  class="${clsRank} ${clsStatusBg} ${this.isValidAlign ? `text-${this.alignValue}` : ''} ${rdOnly ? 'readonlyInput' : ''}"
+  id="tbData"
+  maxLength="${this.maxLength ? this.maxLength : noContent}"
+  minLength="${this.minLength ? this.minLength : noContent}"
+  placeholder="${this.placeholder}"
+  type="${tp}"
+  .value="${val}"
+  .disabled=${effectivelyDisabled}
+  .required=${this.isRequired}
+  ?readonly=${rdOnly}
+  @change="${this.#tbChange}"
+  @input="${this.onInput}"
+  @click="${this.onClick}"
+  autocomplete="off"
+/>`;
   }
 }
 

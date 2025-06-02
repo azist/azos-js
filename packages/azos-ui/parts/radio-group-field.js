@@ -34,31 +34,35 @@ export class RadioGroupField extends FieldPart{
     this.inputChanged();
   }
 
-  renderInput(effectivelyDisabled){
+  renderInput(effectivelyDisabled, effectivelyBrowse){
     const clsRank =   `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
 
     const allItems = [...this.getElementsByTagName("item")];
     const v = this.value;
 
+
+    const rdOnly = this.isReadonly || effectivelyBrowse;
+
     const itemList = html`${allItems.map((item, i) => {
       const itv = item.getAttribute('value');
       return  html`
-        <label class="radio-item" for="${this.id}_${i}">
-          <input
-            type="radio"
-            class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}"
-            id="${this.id}_${i}"
-            name="${this.id}"
-            value="${itv}"
-            .disabled=${effectivelyDisabled}
-            .required=${this.isRequired}
-            ?readonly=${this.isReadonly}
-            @change="${this.#radioChange}"
-            .checked=${itv===v}
-          />
-          <span class="radio-item-label">${item.title}</span>
-        </label>
+<label class="radio-item" for="${this.id}_${i}">
+  <input
+    type="radio"
+    class="${this.isRadio ? "radio" : "switch"} ${clsRank} ${clsStatusBg}"
+    id="${this.id}_${i}"
+    name="${this.id}"
+    value="${itv}"
+    .disabled=${effectivelyDisabled}
+    .required=${this.isRequired}
+    ?readonly=${rdOnly}
+    @change="${this.#radioChange}"
+    .checked=${itv===v}
+    @click="${(e) => { if (rdOnly) e.preventDefault(); }}"
+  />
+  <span class="radio-item-label">${item.title}</span>
+</label>
     `;})}`;
 
     return html`${itemList}`;

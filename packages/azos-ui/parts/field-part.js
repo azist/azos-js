@@ -495,11 +495,10 @@ export class FieldPart extends Part {
 
     if (!effectDisabled || this.whenView || this.whenInsert || this.whenUpdate){
       let mode = DATA_MODE_PROP in this.renderState
-                   ? this.renderState[DATA_MODE_PROP]
+                   ? this.renderState[DATA_MODE_PROP] //use cached value
                    : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
 
       if (mode){
-        effectDisabled = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
         if (!effectDisabled){
           const spec = mode === DATA_MODE.INSERT ? this.whenInsert : mode === DATA_MODE.UPDATE ? this.whenUpdate : this.whenView;
           effectDisabled = isOneOf(spec, ["na", "disable", "disabled"], false);
@@ -507,9 +506,19 @@ export class FieldPart extends Part {
       }
     }
 
-    const clsRank =     `${parseRank(this.rank, true)}`;
-    const clsStatus =   `${parseStatus(this.effectiveStatus, true)}`;
-    const clsDisable =  `${effectDisabled ? "disabled" : ""}`;
+    let effectBrowse = this.isBrowse;
+    if (!effectBrowse){ //impose isBrowse IF we are in VIEW mode
+      let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP] //use cached value
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+      if (mode) effectBrowse = mode !== DATA_MODE.INSERT && mode !== DATA_MODE.UPDATE;
+    }
+
+    const clsRank     = `${parseRank(this.rank, true)}`;
+    const clsStatus   = `${parseStatus(this.effectiveStatus, true)}`;
+    const clsDisable  = `${effectDisabled ? "disabled" : ""}`;
+    const clsBrowse   = `${effectBrowse ? "browse" : ""}`;
     const clsPosition = `${this.titlePosition ? parsePosition(this.titlePosition,true) : "top-left"}`;
 
     const isPreContent = this.isPredefinedContentLayout;
@@ -528,18 +537,20 @@ export class FieldPart extends Part {
     const busy = this.isBusy ? html`<span class="busy"></span>` : null;
 
     return html`
-      <div class="${clsRank} ${clsStatus} ${clsDisable} field">
-        <label class="${clsPosition}">
-          <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title} ${busy}</span>
-          ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput(effectDisabled)} ${msg}</div>` : html`${this.renderInput(effectDisabled)} ${msg}`}
-        </label>
-      </div>
-    `;
+<div class="${clsRank} ${clsStatus} ${clsDisable} ${clsBrowse} field">
+  <label class="${clsPosition}">
+    <span class="${this.isRequired ? 'requiredTitle' : ''}" style="${stlTitleWidth} ${stlTitleHidden}">${this.title} ${busy}</span>
+    ${this.isHorizontal ? html`<div style="${stlContentWidth}">${this.renderInput(effectDisabled, effectBrowse)} ${msg}</div>` : html`${this.renderInput(effectDisabled, effectBrowse)} ${msg}`}
+  </label>
+</div>`;
   }
 
-  /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField */
+  /** Override to render particular input field(s), i.e. CheckField, RadioOptionField, SelectField, TextField
+   * passing effective disabled and browse flags which may be applied in the detailed implementation not to recompute these flags
+   * for example, disabled or read only text inputs rendered accordingly
+  */
   // eslint-disable-next-line no-unused-vars
-  renderInput(effectivelyDisabled){ return noContent; }
+  renderInput(effectivelyDisabled, effectivelyBrowse){ return noContent; }
 
 
   [DATA_BLOCK_CHANGED_METHOD](){ this.inputChanged(); }
@@ -564,7 +575,7 @@ export class FieldPart extends Part {
 
   /** @param {any} value the value to feed to the lookup */
   _feedLookup(value) {
-    if (!this.lookupId || this.isReadonly || this.isDisabled) return;
+    if (!this.lookupId || this.isReadonly || this.isBrowse || this.isDisabled) return;
 
     const scope = this.getScopeContext();
     if (!scope) return;

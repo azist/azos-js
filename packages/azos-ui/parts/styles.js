@@ -90,10 +90,18 @@ export const baseStyles = css`
   color: var(--ctl-req-sym-color);
   text-shadow: var(--ctl-req-sym-text-shadow);
 }
+
+.browse .requiredTitle::after{ color: var(--ghost); font-weight: var(--browse-label-fweight); }
+
+.browse{ opacity: var(--browse-opacity); filter: var(--browse-filter); }
+.browse label > span{ font-weight: var(--browse-label-fweight); }
+
+.readonlyInput{ background: none!important; }
+
 .field{
-  display:block;
-  border:none !important;
-  background-color:unset !important;
+  display: block;
+  border: none !important;
+  background-color: unset !important;
   transition: 0.15s ease-out;
 }
 
@@ -268,14 +276,14 @@ export const checkStyles = css`
         opacity: 1; }
     }
   }
-  .okBg { background-color: var(--s-ok-bg-ctl);        border: var(--s-ok-bor-ctl);}
-  .infoBg { background-color: var(--s-info-bg-ctl);    border: var(--s-info-bor-ctl);}
-  .warningBg { background-color: var(--s-warn-bg-ctl); border: var(--s-warn-bor-ctl);}
-  .alertBg { background-color: var(--s-alert-bg-ctl);  border: var(--s-alert-bor-ctl);}
-  .errorBg { background-color: var(--s-error-bg-ctl);  border: var(--s-error-bor-ctl);}
-  .brand1Bg { background-color: var(--s-brand1-bg-ctl);  border: var(--s-brand1-bor-ctl);}
-  .brand2Bg { background-color: var(--s-brand2-bg-ctl);  border: var(--s-brand2-bor-ctl);}
-  .brand3Bg { background-color: var(--s-brand3-bg-ctl);  border: var(--s-brand3-bor-ctl);}
+  .okBg { background-color: var(--s-ok-bg-ctl)!important;        border: var(--s-ok-bor-ctl);}
+  .infoBg { background-color: var(--s-info-bg-ctl)!important;    border: var(--s-info-bor-ctl);}
+  .warningBg { background-color: var(--s-warn-bg-ctl)!important; border: var(--s-warn-bor-ctl);}
+  .alertBg { background-color: var(--s-alert-bg-ctl)!important;  border: var(--s-alert-bor-ctl);}
+  .errorBg { background-color: var(--s-error-bg-ctl)!important;  border: var(--s-error-bor-ctl);}
+  .brand1Bg { background-color: var(--s-brand1-bg-ctl)!important;  border: var(--s-brand1-bor-ctl);}
+  .brand2Bg { background-color: var(--s-brand2-bg-ctl)!important;  border: var(--s-brand2-bor-ctl);}
+  .brand3Bg { background-color: var(--s-brand3-bg-ctl)!important;  border: var(--s-brand3-bor-ctl);}
 
   .okBg[class~="check"]::before { background-color:none; color: var(--s-ok-fg-ctl); }
   .infoBg[class~="check"]::before { background-color:none; color: var(--s-info-fg-ctl); }
@@ -332,7 +340,9 @@ export const switchStyles = css`
     border: 1px solid var(--ghost);
     background: none;
   }
+
   .switch:disabled::before{background:var(--ghost);}
+
   .okBg[class~="switch"]::before { background-color: var(--s-ok-fg-ctl); }
   .infoBg[class~="switch"]::before { background-color: var(--s-info-fg-ctl); }
   .warningBg[class~="switch"]::before { background-color: var(--s-warn-fg-ctl); }
@@ -342,14 +352,14 @@ export const switchStyles = css`
   .brand2Bg[class~="switch"]::before { background-color: var(--s-brand2-fg-ctl); }
   .brand3Bg[class~="switch"]::before { background-color: var(--s-brand3-fg-ctl); }
 
-  .okBg[class~="switch"]    { background: var(--s-ok-bg-ctl);    border: var(--s-ok-bor-ctl);}
-  .infoBg[class~="switch"]  { background: var(--s-info-bg-ctl);  border: var(--s-info-bor-ctl);}
-  .warningBg[class~="switch"] { background: var(--s-warn-bg-ctl);border: var(--s-warn-bor-ctl); }
-  .alertBg[class~="switch"] { background: var(--s-alert-bg-ctl); border: var(--s-alert-bor-ctl);}
-  .errorBg[class~="switch"] { background: var(--s-error-bg-ctl); border: var(--s-error-bor-ctl);}
-  .brand1Bg[class~="switch"] { background: var(--s-brand1-bg-ctl);  border: var(--s-brand1-bor-ctl);}
-  .brand2Bg[class~="switch"] { background: var(--s-brand2-bg-ctl);  border: var(--s-brand2-bor-ctl);}
-  .brand3Bg[class~="switch"] { background: var(--s-brand3-bg-ctl);  border: var(--s-brand3-bor-ctl);}
+  .okBg[class~="switch"]    { background: var(--s-ok-bg-ctl)!important;    border: var(--s-ok-bor-ctl);}
+  .infoBg[class~="switch"]  { background: var(--s-info-bg-ctl)!important;  border: var(--s-info-bor-ctl);}
+  .warningBg[class~="switch"] { background: var(--s-warn-bg-ctl)!important;border: var(--s-warn-bor-ctl); }
+  .alertBg[class~="switch"] { background: var(--s-alert-bg-ctl)!important; border: var(--s-alert-bor-ctl);}
+  .errorBg[class~="switch"] { background: var(--s-error-bg-ctl)!important; border: var(--s-error-bor-ctl);}
+  .brand1Bg[class~="switch"] { background: var(--s-brand1-bg-ctl)!important;  border: var(--s-brand1-bor-ctl);}
+  .brand2Bg[class~="switch"] { background: var(--s-brand2-bg-ctl)!important;  border: var(--s-brand2-bor-ctl);}
+  .brand3Bg[class~="switch"] { background: var(--s-brand3-bg-ctl)!important;  border: var(--s-brand3-bor-ctl);}
 `;
 
 export const radioStyles = css`
@@ -453,8 +463,6 @@ export const textFieldStyles = css`
     background: none;
     color: var(--ghost);
   }
-
-  .readonlyInput{ background: none; }
 
   select > option { padding: 0.3em 0.35em; }
 `;

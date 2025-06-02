@@ -40,37 +40,36 @@ export class CheckField extends FieldPart{
     this.inputChanged();
   }
 
-  renderInput(effectivelyDisabled){
+  renderInput(effectivelyDisabled, effectivelyBrowse){
     const clsRank=`${parseRank(this.rank, true)}`;
     const clsStatusBg=`${parseStatus(this.status,true,"Bg")}`;
     const checkboxStyles = this.isCheck ? "check" : "switch";
 
-    /**
-     * only define checkTypeStyle if this is a checkbox
-     * we do not want to add checkTypeStyle to the switch
-     */
-    let checkTypeStyle = '';
-    if(this.isCheck) {
-      if(this.checkType === 'cross') {
-        checkTypeStyle = 'cross';
+    // only define checkTypeStyle if this is a checkbox
+    // we do not want to add checkTypeStyle to the switch
+    let checkTypeStyle = "";
+    if(this.isCheck){
+      if(this.checkType === "cross"){
+        checkTypeStyle = "cross";
       } else {
         checkTypeStyle = this.checkType;
       }
     }
 
+    const rdOnly = this.isReadonly || effectivelyBrowse;
+
     return html`
-      <input
-        type="checkbox"
-        class="${checkTypeStyle} ${checkboxStyles} ${clsRank} ${clsStatusBg}"
-        id="${this.id}"
-        name="${this.id}"
-        .disabled=${effectivelyDisabled}
-        .required=${this.isRequired}
-        ?readonly=${this.isReadonly}
-        .checked=${this.value}
-        @change="${this.#chkChange}"
-        @click="${(e) => { if (this.isReadonly) e.preventDefault(); }}" />
-    `;
+<input
+  type="checkbox"
+  class="${checkTypeStyle} ${checkboxStyles} ${clsRank} ${clsStatusBg} ${rdOnly ? 'readonlyInput' : ''}"
+  id="${this.id}"
+  name="${this.id}"
+  .disabled=${effectivelyDisabled}
+  .required=${this.isRequired}
+  ?readonly=${rdOnly}
+  .checked=${this.value}
+  @change="${this.#chkChange}"
+  @click="${(e) => { if (rdOnly) e.preventDefault(); }}" />`;
   }
 }
 
