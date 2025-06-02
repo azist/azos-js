@@ -128,10 +128,11 @@ export class DateRangeField extends FieldPart {
 
 
   renderInput(effectivelyDisabled, effectivelyBrowse) {
+    const rdOnly = this.isReadonly || effectivelyBrowse;
     const cls = [
       parseRank(this.rank, true),
       parseStatus(this.effectiveStatus, true, "Bg"),
-      this.isReadonly ? 'readonlyInput' : '',
+      rdOnly ? 'readonlyInput' : '',
     ].filter(isNonEmptyString).join(' ');
 
     let value = this.value;
@@ -151,7 +152,7 @@ export class DateRangeField extends FieldPart {
           .value="${start}"
           ?disabled=${effectivelyDisabled}
           ?required=${!this.optionalStart}
-          ?readonly=${this.isReadonly || effectivelyBrowse}
+          ?readonly=${rdOnly}
           @change="${this.#tbChange}"
           autocomplete="off"
         />
@@ -163,7 +164,7 @@ export class DateRangeField extends FieldPart {
           .value="${end}"
           ?disabled=${effectivelyDisabled}
           ?required=${!this.optionalEnd}
-          ?readonly=${this.isReadonly || effectivelyBrowse}
+          ?readonly=${rdOnly}
           @change="${this.#tbChange}"
           autocomplete="off"
         />
