@@ -140,9 +140,8 @@ export class CaseBit extends CaseBase {
   captionProperty="Item Name"
   captionValue="Amount"
   captionTitle="InventoryProps"
-  isNumeric
-  boundsNMin="0"
-  boundsNMax="99"
+  boundsMin="0"
+  boundsMax="5"
 ></az-adlib-tag-bit>
 
     `;

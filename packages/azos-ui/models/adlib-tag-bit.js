@@ -12,8 +12,8 @@ export class AdlibTagBit extends Bit {
     captionTitle: { type: String },
     captionProperty: { type: String },
     captionValue: { type: String },
-    boundsNMin: { type: Number },
-    boundsNMax: { type: Number },
+    boundsMin: { type: Number },
+    boundsMax: { type: Number },
     isNumeric: { type: Boolean },
   };
 
@@ -28,8 +28,8 @@ export class AdlibTagBit extends Bit {
   }
 
   renderDetailContent() {
-    const minValue = dflt(this.boundsNMin, 0);
-    const maxValue = dflt(this.boundsNMax, 1000);
+    const minValue = dflt(this.boundsMin, 0);
+    const maxValue = dflt(this.boundsMax, 1000);
 
     var valueTb = this.isNumeric ? html`<az-text
         id="tbValue"
@@ -50,6 +50,8 @@ export class AdlibTagBit extends Bit {
         class="span2"
         title="${dflt(this.captionValue, "Value")}"
         .isReadonly="${this.isReadOnly}"
+        minLength="${minValue}"
+        maxLength="${maxValue}"
       ></az-text>`;
 
 
