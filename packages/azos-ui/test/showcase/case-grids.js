@@ -61,6 +61,16 @@ export class CaseGrids extends CaseBase {
       <div class="card span4">Span all 4 columns</div>
     </div>
 
+    <h3>Grid with Spanning Items NOM (No Media Query/As-is/Unresponsive)</h3>
+    <div class="row cols4 nom">
+      <div class="card span2">Span 2 columns</div>
+      <div class="card">Normal item</div>
+      <div class="card">Normal item</div>
+      <div class="card span3">Span 3 columns</div>
+      <div class="card">Normal item</div>
+      <div class="card span4">Span all 4 columns</div>
+    </div>
+
     <h3>Form-like Layout</h3>
     <div class="row cols2">
       <az-text title="First Name"></az-text>
