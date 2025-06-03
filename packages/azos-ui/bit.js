@@ -9,7 +9,7 @@ import { asBool  } from 'azos/types.js';
 import { AzosElement, css, getBlockDataValue, getEffectiveDataMode, html, noContent, parseRank, parseStatus } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
-import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP } from 'azos/types';
+import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP } from 'azos/types';
 import { isOneOf } from 'azos/strings';
 
 
@@ -362,7 +362,7 @@ export class ListBit extends Bit {
     this.requestUpdate();
     if (!v) return;
     aver.isArray(v, "Array value");
-    for(const one of v) this.upsert(v);
+    for(const one of v) this.upsert(one);
   }
 
 
@@ -423,7 +423,7 @@ export class ListBit extends Bit {
   renderListTail(){ return noContent;  }
 
   renderListItems(){
-    const result = this.#dataElements;
+    const result = this.#listElements;
     return result;
   }
 }
