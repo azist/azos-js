@@ -6,7 +6,7 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { AzosElement, css, getBlockDataValue, getEffectiveDataMode, html, noContent, parseRank, parseStatus } from './ui.js';
+import { AzosElement, css, getEffectiveDataMode, html, noContent, parseRank, parseStatus } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
 import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP } from 'azos/types';
@@ -342,6 +342,15 @@ export class ListBit extends Bit {
   /** Returns a copy of list elements */
   get listElements(){ return [...this.#listElements]; }
 
+  /** Returns a number of items contained in this list */
+  get count(){ return this.#listElements.length; }
+
+  /** Returns an index of existing element found by reference comparison or -1 if not found*/
+  indexOf(elm){
+    if (!elm) return -1;
+    return this.#listElements.indexOf(elm);
+  }
+
 
   /**
    * Allows to iterate over data members (e.g. data fields) contained by this block
@@ -372,10 +381,10 @@ export class ListBit extends Bit {
 
   /** An element factory: projects data vector into appropriate list item element type.
    *  Returns AzosElement which should be used as a list item. You cam make appropriate type polymorphically  */
-  makeOrMapElement(data, mapExistingOnly = false){
+  makeOrMapElement(elmData, mapExistingOnly = false){
     //Do not confuse handlers and events. Handlers are function pointers and return values unlike events
     aver.isNotNull(this.#makeOrMapElementHandler, "ListBit.makeOrMapElement function");
-    return this.#makeOrMapElementHandler(this, data, mapExistingOnly);
+    return this.#makeOrMapElementHandler(this, elmData, mapExistingOnly);
   }
 
   /** Adds an element to list returning true if it was added as it did not exist, otherwise deems element as updated
@@ -384,7 +393,7 @@ export class ListBit extends Bit {
    * @returns {boolean | null} true if inserted, false if updated, null if could not find for update only mode
   */
   upsert(elm, updateOnly = false){
-    aver.isAssigned(elm);
+    aver.isNotNull(elm);
     if (!(elm instanceof AzosElement)) elm = this.makeOrMapElement(elm, updateOnly);
     if (!elm) return null;
 

@@ -122,6 +122,8 @@ export class CaseBit extends CaseBase {
   captionName="Different Name"
 ></az-lat-lng-bit>
 
+<br>
+
 <az-span-bit
   id="bitSpan"
   scope="this"
@@ -129,10 +131,14 @@ export class CaseBit extends CaseBase {
   captionRange="open"
 ></az-span-bit>
 
+<br>
+
 <az-day-override-bit
   id="bitDayOverride"
   scope="this"
 ></az-day-override-bit>
+
+<br>
 
 <az-adlib-tag-bit
   id="bitTag"
