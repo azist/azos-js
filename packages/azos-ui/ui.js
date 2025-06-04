@@ -24,6 +24,8 @@ import { AzosError,
          DATA_MODE_PROP,
          DATA_SCHEMA_PROP,
          TIME_ZONE_PROP,
+         DATA_VALUE_DESCRIPTOR_PROP,
+         DATA_VALUE_DESCRIPTOR_IS_LIST,
        } from "azos/types";
 import { asString } from "azos/strings";
 import { ImageRecord, ImageRegistry } from "azos/bcl/img-registry";
@@ -639,9 +641,17 @@ export function setBlockDataValue(element, v){
       const flds = fields.filter(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
       if (flds.length === 0) continue;
       if (types_isArray(pv)){
-        for(let i=0; i < pv.length && i < flds.length; i++){
-          flds[i][DATA_VALUE_PROP] = isUi ? new UiInputValue(pv[i]) : pv[i];
+
+        const isList = !!(flds[0][DATA_VALUE_DESCRIPTOR_PROP]?.[DATA_VALUE_DESCRIPTOR_IS_LIST]);
+
+        if (isList){
+          flds[0][DATA_VALUE_PROP] = isUi ? new UiInputValue(pv) : pv;
           result = true;
+        } else {
+          for(let i=0; i < pv.length && i < flds.length; i++){
+            flds[i][DATA_VALUE_PROP] = isUi ? new UiInputValue(pv[i]) : pv[i];
+            result = true;
+          }
         }
       } else {
         for(const one of flds){
