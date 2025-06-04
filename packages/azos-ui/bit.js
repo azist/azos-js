@@ -225,12 +225,12 @@ export class Bit extends Block {
 
     let title = this.title ?? `${this.constructor.name}#${this.id}`;
     let subtitle = this.description;
-    let toolbarCmds = [
+    let commands = [
       { text: "Edit", icon: "edit", cmd: "edit" },
       { text: "Delete", icon: "delete", cmd: "delete" }
     ];
 
-    return { title, subtitle, toolbarCmds };
+    return { title, subtitle, commands };
   }
 
 
@@ -313,6 +313,8 @@ export class Bit extends Block {
       const mkp = cmd.provideMarkup(arena, this);
       bar.push(html`<div class="cmd" @click=${() => cmd.exec(arena, this)}>${mkp}</div>`);
     }
+
+    if (bar.length === 0) return noContent;
 
     return html`<div class="toolbar"> ${bar} </div>`;
   }
