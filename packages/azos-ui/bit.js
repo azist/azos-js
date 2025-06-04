@@ -346,8 +346,10 @@ export class ListBit extends Bit {
   border-radius: 0.25em;
 
   &:focus-within{ outline: 3px solid var(--focus-ctl-selected-color); }
+
 }
 
+.selected{ background: var(--selected-item-bg);  }
   `];
 
   static properties = {
@@ -391,7 +393,10 @@ export class ListBit extends Bit {
 
   _cmdRemoveHandler(){
     const one = this.#selectedElement;
-    this.remove(one);
+    this.#selectedElement = null;
+    if (one){
+      this.remove(one);
+    }
   }
 
   /** Returns a copy of list elements */
@@ -479,10 +484,17 @@ export class ListBit extends Bit {
   }
 
   _getSummaryData(){
+    let mode = DATA_MODE_PROP in this.renderState
+                   ? this.renderState[DATA_MODE_PROP]
+                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+    const mutable = mode === DATA_MODE.INSERT || mode === DATA_MODE.UPDATE;
+    const commands = mutable ? [this._cmdAdd, this._cmdRemove] : [];
+
     return {
       title: `${this.title} (${this.count})`,
       subtitle: this.description,
-      commands: [this._cmdAdd, this._cmdRemove]
+      commands: commands
     }
   }
 
@@ -500,10 +512,11 @@ export class ListBit extends Bit {
 
   #divItemFocusIn(item){
     this.#selectedElement = item;
+    this.requestUpdate();
   }
 
   renderListItems(){
-    const result = this.#listElements.map(one => html`<div class="listItem" @focusin="${() => this.#divItemFocusIn(one)}">${one}</div>`);
+    const result = this.#listElements.map(one => html`<div class="listItem ${one == this.#selectedElement ? "selected" : ""}" @focusin="${() => this.#divItemFocusIn(one)}">${one}</div>`);
     return result;
   }
 }
