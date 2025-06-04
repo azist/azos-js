@@ -14,7 +14,7 @@ import { STL_INLINE_GRID } from "../../styles";
 
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
-import { Bit, ListBit } from "../../bit.js";
+import { Bit } from "../../bit.js";
 import { Command } from "../../cmd.js";
 
 export class PersonBlock extends Block {
@@ -67,7 +67,7 @@ export class PersonBlock extends Block {
       <examples-status-block scope="this" id="blockPayoutStatus" name="PayoutStatus"></examples-status-block>
 
       <h4>Status List</h4>
-      <examples-status-list scope="this" id="lstStatuses" name="Statuses"></examples-status-list>
+      <az-list-bit scope="this" id="lstStatuses" name="Statuses" title="Status List" description="Example of using a list bit" itemTagName="examples-status-block"></az-list-bit>
 
       <h4>Other Statuses</h4>
       <!-- notice how both fields map to the same field by name effectively creating an array -->
@@ -169,39 +169,6 @@ export class PersonField extends FieldPart {
 }
 
 
-export class StatusListBit extends ListBit{
-
- #cmdAdd = new Command(this, {
-      icon: "svg://azos.ico.add",
-    handler: function(){
-      console.dir(this);
-      const one = new StatusBlock();
-      one.rank = "small";
-      one.noSummary = true;
-      this.ctx.upsert(one);
-    }
-  });
-
-
-  _getSummaryData(){
-    return {title: `Statuses (${this.count})`, description: "A list of statuses", commands: [this.#cmdAdd]}
-  }
-
-
-  makeOrMapElement(elmData, mapExistingOnly = false){
-    if (this.indexOf(elmData) >=0 ) return elmData;
-    if (mapExistingOnly) return null;
-
-    let result = new StatusBlock();
-    return result;
-  }
-
-}
-
-
-
-
 window.customElements.define("examples-person-block", PersonBlock);
 window.customElements.define("examples-status-block", StatusBlock);
 window.customElements.define("examples-person-field", PersonField);
-window.customElements.define("examples-status-list", StatusListBit);
