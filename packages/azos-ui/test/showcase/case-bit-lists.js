@@ -12,12 +12,16 @@ import { Command } from "../../cmd.js";
 import { DATA_BLOCK_PROP, DATA_VALUE_PROP } from "azos/types";
 import { showMsg } from "../../msg-box.js";
 
+let counter = 0;
+
 export class CaseBitLists extends CaseBase {
+
+
 
   #cmdAddFood = new Command(this, {
       icon: "svg://azos.ico.add",
     handler: function(){
-      this.ctx.bitFoods.upsert("My food");
+      this.ctx.bitFoods.upsert(`My-food-${counter++}`);
     }
   });
 
