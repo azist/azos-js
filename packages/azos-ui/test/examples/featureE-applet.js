@@ -33,8 +33,8 @@ export class ExampleFeatureEApplet extends Applet{
 
   #cmdModal = new Command(this, {
     icon: "svg://azos.ico.openInNew",
-    handler: function(arena, cmd){
-      cmd.ctx.dlgPerson.show();
+    handler: function(){
+      this.ctx.dlgPerson.show();
     }
   });
 

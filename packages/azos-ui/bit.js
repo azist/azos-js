@@ -6,10 +6,10 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { css, getEffectiveDataMode, html, parseRank, parseStatus } from './ui.js';
+import { AzosElement, css, getEffectiveDataMode, html, noContent, parseRank, parseStatus } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
-import { DATA_MODE_PROP, DATA_MODE } from 'azos/types';
+import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP } from 'azos/types';
 import { isOneOf } from 'azos/strings';
 
 
@@ -327,6 +327,114 @@ export class Bit extends Block {
   renderDetailContent(){ return html`<slot>  </slot>`; }
 }
 
-
-
 window.customElements.define("az-bit", Bit);
+
+
+
+
+/** Provides a `Bit` of LIST-like data functionality returning an array of items  */
+export class ListBit extends Bit {
+
+  //Actual array of data elements
+  #listElements = [];
+  #makeOrMapElementHandler = null;
+
+  /** Returns a copy of list elements */
+  get listElements(){ return [...this.#listElements]; }
+
+  /** Returns a number of items contained in this list */
+  get count(){ return this.#listElements.length; }
+
+  /** Returns an index of existing element found by reference comparison or -1 if not found*/
+  indexOf(elm){
+    if (!elm) return -1;
+    return this.#listElements.indexOf(elm);
+  }
+
+
+  /**
+   * Allows to iterate over data members (e.g. data fields) contained by this block
+   */
+  get [DATA_BLOCK_PROP](){ return [...this.#listElements]; }
+
+  get [DATA_VALUE_PROP](){
+    const result = [];
+    for(const one of this.#listElements){
+      const value =  DATA_VALUE_PROP in one ? one[DATA_VALUE_PROP] : one.toString();
+      result.push(value);
+    }
+    return result;
+  }
+
+  set [DATA_VALUE_PROP](v){
+    this.#listElements = [];
+    this.requestUpdate();
+    if (!v) return;
+    aver.isArray(v, "Array value");
+    for(const one of v) this.upsert(one);
+  }
+
+
+  /** A reference to a function which handles mapping of existing element or making new elements. Required if you did not override the `makeOrMapElement(data, mapExistingOnly)` method  */
+  get makeOrMapElementHandler(){ return this.#makeOrMapElementHandler; }
+  set makeOrMapElementHandler(v){ this.#makeOrMapElementHandler = aver.isFunctionOrNull(v); }
+
+  /** An element factory: projects data vector into appropriate list item element type.
+   *  Returns AzosElement which should be used as a list item. You cam make appropriate type polymorphically  */
+  makeOrMapElement(elmData, mapExistingOnly = false){
+    //Do not confuse handlers and events. Handlers are function pointers and return values unlike events
+    aver.isNotNull(this.#makeOrMapElementHandler, "ListBit.makeOrMapElement function");
+    return this.#makeOrMapElementHandler(this, elmData, mapExistingOnly);
+  }
+
+  /** Adds an element to list returning true if it was added as it did not exist, otherwise deems element as updated
+   * @param {object | AzosElement} elm  an object data mappable to `AzosElement` via factory method invocation or pre-mapped AzosElement
+   * @param {boolean} [updateOnly=false] pass true to suppress the insert option and treat this as pure update of an existing item
+   * @returns {boolean | null} true if inserted, false if updated, null if could not find for update only mode
+  */
+  upsert(elm, updateOnly = false){
+    aver.isNotNull(elm);
+    if (!(elm instanceof AzosElement)) elm = this.makeOrMapElement(elm, updateOnly);
+    if (!elm) return null;
+
+    const existing = this.#listElements.find(one => one === elm);
+    if (!existing) this.#listElements.push(elm);
+    this.requestUpdate();
+    return !existing;
+  }
+
+  /**
+   * Removes an element returning true if found and removed
+   * @param {object | AzosElement} elm  an object data mappable to `AzosElement` via factory method invocation or pre-mapped AzosElement
+   * @returns {boolean} true when removed, otherwise false
+   */
+  remove(elm){
+    aver.isAssigned(elm);
+    if (!(elm instanceof AzosElement)) elm = this.makeOrMapElement(elm, true);
+    if (!elm) return false;
+
+    const ok = arrayDelete(this.#listElements, elm);
+    if (!ok) return false;
+    this.requestUpdate();
+    return true;
+  }
+
+
+  renderDetailContent(){
+    const head = this.renderListHead();
+    const items = this.renderListItems();
+    const tail = this.renderListTail();
+    return html`${head}${items}${tail}`;
+  }
+
+
+  renderListHead(){ return noContent;  }
+  renderListTail(){ return noContent;  }
+
+  renderListItems(){
+    const result = this.#listElements;
+    return result;
+  }
+}
+
+window.customElements.define("az-list-bit", ListBit);
