@@ -11,6 +11,7 @@ import { Block } from './blocks.js';
 import { Command } from './cmd.js';
 import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP } from 'azos/types';
 import { isOneOf } from 'azos/strings';
+import { TextField } from './parts/text-field.js';
 
 
 export const STL_BIT = css`
@@ -337,9 +338,61 @@ window.customElements.define("az-bit", Bit);
 /** Provides a `Bit` of LIST-like data functionality returning an array of items  */
 export class ListBit extends Bit {
 
+
+  static styles = [STL_BIT, css`
+.listItem{
+  padding: 1ch;
+  border-bottom: 1px solid #40404030;
+  border-radius: 0.25em;
+
+  &:focus-within{ outline: 3px solid var(--focus-ctl-selected-color); }
+}
+
+  `];
+
+  static properties = {
+    itemTagName: {type: "String"}
+  };
+
+  /** Override to return a class of items being handled by this list
+   * in cases when default logic is used, such as default add handler.
+   * You can override the add handler itself and insert polymorphic types,
+   * however this method is used as a default one
+  */
+  getDefaultItemClass(){
+    const tag = this.itemTagName;
+    let result = null;
+    if (tag)  result = window.customElements.get(tag);
+    return result ?? TextField;
+  }
+
   //Actual array of data elements
   #listElements = [];
   #makeOrMapElementHandler = null;
+  #selectedElement = null;
+
+  _cmdAdd = new Command(this, {
+    icon: "svg://azos.ico.add",
+    handler: () => this._cmdAddHandler()
+  });
+
+  _cmdRemove = new Command(this, {
+    icon: "svg://azos.ico.delete",
+    handler: () => this._cmdRemoveHandler()
+  });
+
+  _cmdAddHandler(){
+    const tItem = this.getDefaultItemClass();
+    const one = new tItem();
+    one.rank = "medium";
+    one.noSummary = true;
+    this.upsert(one);
+  }
+
+  _cmdRemoveHandler(){
+    const one = this.#selectedElement;
+    this.remove(one);
+  }
 
   /** Returns a copy of list elements */
   get listElements(){ return [...this.#listElements]; }
@@ -385,8 +438,12 @@ export class ListBit extends Bit {
    *  Returns AzosElement which should be used as a list item. You cam make appropriate type polymorphically  */
   makeOrMapElement(elmData, mapExistingOnly = false){
     //Do not confuse handlers and events. Handlers are function pointers and return values unlike events
-    aver.isNotNull(this.#makeOrMapElementHandler, "ListBit.makeOrMapElement function");
-    return this.#makeOrMapElementHandler(this, elmData, mapExistingOnly);
+    if (this.#makeOrMapElementHandler) return this.#makeOrMapElementHandler(this, elmData, mapExistingOnly);
+
+    if (this.indexOf(elmData) >=0) return elmData;
+    if (mapExistingOnly) return null;
+
+    return null;
   }
 
   /** Adds an element to list returning true if it was added as it did not exist, otherwise deems element as updated
@@ -411,7 +468,7 @@ export class ListBit extends Bit {
    * @returns {boolean} true when removed, otherwise false
    */
   remove(elm){
-    aver.isAssigned(elm);
+    aver.isNotNull(elm);
     if (!(elm instanceof AzosElement)) elm = this.makeOrMapElement(elm, true);
     if (!elm) return false;
 
@@ -421,6 +478,13 @@ export class ListBit extends Bit {
     return true;
   }
 
+  _getSummaryData(){
+    return {
+      title: `${this.title} (${this.count})`,
+      subtitle: this.description,
+      commands: [this._cmdAdd, this._cmdRemove]
+    }
+  }
 
   renderDetailContent(){
     const head = this.renderListHead();
@@ -433,8 +497,13 @@ export class ListBit extends Bit {
   renderListHead(){ return noContent;  }
   renderListTail(){ return noContent;  }
 
+
+  #divItemFocusIn(item){
+    this.#selectedElement = item;
+  }
+
   renderListItems(){
-    const result = this.#listElements;
+    const result = this.#listElements.map(one => html`<div class="listItem" @focusin="${() => this.#divItemFocusIn(one)}">${one}</div>`);
     return result;
   }
 }
