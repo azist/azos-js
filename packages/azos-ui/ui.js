@@ -640,11 +640,12 @@ export function setBlockDataValue(element, v){
     for(const [pk, pv] of Object.entries(v)){
       const flds = fields.filter(one => one[DATA_NAME_PROP]?.toLowerCase() === pk.toLowerCase());
       if (flds.length === 0) continue;
-      if (types_isArray(pv)){
+
+      if (types_isArray(pv)){ //DATA is array, we need to bind it a awhole if the field supports LIST via value descriptor OR hard coded collection - bind one by one via index
 
         const isList = !!(flds[0][DATA_VALUE_DESCRIPTOR_PROP]?.[DATA_VALUE_DESCRIPTOR_IS_LIST]);
 
-        if (isList){
+        if (isList){//If it is a list then bind array awhole
           flds[0][DATA_VALUE_PROP] = isUi ? new UiInputValue(pv) : pv;
           result = true;
         } else {

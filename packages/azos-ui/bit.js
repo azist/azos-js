@@ -445,6 +445,11 @@ export class ListBit extends Bit {
     }
   }
 
+  /** Override to complete only after your children have loaded */
+  async _doAwaitFullStructureLoad(){
+    for(const one of this.#listElements) await one.updateComplete;
+  }
+
 
   /** A reference to a function which handles mapping of existing element or making new elements. Required if you did not override the `makeOrMapElement(data, mapExistingOnly)` method  */
   get makeOrMapElementHandler(){ return this.#makeOrMapElementHandler; }
@@ -469,9 +474,17 @@ export class ListBit extends Bit {
     const elm = this.makeOrMapElement(data, false);
     if (!elm) return null;
 
-    if (DATA_VALUE_PROP in elm) elm[DATA_VALUE_PROP] = isUiInput ? new UiInputValue(data) : data;
+    console.log("Setting LIST field:", data);
+
+    if (DATA_VALUE_PROP in elm) {
+      const valToSet = isUiInput ? new UiInputValue(data) : data;
+      //we need to bind the data synchronously as the element is not built yet
+      //once the elements `updateComplete` resolves, we can now set its data value property
+      elm.updateComplete.then( () => elm[DATA_VALUE_PROP] = valToSet );
+    }
 
     this.#listElements.push(elm);
+
     return elm;
   }
 
