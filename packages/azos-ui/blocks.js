@@ -72,7 +72,8 @@ export class Block extends Control {
 
   /** Returns a promise which indicates the completion of block loading when all child data entities (such as a sub-block or a field) load
    * Do not override this method, instead override {@link _doAwaitFullStructureLoad} to define what child fields/structures
-   * comprise this block
+   * comprise this block.
+   * WARNING: This is how it is done in LIT 3 see: https://lit.dev/docs/components/lifecycle/#getUpdateComplete
    */
   async getUpdateComplete(){
     const result = await super.getUpdateComplete();

@@ -82,6 +82,7 @@ export class ExampleFeatureEApplet extends Applet{
           },
           "Registered": true,
           "Smoker": true,
+          "Statuses": [{"Status": `S-${COUNTER}`, "Description": `D-${COUNTER}`}, {"Status": `S-${2*COUNTER}`, "Description": `D-${2*COUNTER}`}],
           "drinking": "beer",
           "food": "beef"
         }

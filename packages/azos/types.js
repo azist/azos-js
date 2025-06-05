@@ -109,6 +109,18 @@ export const DATA_NAME_PROP = Symbol("data-name");
 export const DATA_VALUE_PROP = Symbol("data-value");
 
 /**
+ * Returns a descriptor object which specifies parameters about the value,
+ * such is if the value is a list/array etc. When data is bound back from JSON the system may query this
+ * property from the receiving entity such as UI control to better understand how to bind data back into such entity
+ */
+export const DATA_VALUE_DESCRIPTOR_PROP = Symbol("data-value-descriptor");
+
+/**
+ * A boolean flag set to true returned in the value descriptor when the value is a list/array
+ */
+export const DATA_VALUE_DESCRIPTOR_IS_LIST = Symbol("islist");
+
+/**
  * An optional part of "IData" protocol - an entity optionally implementing this interface yields an enumeration of its child entities, such as fields
  * grouped together under a block, blocks such as a composite data controls or forms.
  */

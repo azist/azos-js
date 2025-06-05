@@ -6,10 +6,10 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { AzosElement, css, getEffectiveDataMode, html, noContent, parseRank, parseStatus } from './ui.js';
+import { AzosElement, css, getEffectiveDataMode, html, noContent, parseRank, parseStatus, UiInputValue } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
-import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP } from 'azos/types';
+import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP, DATA_VALUE_DESCRIPTOR_PROP, DATA_VALUE_DESCRIPTOR_IS_LIST } from 'azos/types';
 import { isOneOf } from 'azos/strings';
 import { TextField } from './parts/text-field.js';
 
@@ -417,6 +417,8 @@ export class ListBit extends Bit {
    */
   get [DATA_BLOCK_PROP](){ return [...this.#listElements]; }
 
+  get [DATA_VALUE_DESCRIPTOR_PROP](){ return { [DATA_VALUE_DESCRIPTOR_IS_LIST]: true}; }
+
   get [DATA_VALUE_PROP](){
     const result = [];
     for(const one of this.#listElements){
@@ -430,8 +432,22 @@ export class ListBit extends Bit {
     this.#listElements = [];
     this.requestUpdate();
     if (!v) return;
-    aver.isArray(v, "Array value");
-    for(const one of v) this.upsert(one);
+
+    let isUiInput = false;
+    if (v instanceof UiInputValue) {//unwrap UiInputValue
+      isUiInput = true;
+      v = v.value();
+    }
+
+    aver.isArray(v, "ListBit needs array value");
+    for(const one of v) {
+      this.loadItemFromData(one, isUiInput);
+    }
+  }
+
+  /** Override to complete only after your children have loaded */
+  async _doAwaitFullStructureLoad(){
+    for(const one of this.#listElements) await one.updateComplete;
   }
 
 
@@ -448,7 +464,28 @@ export class ListBit extends Bit {
     if (this.indexOf(elmData) >=0) return elmData;
     if (mapExistingOnly) return null;
 
-    return null;
+    const tItem = this.getDefaultItemClass();
+    const result = new tItem();
+    return result;
+  }
+
+  loadItemFromData(data, isUiInput){
+    aver.isNotNull(data);
+    const elm = this.makeOrMapElement(data, false);
+    if (!elm) return null;
+
+    console.log("Setting LIST field:", data);
+
+    if (DATA_VALUE_PROP in elm) {
+      const valToSet = isUiInput ? new UiInputValue(data) : data;
+      //we need to bind the data synchronously as the element is not built yet
+      //once the elements `updateComplete` resolves, we can now set its data value property
+      elm.updateComplete.then( () => elm[DATA_VALUE_PROP] = valToSet );
+    }
+
+    this.#listElements.push(elm);
+
+    return elm;
   }
 
   /** Adds an element to list returning true if it was added as it did not exist, otherwise deems element as updated
