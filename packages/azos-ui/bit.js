@@ -526,7 +526,7 @@ export class ListBit extends Bit {
                    ? this.renderState[DATA_MODE_PROP]
                    : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
 
-    const mutable = mode === DATA_MODE.INSERT || mode === DATA_MODE.UPDATE;
+    const mutable = mode === undefined || (mode === DATA_MODE.INSERT || mode === DATA_MODE.UPDATE);
     const commands = mutable ? [this._cmdAdd, this._cmdRemove] : [];
 
     return {
