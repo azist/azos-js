@@ -397,10 +397,7 @@ export class ListBit extends Bit {
    * You can override this and prompt used say for data via a popup.
    */
   async addItemAsync(){
-    const tItem = this.getDefaultItemClass();
-    const one = new tItem();
-    one.rank = "medium";
-    this.upsert(one);
+    this.upsert({});
   }
 
   /** Invoked to remove selected item from list.
@@ -466,7 +463,7 @@ export class ListBit extends Bit {
   }
 
 
-  /** A reference to a function which handles mapping of existing data into new elements. Signature: f(this: ListBit, elemData: object)*/
+  /** A reference to a function which handles mapping of existing data into new elements. Signature: f(this: ListBit, elemData: object, existingOnly: bool)*/
   get makeOrMapElementHandler(){ return this.#makeOrMapElementHandler; }
   set makeOrMapElementHandler(v){ this.#makeOrMapElementHandler = aver.isFunctionOrNull(v); }
 
@@ -482,7 +479,7 @@ export class ListBit extends Bit {
    * */
   makeOrMapElement(elmData, existingOnly = false){
     //Do not confuse handlers and events. Handlers are function pointers and return values unlike events
-    if (this.#makeOrMapElementHandler) return this.#makeOrMapElementHandler(this, elmData);
+    if (this.#makeOrMapElementHandler) return this.#makeOrMapElementHandler(this, elmData, existingOnly);
 
     if (this.indexOf(elmData) >= 0) return elmData;
     if (existingOnly) return null;

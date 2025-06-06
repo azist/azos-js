@@ -67,7 +67,19 @@ export class PersonBlock extends Block {
       <examples-status-block scope="this" id="blockPayoutStatus" name="PayoutStatus"></examples-status-block>
 
       <h4>Status List</h4>
-      <az-list-bit scope="this" id="lstStatuses" name="Statuses" title="Status List" description="Example of using a list bit" itemTagName="examples-status-block"></az-list-bit>
+      <az-list-bit scope="this" id="lstStatuses"
+                   name="Statuses"
+                   title="Status List"
+                   description="Example of using a list bit"
+                   itemTagName="examples-status-block"
+                   .makeOrMapElementHandler=${(bit, elmData, onlyExisting) => {
+                     if (bit.indexOf(elmData) >= 0) return elmData;
+                     if (onlyExisting) return null;
+                     const result = new StatusBlock();
+                     result.rank = "medium";
+                     result.noSummary = true;
+                     return result;
+                   }}></az-list-bit>
 
       <h4>Other Statuses</h4>
       <!-- notice how both fields map to the same field by name effectively creating an array -->
