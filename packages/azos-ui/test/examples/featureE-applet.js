@@ -82,7 +82,7 @@ export class ExampleFeatureEApplet extends Applet{
           },
           "Registered": true,
           "Smoker": true,
-          "Statuses": [{"Status": `S-${COUNTER}`, "Description": `D-${COUNTER}`}, {"Status": `S-${2*COUNTER}`, "Description": `D-${2*COUNTER}`}],
+          "Statuses": Array.from({length: COUNTER % 5}, (_, i) => ({"Status": `S-${i}-${COUNTER}`, "Description": `D-${i}-${COUNTER}`, "Approved": i%2 ===0})),
           "drinking": "beer",
           "food": "beef"
         }
