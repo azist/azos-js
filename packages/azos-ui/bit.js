@@ -219,7 +219,8 @@ export class Bit extends Block {
    * This method gets called on every render. You can also add additional props for your custom rendering
    * of the summary section
   */
-  _getSummaryData(){
+  // eslint-disable-next-line no-unused-vars
+  _getSummaryData(effectDisabled, effectMutable){
     if (this.#getSummaryDataHandler){
       return this.#getSummaryDataHandler(this);
     }
@@ -256,6 +257,19 @@ export class Bit extends Block {
         }
       }
     }
+
+
+    let effectMutable = !this.isBrowse && !this.isReadonly;
+
+    if (effectMutable){
+      let mode = DATA_MODE_PROP in this.renderState
+                    ? this.renderState[DATA_MODE_PROP]
+                    : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+      effectMutable = mode === undefined || (mode === DATA_MODE.INSERT || mode === DATA_MODE.UPDATE);
+    }
+
+
     // ---------------------------------------------------------------------------
     if (this.noSummary){
       let cls = `${parseRank(this.rank, true)}`; //ignore "status" coloring as we do not have the outer frame
@@ -263,7 +277,7 @@ export class Bit extends Block {
       return html`<div id="divControl" class="outer ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
     } else {
       let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-      const summary = this._getSummaryData();
+      const summary = this._getSummaryData(effectDisabled, effectMutable);
       const innerContent = html`${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()}`;
       return html`<div id="divControl" class="outer control ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
     }
@@ -521,13 +535,9 @@ export class ListBit extends Bit {
     return true;
   }
 
-  _getSummaryData(){
-    let mode = DATA_MODE_PROP in this.renderState
-                   ? this.renderState[DATA_MODE_PROP]
-                   : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+  _getSummaryData(effectDisabled, effectMutable){
 
-    const mutable = mode === undefined || (mode === DATA_MODE.INSERT || mode === DATA_MODE.UPDATE);
-    const commands = mutable ? [this._cmdAdd, this._cmdRemove] : [];
+    const commands = effectMutable ? [this._cmdAdd, this._cmdRemove] : [];
 
     return {
       title: `${this.title} (${this.count})`,
