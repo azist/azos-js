@@ -342,14 +342,14 @@ export class ListBit extends Bit {
   static styles = [STL_BIT, css`
 .listItem{
   padding: 1ch;
-  border-bottom: 1px solid #40404030;
-  border-radius: 0.25em;
+  border-bottom: 2px dotted #40404020;
+  border-radius: 0px;
 
-  &:focus-within{ outline: 3px solid var(--focus-ctl-selected-color); }
-
+  &:focus-within{ outline: 1px solid var(--focus-ctl-selected-color); }
 }
 
-.selected{ background: var(--selected-item-bg);  }
+.selected{ background: var(--selected-item-bg); border-radius: 0.75em; }
+.last{ border: none; }
   `];
 
   static properties = {
@@ -474,8 +474,6 @@ export class ListBit extends Bit {
     const elm = this.makeOrMapElement(data, false);
     if (!elm) return null;
 
-    console.log("Setting LIST field:", data);
-
     if (DATA_VALUE_PROP in elm) {
       const valToSet = isUiInput ? new UiInputValue(data) : data;
       //we need to bind the data synchronously as the element is not built yet
@@ -556,7 +554,7 @@ export class ListBit extends Bit {
   }
 
   renderListItems(){
-    const result = this.#listElements.map(one => html`<div class="listItem ${one == this.#selectedElement ? "selected" : ""}" @focusin="${() => this.#divItemFocusIn(one)}">${one}</div>`);
+    const result = this.#listElements.map((one, i) => html`<div class="listItem ${one === this.#selectedElement ? "selected" : ""} ${i === this.#listElements.length-1 ? "last" : ""}" @focusin="${() => this.#divItemFocusIn(one)}">${one}</div>`);
     return result;
   }
 }
