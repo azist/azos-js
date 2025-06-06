@@ -387,25 +387,26 @@ export class ListBit extends Bit {
   #makeOrMapElementHandler = null;
   #selectedElement = null;
 
-  _cmdAdd = new Command(this, {
-    icon: "svg://azos.ico.add",
-    handler: () => this._cmdAddHandler()
-  });
+  /** Add command, you may return this from `_getSummaryData()` method */
+  _cmdAdd = new Command(this, { icon: "svg://azos.ico.add",  handler: () => this.addItemAsync() });
+  /** Remove command, you may return this from `_getSummaryData()` method  */
+  _cmdRemove = new Command(this, { icon: "svg://azos.ico.delete", handler: () => this.removeItemAsync() });
 
-  _cmdRemove = new Command(this, {
-    icon: "svg://azos.ico.delete",
-    handler: () => this._cmdRemoveHandler()
-  });
-
-  _cmdAddHandler(){
+  /** Invoked to add item to the list.
+   * Default implementation adds a medium size item of `itemTagName` type or `TextBox` by default.
+   * You can override this and prompt used say for data via a popup.
+   */
+  async addItemAsync(){
     const tItem = this.getDefaultItemClass();
     const one = new tItem();
     one.rank = "medium";
-    one.noSummary = true;
     this.upsert(one);
   }
 
-  _cmdRemoveHandler(){
+  /** Invoked to remove selected item from list.
+   * You may query user with a dialog to prevent removal
+   */
+  async removeItemAsync(){
     const one = this.#selectedElement;
     this.#selectedElement = null;
     if (one){
@@ -455,7 +456,7 @@ export class ListBit extends Bit {
 
     aver.isArray(v, "ListBit needs array value");
     for(const one of v) {
-      this.loadItemFromData(one, isUiInput);
+      this._loadItemFromData(one, isUiInput);
     }
   }
 
@@ -465,25 +466,37 @@ export class ListBit extends Bit {
   }
 
 
-  /** A reference to a function which handles mapping of existing element or making new elements. Required if you did not override the `makeOrMapElement(data, mapExistingOnly)` method  */
+  /** A reference to a function which handles mapping of existing data into new elements. Signature: f(this: ListBit, elemData: object)*/
   get makeOrMapElementHandler(){ return this.#makeOrMapElementHandler; }
   set makeOrMapElementHandler(v){ this.#makeOrMapElementHandler = aver.isFunctionOrNull(v); }
 
   /** An element factory: projects data vector into appropriate list item element type.
-   *  Returns AzosElement which should be used as a list item. You cam make appropriate type polymorphically  */
-  makeOrMapElement(elmData, mapExistingOnly = false){
+   *  Returns AzosElement which should be used as a list item. You cam make instances of
+   *  an appropriate type polymorphically.
+   * The override DOES NOT need to bind data, data property binds later on
+   * @param {any} elmData data object (such as a map) which is used to MAKE a new `AzosElement` derivative suitable to be a list item
+   * @param {Boolean} existingOnly - true to only return existing elements, false to also make new elements if they do not exist for the specified data
+   * @returns {AzosElement} an element which represents the data to be added to the list.
+   * WARNING: this method may return an instance of already existing element as it deems necessary for elements of the same equality
+   * as determined by business-driven equality comparison
+   * */
+  makeOrMapElement(elmData, existingOnly = false){
     //Do not confuse handlers and events. Handlers are function pointers and return values unlike events
-    if (this.#makeOrMapElementHandler) return this.#makeOrMapElementHandler(this, elmData, mapExistingOnly);
+    if (this.#makeOrMapElementHandler) return this.#makeOrMapElementHandler(this, elmData);
 
-    if (this.indexOf(elmData) >=0) return elmData;
-    if (mapExistingOnly) return null;
+    if (this.indexOf(elmData) >= 0) return elmData;
+    if (existingOnly) return null;
 
     const tItem = this.getDefaultItemClass();
     const result = new tItem();
     return result;
   }
 
-  loadItemFromData(data, isUiInput){
+  /** Protected: Loads item from data vector by mapping an object into an existing item or making a new item element (a factory method).
+   * This method is nt expected to be called from business code as it is called as a part of data property assignment.
+   * The newly created element is added into element list buffer
+   */
+  _loadItemFromData(data, isUiInput){
     aver.isNotNull(data);
     const elm = this.makeOrMapElement(data, false);
     if (!elm) return null;
@@ -498,7 +511,7 @@ export class ListBit extends Bit {
       });
     }
 
-    this.#listElements.push(elm);
+    if (this.indexOf(elm) < 0) this.#listElements.push(elm);
 
     return elm;
   }
@@ -513,10 +526,10 @@ export class ListBit extends Bit {
     if (!(elm instanceof AzosElement)) elm = this.makeOrMapElement(elm, updateOnly);
     if (!elm) return null;
 
-    const existing = this.#listElements.find(one => one === elm);
-    if (!existing) this.#listElements.push(elm);
+    const idxExisting = this.indexOf(elm);
+    if (idxExisting < 0) this.#listElements.push(elm);
     this.requestUpdate();
-    return !existing;
+    return idxExisting < 0;
   }
 
   /**
@@ -535,6 +548,7 @@ export class ListBit extends Bit {
     return true;
   }
 
+  /** Override to return {title, subtitle, commands[]} */
   _getSummaryData(effectDisabled, effectMutable){
 
     const commands = effectMutable ? [this._cmdAdd, this._cmdRemove] : [];
