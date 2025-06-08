@@ -180,9 +180,10 @@ export class Block extends Control {
       for(const item of items){
         const vm = item[VALIDATE_METHOD];
         if (vm){
-          const ve = vm.call(item, context, `${scope ?? ""}[${i++}]`, apply);
+          const ve = vm.call(item, context, i > 0 ? `${scope ?? ""}[${i}]` : scope, apply);
           if (ve) errorBatch.push(ve);
         }
+        i++;
       }
 
       this._doValidate(errorBatch, context, scope);
