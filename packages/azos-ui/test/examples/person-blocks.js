@@ -72,6 +72,8 @@ export class PersonBlock extends Block {
                    title="Status List"
                    description="Example of using a list bit"
                    itemTagName="examples-status-block"
+                   minLength=1
+                   maxLength=5
                    .makeOrMapElementHandler=${(bit, elmData, onlyExisting) => {
                      if (bit.indexOf(elmData) >= 0) return elmData;
                      if (onlyExisting) return null;
