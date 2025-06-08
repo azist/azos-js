@@ -176,10 +176,11 @@ export class Block extends Control {
       const items = this[DATA_BLOCK_PROP];
       var errorBatch = [];
 
+      let i = 0;
       for(const item of items){
         const vm = item[VALIDATE_METHOD];
         if (vm){
-          const ve = vm.call(item, context, scope, apply);
+          const ve = vm.call(item, context, `${scope ?? ""}[${i++}]`, apply);
           if (ve) errorBatch.push(ve);
         }
       }

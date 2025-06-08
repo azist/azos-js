@@ -6,11 +6,11 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { AzosElement, css, getEffectiveDataMode, html, noContent, parseRank, parseStatus, UiInputValue } from './ui.js';
+import { AzosElement, css, getEffectiveDataMode, getEffectiveSchema, html, noContent, parseRank, parseStatus, UiInputValue } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
-import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP, DATA_VALUE_DESCRIPTOR_PROP, DATA_VALUE_DESCRIPTOR_IS_LIST, RESET_DIRTY_METHOD } from 'azos/types';
-import { isOneOf } from 'azos/strings';
+import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP, DATA_VALUE_DESCRIPTOR_PROP, DATA_VALUE_DESCRIPTOR_IS_LIST, RESET_DIRTY_METHOD, ValidationError } from 'azos/types';
+import { dflt, isOneOf } from 'azos/strings';
 import { TextField } from './parts/text-field.js';
 
 
@@ -367,7 +367,13 @@ export class ListBit extends Bit {
   `];
 
   static properties = {
-    itemTagName: {type: "String"}
+    itemTagName: {type: "String"},
+
+    /** If defined as a number greater than one imposes a limit on the minimum of list elements */
+    minLength: { type: Number, reflect: false },
+
+    /** If defined as a number greater than one imposes a limit on the maximum number of list elements */
+    maxLength: { type: Number, reflect: false },
   };
 
   /** Override to return a class of items being handled by this list
@@ -393,11 +399,13 @@ export class ListBit extends Bit {
   _cmdRemove = new Command(this, { icon: "svg://azos.ico.delete", handler: () => this.removeItemAsync() });
 
   /** Invoked to add item to the list.
-   * Default implementation adds a medium size item of `itemTagName` type or `TextBox` by default.
-   * You can override this and prompt used say for data via a popup.
+   * Default implementation just uses `upsert()` which in turn resorts to `makeOrMapElement(...)`.
+   * You can override this method here and allocate a specific element, for example by using a popup to prompt the user, hence
+   * this method is asynchronous - it may complete after an indefinite time, for example after getting a user response
    */
   async addItemAsync(){
-    this.upsert({});
+    if (this.maxLength > 0 && this.count >= this.maxLength) return undefined;
+    return this.upsert({});
   }
 
   /** Invoked to remove selected item from list.
@@ -543,6 +551,23 @@ export class ListBit extends Bit {
     if (!ok) return false;
     this.requestUpdate();
     return true;
+  }
+
+   /**
+   * Performs list length validation
+   * @param {Error[]} errorBatch - an array of errors which have already been detected during validation. You add more errors via `errorBatch.push(...)`
+   * @param {*} context optional validation context
+   * @param {*} scope scoping specifier
+   */
+  // eslint-disable-next-line no-unused-vars
+  _doValidate(errorBatch, context, scope){
+    if (this.minLength > 0 && this.count < this.minLength){
+      errorBatch.push(new ValidationError(getEffectiveSchema(this), dflt(this.name, "*"), scope, `List needs at least ${this.minLength} elements`, null, this.constructor.name));
+    }
+
+    if (this.maxLength > 0 && this.count > this.maxLength){
+      errorBatch.push(new ValidationError(getEffectiveSchema(this), dflt(this.name, "*"), scope, `List may contain at most ${this.maxLength} elements`, null, this.constructor.name));
+    }
   }
 
   /** Override to return {title, subtitle, commands[]} */
