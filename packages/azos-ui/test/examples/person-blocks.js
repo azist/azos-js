@@ -11,11 +11,12 @@ import { Block } from "../../blocks.js";
 import { html } from "../../ui.js";
 import { FieldPart } from "../../parts/field-part.js";
 import { STL_INLINE_GRID } from "../../styles";
+import { Bit } from "../../bit.js";
+import { Command } from "../../cmd.js";
 
 import "../../parts/text-field.js";
 import "../../parts/check-field.js"
-import { Bit } from "../../bit.js";
-import { Command } from "../../cmd.js";
+import "../../models/nls-map-bit.js";
 
 export class PersonBlock extends Block {
 
@@ -44,7 +45,7 @@ export class PersonBlock extends Block {
         <az-check scope="this" id="chkSmoker"      name="Smoker"     title="Former Smoker"  isrequired value="false" checkType="cross"></az-check>
       </div>
 
-      <div class="row cols2">
+      <div class="row cols3">
         <az-radio-group id="rgDrinking" name="drinking" title="Drinking Choices (choose only 1)" status="ok">
           <item title="Tea" value="tea"></item>
           <item title="Coke" value="coke"></item>
@@ -58,7 +59,13 @@ export class PersonBlock extends Block {
           <item title="Chicken" value="chi"></item>
           <item title="Fish" value="fish"></item>
         </az-radio-group>
+
+
       </div>
+
+      <az-nls-map-bit scope="this" id="nlsMap" name="lclCodes"
+                    title="Localized Codes"
+                    description="Example of using a NLS Map Bit"></az-nls-map-bit>
 
       <h4>Processing Status</h4>
       <examples-status-block scope="this" id="blockProcessStatus" name="ProcessStatus"></examples-status-block>

@@ -431,6 +431,10 @@ export class ListBit extends Bit {
     return this.#listElements.indexOf(elm);
   }
 
+  find(f){
+    aver.isFunction(f);
+    return this.#listElements.find(f);
+  }
 
   /**
    * Allows to iterate over data members (e.g. data fields) contained by this block
