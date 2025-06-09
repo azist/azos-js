@@ -56,9 +56,9 @@ export class Block extends Control {
     this.title = this.constructor.name;
   }
 
-  /** Use {@link _doLoad} to write business logic on load, when block and all its child structure has loaded.
+  /** Use {@link _doLoadBlockAsync} to write business logic on load, when block and all its child structure has loaded.
    * This is defined by business rules of every block, as {@link _doAwaitFullStructureLoad} gets implemented accordingly.
-   * Do not override `firstUpdated()` in blocks/forms, override `_doLoad()` instead.
+   * Do not override `firstUpdated()` in blocks/forms, override `_doLoadBlockAsync()` instead.
   */
   firstUpdated(){
     super.firstUpdated();
@@ -66,7 +66,7 @@ export class Block extends Control {
     queueMicrotask(async () => {
       await this.updateComplete; //override _doAwaitFullStructureLoad() to determine what "loaded block" means,
                                  //e.g. wait for the "business last" element to appear
-      await this._doLoad();
+      await this._doLoadBlockAsync();
     });
   }
 
@@ -88,7 +88,7 @@ export class Block extends Control {
   }
 
   /** Override to perform actions on load, such as load initial data. Do not use `firstUpdated` */
-  async _doLoad(){ }
+  async _doLoadBlockAsync(){ }
 
 
   get[ERROR_PROP](){ return this.error; }

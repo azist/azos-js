@@ -117,7 +117,7 @@ hr{ border: 1px solid var(--ink); opacity: 0.15; }
   set loadAsyncHandler(v){ this.#loadAsyncHandler = aver.isFunctionOrNull(v); }
 
   //** Loads form data
-  async _doLoad(){
+  async _doLoadBlockAsync(){
     if (this.noAutoLoad){
       this[DATA_VALUE_PROP] = this.data;
       this[DATA_MODE_PROP] = DATA_MODE.UNSPECIFIED;

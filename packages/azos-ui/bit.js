@@ -467,13 +467,13 @@ export class ListBit extends Bit {
     for(const one of v) {
       this._loadItemFromData(one, isUiInput);
     }
+
   }
 
   /** Override to complete only after your children have loaded */
   async _doAwaitFullStructureLoad(){
     for(const one of this.#listElements) await one.updateComplete;
   }
-
 
   /** A reference to a function which handles mapping of existing data into new elements. Signature: f(this: ListBit, elemData: object, existingOnly: bool)*/
   get makeOrMapElementHandler(){ return this.#makeOrMapElementHandler; }

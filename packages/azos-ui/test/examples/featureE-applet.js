@@ -83,6 +83,21 @@ export class ExampleFeatureEApplet extends Applet{
           "Registered": true,
           "Smoker": true,
           "Statuses": Array.from({length: COUNTER % 5}, (_, i) => ({"Status": `S-${i}-${COUNTER}`, "Description": `D-${i}-${COUNTER}`, "Approved": i%2 ===0})),
+          "lclCodes": {
+            "eng": {
+              "n": `Cup ${COUNTER}`,
+              "d": "A cup for drinking tea or coffee"
+            },
+            "deu": {
+              "n": `Tasse ${COUNTER}`,
+              "d": "Eine Tasse zum Trinken von Tee oder Kaffee"
+            },
+            "rus": {
+              "n": `Чашка ${COUNTER}`,
+              "d": "Чашка для питья чая или кофе"
+            },
+
+          },
           "drinking": "beer",
           "food": "beef"
         }
