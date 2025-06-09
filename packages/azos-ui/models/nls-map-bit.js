@@ -60,9 +60,13 @@ export class NlsMapBit extends ListBit {
 
   _getSummaryData(effectDisabled, effectMutable){
     const commands = effectMutable ? [this._cmdAdd, this._cmdRemove] : [];
+
+    const first = this.find(() => true);
+    const subtitle = first ? first.tbName?.value : "";
+
     return {
       title: `${dflt(this.title, this.description, this.name, "")} (${this.count})`,
-      subtitle: "Subtitle",
+      subtitle: subtitle ?? "",
       commands: commands
     };
   }
