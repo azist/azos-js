@@ -50,14 +50,36 @@ export class ExampleFeatureDApplet extends Applet{
     console.dir(frm);
     return {
       person: {
-        LastName: `Abramovich_${ctr}`,
-        FirstName: `Snaker_${10 * ctr}`,
-        PayoutStatus: {Status: `PAY-${ctr}-A08`, Description: `Paid $${ctr*8726}`},
-        ProcessStatus: {Status: `DONE-${ctr}`, Description: `Batch #${ctr*1234567}`},
-        OtherStatuses: [
-          {Status: `S8-${ctr}`, Description: `Loves ${ctr} cats at a time`},
-          {Status: `Z1-${ctr}`, Description: `Z updated ${ctr} times`}
-        ]
+        "DOB": "2024-03-03T06:00:00.000Z",
+        "FirstName": `Snaker_${ctr}`,
+        "LastName": `Abramovich_${ctr * 10}`,
+        "MiddleName": "Q",
+        "OtherStatuses": [
+          {
+            "Approved": false,
+            "Description": "Loves 8 cats at a time",
+            "Status": "S8-8"
+          },
+          {
+            "Approved": false,
+            "Description": "Z updated 8 times",
+            "Status": "Z1-8"
+          }
+        ],
+        "PayoutStatus": {
+          "Approved": false,
+          "Description": "Paid $69808",
+          "Status": "PAY-8-A08"
+        },
+        "Phone": "(800) 123-4567",
+        "ProcessStatus": {
+          "Approved": false,
+          "Description": "Batch #9876536",
+          "Status": "DONE-8"
+        },
+        "Registered": true,
+        "Smoker": false,
+        "Statuses": Array.from({length: ctr % 5}, (_, i) => ({"Status": `S-${i}-${ctr}`, "Description": `D-${i}-${ctr}`, "Approved": ctr%2 ===0})),
       }
     };
   }

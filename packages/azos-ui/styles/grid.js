@@ -36,8 +36,13 @@ const STL_INLINE_GRID = css`
   }
 
   @media (max-width: ${BREAKPOINT_SM}px) {
-    .row{ grid-template-columns: 1fr !important; }
-    [class*="span"] { grid-column: 1 !important; }
+    .row:not(.nom){ /* row lacks "no media" class */
+      grid-template-columns: 1fr !important;
+
+      .span1, .span2, .span3, .span4, .span5, .span6, .span7, .span8, .span9, .span10, .span11, .span12{
+        grid-column: 1 !important;
+      }
+    }
   }
 `;
 

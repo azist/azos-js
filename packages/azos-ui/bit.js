@@ -6,11 +6,12 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { css, getEffectiveDataMode, html, parseRank, parseStatus } from './ui.js';
+import { AzosElement, css, getEffectiveDataMode, getEffectiveSchema, html, noContent, parseRank, parseStatus, UiInputValue } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
-import { DATA_MODE_PROP, DATA_MODE } from 'azos/types';
-import { isOneOf } from 'azos/strings';
+import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP, DATA_VALUE_DESCRIPTOR_PROP, DATA_VALUE_DESCRIPTOR_IS_LIST, RESET_DIRTY_METHOD, ValidationError } from 'azos/types';
+import { dflt, isOneOf } from 'azos/strings';
+import { TextField } from './parts/text-field.js';
 
 
 export const STL_BIT = css`
@@ -218,19 +219,20 @@ export class Bit extends Block {
    * This method gets called on every render. You can also add additional props for your custom rendering
    * of the summary section
   */
-  _getSummaryData(){
+  // eslint-disable-next-line no-unused-vars
+  _getSummaryData(effectDisabled, effectMutable){
     if (this.#getSummaryDataHandler){
       return this.#getSummaryDataHandler(this);
     }
 
     let title = this.title ?? `${this.constructor.name}#${this.id}`;
     let subtitle = this.description;
-    let toolbarCmds = [
+    let commands = [
       { text: "Edit", icon: "edit", cmd: "edit" },
       { text: "Delete", icon: "delete", cmd: "delete" }
     ];
 
-    return { title, subtitle, toolbarCmds };
+    return { title, subtitle, commands };
   }
 
 
@@ -255,6 +257,19 @@ export class Bit extends Block {
         }
       }
     }
+
+
+    let effectMutable = !this.isBrowse && !this.isReadonly;
+
+    if (effectMutable){
+      let mode = DATA_MODE_PROP in this.renderState
+                    ? this.renderState[DATA_MODE_PROP]
+                    : this.renderState[DATA_MODE_PROP] = getEffectiveDataMode(this);
+
+      effectMutable = mode === undefined || (mode === DATA_MODE.INSERT || mode === DATA_MODE.UPDATE);
+    }
+
+
     // ---------------------------------------------------------------------------
     if (this.noSummary){
       let cls = `${parseRank(this.rank, true)}`; //ignore "status" coloring as we do not have the outer frame
@@ -262,7 +277,7 @@ export class Bit extends Block {
       return html`<div id="divControl" class="outer ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
     } else {
       let cls = `${parseRank(this.rank, true)} ${parseStatus(this.status, true)}`;
-      const summary = this._getSummaryData();
+      const summary = this._getSummaryData(effectDisabled, effectMutable);
       const innerContent = html`${this.renderStatusFlag()} ${this.renderSummary(summary)} ${this.renderDetails()}`;
       return html`<div id="divControl" class="outer control ${cls}" ?inert=${effectDisabled}> ${innerContent} </div>`;
     }
@@ -314,6 +329,8 @@ export class Bit extends Block {
       bar.push(html`<div class="cmd" @click=${() => cmd.exec(arena, this)}>${mkp}</div>`);
     }
 
+    if (bar.length === 0) return noContent;
+
     return html`<div class="toolbar"> ${bar} </div>`;
   }
 
@@ -327,6 +344,269 @@ export class Bit extends Block {
   renderDetailContent(){ return html`<slot>  </slot>`; }
 }
 
-
-
 window.customElements.define("az-bit", Bit);
+
+
+
+
+/** Provides a `Bit` of LIST-like data functionality returning an array of items  */
+export class ListBit extends Bit {
+
+
+  static styles = [STL_BIT, css`
+.listItem{
+  padding: 1ch;
+  border-bottom: 2px dotted #40404020;
+  border-radius: 0px;
+
+  &:focus-within{ outline: 1px solid var(--focus-ctl-selected-color); }
+}
+
+.selected{ background: var(--selected-item-bg); border-radius: 0.75em; }
+.last{ border: none; }
+  `];
+
+  static properties = {
+    itemTagName: {type: "String"},
+
+    /** If defined as a number greater than one imposes a limit on the minimum of list elements */
+    minLength: { type: Number, reflect: false },
+
+    /** If defined as a number greater than one imposes a limit on the maximum number of list elements */
+    maxLength: { type: Number, reflect: false },
+  };
+
+  /** Override to return a class of items being handled by this list
+   * in cases when default logic is used, such as default add handler.
+   * You can override the add handler itself and insert polymorphic types,
+   * however this method is used as a default one
+  */
+  getDefaultItemClass(){
+    const tag = this.itemTagName;
+    let result = null;
+    if (tag)  result = window.customElements.get(tag);
+    return result ?? TextField;
+  }
+
+  //Actual array of data elements
+  #listElements = [];
+  #makeOrMapElementHandler = null;
+  #selectedElement = null;
+
+  /** Add command, you may return this from `_getSummaryData()` method */
+  _cmdAdd = new Command(this, { icon: "svg://azos.ico.add",  handler: () => this.addItemAsync() });
+  /** Remove command, you may return this from `_getSummaryData()` method  */
+  _cmdRemove = new Command(this, { icon: "svg://azos.ico.delete", handler: () => this.removeItemAsync() });
+
+  /** Invoked to add item to the list.
+   * Default implementation just uses `upsert()` which in turn resorts to `makeOrMapElement(...)`.
+   * You can override this method here and allocate a specific element, for example by using a popup to prompt the user, hence
+   * this method is asynchronous - it may complete after an indefinite time, for example after getting a user response
+   */
+  async addItemAsync(){
+    if (this.maxLength > 0 && this.count >= this.maxLength) return undefined;
+    return this.upsert({});
+  }
+
+  /** Invoked to remove selected item from list.
+   * You may query user with a dialog to prevent removal
+   */
+  async removeItemAsync(){
+    const one = this.#selectedElement;
+    this.#selectedElement = null;
+    if (one){
+      this.remove(one);
+    }
+  }
+
+  /** Returns a copy of list elements */
+  get listElements(){ return [...this.#listElements]; }
+
+  /** Returns a number of items contained in this list */
+  get count(){ return this.#listElements.length; }
+
+  /** Returns an index of existing element found by reference comparison or -1 if not found*/
+  indexOf(elm){
+    if (!elm) return -1;
+    return this.#listElements.indexOf(elm);
+  }
+
+  find(f){
+    aver.isFunction(f);
+    return this.#listElements.find(f);
+  }
+
+  /**
+   * Allows to iterate over data members (e.g. data fields) contained by this block
+   */
+  get [DATA_BLOCK_PROP](){ return [...this.#listElements]; }
+
+  get [DATA_VALUE_DESCRIPTOR_PROP](){ return { [DATA_VALUE_DESCRIPTOR_IS_LIST]: true}; }
+
+  get [DATA_VALUE_PROP](){
+    const result = [];
+    for(const one of this.#listElements){
+      const value =  DATA_VALUE_PROP in one ? one[DATA_VALUE_PROP] : one.toString();
+      result.push(value);
+    }
+    return result;
+  }
+
+  set [DATA_VALUE_PROP](v){
+    this.#listElements = [];
+    this.requestUpdate();
+    if (!v) return;
+
+    let isUiInput = false;
+    if (v instanceof UiInputValue) {//unwrap UiInputValue
+      isUiInput = true;
+      v = v.value();
+    }
+
+    aver.isArray(v, "ListBit needs array value");
+    for(const one of v) {
+      this._loadItemFromData(one, isUiInput);
+    }
+
+  }
+
+  /** Override to complete only after your children have loaded */
+  async _doAwaitFullStructureLoad(){
+    for(const one of this.#listElements) await one.updateComplete;
+  }
+
+  /** A reference to a function which handles mapping of existing data into new elements. Signature: f(this: ListBit, elemData: object, existingOnly: bool)*/
+  get makeOrMapElementHandler(){ return this.#makeOrMapElementHandler; }
+  set makeOrMapElementHandler(v){ this.#makeOrMapElementHandler = aver.isFunctionOrNull(v); }
+
+  /** An element factory: projects data vector into appropriate list item element type.
+   *  Returns AzosElement which should be used as a list item. You cam make instances of
+   *  an appropriate type polymorphically.
+   * The override DOES NOT need to bind data, data property binds later on
+   * @param {any} elmData data object (such as a map) which is used to MAKE a new `AzosElement` derivative suitable to be a list item
+   * @param {Boolean} existingOnly - true to only return existing elements, false to also make new elements if they do not exist for the specified data
+   * @returns {AzosElement} an element which represents the data to be added to the list.
+   * WARNING: this method may return an instance of already existing element as it deems necessary for elements of the same equality
+   * as determined by business-driven equality comparison
+   * */
+  makeOrMapElement(elmData, existingOnly = false){
+    //Do not confuse handlers and events. Handlers are function pointers and return values unlike events
+    if (this.#makeOrMapElementHandler) return this.#makeOrMapElementHandler(this, elmData, existingOnly);
+
+    if (this.indexOf(elmData) >= 0) return elmData;
+    if (existingOnly) return null;
+
+    const tItem = this.getDefaultItemClass();
+    const result = new tItem();
+    return result;
+  }
+
+  /** Protected: Loads item from data vector by mapping an object into an existing item or making a new item element (a factory method).
+   * This method is nt expected to be called from business code as it is called as a part of data property assignment.
+   * The newly created element is added into element list buffer
+   */
+  _loadItemFromData(data, isUiInput){
+    aver.isNotNull(data);
+    const elm = this.makeOrMapElement(data, false);
+    if (!elm) return null;
+
+    if (DATA_VALUE_PROP in elm) {
+      const valToSet = isUiInput ? new UiInputValue(data) : data;
+      //we need to bind the data synchronously as the element is not built yet
+      //once the elements `updateComplete` resolves, we can now set its data value property
+      elm.updateComplete.then(() => {
+        elm[DATA_VALUE_PROP] = valToSet;
+        if (elm[RESET_DIRTY_METHOD]) elm[RESET_DIRTY_METHOD]();
+      });
+    }
+
+    if (this.indexOf(elm) < 0) this.#listElements.push(elm);
+
+    return elm;
+  }
+
+  /** Adds an element to list returning true if it was added as it did not exist, otherwise deems element as updated
+   * @param {object | AzosElement} elm  an object data mappable to `AzosElement` via factory method invocation or pre-mapped AzosElement
+   * @param {boolean} [updateOnly=false] pass true to suppress the insert option and treat this as pure update of an existing item
+   * @returns {boolean | null} true if inserted, false if updated, null if could not find for update only mode
+  */
+  upsert(elm, updateOnly = false){
+    aver.isNotNull(elm);
+    if (!(elm instanceof AzosElement)) elm = this.makeOrMapElement(elm, updateOnly);
+    if (!elm) return null;
+
+    const idxExisting = this.indexOf(elm);
+    if (idxExisting < 0) this.#listElements.push(elm);
+    this.requestUpdate();
+    return idxExisting < 0;
+  }
+
+  /**
+   * Removes an element returning true if found and removed
+   * @param {object | AzosElement} elm  an object data mappable to `AzosElement` via factory method invocation or pre-mapped AzosElement
+   * @returns {boolean} true when removed, otherwise false
+   */
+  remove(elm){
+    aver.isNotNull(elm);
+    if (!(elm instanceof AzosElement)) elm = this.makeOrMapElement(elm, true);
+    if (!elm) return false;
+
+    const ok = arrayDelete(this.#listElements, elm);
+    if (!ok) return false;
+    this.requestUpdate();
+    return true;
+  }
+
+   /**
+   * Performs list length validation
+   * @param {Error[]} errorBatch - an array of errors which have already been detected during validation. You add more errors via `errorBatch.push(...)`
+   * @param {*} context optional validation context
+   * @param {*} scope scoping specifier
+   */
+  // eslint-disable-next-line no-unused-vars
+  _doValidate(errorBatch, context, scope){
+    if (this.minLength > 0 && this.count < this.minLength){
+      errorBatch.push(new ValidationError(getEffectiveSchema(this), dflt(this.name, "*"), scope, `List needs at least ${this.minLength} elements`, null, this.constructor.name));
+    }
+
+    if (this.maxLength > 0 && this.count > this.maxLength){
+      errorBatch.push(new ValidationError(getEffectiveSchema(this), dflt(this.name, "*"), scope, `List may contain at most ${this.maxLength} elements`, null, this.constructor.name));
+    }
+  }
+
+  /** Override to return {title, subtitle, commands[]} */
+  _getSummaryData(effectDisabled, effectMutable){
+
+    const commands = effectMutable ? [this._cmdAdd, this._cmdRemove] : [];
+
+    return {
+      title: `${this.title} (${this.count})`,
+      subtitle: this.description,
+      commands: commands
+    }
+  }
+
+  renderDetailContent(){
+    const head = this.renderListHead();
+    const items = this.renderListItems();
+    const tail = this.renderListTail();
+    return html`${head}${items}${tail}`;
+  }
+
+
+  renderListHead(){ return noContent;  }
+  renderListTail(){ return noContent;  }
+
+
+  #divItemFocusIn(item){
+    this.#selectedElement = item;
+    this.requestUpdate();
+  }
+
+  renderListItems(){
+    const result = this.#listElements.map((one, i) => html`<div class="listItem ${one === this.#selectedElement ? "selected" : ""} ${i === this.#listElements.length-1 ? "last" : ""}" @focusin="${() => this.#divItemFocusIn(one)}">${one}</div>`);
+    return result;
+  }
+}
+
+window.customElements.define("az-list-bit", ListBit);

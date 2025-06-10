@@ -1,4 +1,10 @@
-import { dflt, dfltObject, trim, isEmpty, isNullOrWhiteSpace } from "azos/strings"; 
+/*<FILE_LICENSE>
+ * Azos (A to Z Application Operating System) Framework
+ * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
+ * See the LICENSE file in the project root for more information.
+</FILE_LICENSE>*/
+
+import { dflt, dfltObject, trim, isEmpty, isNullOrWhiteSpace } from "azos/strings";
 import { asInt, isIntValue, isNumber } from "azos/types";
 import * as log from "azos/log";
 
@@ -32,7 +38,7 @@ export class SpanBit extends Bit {
 
   //TODO: Add data validation after creating parse, parseComponent, parseMinute from C#
   renderDetailContent() {
-    
+
     log.writeConsole(validateHourList("9am-12pm, 1:00pm-7:45pm"));
 
     return html`
@@ -163,19 +169,19 @@ function validateHourList(content)
   {
     var rawStart = parseComponent(kvp[0]);
     if (rawStart < 0) return null;
-   
+
     var rawFinish = parseComponent(kvp[1]);
     if (rawFinish < 0) return null;
-   
+
     var duration = rawFinish >= rawStart ? rawFinish - rawStart : (MINUTES_PER_DAY - rawStart) + rawFinish;
     // finish minute is the start + duration - 1 minute as the start minute is included as part of the range.
     var span = { startMinute:rawStart , durationMinutes: duration, finishMinute: duration > 0 ? rawStart + duration - 1 : -1, rawData:kvp };
-   
+
     data.push(span);
   }
 
   //order in time
-  var result = data.sort(s => s.startMinute); 
+  var result = data.sort(s => s.startMinute);
 
   //check for overlap
   var start = 0;
@@ -222,7 +228,7 @@ function parseComponent(str) {
 function parseMinutes(str)
 {
   if (isNullOrWhiteSpace(str)) return -1;
-  
+
   var i = str.indexOf(':');
 
   if (i === -1)//whole hour, no minute divider found
@@ -240,7 +246,7 @@ function parseMinutes(str)
   var m = str.substring(i+1);
   if(isIntValue(m)) m = asInt(m);
   else return -1;
-  
+
   if (h < 0 || h > 23) return -1;
   if (m < 0 || m > 59) return -1;
 

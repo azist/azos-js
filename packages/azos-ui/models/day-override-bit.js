@@ -1,3 +1,10 @@
+/*<FILE_LICENSE>
+ * Azos (A to Z Application Operating System) Framework
+ * The A to Z Foundation (a.k.a. Azist) licenses this file to you under the MIT license.
+ * See the LICENSE file in the project root for more information.
+</FILE_LICENSE>*/
+
+
 import { TIME_ZONE_PROP } from "azos/types";
 import { dflt, dfltObject } from "azos/strings"
 import { TZ_UTC } from "azos/time";
@@ -25,9 +32,9 @@ export class DayOverrideBit extends Bit {
                           .localizer
                           .formatDateTime(
                             {
-                              dt:this.tbDate?.value, 
-                              dtFormat:DATE_FORMAT.NUM_DATE, 
-                              tmDetails: TIME_DETAILS.NONE, 
+                              dt:this.tbDate?.value,
+                              dtFormat:DATE_FORMAT.NUM_DATE,
+                              tmDetails: TIME_DETAILS.NONE,
                               timeZone: TZ_UTC
                             }), "");
     return {

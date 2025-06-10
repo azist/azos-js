@@ -16,6 +16,7 @@ import "../showcase/case-accordion.js";
 import "../showcase/case-buttons.js";
 import "../showcase/case-buttons-with-icons.js";
 import "../showcase/case-bit.js";
+import "../showcase/case-bit-lists.js";
 import "../showcase/case-checkboxes.js";
 import "../showcase/case-code-box.js";
 import "../showcase/case-error-box.js";
@@ -114,6 +115,7 @@ export class ShowcaseApplet extends Applet {
       <option value="Buttons">Buttons</option>
       <option value="ButtonsWithIcons">Buttons With Icons</option>
       <option value="Bits">Bits</option>
+      <option value="BitLists">Bit Lists</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
       <option value="ErrorBox">Error Box</option>
@@ -153,6 +155,7 @@ export class ShowcaseApplet extends Applet {
       Buttons: html`<az-case-buttons></az-case-buttons>`,
       ButtonsWithIcons: html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`,
       Bits: html`<az-case-bit></az-case-bit>`,
+      BitLists: html`<az-case-bit-lists></az-case-bit-lists>`,
       Checkboxes: html`<az-case-checkboxes></az-case-checkboxes>`,
       CodeBox: html`<az-case-code-box></az-case-code-box>`,
       ErrorBox: html`<az-case-error-box></az-case-error-box>`,
