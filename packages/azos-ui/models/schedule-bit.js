@@ -15,7 +15,7 @@ export class ScheduleBit extends Bit {
     captionSpan: { type: String },
   }
 
-  get[TIME_ZONE_PROP]() { return TZ_UTC; }
+  //get[TIME_ZONE_PROP]() { return TZ_UTC; }
 
   renderDetailContent() {
     return html`
@@ -49,6 +49,11 @@ export class ScheduleBit extends Bit {
         id="bitDayOverride"
         scope="this"
       ></az-day-override-bit>
+
+      <az-adlib-tag-bit
+        id="bitTag"
+        scope="this"
+      ></az-adlib-tag-bit>
 
     </div>
     

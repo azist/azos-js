@@ -21,7 +21,7 @@ export class DayOverrideBit extends Bit {
     const summary = dfltObject(this.tbName?.value, html`<span style="color: var(--ghost)">Day Override</span>`);
     // Always localize the DATE to UTC since we don't want that to be altered during localization elsewhere.
     // As the UTC date is a statutory date that will be compared against the application date in EVERY PARTICULAR LOCAL TIMEZONE
-    const subSummary = this.arena.app
+    const subSummary = dflt(this.arena.app
                           .localizer
                           .formatDateTime(
                             {
@@ -29,7 +29,7 @@ export class DayOverrideBit extends Bit {
                               dtFormat:DATE_FORMAT.NUM_DATE, 
                               tmDetails: TIME_DETAILS.NONE, 
                               timeZone: TZ_UTC
-                            });
+                            }), "");
     return {
       title: summary,
       subtitle: subSummary,
@@ -62,7 +62,9 @@ export class DayOverrideBit extends Bit {
         scope="this"
         name="Date"
         class="span2"
-        title="Override Date"
+        contentWidth="50"
+        titleWidth="50"
+        title="Date"
         .isReadonly="${this.isReadOnly}"
         displayFormat='<<v::ld{"dtFormat":"LongDate", "tmDetails":"NONE"}>>'
         dataKind="datetime"
@@ -73,7 +75,9 @@ export class DayOverrideBit extends Bit {
         id="tbHours"
         scope="this"
         name="Hours"
-        title="${dflt(this.captionHours, "Scheduled Hours")}"
+        contentWidth="50"
+        titleWidth="50"
+        title="${dflt(this.captionHours, "Hours")}"
         class="span2"
       ></az-text>
     </div>`;
