@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 //import { describe, it } from "mocha";
-import { defineUnit as describe, defineCase as it } from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import { ABSTRACT } from "../coreconsts.js"
 import { dispose } from "../types.js";
 import * as aver from "../aver.js";
@@ -48,9 +48,9 @@ class OhioNews extends INews{
 
 
 
-describe("#AppModule", function() {
+unit("#AppModule", function() {
 
-  it("UsNews needs weather",   function() {
+  cs("UsNews needs weather",   function() {
 
     const app = application({
       modules: [
@@ -68,7 +68,7 @@ describe("#AppModule", function() {
     dispose(app);
   });
 
-  it("UsNews fail wo weather",   function() {
+  cs("UsNews fail wo weather",   function() {
     aver.throws(() =>{
         application({
           modules: [
@@ -80,7 +80,7 @@ describe("#AppModule", function() {
   });
 
 
-  it("OhioNews",   function() {
+  cs("OhioNews",   function() {
 
     const app = application({
       modules: [

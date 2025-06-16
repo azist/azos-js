@@ -5,15 +5,15 @@
 </FILE_LICENSE>*/
 
 //import { describe, it } from "mocha";
-import { defineUnit as describe, defineCase as it } from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "../aver.js";
 import { $ } from "../linq.js";
 import * as sut from "../conf.js";
 
-describe("Configuration", function() {
+unit("Configuration", function() {
 
-  describe("config", function() {
-    it("config()",   function() {
+  unit("config", function() {
+    cs("config()",   function() {
       const cfg = sut.config({a: 1, b: 2, c: true});
       aver.areEqual(3, cfg.root.count);
       aver.areEqual(1, cfg.root.get("a"));
@@ -22,16 +22,16 @@ describe("Configuration", function() {
     });
   });
 
-  describe(".ctor", function() {
+  unit(".ctor", function() {
 
-    it("undef",        () => aver.throws(()=> new sut.Configuration(undefined), "init content"));
-    it("null",         () => aver.throws(()=> new sut.Configuration(null), "init content"));
-    it("empty string", () => aver.throws(() => new sut.Configuration(""), "init content"));
-    it("bad json string", () => aver.throws(() => new sut.Configuration("{ bad json"), "init content"));
-    it("non object",   () => aver.throws(() => new sut.Configuration(123), "init content"));
+    cs("undef",        () => aver.throws(()=> new sut.Configuration(undefined), "init content"));
+    cs("null",         () => aver.throws(()=> new sut.Configuration(null), "init content"));
+    cs("empty string", () => aver.throws(() => new sut.Configuration(""), "init content"));
+    cs("bad json string", () => aver.throws(() => new sut.Configuration("{ bad json"), "init content"));
+    cs("non object",   () => aver.throws(() => new sut.Configuration(123), "init content"));
 
 
-    it("from object",   function() {
+    cs("from object",   function() {
       const cfg = new sut.Configuration({a: 1, b: 2, c: true});
       aver.areEqual(3, cfg.root.count);
       aver.areEqual(1, cfg.root.get("a"));
@@ -39,7 +39,7 @@ describe("Configuration", function() {
       aver.areEqual(true, cfg.root.get("c"));
     });
 
-    it("from string",   function() {
+    cs("from string",   function() {
       const cfg = new sut.Configuration('{"a": 1, "b": 2, "c": true}');
       aver.areEqual(3, cfg.root.count);
       aver.areEqual(1, cfg.root.get("a"));
@@ -47,7 +47,7 @@ describe("Configuration", function() {
       aver.areEqual(true, cfg.root.get("c"));
     });
 
-    it(".content",   function() {
+    cs(".content",   function() {
       const cfg = new sut.Configuration('{"a": 1, "b": -2}');
       aver.areEqual(2, cfg.root.count);
       aver.areEqual(1, cfg.root.get("a"));
@@ -62,91 +62,91 @@ describe("Configuration", function() {
 });
 
 
-describe("ConfigNode", function() {
+unit("ConfigNode", function() {
 
-  it("toString()",   function() {
+  cs("toString()",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     //console.info(cfg.root.toString());
     aver.areEqual("ConfigNode('/', {3})", cfg.root.toString());
   });
 
-  it("configuration",   function() {
+  cs("configuration",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     aver.areEqual(cfg, cfg.root.configuration);
   });
 
-  it("name",   function() {
+  cs("name",   function() {
     const cfg = sut.config({a: 1, b: {f: true}});
     aver.areEqual("/", cfg.root.name);
     aver.areEqual("b", cfg.root.get("b").name);
   });
 
-  it("parent",   function() {
+  cs("parent",   function() {
     const cfg = sut.config({a: 1, b: {f: true}});
     aver.areEqual(cfg.root, cfg.root.get("b").parent);
   });
 
-  it("isSection|isArray",   function() {
+  cs("isSection|isArray",   function() {
     const cfg = sut.config({a: [1,2,3], b: {f: true}});
     aver.isTrue(cfg.root.get("a").isArray);
     aver.isTrue(cfg.root.get("b").isSection);
   });
 
-  it("path",   function() {
+  cs("path",   function() {
     const cfg = sut.config({a: 1, b: {f: {q: [ {a1: {}}, [{ok: false}] ]}}});
     aver.areEqual("/b", cfg.root.get("b").path);
     aver.areEqual("/b/f", cfg.root.get("b").get("f").path);
     aver.areEqual("/b/f/q/#0/a1", cfg.root.get("b").get("f").get("q").get("#0").get("a1").path);
   });
 
-  it("get() null/undefined values",   function() {
+  cs("get() null/undefined values",   function() {
     const cfg = sut.config({a: 1, b: null, c: undefined});
     aver.areEqual(1, cfg.root.get("a"));
     aver.areEqual(null, cfg.root.get("b"));
     aver.areEqual(undefined, cfg.root.get("c"));
   });
 
-  it("get()",   function() {
+  cs("get()",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     aver.areEqual(undefined, cfg.root.get());
   });
 
-  it("get(null)",   function() {
+  cs("get(null)",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     aver.areEqual(undefined, cfg.root.get(null));
   });
 
-  it("get('')",   function() {
+  cs("get('')",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     aver.areEqual(undefined, cfg.root.get(""));
   });
 
-  it("get('notExist')",   function() {
+  cs("get('notExist')",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     aver.areEqual(undefined, cfg.root.get("notExist"));
   });
 
-  it("get('notExist', 'a')",   function() {
+  cs("get('notExist', 'a')",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     aver.areEqual(1, cfg.root.get("notExist", "a"));
   });
 
-  it("get('notExist', 'b', 'a')",   function() {
+  cs("get('notExist', 'b', 'a')",   function() {
     const cfg = sut.config({a: 1, b: 2, c: true});
     aver.areEqual(2, cfg.root.get("notExist", "b", "a"));
   });
 
-  it("get('notExist', null, 'a')",   function() {
+  cs("get('notExist', null, 'a')",   function() {
     const cfg = sut.config({a: 11, b: 22, c: true});
     aver.areEqual(11, cfg.root.get("notExist", null, "a"));
   });
 
-  it("get('notExist', undefined, 'a')",   function() {
+  cs("get('notExist', undefined, 'a')",   function() {
     const cfg = sut.config({a: 11, b: 22, c: true});
     aver.areEqual(11, cfg.root.get("notExist", undefined, "a"));
   });
 
-  it("get(null|undef combinations)",   function() {
+  cs("get(null|undef combinations)",   function() {
     const cfg = sut.config({a: 11, b: 22, c: true});
     aver.areEqual(11, cfg.root.get(undefined, "notExist", undefined, "a"));
     aver.areEqual(11, cfg.root.get(null, "notExist", undefined, "a"));
@@ -158,7 +158,7 @@ describe("ConfigNode", function() {
     aver.areEqual(11, cfg.root.get("a", ...a));
   });
 
-  it("getVerbatim(null|undef combinations)",   function() {
+  cs("getVerbatim(null|undef combinations)",   function() {
     const cfg = sut.config({a: 11, b: 22, c: true});
     aver.areEqual(11, cfg.root.getVerbatim(undefined, "notExist", undefined, "a"));
     aver.areEqual(11, cfg.root.getVerbatim(null, "notExist", undefined, "a"));
@@ -170,7 +170,7 @@ describe("ConfigNode", function() {
     aver.areEqual(11, cfg.root.getVerbatim("a", ...a));
   });
 
-  it("get(section)",   function() {
+  cs("get(section)",   function() {
     const cfg = sut.config({a: 11, b: {d: -9, z: 78.12}, c: true});
     aver.areEqual(11, cfg.root.get("a"));
     aver.isOf(cfg.root.get("b"), sut.ConfigNode);
@@ -179,7 +179,7 @@ describe("ConfigNode", function() {
   });
 
 
-  it("complex structure and nav",   function() {
+  cs("complex structure and nav",   function() {
     const cfg = sut.config({
       v: null,
       a: {
@@ -223,7 +223,7 @@ describe("ConfigNode", function() {
     aver.areEqual("little bug", cfg.root.nav("/a/section1/array").get("2").get("0").nav("string name"));
   });
 
-  it("iterator",   function() {
+  cs("iterator",   function() {
     const cfg = sut.config({
       abba: 11,
       bubba: {d: -9, z: 78.12},
@@ -252,7 +252,7 @@ describe("ConfigNode", function() {
     aver.areIterablesEquivalent([1, 5, cfg.root.nav("/dole/2")], doleItems.select(one => one.val));
   });
 
-  it("var-path-eval",   function() {
+  cs("var-path-eval",   function() {
     const cfg = sut.config({
       id: "a1bold",
       paths: {
@@ -298,7 +298,7 @@ describe("ConfigNode", function() {
     aver.areEqual("~/data-a1bold", cfg.root.get("paths_Alias2").get("data"));
   });
 
-  it("verbatim",   function() {
+  cs("verbatim",   function() {
     const cfg = sut.config({
       id: "a1bold",
       paths: new sut.Verbatim({
@@ -330,7 +330,7 @@ describe("ConfigNode", function() {
 
   });
 
-  it("verbatim-2",   function() {
+  cs("verbatim-2",   function() {
 
     class A{  [sut.GET_CONFIG_VERBATIM_VALUE](){ return 1234;}  }
     class B{    }
@@ -349,7 +349,7 @@ describe("ConfigNode", function() {
   });
 
 
-  it("var-recursion",   function() {
+  cs("var-recursion",   function() {
     const cfg = sut.config({
       id: "a1bold",
       paths: {
@@ -364,7 +364,7 @@ describe("ConfigNode", function() {
   });
 
 
-  it("getNodeAttrOrValue()",   function() {
+  cs("getNodeAttrOrValue()",   function() {
     aver.areEqual(1, sut.getNodeAttrOrValue(1, "a"));
     aver.areEqual("yes no", sut.getNodeAttrOrValue("yes no", "a"));
     aver.areEqual(-897.12, sut.getNodeAttrOrValue(sut.config({a: -897.12}), "a"));
@@ -374,7 +374,7 @@ describe("ConfigNode", function() {
     aver.areEqual("zzz", sut.getNodeAttrOrValue(sut.config({a: "$(b)", b: "zzz"}), "no", "cant", "a"));
   });
 
-  it("getVerbatimNodeAttrOrValue()",   function() {
+  cs("getVerbatimNodeAttrOrValue()",   function() {
     aver.areEqual(1, sut.getVerbatimNodeAttrOrValue(1, "a"));
     aver.areEqual("yes no", sut.getVerbatimNodeAttrOrValue("yes no", "a"));
     aver.areEqual(-897.12, sut.getVerbatimNodeAttrOrValue(sut.config({a: -897.12}), "a"));
@@ -385,9 +385,9 @@ describe("ConfigNode", function() {
   });
 
 
-  describe("Flatten", function(){
+  unit("Flatten", function(){
 
-    it("map-simple",  function() {
+    cs("map-simple",  function() {
       const cfg = sut.config({ a: 1, b: 2, s: "hello" });
 
       const got = cfg.root.flatten();
@@ -397,7 +397,7 @@ describe("ConfigNode", function() {
       aver.areEqual("hello", got.s);
     });
 
-    it("map-simple-var",  function() {
+    cs("map-simple-var",  function() {
       const cfg = sut.config({ a: 1, b: 2, c: "$(b)-$(a)" });
 
       const got = cfg.root.flatten();
@@ -407,7 +407,7 @@ describe("ConfigNode", function() {
       aver.areEqual("2-1", got.c);
     });
 
-    it("map-simple-var-verbatim",  function() {
+    cs("map-simple-var-verbatim",  function() {
       const cfg = sut.config({ a: 1, b: 2, c: "$(b)-$(a)" });
 
       const got = cfg.root.flatten(true);
@@ -417,7 +417,7 @@ describe("ConfigNode", function() {
       aver.areEqual("$(b)-$(a)", got.c);
     });
 
-    it("array-simple",  function() {
+    cs("array-simple",  function() {
       const cfg = sut.config({d: [1, 2, "hello"]});
 
       const got = cfg.root.get("d").flatten();
@@ -427,7 +427,7 @@ describe("ConfigNode", function() {
       aver.areEqual("hello", got[2]);
     });
 
-    it("array-simple-var",  function() {
+    cs("array-simple-var",  function() {
       const cfg = sut.config({d: [1, 2, "$(1)-$(0)"]});
 
       const got = cfg.root.get("d").flatten();
@@ -437,7 +437,7 @@ describe("ConfigNode", function() {
       aver.areEqual("2-1", got[2]);
     });
 
-    it("array-simple-var-verbatim",  function() {
+    cs("array-simple-var-verbatim",  function() {
       const cfg = sut.config({d: [1, 2, "$(1)-$(0)"]});
 
       const got = cfg.root.get("d").flatten(true);
@@ -448,7 +448,7 @@ describe("ConfigNode", function() {
     });
 
 
-    it("complex",  function() {
+    cs("complex",  function() {
       const cfg = sut.config({
          a: 10,
          b: -275,
@@ -482,7 +482,7 @@ describe("ConfigNode", function() {
       aver.areEqual(-789.234, got.d.z[1].b);
     });
 
-    it("complex-getFlatNode()",  function() {
+    cs("complex-getFlatNode()",  function() {
       const cfg = sut.config({
          a: 10,
          b: -275,
@@ -512,7 +512,7 @@ describe("ConfigNode", function() {
   });
 
 
-  it("getChildren()",   function() {
+  cs("getChildren()",   function() {
     const cfg = sut.config({
       a: {x: 123},
       b: [{x: -11}, {x: -22}],
@@ -585,294 +585,294 @@ describe("ConfigNode", function() {
     vDate1: new Date("2017-10-19")
   }).root;
 
-  it("getString(undefined)",   function() {
+  cs("getString(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getString("vUndefined"));
     aver.areEqual("Mister X!", cfgGetAccessors.getString("vUndefined", "Mister X!"));
   });
 
-  it("getString(null)",   function() {
+  cs("getString(null)",   function() {
     aver.areEqual(null, cfgGetAccessors.getString("vNull"));
     aver.areEqual("Mister Y!", cfgGetAccessors.getString("vNull", "Mister Y!"));
   });
 
-  it("getString('')",   function() {
+  cs("getString('')",   function() {
     aver.areEqual("", cfgGetAccessors.getString("vStringEmpty"));
     aver.areEqual("zzz", cfgGetAccessors.getString("vStringEmpty", "zzz"));
     aver.areEqual(" ", cfgGetAccessors.getString("vStringSpace"));
     aver.areEqual("nnn", cfgGetAccessors.getString("vStringSpace", "nnn"));
   });
 
-  it("getString(int)",   function() {
+  cs("getString(int)",   function() {
     aver.areEqual(0xfaca.toString(), cfgGetAccessors.getString("vInt3"));
     aver.areEqual(0xfaca.toString(), cfgGetAccessors.getString("vInt3", "kuku"));
   });
 
-  it("getString(money)",   function() {
+  cs("getString(money)",   function() {
     aver.areEqual("-12345.12345", cfgGetAccessors.getString("vMoney3"));
     aver.areEqual("-12345.12345", cfgGetAccessors.getString("vMoney3","smoke"));
   });
 
-  it("getBool(undefined)",   function() {
+  cs("getBool(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getBool("vUndefined"));
     aver.areEqual(true, cfgGetAccessors.getBool("vUndefined", true));
   });
 
-  it("getBool(null)",   function() {
+  cs("getBool(null)",   function() {
     aver.areEqual(false, cfgGetAccessors.getBool("vNull"));
     aver.areEqual(false, cfgGetAccessors.getBool("vNull", true));
   });
 
-  it("getBool(' ')",   function() {
+  cs("getBool(' ')",   function() {
     aver.areEqual(false, cfgGetAccessors.getBool("vStringSpace"));
     aver.areEqual(false, cfgGetAccessors.getBool("vStringSpace", true));
   });
 
-  it("getBool(str1)",   function() {
+  cs("getBool(str1)",   function() {
     aver.areEqual(true, cfgGetAccessors.getBool("vStringBool1"));
     aver.areEqual(true, cfgGetAccessors.getBool("vStringBool1", false));
   });
 
-  it("getBool(str2)",   function() {
+  cs("getBool(str2)",   function() {
     aver.areEqual(true, cfgGetAccessors.getBool("vStringBool2"));
     aver.areEqual(true, cfgGetAccessors.getBool("vStringBool2", false));
   });
 
-  it("getBool(str3)",   function() {
+  cs("getBool(str3)",   function() {
     aver.areEqual(true, cfgGetAccessors.getBool("vStringBool3"));
     aver.areEqual(true, cfgGetAccessors.getBool("vStringBool3", false));
   });
 
-  it("getBool(bool1)",   function() {
+  cs("getBool(bool1)",   function() {
     aver.areEqual(true, cfgGetAccessors.getBool("vBool1"));
     aver.areEqual(true, cfgGetAccessors.getBool("vBool1", false));
   });
 
-  it("getBool(bool2)",   function() {
+  cs("getBool(bool2)",   function() {
     aver.areEqual(true, cfgGetAccessors.getBool("vBool2"));
     aver.areEqual(true, cfgGetAccessors.getBool("vBool2", false));
   });
 
-  it("getBool(bool3)",   function() {
+  cs("getBool(bool3)",   function() {
     aver.areEqual(false, cfgGetAccessors.getBool("vBool3"));
     aver.areEqual(false, cfgGetAccessors.getBool("vBool3", true));
   });
 
 
-  it("getTriBool(undefined)",   function() {
+  cs("getTriBool(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getTriBool("vUndefined"));
     aver.areEqual(undefined, cfgGetAccessors.getTriBool("vUndefined", true));
   });
 
-  it("getTriBool(null)",   function() {
+  cs("getTriBool(null)",   function() {
     aver.areEqual(false, cfgGetAccessors.getTriBool("vNull"));
     aver.areEqual(false, cfgGetAccessors.getTriBool("vNull", true));
   });
 
-  it("getTriBool(' ')",   function() {
+  cs("getTriBool(' ')",   function() {
     aver.areEqual(false, cfgGetAccessors.getTriBool("vStringSpace"));
     aver.areEqual(false, cfgGetAccessors.getTriBool("vStringSpace", true));
   });
 
-  it("getTriBool(str1)",   function() {
+  cs("getTriBool(str1)",   function() {
     aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool1"));
     aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool1", false));
   });
 
-  it("getTriBool(str2)",   function() {
+  cs("getTriBool(str2)",   function() {
     aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool2"));
     aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool2", false));
   });
 
-  it("getTriBool(str3)",   function() {
+  cs("getTriBool(str3)",   function() {
     aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool3"));
     aver.areEqual(true, cfgGetAccessors.getTriBool("vStringBool3", false));
   });
 
-  it("getInt(undefined)",   function() {
+  cs("getInt(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getInt("vUndefined"));
     aver.areEqual(123, cfgGetAccessors.getInt("vUndefined", 123));
   });
 
-  it("getInt(null)",   function() {
+  cs("getInt(null)",   function() {
     aver.areEqual(0, cfgGetAccessors.getInt("vNull"));
     aver.areEqual(0, cfgGetAccessors.getInt("vNull", 456));
   });
 
-  it("getInt('')",   function() {
+  cs("getInt('')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getInt("vStringEmpty"));
     aver.areEqual(456, cfgGetAccessors.getInt("vStringEmpty", 456));
   });
 
-  it("getInt(' ')",   function() {
+  cs("getInt(' ')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getInt("vStringSpace"));
     aver.areEqual(-456, cfgGetAccessors.getInt("vStringSpace", -456));
   });
 
-  it("getInt(str1)",   function() {
+  cs("getInt(str1)",   function() {
     aver.areEqual(9, cfgGetAccessors.getInt("vStringInt1"));
     aver.areEqual(9, cfgGetAccessors.getInt("vStringInt1", -456));
   });
 
-  it("getInt(str2)",   function() {
+  cs("getInt(str2)",   function() {
     aver.areEqual(9, cfgGetAccessors.getInt("vStringInt2"));
     aver.areEqual(9, cfgGetAccessors.getInt("vStringInt2", -456));
   });
 
-  it("getInt(str3)",   function() {
+  cs("getInt(str3)",   function() {
     aver.areEqual(-9, cfgGetAccessors.getInt("vStringInt3"));
     aver.areEqual(-9, cfgGetAccessors.getInt("vStringInt3", -456));
   });
 
-  it("getInt(int1)",   function() {
+  cs("getInt(int1)",   function() {
     aver.areEqual(123, cfgGetAccessors.getInt("vInt1"));
     aver.areEqual(123, cfgGetAccessors.getInt("vInt1", -456));
   });
 
-  it("getInt(int2)",   function() {
+  cs("getInt(int2)",   function() {
     aver.areEqual(-123, cfgGetAccessors.getInt("vInt2"));
     aver.areEqual(-123, cfgGetAccessors.getInt("vInt2", -456));
   });
 
-  it("getInt(int3)",   function() {
+  cs("getInt(int3)",   function() {
     aver.areEqual(0xfaca, cfgGetAccessors.getInt("vInt3"));
     aver.areEqual(0xfaca, cfgGetAccessors.getInt("vInt3", -456));
   });
 
-  it("getReal(undefined)",   function() {
+  cs("getReal(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getReal("vUndefined"));
     aver.areEqual(123e5, cfgGetAccessors.getReal("vUndefined", 123e5));
   });
 
-  it("getReal(null)",   function() {
+  cs("getReal(null)",   function() {
     aver.areEqual(0, cfgGetAccessors.getReal("vNull"));
     aver.areEqual(0, cfgGetAccessors.getReal("vNull", 456.1));
   });
 
-  it("getReal('')",   function() {
+  cs("getReal('')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getReal("vStringEmpty"));
     aver.areEqual(456.2, cfgGetAccessors.getReal("vStringEmpty", 456.2));
   });
 
-  it("getReal(' ')",   function() {
+  cs("getReal(' ')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getReal("vStringSpace"));
     aver.areEqual(-456.03, cfgGetAccessors.getReal("vStringSpace", -456.03));
   });
 
-  it("getReal(str1)",   function() {
+  cs("getReal(str1)",   function() {
     aver.areEqual(1.0, cfgGetAccessors.getReal("vStringReal1"));
     aver.areEqual(1.0, cfgGetAccessors.getReal("vStringReal1", -456.02));
   });
 
-  it("getReal(str2)",   function() {
+  cs("getReal(str2)",   function() {
     aver.areEqual(-1.0, cfgGetAccessors.getReal("vStringReal2"));
     aver.areEqual(-1.0, cfgGetAccessors.getReal("vStringReal2", -456.03));
   });
 
-  it("getReal(str3)",   function() {
+  cs("getReal(str3)",   function() {
     aver.areEqual(-1e5, cfgGetAccessors.getReal("vStringReal3"));
     aver.areEqual(-1e5, cfgGetAccessors.getReal("vStringReal3", -456.04));
   });
 
-  it("getReal(r1)",   function() {
+  cs("getReal(r1)",   function() {
     aver.areEqual(123.0, cfgGetAccessors.getReal("vReal1"));
     aver.areEqual(123.0, cfgGetAccessors.getReal("vReal1", -456.1));
   });
 
-  it("getReal(r2)",   function() {
+  cs("getReal(r2)",   function() {
     aver.areEqual(-123.0, cfgGetAccessors.getReal("vReal2"));
     aver.areEqual(-123.0, cfgGetAccessors.getReal("vReal2", -456.2));
   });
 
-  it("getReal(r3)",   function() {
+  cs("getReal(r3)",   function() {
     aver.areEqual(-5e-9, cfgGetAccessors.getReal("vReal3"));
     aver.areEqual(-5e-9, cfgGetAccessors.getReal("vReal3", -456.3));
   });
 
 
-  it("getMoney(undefined)",   function() {
+  cs("getMoney(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getMoney("vUndefined"));
     aver.areEqual(100.18, cfgGetAccessors.getMoney("vUndefined", 100.18));
   });
 
-  it("getMoney(null)",   function() {
+  cs("getMoney(null)",   function() {
     aver.areEqual(0, cfgGetAccessors.getMoney("vNull"));
     aver.areEqual(0, cfgGetAccessors.getMoney("vNull", 456.1));
   });
 
-  it("getMoney('')",   function() {
+  cs("getMoney('')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getMoney("vStringEmpty"));
     aver.areEqual(-300.12, cfgGetAccessors.getMoney("vStringEmpty", -300.12));
   });
 
-  it("getMoney(' ')",   function() {
+  cs("getMoney(' ')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getMoney("vStringSpace"));
     aver.areEqual(-456.03, cfgGetAccessors.getMoney("vStringSpace", -456.03));
   });
 
-  it("getMoney(str1)",   function() {
+  cs("getMoney(str1)",   function() {
     aver.areEqual(1.0, cfgGetAccessors.getMoney("vStringMoney1"));
     aver.areEqual(1.0, cfgGetAccessors.getMoney("vStringMoney1", -456.02));
   });
 
-  it("getMoney(str2)",   function() {
+  cs("getMoney(str2)",   function() {
     aver.areEqual(-1.01, cfgGetAccessors.getMoney("vStringMoney2"));
     aver.areEqual(-1.01, cfgGetAccessors.getMoney("vStringMoney2", -456.03));
   });
 
-  it("getMoney(str3)",   function() {
+  cs("getMoney(str3)",   function() {
     aver.areEqual(12345.1234, cfgGetAccessors.getMoney("vStringMoney3"));
     aver.areEqual(12345.1234, cfgGetAccessors.getMoney("vStringMoney3", -456.04));
   });
 
-  it("getMoney(m1)",   function() {
+  cs("getMoney(m1)",   function() {
     aver.areEqual(123.0, cfgGetAccessors.getMoney("vMoney1"));
     aver.areEqual(123.0, cfgGetAccessors.getMoney("vMoney1", -456.1));
   });
 
-  it("getMoney(m2)",   function() {
+  cs("getMoney(m2)",   function() {
     aver.areEqual(-123.0012, cfgGetAccessors.getMoney("vMoney2"));
     aver.areEqual(-123.0012, cfgGetAccessors.getMoney("vMoney2", -456.2));
   });
 
-  it("getMoney(m3)",   function() {
+  cs("getMoney(m3)",   function() {
     aver.areEqual(-12345.1234, cfgGetAccessors.getMoney("vMoney3"));
     aver.areEqual(-12345.1234, cfgGetAccessors.getMoney("vMoney3", -456.3));
   });
 
 
 
-  it("getDate(undefined)",   function() {
+  cs("getDate(undefined)",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getDate("vUndefined"));
     aver.areEqual(1980, cfgGetAccessors.getDate("vUndefined", new Date("1980-02-21")).getUTCFullYear());
   });
 
-  it("getDate(null)",   function() {
+  cs("getDate(null)",   function() {
     aver.areEqual(1970, cfgGetAccessors.getDate("vNull").getUTCFullYear());
     aver.areEqual(1970, cfgGetAccessors.getDate("vNull", new Date("1980-02-21")).getUTCFullYear());
   });
 
-  it("getDate('')",   function() {
+  cs("getDate('')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getDate("vStringEmpty"));
     aver.areEqual(-300.12, cfgGetAccessors.getDate("vStringEmpty", -300.12));
   });
 
-  it("getDate(' ')",   function() {
+  cs("getDate(' ')",   function() {
     aver.areEqual(undefined, cfgGetAccessors.getDate("vStringSpace"));
     aver.areEqual(-456.03, cfgGetAccessors.getDate("vStringSpace", -456.03));
   });
 
-  it("getDate(str1)",   function() {
+  cs("getDate(str1)",   function() {
     aver.areEqual(2021, cfgGetAccessors.getDate("vStringDate1").getFullYear());
     aver.areEqual(2021, cfgGetAccessors.getDate("vStringDate1", new Date("1980-02-21")).getUTCFullYear());
   });
 
-  it("getDate(str2)",   function() {
+  cs("getDate(str2)",   function() {
     aver.areEqual(2018, cfgGetAccessors.getDate("vStringDate2").getFullYear());
     aver.areEqual(2018, cfgGetAccessors.getDate("vStringDate2", new Date("1980-02-21")).getUTCFullYear());
   });
 
 
-  it("getDate(d1)",   function() {
+  cs("getDate(d1)",   function() {
     //console.dir(cfgGetAccessors.getString("vDate1"));
     aver.areEqual(2017, cfgGetAccessors.getDate("vDate1").getFullYear());
     aver.areEqual(2017, cfgGetAccessors.getDate("vDate1",  new Date("1980-02-21")).getUTCFullYear());
@@ -917,9 +917,9 @@ class ConfMockStandalone {
   get args(){ return this.#args;}
 }
 
-describe("Config::MakeNew", function() {
+unit("Config::MakeNew", function() {
 
-  it("makeA",   function() {
+  cs("makeA",   function() {
     const cfg = sut.config({
       type: ConfMockA,
       name: "MockA",
@@ -933,7 +933,7 @@ describe("Config::MakeNew", function() {
     aver.areEqual(99, got.age);
   });
 
-  it("makeB",   function() {
+  cs("makeB",   function() {
     const cfg = sut.config({
       type: ConfMockB,
       name: "MockB",
@@ -947,7 +947,7 @@ describe("Config::MakeNew", function() {
     aver.areEqual(1980, got.dob.getFullYear());
   });
 
-  it("makeC",   function() {
+  cs("makeC",   function() {
     const cfg = sut.config({
       type: ConfMockC,
       name: "MockC",
@@ -964,25 +964,25 @@ describe("Config::MakeNew", function() {
     aver.areEqual(1999, got.dob.getFullYear());
   });
 
-  it("makeWrongSubtype",   function() {
+  cs("makeWrongSubtype",   function() {
     const cfg = sut.config({ type: ConfMockStandalone });
     aver.throws(() => sut.makeNew(IConfMock, cfg.root), "is not of expected base");
   });
 
-  it("useFactoryFunction",   function() {
+  cs("useFactoryFunction",   function() {
     const got = sut.makeNew(Object, ConfMockStandalone);
     aver.isOf(got, ConfMockStandalone);
     aver.areEqual(0, got.args.length);
   });
 
-  it("useFactoryFunction ctor args",   function() {
+  cs("useFactoryFunction ctor args",   function() {
     const got = sut.makeNew(Object, ConfMockStandalone, null, null, [1, true, 'abc']);
     aver.isOf(got, ConfMockStandalone);
     aver.areEqual(3, got.args.length);
     aver.areArraysEquivalent([1, true, 'abc'], got.args);
   });
 
-  it("useFactoryFunction ctor args with director",   function() {
+  cs("useFactoryFunction ctor args with director",   function() {
     const dir = {a: 1};
 
     const got = sut.makeNew(Object, ConfMockStandalone, dir, null, [1, true, 'abc']);
@@ -991,7 +991,7 @@ describe("Config::MakeNew", function() {
     aver.areArraysEquivalent([dir, 1, true, 'abc'], got.args);
   });
 
-  it("standalone cfg dir args",   function() {
+  cs("standalone cfg dir args",   function() {
     const dir = {a: 1};
     const cfg = sut.config({ type: ConfMockStandalone });
     const got = sut.makeNew(Object, cfg.root, dir, null, [-1, true, 'abcd']);
@@ -1000,7 +1000,7 @@ describe("Config::MakeNew", function() {
     aver.areArraysEquivalent([dir, cfg.root, -1, true, 'abcd'], got.args);
   });
 
-  it("standalone cfg dir default type args",   function() {
+  cs("standalone cfg dir default type args",   function() {
     const dir = {a: 1};
     const cfg = sut.config({ x: 1 });
     const got = sut.makeNew(Object, cfg.root, dir, ConfMockStandalone, [-1, true, 'abcd']);
@@ -1009,7 +1009,7 @@ describe("Config::MakeNew", function() {
     aver.areArraysEquivalent([dir, cfg.root, -1, true, 'abcd'], got.args);
   });
 
-  it("standalone missing dflt type",   function() {
+  cs("standalone missing dflt type",   function() {
     const dir = {a: 1};
     const cfg = sut.config({ x: 1 });
     aver.throws(() => sut.makeNew(Object, cfg.root, dir, undefined, [-1, true, 'abcd']), "cls was not supplied");
@@ -1018,7 +1018,7 @@ describe("Config::MakeNew", function() {
 });
 
 
-describe("Config::Performance", function() {
+unit("Config::Performance", function() {
 
   const cfgJson =`{
     "a": 1, "b": true, "c": false, "d": null, "e": -9e3, "msg": "loaded from json",
@@ -1040,7 +1040,7 @@ describe("Config::Performance", function() {
     }`;
 
 
-  it("from Json",   function() { // 75K ops/sec on OCTOD
+  cs("from Json",   function() { // 75K ops/sec on OCTOD
     console.time("cfg");
     for(let i=0; i<10_000; i++){
       const cfg = sut.config(cfgJson);
@@ -1050,7 +1050,7 @@ describe("Config::Performance", function() {
 
   });
 
-  it("navigate",   function() { // 80K ops/sec on OCTOD
+  cs("navigate",   function() { // 80K ops/sec on OCTOD
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){
@@ -1060,7 +1060,7 @@ describe("Config::Performance", function() {
 
   });
 
-  it("makeNew",   function() { // 200K ops/sec on OCTOD
+  cs("makeNew",   function() { // 200K ops/sec on OCTOD
     console.time("cfg");
     const cfg = sut.config(cfgJson);
     for(let i=0; i<10_000; i++){

@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 //import { describe, it } from "mocha";
-import { defineUnit as describe, defineCase as it } from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "azos/aver";
 import {ABSTRACT} from "azos/coreconsts";
 import * as conf from "azos/conf";
@@ -32,17 +32,17 @@ class NationWeather extends IWeather{
 
 
 
-describe("Linker", function() {
+unit("Linker", function() {
 
-  describe("ModuleLinker", function() {
+  unit("ModuleLinker", function() {
 
-    it("tinterface-thandler",   function() {
+    cs("tinterface-thandler",   function() {
       const linker = new mod.ModuleLinker();
       aver.areEqual(mod.Module, linker.TInterface);
       aver.areEqual(mod.Module, linker.THandler);
     });
 
-    it("no-name",   function() {
+    cs("no-name",   function() {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({}).root;
       aver.isTrue(  linker.register(new LocalWeather(apps.NopApplication.instance, cfg))  );
@@ -60,7 +60,7 @@ describe("Linker", function() {
     });
 
 
-    it("with name",   function() {
+    cs("with name",   function() {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({}).root;
       aver.isTrue(  linker.register(new LocalWeather(apps.NopApplication.instance, cfg), null, "loc")  );
@@ -82,7 +82,7 @@ describe("Linker", function() {
       aver.areEqual("Nationwide weather is fair; 75F: 123", nationWeather.getWeather(123));
     });
 
-    it("concrete type",   function() {
+    cs("concrete type",   function() {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({}).root;
       aver.isTrue(  linker.register(new LocalWeather(apps.NopApplication.instance, cfg), IWeather)  );
@@ -104,7 +104,7 @@ describe("Linker", function() {
       aver.areEqual("Nationwide weather is fair; 75F: 122", nationWeather.getWeather(122));
     });
 
-    it("concrete type with name",   function() {
+    cs("concrete type with name",   function() {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({}).root;
       aver.isTrue(  linker.register(new LocalWeather(apps.NopApplication.instance, cfg), IWeather, "loc")  );
@@ -135,7 +135,7 @@ describe("Linker", function() {
 
     });
 
-    it("register-unregister-dump",   function() {
+    cs("register-unregister-dump",   function() {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({name: null}).root;
 
@@ -239,7 +239,7 @@ describe("Linker", function() {
       aver.areEqual(0, Object.keys(watch).length);
     });
 
-    it("link()",   function() {
+    cs("link()",   function() {
       const linker = new mod.ModuleLinker();
       const cfg = conf.config({}).root;
 

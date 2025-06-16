@@ -4,13 +4,13 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { defineUnit as describe, defineCase as it } from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as sut from "../security.js";
 import * as aver from "../aver.js";
 
-describe("Security", function() {
-  describe("#parseJwtToken()", function() {
-    it("parseSample1", function(){
+unit("Security", function() {
+  unit("#parseJwtToken()", function() {
+    cs("parseSample1", function(){
       /*
       {
   "sub": "1234567890",
