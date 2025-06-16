@@ -4,7 +4,6 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-//import { describe, it } from "mocha";
 import { defineUnit as unit, defineCase as cs } from "../run.js";
 import { ABSTRACT } from "../coreconsts.js"
 import { dispose } from "../types.js";
