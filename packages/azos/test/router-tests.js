@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { defineUnit as unit, defineCase as cse } from "../run.js";
+import { defineUnit as unit, defineCase as cs } from "../run.js";
 import * as aver from "azos/aver";
 import { config, ConfigNode } from "azos/conf";
 import * as apps from "azos/application";
@@ -15,7 +15,7 @@ unit("Router", function() {
 
   unit("Integration", function(){
 
-    cse("base-functionality-01", function(){
+    cs("base-functionality-01", function(){
 
       const cfg = config({
         errorPath: "error",

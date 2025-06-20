@@ -82,10 +82,10 @@ unit("Time", function () {
         aver.isOf(utc, TimeZone, "UTC is a TimeZone");//even when it is not declared, it is always present
 
         const tz1 = localizer.getTimeZone("t1");
-        aver.isOf(tz1, TeztTimeZone, "UTC is a TimeZone");
+        aver.isOf(tz1, TeztTimeZone, "tz1 is a TimeZone");
 
         const tz2 = localizer.getTimeZone("t2");
-        aver.isOf(tz2, TeztTimeZone, "UTC is a TimeZone");
+        aver.isOf(tz2, TeztTimeZone, "tz2 is a TimeZone");
 
         const allZones = localizer.getAllTimeZones();
         aver.isArray(allZones, "getAllZones");
