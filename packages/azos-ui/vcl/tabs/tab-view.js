@@ -249,6 +249,7 @@ export class TabView extends Control {
     this.update({ "activeTab": oldTab, "activeTabIndex": oldIndex });
     this.#scrollTabBtnIntoView(newTab);
     this.scrollIntoView();
+    newTab._doWhenActivated();
     if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: newTab }, bubbles: true }));
   }
 
