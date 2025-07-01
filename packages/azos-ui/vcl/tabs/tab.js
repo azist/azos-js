@@ -132,5 +132,11 @@ export class Tab extends Block {
     this.tabView.moveTab(this, beforeTab);
   }
 
+  /**
+   * This method is called when the tab is activated, i.e. when it becomes the active tab in the TabView.
+   * It can be overridden in subclasses to perform actions when the tab is activated.
+   */
+  _doWhenActivated() { }
+
   renderControl() { return html`<slot></slot>`; }
 }
