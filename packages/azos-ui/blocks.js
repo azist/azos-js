@@ -97,7 +97,7 @@ export class Block extends Control {
   /** Checks whether any children have unsaved changes (dirty) */
   get [DIRTY_PROP]() {
     const mode = getEffectiveDataMode(this);
-    if (mode && mode !== DATA_MODE.UNSPECIFIED) return true;//Must be in View mode not to be "dirty"
+    if (mode && mode === DATA_MODE.UNSPECIFIED) return false;//Assume clean if in view mode
     return this[DATA_BLOCK_PROP].some(one => one[DIRTY_PROP] === true);
   }
 
