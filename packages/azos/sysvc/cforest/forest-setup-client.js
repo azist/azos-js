@@ -31,15 +31,8 @@ export class ForestSetupClient extends IClient {
     id = guardId(id, "nodeVersionList"); // Ensure id is a valid EntityId
     const params = new URLSearchParams({ id });
 
-    try {
-      const response = await this.get(`/conf/forest/tree/version-list${params}`, {}, abortSignal);
-      return response?.data?.data ?? null;
-    } catch(error) {
-      if(error.code===404) {
-        return [];
-      }
-      return null;
-    }
+    const response = await this.get(`/conf/forest/tree/version-list?${params}`, {}, abortSignal);
+    return response?.data?.data ?? null;
   }
 
   /**
@@ -49,7 +42,7 @@ export class ForestSetupClient extends IClient {
    * @returns {Promise<object>} - NodeInfo or null if not found
    */
   async nodeInfoVersion(idVersion, abortSignal = null) {
-    id = guardId(id, "nodeInfoVersion"); // Ensure id is a valid EntityId
+    idVersion = guardId(idVersion, "nodeInfoVersion"); // Ensure id is a valid EntityId
     const params = new URLSearchParams({ id: idVersion });
     const response = await this.get(`/conf/forest/tree/version?${params}`, {}, abortSignal);
     return response?.data?.data ?? null;

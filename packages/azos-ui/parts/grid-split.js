@@ -12,7 +12,6 @@ export class GridSplit extends Part {
   static #sidSeed = 0;
   static #pidPrefix = "sgv";
   static styles = [  STL_INLINE_GRID, css`
-
     .resizable-cols {
       displai: grid;
       grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) 1ch repeat(var(--grid-splitter-right-cols), 1fr);
@@ -65,10 +64,6 @@ export class GridSplit extends Part {
   constructor() {
     super();
     this.sid = GridSplit.#sidSeed++;
-  }
-
-  connectedCallback(){
-    super.connectedCallback();
   }
 
   disconnectedCallback() {
