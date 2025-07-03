@@ -84,7 +84,7 @@ class CfgForestSettings  extends Block {
 
   render() {
 
-    if(!this.forests || this.forests.length === 0) html`<div class="cardBasic">No forests available. Please create a forest first.</div>`;
+    if(!this.forests || this.forests.length === 0) return html`<div class="cardBasic">No forests available. Please create a forest first.</div>`;
     const forests = this.forests.map(forest => html`<option value="${forest.id}" .selected="${  this.activeForest == forest.id }" title="${forest.title}">${forest.title}</option>`);
     const forestOptions = [forests.length === 0 ? html`<option value="No forests available" title="">No forests available</option>` : html`<option value="" title="Select a forest&hellip;">"Select a forest&hellip;</option>`, ...forests ];
     const treeOptions = this.updatedTreeOptions();
@@ -94,7 +94,7 @@ class CfgForestSettings  extends Block {
         <div class="row">
           <az-select id="forestSelect" title="Select Forest" @change="${this.onForestChange}">${forestOptions}</az-select><br/>
           <az-select id="treeSelect" title="Select Tree" @change="${this.onTreeChange}">${treeOptions}</az-select><br />
-          <az-text id="asOfDate" scope="this" title="New As of Date" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="datetime-local"  @change="${this.onAsOfDateChange}"></az-text><br/>
+          <az-text id="asOfDate" scope="this" title="New As of Date" placeholder="2024/01/01 1:00 pm" dataType="date" dataKind="date"  @change="${this.onAsOfDateChange}"></az-text><br/>
         </div>
 
         <div class="horizontalBtnBar">
@@ -102,21 +102,6 @@ class CfgForestSettings  extends Block {
           <az-button id="btnCloseSettings"      title="Close" @click="${() => {this.dlgCfgForestsSettingsModal.close()}}"></az-button>
         </div>
 
-
-        <div>
-          <p>Temporary values to be applied on Ok</p>
-          <ul>
-            <li>Forest: ${this.#tmpForestSelection || "Not selected"}</li>
-            <li>Tree: ${this.#tmpTreeSelection || "Not selected"}</li>
-            <li>As of Date: ${this.#tmpAsOfUtc || "Not set"}</li>
-          </ul>
-          <p>Active values</p>
-          <ul>
-            <li>Forest: ${this.activeForest || "Not selected"}</li>
-            <li>Tree: ${this.activeTree || "Not selected"}</li>
-            <li>As of Date: ${this.activeAsOfUtc || "Not set"}</li>
-          </ul>
-        </div>
       </div>
     </az-modal-dialog>`;
   }

@@ -50,6 +50,7 @@ export class CfgForestApplet extends Applet  {
     }
   `];
 
+
   #ref = { forestClient: ForestSetupClient };
 
   #forests = null;
@@ -152,7 +153,18 @@ export class CfgForestApplet extends Applet  {
         this.activeForest = this.#forests[0].id;
         this.activeTree = this.#forests[0].trees[0];
       }
+
+      this.treeView.addEventListener("nodeUserAction", (e) => {
+        e.stopPropagation();
+        const { node, action } = e.detail;
+        console.log("CfgForestApplet#treeView nodeUserAction", { node, action });
+        if (action === "click") {
+          this.onCFNodeSelected(node);
+        }
+      });
+
       this.treeView.requestUpdate();
+
       this.arena.requestUpdate();
       this.requestUpdate();
     },"Loading forests");
@@ -258,10 +270,30 @@ export class CfgForestApplet extends Applet  {
   }
 
   async onCFNodeSelected(node){
+    console.log("CfgForestApplet#onCFNodeSelected", node);
+    // const doIt = async () => {
+    //   const id = node.data.Id;
+    //   console.log("onCFNodeSelected", node.id, this.#nodeCache.has(id));
 
+    //   if(!this.#nodeCache.has(id)) {
+    //     const data = await this.#ref.forestClient.nodeInfo(id);
+    //     this.#nodeCache.set(id, data);
+    //   }
+
+    //   const currentNodeData = this.#nodeCache.get(id);
+    //   this.#activeNodeData = currentNodeData;
+    //   await this.preloadChildren(id, 2, node);
+    //   this.treeView.requestUpdate();
+    // }
+    // await Spinner.exec(async()=> { await doIt(); }, "Loading Node Data");
+
+    // this.requestUpdate();
+  }
+
+  async onCFNodeClick(node) {
     const doIt = async () => {
       const id = node.data.Id;
-      console.log("onCFNodeSelected", node.id, this.#nodeCache.has(id));
+      console.log("onCFNodeClick", node.id, this.#nodeCache.has(id));
 
       if(!this.#nodeCache.has(id)) {
         const data = await this.#ref.forestClient.nodeInfo(id);
@@ -297,7 +329,9 @@ export class CfgForestApplet extends Applet  {
   render(){
     if(!this.#forests) return;
     const asOfDisplay = (new Date( this.#activeAsOfUtc ? this.#activeAsOfUtc : Date.now())).toLocaleString();
-    const showAsOf = !this.#activeAsOfUtc ? "" : html`<div class="cardBasic"><span class="asOfUtc" @click="${(e) => this.#cfgForestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
+    const showAsOf = !this.#activeAsOfUtc
+      ? html`<div class="cardBasic"><strong>As of: </strong></span>Utc Now</div>`
+      : html`<div class="cardBasic"><span class="asOfUtc" @click="${(e) => this.#cfgForestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
 
     return html`
       ${this.renderCrudForm()}
@@ -317,12 +351,11 @@ export class CfgForestApplet extends Applet  {
 
       <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8">
         <div slot="left-top">
-
-          ${showAsOf}
           <div class="cardBasic">
             <az-cforest-view
               id="treeView" scope="this"
-              .selectHook="${this.onCFNodeSelected.bind(this)}"
+              .title="${ html`${showAsOf}`}"
+              .selectHook="${this.onCFNodeClick.bind(this)}"
               .rootNode="${this.#activeRootNode}"></az-cforest-view>
           </div>
 

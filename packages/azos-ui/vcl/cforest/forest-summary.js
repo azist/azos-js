@@ -53,6 +53,7 @@ class CForestNodeSummary extends Block {
   async onVersionDetailClick(e) {
     const versionId = `${this.source.Tree}.gver@${this.source.Forest}::${e.target.value}`;
     this.#selectedVersionDetails = await this.#ref.forestClient.nodeInfoVersion(versionId);
+    this.dlgNodeVersions.update();
     this.requestUpdate();
   }
 
@@ -63,7 +64,7 @@ class CForestNodeSummary extends Block {
     const showVersions = this.source?.Versions && this.source?.Versions?.length > 1;
     const nodeVersionDetails = html`${(new Date(this.source?.DataVersion?.Utc ? this.source?.DataVersion?.Utc : Date.now())).toLocaleString()} (${this.source?.DataVersion?.State})`;
     const versionsBtn = showVersions ? html`<az-button id="btnNodeVersions" title="Version..." rank="6" class="selectedNodeBtn"  position="left" icon="svg://azos.ico.tenancy" @click="${ () => this.dlgNodeVersions.show()}">Versions</az-button>` : null;
-    const versionOptions = showVersions ? this.source?.Versions?.map(version => `<option value="${version.G_Version}" title="${version.State} ${(new Date(version.Utc)).toLocaleString() } - ${version.G_Version}">${version.G_Version}</option>`) : null;
+    const versionOptions = showVersions ? this.source?.Versions?.map(version => html`<option value="${version.G_Version}" title="${version.State} ${(new Date(version.Utc)).toLocaleString() } - ${version.G_Version}">${version.G_Version}</option>`) : null;
 
 
     const copyBtn = html`<az-button id="btnCopyPath" rank="6" icon="svg://azos.ico.copy" @click="${(e) => {
