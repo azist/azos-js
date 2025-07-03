@@ -13,7 +13,7 @@ export class GridSplit extends Part {
   static #pidPrefix = "sgv";
   static styles = [  STL_INLINE_GRID, css`
     .resizable-cols {
-      displai: grid;
+      display: grid;
       grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) 1ch repeat(var(--grid-splitter-right-cols), 1fr);
       gap: 0px;
       position: relative;
@@ -84,7 +84,7 @@ export class GridSplit extends Part {
 
 
   #useFallback(fallbackWarning) {
-    console.warn(`SplitGridView: splitLeftCols + splitRightCols ${fallbackWarning}, got ${this.splitLeftCols} + ${this.splitRightCols}`);
+    console.warn(`GridView: splitLeftCols + splitRightCols ${fallbackWarning}, got ${this.splitLeftCols} + ${this.splitRightCols}`);
     this.splitLeftCols = 3; // fallback to default
     this.splitRightCols = 9; // fallback to default
   }
@@ -156,7 +156,7 @@ export class GridSplit extends Part {
     newLeftCols = Math.max(1, Math.min(newLeftCols, cols - 1));
     this.#row.style.setProperty('--grid-splitter-left-cols', newLeftCols);
     this.#row.style.setProperty('--grid-splitter-right-cols', cols - newLeftCols);
-    this.#row.style.gridTemplateColumn = `repeat(${newLeftCols}, 1fr) 1ch repeat(${cols - newLeftCols}, 1fr)`;
+    this.#row.style.gridTemplateColumns = `repeat(${newLeftCols}, 1fr) 1ch repeat(${cols - newLeftCols}, 1fr)`;
   }
 
   render() {
