@@ -4,8 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-//import { describe, it } from "mocha";
-import { defineUnit as describe, defineCase as it, condir } from "../run.js";
+import { defineUnit as unit, defineCase as cs, condir } from "../run.js";
 import * as aver from "../aver.js";
 import { ILog } from "../ilog.js";
 import * as log from "../log.js";
@@ -23,10 +22,10 @@ class IMemoryLog extends ILog{
   _doWrite(msg){ this.#buffer.push(msg); }
 }
 
-describe("Application", function() {
-  describe("Log", function() {
+unit("Application", function() {
+  unit("Log", function() {
 
-    it("log-mem-buffer",   function() {
+    cs("log-mem-buffer",   function() {
 
       let logBuffer = [];
 
@@ -52,9 +51,9 @@ describe("Application", function() {
   });
 });
 
-describe("LoggingCommon", function() {
+unit("LoggingCommon", function() {
 
-  it(".exceptionToData(new Error())",   function() {
+  cs(".exceptionToData(new Error())",   function() {
     const got = log.exceptionToData(new Error("crap message"));
     condir("new Error()", got);
     aver.areEqual("Error", got["TypeName"]);
@@ -64,7 +63,7 @@ describe("LoggingCommon", function() {
     aver.isTrue(got["StackTrace"].length > 0);
   });
 
-  it(".exceptionToData(throw new Error())",   function() {
+  cs(".exceptionToData(throw new Error())",   function() {
     try{
       throw new Error("crap message");
     } catch(err) {
@@ -78,7 +77,7 @@ describe("LoggingCommon", function() {
     }
   });
 
-  it(".exceptionToData(new AzosError())",   function() {
+  cs(".exceptionToData(new AzosError())",   function() {
     const got = log.exceptionToData(new AzosError("AZ5 msg", "reactor4", null, -1234));
     condir("new AzosError()", got);
     aver.areEqual("AzosError -1234 @ 'reactor4'", got["TypeName"]);
@@ -88,7 +87,7 @@ describe("LoggingCommon", function() {
     aver.isTrue(got["StackTrace"].length > 0);
   });
 
-  it(".exceptionToData(throw new AzosError(nested))",   function() {
+  cs(".exceptionToData(throw new AzosError(nested))",   function() {
     try{
       try{
         throw new AzosError("Inner msg", "site-3", null, 37);

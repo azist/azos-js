@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import {suite, Runner, cmdArgsCaseFilter, defineUnit, defineCase} from "../run.js";
+import {suite, Runner, cmdArgsCaseFilter, defineUnit as unit, defineCase as cs} from "../run.js";
 import * as aver from "../aver.js";
 
 import "./types-tests.js";
@@ -28,25 +28,25 @@ import "./localization-tests.js";
 
 ////clearSuite();
 
-defineUnit("RunnerSystemTests", function(){
+unit("RunnerSystemTests", function(){
 
-  defineCase("function", function(){
+  cs("function", function(){
     aver.areEqual(4, 2 + 2);
   });
 
-  defineCase("arrow", () => aver.areEqual(5, 2 + 3));
+  cs("arrow", () => aver.areEqual(5, 2 + 3));
 
-  defineCase("async-arrow-instant", async () => aver.areEqual(5, 2 + 3));
-  defineCase("async-arrow-delay", async () => await new Promise(r => setTimeout(r, 250)));
+  cs("async-arrow-instant", async () => aver.areEqual(5, 2 + 3));
+  cs("async-arrow-delay", async () => await new Promise(r => setTimeout(r, 250)));
 
-  defineCase("promise-fun-instant", function(){ return Promise.resolve(123); } );
-  defineCase("promise-fun-delay", function(){ return new Promise(r => setTimeout(r, 250)); });
+  cs("promise-fun-instant", function(){ return Promise.resolve(123); } );
+  cs("promise-fun-delay", function(){ return new Promise(r => setTimeout(r, 250)); });
 
-  defineUnit("SkippedUnitWhichWillNeverRun", function(){
-    defineCase("never-run", function(){  });
+  unit("SkippedUnitWhichWillNeverRun", function(){
+    cs("never-run", function(){  });
   }, () => true);
 
-  defineCase("this-case-will-be-skipped", function(){  }, () => true);
+  cs("this-case-will-be-skipped", function(){  }, () => true);
 
 });
 

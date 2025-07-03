@@ -224,6 +224,18 @@ export function isNumber(a, from) {
 }
 
 /**
+ * Performs strict test for number or null/undefined (converted to null)
+ * @param {*} a
+ * @param {string | undefined} from optional clause in case of failure
+ * @returns null if undefined or null, original number after successful type check, or throws
+ */
+export function isNumberOrNull(a, from) {
+  if (a === undefined || a === null) return null;
+  if (types.isNumber(a)) return a;
+  throw AVERMENT_FAILURE(`isNumberOrNull(${dv(a)})`, from);
+}
+
+/**
  * Performs strict test for string
  * @param {*} a
  * @param {string | undefined} from optional clause in case of failure
