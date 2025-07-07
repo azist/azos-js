@@ -60,7 +60,6 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
 
   `];
 
-
   #ref = { forestClient: ForestSetupClient };
 
   // Holds the root node id for the active tree for quick access
@@ -159,6 +158,7 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
     this.link(this.#ref);
     this.arena.installToolbarCommands([ this.#forestSettingsCmd, this.#forestRefreshCmd]);
     Spinner.exec(async()=> await this.loadRootNode(),"Loading forests/trees");
+
     // debug only
     // @todo: !remove these before production!
     window.nodeTreeMap = this.#nodeTreeMap; // for debugging
@@ -248,6 +248,7 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
     if(!this.#nodeCache.get(id)) {
       this.#activeNodeData = await this.#getNodeById(id, this.#asOfUtc);
       this.#nodeCache.set(id, this.#activeNodeData);
+      await this.loadNodeChildren(id);
     }
     this.requestUpdate();
   }
@@ -324,6 +325,19 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
     this.refreshTree();
   }
 
+  renderNodeTreeCacheButtons(){
+    const buttons = [];
+    for(const entry of this.#nodeTreeMap.entries()){
+      let [ parentID, childNodeList ] = entry;
+      childNodeList = Array.isArray(childNodeList) ? childNodeList : [ childNodeList ];
+      childNodeList?.forEach(childNode => {
+        buttons.push(html`<az-button title="Set ${childNode.PathSegment} as active" @click="${() => this.setActiveNodeId(childNode.Id)}"></az-button>`)
+      });
+    }
+    return buttons;
+  }
+
+
   render(){
 
     const forestId = this.#tmpForestSelection || this.activeForest;
@@ -387,6 +401,7 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
             <li>Nodes in tree map: ${this.#nodeTreeMap.size}</li>
           </ul>
           <az-button title="Set root as active" @click="${()=> this.setActiveNodeId(this.#rootNodeId) }"></az-button>
+          ${this.renderNodeTreeCacheButtons()}
         </div>
 
       </div>
