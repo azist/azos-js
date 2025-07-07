@@ -135,8 +135,11 @@ export class Tab extends Block {
   /**
    * This method is called when the tab is activated, i.e. when it becomes the active tab in the TabView.
    * It can be overridden in subclasses to perform actions when the tab is activated.
+   * By default, it dispatches an "activated" event for use with an adhoc az-tab application.
    */
-  _doWhenActivated() { }
+  _doAfterActivated() {
+    this.dispatchEvent(new Event("activated"));
+  }
 
   renderControl() { return html`<slot></slot>`; }
 }

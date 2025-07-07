@@ -249,7 +249,7 @@ export class TabView extends Control {
     this.update({ "activeTab": oldTab, "activeTabIndex": oldIndex });
     this.#scrollTabBtnIntoView(newTab);
     this.scrollIntoView();
-    newTab._doWhenActivated();
+    newTab._doAfterActivated();
     if (this.#elementFirstRendered) this.dispatchEvent(new CustomEvent("tabChanged", { detail: { tab: newTab }, bubbles: true }));
   }
 
@@ -453,6 +453,7 @@ export class TabView extends Control {
     this.tabs = this.getTabs();
     // TODO: needed? if (removed) tab[DISPOSE_METHOD]();
     this.requestUpdate();
+    return true;
   }
 
   connectedCallback() {
