@@ -14,9 +14,9 @@ import "azos-ui/vcl/tabs/tab";
 import "azos-ui/parts/grid-split"
 import "azos-ui/parts/select-field";
 
+import "azos-ui/vcl/cforest/forest-summary";
+import "azos-ui/vcl/cforest/forest-breadcrumbs";
 // import "./forest-view";
-// import "./forest-summary";
-// import "./forest-breadcrumbs";
 // import "azos-ui/vcl/cforest/forest-settings";
 
 export class CfgForestApplet2ABetterForestExplorer extends Applet  {
@@ -111,7 +111,7 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
   get activeAsOfUtc() { return this.#asOfUtc; }
   set activeAsOfUtc(value) {
     if(this.#asOfUtc === value) return;
-    this.#asOfUtc = value;
+    this.#asOfUtc = (new Date(value)).toISOString(); // ensure it's a string
     this.requestUpdate();
   }
 
@@ -168,10 +168,17 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
 
   refreshTree = async () => {
     console.debug("#refreshTree called");
-    await Spinner.exec(async()=> await this.loadRootNode(),"Loading forests/trees");
+    const currentNode = this.activeNodeData;
+    await Spinner.exec(async()=> {
+      await this.loadRootNode();
+      if(currentNode.FullPath !== "/") {
+        await this.loadNodeAncestors(currentNode.Id);
+        await this.setActiveNodeId(currentNode.Id);
+      }
+    }, "Loading forests/trees");
   }
 
-  async loadRootNode(currentPath = "/"){
+  async loadRootNode(){
     this.#nodeCache.clear();
     this.#nodeTreeMap.clear();
 
@@ -189,7 +196,7 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
     this.#asOfUtc = this.activeAsOfUtc || null ; // null means "now"
 
     // Get the root node for the active tree and set it's data as the current data object
-    const rootNodeInfo = await this.#getNodeByPath(this.#forest, this.#tree, currentPath, this.#asOfUtc);
+    const rootNodeInfo = await this.#getNodeByPath(this.#forest, this.#tree, "/", this.#asOfUtc);
     this.#nodeCache.set(rootNodeInfo.Id, rootNodeInfo);
     this.#activeNodeData = rootNodeInfo;
 
@@ -206,6 +213,24 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
 
     // @todo: allow for the loading of any node by id or path
     // @todo: path traversal to only load the children at the levels of the ancestor nodes
+  }
+
+  async loadNodeAncestors(nodeId, max = 10) {
+    console.debug("#loadNodeAncestors", nodeId);
+    if(!nodeId) return;
+    const node = await this.#getNodeById(nodeId, this.#asOfUtc);
+    if(!node) return;
+
+    // Load the parent node
+    const parentId = `${this.activeTree}.gnode@${this.activeForest}::${node.G_Parent}`;
+    if(parentId && !this.#nodeTreeMap.has(parentId)) {
+      await this.loadNodeChildren(parentId, 2);
+    }
+
+    // Load the ancestors recursively
+    if(parentId && parentId !== `${this.activeTree}.gnode@${this.activeForest}::0:0:1` && max > 0) {
+      await this.loadNodeAncestors(parentId, max - 1);
+    }
   }
 
   async loadNodeChildren(parentId, depth = 2) {
@@ -252,19 +277,6 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
     }
     this.requestUpdate();
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   _treeOptions(forestId = this.#tmpForestSelection || this.activeForest) {
     const treeOptions = this.#forests.find(f => f.id === forestId)?.trees.map(tree => html`<option value="${tree}" title="${tree}">${tree}</option>`) || [];
@@ -325,10 +337,25 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
     this.refreshTree();
   }
 
+  _onCrumbClick(crumbPath) {
+    const findIdByFullPath = async (fullPath) => {
+      const node = await this.#getNodeByPath(this.activeForest, this.activeTree, fullPath, this.activeAsOfUtc);
+      if(!node) {
+        console.warn("#findIdByFullPath - Node not found for path:", fullPath);
+        return null;
+      }
+      return node.Id;
+    }
+
+    findIdByFullPath(crumbPath).then(nodeId => {
+      if(nodeId) this.setActiveNodeId(nodeId);
+    }).catch(err => console.error("Error finding node by path:", crumbPath, err));
+  }
+
   renderNodeTreeCacheButtons(){
     const buttons = [];
     for(const entry of this.#nodeTreeMap.entries()){
-      let [ parentID, childNodeList ] = entry;
+      let [ , childNodeList ] = entry;
       childNodeList = Array.isArray(childNodeList) ? childNodeList : [ childNodeList ];
       childNodeList?.forEach(childNode => {
         buttons.push(html`<az-button title="Set ${childNode.PathSegment} as active" @click="${() => this.setActiveNodeId(childNode.Id)}"></az-button>`)
@@ -349,7 +376,15 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
       html`<option value="" title="Select a tree&hellip;">Select a tree&hellip;</option>`,
       ...trees.map(tree => html`<option value="${tree}" .selected="${this.#tmpTreeSelection === tree}" title="${tree}">${tree}</option>`)
     ];
-    console.log("#render", forests, trees);
+
+    const asOfDisplay = (new Date( this.activeAsOfUtc ? this.activeAsOfUtc : Date.now())).toLocaleString();
+    const showAsOf = !this.activeAsOfUtc
+      ? html`<div class=""><strong>As of: </strong></span>Utc Now</div>`
+      : html`<div class=""><span class="asOfUtc" @click="${(e) => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
+
+
+
+
 
     return html`
     <az-modal-dialog id="dlgCfgForestsSettingsModal" scope="this" title="Forest">
@@ -387,19 +422,24 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
     </az-modal-dialog>
 
 
-
-
-    <div>[ Breadcrumbs ]</div>
-
+    <az-cforest-breadcrumbs
+      .node="${this.#activeNodeData}"
+      .onCrumbClick="${this._onCrumbClick.bind(this)}"
+      .onCFSettingsClick="${() => this.dlgCfgForestsSettingsModal.show()}"
+      scope="this"
+      id="cforestBreadcrumbs"
+    ></az-cforest-breadcrumbs>
     <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8">
       <div slot="left-top">
         <div class="cardBasic">
-          [ Tree Navigation ]
+          ${showAsOf}
+          <hr/>
           <ul>
             <li>Root: ${this.#forest} / ${this.#tree} @ ${this.#asOfUtc || "now"}</li>
-            <li>Nodes in cache: </li>
+            <li>Nodes in cache: ${this.#nodeCache.size}</li>
             <li>Nodes in tree map: ${this.#nodeTreeMap.size}</li>
           </ul>
+
           <az-button title="Set root as active" @click="${()=> this.setActiveNodeId(this.#rootNodeId) }"></az-button>
           ${this.renderNodeTreeCacheButtons()}
         </div>
@@ -408,8 +448,7 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
       <div slot="right-bottom">
 
         <div class="cardBasic">
-          [ Node summary ]
-          <pre>${this.#activeNodeId || "No active node"}</pre>
+          <az-cforest-summary .source="${this.#activeNodeData}" scope="this" id="cforestSummary"></az-cforest-summary>
         </div>
 
         <az-bit id="selectedSummary" scope="this" title="Summary" isExpanded="${true}">
@@ -419,15 +458,6 @@ export class CfgForestApplet2ABetterForestExplorer extends Applet  {
 
       </div>
     </az-grid-split>
-
-
-    <az-bit id="currentNodeCache" scope="this" title="Node cache" isExpanded="${false}">
-      <pre>${JSON.stringify(Array.from(this.#nodeCache.entries()), null, 2) || "No active node data"}</pre>
-    </az-bit>
-
-    <az-bit id="currentTreeCache" scope="this" title="Tree cache" isExpanded="${false}">
-      <pre>${JSON.stringify(Array.from(this.#nodeTreeMap.entries()), null, 2) || "No active node data"}</pre>
-    </az-bit>
     `;
   }
 }

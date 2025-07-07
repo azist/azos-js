@@ -44,14 +44,25 @@ class CForestNodeSummary extends Block {
 
   #ref = { forestClient: ForestSetupClient };
   #selectedVersionDetails = null;
+  #versionCache = new Map();
 
   connectedCallback() {
     super.connectedCallback();
     this.link(this.#ref);
   }
 
+  async onVersionBtnClick(e) {
+    if(!this.#versionCache.has(this.source.Id)) {
+      const versions = await this.#ref.forestClient.nodeVersionList(this.source.Id) || [];
+      this.#versionCache.set(this.source.Id, versions);
+    }
+    this.dlgNodeVersions.update();
+    this.requestUpdate();
+    this.dlgNodeVersions.show();
+  }
+
   async onVersionDetailClick(e) {
-    const versionId = `${this.source.Tree}.gver@${this.source.Forest}::${e.target.value}`;
+    const versionId = `${this.activeTree}.gver@${this.activeForest}::${e.target.value}`;
     this.#selectedVersionDetails = await this.#ref.forestClient.nodeInfoVersion(versionId);
     this.dlgNodeVersions.update();
     this.requestUpdate();
@@ -61,10 +72,9 @@ class CForestNodeSummary extends Block {
     if(!this.source) return html`<span class="no-version">No selected version</span>`;
     const title = this.source.PathSegment || "No selected node";
 
-    const showVersions = this.source?.Versions && this.source?.Versions?.length > 1;
     const nodeVersionDetails = html`${(new Date(this.source?.DataVersion?.Utc ? this.source?.DataVersion?.Utc : Date.now())).toLocaleString()} (${this.source?.DataVersion?.State})`;
-    const versionsBtn = showVersions ? html`<az-button id="btnNodeVersions" title="Version..." rank="6" class="selectedNodeBtn"  position="left" icon="svg://azos.ico.tenancy" @click="${ () => this.dlgNodeVersions.show()}">Versions</az-button>` : null;
-    const versionOptions = showVersions ? this.source?.Versions?.map(version => html`<option value="${version.G_Version}" title="${version.State} ${(new Date(version.Utc)).toLocaleString() } - ${version.G_Version}">${version.G_Version}</option>`) : null;
+    const versionsBtn = html`<az-button id="btnNodeVersions" title="Version..." rank="6" class="selectedNodeBtn"  position="left" icon="svg://azos.ico.tenancy" @click="${ () => this.onVersionBtnClick()}">Versions</az-button>`;
+    const versionOptions = this.source?.Versions?.map(version => html`<option value="${version.G_Version}" title="${version.State} ${(new Date(version.Utc)).toLocaleString() } - ${version.G_Version}">${version.G_Version}</option>`);
 
 
     const copyBtn = html`<az-button id="btnCopyPath" rank="6" icon="svg://azos.ico.copy" @click="${(e) => {
@@ -92,10 +102,7 @@ class CForestNodeSummary extends Block {
         <div slot="body">
           <az-grid cols="1" rows="auto" class="nodeVersionList">
             <az-select id="versionSelect" title="Select version" @change="${this.onVersionDetailClick}">
-              ${showVersions
-                ? html`<option value="" title="No versions available">No versions available</option>`
-                : versionOptions
-              }
+              ${versionOptions}
             </az-select>
             <div class="strip-h">
               ${this.#selectedVersionDetails
@@ -104,6 +111,9 @@ class CForestNodeSummary extends Block {
             </div>
           </az-grid>
           <az-button @click="${() => this.dlgNodeVersions.close()}" title="Close" style="float: right;"></az-button>
+          <az-bit title="Node Versions" scope="this" isExpanded="true">
+            <pre>${JSON.stringify(Array.from(this.#versionCache.entries()), null, 2) || "No node version data"}</pre>
+          </az-bit>
         </div>
       </az-modal-dialog>
       `;
