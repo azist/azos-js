@@ -11,13 +11,15 @@ import "azos-ui/vcl/util/object-inspector";
 import "azos-ui/vcl/tabs/tab-view";
 import "azos-ui/vcl/tabs/tab";
 
+import "azos-ui/vcl/tree-view/tree-view";
+
 import "azos-ui/parts/grid-split"
 import "azos-ui/parts/select-field";
 
-import "./forest-view";
-import "./forest-summary";
-import "./forest-breadcrumbs";
-import "./forest-settings";
+import "azos-ui/vcl/cforest/forest-summary";
+import "azos-ui/vcl/cforest/forest-breadcrumbs";
+import "azos-ui/vcl/cforest/forest-settings";
+
 
 export class CfgForestApplet extends Applet  {
 
@@ -38,6 +40,7 @@ export class CfgForestApplet extends Applet  {
       margin: 0 0 0.5em 0;
     }
 
+
     az-tab {
       margin: 0;
       padding: 0.5em;
@@ -48,345 +51,396 @@ export class CfgForestApplet extends Applet  {
       border-radius: 0 0.75em 0 0.75em;
       overflow: auto;
     }
-  `];
+
+    .horizontalBtnBar {
+      display: flex;
+      width: 100%;
+    }
+    .horizontalBtnBar az-button {
+      flex: 1;
+    }`];
 
 
   #ref = { forestClient: ForestSetupClient };
 
-  #forests = null;
-  #useDefaultRoot = true;
+  // Holds the root node id for the active tree for quick access
+  // @todo: most likely remove for a better solution
+  #rootNodeId = null;
 
-  #activeRootNode = null;
-  #activeForest = null;
-  #activeTree = null;
-  #activeAsOfUtc = null;
-  #activeNodeData = null;
+  // Holds the forests and their trees
+  // @todo: implement loading and saving of forest data
+  #forests = [
+    { id: "test-f1", title: "Test Forest 1", trees: [] },
+    { id: "g8corp", title: "G8 Corporation", trees: [] }
+  ];
+  get forests() { return this.#forests; }
 
-  #nodeCache = new Map();
+  /**
+   * Cache for nodes to avoid redundant requests
+   */
+  #nodeCache = new Map(); // Map<id, nodeData>
+  #nodeTreeMap = new Map(); // Map<parentId, childrenData[] >
 
-  get activeForest() { return this.#activeForest; }
+  /**
+   * Holds the currently selected forest id
+   */
+  #forest = null;
+  get activeForest() { return this.#forest; }
   set activeForest(value) {
-    if (this.#activeForest !== value) {
-      this.#activeForest = !value ? null : value;
-      this.#activeTree = null;
-      this.#activeAsOfUtc = null;
-      this.treeView.requestUpdate();
-      this.arena.requestUpdate();
-      this.requestUpdate();
-    }
-  }
-
-  get activeTree() { return this.#activeTree; }
-  set activeTree(value) {
-    if (this.#activeTree !== value) {
-      this.#activeTree = value;
-      if (this.#activeForest && this.#activeTree) {
-        this.#initTreeRootNode(this.#activeForest, this.#activeTree, "/");
-      }
-    }
-  }
-
-  get activeRootNode() { return this.#activeRootNode; }
-  set activeRootNode(node) {
-    this.#activeRootNode = node;
-    this.treeView.requestUpdate();
+    if(this.#forest === value) return;
+    this.#forest = value;
     this.requestUpdate();
-    if (this.#activeForest && this.#activeTree) {
-      if(this.#activeRootNode?.Id) {
-        this.#initTreeRootNode(this.#activeForest, this.#activeTree, undefined, this.#activeRootNode.Id);
-      } else {
-        this.#initTreeRootNode(this.#activeForest, this.#activeTree, "/");
-      }
-    }
   }
 
-  get activeAsOfUtc() { return this.#activeAsOfUtc; }
-  set activeAsOfUtc(value) {
-    if (this.#activeAsOfUtc !== value) {
-      this.#activeAsOfUtc = value;
-      this.requestUpdate();
-      if (this.#activeForest && this.#activeTree) {
-        this.#initTreeRootNode(this.#activeForest, this.#activeTree, this.#activeRootNode?.FullPath ?? "/");
-      }
-    }
+  /**
+   * Holds the currently selected tree - trees are only ids...
+   */
+  #tree = null;
+  get activeTree() { return this.#tree; }
+  set activeTree(value) {
+    if(this.#tree === value) return;
+    this.#tree = value;
+    this.requestUpdate();
   }
+
+  /**
+   * Holds the currently selected asOfUtc timestamp or is null for "now"
+   * @type {Date|null}
+   * @default null
+   */
+  #asOfUtc = null;
+  get activeAsOfUtc() { return this.#asOfUtc; }
+  set activeAsOfUtc(value) {
+    if(this.#asOfUtc === value) return;
+    this.#asOfUtc = (new Date(value)).toISOString(); // ensure it's a string
+    this.requestUpdate();
+  }
+
+  /**
+   * Holds the currently selected node id
+   * @type {string|null}
+   * @default null
+   */
+  #activeNodeId = null;
+  get activeNodeId() { return this.#activeNodeId; }
+
+  /**
+   * Holds the currently selected node data
+   * @type {object|null}
+   * @default null
+   */
+  #activeNodeData = null;
+  get activeNodeData() { return this.#activeNodeData; }
 
   get title(){
-    return html` ${
-      !this.activeTree
-        ? ""
-        : `Forest Explorer: ${this.activeTree}@${
-          !this.activeForest
-            ? ""
-            : `${this.activeForest}${
-              this.#activeNodeData?.PathSegment
-                ? `/${this.#activeNodeData.PathSegment}` : ""
-            }`}`}`;
+    const activeForest = this.#forest || " - ";
+    const activeTree = this.#tree || " - ";
+    const activeNodePath = this.#activeNodeData?.PathSegment ? this.#activeNodeData.PathSegment : "";
+    return html`Forest Explorer: ${activeTree}@${activeForest} ${activeNodePath}`;
   }
 
-  #cfgForestSettingsCmd = new Command(this, {
+  #forestSettingsCmd = new Command(this, {
     uri: `CfgForest.ForestTreeAsOfUtc`,
     icon: "svg://azos.ico.database",
     title: "CfgForest Settings",
-    handler: async () => {
-      console.log(`CfgForestApplet#cfgForestSettingsCmd handler`, this.forestSettings);
-      this.forestSettings.open();
-    }
+    handler: async () =>  await this.dlgSettings.open()
+  });
+
+  #forestRefreshCmd = new Command(this, {
+    uri: `CfgForest.RefreshForestTree`,
+    icon: "svg://azos.ico.refresh",
+    title: "CfgForest Refresh",
+    handler: async () =>  await this.#refreshTree()
   });
 
   connectedCallback() {
     super.connectedCallback();
     this.link(this.#ref);
-    this.arena.installToolbarCommands([this.#cfgForestSettingsCmd]);
+    this.arena.installToolbarCommands([ this.#forestSettingsCmd, this.#forestRefreshCmd]);
     this.#bootstrap();
   }
 
-  openForestSettings() {
-    console.log(`CfgForestApplet#openForestSettings`, this.forestSettings);
-    this.forestSettings.open();
-  }
-
-  async #bootstrap() {
+  async #bootstrap(){
     await Spinner.exec(async()=> {
-      await this.#loadTreesForForests();
-      if (this.#useDefaultRoot) {
-        this.activeForest = this.#forests[0].id;
-        this.activeTree = this.#forests[0].trees[0];
-      }
-
-      this.treeView.addEventListener("nodeUserAction", (e) => {
+      await this.#loadRootNode();
+      // listen for any treeview interactions
+      this.tvExplorer.addEventListener("nodeUserAction", (e) => {
         e.stopPropagation();
         const { node, action } = e.detail;
-        console.log("CfgForestApplet#treeView nodeUserAction", { node, action });
-        if (action === "click") {
-          this.onCFNodeSelected(node);
+        console.log("CfgForestApplet#tvExplorer nodeUserAction", { node, action });
+        if (["click"].includes(action)){
+          if(node.canOpen && !node.opened) node.open();
+          if(node.canOpen && node.opened) node.close();
+          this.#setActiveNodeId(node.data.Id, node);
         }
       });
+    },"Loading forests/trees");
 
-      this.treeView.requestUpdate();
-
-      this.arena.requestUpdate();
-      this.requestUpdate();
-    },"Loading forests");
+    // debug only
+    // @todo: !remove these before production!
+    window.nodeTreeMap = this.#nodeTreeMap; // for debugging
+    window.nodeCache = this.#nodeCache; // for debugging
+    window.setCurrentNodeId = async (id) => await this.#setActiveNodeId(id); // for debugging
   }
 
-  async #loadTreesForForests() {
-    const forests = [
-      { id: "test-f1", title: "Test Forest 1", trees: [] },
-      { id: "g8corp", title: "G8 Corporation", trees: [] }
-    ];
-    for (let forestIdx = 0; forestIdx < forests.length; forestIdx++) {
-      const forest = forests[forestIdx];
+  async #refreshTree(){
+    console.debug("#refreshTree called");
+    const currentNode = this.activeNodeData;
+    await Spinner.exec(async()=> {
+      this.tvExplorer.root.removeAllChildren();
+      await this.#loadRootNode();
+      if(currentNode.FullPath !== "/") {
+        await this.#loadNodeAncestors(currentNode.Id);
+        await this.#setActiveNodeId(currentNode.Id);
+      }
+    }, "Loading forests/trees");
+  }
+
+  async #loadRootNode(){
+    this.#nodeCache.clear();
+    this.#nodeTreeMap.clear();
+
+    // get and update all forests trees for selection
+    for (let forestIdx = 0; forestIdx < this.#forests.length; forestIdx++) {
+      const forest = this.#forests[forestIdx];
       const trees = await this.#ref.forestClient.treeList(forest.id);
       forest.trees = trees;
     }
-    this.#forests = forests;
+
+    // set defaults for now
+    // @todo: auto load the last used forest/tree/asofutc/nodeId or show setting modal for forests
+    this.#forest = this.activeForest || "test-f1";
+    this.#tree = this.activeTree || "t1";
+    this.#asOfUtc = this.activeAsOfUtc || null ; // null means "now"
+
+    // Get the root node for the active tree and set it's data as the current data object
+    const rootNodeInfo = await this.#getNodeByPath(this.#forest, this.#tree, "/", this.#asOfUtc);
+    this.#nodeCache.set(rootNodeInfo.Id, rootNodeInfo);
+    this.#activeNodeData = rootNodeInfo;
+
+    // Set the root node id for quick access
+    this.#rootNodeId = rootNodeInfo.Id;
+    // Set the active node id to the root node id
+    this.#activeNodeId = rootNodeInfo.Id;
+
+    // add root node to the tree view
+    let root = undefined;
+    if(this.tvExplorer){
+      root = this.tvExplorer.root.addChild(rootNodeInfo.PathSegment, {
+        data: { ...rootNodeInfo },
+        showPath: false,
+        canOpen: true,
+      });
+      this.tvExplorer.requestUpdate();
+    }
+
+    // Load children of the root node to a depth of 2
+    await this.#loadNodeChildren(this.#rootNodeId, 2, root);
+
     this.arena.requestUpdate();
     this.requestUpdate();
+
+    // @todo: allow for the loading of any node by id or path
+    // @todo: path traversal to only load the children at the levels of the ancestor nodes
   }
 
-  async #initTreeRootNode(forest = this.#activeForest, tree = this.#activeTree, path = null, nodeId = null, parent = this.treeView.root, asOfUtc = this.#activeAsOfUtc, abortSignal = null) {
-    if(!forest || !tree) return;
-    await Spinner.exec(async()=> this.#configureRootTreeNode(forest, tree, path, nodeId, parent, asOfUtc, abortSignal), "Initializing Tree View Root");
-    this.treeView.requestUpdate();
-    this.requestUpdate();
-    this.arena.requestUpdate();
-    this.#activeNodeData = this.#nodeCache.get(this.#activeRootNode?.Id) || null;
+  // @todo: refactor to ensure children are loaded under the correct parent node
+  async #loadNodeAncestors(nodeId, stopAtId = "0:0:1") {
+    if(!nodeId) return;
+    const parentNodeDetails = [];
+    const node = await this.#getNodeById(nodeId, this.#asOfUtc);
+    this.#nodeCache.set(nodeId, node);
+
+    let parentId = `${this.activeTree}.gnode@${this.activeForest}::${node.G_Parent}`;
+
+    // go up the tree gathering node info until root node is reached
+    while(parentId !== `${this.activeTree}.gnode@${this.activeForest}::${stopAtId}`){
+      const parentNodeInfo = await this.#getNodeById(parentId, this.#asOfUtc);
+      parentNodeDetails.push({ id: parentId, info: parentNodeInfo});
+      this.#nodeCache.set(parentId, parentNodeInfo);
+      parentId = `${this.activeTree}.gnode@${this.activeForest}::${parentNodeInfo.G_Parent}`;
+    }
+
+    parentNodeDetails.reverse(); // reverse to start from the root node
+
+
+    let parentNode = this.tvExplorer.getAllVisibleNodes().find( n => n.data.Id === parentId);
+    let priorParent = this.tvExplorer.getAllVisibleNodes().find( n => n.data.Id === nodeId);
+    // load each node starting from the root node children
+    for (const { id, info } of parentNodeDetails) {
+      console.log("all visible nodes", this.tvExplorer.getAllVisibleNodes());
+      await this.#loadNodeChildren(id, 1, parentNode);
+      priorParent = parentNode;
+      parentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === id);
+      console.log("CForestNodeVersions.#loadNodeAncestors", priorParent, parentNode);
+    }
+
+    this.tvExplorer.requestUpdate();
   }
 
-  async #configureRootTreeNode(forest = this.#activeForest, tree = this.#activeTree, path = null, nodeId = null, parent = this.treeView.root, asOfUtc = this.#activeAsOfUtc, abortSignal = null) {
-    if(!forest || !tree) return;
-    this.treeView.removeAllNodes();
-    if(path === null && nodeId === null) path = "/";
+  async #loadNodeChildren(parentId, depth = 2, parentNode = null) {
+    if(depth === 0 || this.#nodeTreeMap.has(parentId)) return;
+    const children = await this.#getChildrenNodesById(parentId);
+    this.#nodeTreeMap.set(parentId, children);
 
-    const rootCfgNode = nodeId
-      ? await this.#getNodeById(nodeId,asOfUtc,abortSignal)
-      : await this.#getNodeByPath(forest, tree, path,asOfUtc,abortSignal);
+    for (const child of children) {
+      const childNodeInfo = await this.#getNodeById(child.Id, this.#asOfUtc);
 
-    const parentId = rootCfgNode.Id;
-    this.#nodeCache.set(parentId, rootCfgNode);
+      if(parentNode) {
+        if (!childNodeInfo) {
+          parentNode.canOpen = false;
+          parentNode.chevronVisible = false;
+          parentNode.opened = false;
+          parentNode.icon = "svg://azos.ico.draft";
+          this.tvExplorer.requestUpdate();
+          continue;
+        }
+        parentNode.canOpen = true; // ensure the parent node can be opened
+      }
 
-    let rootNode = parent.addChild(rootCfgNode.PathSegment, { // { icon, checkable, canClose, canOpen, nodeVisible, opened, showPath
-      data: { ...rootCfgNode },
-      showPath: false,
-      canOpen: true,
-      ghostPostfix: html`<span title="${rootCfgNode?.DataVersion?.State}">${(new Date(rootCfgNode?.DataVersion?.Utc)).toLocaleDateString()} - ${(new Date(rootCfgNode?.DataVersion?.Utc)).toLocaleTimeString()}</span>`,
-    });
+      const childNode = parentNode.addChild(childNodeInfo.PathSegment, {
+        data: { ...childNodeInfo },
+        showPath: false,
+        canOpen: true,
+        ghostPostfix: html`<span title="${childNodeInfo?.DataVersion?.State}">${childNodeInfo?.DataVersion?.Utc}</span>`,
+      });
 
-    rootCfgNode._tvNode = rootNode;
-    this.#nodeCache.set(parentId, rootCfgNode);
-    rootNode.isRoot = true;
-
-    this.#activeRootNode = rootNode.data;
-    await this.preloadChildren(nodeId, 2, rootNode);
+      parentNode.open();
+      await this.#loadNodeChildren(child.Id, depth - 1, childNode);
+    }
+    this.tvExplorer.requestUpdate();
   }
 
-  async #getNodeByPath(idForest, idTree, path = '/', asOfUtc = this.#activeAsOfUtc, abortSignal = null) {
+  async #getChildrenNodesById(parentId) {
+    const isCached = this.#nodeTreeMap.has(parentId);
+    if(isCached){
+      const childrenFromCache = this.#nodeTreeMap.get(parentId);
+      return Array.isArray(childrenFromCache) ? childrenFromCache : [ childrenFromCache ];
+      // @todo: look into why setting the children as an array with a single object gets only the object
+    }
+
+    const children = await this.#ref.forestClient.childNodeList(parentId) || [];
+    this.#nodeTreeMap.set(parentId, children);
+    return Array.isArray(children) ? children : [ children ];
+  }
+
+  async #getNodeByPath(idForest, idTree, path = '/', asOfUtc = this.#asOfUtc, abortSignal = null) {
     let node = await this.#ref.forestClient.probePath(idForest, idTree, path, asOfUtc, abortSignal);
     return node;
   }
 
-  async #getNodeById(id = '0:0:1', asOfUtc = this.#activeAsOfUtc, abortSignal = null) {
+  async #getNodeById(id = '0:0:1', asOfUtc = this.#asOfUtc, abortSignal = null) {
     let node = await this.#ref.forestClient.nodeInfo(id, asOfUtc, abortSignal);
     return node;
   }
 
-  async preloadChildren(id, depth, parentNode ) {
-    if(!id || depth <= 0) return;
-    let parentData = this.#nodeCache.has(id) ? this.#nodeCache.get(id) : await this.#getNodeById(id)
-    if(parentData._childrenLoaded) return;
-    parentNode.isLoading = true;
-
-
-    this.treeView.requestUpdate();
-
-    if(!parentData.Versions)  {
-      const versions = await this.#ref.forestClient.nodeVersionList(id) || [];
-      parentData.Versions = versions;
+  async #setActiveNodeId(id, originNode = null) {
+    console.debug("#setActiveNodeId", id, originNode);
+    if(!id) return;
+    this.#activeNodeId = id;
+    this.#activeNodeData = this.#nodeCache.get(id) || null;
+    if(!this.#nodeCache.get(id)) {
+      this.#activeNodeData = await this.#getNodeById(id, this.#asOfUtc);
+      this.#nodeCache.set(id, this.#activeNodeData);
+      await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 2, originNode); }, "Loading node children");
     }
-
-    if(!parentData.Children) {
-      const children =  await this.#ref.forestClient.childNodeList(id) || [];
-      parentData.Children = children;
-    }
-
-    const hasChildren = parentData.Children && parentData.Children.length > 0;
-    parentNode.chevronVisible = hasChildren;
-    parentNode.canOpen = hasChildren;
-    parentNode.isBranch = hasChildren;
-    parentNode.isLeaf = !hasChildren;
-    parentNode.showPath = false;
-    parentNode.ghostPostfix = html`<span title="${parentData?.DataVersion?.State}">${(new Date(parentData?.DataVersion?.Utc)).toLocaleDateString()} - ${(new Date(parentData?.DataVersion?.Utc)).toLocaleTimeString()}</span>`;
-
-    for (const child of parentData.Children) {
-      const childNode = parentNode.addChild(child.PathSegment, { showPath: false, data: child });
-      await this.preloadChildren(child.Id, depth - 1, childNode);
-      parentData._childrenLoaded = true;
-    }
-
-    parentNode.isLoading = false;
-    parentData._tvNode = parentNode;
-    this.#nodeCache.set(id, parentData);
-  }
-
-  async onCFNodeSelected(node){
-    console.log("CfgForestApplet#onCFNodeSelected", node);
-    // const doIt = async () => {
-    //   const id = node.data.Id;
-    //   console.log("onCFNodeSelected", node.id, this.#nodeCache.has(id));
-
-    //   if(!this.#nodeCache.has(id)) {
-    //     const data = await this.#ref.forestClient.nodeInfo(id);
-    //     this.#nodeCache.set(id, data);
-    //   }
-
-    //   const currentNodeData = this.#nodeCache.get(id);
-    //   this.#activeNodeData = currentNodeData;
-    //   await this.preloadChildren(id, 2, node);
-    //   this.treeView.requestUpdate();
-    // }
-    // await Spinner.exec(async()=> { await doIt(); }, "Loading Node Data");
-
-    // this.requestUpdate();
-  }
-
-  async onCFNodeClick(node) {
-    const doIt = async () => {
-      const id = node.data.Id;
-      console.log("onCFNodeClick", node.id, this.#nodeCache.has(id));
-
-      if(!this.#nodeCache.has(id)) {
-        const data = await this.#ref.forestClient.nodeInfo(id);
-        this.#nodeCache.set(id, data);
-      }
-
-      const currentNodeData = this.#nodeCache.get(id);
-      this.#activeNodeData = currentNodeData;
-      await this.preloadChildren(id, 2, node);
-      this.treeView.requestUpdate();
-    }
-    await Spinner.exec(async()=> { await doIt(); }, "Loading Node Data");
-
     this.requestUpdate();
   }
 
-  renderCrudForm(){
-    const onCrudElementChange = (e) =>  console.log(`CfgForestApplet#renderCrudForm onCrudElementChange`, e);
+  #txtCrumbClick(crumbPath) {
+    const findIdByFullPath = async (fullPath) => {
+      const node = await this.#getNodeByPath(this.activeForest, this.activeTree, fullPath, this.activeAsOfUtc);
+      if(!node) {
+        console.warn("#findIdByFullPath - Node not found for path:", fullPath);
+        return null;
+      }
+      return node.Id;
+    }
+
+    findIdByFullPath(crumbPath).then(nodeId => {
+      if(nodeId) this.#setActiveNodeId(nodeId);
+    }).catch(err => console.error("Error finding node by path:", crumbPath, err));
+  }
+
+  #renderDevInfo(){
     return html`
-    <az-modal-dialog id="dlgNode" scope="self" title="Selected Node">
-      <div slot="body">
-        <az-text id="tbNodeTitle"           scope="this" name="PathSegment"     title="Node Title"        placeholder="Node Title"          dataType="string" @change="${onCrudElementChange}"></az-text>
-        <az-text id="tbNodeProperties"      scope="this" name="Properties"      title="Node Properties"   placeholder="Node Properties"     dataType="json"   @change="${onCrudElementChange}"></az-text>
-        <az-text id="tbNodeEffectiveConfig" scope="this" name="EffectiveConfig" title="Effective Config"  placeholder="Effective Config"    dataType="json"   @change="${onCrudElementChange}"></az-text>
-        <az-text id="tbNodeLevelConfig"     scope="this" name="LevelConfig"     title="Level Config"      placeholder="Level Config"        dataType="json"   @change="${onCrudElementChange}"></az-text>
-        <az-button @click="${() => this.dlgNode.close()}" title="Close" style="float: right;"></az-button>
-      </div>
-    </az-modal-dialog>
+      <hr style="opacity: 0.5;"/>
+      <ul>
+        <li>Root: ${this.#forest} / ${this.#tree} @ ${this.#asOfUtc || "now"}</li>
+        <li>Nodes in cache: ${this.#nodeCache.size}</li>
+        <li>Nodes in tree map: ${this.#nodeTreeMap.size}</li>
+      </ul>
     `;
   }
 
-
   render(){
-    if(!this.#forests) return;
-    const asOfDisplay = (new Date( this.#activeAsOfUtc ? this.#activeAsOfUtc : Date.now())).toLocaleString();
-    const showAsOf = !this.#activeAsOfUtc
-      ? html`<div class="cardBasic"><strong>As of: </strong></span>Utc Now</div>`
-      : html`<div class="cardBasic"><span class="asOfUtc" @click="${(e) => this.#cfgForestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
+    const asOfDisplay = this.activeAsOfUtc;
+    const showAsOf = !this.activeAsOfUtc
+      ? html`<div class=""><strong>As of: </strong></span>Utc Now</div>`
+      : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
 
     return html`
-      ${this.renderCrudForm()}
-
-      <az-cfg-forest-settings scope="this" id="forestSettings"
+      <az-cfg-settings
+        id="dlgSettings"
+        scope="this"
         .forests="${this.#forests}"
-        .activeForest="${this.#activeForest}"
-        .activeTree="${this.#activeTree}"
-        .activeAsOfUtc="${this.#activeAsOfUtc}"></az-cfg-forest-settings>
+        .activeForest="${this.activeForest}"
+        .activeTree="${this.activeTree}"
+        .activeAsOfUtc="${this.activeAsOfUtc}"
+        .applySettings="${(forest, tree, asOfUtc) => {
+          this.activeForest = forest;
+          this.activeTree = tree;
+          this.activeAsOfUtc = asOfUtc;
+          this.#refreshTree();
+        }}"
+      ></az-cfg-settings>
+
 
       <az-cforest-breadcrumbs
-        id="cforestBreadcrumbs" scope="this"
         .node="${this.#activeNodeData}"
-        .onCrumbClick="${e => { e.preventDefault(); }}"
-        .onCFSettingsClick="${(e) => { e.preventDefault(); this.openForestSettings(); }}">
-      </az-cforest-breadcrumbs>
+        .onCrumbClick="${this.#txtCrumbClick.bind(this)}"
+        .onCFSettingsClick="${() => this.dlgCfgForestsSettingsModal.show()}"
+        scope="this"
+        id="cforestBreadcrumbs"
+      ></az-cforest-breadcrumbs>
+
 
       <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8">
         <div slot="left-top">
+
           <div class="cardBasic">
-            <az-cforest-view
-              id="treeView" scope="this"
-              .title="${ html`${showAsOf}`}"
-              .selectHook="${this.onCFNodeClick.bind(this)}"
-              .rootNode="${this.#activeRootNode}"></az-cforest-view>
+            ${showAsOf}
+            <hr style="opacity: 0.5;"/>
+            <az-tree-view id="tvExplorer" scope="this"></az-tree-view>
+            ${this.#renderDevInfo()}
           </div>
 
         </div>
         <div slot="right-bottom">
 
           <div class="cardBasic">
-            <az-cforest-summary id="cforestSummary" scope="this" .source="${this.#activeNodeData}"></az-cforest-summary>
+            <az-cforest-summary .source="${this.#activeNodeData}" scope="this" id="cforestSummary"></az-cforest-summary>
           </div>
 
-          <az-block id="selectedSummary" scope="this" title="Summary" isExpanded="${true}">
-            <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>
-              <az-tab title="Selected Node" .canClose="${false}">
-                  <az-object-inspector id="objectInspector0" scope="self" .source=${this.#activeNodeData}></az-object-inspector>
-              </az-tab>
-              <az-tab title="Level Config" .canClose="${false}">
-                <az-object-inspector id="objectInspector1" scope="self" .source=${this.#activeNodeData?.LevelConfig ? JSON.parse(this.#activeNodeData?.LevelConfig) : {}}></az-object-inspector>
-              </az-tab>
-              <az-tab title="Effective Config" .canClose="${false}">
-                <az-object-inspector id="objectInspector2" scope="self" .source=${this.#activeNodeData?.EffectiveConfig ? JSON.parse(this.#activeNodeData?.EffectiveConfig) : {}}></az-object-inspector>
-              </az-tab>
-              <az-tab title="Properties" .canClose="${false}">
-                <az-object-inspector id="objectInspector3" scope="self" .source=${this.#activeNodeData?.Properties ? JSON.parse(this.#activeNodeData?.Properties) : {}}></az-object-inspector>
-              </az-tab>
-            </az-tab-view>
-          </az-block>
+          <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>
+            <az-tab title="Selected Node" .canClose="${false}">
+                <az-object-inspector id="objectInspector0" scope="self" .source=${this.#activeNodeData}></az-object-inspector>
+            </az-tab>
+            <az-tab title="Level Config" .canClose="${false}">
+              <az-object-inspector id="objectInspector1" scope="self" .source=${this.#activeNodeData?.LevelConfig ? JSON.parse(this.#activeNodeData?.LevelConfig) : {}}></az-object-inspector>
+            </az-tab>
+            <az-tab title="Effective Config" .canClose="${false}">
+              <az-object-inspector id="objectInspector2" scope="self" .source=${this.#activeNodeData?.EffectiveConfig ? JSON.parse(this.#activeNodeData?.EffectiveConfig) : {}}></az-object-inspector>
+            </az-tab>
+            <az-tab title="Properties" .canClose="${false}">
+              <az-object-inspector id="objectInspector3" scope="self" .source=${this.#activeNodeData?.Properties ? JSON.parse(this.#activeNodeData?.Properties) : {}}></az-object-inspector>
+            </az-tab>
+          </az-tab-view>
 
         </div>
-      </az-split-grid-view>
+      </az-grid-split>
     `;
   }
 }
 
-window.customElements.define("az-cfg-forest-applet", CfgForestApplet);
+window.customElements.define("az-cfg-forest2-a-applet", CfgForestApplet);

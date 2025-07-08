@@ -120,7 +120,7 @@ export class ForestSetupClient extends IClient {
    * @returns {Promise<object[]>} - List of TreeNodeHeader objects or null if not found
    */
   async childNodeList(idParent, asOfUtc = null, abortSignal = null) {
-    console.log("childNodeList called with idParent:", idParent, "asOfUtc:", asOfUtc);
+    // console.log("childNodeList called with idParent:", idParent, "asOfUtc:", asOfUtc);
     idParent = guardId(idParent, "childNodeList"); // Ensure id is a valid EntityId
 
     const params = { idparent: idParent };
@@ -148,7 +148,7 @@ export class ForestSetupClient extends IClient {
    * @returns {Promise<object>} - TreeNodeInfo object or null if not found
    */
   async nodeInfo(id, asOfUtc = null, abortSignal = null) {
-    console.log("nodeInfo called with id:", id, "asOfUtc:", asOfUtc);
+    // console.log("nodeInfo called with id:", id, "asOfUtc:", asOfUtc);
     id = guardId(id, "nodeInfo"); // Ensure id is a valid EntityId
 
     const params = { id };
@@ -168,7 +168,7 @@ export class ForestSetupClient extends IClient {
    * @returns {Promise<object>} - Last node found or null if nothing was found
    */
   async probePath(idForest, idTree, path, asOfUtc = null, abortSignal = null) {
-    console.log("probePath called with idForest:", idForest, "idTree:", idTree, "path:", path, "asOfUtc:", asOfUtc);
+    // console.log("probePath called with idForest:", idForest, "idTree:", idTree, "path:", path, "asOfUtc:", asOfUtc);
     idForest = guardAtomId(idForest, "probePath"); // Ensure idForest is a valid EntityId
     idTree = guardAtomId(idTree, "probePath"); // Ensure idTree is a valid EntityId
     aver.isString(path, "path");
