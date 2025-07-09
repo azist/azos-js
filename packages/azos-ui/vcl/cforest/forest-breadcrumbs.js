@@ -21,6 +21,7 @@ class CForestBreadcrumbs extends Block {
       align-items: center;
       font-size: 1rem;
       padding: 0.5em;
+      height: 2ch;
     }
 
     .crumb {
@@ -99,7 +100,7 @@ class CForestBreadcrumbs extends Block {
         toast(`Copied '${this.node.FullPath}' to clipboard`, { timeout: 1_000, status: "ok", position: "top-center" });
       }}"></az-button>`;
 
-    const trail = [actionBtn, html`<span class="crumb"  @click="${() => this.#onCrumbClick("/","/")}">://</span>`];
+    const trail = [actionBtn, html`<span class="crumb"  @click="${() => this.#onCrumbClick(-1,this.node.FullPath)}">://</span>`];
 
     if (this.node?.FullPath){
       const segments = this.node.FullPath.split('/').filter(p => p);

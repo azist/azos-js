@@ -1,14 +1,8 @@
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
-import { html, css, verbatimHtml } from "azos-ui/ui";
+import { html, css } from "azos-ui/ui";
 import { Block } from "azos-ui/blocks";
 import "azos-ui/vcl/util/object-inspector";
-import { toast } from "azos-ui/toast";
-import { writeToClipboard } from "azos-ui/vcl/util/clipboard";
 import { Spinner } from "../../spinner.js";
-
-
-// @todo: broke version dropdown. Data is available, need to check the render flow (was working)
-
 
 class CForestNodeVersions extends Block {
 
@@ -72,8 +66,6 @@ class CForestNodeVersions extends Block {
       await this.dlgNodeVersions.show();
 
     }, "Loading versions...");
-
-    // console.log("CForestNodeVersions.#loadVersions completed", this.#selectedVersionDetails);
   }
 
   async #loadVersionDetails(versionId) {
@@ -82,7 +74,6 @@ class CForestNodeVersions extends Block {
     this.#selectedVersionDetails = await this.#ref.forestClient.nodeInfoVersion(versionId);
     this.#versionOptions = this.#selectedVersions.map(this.#optToOption);
 
-    // console.debug("CForestNodeVersions.#loadVersionDetails",versionId, this.#selectedVersionDetails);
     this.selVersions.requestUpdate();
     this.objectInspector.requestUpdate();
     this.requestUpdate();
@@ -95,8 +86,6 @@ class CForestNodeVersions extends Block {
 
   render(){
     if(!this.source) return null;
-
-    // console.log("CForestNodeSummary.render", this.source);
 
     return html`
       <az-button id="btnNodeVersions" title="Version..." rank="6" class="selectedNodeBtn"  position="left" icon="svg://azos.ico.tenancy" @click="${ () => this.#loadVersions(this.source.Id)}">Versions</az-button>
@@ -131,39 +120,3 @@ class CForestNodeVersions extends Block {
 }
 
 window.customElements.define("az-cforest-versions", CForestNodeVersions);
-
-  // async onVersionBtnClick(e) {
-  //   if(!this.#versionCache.has(this.source.Id)) {
-  //     const versions = await this.#ref.forestClient.nodeVersionList(this.source.Id) || [];
-  //     this.#versionCache.set(this.source.Id, versions);
-  //   }
-  //   this.dlgNodeVersions.update();
-  //   this.requestUpdate();
-  //   this.dlgNodeVersions.show();
-  // }
-
-  // async onVersionDetailClick(e) {
-  //   const versionId = `${this.activeTree}.gver@${this.activeForest}::${e.target.value}`;
-  //   this.#selectedVersionDetails = await this.#ref.forestClient.nodeInfoVersion(versionId);
-  //   this.dlgNodeVersions.update();
-  //   this.requestUpdate();
-  // }
-
-  // <az-modal-dialog id="dlgNodeVersions" scope="self" title="Versions: ${this.source?.PathSegment}">
-  //   <div slot="body">
-  //     <az-grid cols="1" rows="auto" class="nodeVersionList">
-  //       <az-select id="versionSelect" title="Select version" @change="${this.onVersionDetailClick}">
-  //         ${versionOptions}
-  //       </az-select>
-  //       <div class="strip-h">
-  //         ${this.#selectedVersionDetails
-  //           ? html`<az-object-inspector id="objectInspector" scope="this" .source=${this.#selectedVersionDetails}></az-object-inspector>`
-  //           : html`<span class="no-version">No version selected</span>`}
-  //       </div>
-  //     </az-grid>
-  //     <az-button @click="${() => this.dlgNodeVersions.close()}" title="Close" style="float: right;"></az-button>
-  //     <az-bit title="Node Versions" scope="this" isExpanded="true">
-  //       <pre>${JSON.stringify(Array.from(this.#versionCache.entries()), null, 2) || "No node version data"}</pre>
-  //     </az-bit>
-  //   </div>
-  // </az-modal-dialog>

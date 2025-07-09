@@ -106,7 +106,7 @@ export class CfgForestApplet extends Applet  {
   get activeAsOfUtc() { return this.#asOfUtc; }
   set activeAsOfUtc(value) {
     if(this.#asOfUtc === value) return;
-    this.#asOfUtc = (new Date(value)).toISOString(); // ensure it's a string
+    this.#asOfUtc = (value === null || value === undefined) ? this.#asOfUtc = null : (new Date(value)).toISOString(); // ensure it's a string
     this.requestUpdate();
   }
 
@@ -128,13 +128,14 @@ export class CfgForestApplet extends Applet  {
   set activeNodeData(value) {
     if(this.#activeNodeData === value) return;
     this.#activeNodeData = value;
+    this.arena.requestUpdate();
   }
 
   get title(){
     const activeForest = this.#forest || " - ";
     const activeTree = this.#tree || " - ";
-    const activeNodePath = this.#activeNodeData?.PathSegment ? this.#activeNodeData.PathSegment : "";
-    return html`Forest Explorer: ${activeTree}@${activeForest} ${activeNodePath}`;
+    const activeNodePath = this.#activeNodeData?.PathSegment ? this.#activeNodeData.PathSegment === "/" ? "://" : this.#activeNodeData.PathSegment : "";
+    return html`Forest Explorer: ${activeTree}@${activeForest} &hellip; ${activeNodePath}`;
   }
 
   #forestSettingsCmd = new Command(this, {
@@ -305,12 +306,11 @@ export class CfgForestApplet extends Applet  {
       await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 2, originNode); }, "Loading node children");
     }
     this.tvExplorer.selectedNode = originNode ? originNode : this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === id);
+    this.arena.requestUpdate();
     this.requestUpdate();
   }
 
   async refreshTree(){
-    console.debug("#refreshTree called");
-
     const currentNode = { ...this.activeNodeData };
 
     await Spinner.exec(async()=> {
@@ -344,6 +344,7 @@ export class CfgForestApplet extends Applet  {
           if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
           this.activeForest = forest;
           this.activeTree = tree;
+
           this.activeAsOfUtc = asOfUtc;
           this.activeNodeData = null;
           this.refreshTree();

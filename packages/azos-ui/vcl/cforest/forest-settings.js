@@ -3,9 +3,6 @@ import { Block } from "azos-ui/blocks";
 import "azos-ui/parts/select-field";
 import { VALIDATE_METHOD } from "azos/types";
 
-// @todo: remove redundant forest and tree vars
-// @todo: remove redundant request updates
-
 class CfgForestSettings extends Block {
 
   static properties = {
@@ -66,6 +63,8 @@ class CfgForestSettings extends Block {
     const invalidForest = this.selForest[VALIDATE_METHOD](null, "", true)
     const invalidTree = this.selTree[VALIDATE_METHOD](null, "", true)
     if(invalidForest || invalidTree) return;
+
+    console.log(`Applying settings: Forest=${this.selForest.value}, Tree=${this.selTree.value}, AsOfDate=${this.datAsOfDate.value || null}`);
 
     this.applySettings?.( this.selForest.value, this.selTree.value, this.datAsOfDate.value || null);
     this.dlgSettingsModal.close();
