@@ -45,7 +45,7 @@ class CForestBreadcrumbs extends Block {
 
     .crumb-current {
       font-weight: bold;
-      color: #222;
+      color: var(--ink);
       cursor: default;
       text-decoration: none;
 
@@ -117,7 +117,8 @@ class CForestBreadcrumbs extends Block {
     const copyBtn = html`<az-button id="btnCopyPath" class="copyBtn" rank="6" icon="svg://azos.ico.copy" @click="${(e) => {
       writeToClipboard(this.node.FullPath);
       toast(`Copied '${this.node.FullPath}' to clipboard`, { timeout: 1_000, status: "ok", position: "top-center" });
-    }}"></az-button>`;
+    }}">
+    </az-button>`;
 
     const trail = [actionBtn, html`<span class="crumb"  @click="${() => this.#onCrumbClick("/","/")}">://</span>`];
 
@@ -125,7 +126,7 @@ class CForestBreadcrumbs extends Block {
     if (this.node?.FullPath){
       const segments = this.node.FullPath.split('/').filter(p => p);
       const sep = html`<span class="crumb-separator">/</span>`;
-      const breadcrumbs = segments.map((seg, i) => html`${i>0? sep : ""}<span class="crumb" @click="${() => this.#onCrumbClick(seg,this.node.FullPath)}">${seg}</span>`);
+      const breadcrumbs = segments.map((seg, i) => html`${i>0? sep : ""}<span class="crumb ${i<segments.length-1 ? "": "crumb-current"}" @click="${() => this.#onCrumbClick(seg,this.node.FullPath)}">${seg}</span>`);
       if(breadcrumbs.length ) trail.push(breadcrumbs);
       if(segments.length > 0) trail.push(copyBtn);
     }
