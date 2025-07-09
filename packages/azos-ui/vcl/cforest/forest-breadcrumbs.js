@@ -110,7 +110,7 @@ class CForestBreadcrumbs extends Block {
     const forest = this?.node?.Forest || "None";
 
     const actionBtn = html`
-    <div id="btnCfgForestSettings" @click="${this.onCFSettingsClick}" >
+    <div id="btnCfgForestSettings" style="font-weight: bold;" @click="${this.onCFSettingsClick}" >
       <span class="crumb">${tree}</span>@<span class="crumbAlt">${forest}</span>
     </div>`;
 

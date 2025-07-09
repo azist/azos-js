@@ -245,36 +245,21 @@ export class CfgForestApplet extends Applet  {
   }
 
   // @todo: refactor to ensure children are loaded under the correct parent node
-  async #loadNodeAncestors(nodeId, stopAtId = "0:0:1") {
+  async #loadNodeAncestors(nodeId) {
     if(!nodeId) return;
-    const parentNodeDetails = [];
+
     const node = await this.#getNodeById(nodeId, this.#asOfUtc);
-    this.#nodeCache.set(nodeId, node);
+    const paths = node.FullPath.split("/").map( (s,i,a) => `/${a.slice(1,i+1).join("/")}`);
 
-    let parentId = `${this.activeTree}.gnode@${this.activeForest}::${node.G_Parent}`;
+    let parentNode = this.tvExplorer.root;
+    for (const path of paths) {
+      const parentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.FullPath === path);
+      const parentNodeInfo = await this.#getNodeByPath(this.activeForest, this.activeTree, path, this.#asOfUtc);
+      this.#nodeCache.set(parentNodeInfo.Id, parentNodeInfo);
 
-    // go up the tree gathering node info until root node is reached
-    while(parentId !== `${this.activeTree}.gnode@${this.activeForest}::${stopAtId}`){
-      const parentNodeInfo = await this.#getNodeById(parentId, this.#asOfUtc);
-      parentNodeDetails.push({ id: parentId, info: parentNodeInfo});
-      this.#nodeCache.set(parentId, parentNodeInfo);
-      parentId = `${this.activeTree}.gnode@${this.activeForest}::${parentNodeInfo.G_Parent}`;
+      console.log("CForestNodeVersions.#loadNodeAncestors", parentNodeInfo, parentNode);
+      await this.#loadNodeChildren(parentNodeInfo.Id, 2, parentNode);
     }
-
-    parentNodeDetails.reverse(); // reverse to start from the root node
-
-
-    let parentNode = this.tvExplorer.getAllVisibleNodes().find( n => n.data.Id === parentId);
-    let priorParent = this.tvExplorer.getAllVisibleNodes().find( n => n.data.Id === nodeId);
-    // load each node starting from the root node children
-    for (const { id, info } of parentNodeDetails) {
-      console.log("all visible nodes", this.tvExplorer.getAllVisibleNodes());
-      await this.#loadNodeChildren(id, 1, parentNode);
-      priorParent = parentNode;
-      parentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === id);
-      console.log("CForestNodeVersions.#loadNodeAncestors", priorParent, parentNode);
-    }
-
     this.tvExplorer.requestUpdate();
   }
 
@@ -388,6 +373,7 @@ export class CfgForestApplet extends Applet  {
         .activeTree="${this.activeTree}"
         .activeAsOfUtc="${this.activeAsOfUtc}"
         .applySettings="${(forest, tree, asOfUtc) => {
+          if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
           this.activeForest = forest;
           this.activeTree = tree;
           this.activeAsOfUtc = asOfUtc;

@@ -72,7 +72,6 @@ class CfgForestSettings extends Block {
   }
 
   #btnCloseClick = () => {
-    // console.log(`CfgForestApplet#renderSettingsForm onCloseClick`);
     this.dlgSettingsModal.close();
   }
 
