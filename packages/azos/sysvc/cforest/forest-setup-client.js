@@ -154,8 +154,18 @@ export class ForestSetupClient extends IClient {
     const params = { id };
     if (asOfUtc) params.asofutc = asOfUtc;
     const search = new URLSearchParams(params);
-    const response = await this.get(`/conf/forest/tree/node?${search}`, search, abortSignal);
-    return response?.data?.data ?? null;
+
+    try {
+      const response = await this.get(`/conf/forest/tree/node?${search}`, search, abortSignal);
+      return response?.data?.data ?? null;
+    } catch(error) {
+      if(error.response && error.code===404) {
+        // If the node is not found, return an empty list
+        return [];
+      }
+      console.error("Error in nodeInfo:", error);
+      return null;
+    }
   }
 
   /**

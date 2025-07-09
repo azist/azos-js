@@ -82,8 +82,6 @@ class CfgForestSettings extends Block {
     const forestOptions = this.forests.map(forest => this.#optToOption(forest, this.#tmpForestSelection === forest.id));
     const treeOptions = this.#currentForestObject?.trees?.map(tree => this.#optToOption({ id: tree, title: tree }, this.#tmpTreeSelection === tree));
 
-    // console.log("CfgForestApplet#renderSettingsForm render", this.#currentForestObject, this.#currentForestTrees);
-
     return html`
     <az-modal-dialog id="dlgSettingsModal" scope="self" title="Forest">
       <div slot="body">

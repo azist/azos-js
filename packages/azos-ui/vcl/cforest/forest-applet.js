@@ -6,25 +6,22 @@ import { Command } from "azos-ui/cmd";
 import { Spinner } from "azos-ui/spinner";
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
 import "azos-ui/bit";
-
 import "azos-ui/vcl/util/object-inspector";
 import "azos-ui/vcl/tabs/tab-view";
 import "azos-ui/vcl/tabs/tab";
-
-import "azos-ui/vcl/tree-view/tree-view";
-
-import "azos-ui/parts/grid-split"
 import "azos-ui/parts/select-field";
 
+import "azos-ui/parts/grid-split"
 import "azos-ui/vcl/cforest/forest-summary";
 import "azos-ui/vcl/cforest/forest-breadcrumbs";
 import "azos-ui/vcl/cforest/forest-settings";
-
+import "azos-ui/vcl/cforest/forest-treeview";
 
 export class CfgForestApplet extends Applet  {
 
   static styles = [ STL_INLINE_GRID, Block.styles, css`
     h2, h3 { margin-top: 0; }
+
     .inputBar {
       display: flex;
       justify-content: flex-start;
@@ -39,7 +36,6 @@ export class CfgForestApplet extends Applet  {
       box-shadow: var(--ctl-box-shadow);
       margin: 0 0 0.5em 0;
     }
-
 
     az-tab {
       margin: 0;
@@ -56,9 +52,11 @@ export class CfgForestApplet extends Applet  {
       display: flex;
       width: 100%;
     }
+
     .horizontalBtnBar az-button {
       flex: 1;
-    }`];
+    }
+  `];
 
 
   #ref = { forestClient: ForestSetupClient };
@@ -161,21 +159,26 @@ export class CfgForestApplet extends Applet  {
     const bootstrap = async () => {
       await Spinner.exec(async()=> {
         await this.#loadRootNode();
-        this.tvExplorer.addEventListener("nodeUserAction", (e) => {
-          e.stopPropagation();
-          const { node, action } = e.detail;
-          if (["click"].includes(action)){
-            if(node.canOpen && !node.opened) node.open();
-            if(node.canOpen && node.opened) node.close();
-            this.setActiveNodeId(node.data.Id, node);
-          }
-        });
+        this.#addTreeExplorerEventListeners();
       },"Loading forests/trees");
     }
 
     bootstrap();
     window.nodeCache = this.#nodeCache; // for debugging purposes
     window.nodeTreeMap = this.#nodeTreeMap; // for debugging purposes
+  }
+
+  #addTreeExplorerEventListeners(){
+    this.tvExplorer.addEventListener("nodeUserAction", (e) => {
+      e.stopPropagation();
+      const { node, action } = e.detail;
+      if (["click"].includes(action)){
+        if(node.canOpen && !node.opened) node.open();
+        if(node.canOpen && node.opened) node.close();
+        this.setActiveNodeId(node.data.Id, node);
+        this.tvExplorer.selectedNode = node;
+      }
+    });
   }
 
   async #loadRootNode(){
@@ -201,11 +204,14 @@ export class CfgForestApplet extends Applet  {
         data: { ...rootNodeInfo },
         showPath: false,
         canOpen: true,
+        icon: "svg://azos.ico.home",
+        endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${rootNodeInfo?.DataVersion?.Utc}</span>`,
       });
       this.tvExplorer.requestUpdate();
     }
 
     await this.#loadNodeChildren( rootNodeInfo.Id, 2, root);
+    this.setActiveNodeId(rootNodeInfo.Id, root);
     this.arena.requestUpdate();
     this.requestUpdate();
   }
@@ -231,26 +237,35 @@ export class CfgForestApplet extends Applet  {
 
     const children = await this.#getChildrenNodesById(parentId);
     this.#nodeTreeMap.set(parentId, children);
+    if(!children || children.length === 0) {
+      if(parentNode) {
+        parentNode.canOpen = false;
+        parentNode.opened = false;
+        parentNode.icon = "svg://azos.ico.draft";
+        this.tvExplorer.requestUpdate();
+      }
+      return;
+    }
 
     for (const child of children) {
       const childNodeInfo = await this.#getNodeById(child.Id, this.#asOfUtc);
       if (!childNodeInfo) {
         parentNode.canOpen = false;
-        parentNode.chevronVisible = false;
         parentNode.opened = false;
-        parentNode.icon = "svg://azos.ico.draft";
         this.tvExplorer.requestUpdate();
         continue;
       }
-      parentNode.canOpen = true; // ensure the parent node can be opened
-      parentNode.open();
+
       const childNode = parentNode.addChild(childNodeInfo.PathSegment, {
         data: { ...childNodeInfo },
         showPath: false,
         canOpen: true,
-        ghostPostfix: html`<span title="${childNodeInfo?.DataVersion?.State}">${childNodeInfo?.DataVersion?.Utc}</span>`,
+        opened: true,
+        showChevron: false,
+        endContent: html`<span title="${childNodeInfo?.DataVersion?.State}">${childNodeInfo?.DataVersion?.Utc}</span>`,
       });
 
+      parentNode.open();
 
       await this.#loadNodeChildren(child.Id, depth - 1, childNode);
     }
@@ -289,6 +304,7 @@ export class CfgForestApplet extends Applet  {
       this.#nodeCache.set(id, this.#activeNodeData);
       await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 2, originNode); }, "Loading node children");
     }
+    this.tvExplorer.selectedNode = originNode ? originNode : this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === id);
     this.requestUpdate();
   }
 
@@ -308,17 +324,6 @@ export class CfgForestApplet extends Applet  {
         await this.setActiveNodeId(this.tvExplorer.root.data.Id, this.tvExplorer.root);
       }
     }, "Loading forests/trees");
-  }
-
-  #renderDevInfo(){
-    return html`
-      <hr style="opacity: 0.5;"/>
-      <ul>
-        <li>Root: ${this.#forest} / ${this.#tree} @ ${this.#asOfUtc || "now"}</li>
-        <li>Nodes in cache: ${this.#nodeCache.size}</li>
-        <li>Nodes in tree map: ${this.#nodeTreeMap.size}</li>
-      </ul>
-    `;
   }
 
   render(){
@@ -350,10 +355,11 @@ export class CfgForestApplet extends Applet  {
         .node="${this.#activeNodeData}"
         .onCrumbClick="${crumbPath => {
           const currentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.FullPath === crumbPath);
-          console.log("#txtCrumbClick - Current Node", currentNode);
+          console.log("#txtCrumbClick", { crumbPath, currentNode});
+          this.tvExplorer.selectedNode = currentNode;
           this.setActiveNodeId(currentNode?.data?.Id);
         }}"
-        .onCFSettingsClick="${() => this.dlgCfgForestsSettingsModal.show()}"
+        .onCFSettingsClick="${() => this.dlgSettings.open()}"
         scope="this"
         id="cforestBreadcrumbs"
       ></az-cforest-breadcrumbs>
@@ -365,8 +371,7 @@ export class CfgForestApplet extends Applet  {
           <div class="cardBasic">
             ${showAsOf}
             <hr style="opacity: 0.5;"/>
-            <az-tree-view id="tvExplorer" scope="this"></az-tree-view>
-            ${this.#renderDevInfo()}
+            <az-cforest-view id="tvExplorer" scope="this"  style="min-height: 30vh;"></az-cforest-view>
           </div>
 
         </div>
@@ -378,16 +383,20 @@ export class CfgForestApplet extends Applet  {
 
           <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>
             <az-tab title="Selected Node" .canClose="${false}">
-                <az-object-inspector id="objectInspector0" scope="self" .source=${this.#activeNodeData}></az-object-inspector>
+              <az-object-inspector id="objectInspector0" scope="self"
+                .source=${this.#activeNodeData}></az-object-inspector>
             </az-tab>
             <az-tab title="Level Config" .canClose="${false}">
-              <az-object-inspector id="objectInspector1" scope="self" .source=${this.#activeNodeData?.LevelConfig ? JSON.parse(this.#activeNodeData?.LevelConfig) : {}}></az-object-inspector>
+              <az-object-inspector id="objectInspector1" scope="self"
+                .source=${this.#activeNodeData?.LevelConfig ? JSON.parse(this.#activeNodeData?.LevelConfig) : {}}></az-object-inspector>
             </az-tab>
             <az-tab title="Effective Config" .canClose="${false}">
-              <az-object-inspector id="objectInspector2" scope="self" .source=${this.#activeNodeData?.EffectiveConfig ? JSON.parse(this.#activeNodeData?.EffectiveConfig) : {}}></az-object-inspector>
+              <az-object-inspector id="objectInspector2" scope="self"
+                .source=${this.#activeNodeData?.EffectiveConfig ? JSON.parse(this.#activeNodeData?.EffectiveConfig) : {}}></az-object-inspector>
             </az-tab>
             <az-tab title="Properties" .canClose="${false}">
-              <az-object-inspector id="objectInspector3" scope="self" .source=${this.#activeNodeData?.Properties ? JSON.parse(this.#activeNodeData?.Properties) : {}}></az-object-inspector>
+              <az-object-inspector id="objectInspector3" scope="self"
+                .source=${this.#activeNodeData?.Properties ? JSON.parse(this.#activeNodeData?.Properties) : {}}></az-object-inspector>
             </az-tab>
           </az-tab-view>
 
@@ -397,4 +406,4 @@ export class CfgForestApplet extends Applet  {
   }
 }
 
-window.customElements.define("az-cfg-forest2-a-applet", CfgForestApplet);
+window.customElements.define("az-cfg-forest-applet", CfgForestApplet);

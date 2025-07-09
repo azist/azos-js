@@ -336,7 +336,7 @@ ${title}
     // console.log(node.treeNodeId, this.focusedNode?.treeNodeId);
     return html`
     <div id="tn${node.treeNodeId}"
-      class="treeNodeHeader ${node.isSelected ? "selected" : ""} "
+      class="treeNodeHeader"
       @click=${() => this.#onNodeClicked(node)}
       @dblclick="${evt => this.#onDoubleClick(evt, node)}"
       tabindex="${this.nodeInFocus?.treeNodeId === node.treeNodeId ? 0 : -1}"

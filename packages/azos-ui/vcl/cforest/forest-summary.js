@@ -57,6 +57,7 @@ class CForestNodeSummary extends Block {
       id="btnCopyPath"
       rank="6"
       icon="svg://azos.ico.copy"
+      title="Copy Id"
       @click="${(e) => {
         writeToClipboard(this.source.Id);
         toast(`Copied '${this.source.Id}' to clipboard`, { timeout: 1_000, status: "ok", position: "top-center" });
