@@ -344,7 +344,6 @@ export class CfgForestApplet extends Applet  {
           if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
           this.activeForest = forest;
           this.activeTree = tree;
-
           this.activeAsOfUtc = asOfUtc;
           this.activeNodeData = null;
           this.refreshTree();
@@ -356,9 +355,8 @@ export class CfgForestApplet extends Applet  {
         .node="${this.#activeNodeData}"
         .onCrumbClick="${crumbPath => {
           const currentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.FullPath === crumbPath);
-          console.log("#txtCrumbClick", { crumbPath, currentNode});
-          this.tvExplorer.selectedNode = currentNode;
           this.setActiveNodeId(currentNode?.data?.Id);
+          this.tvExplorer.selectedNode = currentNode;
         }}"
         .onCFSettingsClick="${() => this.dlgSettings.open()}"
         scope="this"

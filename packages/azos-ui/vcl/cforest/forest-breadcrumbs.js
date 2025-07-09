@@ -37,7 +37,6 @@ class CForestBreadcrumbs extends Block {
       font-size: var(--r3-fs);
     }
 
-
     .crumb:hover, .crumbAlt:hover {
       cursor: pointer;
     }
