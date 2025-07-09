@@ -160,7 +160,7 @@ export class CfgForestApplet extends Applet  {
 
     const bootstrap = async () => {
       await Spinner.exec(async()=> {
-        await this.#initializeRootNode();
+        await this.#loadRootNode();
         this.tvExplorer.addEventListener("nodeUserAction", (e) => {
           e.stopPropagation();
           const { node, action } = e.detail;
@@ -178,7 +178,7 @@ export class CfgForestApplet extends Applet  {
     window.nodeTreeMap = this.#nodeTreeMap; // for debugging purposes
   }
 
-  async #initializeRootNode(){
+  async #loadRootNode(){
     this.#nodeCache.clear();
     this.#nodeTreeMap.clear();
 
@@ -202,9 +202,12 @@ export class CfgForestApplet extends Applet  {
         showPath: false,
         canOpen: true,
       });
+      this.tvExplorer.requestUpdate();
     }
 
     await this.#loadNodeChildren( rootNodeInfo.Id, 2, root);
+    this.arena.requestUpdate();
+    this.requestUpdate();
   }
 
   async #loadNodeAncestors(targetNodeId) {
@@ -236,7 +239,7 @@ export class CfgForestApplet extends Applet  {
         parentNode.chevronVisible = false;
         parentNode.opened = false;
         parentNode.icon = "svg://azos.ico.draft";
-        // this.tvExplorer.requestUpdate();
+        this.tvExplorer.requestUpdate();
         continue;
       }
       parentNode.canOpen = true; // ensure the parent node can be opened
@@ -247,6 +250,7 @@ export class CfgForestApplet extends Applet  {
         canOpen: true,
         ghostPostfix: html`<span title="${childNodeInfo?.DataVersion?.State}">${childNodeInfo?.DataVersion?.Utc}</span>`,
       });
+
 
       await this.#loadNodeChildren(child.Id, depth - 1, childNode);
     }
@@ -289,11 +293,15 @@ export class CfgForestApplet extends Applet  {
   }
 
   async refreshTree(){
-    const currentNode = this.activeNodeData;
+    console.debug("#refreshTree called");
+
+    const currentNode = { ...this.activeNodeData };
+
     await Spinner.exec(async()=> {
       this.tvExplorer.root.removeAllChildren();
-      await this.#initializeRootNode();
-      if(currentNode?.Forest === this.activeForest && currentNode?.Tree === this.activeTree && currentNode.FullPath !== "/") {
+      await this.#loadRootNode();
+
+      if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
         await this.#loadNodeAncestors(currentNode.Id);
         await this.setActiveNodeId(currentNode.Id);
       } else {

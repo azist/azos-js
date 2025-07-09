@@ -122,7 +122,6 @@ class CForestBreadcrumbs extends Block {
 
     const trail = [actionBtn, html`<span class="crumb"  @click="${() => this.#onCrumbClick("/","/")}">://</span>`];
 
-
     if (this.node?.FullPath){
       const segments = this.node.FullPath.split('/').filter(p => p);
       const sep = html`<span class="crumb-separator">/</span>`;
