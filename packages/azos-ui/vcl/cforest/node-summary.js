@@ -1,17 +1,20 @@
-import { html, css } from "azos-ui/ui";
-import { Block } from "azos-ui/blocks";
+import { html, css, Control } from "azos-ui/ui";
+
 import "azos-ui/vcl/util/object-inspector";
 import { toast } from "azos-ui/toast";
 import { writeToClipboard } from "azos-ui/vcl/util/clipboard";
 
-class CForestNodeSummary extends Block {
+/**
+ * Component for displaying a summary of a selected node in a forest context.
+ */
+class CForestNodeSummary extends Control {
 
   static properties = {
     source: { type: Object },
     openVersions: { type: Function }
   }
 
-  static styles = [ Block.styles, css`
+  static styles = [ css`
     h4, h5, h6 {
       margin: 0;
     }
@@ -33,12 +36,9 @@ class CForestNodeSummary extends Block {
     .buttonBar> :last-child {
       margin-left: auto;
     }
-
-    .selectedNodeBtn{}
-
   `];
 
-  render(){
+  renderControl(){
     if(!this.source) return html`<span class="no-version">No selected version</span>`;
     const title = this.source.PathSegment || "No selected node";
 
@@ -64,9 +64,8 @@ class CForestNodeSummary extends Block {
           <az-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit" @click="${(e) => {}}">Edit</az-button>
           <az-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.tenancy" @click="${(e) => this.openVersions()}">Edit</az-button>
         </div>
-      </div>
-      `;
-    }
+      </div>`;
+  }
 }
 
 window.customElements.define("az-cforest-summary", CForestNodeSummary);

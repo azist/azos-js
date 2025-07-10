@@ -1,10 +1,14 @@
-import { html, css } from "azos-ui/ui";
+import { html, css, Control } from "azos-ui/ui";
 import { Block } from "azos-ui/blocks";
 import "azos-ui/vcl/util/object-inspector";
 import { writeToClipboard } from "azos-ui/vcl/util/clipboard";
 import { toast } from "azos-ui/toast";
 
-class CForestBreadcrumbs extends Block {
+/**
+ * Component for displaying node breadcrumbs in a forest context
+ *   allowing navigation through nodes, copying node paths, and a utility button.
+ */
+class CForestBreadcrumbs extends Control {
 
   static properties = {
     node: { type: Object, reflect: true },
@@ -12,33 +16,73 @@ class CForestBreadcrumbs extends Block {
     onCFSettingsClick: { type: Function, reflect: true },
   };
 
-  static styles = [ Block.styles, css`
+  static styles = [css`
+
+    :host {
+      --vcl-cfe-bc-padding: 0.5em;
+      --vcl-cfe-bc-fs: var(--r3-fs);
+      --vcl-cfe-bc-ink: var(--brand2-ink-sup);
+      --vcl-cfe-bc-ink-alt: var(--brand1-ink-sup);
+      --vcl-cfe-bc-ink-inactive: var(--ink);
+
+      --vcl-cfe-bc-bar-bg: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.02));
+      --vcl-cfe-bc-bar-ink: var(--vcl-cfe-bc-ink);
+      --vcl-cfe-bc-bar-height: 2em;
+      --vcl-cfe-bc-bar-bor-btm: 1px solid rgba(0,0,0,0.01);
+
+      --vcl-cfe-bc-btn-bg: var(--s-default-bg-ctl);
+      --vcl-cfe-bc-btn-bor: var(--s-default-bor-ctl-btn);
+      --vcl-cfe-bc-btn-bor-rad: var(--r4-brad-ctl);
+      --vcl-cfe-bc-btn-padding: var(--vcl-cfe-bc-padding);
+
+      --vcl-cfe-bc-root-padding: 0 var(--vcl-cfe-bc-padding);
+    }
 
     .crumbs {
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.02));
-      border-bottom: 1px solid rgba(0,0,0,0.01);
       display: flex;
       align-items: center;
-      font-size: 1rem;
-      padding: 0.5em;
-      height: 2em;
+      background: var(--vcl-cfe-bc-bar-bg);
+      border-bottom: var(--vcl-cfe-bc-bar-bor-btm);
+      padding: var(--vcl-cfe-bc-padding);
+      height: var(--vcl-cfe-bc-bar-height);
+    }
+
+    .btnSettings {
+      background: var(--vcl-cfe-bc-btn-bg);
+      border: var(--vcl-cfe-bc-btn-bor);
+      padding: var(--vcl-cfe-bc-btn-padding);
+      border-radius: var(--vcl-cfe-bc-btn-bor-rad);
+    }
+
+    .btnSettings:hover {
+      background: var(--focus-ctl-selected-color);
+      cursor: pointer;
+    }
+
+    .forest-setting-separator {
+      font-size: var(--vcl-cfe-bc-fs);
+      margin: 0 var(--vcl-cfe-bc-padding);
+    }
+
+    .rootCrumb {
+      padding: var(--vcl-cfe-bc-root-padding);
+    }
+
+    .crumb-separator {
+      color: var(--vcl-cfe-bc-ink-inactive);
+      padding: 0 4px;
+      user-select: none;
+      font-size: var(--vcl-cfe-bc-fs);
     }
 
     .crumb {
-      color: var(--brand2-ink-sup);
-      padding: 0 2px;
-      transition: text-decoration 0.2s;
-      font-size: var(--r3-fs);
+      color: var(--vcl-cfe-bc-ink);
+      font-size: var(--vcl-cfe-bc-fs);
     }
 
     .crumbAlt {
-      color: var(--brand1-ink-sup);
-      padding: 0 2px;
-      font-size: var(--r3-fs);
-    }
-
-    .crumb:hover, .crumbAlt:hover {
-      cursor: pointer;
+      color: var(--vcl-cfe-bc-ink-alt);
+      font-size: var(--vcl-cfe-bc-fs);
     }
 
     .crumb:hover, .crumbAlt:hover {
@@ -47,7 +91,7 @@ class CForestBreadcrumbs extends Block {
 
     .crumb.crumb-current {
       font-weight: bold;
-      color: var(--ink);
+      color: var(--vcl-cfe-bc-ink-inactive);
       cursor: default;
       text-decoration: none;
 
@@ -56,37 +100,16 @@ class CForestBreadcrumbs extends Block {
       }
     }
 
-    .crumb-separator {
-      color: #888;
-      padding: 0 4px;
-      user-select: none;
-      font-size: var(--r3-fs);
-    }
-
-    .forest-setting-separator {
-      font-size: var(--r3-fs);
-      margin: 0 0.5em;
-    }
-
-    .rootCrumb {
-      padding-left: 0.5em;
-    }
-
-    .btnSettings {
-      border: var(--s-default-bor-ctl-btn);
-      padding: 0.5em;
-      border-radius: 0.25em;
-      background: var(--brand1-ink-hdr);
-    }
-
-    .btnSettings:hover {
-      background: var(--focus-ctl-selected-color);
-      cursor: pointer;
-    }
 
     `];
 
 
+  /**
+   * Handles breadcrumb click events.
+   * @param {*} idx - The index of the clicked breadcrumb.
+   * @param {*} fullpath - The full path of the currently selected node.
+   * @returns {void}
+   */
   #onCrumbClick(idx, fullpath) {
     const segments = fullpath.split('/').filter(p => p);
     if (idx === -1) {
@@ -98,6 +121,12 @@ class CForestBreadcrumbs extends Block {
     this.onCrumbClick(path);
   }
 
+
+  /**
+   * Click handler for copying the node path to clipboard.
+   * Displays a toast notification upon successful copy.
+   * @param {Event} e - The click event.
+   */
   #btnCopyClick(e) {
     writeToClipboard(this.node.FullPath);
     toast(`Copied '${this.node.FullPath}' to clipboard`, { timeout: 1_000, status: "ok", position: "top-center" });

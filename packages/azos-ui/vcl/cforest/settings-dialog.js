@@ -2,6 +2,9 @@ import { html, css } from "azos-ui/ui";
 import { ModalDialog } from "../../modal-dialog.js";
 import "azos-ui/parts/select-field";
 
+/**
+ * Dialog for configuring forest settings, allowing users to select a forest, tree, and an optional date.
+ */
 class CfgForestSettings extends ModalDialog {
 
   static properties = {
@@ -13,14 +16,26 @@ class CfgForestSettings extends ModalDialog {
     az-text, az-select { width: -webkit-fill-available; }
   `];
 
+  /**
+   * Temporary selections for forest, tree, and asOfUtc date.
+   * These are used to hold the user's selections before applying them.
+   * They are initialized to null or undefined to indicate no selection.
+   */
   #tmpForestSelection = null;
   #tmpTreeSelection = null;
   #tmpAsOfUtc = undefined;
 
+  /**
+   * The currently selected forest object and its trees.
+   */
   #currentForestObject = null;
   #currentForestTrees = null;
 
-  #onForestChange = (e) => {
+  /**
+   * Handles the change event for the forest selection dropdown.
+   * Updates the temporary forest selection and retrieves the corresponding trees.
+   */
+  #onForestChange(e){
     const forestId = e.target.value;
     this.#tmpForestSelection = forestId;
 
@@ -30,27 +45,16 @@ class CfgForestSettings extends ModalDialog {
     this.#tmpForestSelection = forestId;
     this.#tmpTreeSelection = this.#currentForestTrees[0] || null;
 
-    this.selForest.requestUpdate();
-    this.selTree.requestUpdate();
     this.requestUpdate();
   }
 
-  show(){
-    this.#tmpForestSelection = this.settings.activeForest || null;
-    this.#tmpTreeSelection = this.settings.activeTree || null;
-    if(this.#tmpAsOfUtc) this.#tmpAsOfUtc = this.settings.activeAsOfUtc;
-
-    this.#currentForestObject = this.settings.forests.find(f => f.id === this.#tmpForestSelection);
-    this.#currentForestTrees = this.#currentForestObject?.trees;
-
-    this.selForest.requestUpdate();
-    this.selTree.requestUpdate();
-    this.requestUpdate();
-
-    return super.show();
-  }
-
-  #btnApplyClick = (e) => {
+  /**
+   * Handles the click event for the Apply button.
+   * Validates the selections and sets the modal result with the selected forest, tree, and asOfUtc date.
+   * Closes the dialog if all validations pass.
+   * If any validation fails, it prevents closing the dialog.
+   */
+  #btnApplyClick(){
     this.selForest.validate();
     this.selTree.validate();
     this.datAsOfDate.validate();
@@ -63,17 +67,32 @@ class CfgForestSettings extends ModalDialog {
     this.close();
   }
 
-  #btnCloseClick = () => {
+  /**
+   * Handles the click event for the Close button.
+   * Resets the modal result to null and closes the dialog.
+   */
+  #btnCloseClick(){
     this.modalResult = null;
     this.close();
   }
 
-  #optToOption = (opt, selected = false) => html`<option value="${opt.id}" .selected="${selected}" title="${opt.title}">${opt.title}</option>`;
+  /**
+   * Converts a forest option object to an HTML option element.
+   * @param {Object} opt - The forest option object containing id and title.
+   * @param {boolean} [selected=false] - Whether the option should be selected.
+   * @returns {HTMLTemplateElement} - The HTML option element.
+   */
+  #optToOption(opt, selected = false) {
+    return html`<option value="${opt.id}" .selected="${selected}" title="${opt.title}">${opt.title}</option>`;
+  }
 
   renderBodyContent(){
 
-    const forestOptions = this.settings.forests.map(forest => this.#optToOption(forest, this.#tmpForestSelection === forest.id));
-    const treeOptions = this.#currentForestObject?.trees?.map(tree => this.#optToOption({ id: tree, title: tree }, this.#tmpTreeSelection === tree));
+    const currentForestId = this.#tmpForestSelection || this.settings.activeForest;
+    const currentTreeId = this.#tmpTreeSelection || this.settings.activeTree;
+
+    const forestOptions = this.settings.forests.map(forest => this.#optToOption(forest, currentForestId === forest.id));
+    const treeOptions = this.settings.forests.find(f => f.id === currentForestId)?.trees?.map(tree => this.#optToOption({ id: tree, title: tree }, currentTreeId === tree));
 
     return html`
       <div class="strip-h">
@@ -83,7 +102,7 @@ class CfgForestSettings extends ModalDialog {
           title="Forest"
           rank="Normal"
           @change="${this.#onForestChange}"
-          .value="${this.#tmpForestSelection}"
+          .value="${this.#tmpForestSelection || this.settings.activeForest}"
           isRequired>${forestOptions}</az-select></div>
 
       <div class="strip-h">
@@ -92,7 +111,7 @@ class CfgForestSettings extends ModalDialog {
           scope="this"
           title="Tree"
           rank="Normal"
-          .value="${this.#tmpTreeSelection}"
+          .value="${this.#tmpTreeSelection || this.settings.activeTree}"
           isRequired>${treeOptions}</az-select></div>
 
       <div class="strip-h">
@@ -100,10 +119,10 @@ class CfgForestSettings extends ModalDialog {
           id="datAsOfDate"
           scope="this"
           title="As of Date"
-          placeholder="2024/01/01 1:00 pm"
+          placeholder="01/21/2022 1:00 pm"
           dataType="date"
           datakind="datetime"
-          .value="${this.#tmpAsOfUtc}"
+          .value="${this.#tmpAsOfUtc || !this.settings.activeAsOfUtc ? undefined : this.settings.activeAsOfUtc}"
           timeZone="UTC"></az-text>
       </div>
 

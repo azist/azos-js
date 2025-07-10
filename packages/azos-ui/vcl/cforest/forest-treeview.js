@@ -59,7 +59,7 @@ class CForestTree extends TreeView {
       background: var(--s-info-bg-ctl);
     }
     .treeNodeChildren {
-      margin:0;
+
     }
     .treeNodeChildren .treeNodeChildren {
       padding-left: 0.8em;

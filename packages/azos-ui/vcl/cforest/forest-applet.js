@@ -36,7 +36,7 @@ export class CfgForestApplet extends Applet  {
       border: var(--s-default-bor-ctl);
       background-color: var(--s-default-bg-ctl);
       padding: 0.55em 0.75em 0.55em 0.75em;
-      border-radius: 0.75em 0.75em 0.75em 0.75em;
+      border-radius: var(--r4-brad-ctl);
       box-shadow: var(--ctl-box-shadow);
       margin: 0 0 0.5em 0;
     }
@@ -48,7 +48,7 @@ export class CfgForestApplet extends Applet  {
       border: var(--s-default-bor-ctl);
       background-color: var(--s-default-bg-ctl);
       box-shadow: var(--ctl-box-shadow);
-      border-radius: 0 0.75em 0 0.75em;
+      border-radius: 0 var(--r4-brad-ctl) 0 var(--r4-brad-ctl);
       overflow: auto;
     }
 
@@ -69,12 +69,13 @@ export class CfgForestApplet extends Applet  {
       .minHeightEnforced {
         min-height: auto; /* Override for small screens */
       }
+   }
   `];
 
   #ref = { forestClient: ForestSetupClient };
 
   // Holds the forests and their trees
-  // @todo: implement loading and saving of forest data
+  // @todo: implement loading and saving of forest data from a server or local storage
   #forests = [
     { id: "test-f1", title: "Test Forest 1", trees: [] },
     { id: "g8corp", title: "G8 Corporation", trees: [] }
@@ -145,6 +146,10 @@ export class CfgForestApplet extends Applet  {
     this.arena.requestUpdate();
   }
 
+  /**
+   * Returns the title of the applet based on the active forest, tree, and node path.
+   * If no forest or tree is selected, it defaults to " - "
+   */
   get title(){
     const activeForest = this.#forest || " - ";
     const activeTree = this.#tree || " - ";
@@ -152,6 +157,9 @@ export class CfgForestApplet extends Applet  {
     return html`Config Tree Explorer: ${activeTree}@${activeForest} &hellip; ${activeNodePath}`;
   }
 
+  /**
+   * Command to open the settings dialog for configuring the forest, tree, and an optional asOfUtc
+   */
   #forestSettingsCmd = new Command(this, {
     uri: `CfgForest.ForestTreeAsOfUtc`,
     icon: "svg://azos.ico.database",
@@ -159,11 +167,20 @@ export class CfgForestApplet extends Applet  {
     handler: async () =>  {
       const settings = (await this.dlgSettings.show()).modalResult;
       if (!settings) return;
-      await this.#loadForestSettings(settings);
+      await this.#applyForestSettings(settings);
     }
   });
 
-  #loadForestSettings = async ({ forest, tree, asOfUtc }) => {
+
+  /**
+   * Applies the forest settings by updating the active forest, tree, and asOfUtc.
+   * If the settings are the same as the current active settings, it does nothing.
+   * @param {Object} settings - The settings object containing forest, tree, and asOfUtc.
+   * @param {string} settings.forest - The id of the forest to set as active.
+   * @param {string} settings.tree - The id of the tree to set as active.
+   * @param {string|null} settings.asOfUtc - The UTC timestamp to set as active, or null for "now".
+   */
+  #applyForestSettings = async ({ forest, tree, asOfUtc }) => {
     console.log(`Applying settings: Forest=${forest}, Tree=${tree}, AsOfDate=${asOfUtc}`);
 
     if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
@@ -174,6 +191,10 @@ export class CfgForestApplet extends Applet  {
     this.refreshTree();
   }
 
+  /**
+   * Command to refresh the forest tree view.
+   * It reloads the root node and updates the tree view.
+   */
   #forestRefreshCmd = new Command(this, {
     uri: `CfgForest.RefreshForestTree`,
     icon: "svg://azos.ico.refresh",
@@ -200,6 +221,10 @@ export class CfgForestApplet extends Applet  {
     window.nodeTreeMap = this.#nodeTreeMap; // for debugging purposes
   }
 
+  /**
+   * Attaches event listeners to the tree view explorer for user actions.
+   * Events tracked include focusChanged, click, dblclick, opened, closed.
+   */
   #addTreeViewEventListeners(){
     this.tvExplorer.addEventListener("nodeUserAction", (e) => {
       e.stopPropagation();
@@ -213,6 +238,12 @@ export class CfgForestApplet extends Applet  {
     });
   }
 
+  /**
+   * Loads the root node of the currently active forest and tree.
+   * It clears the node cache and tree map, retrieves the trees for each forest,
+   * and fetches the root node by its path. The root node is then added to the
+   * tree view explorer and set as the active/selected node.
+   */
   async #loadRootNode(){
     this.#nodeCache.clear();
     this.#nodeTreeMap.clear();
@@ -246,6 +277,12 @@ export class CfgForestApplet extends Applet  {
     this.setActiveNodeId(rootNodeInfo.Id, root);
   }
 
+  /**
+   * Loads the ancestors of a given node.
+   * This method retrieves the full path of the target node,
+   * splits it into segments, and iteratively sets each ancestor node as active in the tree view explorer.
+   * It ensures that the tree view is updated to reflect the active node and its ancestors.
+   */
   async #loadNodeAncestors(targetNodeId) {
     const targetNodeData = await this.#getNodeById(targetNodeId, this.#asOfUtc);
     const paths = targetNodeData.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
@@ -262,6 +299,14 @@ export class CfgForestApplet extends Applet  {
     this.tvExplorer.requestUpdate();
   }
 
+
+  /**
+   * Loads the children of a given node.
+   * This method checks if the node's children are already cached, and if not, it retrieves them from the server.
+   * It then creates child nodes in the tree view explorer and recursively loads their children if necessary.
+   * If the node has no children, it updates the parent node's properties to reflect that it cannot be opened or closed,
+   * and sets its icon to indicate that it is a draft node.
+   */
   async #loadNodeChildren(parentId, depth = 1, parentNode = null) {
     if(depth === 0 || this.#nodeTreeMap.has(parentId)) return;
 
@@ -307,6 +352,15 @@ export class CfgForestApplet extends Applet  {
     this.tvExplorer.requestUpdate();
   }
 
+  /**
+   * Retrieves the children nodes of a given parent node by its ID.
+   * It checks if the children are already cached in the nodeTreeMap.
+   * If cached, it returns the cached children; otherwise, it fetches them from the server.
+   * The method ensures that the children are returned as an array, even if there is
+   * only a single child node.
+   * @param {string} parentId - The ID of the parent node for which to retrieve children.
+   * @returns {Promise<Array>} - A promise that resolves to an array of child nodes
+   */
   async #getChildrenNodesById(parentId) {
     const isCached = this.#nodeTreeMap.has(parentId);
     if(isCached){
@@ -320,11 +374,28 @@ export class CfgForestApplet extends Applet  {
     return Array.isArray(children) ? children : [ children ];
   }
 
+
+  /**
+   * Retrieves a node by its path in the specified forest and tree.
+   * @param {string} idForest - The ID of the forest to which the tree belongs.
+   * @param {string} idTree - The ID of the tree to which the node belongs.
+   * @param {string} path - The path of the node to retrieve, defaults to '/'.
+   * @param {string|null} asOfUtc - The UTC timestamp to retrieve the node as of, defaults to the current asOfUtc.
+   * @param {AbortSignal|null} abortSignal - Optional signal to abort the request.
+   * @returns {Promise<Object>}
+   */
   async #getNodeByPath(idForest, idTree, path = '/', asOfUtc = this.#asOfUtc, abortSignal = null) {
     let node = await this.#ref.forestClient.probePath(idForest, idTree, path, asOfUtc, abortSignal);
     return node;
   }
 
+  /**
+   * Retrieves a node by its ID and asOfUtc timestamp.
+   * @param {string} id - The ID of the node to retrieve.
+   * @param {string|null} asOfUtc - The UTC timestamp to retrieve the node as of.
+   * @param {AbortSignal|null} abortSignal - Optional signal to abort the request
+   * @return {Promise<Object>} - A promise that resolves to the node data.
+   */
   async #getNodeById(id = '0:0:1', asOfUtc = this.#asOfUtc, abortSignal = null) {
     let node = await this.#ref.forestClient.nodeInfo(id, asOfUtc, abortSignal);
     return node;
@@ -352,6 +423,12 @@ export class CfgForestApplet extends Applet  {
     this.tvExplorer.requestUpdate();
   }
 
+  /**
+   * Sets the active node ID and updates the UI accordingly.
+   * @param {*} id - The ID of the node to set as active.
+   * @param {*} originNode - The original node from which the action was initiated.
+   * @returns {Promise<void>}
+   */
   async setActiveNodeId(id, originNode = null) {
     if(!id) return;
     this.#activeNodeId = id;
@@ -367,6 +444,11 @@ export class CfgForestApplet extends Applet  {
     this.requestUpdate();
   }
 
+  /**
+   * Refreshes the entire tree view by reloading the root node and its children.
+   * After refresh it sets the active node to the previously active node if one is set.
+   * If the current active node does not match the active tree and forest, it sets the active node to the root node.
+   */
   async refreshTree(){
     const currentNode = { ...this.activeNodeData };
 
