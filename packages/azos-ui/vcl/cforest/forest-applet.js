@@ -149,7 +149,7 @@ export class CfgForestApplet extends Applet  {
     const activeForest = this.#forest || " - ";
     const activeTree = this.#tree || " - ";
     const activeNodePath = this.#activeNodeData?.PathSegment ? this.#activeNodeData.PathSegment === "/" ? "://" : this.#activeNodeData.PathSegment : "";
-    return html`Forest Explorer: ${activeTree}@${activeForest} &hellip; ${activeNodePath}`;
+    return html`Config Tree Explorer: ${activeTree}@${activeForest} &hellip; ${activeNodePath}`;
   }
 
   #forestSettingsCmd = new Command(this, {
@@ -207,14 +207,6 @@ export class CfgForestApplet extends Applet  {
       console.log("Node User Action:", action, node);
 
       if(action === "click") {
-        // if(node.canOpen && !node.opened){
-        //   node.icon = "svg://azos.ico.folderOpen";
-        //   node.open();
-        // }
-        // if(node.canOpen && node.opened) {
-        //   node.icon = "svg://azos.ico.folder";
-        //   node.close();
-        // }
         this.setActiveNodeId(node.data.Id, node);
         this.tvExplorer.selectedNode = node;
       }
@@ -401,7 +393,7 @@ export class CfgForestApplet extends Applet  {
       <az-forest-settings-dialog
         id="dlgSettings"
         scope="this"
-        title="Forest"
+        title="Explorer Settings"
         .settings="${{
           forests: this.#forests,
           activeForest: this.activeForest,

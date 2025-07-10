@@ -53,7 +53,8 @@ class CfgForestSettings extends ModalDialog {
   #btnApplyClick = (e) => {
     this.selForest.validate();
     this.selTree.validate();
-    if(this.selForest.error || this.selTree.error) return;
+    this.datAsOfDate.validate();
+    if(this.selForest.error || this.selTree.error || this.datAsOfDate.error) return;
     this.modalResult = {
       forest: this.selForest.value,
       tree: this.selTree.value,
@@ -64,17 +65,12 @@ class CfgForestSettings extends ModalDialog {
 
   #btnCloseClick = () => {
     this.modalResult = null;
-    this.#tmpForestSelection = null;
-    this.#tmpTreeSelection = null;
-    this.#tmpAsOfUtc = undefined;
     this.close();
   }
 
   #optToOption = (opt, selected = false) => html`<option value="${opt.id}" .selected="${selected}" title="${opt.title}">${opt.title}</option>`;
 
   renderBodyContent(){
-
-
 
     const forestOptions = this.settings.forests.map(forest => this.#optToOption(forest, this.#tmpForestSelection === forest.id));
     const treeOptions = this.#currentForestObject?.trees?.map(tree => this.#optToOption({ id: tree, title: tree }, this.#tmpTreeSelection === tree));

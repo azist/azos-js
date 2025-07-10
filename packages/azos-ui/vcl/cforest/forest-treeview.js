@@ -64,6 +64,10 @@ class CForestTree extends TreeView {
     .treeNodeChildren .treeNodeChildren {
       padding-left: 0.8em;
     }
+
+    svg.icon {
+      --icon-stroke: var(--vcl-treeview-svg-stroke) !important;
+    }
   `];
 
   _createNode(parent, title, options = {}) {
