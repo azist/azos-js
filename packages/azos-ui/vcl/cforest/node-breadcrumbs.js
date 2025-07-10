@@ -74,14 +74,15 @@ class CForestBreadcrumbs extends Block {
     }
 
     .btnSettings {
-      font-weight: bold;
       border: var(--s-default-bor-ctl-btn);
       padding: 0.25em;
-      border-radius: 0.05em;
-      background: var(--brand1-ink-header);
+      border-radius: 0.25em;
+      background: var(--brand1-ink-hdr);
     }
+
     .btnSettings:hover {
       background: var(--focus-ctl-selected-color);
+      cursor: pointer;
     }
 
     `];
@@ -103,7 +104,7 @@ class CForestBreadcrumbs extends Block {
     const forest = this?.node?.Forest || "None";
 
     const actionBtn = html`
-      <div id="btnCfgForestSettings" class="btnSettings" style="font-weight: bold;" @click="${this.onCFSettingsClick}" >
+      <div id="btnCfgForestSettings" class="btnSettings" @click="${this.onCFSettingsClick}" >
         <span class="crumb">${tree}</span>@<span class="crumbAlt">${forest}</span>
       </div>`;
 
