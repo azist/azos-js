@@ -21,7 +21,7 @@ class CForestBreadcrumbs extends Block {
       align-items: center;
       font-size: 1rem;
       padding: 0.5em;
-      height: 2ch;
+      height: 2em;
     }
 
     .crumb {
@@ -71,7 +71,20 @@ class CForestBreadcrumbs extends Block {
 
     .crumb-label {
       font-style: italic;
-    }`];
+    }
+
+    .btnSettings {
+      font-weight: bold;
+      border: var(--s-default-bor-ctl-btn);
+      padding: 0.25em;
+      border-radius: 0.05em;
+      background: var(--brand1-ink-header);
+    }
+    .btnSettings:hover {
+      background: var(--focus-ctl-selected-color);
+    }
+
+    `];
 
 
   #onCrumbClick(idx, fullpath) {
@@ -90,7 +103,7 @@ class CForestBreadcrumbs extends Block {
     const forest = this?.node?.Forest || "None";
 
     const actionBtn = html`
-      <div id="btnCfgForestSettings" style="font-weight: bold;" @click="${this.onCFSettingsClick}" >
+      <div id="btnCfgForestSettings" class="btnSettings" style="font-weight: bold;" @click="${this.onCFSettingsClick}" >
         <span class="crumb">${tree}</span>@<span class="crumbAlt">${forest}</span>
       </div>`;
 

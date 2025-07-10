@@ -5,6 +5,7 @@ import { Block } from "azos-ui/blocks";
 import { Command } from "azos-ui/cmd";
 import { Spinner } from "azos-ui/spinner";
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
+
 import "azos-ui/bit";
 import "azos-ui/vcl/util/object-inspector";
 import "azos-ui/vcl/tabs/tab-view";
@@ -12,9 +13,12 @@ import "azos-ui/vcl/tabs/tab";
 import "azos-ui/parts/select-field";
 
 import "azos-ui/parts/grid-split"
-import "azos-ui/vcl/cforest/forest-summary";
-import "azos-ui/vcl/cforest/forest-breadcrumbs";
-import "azos-ui/vcl/cforest/forest-settings";
+
+import "azos-ui/vcl/cforest/node-summary";
+import "azos-ui/vcl/cforest/node-breadcrumbs";
+import "azos-ui/vcl/cforest/settings-dialog";
+import "azos-ui/vcl/cforest/versions-dialog";
+
 import "azos-ui/vcl/cforest/forest-treeview";
 
 export class CfgForestApplet extends Applet  {
@@ -56,8 +60,16 @@ export class CfgForestApplet extends Applet  {
     .horizontalBtnBar az-button {
       flex: 1;
     }
-  `];
 
+    .minHeightEnforced {
+      min-height: 30vh;
+    }
+
+    @media (max-width: 600px) {
+      .minHeightEnforced {
+        min-height: auto; /* Override for small screens */
+      }
+  `];
 
   #ref = { forestClient: ForestSetupClient };
 
@@ -83,6 +95,7 @@ export class CfgForestApplet extends Applet  {
   set activeForest(value) {
     if(this.#forest === value) return;
     this.#forest = value;
+    this.dlgSettings.requestUpdate();
     this.requestUpdate();
   }
 
@@ -94,6 +107,7 @@ export class CfgForestApplet extends Applet  {
   set activeTree(value) {
     if(this.#tree === value) return;
     this.#tree = value;
+    this.dlgSettings.requestUpdate();
     this.requestUpdate();
   }
 
@@ -142,8 +156,23 @@ export class CfgForestApplet extends Applet  {
     uri: `CfgForest.ForestTreeAsOfUtc`,
     icon: "svg://azos.ico.database",
     title: "CfgForest Settings",
-    handler: async () =>  await this.dlgSettings.open()
+    handler: async () =>  {
+      const settings = (await this.dlgSettings.show()).modalResult;
+      if (!settings) return;
+      await this.#loadForestSettings(settings);
+    }
   });
+
+  #loadForestSettings = async ({ forest, tree, asOfUtc }) => {
+    console.log(`Applying settings: Forest=${forest}, Tree=${tree}, AsOfDate=${asOfUtc}`);
+
+    if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
+    this.activeForest = forest;
+    this.activeTree = tree;
+    this.activeAsOfUtc = asOfUtc;
+    this.activeNodeData = null;
+    this.refreshTree();
+  }
 
   #forestRefreshCmd = new Command(this, {
     uri: `CfgForest.RefreshForestTree`,
@@ -160,7 +189,9 @@ export class CfgForestApplet extends Applet  {
     const bootstrap = async () => {
       await Spinner.exec(async()=> {
         await this.#loadRootNode();
-        this.#addTreeExplorerEventListeners();
+        this.#addTreeViewEventListeners();
+        this.arena.requestUpdate();
+        this.requestUpdate();
       },"Loading forests/trees");
     }
 
@@ -169,13 +200,21 @@ export class CfgForestApplet extends Applet  {
     window.nodeTreeMap = this.#nodeTreeMap; // for debugging purposes
   }
 
-  #addTreeExplorerEventListeners(){
+  #addTreeViewEventListeners(){
     this.tvExplorer.addEventListener("nodeUserAction", (e) => {
       e.stopPropagation();
       const { node, action } = e.detail;
-      if (["click"].includes(action)){
-        if(node.canOpen && !node.opened) node.open();
-        if(node.canOpen && node.opened) node.close();
+      console.log("Node User Action:", action, node);
+
+      if(action === "click") {
+        if(node.canOpen && !node.opened){
+          node.icon = "svg://azos.ico.folderOpen";
+          node.open();
+        }
+        if(node.canOpen && node.opened) {
+          node.icon = "svg://azos.ico.folder";
+          node.close();
+        }
         this.setActiveNodeId(node.data.Id, node);
         this.tvExplorer.selectedNode = node;
       }
@@ -192,7 +231,7 @@ export class CfgForestApplet extends Applet  {
 
     this.#forest = this.activeForest || this.#forests[0].id;
     this.#tree = this.activeTree || this.#forests[0].trees[0];
-    this.#asOfUtc = this.activeAsOfUtc || null ; // null means "now"
+    this.#asOfUtc = this.activeAsOfUtc || null;
 
     const rootNodeInfo = await this.#getNodeByPath(this.#forest, this.#tree, "/", this.#asOfUtc);
     this.#nodeCache.set(rootNodeInfo.Id, rootNodeInfo);
@@ -213,8 +252,6 @@ export class CfgForestApplet extends Applet  {
 
     await this.#loadNodeChildren( rootNodeInfo.Id, 2, root);
     this.setActiveNodeId(rootNodeInfo.Id, root);
-    this.arena.requestUpdate();
-    this.requestUpdate();
   }
 
   async #loadNodeAncestors(targetNodeId) {
@@ -241,6 +278,7 @@ export class CfgForestApplet extends Applet  {
     if(!children || children.length === 0) {
       if(parentNode) {
         parentNode.canOpen = false;
+        parentNode.canClose = false;
         parentNode.opened = false;
         parentNode.icon = "svg://azos.ico.draft";
         this.tvExplorer.requestUpdate();
@@ -266,10 +304,14 @@ export class CfgForestApplet extends Applet  {
         endContent: html`<span title="${childNodeInfo?.DataVersion?.State}">${childNodeInfo?.DataVersion?.Utc}</span>`,
       });
 
+      parentNode.canOpen = true;
+      parentNode.canClose = true;
+      parentNode.icon = parentNode.isOpen ? "svg://azos.ico.folderOpen" : "svg://azos.ico.folder";
       parentNode.open();
 
       await this.#loadNodeChildren(child.Id, depth - 1, childNode);
     }
+    this.#updateNodeIcons();
     this.tvExplorer.requestUpdate();
   }
 
@@ -296,6 +338,28 @@ export class CfgForestApplet extends Applet  {
     return node;
   }
 
+  #updateNodeIcons() {
+    // dirty fix for nodes
+    this.tvExplorer.getAllVisibleNodes().forEach(node => {
+      const nodeId = node.data?.Id;
+      if(!nodeId) return;
+      const fromTreeMap = this.#nodeTreeMap.get(nodeId);
+      if(!fromTreeMap) return;
+      if(fromTreeMap.length > 0) {
+        node.canOpen = true;
+        node.canClose = true;
+        node.opened = true;
+        node.icon = !node.isOpen ? "svg://azos.ico.folderOpen" : "svg://azos.ico.folder";
+      } else {
+        node.canOpen = false;
+        node.canClose = false;
+        node.opened = false;
+        node.icon = "svg://azos.ico.draft";
+      }
+    });
+    this.tvExplorer.requestUpdate();
+  }
+
   async setActiveNodeId(id, originNode = null) {
     if(!id) return;
     this.#activeNodeId = id;
@@ -303,9 +367,10 @@ export class CfgForestApplet extends Applet  {
     if(!this.#nodeCache.get(id)) {
       this.#activeNodeData = await this.#getNodeById(id, this.#asOfUtc);
       this.#nodeCache.set(id, this.#activeNodeData);
-      await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 2, originNode); }, "Loading node children");
     }
+    await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 2, originNode); }, "Loading node children");
     this.tvExplorer.selectedNode = originNode ? originNode : this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === id);
+
     this.arena.requestUpdate();
     this.requestUpdate();
   }
@@ -333,23 +398,26 @@ export class CfgForestApplet extends Applet  {
       : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
 
     return html`
-      <az-cfg-settings
+      <az-forest-settings-dialog
         id="dlgSettings"
         scope="this"
-        .forests="${this.#forests}"
+        title="Forest"
+        .settings="${{
+          forests: this.#forests,
+          activeForest: this.activeForest,
+          activeTree: this.activeTree,
+          activeAsOfUtc: this.activeAsOfUtc
+        }}"
+      ></az-forest-settings-dialog>
+
+      <az-forest-node-version-dialog
+        id="dlgNodeVersions"
+        scope="this"
+        title="Node Versions"
+        .source="${this.#activeNodeData}"
         .activeForest="${this.activeForest}"
         .activeTree="${this.activeTree}"
-        .activeAsOfUtc="${this.activeAsOfUtc}"
-        .applySettings="${(forest, tree, asOfUtc) => {
-          if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
-          this.activeForest = forest;
-          this.activeTree = tree;
-          this.activeAsOfUtc = asOfUtc;
-          this.activeNodeData = null;
-          this.refreshTree();
-        }}"
-      ></az-cfg-settings>
-
+      ></az-forest-node-version-dialog>
 
       <az-cforest-breadcrumbs
         .node="${this.#activeNodeData}"
@@ -358,7 +426,7 @@ export class CfgForestApplet extends Applet  {
           this.setActiveNodeId(currentNode?.data?.Id);
           this.tvExplorer.selectedNode = currentNode;
         }}"
-        .onCFSettingsClick="${() => this.dlgSettings.open()}"
+        .onCFSettingsClick="${() => this.dlgSettings.show()}"
         scope="this"
         id="cforestBreadcrumbs"
       ></az-cforest-breadcrumbs>
@@ -370,14 +438,14 @@ export class CfgForestApplet extends Applet  {
           <div class="cardBasic">
             ${showAsOf}
             <hr style="opacity: 0.5;"/>
-            <az-cforest-view id="tvExplorer" scope="this"  style="min-height: 30vh;"></az-cforest-view>
+            <az-cforest-view id="tvExplorer" scope="this" class="minHeightEnforced"></az-cforest-view>
           </div>
 
         </div>
         <div slot="right-bottom">
 
           <div class="cardBasic">
-            <az-cforest-summary .source="${this.#activeNodeData}" scope="this" id="cforestSummary"></az-cforest-summary>
+            <az-cforest-summary .source="${this.#activeNodeData}" .openVersions="${() => this.dlgNodeVersions.show()}" scope="this" id="cforestSummary"></az-cforest-summary>
           </div>
 
           <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>

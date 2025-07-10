@@ -51,7 +51,7 @@ class CForestTree extends TreeView {
     }
     .nodeTitle {
       white-space: nowrap;
-      font-size: var(--r5-fs);
+      font-size: var(--r3-fs);
     }
     .selected .treeNodeHeader {
       font-weight: bold;
