@@ -207,14 +207,14 @@ export class CfgForestApplet extends Applet  {
       console.log("Node User Action:", action, node);
 
       if(action === "click") {
-        if(node.canOpen && !node.opened){
-          node.icon = "svg://azos.ico.folderOpen";
-          node.open();
-        }
-        if(node.canOpen && node.opened) {
-          node.icon = "svg://azos.ico.folder";
-          node.close();
-        }
+        // if(node.canOpen && !node.opened){
+        //   node.icon = "svg://azos.ico.folderOpen";
+        //   node.open();
+        // }
+        // if(node.canOpen && node.opened) {
+        //   node.icon = "svg://azos.ico.folder";
+        //   node.close();
+        // }
         this.setActiveNodeId(node.data.Id, node);
         this.tvExplorer.selectedNode = node;
       }
@@ -270,7 +270,7 @@ export class CfgForestApplet extends Applet  {
     this.tvExplorer.requestUpdate();
   }
 
-  async #loadNodeChildren(parentId, depth = 2, parentNode = null) {
+  async #loadNodeChildren(parentId, depth = 1, parentNode = null) {
     if(depth === 0 || this.#nodeTreeMap.has(parentId)) return;
 
     const children = await this.#getChildrenNodesById(parentId);
@@ -368,7 +368,7 @@ export class CfgForestApplet extends Applet  {
       this.#activeNodeData = await this.#getNodeById(id, this.#asOfUtc);
       this.#nodeCache.set(id, this.#activeNodeData);
     }
-    await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 2, originNode); }, "Loading node children");
+    await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 1, originNode); }, "Loading node children");
     this.tvExplorer.selectedNode = originNode ? originNode : this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === id);
 
     this.arena.requestUpdate();

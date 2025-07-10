@@ -29,6 +29,15 @@ class CForestNodeVersions extends ModalDialog {
     return super.show();
   }
 
+  close(){
+    this.#selectedVersions = null;
+    this.#selectedVersionDetails = null;
+    this.#selectedVersionId = null;
+    this.#versionOptions = [];
+    this.requestUpdate();
+    super.close();
+  }
+
   async #loadVersions() {
     await Spinner.exec(async()=> {
       const versionId = `${this.source.Tree}.gver@${this.source.Forest}::${this.source.DataVersion?.G_Version}`;
