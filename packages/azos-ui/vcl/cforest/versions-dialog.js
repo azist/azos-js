@@ -1,10 +1,14 @@
-import { html } from "azos-ui/ui";
+import { html, css } from "azos-ui/ui";
 import { ModalDialog } from "../../modal-dialog.js";
 import "azos-ui/parts/select-field";
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
 import { Spinner } from "../../spinner";
 
 class CForestNodeVersions extends ModalDialog {
+
+  static styles = [ ModalDialog.styles, css`
+    az-select { width: -webkit-fill-available; }
+  `];
 
   static properties = {
     source: { type: Object },

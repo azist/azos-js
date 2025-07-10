@@ -9,7 +9,8 @@ class CfgForestSettings extends ModalDialog {
   }
 
   static styles = [ ModalDialog.styles, css`
-    az-button { width: 12ch; }
+    az-button { width: 7em; }
+    az-text, az-select { width: -webkit-fill-available; }
   `];
 
   #tmpForestSelection = null;
@@ -110,7 +111,7 @@ class CfgForestSettings extends ModalDialog {
           timeZone="UTC"></az-text>
       </div>
 
-      <div class="strip-h"></div>
+      <div class="row">&nbsp;</div>
 
       <div class="row cols2">
         <az-button id="btnApplySettings" title="Apply" @click="${this.#btnApplyClick}"></az-button>

@@ -41,7 +41,11 @@ class CForestBreadcrumbs extends Block {
       cursor: pointer;
     }
 
-    .crumb-current {
+    .crumb:hover, .crumbAlt:hover {
+      cursor: pointer;
+    }
+
+    .crumb.crumb-current {
       font-weight: bold;
       color: var(--ink);
       cursor: default;
@@ -60,22 +64,17 @@ class CForestBreadcrumbs extends Block {
     }
 
     .forest-setting-separator {
-     font-size: var(--r3-fs);
-     margin: 0 0.5em;
-    }
-    .rootCrumb {
-      color: #0078d4;
-      font-style: italic;
       font-size: var(--r3-fs);
+      margin: 0 0.5em;
     }
 
-    .crumb-label {
-      font-style: italic;
+    .rootCrumb {
+      padding-left: 0.5em;
     }
 
     .btnSettings {
       border: var(--s-default-bor-ctl-btn);
-      padding: 0.25em;
+      padding: 0.5em;
       border-radius: 0.25em;
       background: var(--brand1-ink-hdr);
     }
@@ -113,12 +112,12 @@ class CForestBreadcrumbs extends Block {
         toast(`Copied '${this.node.FullPath}' to clipboard`, { timeout: 1_000, status: "ok", position: "top-center" });
       }}"></az-button>`;
 
-    const trail = [actionBtn, html`<span class="crumb"  @click="${() => this.#onCrumbClick(-1,this.node.FullPath)}">://</span>`];
+    const trail = [actionBtn, html`<span class="crumb rootCrumb ${this.node?.FullPath === "/" ? "crumb-current" : ""}" title="${this.node?.FullPath === "/" ? "root" : this.node?.FullPath}" @click="${() => this.#onCrumbClick(-1,this.node.FullPath)}">://</span>`];
 
     if (this.node?.FullPath){
       const segments = this.node.FullPath.split('/').filter(p => p);
       const sep = html`<span class="crumb-separator">/</span>`;
-      const breadcrumbs = segments.map((seg, i) => html`${i>0? sep : ""}<span class="crumb ${i<segments.length-1 ? "": "crumb-current"}" @click="${() => this.#onCrumbClick(i,this.node.FullPath)}">${seg}</span>`);
+      const breadcrumbs = segments.map((seg, i) => html`${i>0? sep : ""}<span class="crumb ${i<segments.length-1 ? "": "crumb-current"}" title="${this.node.FullPath}" @click="${() => this.#onCrumbClick(i,this.node.FullPath)}">${seg}</span>`);
       if(breadcrumbs.length ) trail.push(breadcrumbs);
       if(segments.length > 0) trail.push(copyBtn);
     }
