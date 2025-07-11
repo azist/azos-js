@@ -20,6 +20,7 @@ import "azos-ui/vcl/cforest/settings-dialog";
 import "azos-ui/vcl/cforest/versions-dialog";
 
 import "azos-ui/vcl/cforest/forest-treeview";
+import { isAssigned } from "azos/types";
 
 export class CfgForestApplet extends Applet  {
 
@@ -74,7 +75,6 @@ export class CfgForestApplet extends Applet  {
   #ref = { forestClient: ForestSetupClient };
 
   // Holds the forests and their trees
-  // @todo: implement loading and saving of forest data from a server or local storage
   #forests = [
     { id: "test-f1", title: "Test Forest 1", trees: [] },
     { id: "g8corp", title: "G8 Corporation", trees: [] }
@@ -258,7 +258,7 @@ export class CfgForestApplet extends Applet  {
         showPath: false,
         canOpen: true,
         icon: "svg://azos.ico.home",
-        endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${rootNodeInfo?.DataVersion?.Utc}</span>`,
+        endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${this.formatDT(rootNodeInfo?.DataVersion?.Utc)} UTC</span>`,
       });
       this.tvExplorer.requestUpdate();
     }
@@ -305,6 +305,7 @@ export class CfgForestApplet extends Applet  {
         parentNode.canOpen = false;
         parentNode.canClose = false;
         parentNode.opened = false;
+        parentNode.showChevron = false;
         parentNode.icon = "svg://azos.ico.draft";
         this.tvExplorer.requestUpdate();
       }
@@ -323,10 +324,10 @@ export class CfgForestApplet extends Applet  {
       const childNode = parentNode.addChild(childNodeInfo.PathSegment, {
         data: { ...childNodeInfo },
         showPath: false,
-        canOpen: true,
-        opened: true,
-        showChevron: false,
-        endContent: html`<span title="${childNodeInfo?.DataVersion?.State}">${childNodeInfo?.DataVersion?.Utc}</span>`,
+        // canOpen: false,
+        // opened: false,
+        // showChevron: false,
+        endContent: html`<span title="${childNodeInfo?.DataVersion?.State}">${this.formatDT(childNodeInfo?.DataVersion?.Utc)} UTC</span>`,
       });
 
       parentNode.canOpen = true;
@@ -460,11 +461,14 @@ export class CfgForestApplet extends Applet  {
     this.tvExplorer.selectedNode = currentNode;
   }
 
+  formatDT = dt => isAssigned(dt) ? this.arena.app.localizer.formatDateTime({ dt, dtFormat: "NumDate", tmDetails: "HM" }) : null;
+
+
   render(){
     const asOfDisplay = this.activeAsOfUtc;
     const showAsOf = !this.activeAsOfUtc
       ? html`<div class=""><strong>As of: </strong></span>Utc Now</div>`
-      : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
+      : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${this.formatDT(asOfDisplay)} UTC</span></div>`;
 
     return html`
       <az-forest-settings-dialog id="dlgSettings" scope="this" title="Explorer Settings"
