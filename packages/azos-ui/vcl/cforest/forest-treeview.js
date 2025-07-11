@@ -2,6 +2,10 @@ import { TreeNode } from "azos-ui/vcl/tree-view/tree-node";
 import { TreeView } from "azos-ui/vcl/tree-view/tree-view";
 import { html, css } from "azos-ui/ui";
 
+/**
+ * CForestNode is a specialized TreeNode for the CForestTree.
+ * It includes properties for selection state and additional end content.
+ */
 class CForestNode extends TreeNode {
   #isSelected = false;
   #endContent = null;
@@ -18,6 +22,10 @@ class CForestNode extends TreeNode {
   }
 }
 
+/**
+ * CForestTree is a specialized TreeView for displaying a forest structure.
+ * It allows for selection of nodes and displays additional information such as paths and end content.
+ */
 class CForestTree extends TreeView {
 
   #selectedNode = null;
