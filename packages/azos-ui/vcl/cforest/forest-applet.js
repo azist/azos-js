@@ -22,6 +22,10 @@ import "azos-ui/vcl/cforest/versions-dialog";
 import "azos-ui/vcl/cforest/forest-treeview";
 import { isAssigned } from "azos/types";
 
+
+/**
+ * CfgForestApplet is an applet that provides a user interface for exploring and managing configuration forests, their trees, and their nodes.
+ */
 export class CfgForestApplet extends Applet  {
 
   static styles = [ STL_INLINE_GRID, Block.styles, css`
