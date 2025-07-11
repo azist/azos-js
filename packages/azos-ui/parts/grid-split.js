@@ -7,6 +7,12 @@
 import { css, html, Part } from "azos-ui/ui";
 import STL_INLINE_GRID from "azos-ui/styles/grid";
 
+/**
+ * GridSplit is a part that allows for a resizable grid layout with two columns.
+ * It provides a splitter that can be dragged to adjust the width of the left and right columns.
+ * The left column can contain content in the "left-top" slot, and the right column can contain content in the "right-bottom" slot.
+ * The number of columns on the left and right can be configured using the `splitLeftCols` and `splitRightCols` properties.
+ */
 export class GridSplit extends Part {
 
   static #sidSeed = 0;
