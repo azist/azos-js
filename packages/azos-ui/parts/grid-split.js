@@ -5,7 +5,6 @@
 </FILE_LICENSE>*/
 
 import { css, html, Part } from "azos-ui/ui";
-import STL_INLINE_GRID from "azos-ui/styles/grid";
 
 /**
  * GridSplit is a part that allows for a resizable grid layout with two columns.
@@ -17,7 +16,16 @@ export class GridSplit extends Part {
 
   static sidSeed = 0;
   static pidPrefix = "sgv";
-  static styles = [  STL_INLINE_GRID, css`
+  static styles = [ css`
+
+    :host {
+      --grid-splitter-content: "⁝";
+      --grid-splitter-bg: linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
+      --grid-splitter-inner-border: 1px solid rgba(0,0,0,0.05);
+      --grid-splitter-box-shadow: inset 0 0 0 rgba(0,0,0,0.05);
+    }
+
+
     .resizable-cols {
       display: grid;
       grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) 1ch repeat(var(--grid-splitter-right-cols), 1fr);
@@ -29,27 +37,27 @@ export class GridSplit extends Part {
     .resizable-col-left-top, .resizable-col-right-bottom {
       padding: 0.5em;
       overflow: auto;
-      box-shadow: inset 0 0 0 rgba(0,0,0,0.05);
+      box-shadow: var(--grid-splitter-box-shadow);
     }
 
     .resizable-col-left-top {
-      border-right: 1px solid rgba(0,0,0,0.05);
+      border-right: var(--grid-splitter-inner-border);
     }
 
     .resizable-col-right-bottom {
-      border-left: 1px solid rgba(0,0,0,0.05);
+      border-left: var(--grid-splitter-inner-border);
     }
 
     .resizable-cols .resizable-col-splitter {
       display: flex;
       cursor: col-resize;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
+      background: var(--grid-splitter-bg);
       align-items: center;
       justify-content: center;
     }
 
     .resizable-cols .resizable-col-splitter:before {
-      content: "⁝";
+      content: var(--grid-splitter-content);
       display: block;
       text-align: center;
       color: rgba(0,0,0,0.3);

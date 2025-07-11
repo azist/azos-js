@@ -44,18 +44,25 @@ export class CaseGridSplit extends CaseBase {
         <div slot="right-bottom">Right Bottom Content</div>
       </az-grid-split>
 
-      <h3>6:6 Split</h3>
-      <az-grid-split scope="this" splitLeftCols="6" splitRightCols="6">
-        <div slot="left-top">Left Top Content</div>
-        <div slot="right-bottom">Right Bottom Content</div>
+      <h3>Nested Split Grid</h3>
+      <p>
+        This example shows a nested grid split layout. The outer grid has a 3:9 split, and the inner grid has a 3:1 split.
+        The left column of the outer grid contains a nested grid split layout.
+      </p>
+      <az-grid-split scope="this" splitLeftCols="3" splitRightCols="9">
+        <div slot="left-top">Outer Left Top Content</div>
+        <div slot="right-bottom">Outer Right Bottom Content
+
+          <az-grid-split scope="this" splitLeftCols="3" splitRightCols="1">
+            <div slot="left-top">Inner Left Top Content</div>
+            <div slot="right-bottom">Inner Right Bottom Content</div>
+          </az-grid-split>
+
+          </div>
       </az-grid-split>
 
-      <h3>9:3 Split</h3>
-      <az-grid-split scope="this" splitLeftCols="9" splitRightCols="3">
-        <div slot="left-top">Left Top Content</div>
-        <div slot="right-bottom">Right Bottom Content</div>
-      </az-grid-split>
 
+      <h3>Assorted Split Configurations</h3>
       ${this.#buildSplitConfigs().map(config => html`
         <h3>${config.id} Split</h3>
         <p>${config.msg}</p>
