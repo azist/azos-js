@@ -25,6 +25,7 @@ class CForestTree extends TreeView {
 
   get selectedNode() { return this.#selectedNode; }
   set selectedNode(node) {
+    if(!node) return;
     if(this.#prevouslySelectedNode) this.#prevouslySelectedNode.isSelected = false;
     this.#prevouslySelectedNode = node;
     this.#selectedNode = node;

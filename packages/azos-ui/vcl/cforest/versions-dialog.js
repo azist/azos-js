@@ -1,8 +1,8 @@
 import { html, css } from "azos-ui/ui";
 import { ModalDialog } from "../../modal-dialog.js";
-import "azos-ui/parts/select-field";
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
 import { Spinner } from "../../spinner";
+import "../../parts/select-field";
 
 /**
  * Dialog for displaying, selecting, and viewing versions of a source forest node.
@@ -66,10 +66,7 @@ class CForestNodeVersions extends ModalDialog {
       this.#versionOptions = this.#selectedVersions.map(opt => ({ title: `${opt.State} ${opt.Utc} - ${opt.G_Version}`, value: opt.G_Version }));
 
       await this.#loadVersionDetails(this.#selectedVersionId); // auto load the current version details
-
-      this.objectInspector.requestUpdate();
       this.requestUpdate();
-
     }, "Loading versions...");
   }
 
@@ -82,8 +79,6 @@ class CForestNodeVersions extends ModalDialog {
   async #loadVersionDetails(versionId) {
     this.#selectedVersionId  = this.source.DataVersion?.G_Version;
     this.#selectedVersionDetails = await this.#ref.forestClient.nodeInfoVersion(`${this.source.Tree}.gver@${this.source.Forest}::${versionId}`);
-
-    this.objectInspector.requestUpdate();
     this.requestUpdate();
   }
 

@@ -44,7 +44,6 @@ export class CfgForestApplet extends Applet  {
     az-tab {
       margin: 0;
       padding: 0.5em;
-      background-color: var(--s-default-bg-ctl);
       border: var(--s-default-bor-ctl);
       background-color: var(--s-default-bg-ctl);
       box-shadow: var(--ctl-box-shadow);
@@ -96,8 +95,6 @@ export class CfgForestApplet extends Applet  {
   set activeForest(value) {
     if(this.#forest === value) return;
     this.#forest = value;
-    this.dlgSettings.requestUpdate();
-    this.requestUpdate();
   }
 
   /**
@@ -108,8 +105,6 @@ export class CfgForestApplet extends Applet  {
   set activeTree(value) {
     if(this.#tree === value) return;
     this.#tree = value;
-    this.dlgSettings.requestUpdate();
-    this.requestUpdate();
   }
 
   /**
@@ -122,7 +117,6 @@ export class CfgForestApplet extends Applet  {
   set activeAsOfUtc(value) {
     if(this.#asOfUtc === value) return;
     this.#asOfUtc = (value === null || value === undefined) ? this.#asOfUtc = null : (new Date(value)).toISOString(); // ensure it's a string
-    this.requestUpdate();
   }
 
   /**
@@ -143,7 +137,6 @@ export class CfgForestApplet extends Applet  {
   set activeNodeData(value) {
     if(this.#activeNodeData === value) return;
     this.#activeNodeData = value;
-    this.arena.requestUpdate();
   }
 
   /**
@@ -173,6 +166,17 @@ export class CfgForestApplet extends Applet  {
 
 
   /**
+   * Command to refresh the forest tree view.
+   * It reloads the root node and updates the tree view.
+   */
+  #forestRefreshCmd = new Command(this, {
+    uri: `CfgForest.RefreshForestTree`,
+    icon: "svg://azos.ico.refresh",
+    title: "CfgForest Refresh",
+    handler: async () =>  await this.refreshTree()
+  });
+
+  /**
    * Applies the forest settings by updating the active forest, tree, and asOfUtc.
    * If the settings are the same as the current active settings, it does nothing.
    * @param {Object} settings - The settings object containing forest, tree, and asOfUtc.
@@ -191,16 +195,6 @@ export class CfgForestApplet extends Applet  {
     this.refreshTree();
   }
 
-  /**
-   * Command to refresh the forest tree view.
-   * It reloads the root node and updates the tree view.
-   */
-  #forestRefreshCmd = new Command(this, {
-    uri: `CfgForest.RefreshForestTree`,
-    icon: "svg://azos.ico.refresh",
-    title: "CfgForest Refresh",
-    handler: async () =>  await this.refreshTree()
-  });
 
   connectedCallback() {
     super.connectedCallback();
@@ -211,14 +205,10 @@ export class CfgForestApplet extends Applet  {
       await Spinner.exec(async()=> {
         await this.#loadRootNode();
         this.#addTreeViewEventListeners();
-        this.arena.requestUpdate();
-        this.requestUpdate();
       },"Loading forests/trees");
     }
 
     bootstrap();
-    window.nodeCache = this.#nodeCache; // for debugging purposes
-    window.nodeTreeMap = this.#nodeTreeMap; // for debugging purposes
   }
 
   /**
@@ -229,7 +219,7 @@ export class CfgForestApplet extends Applet  {
     this.tvExplorer.addEventListener("nodeUserAction", (e) => {
       e.stopPropagation();
       const { node, action } = e.detail;
-      console.log("Node User Action:", action, node);
+      // console.log("Node User Action:", action, node);
 
       if(action === "click") {
         this.setActiveNodeId(node.data.Id, node);
@@ -273,7 +263,7 @@ export class CfgForestApplet extends Applet  {
       this.tvExplorer.requestUpdate();
     }
 
-    await this.#loadNodeChildren( rootNodeInfo.Id, 2, root);
+    await this.#loadNodeChildren( rootNodeInfo.Id, 1, root);
     this.setActiveNodeId(rootNodeInfo.Id, root);
   }
 
@@ -295,8 +285,6 @@ export class CfgForestApplet extends Applet  {
         await this.setActiveNodeId(node.data.Id, node);
       }
     }
-
-    this.tvExplorer.requestUpdate();
   }
 
 
@@ -465,6 +453,13 @@ export class CfgForestApplet extends Applet  {
     }, "Loading forests/trees");
   }
 
+
+  async breadCrumbCrumbClick(crumbPath) {
+    const currentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.FullPath === crumbPath);
+    this.setActiveNodeId(currentNode?.data?.Id);
+    this.tvExplorer.selectedNode = currentNode;
+  }
+
   render(){
     const asOfDisplay = this.activeAsOfUtc;
     const showAsOf = !this.activeAsOfUtc
@@ -472,10 +467,7 @@ export class CfgForestApplet extends Applet  {
       : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${asOfDisplay}</span></div>`;
 
     return html`
-      <az-forest-settings-dialog
-        id="dlgSettings"
-        scope="this"
-        title="Explorer Settings"
+      <az-forest-settings-dialog id="dlgSettings" scope="this" title="Explorer Settings"
         .settings="${{
           forests: this.#forests,
           activeForest: this.activeForest,
@@ -484,25 +476,14 @@ export class CfgForestApplet extends Applet  {
         }}"
       ></az-forest-settings-dialog>
 
-      <az-forest-node-version-dialog
-        id="dlgNodeVersions"
-        scope="this"
-        title="Node Versions"
-        .source="${this.#activeNodeData}"
-        .activeForest="${this.activeForest}"
-        .activeTree="${this.activeTree}"
-      ></az-forest-node-version-dialog>
+      <az-forest-node-version-dialog id="dlgNodeVersions" scope="this" title="Node Versions"
+        .source="${this.#activeNodeData}" .activeForest="${this.activeForest}" .activeTree="${this.activeTree}">
+      </az-forest-node-version-dialog>
 
-      <az-cforest-breadcrumbs
+      <az-cforest-breadcrumbs id="cforestBreadcrumbs" scope="this"
         .node="${this.#activeNodeData}"
-        .onCrumbClick="${crumbPath => {
-          const currentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.FullPath === crumbPath);
-          this.setActiveNodeId(currentNode?.data?.Id);
-          this.tvExplorer.selectedNode = currentNode;
-        }}"
-        .onCFSettingsClick="${() => this.dlgSettings.show()}"
-        scope="this"
-        id="cforestBreadcrumbs"
+        .onCrumbClick="${crumb => this.breadCrumbCrumbClick(crumb)}"
+        .onCFSettingsClick="${() => this.#forestSettingsCmd.exec(this.arena)}"
       ></az-cforest-breadcrumbs>
 
 
