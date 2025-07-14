@@ -17,15 +17,13 @@ export class GridSplit extends Part {
   static sidSeed = 0;
   static pidPrefix = "sgv";
   static styles = [ css`
-
     :host {
       --grid-splitter-content: "⁝";
       --grid-splitter-bg: linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
       --grid-splitter-inner-border: 1px solid rgba(0,0,0,0.05);
       --grid-splitter-box-shadow: inset 0 0 0 rgba(0,0,0,0.05);
+      --grid-splitter-col-border: none;
     }
-
-
     .resizable-cols {
       display: grid;
       grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) 1ch repeat(var(--grid-splitter-right-cols), 1fr);
@@ -42,10 +40,17 @@ export class GridSplit extends Part {
 
     .resizable-col-left-top {
       border-right: var(--grid-splitter-inner-border);
+      border-bottom: var(--grid-splitter-col-border);
+      border-top: var(--grid-splitter-col-border);
+      border-left: var(--grid-splitter-col-border);
     }
 
     .resizable-col-right-bottom {
       border-left: var(--grid-splitter-inner-border);
+      border-right: var(--grid-splitter-col-border);
+      border-bottom: var(--grid-splitter-col-border);
+      border-top: var(--grid-splitter-col-border);
+
     }
 
     .resizable-cols .resizable-col-splitter {
@@ -64,15 +69,10 @@ export class GridSplit extends Part {
       line-height: 100%;
     }
 
-    .visibleGrid {
-      border: 1px dashed rgba(0,128,255,0.5);
-    }
 
     @media (max-width: 600px) {
       .resizable-col-splitter { display: none !important; }
-
       .resizable-cols { grid-template-columns: 1fr !important; }
-
       .resizable-col-left-top, .resizable-col-right-bottom {
         grid-column: span 1 !important;
         border: none !important;
@@ -94,7 +94,6 @@ export class GridSplit extends Part {
   startLeftCols = 0;
 
   #listenersBound = false;
-  #visibleGrid = true;
 
   constructor() {
     super();
@@ -279,11 +278,11 @@ export class GridSplit extends Part {
   render() {
     return html`
       <div id="${GridSplit.pidPrefix}${this.sid}" class="row resizable-cols" style="--grid-splitter-left-cols: ${this.splitLeftCols}; --grid-splitter-right-cols: ${this.splitRightCols};">
-        <div class="resizable-col-left-top  ${this.#visibleGrid ? "visibleGrid" : ""}" style="grid-column: span var(--grid-splitter-left-cols);">
+        <div class="resizable-col-left-top" style="grid-column: span var(--grid-splitter-left-cols);">
           <slot name="left-top"></slot>
         </div>
         <div class="resizable-col-splitter" title="Resize"></div>
-        <div class="resizable-col-right-bottom  ${this.#visibleGrid ? "visibleGrid" : ""}" style="grid-column: span var(--grid-splitter-right-cols);">
+        <div class="resizable-col-right-bottom" style="grid-column: span var(--grid-splitter-right-cols);">
           <slot name="right-bottom"></slot>
         </div>
       </div>
