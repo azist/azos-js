@@ -13,7 +13,7 @@ import { css, html, Part } from "azos-ui/ui";
  * The number of columns on the left and right can be configured using the `splitLeftCols` and `splitRightCols` properties.
  */
 export class GridSplit extends Part {
-  // linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
+
   static sidSeed = 0;
   static pidPrefix = "sgv";
   static styles = [ css`
@@ -178,15 +178,12 @@ export class GridSplit extends Part {
     }
 
     const pid = `${GridSplit.pidPrefix}${this.sid}`;
-    // console.log({ pid, splitLeftCols: this.splitLeftCols, splitRightCols: this.splitRightCols });
-
     this.row = this.shadowRoot.querySelector(`#${pid}`);
     this.splitter = this.shadowRoot.querySelector(`#${pid} .resizable-col-splitter`);
 
     this.splitter.addEventListener('mousedown', this.onSplitterMouseDown);
     this.splitter.addEventListener('touchstart', this.onSplitterTouchStart, { passive: false });
     this.#splitterListening = true;
-    // console.log("GridSplit initialized with splitter", this.splitter);
   }
 
   /**
@@ -196,7 +193,6 @@ export class GridSplit extends Part {
    */
   onSplitterMouseDown(e){
     e.preventDefault();
-    // console.log("Splitter mouse down", e);
     this.startX = e.clientX;
     this.startLeftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
     document.addEventListener('mousemove', this.onSplitterMouseMove);
@@ -209,7 +205,6 @@ export class GridSplit extends Part {
    * Calls doResize with the current mouse position.
    */
   onSplitterMouseMove(e){
-    // console.log("Splitter mouse move", e);
     e.preventDefault();
     this.doResize(e.clientX);
   };
@@ -228,7 +223,6 @@ export class GridSplit extends Part {
    * Adds touchmove and touchend event listeners to handle resizing.
    */
   onSplitterTouchStart(e){
-    console.log("Splitter touch start", e);
     if (e.touches.length !== 1) return;
     this.startX = e.touches[0].clientX;
     this.startLeftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
@@ -242,7 +236,6 @@ export class GridSplit extends Part {
    * Calls doResize with the current touch position.
    */
   onSplitterTouchMove(e){
-    console.log("Splitter touch move", e);
     if (e.touches.length !== 1) return;
     e.preventDefault();
     this.doResize(e.touches[0].clientX);
@@ -264,7 +257,6 @@ export class GridSplit extends Part {
    * @param {number} currentX - The current X position of the mouse or touch event.
    */
   doResize(currentX) {
-    // console.log("Resizing columns", { currentX, startX: this.startX, startLeftCols: this.startLeftCols });
     const delta = currentX - this.startX;
     const totalWidth = this.row.offsetWidth;
     const leftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
