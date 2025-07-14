@@ -90,10 +90,10 @@ export class GridSplit extends Part {
     splitRightCols: { type: Number },
   };
 
-  row = null;
-  splitter = null;
-  startX = 0;
-  startLeftCols = 0;
+  #row = null;
+  #splitter = null;
+  #startX = 0;
+  #startLeftCols = 0;
 
   #listenersBound = false;
   #splitterListening = false;
@@ -120,8 +120,8 @@ export class GridSplit extends Part {
   #resetSplitterListeners(){
     // Clean up any previous listeners
     if (this.#splitterListening) {
-      this.splitter.removeEventListener('mousedown', this.onSplitterMouseDown);
-      this.splitter.removeEventListener('touchstart', this.onSplitterTouchStart);
+      this.#splitter.removeEventListener('mousedown', this.onSplitterMouseDown);
+      this.#splitter.removeEventListener('touchstart', this.onSplitterTouchStart);
       this.#splitterListening = false;
     }
   }
@@ -144,7 +144,7 @@ export class GridSplit extends Part {
   }
 
   firstUpdated() {
-    this.setupSplitter();
+    this.#setupSplitter();
   }
 
   /**
@@ -152,7 +152,7 @@ export class GridSplit extends Part {
    * Logs a warning and sets default values.
    * @param {string} fallbackWarning - The reason for the fallback.
    */
-  useFallback(fallbackWarning) {
+  #useFallback(fallbackWarning) {
     const pid = `${GridSplit.pidPrefix}${this.sid}`;
     console.warn(`GridView (${pid}): splitLeftCols + splitRightCols ${fallbackWarning}, got ${this.splitLeftCols} + ${this.splitRightCols}`);
     this.splitLeftCols = 3; // fallback to default
@@ -164,25 +164,25 @@ export class GridSplit extends Part {
    * Validates the splitLeftCols and splitRightCols properties.
    * If they are invalid, it calls useFallback to set default values.
    */
-  setupSplitter() {
+  #setupSplitter() {
 
     this.#resetDragListeners();
     this.#resetSplitterListeners();
 
     if(this.splitLeftCols+this.splitRightCols > 12) {
-      this.useFallback("exceeds 12");
+      this.#useFallback("exceeds 12");
     } else if(this.splitLeftCols < 1 || this.splitRightCols < 1) {
-      this.useFallback("must be at least 1");
+      this.#useFallback("must be at least 1");
     } else if(this.splitLeftCols + this.splitRightCols < 3) {
-      this.useFallback("must be at least 3");
+      this.#useFallback("must be at least 3");
     }
 
     const pid = `${GridSplit.pidPrefix}${this.sid}`;
-    this.row = this.shadowRoot.querySelector(`#${pid}`);
-    this.splitter = this.shadowRoot.querySelector(`#${pid} .resizable-col-splitter`);
+    this.#row = this.shadowRoot.querySelector(`#${pid}`);
+    this.#splitter = this.shadowRoot.querySelector(`#${pid} .resizable-col-splitter`);
 
-    this.splitter.addEventListener('mousedown', this.onSplitterMouseDown);
-    this.splitter.addEventListener('touchstart', this.onSplitterTouchStart, { passive: false });
+    this.#splitter.addEventListener('mousedown', this.onSplitterMouseDown);
+    this.#splitter.addEventListener('touchstart', this.onSplitterTouchStart, { passive: false });
     this.#splitterListening = true;
   }
 
@@ -193,8 +193,8 @@ export class GridSplit extends Part {
    */
   onSplitterMouseDown(e){
     e.preventDefault();
-    this.startX = e.clientX;
-    this.startLeftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
+    this.#startX = e.clientX;
+    this.#startLeftCols = parseInt(getComputedStyle(this.#row).getPropertyValue('--grid-splitter-left-cols'), 10);
     document.addEventListener('mousemove', this.onSplitterMouseMove);
     document.addEventListener('mouseup', this.onSplitterMouseUp);
     this.#dragging = true;
@@ -206,7 +206,7 @@ export class GridSplit extends Part {
    */
   onSplitterMouseMove(e){
     e.preventDefault();
-    this.doResize(e.clientX);
+    this.#doResize(e.clientX);
   };
 
   /**
@@ -224,8 +224,8 @@ export class GridSplit extends Part {
    */
   onSplitterTouchStart(e){
     if (e.touches.length !== 1) return;
-    this.startX = e.touches[0].clientX;
-    this.startLeftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
+    this.#startX = e.touches[0].clientX;
+    this.#startLeftCols = parseInt(getComputedStyle(this.#row).getPropertyValue('--grid-splitter-left-cols'), 10);
     document.addEventListener('touchmove', this.onSplitterTouchMove, { passive: false });
     document.addEventListener('touchend', this.onSplitterTouchEnd);
     this.#dragging = true;
@@ -238,7 +238,7 @@ export class GridSplit extends Part {
   onSplitterTouchMove(e){
     if (e.touches.length !== 1) return;
     e.preventDefault();
-    this.doResize(e.touches[0].clientX);
+    this.#doResize(e.touches[0].clientX);
   };
 
   /**
@@ -256,18 +256,18 @@ export class GridSplit extends Part {
    * Updates the CSS variables for left and right columns accordingly.
    * @param {number} currentX - The current X position of the mouse or touch event.
    */
-  doResize(currentX) {
-    const delta = currentX - this.startX;
-    const totalWidth = this.row.offsetWidth;
-    const leftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
-    const rightCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-right-cols'), 10);
+  #doResize(currentX) {
+    const delta = currentX - this.#startX;
+    const totalWidth = this.#row.offsetWidth;
+    const leftCols = parseInt(getComputedStyle(this.#row).getPropertyValue('--grid-splitter-left-cols'), 10);
+    const rightCols = parseInt(getComputedStyle(this.#row).getPropertyValue('--grid-splitter-right-cols'), 10);
     const cols = leftCols + rightCols;
     const colWidth = totalWidth / cols;
-    let newLeftCols = Math.round(this.startLeftCols + delta / colWidth);
+    let newLeftCols = Math.round(this.#startLeftCols + delta / colWidth);
     newLeftCols = Math.max(1, Math.min(newLeftCols, cols - 1));
-    this.row.style.setProperty('--grid-splitter-left-cols', newLeftCols);
-    this.row.style.setProperty('--grid-splitter-right-cols', cols - newLeftCols);
-    this.row.style.gridTemplateColumns = `repeat(${newLeftCols}, 1fr) var(--grid-splitter-width) repeat(${cols - newLeftCols}, 1fr)`;
+    this.#row.style.setProperty('--grid-splitter-left-cols', newLeftCols);
+    this.#row.style.setProperty('--grid-splitter-right-cols', cols - newLeftCols);
+    this.#row.style.gridTemplateColumns = `repeat(${newLeftCols}, 1fr) var(--grid-splitter-width) repeat(${cols - newLeftCols}, 1fr)`;
   }
 
   render() {
