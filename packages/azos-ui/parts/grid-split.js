@@ -20,13 +20,14 @@ export class GridSplit extends Part {
     :host {
       --grid-splitter-content: "⁝";
       --grid-splitter-bg: none;
+      --grid-splitter-width: 0.75em;
       --grid-splitter-inner-border: 1px solid rgba(0,0,0,0.05);
       --grid-splitter-box-shadow: inset 0 0 0 rgba(0,0,0,0.05);
       --grid-splitter-col-border: none;
     }
     .resizable-cols {
       display: grid;
-      grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) 1ch repeat(var(--grid-splitter-right-cols), 1fr);
+      grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) var(--grid-splitter-width) repeat(var(--grid-splitter-right-cols), 1fr);
       gap: 0px;
       position: relative;
       margin-bottom: 0;
@@ -153,7 +154,8 @@ export class GridSplit extends Part {
    * @param {string} fallbackWarning - The reason for the fallback.
    */
   useFallback(fallbackWarning) {
-    console.warn(`GridView: splitLeftCols + splitRightCols ${fallbackWarning}, got ${this.splitLeftCols} + ${this.splitRightCols}`);
+    const pid = `${GridSplit.pidPrefix}${this.sid}`;
+    console.warn(`GridView (${pid}): splitLeftCols + splitRightCols ${fallbackWarning}, got ${this.splitLeftCols} + ${this.splitRightCols}`);
     this.splitLeftCols = 3; // fallback to default
     this.splitRightCols = 9; // fallback to default
   }
@@ -173,11 +175,11 @@ export class GridSplit extends Part {
     } else if(this.splitLeftCols < 1 || this.splitRightCols < 1) {
       this.useFallback("must be at least 1");
     } else if(this.splitLeftCols + this.splitRightCols < 3) {
-      this.useFallback(" must be at least 3");
+      this.useFallback("must be at least 3");
     }
 
     const pid = `${GridSplit.pidPrefix}${this.sid}`;
-    console.log({ pid, splitLeftCols: this.splitLeftCols, splitRightCols: this.splitRightCols });
+    // console.log({ pid, splitLeftCols: this.splitLeftCols, splitRightCols: this.splitRightCols });
 
     this.row = this.shadowRoot.querySelector(`#${pid}`);
     this.splitter = this.shadowRoot.querySelector(`#${pid} .resizable-col-splitter`);
@@ -195,7 +197,7 @@ export class GridSplit extends Part {
    */
   onSplitterMouseDown(e){
     e.preventDefault();
-    console.log("Splitter mouse down", e);
+    // console.log("Splitter mouse down", e);
     this.startX = e.clientX;
     this.startLeftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
     document.addEventListener('mousemove', this.onSplitterMouseMove);
@@ -208,7 +210,7 @@ export class GridSplit extends Part {
    * Calls doResize with the current mouse position.
    */
   onSplitterMouseMove(e){
-    console.log("Splitter mouse move", e);
+    // console.log("Splitter mouse move", e);
     e.preventDefault();
     this.doResize(e.clientX);
   };
@@ -263,7 +265,7 @@ export class GridSplit extends Part {
    * @param {number} currentX - The current X position of the mouse or touch event.
    */
   doResize(currentX) {
-    console.log("Resizing columns", { currentX, startX: this.startX, startLeftCols: this.startLeftCols });
+    // console.log("Resizing columns", { currentX, startX: this.startX, startLeftCols: this.startLeftCols });
     const delta = currentX - this.startX;
     const totalWidth = this.row.offsetWidth;
     const leftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
@@ -274,7 +276,7 @@ export class GridSplit extends Part {
     newLeftCols = Math.max(1, Math.min(newLeftCols, cols - 1));
     this.row.style.setProperty('--grid-splitter-left-cols', newLeftCols);
     this.row.style.setProperty('--grid-splitter-right-cols', cols - newLeftCols);
-    this.row.style.gridTemplateColumns = `repeat(${newLeftCols}, 1fr) 1em repeat(${cols - newLeftCols}, 1fr)`;
+    this.row.style.gridTemplateColumns = `repeat(${newLeftCols}, 1fr) var(--grid-splitter-width) repeat(${cols - newLeftCols}, 1fr)`;
   }
 
   render() {

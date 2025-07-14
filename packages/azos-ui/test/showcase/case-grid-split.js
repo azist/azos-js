@@ -9,24 +9,36 @@ import { CaseBase } from "./case-base";
 
 import STL_CARD from "../../styles/card.js";
 import "../../parts/grid-split";
+import STL_INLINE_GRID from "../../styles/grid.js";
 
 export class CaseGridSplit extends CaseBase {
 
-  static styles = [STL_CARD];
+  static styles = [ this.styles, STL_INLINE_GRID, STL_CARD];
 
-  #buildAssortedSplitConfigs(){
-    return [
-      { id: "6:6", splitLeftCols: 6, splitRightCols: 6, msg: "This is a 6:6 split layout." },
-      { id: "9:3", splitLeftCols: 9, splitRightCols: 3, msg: "This is a 9:3 split layout." },
-      { id: "12:0", splitLeftCols: 12, splitRightCols: 0, msg: "This is an invalid 12:0 split layout. Fallbacks back to 3:9" },
-      { id: "0:12", splitLeftCols: 0, splitRightCols: 12, msg: "This is an invalid 0:12 split layout. Fallbacks back to 3:9" },
+  #validConfigs = [
+    { id: "6:6", splitLeftCols: 6, splitRightCols: 6},
+    { id: "9:3", splitLeftCols: 9, splitRightCols: 3},
+    { id: "1:3", splitLeftCols: 1, splitRightCols: 3},
+    { id: "2:2", splitLeftCols: 2, splitRightCols: 2},
+    { id: "3:1", splitLeftCols: 3, splitRightCols: 1}];
 
-      { id: "1:3", splitLeftCols: 1, splitRightCols: 3, msg: "This is a 1:3 split layout." },
-      { id: "2:2", splitLeftCols: 2, splitRightCols: 2, msg: "This is a 2:2 split layout." },
-      { id: "3:1", splitLeftCols: 3, splitRightCols: 1, msg: "This is a 3:1 split layout." },
-      { id: "1:1", splitLeftCols: 1, splitRightCols: 1, msg: "This is a 1:1 split layout." },
-    ];
+  #invalidConfigs = [
+    { id: "12:0", splitLeftCols: 12, splitRightCols: 0, msg: "This is an invalid 12:0 split layout. Fallbacks back to 3:9" },
+    { id: "0:12", splitLeftCols: 0, splitRightCols: 12, msg: "This is an invalid 0:12 split layout. Fallbacks back to 3:9" },
+    { id: "1:1", splitLeftCols: 1, splitRightCols: 1, msg: "This is an invalid 1:1 split layout. Fallbacks back to 3:9" }];
+
+
+  #buildSplitConfigs(configs){
+    return configs.map(config => html`
+      <h3>${config.id} Split</h3>
+      ${config.msg ? html`<p>${config.msg}</p>`: ""}
+      <az-grid-split style="--grid-splitter-col-border: 1px dashed rgba(0, 145, 255, 0.5);" scope="this" splitLeftCols="${config.splitLeftCols}" splitRightCols="${config.splitRightCols}">
+        <div slot="left-top"><div class="card">Left Top Content</div></div>
+        <div slot="right-bottom"><div class="card">Right Bottom Content</div></div>
+      </az-grid-split>
+    `);
   }
+
 
   renderControl() {
     return html`
@@ -36,9 +48,20 @@ export class CaseGridSplit extends CaseBase {
         The number of columns on the left and right can be configured using the <code>splitLeftCols</code> and <code>splitRightCols</code> properties.
       </p>
       <p> The splitter can be dragged to adjust the width of the left and right columns. The left column is set to 3 columns, and the right column is set to 9 columns by default.</p>
-      <h3>3:9 Split</h3>
 
-      <az-grid-split scope="this" splitLeftCols="3" splitRightCols="9">
+      <code><pre>
+&lt;az-grid-split scope="this" splitLeftCols="3" splitRightCols="9"&gt;
+  &lt;div slot="left-top"&gt;
+    &lt;div class="card"&gt;Left Top Content&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div slot="right-bottom"&gt;
+    &lt;div class="card"&gt;Right Bottom Content&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/az-grid-split&gt;
+      </pre></code>
+
+      <h3>3:9 Split</h3>
+      <az-grid-split scope="this" splitLeftCols="3" splitRightCols="3">
         <div slot="left-top"><div class="card">Left Top Content</div></div>
         <div slot="right-bottom"><div class="card">Right Bottom Content</div></div>
       </az-grid-split>
@@ -60,15 +83,20 @@ export class CaseGridSplit extends CaseBase {
       </az-grid-split>
 
 
-      <h3>Assorted Split Configurations</h3>
-      ${this.#buildAssortedSplitConfigs().map(config => html`
-        <h3>${config.id} Split</h3>
-        <p>${config.msg}</p>
-        <az-grid-split style="--grid-splitter-col-border: 1px dashed rgba(0, 145, 255, 0.5);" scope="this" splitLeftCols="${config.splitLeftCols}" splitRightCols="${config.splitRightCols}">
-          <div slot="left-top"><div class="card">Left Top Content</div></div>
-          <div slot="right-bottom"><div class="card">Right Bottom Content</div></div>
-        </az-grid-split>
-      `)}
+      <h3>Valid Split Configuration Examples</h3>
+      <p>
+        The following examples demonstrate various split configurations with different left and right column ratios.
+        The left and right columns can be resized by dragging the splitter.
+      </p>
+      ${this.#buildSplitConfigs(this.#validConfigs)}
+
+
+      <h3 status="error">Invalid Split Configurations</h3>
+      <p>
+        The following examples demonstrate invalid split configurations that do not meet the minimum requirements.
+        These configurations will fallback to a default 3:9 split layout.
+      </p>
+      ${this.#buildSplitConfigs(this.#invalidConfigs)}
     `;
   }
 }
