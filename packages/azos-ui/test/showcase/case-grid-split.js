@@ -10,6 +10,7 @@ import { CaseBase } from "./case-base";
 import STL_CARD from "../../styles/card.js";
 import "../../parts/grid-split";
 import STL_INLINE_GRID from "../../styles/grid.js";
+import { GridSplit } from "../../parts/grid-split";
 
 export class CaseGridSplit extends CaseBase {
 
@@ -32,7 +33,7 @@ export class CaseGridSplit extends CaseBase {
     return configs.map(config => html`
       <h3>${config.id} Split</h3>
       ${config.msg ? html`<p>${config.msg}</p>`: ""}
-      <az-grid-split style="--grid-splitter-col-border: 1px dashed rgba(0, 145, 255, 0.5);" scope="this" splitLeftCols="${config.splitLeftCols}" splitRightCols="${config.splitRightCols}">
+      <az-grid-split scope="this" splitLeftCols="${config.splitLeftCols}" splitRightCols="${config.splitRightCols}">
         <div slot="left-top"><div class="card">Left Top Content</div></div>
         <div slot="right-bottom"><div class="card">Right Bottom Content</div></div>
       </az-grid-split>
@@ -61,7 +62,7 @@ export class CaseGridSplit extends CaseBase {
       </pre></code>
 
       <h3>3:9 Split</h3>
-      <az-grid-split scope="this" splitLeftCols="3" splitRightCols="3">
+      <az-grid-split scope="this" splitLeftCols="3" splitRightCols="9">
         <div slot="left-top"><div class="card">Left Top Content</div></div>
         <div slot="right-bottom"><div class="card">Right Bottom Content</div></div>
       </az-grid-split>
@@ -97,8 +98,35 @@ export class CaseGridSplit extends CaseBase {
         These configurations will fallback to a default 3:9 split layout.
       </p>
       ${this.#buildSplitConfigs(this.#invalidConfigs)}
+
+      <h3>Custom Grid Split</h3>
+      <p>
+        This example demonstrates a custom grid split component with a default 2:5 split and overridden border.
+      </p>
+      <az-grid-split-custom scope="this">
+        <div slot="left-top"><div class="card">Custom Left Top Content</div></div>
+        <div slot="right-bottom"><div class="card">Custom Right Bottom Content</div></div>
+      </az-grid-split-custom>
     `;
   }
 }
 
 window.customElements.define("az-case-grid-split", CaseGridSplit);
+
+
+class GridSplitCustom extends GridSplit {
+
+  static styles = [GridSplit.styles, css`
+    :host {
+      --grid-splitter-col-border: 1px solid rgba(0, 255, 26, 0.5);
+    }
+  `];
+
+  constructor() {
+    super();
+    this.splitLeftCols = 2; // Default left column count
+    this.splitRightCols = 5; // Default right column count
+  }
+
+}
+window.customElements.define("az-grid-split-custom", GridSplitCustom);
