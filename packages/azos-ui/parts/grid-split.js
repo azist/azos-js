@@ -88,7 +88,6 @@ export class GridSplit extends Part {
     sid: { type: Number },
     splitLeftCols: { type: Number },
     splitRightCols: { type: Number },
-    visibleGrid: { type: Boolean, default: false },
   };
 
   row = null;
