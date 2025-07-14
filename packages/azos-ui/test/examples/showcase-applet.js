@@ -40,6 +40,7 @@ import "../showcase/case-launcher.js";
 import "../showcase/case-cards.js";
 import "../showcase/case-grids.js";
 import "../showcase/case-prose.js";
+import "../showcase/case-grid-split.js";
 import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
@@ -138,6 +139,7 @@ export class ShowcaseApplet extends Applet {
       <option value="Launcher">Launcher</option>
       <option value="Cards">Cards</option>
       <option value="Grids">Grids</option>
+      <option value="GridSplit">Grid Split</option>
       <option value="Prose">Prose</option>
     </select>
 
@@ -178,6 +180,7 @@ export class ShowcaseApplet extends Applet {
       Launcher: html`<az-case-launcher></az-case-launcher>`,
       Cards: html`<az-case-cards></az-case-cards>`,
       Grids: html`<az-case-grids></az-case-grids>`,
+      GridSplit: html`<az-case-grid-split></az-case-grid-split>`,
       Prose: html`<az-case-prose></az-case-prose>`,
 
     };

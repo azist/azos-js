@@ -5,7 +5,6 @@
 </FILE_LICENSE>*/
 
 import { css, html, Part } from "azos-ui/ui";
-import STL_INLINE_GRID from "azos-ui/styles/grid";
 
 /**
  * GridSplit is a part that allows for a resizable grid layout with two columns.
@@ -15,12 +14,20 @@ import STL_INLINE_GRID from "azos-ui/styles/grid";
  */
 export class GridSplit extends Part {
 
-  static #sidSeed = 0;
-  static #pidPrefix = "sgv";
-  static styles = [  STL_INLINE_GRID, css`
+  static sidSeed = 0;
+  static pidPrefix = "sgv";
+  static styles = [ css`
+    :host {
+      --grid-splitter-content: "⁝";
+      --grid-splitter-bg: none;
+      --grid-splitter-width: 0.75em;
+      --grid-splitter-inner-border: 1px solid rgba(0,0,0,0.05);
+      --grid-splitter-box-shadow: inset 0 0 0 rgba(0,0,0,0.05);
+      --grid-splitter-col-border: none;
+    }
     .resizable-cols {
       display: grid;
-      grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) 1ch repeat(var(--grid-splitter-right-cols), 1fr);
+      grid-template-columns: repeat(var(--grid-splitter-left-cols), 1fr) var(--grid-splitter-width) repeat(var(--grid-splitter-right-cols), 1fr);
       gap: 0px;
       position: relative;
       margin-bottom: 0;
@@ -29,38 +36,46 @@ export class GridSplit extends Part {
     .resizable-col-left-top, .resizable-col-right-bottom {
       padding: 0.5em;
       overflow: auto;
-      box-shadow: inset 0 0 0 rgba(0,0,0,0.05);
+      box-shadow: var(--grid-splitter-box-shadow);
     }
 
     .resizable-col-left-top {
-      border-right: 1px solid rgba(0,0,0,0.05);
+      border-right: var(--grid-splitter-inner-border);
+      border-bottom: var(--grid-splitter-col-border);
+      border-top: var(--grid-splitter-col-border);
+      border-left: var(--grid-splitter-col-border);
     }
 
     .resizable-col-right-bottom {
-      border-left: 1px solid rgba(0,0,0,0.05);
+      border-left: var(--grid-splitter-inner-border);
+      border-right: var(--grid-splitter-col-border);
+      border-bottom: var(--grid-splitter-col-border);
+      border-top: var(--grid-splitter-col-border);
+
     }
 
     .resizable-cols .resizable-col-splitter {
       display: flex;
       cursor: col-resize;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
+      background: var(--grid-splitter-bg);
       align-items: center;
       justify-content: center;
+      padding: 0;
+      margin:0px;
     }
 
     .resizable-cols .resizable-col-splitter:before {
-      content: "⁝";
+      content: var(--grid-splitter-content);
       display: block;
       text-align: center;
       color: rgba(0,0,0,0.3);
       line-height: 100%;
     }
 
+
     @media (max-width: 600px) {
       .resizable-col-splitter { display: none !important; }
-
       .resizable-cols { grid-template-columns: 1fr !important; }
-
       .resizable-col-left-top, .resizable-col-right-bottom {
         grid-column: span 1 !important;
         border: none !important;
@@ -72,7 +87,7 @@ export class GridSplit extends Part {
   static properties = {
     sid: { type: Number },
     splitLeftCols: { type: Number },
-    splitRightCols: { type: Number }
+    splitRightCols: { type: Number },
   };
 
   #row = null;
@@ -80,21 +95,52 @@ export class GridSplit extends Part {
   #startX = 0;
   #startLeftCols = 0;
 
+  #listenersBound = false;
+  #splitterListening = false;
+  #dragging = false;
+
   constructor() {
     super();
-    this.sid = GridSplit.#sidSeed++;
+    this.sid = GridSplit.sidSeed++;
+    this.#bindListeners();
+  }
+
+  #bindListeners() {
+    // Bind handlers once
+    if (this.#listenersBound) return;
+    this.onSplitterMouseDown = this.onSplitterMouseDown.bind(this);
+    this.onSplitterMouseMove = this.onSplitterMouseMove.bind(this);
+    this.onSplitterMouseUp = this.onSplitterMouseUp.bind(this);
+    this.onSplitterTouchStart = this.onSplitterTouchStart.bind(this);
+    this.onSplitterTouchEnd = this.onSplitterTouchEnd.bind(this);
+    this.onSplitterTouchMove = this.onSplitterTouchMove.bind(this);
+    this.#listenersBound = true;
+  }
+
+  #resetSplitterListeners(){
+    // Clean up any previous listeners
+    if (this.#splitterListening) {
+      this.#splitter.removeEventListener('mousedown', this.onSplitterMouseDown);
+      this.#splitter.removeEventListener('touchstart', this.onSplitterTouchStart);
+      this.#splitterListening = false;
+    }
+  }
+
+  #resetDragListeners() {
+    // Clean up any previous listeners
+    if(this.#dragging) {
+      document.removeEventListener('mousemove', this.onSplitterMouseMove);
+      document.removeEventListener('mouseup', this.onSplitterMouseUp);
+      document.removeEventListener('touchmove', this.onSplitterTouchMove);
+      document.removeEventListener('touchend', this.onSplitterTouchEnd);
+      this.#dragging = false;
+    }
   }
 
   disconnectedCallback() {
+    this.#resetDragListeners();
+    this.#resetSplitterListeners();
     super.disconnectedCallback();
-    if (this.#splitter) {
-      this.#splitter.removeEventListener('mousedown', this.#onSplitterMouseDown);
-      this.#splitter.removeEventListener('touchstart', this.#onSplitterTouchStart);
-      document.removeEventListener('mousemove', this.#onSplitterMouseMove);
-      document.removeEventListener('mouseup', this.#onSplitterMouseUp);
-      document.removeEventListener('touchmove', this.#onSplitterTouchMove);
-      document.removeEventListener('touchend', this.#onSplitterTouchEnd);
-    }
   }
 
   firstUpdated() {
@@ -107,7 +153,8 @@ export class GridSplit extends Part {
    * @param {string} fallbackWarning - The reason for the fallback.
    */
   #useFallback(fallbackWarning) {
-    console.warn(`GridView: splitLeftCols + splitRightCols ${fallbackWarning}, got ${this.splitLeftCols} + ${this.splitRightCols}`);
+    const pid = `${GridSplit.pidPrefix}${this.sid}`;
+    console.warn(`GridView (${pid}): splitLeftCols + splitRightCols ${fallbackWarning}, got ${this.splitLeftCols} + ${this.splitRightCols}`);
     this.splitLeftCols = 3; // fallback to default
     this.splitRightCols = 9; // fallback to default
   }
@@ -115,22 +162,28 @@ export class GridSplit extends Part {
   /**
    * Sets up the splitter element and its event listeners.
    * Validates the splitLeftCols and splitRightCols properties.
-   * If they are invalid, it calls #useFallback to set default values.
+   * If they are invalid, it calls useFallback to set default values.
    */
   #setupSplitter() {
+
+    this.#resetDragListeners();
+    this.#resetSplitterListeners();
+
     if(this.splitLeftCols+this.splitRightCols > 12) {
       this.#useFallback("exceeds 12");
     } else if(this.splitLeftCols < 1 || this.splitRightCols < 1) {
       this.#useFallback("must be at least 1");
     } else if(this.splitLeftCols + this.splitRightCols < 3) {
-      this.#useFallback(" must be at least 3");
+      this.#useFallback("must be at least 3");
     }
 
-    const pid = `${GridSplit.#pidPrefix}${this.sid}`;
+    const pid = `${GridSplit.pidPrefix}${this.sid}`;
     this.#row = this.shadowRoot.querySelector(`#${pid}`);
     this.#splitter = this.shadowRoot.querySelector(`#${pid} .resizable-col-splitter`);
-    this.#splitter.addEventListener('mousedown', this.#onSplitterMouseDown);
-    this.#splitter.addEventListener('touchstart', this.#onSplitterTouchStart, { passive: false });
+
+    this.#splitter.addEventListener('mousedown', this.onSplitterMouseDown);
+    this.#splitter.addEventListener('touchstart', this.onSplitterTouchStart, { passive: false });
+    this.#splitterListening = true;
   }
 
   /**
@@ -138,19 +191,20 @@ export class GridSplit extends Part {
    * Initializes the starting position and left column count.
    * Adds mousemove and mouseup event listeners to handle resizing.
    */
-  #onSplitterMouseDown = (e) => {
+  onSplitterMouseDown(e){
     e.preventDefault();
     this.#startX = e.clientX;
     this.#startLeftCols = parseInt(getComputedStyle(this.#row).getPropertyValue('--grid-splitter-left-cols'), 10);
-    document.addEventListener('mousemove', this.#onSplitterMouseMove);
-    document.addEventListener('mouseup', this.#onSplitterMouseUp);
+    document.addEventListener('mousemove', this.onSplitterMouseMove);
+    document.addEventListener('mouseup', this.onSplitterMouseUp);
+    this.#dragging = true;
   };
 
   /**
    * Handles the mouse move event for the splitter.
-   * Calls #doResize with the current mouse position.
+   * Calls doResize with the current mouse position.
    */
-  #onSplitterMouseMove = (e) => {
+  onSplitterMouseMove(e){
     e.preventDefault();
     this.#doResize(e.clientX);
   };
@@ -159,9 +213,8 @@ export class GridSplit extends Part {
    * Handles the mouse up event for the splitter.
    * Removes the mousemove and mouseup event listeners to stop resizing.
    */
-  #onSplitterMouseUp = () => {
-    document.removeEventListener('mousemove', this.#onSplitterMouseMove);
-    document.removeEventListener('mouseup', this.#onSplitterMouseUp);
+  onSplitterMouseUp(){
+    this.#resetDragListeners();
   };
 
   /**
@@ -169,19 +222,20 @@ export class GridSplit extends Part {
    * Initializes the starting position and left column count.
    * Adds touchmove and touchend event listeners to handle resizing.
    */
-  #onSplitterTouchStart = (e) => {
+  onSplitterTouchStart(e){
     if (e.touches.length !== 1) return;
     this.#startX = e.touches[0].clientX;
     this.#startLeftCols = parseInt(getComputedStyle(this.#row).getPropertyValue('--grid-splitter-left-cols'), 10);
-    document.addEventListener('touchmove', this.#onSplitterTouchMove, { passive: false });
-    document.addEventListener('touchend', this.#onSplitterTouchEnd);
+    document.addEventListener('touchmove', this.onSplitterTouchMove, { passive: false });
+    document.addEventListener('touchend', this.onSplitterTouchEnd);
+    this.#dragging = true;
   };
 
   /**
    * Handles the touch move event for the splitter.
-   * Calls #doResize with the current touch position.
+   * Calls doResize with the current touch position.
    */
-  #onSplitterTouchMove = (e) => {
+  onSplitterTouchMove(e){
     if (e.touches.length !== 1) return;
     e.preventDefault();
     this.#doResize(e.touches[0].clientX);
@@ -192,9 +246,8 @@ export class GridSplit extends Part {
    * Removes the touchmove and touchend event listeners to stop resizing.
    * This is necessary to clean up after the touch interaction ends.
    */
-  #onSplitterTouchEnd = () => {
-    document.removeEventListener('touchmove', this.#onSplitterTouchMove);
-    document.removeEventListener('touchend', this.#onSplitterTouchEnd);
+  onSplitterTouchEnd = () => {
+    this.#resetDragListeners();
   };
 
   /**
@@ -214,16 +267,18 @@ export class GridSplit extends Part {
     newLeftCols = Math.max(1, Math.min(newLeftCols, cols - 1));
     this.#row.style.setProperty('--grid-splitter-left-cols', newLeftCols);
     this.#row.style.setProperty('--grid-splitter-right-cols', cols - newLeftCols);
-    this.#row.style.gridTemplateColumns = `repeat(${newLeftCols}, 1fr) 1ch repeat(${cols - newLeftCols}, 1fr)`;
+    this.#row.style.gridTemplateColumns = `repeat(${newLeftCols}, 1fr) var(--grid-splitter-width) repeat(${cols - newLeftCols}, 1fr)`;
   }
 
   render() {
     return html`
-      <div id="${GridSplit.#pidPrefix}${this.sid}" class="row resizable-cols" style="--grid-splitter-left-cols: ${this.splitLeftCols}; --grid-splitter-right-cols: ${this.splitRightCols};">
+      <div id="${GridSplit.pidPrefix}${this.sid}" class="row resizable-cols" style="--grid-splitter-left-cols: ${this.splitLeftCols}; --grid-splitter-right-cols: ${this.splitRightCols};">
         <div class="resizable-col-left-top" style="grid-column: span var(--grid-splitter-left-cols);">
           <slot name="left-top"></slot>
         </div>
+
         <div class="resizable-col-splitter" title="Resize"></div>
+
         <div class="resizable-col-right-bottom" style="grid-column: span var(--grid-splitter-right-cols);">
           <slot name="right-bottom"></slot>
         </div>
