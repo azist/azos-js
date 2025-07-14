@@ -8,13 +8,11 @@ import { html, css } from "../../ui";
 import { CaseBase } from "./case-base";
 
 import STL_CARD from "../../styles/card.js";
-import { GridSplit } from "../../parts/grid-split.js";
+import "../../parts/grid-split";
 
 export class CaseGridSplit extends CaseBase {
 
-  static styles = [GridSplit.styles, STL_CARD, css`
-    --grid-splitter-col-border: 1px dashed rgba(0, 145, 255, 0.5);
-    `];
+  static styles = [STL_CARD];
 
   #buildAssortedSplitConfigs(){
     return [
@@ -37,9 +35,7 @@ export class CaseGridSplit extends CaseBase {
         This example demonstrates a resizable grid layout with two columns. The left column can contain content in the "left-top" slot, and the right column can contain content in the "right-bottom" slot.
         The number of columns on the left and right can be configured using the <code>splitLeftCols</code> and <code>splitRightCols</code> properties.
       </p>
-      <p>
-        The splitter can be dragged to adjust the width of the left and right columns. The left column is set to 2 columns, and the right column is set to 3 columns by default.
-      </p>
+      <p> The splitter can be dragged to adjust the width of the left and right columns. The left column is set to 3 columns, and the right column is set to 9 columns by default.</p>
       <h3>3:9 Split</h3>
 
       <az-grid-split scope="this" splitLeftCols="3" splitRightCols="9">

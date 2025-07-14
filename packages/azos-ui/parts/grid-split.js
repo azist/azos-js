@@ -13,13 +13,13 @@ import { css, html, Part } from "azos-ui/ui";
  * The number of columns on the left and right can be configured using the `splitLeftCols` and `splitRightCols` properties.
  */
 export class GridSplit extends Part {
-
+  // linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
   static sidSeed = 0;
   static pidPrefix = "sgv";
   static styles = [ css`
     :host {
       --grid-splitter-content: "⁝";
-      --grid-splitter-bg: linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
+      --grid-splitter-bg: none;
       --grid-splitter-inner-border: 1px solid rgba(0,0,0,0.05);
       --grid-splitter-box-shadow: inset 0 0 0 rgba(0,0,0,0.05);
       --grid-splitter-col-border: none;
@@ -59,6 +59,8 @@ export class GridSplit extends Part {
       background: var(--grid-splitter-bg);
       align-items: center;
       justify-content: center;
+      padding: 0;
+      margin:0px;
     }
 
     .resizable-cols .resizable-col-splitter:before {
@@ -94,6 +96,8 @@ export class GridSplit extends Part {
   startLeftCols = 0;
 
   #listenersBound = false;
+  #splitterListening = false;
+  #dragging = false;
 
   constructor() {
     super();
@@ -113,21 +117,29 @@ export class GridSplit extends Part {
     this.#listenersBound = true;
   }
 
-  #resetListeners() {
+  #resetSplitterListeners(){
     // Clean up any previous listeners
-    if (this.splitter) {
+    if (this.#splitterListening) {
       this.splitter.removeEventListener('mousedown', this.onSplitterMouseDown);
       this.splitter.removeEventListener('touchstart', this.onSplitterTouchStart);
-
+      this.#splitterListening = false;
     }
-    document.removeEventListener('mousemove', this.onSplitterMouseMove);
-    document.removeEventListener('mouseup', this.onSplitterMouseUp);
-    document.removeEventListener('touchmove', this.onSplitterTouchMove);
-    document.removeEventListener('touchend', this.onSplitterTouchEnd);
+  }
+
+  #resetDragListeners() {
+    // Clean up any previous listeners
+    if(this.#dragging) {
+      document.removeEventListener('mousemove', this.onSplitterMouseMove);
+      document.removeEventListener('mouseup', this.onSplitterMouseUp);
+      document.removeEventListener('touchmove', this.onSplitterTouchMove);
+      document.removeEventListener('touchend', this.onSplitterTouchEnd);
+      this.#dragging = false;
+    }
   }
 
   disconnectedCallback() {
-    this.#resetListeners();
+    this.#resetDragListeners();
+    this.#resetSplitterListeners();
     super.disconnectedCallback();
   }
 
@@ -153,15 +165,8 @@ export class GridSplit extends Part {
    */
   setupSplitter() {
 
-    // Clean up any previous listeners
-    if (this.splitter) {
-      this.splitter.removeEventListener('mousedown', this.onSplitterMouseDown);
-      this.splitter.removeEventListener('touchstart', this.onSplitterTouchStart);
-    }
-    document.removeEventListener('mousemove', this.onSplitterMouseMove);
-    document.removeEventListener('mouseup', this.onSplitterMouseUp);
-    document.removeEventListener('touchmove', this.onSplitterTouchMove);
-    document.removeEventListener('touchend', this.onSplitterTouchEnd);
+    this.#resetDragListeners();
+    this.#resetSplitterListeners();
 
     if(this.splitLeftCols+this.splitRightCols > 12) {
       this.useFallback("exceeds 12");
@@ -179,8 +184,8 @@ export class GridSplit extends Part {
 
     this.splitter.addEventListener('mousedown', this.onSplitterMouseDown);
     this.splitter.addEventListener('touchstart', this.onSplitterTouchStart, { passive: false });
-
-    console.log("GridSplit initialized with splitter", this.splitter);
+    this.#splitterListening = true;
+    // console.log("GridSplit initialized with splitter", this.splitter);
   }
 
   /**
@@ -195,6 +200,7 @@ export class GridSplit extends Part {
     this.startLeftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
     document.addEventListener('mousemove', this.onSplitterMouseMove);
     document.addEventListener('mouseup', this.onSplitterMouseUp);
+    this.#dragging = true;
   };
 
   /**
@@ -212,10 +218,7 @@ export class GridSplit extends Part {
    * Removes the mousemove and mouseup event listeners to stop resizing.
    */
   onSplitterMouseUp(){
-    console.log("Splitter mouse up");
-    document.removeEventListener('mousemove', this.onSplitterMouseMove);
-    document.removeEventListener('mouseup', this.onSplitterMouseUp);
-    console.log("Splitter resizing ended");
+    this.#resetDragListeners();
   };
 
   /**
@@ -230,6 +233,7 @@ export class GridSplit extends Part {
     this.startLeftCols = parseInt(getComputedStyle(this.row).getPropertyValue('--grid-splitter-left-cols'), 10);
     document.addEventListener('touchmove', this.onSplitterTouchMove, { passive: false });
     document.addEventListener('touchend', this.onSplitterTouchEnd);
+    this.#dragging = true;
   };
 
   /**
@@ -249,9 +253,7 @@ export class GridSplit extends Part {
    * This is necessary to clean up after the touch interaction ends.
    */
   onSplitterTouchEnd = () => {
-    console.log("Splitter touch end");
-    document.removeEventListener('touchmove', this.onSplitterTouchMove);
-    document.removeEventListener('touchend', this.onSplitterTouchEnd);
+    this.#resetDragListeners();
   };
 
   /**
@@ -281,7 +283,9 @@ export class GridSplit extends Part {
         <div class="resizable-col-left-top" style="grid-column: span var(--grid-splitter-left-cols);">
           <slot name="left-top"></slot>
         </div>
+
         <div class="resizable-col-splitter" title="Resize"></div>
+
         <div class="resizable-col-right-bottom" style="grid-column: span var(--grid-splitter-right-cols);">
           <slot name="right-bottom"></slot>
         </div>
