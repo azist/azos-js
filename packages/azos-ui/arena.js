@@ -298,6 +298,7 @@ export class Arena extends AzosElement {
     this.#applet.args = args;//pass launch args
     this.#applet.session = session;//pass effective session context
     this.requestUpdate();
+    await this.#applet.appletMountedCallback();//call applet mounted hook
     return true;
   }
 

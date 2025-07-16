@@ -75,6 +75,22 @@ export class Applet extends AzosElement {
     return true;
   }
 
+
+  /**
+   * This callback is called by the arena when the applet is fully mounted. The default implementation asyncronusly delegates
+   *  the actual work into {@link appletBootstrap} which can be overridden to perform the actual applet spcific logic upon first mount.
+   * You would rarely override this method, but rather override {@link appletBootstrap} to perform actions after the applet is fully mounted.
+   */
+  appletMountedCallback() {
+    queueMicrotask( () => this.appletBootstrap() );
+  }
+
+  /**
+   * Override this method to perform actions after applet has been fully mounted in the arena and args, session, and other variables are set can be relied upon
+   * Can be Async or sync - by default no one waits for the completion
+   */
+  appletBootstrap(){}
+
   /** Returns a logical schema name for the applet, which is used as a default if no inner schemas are defined */
   get [DATA_SCHEMA_PROP](){ return `${this.constructor.name}`; }
 
