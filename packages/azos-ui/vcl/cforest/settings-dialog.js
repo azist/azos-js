@@ -83,7 +83,7 @@ class CfgForestSettings extends ModalDialog {
    * @returns {HTMLTemplateElement} - The HTML option element.
    */
   #optToOption(opt, selected = false) {
-    return html`<option value="${opt.id}" .selected="${selected}" title="${opt.title}">${opt.title}</option>`;
+    return html`<option value="${opt.id}" .selected="${selected}" title="${opt.id}">${opt.id}</option>`;
   }
 
   renderBodyContent(){

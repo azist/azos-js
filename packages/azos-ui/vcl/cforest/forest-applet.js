@@ -1,27 +1,25 @@
-import STL_INLINE_GRID from "azos-ui/styles/grid";
-import { html, css } from "azos-ui/ui";
-import { Applet } from "azos-ui/applet";
-import { Block } from "azos-ui/blocks";
-import { Command } from "azos-ui/cmd";
-import { Spinner } from "azos-ui/spinner";
+import STL_INLINE_GRID from "../../styles/grid";
+import * as aver from "azos/aver";
+import { html, css } from "../../ui";
+import { Applet } from "../../applet";
+import { Block } from "../../blocks";
+import { Command } from "../../cmd";
+import { Spinner } from "../../spinner";
+import "../../bit";
+import "../../vcl/util/object-inspector";
+import "../../vcl/tabs/tab-view";
+import "../../vcl/tabs/tab";
+import "../../vcl/tree-view/async-tree-view";
+import "../../parts/select-field";
+import "../../parts/grid-split"
+
+import "./node-summary";
+import "./node-breadcrumbs";
+import "./settings-dialog";
+import "./versions-dialog";
+
+import { CfgForestTreeNode } from "./tree-nodes.js";
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
-
-import "azos-ui/bit";
-import "azos-ui/vcl/util/object-inspector";
-import "azos-ui/vcl/tabs/tab-view";
-import "azos-ui/vcl/tabs/tab";
-import "azos-ui/parts/select-field";
-
-import "azos-ui/parts/grid-split"
-
-import "azos-ui/vcl/cforest/node-summary";
-import "azos-ui/vcl/cforest/node-breadcrumbs";
-import "azos-ui/vcl/cforest/settings-dialog";
-import "azos-ui/vcl/cforest/versions-dialog";
-
-import "azos-ui/vcl/cforest/forest-treeview";
-import { isAssigned } from "azos/types";
-
 
 /**
  * CfgForestApplet is an applet that provides a user interface for exploring and managing configuration forests, their trees, and their nodes.
@@ -66,7 +64,7 @@ export class CfgForestApplet extends Applet  {
     }
 
     .minHeightEnforced {
-      min-height: 30vh;
+      min-height: 60vh;
     }
 
     @media (max-width: 600px) {
@@ -76,20 +74,13 @@ export class CfgForestApplet extends Applet  {
    }
   `];
 
-  #ref = { forestClient: ForestSetupClient };
+  #client = null;
 
   // Holds the forests and their trees
-  #forests = [
-    { id: "test-f1", title: "Test Forest 1", trees: [] },
-    { id: "g8corp", title: "G8 Corporation", trees: [] }
-  ];
+  // will be updated after the firstUp2dated
+  #forests = [];
   get forests() { return this.#forests; }
-
-  /**
-   * Cache for nodes to avoid redundant requests
-   */
-  #nodeCache = new Map(); // Map<id, nodeData>
-  #nodeTreeMap = new Map(); // Map<parentId, childrenData[] >
+  set forests(value) { this.#forests = value; }
 
   /**
    * Holds the currently selected forest id
@@ -130,6 +121,10 @@ export class CfgForestApplet extends Applet  {
    */
   #activeNodeId = null;
   get activeNodeId() { return this.#activeNodeId; }
+  set activeNodeId(value) {
+    if(this.#activeNodeId === value) return;
+    this.#activeNodeId = value;
+  }
 
   /**
    * Holds the currently selected node data
@@ -168,7 +163,6 @@ export class CfgForestApplet extends Applet  {
     }
   });
 
-
   /**
    * Command to refresh the forest tree view.
    * It reloads the root node and updates the tree view.
@@ -190,7 +184,6 @@ export class CfgForestApplet extends Applet  {
    */
   #applyForestSettings = async ({ forest, tree, asOfUtc }) => {
     console.log(`Applying settings: Forest=${forest}, Tree=${tree}, AsOfDate=${asOfUtc}`);
-
     if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
     this.activeForest = forest;
     this.activeTree = tree;
@@ -199,37 +192,46 @@ export class CfgForestApplet extends Applet  {
     this.refreshTree();
   }
 
+  /**
+   * Bootstrap the applet by initializing the client and tree view.
+   */
+  async appletBootstrap() {
+    aver.isObject(this.args, "CfgForestApplet args obj");
+    aver.isArray(this.args.forestIds, "args.forestIds arr");
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.link(this.#ref);
-    this.arena.installToolbarCommands([ this.#forestSettingsCmd, this.#forestRefreshCmd]);
-
-    const bootstrap = async () => {
-      await Spinner.exec(async()=> {
-        await this.#loadRootNode();
-        this.#addTreeViewEventListeners();
-      },"Loading forests/trees");
+    this.#forests = this.args.forestIds.map(f => ({ id: f, trees: []}));
+    if(this.args.client instanceof ForestSetupClient) {
+      this.#client = this.args.client;
+    } else {
+      aver.isString(this.args.client, "args.client str");
+      this.#client = this.arena.app.moduleLinker.resolve(ForestSetupClient, this.args.client);
     }
 
-    bootstrap();
+    // Perform any actions needed after the applet is mounted
+    this.arena.installToolbarCommands([ this.#forestSettingsCmd, this.#forestRefreshCmd]);
+    await this.#loadForestsTrees();
+    await this.#initializeTreeView();
   }
 
-  /**
-   * Attaches event listeners to the tree view explorer for user actions.
-   * Events tracked include focusChanged, click, dblclick, opened, closed.
-   */
-  #addTreeViewEventListeners(){
-    this.tvExplorer.addEventListener("nodeUserAction", (e) => {
-      e.stopPropagation();
-      const { node, action } = e.detail;
-      // console.log("Node User Action:", action, node);
+  async #loadForestsTrees() {
+    // get all the trees for each forest and update the forests
+    for (let forestIdx = 0; forestIdx <  this.forests.length; forestIdx++) {
+      this.forests[forestIdx].trees = await this.#client.treeList(this.forests[forestIdx].id) || [];
+      aver.isArray(this.forests[forestIdx].trees, "Forest trees must be an array");
+      console.log("Loaded trees for forest:", this.forests[forestIdx].id);
+    }
 
-      if(action === "click") {
-        this.setActiveNodeId(node.data.Id, node);
-        this.tvExplorer.selectedNode = node;
-      }
-    });
+    this.#forest = this.activeForest || this.forests[0].id;
+    this.#tree = this.activeTree || this.forests[0].trees[0];
+    this.#asOfUtc = this.activeAsOfUtc || null;
+  }
+
+  async tvNodeSelected(node) {
+    // console.log(`tvNodeSelected node: ${node.title}`, node);
+    this.activeNodeData = node.data;
+    this.activeNodeId = node.data.Id;
+    this.arena.requestUpdate();
+    this.requestUpdate();
   }
 
   /**
@@ -238,37 +240,40 @@ export class CfgForestApplet extends Applet  {
    * and fetches the root node by its path. The root node is then added to the
    * tree view explorer and set as the active/selected node.
    */
-  async #loadRootNode(){
-    this.#nodeCache.clear();
-    this.#nodeTreeMap.clear();
+  async #initializeTreeView(){
 
-    for (let forestIdx = 0; forestIdx < this.#forests.length; forestIdx++) {
-      this.#forests[forestIdx].trees = await this.#ref.forestClient.treeList(this.#forests[forestIdx].id);
-    }
+    // share the client with our treeview
+    this.tvExplorer.client = this.#client;
 
-    this.#forest = this.activeForest || this.#forests[0].id;
-    this.#tree = this.activeTree || this.#forests[0].trees[0];
-    this.#asOfUtc = this.activeAsOfUtc || null;
+    // bind our select hook for the tree view to our node selection handler
+    this.tvExplorer.selectedCallback = (node) => this.tvNodeSelected(node);
 
-    const rootNodeInfo = await this.#getNodeByPath(this.#forest, this.#tree, "/", this.#asOfUtc);
-    this.#nodeCache.set(rootNodeInfo.Id, rootNodeInfo);
-    this.#activeNodeData = rootNodeInfo;
-    this.#activeNodeId = rootNodeInfo.Id;
+    // treeview settings
+    this.tvExplorer.settings = {
+      forests: this.forests,
+      activeForest: this.activeForest,
+      activeTree: this.activeTree,
+      activeAsOfUtc: this.activeAsOfUtc
+    };
 
-    let root = undefined;
-    if(this.tvExplorer){
-      root = this.tvExplorer.root.addChild(rootNodeInfo.PathSegment, {
+    await Spinner.exec(async()=> {
+      // clear any existing children
+      this.tvExplorer.root.removeAllChildren();
+
+      // Load the root node for the currently active forest and tree
+      const rootNodeInfo = await this.#client.probePath(this.#forest, this.#tree, "/", this.#asOfUtc);
+      const root = this.tvExplorer.root.addChild(rootNodeInfo.PathSegment, {
         data: { ...rootNodeInfo },
         showPath: false,
         canOpen: true,
         icon: "svg://azos.ico.home",
         endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${this.formatDT(rootNodeInfo?.DataVersion?.Utc)} UTC</span>`,
-      });
-      this.tvExplorer.requestUpdate();
-    }
+      }, CfgForestTreeNode);
 
-    await this.#loadNodeChildren( rootNodeInfo.Id, 1, root);
-    this.setActiveNodeId(rootNodeInfo.Id, root);
+      root.isNodeInfoLoaded = true;
+      this.tvExplorer.selectedNode = root
+      this.tvExplorer.requestUpdate();
+    },"Loading forests/trees");
   }
 
   /**
@@ -278,163 +283,21 @@ export class CfgForestApplet extends Applet  {
    * It ensures that the tree view is updated to reflect the active node and its ancestors.
    */
   async #loadNodeAncestors(targetNodeId) {
-    const targetNodeData = await this.#getNodeById(targetNodeId, this.#asOfUtc);
+    const targetNodeData = await this.#client.nodeInfo(targetNodeId, this.#asOfUtc);
     const paths = targetNodeData.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
 
     for (let i = 0; i < paths.length; i++) {
       const path = paths[i];
       const visibleNodes = this.tvExplorer.getAllVisibleNodes();
-      const parentNode = visibleNodes.filter(n => n.data.FullPath === path);
-      for (const node of parentNode) {
-        await this.setActiveNodeId(node.data.Id, node);
+
+      const parentNode = visibleNodes.find(n => n.data.FullPath === path);
+      if(parentNode) await parentNode.open(true);
+      if(i === paths.length - 1) {
+        this.tvExplorer.selectedNode = parentNode;
+        this.activeNodeData = parentNode.data;
+        this.activeNodeId = parentNode.data.Id;
       }
     }
-  }
-
-
-  /**
-   * Loads the children of a given node.
-   * This method checks if the node's children are already cached, and if not, it retrieves them from the server.
-   * It then creates child nodes in the tree view explorer and recursively loads their children if necessary.
-   * If the node has no children, it updates the parent node's properties to reflect that it cannot be opened or closed,
-   * and sets its icon to indicate that it is a draft node.
-   */
-  async #loadNodeChildren(parentId, depth = 1, parentNode = null) {
-    if(depth === 0 || this.#nodeTreeMap.has(parentId)) return;
-
-    const children = await this.#getChildrenNodesById(parentId);
-    this.#nodeTreeMap.set(parentId, children);
-    if(!children || children.length === 0) {
-      if(parentNode) {
-        parentNode.canOpen = false;
-        parentNode.canClose = false;
-        parentNode.opened = false;
-        parentNode.showChevron = false;
-        parentNode.icon = "svg://azos.ico.draft";
-        this.tvExplorer.requestUpdate();
-      }
-      return;
-    }
-
-    for (const child of children) {
-      const childNodeInfo = await this.#getNodeById(child.Id, this.#asOfUtc);
-      if (!childNodeInfo) {
-        parentNode.canOpen = false;
-        parentNode.opened = false;
-        this.tvExplorer.requestUpdate();
-        continue;
-      }
-
-      const childNode = parentNode.addChild(childNodeInfo.PathSegment, {
-        data: { ...childNodeInfo },
-        showPath: false,
-        // canOpen: false,
-        // opened: false,
-        // showChevron: false,
-        endContent: html`<span title="${childNodeInfo?.DataVersion?.State}">${this.formatDT(childNodeInfo?.DataVersion?.Utc)} UTC</span>`,
-      });
-
-      parentNode.canOpen = true;
-      parentNode.canClose = true;
-      parentNode.icon = parentNode.isOpen ? "svg://azos.ico.folderOpen" : "svg://azos.ico.folder";
-      parentNode.open();
-
-      await this.#loadNodeChildren(child.Id, depth - 1, childNode);
-    }
-    this.#updateNodeIcons();
-    this.tvExplorer.requestUpdate();
-  }
-
-  /**
-   * Retrieves the children nodes of a given parent node by its ID.
-   * It checks if the children are already cached in the nodeTreeMap.
-   * If cached, it returns the cached children; otherwise, it fetches them from the server.
-   * The method ensures that the children are returned as an array, even if there is
-   * only a single child node.
-   * @param {string} parentId - The ID of the parent node for which to retrieve children.
-   * @returns {Promise<Array>} - A promise that resolves to an array of child nodes
-   */
-  async #getChildrenNodesById(parentId) {
-    const isCached = this.#nodeTreeMap.has(parentId);
-    if(isCached){
-      const childrenFromCache = this.#nodeTreeMap.get(parentId);
-      return Array.isArray(childrenFromCache) ? childrenFromCache : [ childrenFromCache ];
-      // @todo: look into why setting the children as an array with a single object gets only the object
-    }
-
-    const children = await this.#ref.forestClient.childNodeList(parentId) || [];
-    this.#nodeTreeMap.set(parentId, children);
-    return Array.isArray(children) ? children : [ children ];
-  }
-
-
-  /**
-   * Retrieves a node by its path in the specified forest and tree.
-   * @param {string} idForest - The ID of the forest to which the tree belongs.
-   * @param {string} idTree - The ID of the tree to which the node belongs.
-   * @param {string} path - The path of the node to retrieve, defaults to '/'.
-   * @param {string|null} asOfUtc - The UTC timestamp to retrieve the node as of, defaults to the current asOfUtc.
-   * @param {AbortSignal|null} abortSignal - Optional signal to abort the request.
-   * @returns {Promise<Object>}
-   */
-  async #getNodeByPath(idForest, idTree, path = '/', asOfUtc = this.#asOfUtc, abortSignal = null) {
-    let node = await this.#ref.forestClient.probePath(idForest, idTree, path, asOfUtc, abortSignal);
-    return node;
-  }
-
-  /**
-   * Retrieves a node by its ID and asOfUtc timestamp.
-   * @param {string} id - The ID of the node to retrieve.
-   * @param {string|null} asOfUtc - The UTC timestamp to retrieve the node as of.
-   * @param {AbortSignal|null} abortSignal - Optional signal to abort the request
-   * @return {Promise<Object>} - A promise that resolves to the node data.
-   */
-  async #getNodeById(id = '0:0:1', asOfUtc = this.#asOfUtc, abortSignal = null) {
-    let node = await this.#ref.forestClient.nodeInfo(id, asOfUtc, abortSignal);
-    return node;
-  }
-
-  #updateNodeIcons() {
-    // dirty fix for nodes
-    this.tvExplorer.getAllVisibleNodes().forEach(node => {
-      const nodeId = node.data?.Id;
-      if(!nodeId) return;
-      const fromTreeMap = this.#nodeTreeMap.get(nodeId);
-      if(!fromTreeMap) return;
-      if(fromTreeMap.length > 0) {
-        node.canOpen = true;
-        node.canClose = true;
-        node.opened = true;
-        node.icon = !node.isOpen ? "svg://azos.ico.folderOpen" : "svg://azos.ico.folder";
-      } else {
-        node.canOpen = false;
-        node.canClose = false;
-        node.opened = false;
-        node.icon = "svg://azos.ico.draft";
-      }
-    });
-    this.tvExplorer.requestUpdate();
-  }
-
-  /**
-   * Sets the active node ID and updates the UI accordingly.
-   * @param {*} id - The ID of the node to set as active.
-   * @param {*} originNode - The original node from which the action was initiated.
-   * @returns {Promise<void>}
-   */
-  async setActiveNodeId(id, originNode = null) {
-    if(!id) return;
-    this.#activeNodeId = id;
-    this.#activeNodeData = this.#nodeCache.get(id) || null;
-    if(!this.#nodeCache.get(id)) {
-      this.#activeNodeData = await this.#getNodeById(id, this.#asOfUtc);
-      this.#nodeCache.set(id, this.#activeNodeData);
-    }
-    await Spinner.exec(async()=> { await this.#loadNodeChildren(id, 1, originNode); }, "Loading node children");
-    this.tvExplorer.selectedNode = originNode ? originNode : this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === id);
-
-    this.arena.requestUpdate();
-    this.requestUpdate();
   }
 
   /**
@@ -446,27 +309,22 @@ export class CfgForestApplet extends Applet  {
     const currentNode = { ...this.activeNodeData };
 
     await Spinner.exec(async()=> {
-      this.tvExplorer.root.removeAllChildren();
-      await this.#loadRootNode();
-
+      await this.#initializeTreeView();
       if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
         await this.#loadNodeAncestors(currentNode.Id);
-        await this.setActiveNodeId(currentNode.Id);
       } else {
-        await this.setActiveNodeId(this.tvExplorer.root.data.Id, this.tvExplorer.root);
+        this.activeNodeData = this.tvExplorer.root.data;
+        this.activeNodeId = this.tvExplorer.root.data.Id;
       }
     }, "Loading forests/trees");
   }
 
-
   async breadCrumbCrumbClick(crumbPath) {
     const currentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.FullPath === crumbPath);
-    this.setActiveNodeId(currentNode?.data?.Id);
     this.tvExplorer.selectedNode = currentNode;
   }
 
-  formatDT = dt => isAssigned(dt) ? this.arena.app.localizer.formatDateTime({ dt, dtFormat: "NumDate", tmDetails: "HM" }) : null;
-
+  formatDT = dt => dt ? this.arena.app.localizer.formatDateTime({ dt, dtFormat: "NumDate", tmDetails: "HM" }) : null;
 
   render(){
     const asOfDisplay = this.activeAsOfUtc;
@@ -477,7 +335,7 @@ export class CfgForestApplet extends Applet  {
     return html`
       <az-forest-settings-dialog id="dlgSettings" scope="this" title="Explorer Settings"
         .settings="${{
-          forests: this.#forests,
+          forests: this.forests,
           activeForest: this.activeForest,
           activeTree: this.activeTree,
           activeAsOfUtc: this.activeAsOfUtc
@@ -494,16 +352,15 @@ export class CfgForestApplet extends Applet  {
         .onCFSettingsClick="${() => this.#forestSettingsCmd.exec(this.arena)}"
       ></az-cforest-breadcrumbs>
 
-
       <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8">
         <div slot="left-top">
-
           <div class="cardBasic">
-            ${showAsOf}
-            <hr style="opacity: 0.5;"/>
-            <az-cforest-view id="tvExplorer" scope="this" class="minHeightEnforced"></az-cforest-view>
+            ${showAsOf}<hr style="opacity: 0.5;"/>
+            <az-async-tree-view
+              id="tvExplorer"
+              scope="this"
+              class="minHeightEnforced"></az-async-tree-view>
           </div>
-
         </div>
         <div slot="right-bottom">
 
