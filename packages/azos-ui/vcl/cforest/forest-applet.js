@@ -9,7 +9,7 @@ import "../../bit";
 import "../../vcl/util/object-inspector";
 import "../../vcl/tabs/tab-view";
 import "../../vcl/tabs/tab";
-import "../../vcl/tree-view/async-tree-view";
+import "../../vcl/tree-viewN/tree-view"
 import "../../parts/select-field";
 import "../../parts/grid-split"
 
@@ -18,7 +18,6 @@ import "./node-breadcrumbs";
 import "./settings-dialog";
 import "./versions-dialog";
 
-import { CfgForestTreeNode } from "./tree-nodes.js";
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
 
 /**
@@ -227,9 +226,11 @@ export class CfgForestApplet extends Applet  {
   }
 
   async tvNodeSelected(node) {
-    // console.log(`tvNodeSelected node: ${node.title}`, node);
+    console.log(`tvNodeSelected node: ${node.title}`, node);
     this.activeNodeData = node.data;
     this.activeNodeId = node.data.Id;
+    this.addNodeInfo(node);
+    this.addChildrenNodes(node);
     this.arena.requestUpdate();
     this.requestUpdate();
   }
@@ -237,24 +238,14 @@ export class CfgForestApplet extends Applet  {
   /**
    * Loads the root node of the currently active forest and tree.
    * It clears the node cache and tree map, retrieves the trees for each forest,
-   * and fetches the root node by its path. The root node is then added to the
+   * and fetches the root node by its path. The -root node is then added to the
    * tree view explorer and set as the active/selected node.
    */
   async #initializeTreeView(){
 
-    // share the client with our treeview
-    this.tvExplorer.client = this.#client;
-
     // bind our select hook for the tree view to our node selection handler
-    this.tvExplorer.selectedCallback = (node) => this.tvNodeSelected(node);
-
-    // treeview settings
-    this.tvExplorer.settings = {
-      forests: this.forests,
-      activeForest: this.activeForest,
-      activeTree: this.activeTree,
-      activeAsOfUtc: this.activeAsOfUtc
-    };
+    this.tvExplorer.selectedCallback = this.tvNodeSelected.bind(this);
+    this.tvExplorer.openedCallback = this.tvNodeSelected.bind(this);
 
     await Spinner.exec(async()=> {
       // clear any existing children
@@ -268,14 +259,56 @@ export class CfgForestApplet extends Applet  {
         canOpen: true,
         icon: "svg://azos.ico.home",
         endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${this.formatDT(rootNodeInfo?.DataVersion?.Utc)} UTC</span>`,
-      }, CfgForestTreeNode);
-
+      });
       root.isNodeInfoLoaded = true;
-      this.tvExplorer.selectedNode = root
+      this.tvExplorer.selectNode(root);
       this.tvExplorer.requestUpdate();
     },"Loading forests/trees");
   }
 
+  async addChildrenNodes(parentNode){
+    if(parentNode.isChildNodeListLoaded) return;
+    parentNode.isChildNodeListLoaded = true;
+
+
+    aver.isObject(parentNode, "parentNode obj");
+    aver.isObject(parentNode.data, "parentNode.data obj");
+    aver.isString(parentNode.data.Id, "parentNode.data.Id str");
+
+    const childNodeList = await this.#client.childNodeList(parentNode.data.Id, this.activeAsOfUtc) || [];
+
+    if(childNodeList.length > 0) {
+      for(let index = 0; index < childNodeList.length; index++) {
+        const child = childNodeList[index];
+        const childNodeInfo = await this.#client.nodeInfo(child.Id);
+        const grandChildNodeList = await this.#client.childNodeList(child.Id, this.activeAsOfUtc) || [];
+        const childNode = parentNode.addChild(child.PathSegment, {
+          data: { ...childNodeInfo },
+          showPath: false,
+          canOpen: grandChildNodeList.length > 0,
+          endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${childNodeInfo.DataVersion.Utc} UTC</span>`,
+        });
+
+        if(!grandChildNodeList.length > 0) childNode.icon = "svg://azos.ico.draft";
+      }
+    }
+    parentNode.isChildNodeListLoaded = true;
+    parentNode.isLoadingDetails = false;
+    this.tvExplorer.requestUpdate();
+  }
+
+  async addNodeInfo(node){
+    if(node.isNodeInfoLoaded) return;
+    node.isNodeInfoLoaded = true;
+    const nodeInfo = await this.#client.nodeInfo(node.data.Id);
+    node.data = { ...node.data, ...nodeInfo  };
+    node.endContent = html`<span title="${node.data.DataVersion?.State}">${node.data.DataVersion.Utc} UTC</span>`;
+    this.tvExplorer.requestUpdate();
+    if(this.isSelected) this.tvExplorer.selectedCallback(node);
+  }
+
+
+  //! todo: implement this without relying on the node's data.FullPath
   /**
    * Loads the ancestors of a given node.
    * This method retrieves the full path of the target node,
@@ -287,15 +320,28 @@ export class CfgForestApplet extends Applet  {
     const paths = targetNodeData.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
 
     for (let i = 0; i < paths.length; i++) {
-      const path = paths[i];
       const visibleNodes = this.tvExplorer.getAllVisibleNodes();
 
+      const path = paths[i];
       const parentNode = visibleNodes.find(n => n.data.FullPath === path);
-      if(parentNode) await parentNode.open(true);
-      if(i === paths.length - 1) {
+
+      console.log(`Loading ancestor path: ${paths[i]}`, parentNode);
+      if(parentNode) {
+        this.tvExplorer.selectNode(parentNode);
+
+        parentNode.open();
+        this.tvExplorer.requestUpdate();
+
         this.tvExplorer.selectedNode = parentNode;
-        this.activeNodeData = parentNode.data;
-        this.activeNodeId = parentNode.data.Id;
+        parentNode.isSelected = true;
+
+        this.tvExplorer.requestUpdate();
+
+        if(i === paths.length - 1) {
+          this.activeNodeData = parentNode.data;
+          this.activeNodeId = parentNode.data.Id;
+        }
+
       }
     }
   }
@@ -356,10 +402,7 @@ export class CfgForestApplet extends Applet  {
         <div slot="left-top">
           <div class="cardBasic">
             ${showAsOf}<hr style="opacity: 0.5;"/>
-            <az-async-tree-view
-              id="tvExplorer"
-              scope="this"
-              class="minHeightEnforced"></az-async-tree-view>
+            <az-tree-view-n id="tvExplorer" scope="this" class="minHeightEnforced"></az-tree-view-n>
           </div>
         </div>
         <div slot="right-bottom">
