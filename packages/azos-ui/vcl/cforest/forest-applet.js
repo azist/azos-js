@@ -6,9 +6,11 @@ import { Block } from "../../blocks";
 import { Command } from "../../cmd";
 import { Spinner } from "../../spinner";
 import "../../bit";
-import "../../vcl/util/object-inspector";
+// import "../../vcl/util/object-inspector";
+import "../../vcl/util/code-box";
 import "../../vcl/tabs/tab-view";
 import "../../vcl/tabs/tab";
+
 import "../../vcl/tree-viewN/tree-view"
 import "../../parts/select-field";
 import "../../parts/grid-split"
@@ -238,7 +240,7 @@ export class CfgForestApplet extends Applet  {
   /**
    * Loads the root node of the currently active forest and tree.
    * It clears the node cache and tree map, retrieves the trees for each forest,
-   * and fetches the root node by its path. The -root node is then added to the
+   * and fetches the root node by its path. The root node is then added to the
    * tree view explorer and set as the active/selected node.
    */
   async #initializeTreeView(){
@@ -270,7 +272,6 @@ export class CfgForestApplet extends Applet  {
     if(parentNode.isChildNodeListLoaded) return;
     parentNode.isChildNodeListLoaded = true;
 
-
     aver.isObject(parentNode, "parentNode obj");
     aver.isObject(parentNode.data, "parentNode.data obj");
     aver.isString(parentNode.data.Id, "parentNode.data.Id str");
@@ -286,7 +287,7 @@ export class CfgForestApplet extends Applet  {
           data: { ...childNodeInfo },
           showPath: false,
           canOpen: grandChildNodeList.length > 0,
-          endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${childNodeInfo.DataVersion.Utc} UTC</span>`,
+          endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)} UTC</span>`,
         });
 
         if(!grandChildNodeList.length > 0) childNode.icon = "svg://azos.ico.draft";
@@ -302,7 +303,7 @@ export class CfgForestApplet extends Applet  {
     node.isNodeInfoLoaded = true;
     const nodeInfo = await this.#client.nodeInfo(node.data.Id);
     node.data = { ...node.data, ...nodeInfo  };
-    node.endContent = html`<span title="${node.data.DataVersion?.State}">${node.data.DataVersion.Utc} UTC</span>`;
+    node.endContent = html`<span title="${node.data.DataVersion?.State}">${this.formatDT(node.data.DataVersion.Utc)} UTC</span>`;
     this.tvExplorer.requestUpdate();
     if(this.isSelected) this.tvExplorer.selectedCallback(node);
   }
@@ -327,9 +328,10 @@ export class CfgForestApplet extends Applet  {
 
       console.log(`Loading ancestor path: ${paths[i]}`, parentNode);
       if(parentNode) {
-        this.tvExplorer.selectNode(parentNode);
+        // this.tvExplorer.selectNode(parentNode);
 
-        parentNode.open();
+        parentNode.isVisible = true;
+        // parentNode.open();
         this.tvExplorer.requestUpdate();
 
         this.tvExplorer.selectedNode = parentNode;
@@ -371,7 +373,7 @@ export class CfgForestApplet extends Applet  {
   }
 
   formatDT = dt => dt ? this.arena.app.localizer.formatDateTime({ dt, dtFormat: "NumDate", tmDetails: "HM" }) : null;
-
+  formatCV = cv => cv ?  JSON.stringify(JSON.parse(cv), null, 2) : "{}";
   render(){
     const asOfDisplay = this.activeAsOfUtc;
     const showAsOf = !this.activeAsOfUtc
@@ -413,20 +415,20 @@ export class CfgForestApplet extends Applet  {
 
           <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>
             <az-tab title="Selected Node" .canClose="${false}">
-              <az-object-inspector id="objectInspector0" scope="self"
-                .source=${this.#activeNodeData}></az-object-inspector>
+              <az-code-box id="objectInspector0" scope="self" highlight="json"
+                .source=${JSON.stringify(this.#activeNodeData, null, 2)}></az-code-box>
             </az-tab>
             <az-tab title="Level Config" .canClose="${false}">
-              <az-object-inspector id="objectInspector1" scope="self"
-                .source=${this.#activeNodeData?.LevelConfig ? JSON.parse(this.#activeNodeData?.LevelConfig) : {}}></az-object-inspector>
+              <az-code-box id="objectInspector1" scope="self" highlight="json"
+                .source=${this.formatCV(this.#activeNodeData?.LevelConfig)}></az-code-box>
             </az-tab>
             <az-tab title="Effective Config" .canClose="${false}">
-              <az-object-inspector id="objectInspector2" scope="self"
-                .source=${this.#activeNodeData?.EffectiveConfig ? JSON.parse(this.#activeNodeData?.EffectiveConfig) : {}}></az-object-inspector>
+              <az-code-box id="objectInspector2" scope="self" highlight="json"
+                .source=${this.formatCV(this.#activeNodeData?.EffectiveConfig)}></az-code-box>
             </az-tab>
             <az-tab title="Properties" .canClose="${false}">
-              <az-object-inspector id="objectInspector3" scope="self"
-                .source=${this.#activeNodeData?.Properties ? JSON.parse(this.#activeNodeData?.Properties) : {}}></az-object-inspector>
+              <az-code-box id="objectInspector3" scope="self" highlight="json"
+                .source=${this.formatCV(this.#activeNodeData?.Properties)}></az-code-box>
             </az-tab>
           </az-tab-view>
 

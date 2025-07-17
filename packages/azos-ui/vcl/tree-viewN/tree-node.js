@@ -165,7 +165,5 @@ export class TreeNode extends DisposableObject {
     this.treeView.requestUpdate();
   }
 
-  selected() {
-    console.warn("TreeNode.selected() is not implemented. Override this method in subclasses to handle node selection.");
-  }
+  selected() {}
 }

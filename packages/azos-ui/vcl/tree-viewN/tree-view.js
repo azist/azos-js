@@ -170,7 +170,7 @@ export class TreeView extends Control {
    * @param {any} eArgs arguments passed to the event via detail
    */
   _dispatchNodeUserActionEvent(node, eArgs) {
-    console.log("CfgForestTreeView._dispatchNodeUserActionEvent", node, eArgs);
+    console.log("TreeView._dispatchNodeUserActionEvent", node, eArgs);
     if(eArgs?.action === "click") this.selectedNode = node;
     if(eArgs?.action === "opened") this.openedCallback?.(node);
     this.dispatchEvent(new CustomEvent("nodeUserAction", { detail: { node, ...eArgs } }))
