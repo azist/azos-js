@@ -88,10 +88,9 @@ ${this.doPromptUserInput ? html`
 export async function prompt(okCancelPrompt, { title, ok, cancel, okBtnStatus, status, rank } = {}, { doPromptUserInput, currentValue, title: inputTitle } = {}) {
   const modal = new OkCancelModal(okCancelPrompt, { title, ok, cancel, okBtnStatus, status, rank }, { doPromptUserInput, currentValue, inputTitle });
   document.body.appendChild(modal);
-  modal.update();
   try {
-    modal.show();
-    return await modal.shownPromise;
+    modal.update();
+    return await modal.show();
   } finally {
     document.body.removeChild(modal);
   }
