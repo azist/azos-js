@@ -1,8 +1,6 @@
-import { html, css, Control } from "azos-ui/ui";
-import { Block } from "azos-ui/blocks";
-import "azos-ui/vcl/util/object-inspector";
-import { writeToClipboard } from "azos-ui/vcl/util/clipboard";
-import { toast } from "azos-ui/toast";
+import { html, css, Control } from "../../ui";
+import { writeToClipboard } from "../util/clipboard";
+import { toast } from "../../toast";
 
 /**
  * Component for displaying node breadcrumbs in a forest context

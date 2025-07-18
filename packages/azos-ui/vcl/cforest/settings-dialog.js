@@ -1,6 +1,6 @@
-import { html, css } from "azos-ui/ui";
+import { html, css } from "../../ui";
 import { ModalDialog } from "../../modal-dialog.js";
-import "azos-ui/parts/select-field";
+import "../../parts/select-field";
 
 /**
  * Dialog for configuring forest settings, allowing users to select a forest, tree, and an optional date.

@@ -1,7 +1,7 @@
-import { html, css } from "azos-ui/ui";
+import { html, css } from "../../ui";
 import { ModalDialog } from "../../modal-dialog.js";
-import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
 import { Spinner } from "../../spinner";
+import { ForestSetupClient } from "../../../azos/sysvc/cforest/forest-setup-client";
 import "../../parts/select-field";
 
 /**

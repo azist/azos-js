@@ -6,7 +6,7 @@ import { Block } from "../../blocks";
 import { Command } from "../../cmd";
 import { Spinner } from "../../spinner";
 import "../../bit";
-// import "../../vcl/util/object-inspector";
+
 import "../util/code-box";
 import "../tabs/tab-view";
 import "../tabs/tab";
