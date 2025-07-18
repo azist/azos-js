@@ -158,11 +158,13 @@ export class ForestExplorerApplet extends Applet  {
     icon: "svg://azos.ico.database",
     title: "CfgForest Settings",
     handler: async () =>  {
-      const settings = (await this.dlgSettings.show({
-        forest: this.activeForest,
-        tree: this.activeTree,
-        asOfUtc: this.activeAsOfUtc
-      })).modalResult;
+      let args = {
+        forest:  this.ctx.activeForest,
+        tree:    this.ctx.activeTree,
+        asOfUtc: this.ctx.activeAsOfUtc
+      };
+
+      const settings = (await this.dlgSettings.show(args)).modalResult;
       if (!settings) return;
       await this.#applyForestSettings(settings);
     }
