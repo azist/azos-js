@@ -183,8 +183,8 @@ export class CfgForestApplet extends Applet  {
    * @param {string} settings.tree - The id of the tree to set as active.
    * @param {string|null} settings.asOfUtc - The UTC timestamp to set as active, or null for "now".
    */
-  #applyForestSettings = async ({ forest, tree, asOfUtc }) => {
-    console.log(`Applying settings: Forest=${forest}, Tree=${tree}, AsOfDate=${asOfUtc}`);
+  async #applyForestSettings ({ forest, tree, asOfUtc }){
+    // console.log(`Applying settings: Forest=${forest}, Tree=${tree}, AsOfDate=${asOfUtc}`);
     if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
     this.activeForest = forest;
     this.activeTree = tree;
@@ -210,16 +210,23 @@ export class CfgForestApplet extends Applet  {
 
     // Perform any actions needed after the applet is mounted
     this.arena.installToolbarCommands([ this.#forestSettingsCmd, this.#forestRefreshCmd]);
-    await this.#loadForestsTrees();
-    await this.#initializeTreeView();
+
+    await Spinner.exec(async () => {
+      await this.#loadForestsTrees();
+      await this.#initializeTreeView();
+      this.tvExplorer.selectNode(this.tvExplorer.root.children[0]);
+    }, "Loading forests/trees");
   }
 
+  /**
+   * Fetches trees for each forest and sets the active forest, tree, and asOfUtc.
+   */
   async #loadForestsTrees() {
     // get all the trees for each forest and update the forests
     for (let forestIdx = 0; forestIdx <  this.forests.length; forestIdx++) {
       this.forests[forestIdx].trees = await this.#client.treeList(this.forests[forestIdx].id) || [];
       aver.isArray(this.forests[forestIdx].trees, "Forest trees must be an array");
-      console.log("Loaded trees for forest:", this.forests[forestIdx].id);
+      // console.log("Loaded trees for forest:", this.forests[forestIdx].id);
     }
 
     this.#forest = this.activeForest || this.forests[0].id;
@@ -227,27 +234,44 @@ export class CfgForestApplet extends Applet  {
     this.#asOfUtc = this.activeAsOfUtc || null;
   }
 
-  async tvNodeSelected(node) {
-    console.log(`tvNodeSelected node: ${node.title}`, node);
-    this.activeNodeData = node.data;
-    this.activeNodeId = node.data.Id;
-    this.addNodeInfo(node);
-    this.addChildrenNodes(node);
-    this.arena.requestUpdate();
-    this.requestUpdate();
+  /**
+   * Updates the applet state when a tree view node is selected.
+   * Fetches the node's data and children nodes,
+   * and sets the active node data and id.
+   * @param {TreeNode} node - The selected tree node.
+   */
+  async updateOnNodeSelect(node) {
+    // console.log(`tvNodeSelected node: ${node.title}`, node);
+      this.activeNodeData = node.data;
+      this.activeNodeId = node.data.Id;
+
+      node.isLoading = true;
+      // const lastIcon = node.icon;
+      // node.icon = "svg://azos.ico.refresh";
+      this.tvExplorer.requestUpdate();
+
+      await this.addNodeInfo(node);
+      await this.addChildrenNodes(node);
+
+      node.open();
+
+      node.isLoading = false;
+      // node.icon = lastIcon;
+      this.tvExplorer.requestUpdate();
+      this.requestUpdate();
+      this.arena.requestUpdate();
   }
 
   /**
    * Loads the root node of the currently active forest and tree.
-   * It clears the node cache and tree map, retrieves the trees for each forest,
-   * and fetches the root node by its path. The root node is then added to the
-   * tree view explorer and set as the active/selected node.
+   * Retrieves the trees for each forest, and fetches the root node
+   * by its path. The root node is then added to the tree view
+   * explorer and set as the active/selected node.
    */
   async #initializeTreeView(){
-
     // bind our select hook for the tree view to our node selection handler
-    this.tvExplorer.selectedCallback = this.tvNodeSelected.bind(this);
-    this.tvExplorer.openedCallback = this.tvNodeSelected.bind(this);
+    this.tvExplorer.selectedCallback = this.updateOnNodeSelect.bind(this);
+    this.tvExplorer.openedCallback = this.updateOnNodeSelect.bind(this); // todo: handle open
 
     await Spinner.exec(async()=> {
       // clear any existing children
@@ -263,11 +287,13 @@ export class CfgForestApplet extends Applet  {
         endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${this.formatDT(rootNodeInfo?.DataVersion?.Utc)} UTC</span>`,
       });
       root.isNodeInfoLoaded = true;
-      this.tvExplorer.selectNode(root);
-      this.tvExplorer.requestUpdate();
     },"Loading forests/trees");
   }
 
+  /**
+   * Adds child nodes to the specified parent node.
+   * @param {TreeNode} parentNode - The parent node to add children to.
+   */
   async addChildrenNodes(parentNode){
     if(parentNode.isChildNodeListLoaded) return;
     parentNode.isChildNodeListLoaded = true;
@@ -279,18 +305,20 @@ export class CfgForestApplet extends Applet  {
     const childNodeList = await this.#client.childNodeList(parentNode.data.Id, this.activeAsOfUtc) || [];
 
     if(childNodeList.length > 0) {
+      parentNode.icon = "svg://azos.ico.folder";
+      parentNode.showChevron = true;
       for(let index = 0; index < childNodeList.length; index++) {
         const child = childNodeList[index];
         const childNodeInfo = await this.#client.nodeInfo(child.Id);
         const grandChildNodeList = await this.#client.childNodeList(child.Id, this.activeAsOfUtc) || [];
-        const childNode = parentNode.addChild(child.PathSegment, {
+        parentNode.addChild(child.PathSegment, {
           data: { ...childNodeInfo },
           showPath: false,
           canOpen: grandChildNodeList.length > 0,
+          hideChevron: true,
+          icon: grandChildNodeList.length > 0 ? "svg://azos.ico.folder" : "svg://azos.ico.draft",
           endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)} UTC</span>`,
         });
-
-        if(!grandChildNodeList.length > 0) childNode.icon = "svg://azos.ico.draft";
       }
     }
     parentNode.isChildNodeListLoaded = true;
@@ -316,37 +344,37 @@ export class CfgForestApplet extends Applet  {
    * splits it into segments, and iteratively sets each ancestor node as active in the tree view explorer.
    * It ensures that the tree view is updated to reflect the active node and its ancestors.
    */
-  async #loadNodeAncestors(targetNodeId) {
-    const targetNodeData = await this.#client.nodeInfo(targetNodeId, this.#asOfUtc);
-    const paths = targetNodeData.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
+  // async #loadNodeAncestors(targetNodeId) {
+  //   const targetNodeData = await this.#client.nodeInfo(targetNodeId, this.#asOfUtc);
+  //   const paths = targetNodeData.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
 
-    for (let i = 0; i < paths.length; i++) {
-      const visibleNodes = this.tvExplorer.getAllVisibleNodes();
+  //   for (let i = 0; i < paths.length; i++) {
+  //     const visibleNodes = this.tvExplorer.getAllVisibleNodes();
 
-      const path = paths[i];
-      const parentNode = visibleNodes.find(n => n.data.FullPath === path);
+  //     const path = paths[i];
+  //     const parentNode = visibleNodes.find(n => n.data.FullPath === path);
 
-      console.log(`Loading ancestor path: ${paths[i]}`, parentNode);
-      if(parentNode) {
-        // this.tvExplorer.selectNode(parentNode);
+  //     console.log(`Loading ancestor path: ${paths[i]}`, parentNode);
+  //     if(parentNode) {
+  //       // this.tvExplorer.selectNode(parentNode);
 
-        parentNode.isVisible = true;
-        // parentNode.open();
-        this.tvExplorer.requestUpdate();
+  //       parentNode.isVisible = true;
+  //       // parentNode.open();
+  //       this.tvExplorer.requestUpdate();
 
-        this.tvExplorer.selectedNode = parentNode;
-        parentNode.isSelected = true;
+  //       this.tvExplorer.selectedNode = parentNode;
+  //       parentNode.isSelected = true;
 
-        this.tvExplorer.requestUpdate();
+  //       this.tvExplorer.requestUpdate();
 
-        if(i === paths.length - 1) {
-          this.activeNodeData = parentNode.data;
-          this.activeNodeId = parentNode.data.Id;
-        }
+  //       if(i === paths.length - 1) {
+  //         this.activeNodeData = parentNode.data;
+  //         this.activeNodeId = parentNode.data.Id;
+  //       }
 
-      }
-    }
-  }
+  //     }
+  //   }
+  // }
 
   /**
    * Refreshes the entire tree view by reloading the root node and its children.
@@ -358,22 +386,28 @@ export class CfgForestApplet extends Applet  {
 
     await Spinner.exec(async()=> {
       await this.#initializeTreeView();
-      if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
-        await this.#loadNodeAncestors(currentNode.Id);
-      } else {
-        this.activeNodeData = this.tvExplorer.root.data;
-        this.activeNodeId = this.tvExplorer.root.data.Id;
-      }
+      this.tvExplorer.selectNode(this.tvExplorer.root.children[0]);
+
+      // if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
+      //   await this.#loadNodeAncestors(currentNode.Id);
+      // } else {
+      //   this.activeNodeData = this.tvExplorer.root.data;
+      //   this.activeNodeId = this.tvExplorer.root.data.Id;
+      // // }
+
     }, "Loading forests/trees");
   }
 
+  // Searches the tree view for a node with the specified path.
+  // If found, it selects the node and updates the active node data and id.
   async breadCrumbCrumbClick(crumbPath) {
     const currentNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.FullPath === crumbPath);
     this.tvExplorer.selectedNode = currentNode;
   }
 
-  formatDT = dt => dt ? this.arena.app.localizer.formatDateTime({ dt, dtFormat: "NumDate", tmDetails: "HM" }) : null;
-  formatCV = cv => cv ?  JSON.stringify(JSON.parse(cv), null, 2) : "{}";
+  formatDT = dt => dt ? this.arena.app.localizer.formatDateTime({ dt, dtFormat: "NumDate", tmDetails: "HM" }) : null; // formats the date to a human-readable format
+  formatCV = cv => cv ?  JSON.stringify(JSON.parse(cv), null, 2) : "{}"; // formats the config version to a JSON string
+
   render(){
     const asOfDisplay = this.activeAsOfUtc;
     const showAsOf = !this.activeAsOfUtc
@@ -415,20 +449,16 @@ export class CfgForestApplet extends Applet  {
 
           <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>
             <az-tab title="Selected Node" .canClose="${false}">
-              <az-code-box id="objectInspector0" scope="self" highlight="json"
-                .source=${JSON.stringify(this.#activeNodeData, null, 2)}></az-code-box>
+              <az-code-box id="objectInspector0" scope="self" highlight="json" .source=${JSON.stringify(this.#activeNodeData, null, 2)}></az-code-box>
             </az-tab>
             <az-tab title="Level Config" .canClose="${false}">
-              <az-code-box id="objectInspector1" scope="self" highlight="json"
-                .source=${this.formatCV(this.#activeNodeData?.LevelConfig)}></az-code-box>
+              <az-code-box id="objectInspector1" scope="self" highlight="json" .source=${this.formatCV(this.#activeNodeData?.LevelConfig)}></az-code-box>
             </az-tab>
             <az-tab title="Effective Config" .canClose="${false}">
-              <az-code-box id="objectInspector2" scope="self" highlight="json"
-                .source=${this.formatCV(this.#activeNodeData?.EffectiveConfig)}></az-code-box>
+              <az-code-box id="objectInspector2" scope="self" highlight="json" .source=${this.formatCV(this.#activeNodeData?.EffectiveConfig)}></az-code-box>
             </az-tab>
             <az-tab title="Properties" .canClose="${false}">
-              <az-code-box id="objectInspector3" scope="self" highlight="json"
-                .source=${this.formatCV(this.#activeNodeData?.Properties)}></az-code-box>
+              <az-code-box id="objectInspector3" scope="self" highlight="json" .source=${this.formatCV(this.#activeNodeData?.Properties)}></az-code-box>
             </az-tab>
           </az-tab-view>
 

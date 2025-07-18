@@ -89,21 +89,50 @@ export class TreeView extends Control {
       white-space: nowrap;
       font-size: var(--r3-fs);
     }
+
+
+
+
+
+    .treeNodeChildren .treeNodeChildren {
+      padding-left: 0.8em;
+    }
+
     .selected .treeNodeHeader {
       font-weight: bold;
       color: var(--s-info-fg-ctl);
       background: var(--s-info-bg-ctl);
     }
-    .treeNodeChildren {
 
+    .loadAnimation {
+      display: inline-block;
+      /* animation: spin 0.75s linear infinite; */
+      animation: pulseOpacity 0.75s linear infinite;
     }
-    .treeNodeChildren .treeNodeChildren {
-      padding-left: 0.8em;
+
+    @keyframes pulseOpacity {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+   }
+
+    @keyframes spin {
+      to { transform: rotate(360deg);
+    }
+
+    .loadingNode {
+      font-weight: 300;
+      color: var(--ghost);
     }
 
     svg.icon {
       --icon-stroke: var(--vcl-treeview-svg-stroke) !important;
     }
+
+    .loadingNode svg.icon {
+      --icon-stroke: var(--ghost) !important;
+      --icon-stroke-width: 1px !important;
+    }
+
   `];
 
   static properties = {
@@ -148,13 +177,12 @@ export class TreeView extends Control {
 
   get selectedNode() { return this.#selectedNode; }
   set selectedNode(node) {
-    if(!node) return;
+    if(!node || !node.isSelectable) return;
     if(this.#previouslySelectedNode) this.#previouslySelectedNode.isSelected = false;
     this.#previouslySelectedNode = node;
     this.#selectedNode = node;
     node.isSelected = true;
     this.requestUpdate();
-    node.selected();
     this.selectedCallback?.(node);
   }
 
@@ -170,7 +198,7 @@ export class TreeView extends Control {
    * @param {any} eArgs arguments passed to the event via detail
    */
   _dispatchNodeUserActionEvent(node, eArgs) {
-    console.log("TreeView._dispatchNodeUserActionEvent", node, eArgs);
+    // console.log("TreeView._dispatchNodeUserActionEvent", node, eArgs);
     if(eArgs?.action === "click") this.selectedNode = node;
     if(eArgs?.action === "opened") this.openedCallback?.(node);
     this.dispatchEvent(new CustomEvent("nodeUserAction", { detail: { node, ...eArgs } }))
@@ -405,13 +433,14 @@ ${title}
         tabindex="${this.nodeInFocus?.treeNodeId === node.treeNodeId ? 0 : -1}"
         >
         ${this.renderChevron(node)}
-        ${this.renderIcon(node)}
+        <span class="${node.isLoading ? 'loadAnimation' : ''}">${this.renderIcon(node)}</span>
         <div class="treeNodeHeaderContent">
           ${this.renderHeaderContent(node)}
         </div>
       </div>
     `;
 
+    if(node.isLoading) nodeHtml = html`<span class="loadingNode browse">${nodeHtml}</span>`;
     if(node.isSelected) nodeHtml = html`<span class="selected">${nodeHtml}</span>`;
     return nodeHtml;
   }
