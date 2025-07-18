@@ -139,6 +139,7 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
 
   #shownPromise = null;
   #resolve = null;
+  #modalArgs = null;
   #modalResult = null;
 
   /** Optional `arena` allows for programmatic association, such as dialog boxes */
@@ -151,22 +152,31 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   /** Returns a Promise which resolves with modal dialog result, or null if `show()` has not been called yet */
   get shownPromise() { return this.#shownPromise; }
 
+  /** Gets modal args object which is set in a `show(args)` call and contains dialog show arguments */
+  get modalArgs() { return this.#modalArgs; }
+
+  /** Sets modal args object, which is typically passed in a `show(args)` call and contains dialog show arguments */
+  set modalArgs(v) { this.#modalArgs = v; }
+
   /** Gets modal result object which is set when this dialog is closed */
   get modalResult() { return this.#modalResult; }
 
   /** Sets modal result before this dialog gets closed */
   set modalResult(v) { this.#modalResult = v; }
 
+
   /**
    * Opens a modal dialog box and instantly returns a promise
    * which is resolved on dialog close. You can then inspect `dialog.modalResult` property
    * to see why/how/with what result dialog was closed
+   * @param {*} args - an optional args object which is set into `dialog.modalArgs` property. You can pass initial state on show
    * @returns {Promise<this>} a promise with is resolved upon dialog box closure
   */
-  show(){
+  show(args){
     if (this.#shownPromise !== null) return this.#shownPromise;
     const dlg = this.#getDlgElm();
     this.#modalResult = null;
+    this.#modalArgs = args ?? null;
     dlg.showModal();
     this.#shownPromise = new Promise((resolve) => this.#resolve = resolve);
     ModalDialog.#instances.push(this);
