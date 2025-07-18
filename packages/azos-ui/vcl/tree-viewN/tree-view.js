@@ -186,12 +186,10 @@ export class TreeView extends Control {
     this.selectedCallback?.(node);
   }
 
-
   async selectNode(node){
     this.selectedNode = node;
     this.requestUpdate();
   }
-
 
   /**
    * @param {TreeNode} node the node that changed

@@ -8,7 +8,7 @@ import { toast } from "azos-ui/toast";
  * Component for displaying node breadcrumbs in a forest context
  *   allowing navigation through nodes, copying node paths, and a utility button.
  */
-class CForestBreadcrumbs extends Control {
+class ForestBreadcrumbs extends Control {
 
   static properties = {
     node: { type: Object, reflect: true },
@@ -154,4 +154,4 @@ class CForestBreadcrumbs extends Control {
   }
 }
 
-window.customElements.define("az-cforest-breadcrumbs", CForestBreadcrumbs);
+window.customElements.define("az-cforest-breadcrumbs", ForestBreadcrumbs);

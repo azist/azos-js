@@ -7,7 +7,7 @@ import "../../parts/select-field";
 /**
  * Dialog for displaying, selecting, and viewing versions of a source forest node.
  */
-class CForestNodeVersions extends ModalDialog {
+class ForestNodeVersionsDialog extends ModalDialog {
 
   static styles = [ ModalDialog.styles, css`
     az-select { width: -webkit-fill-available; }
@@ -107,4 +107,4 @@ class CForestNodeVersions extends ModalDialog {
   }
 }
 
-window.customElements.define("az-forest-node-version-dialog", CForestNodeVersions);
+window.customElements.define("az-forest-node-version-dialog", ForestNodeVersionsDialog);

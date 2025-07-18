@@ -5,7 +5,7 @@ import "azos-ui/parts/select-field";
 /**
  * Dialog for configuring forest settings, allowing users to select a forest, tree, and an optional date.
  */
-class CfgForestSettings extends ModalDialog {
+class ForestSettingsDialog extends ModalDialog {
 
   static properties = {
     settings: { type: Object },
@@ -138,4 +138,4 @@ class CfgForestSettings extends ModalDialog {
   }
 }
 
-window.customElements.define("az-forest-settings-dialog", CfgForestSettings);
+window.customElements.define("az-forest-settings-dialog", ForestSettingsDialog);

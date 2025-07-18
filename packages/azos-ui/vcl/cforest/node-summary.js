@@ -7,7 +7,7 @@ import { writeToClipboard } from "azos-ui/vcl/util/clipboard";
 /**
  * Component for displaying a summary of a selected node in a forest context.
  */
-class CForestNodeSummary extends Control {
+class ForestNodeSummary extends Control {
 
   static properties = {
     source: { type: Object },
@@ -68,4 +68,4 @@ class CForestNodeSummary extends Control {
   }
 }
 
-window.customElements.define("az-cforest-summary", CForestNodeSummary);
+window.customElements.define("az-cforest-summary", ForestNodeSummary);
