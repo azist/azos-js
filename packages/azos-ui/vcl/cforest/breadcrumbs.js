@@ -1,14 +1,12 @@
-import { html, css, Control } from "azos-ui/ui";
-import { Block } from "azos-ui/blocks";
-import "azos-ui/vcl/util/object-inspector";
-import { writeToClipboard } from "azos-ui/vcl/util/clipboard";
-import { toast } from "azos-ui/toast";
+import { html, css, Control } from "../../ui";
+import { writeToClipboard } from "../util/clipboard";
+import { toast } from "../../toast";
 
 /**
  * Component for displaying node breadcrumbs in a forest context
  *   allowing navigation through nodes, copying node paths, and a utility button.
  */
-class CForestBreadcrumbs extends Control {
+class ForestBreadcrumbs extends Control {
 
   static properties = {
     node: { type: Object, reflect: true },
@@ -154,4 +152,4 @@ class CForestBreadcrumbs extends Control {
   }
 }
 
-window.customElements.define("az-cforest-breadcrumbs", CForestBreadcrumbs);
+window.customElements.define("az-cforest-breadcrumbs", ForestBreadcrumbs);

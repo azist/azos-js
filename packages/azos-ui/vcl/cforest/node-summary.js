@@ -1,13 +1,11 @@
-import { html, css, Control } from "azos-ui/ui";
-
-import "azos-ui/vcl/util/object-inspector";
-import { toast } from "azos-ui/toast";
-import { writeToClipboard } from "azos-ui/vcl/util/clipboard";
+import { html, css, Control } from "../../ui";
+import { toast } from "../../toast";
+import { writeToClipboard } from "../util/clipboard";
 
 /**
  * Component for displaying a summary of a selected node in a forest context.
  */
-class CForestNodeSummary extends Control {
+class ForestNodeSummary extends Control {
 
   static properties = {
     source: { type: Object },
@@ -68,4 +66,4 @@ class CForestNodeSummary extends Control {
   }
 }
 
-window.customElements.define("az-cforest-summary", CForestNodeSummary);
+window.customElements.define("az-cforest-summary", ForestNodeSummary);

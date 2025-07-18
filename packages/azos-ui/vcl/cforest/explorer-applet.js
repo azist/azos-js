@@ -6,18 +6,18 @@ import { Block } from "../../blocks";
 import { Command } from "../../cmd";
 import { Spinner } from "../../spinner";
 import "../../bit";
-// import "../../vcl/util/object-inspector";
-import "../../vcl/util/code-box";
-import "../../vcl/tabs/tab-view";
-import "../../vcl/tabs/tab";
 
-import "../../vcl/tree-viewN/tree-view"
+import "../util/code-box";
+import "../tabs/tab-view";
+import "../tabs/tab";
+
+import "../tree-viewN/tree-view"
 import "../../parts/select-field";
 import "../../parts/grid-split"
 
-import "./node-summary";
-import "./node-breadcrumbs";
 import "./settings-dialog";
+import "./breadcrumbs";
+import "./node-summary";
 import "./versions-dialog";
 
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
@@ -25,7 +25,7 @@ import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
 /**
  * CfgForestApplet is an applet that provides a user interface for exploring and managing configuration forests, their trees, and their nodes.
  */
-export class CfgForestApplet extends Applet  {
+export class ForestExplorerApplet extends Applet  {
 
   static styles = [ STL_INLINE_GRID, Block.styles, css`
     h2, h3 { margin-top: 0; }
@@ -158,7 +158,11 @@ export class CfgForestApplet extends Applet  {
     icon: "svg://azos.ico.database",
     title: "CfgForest Settings",
     handler: async () =>  {
-      const settings = (await this.dlgSettings.show()).modalResult;
+      const settings = (await this.dlgSettings.show({
+        forest: this.activeForest,
+        tree: this.activeTree,
+        asOfUtc: this.activeAsOfUtc
+      })).modalResult;
       if (!settings) return;
       await this.#applyForestSettings(settings);
     }
@@ -279,14 +283,15 @@ export class CfgForestApplet extends Applet  {
 
       // Load the root node for the currently active forest and tree
       const rootNodeInfo = await this.#client.probePath(this.#forest, this.#tree, "/", this.#asOfUtc);
-      const root = this.tvExplorer.root.addChild(rootNodeInfo.PathSegment, {
+      const rootNode = this.tvExplorer.root.addChild(rootNodeInfo.PathSegment, {
         data: { ...rootNodeInfo },
         showPath: false,
         canOpen: true,
         icon: "svg://azos.ico.home",
         endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${this.formatDT(rootNodeInfo?.DataVersion?.Utc)} UTC</span>`,
+        isVisible: true,
       });
-      root.isNodeInfoLoaded = true;
+      rootNode.isNodeInfoLoaded = true;
     },"Loading forests/trees");
   }
 
@@ -307,6 +312,7 @@ export class CfgForestApplet extends Applet  {
     if(childNodeList.length > 0) {
       parentNode.icon = "svg://azos.ico.folder";
       parentNode.showChevron = true;
+
       for(let index = 0; index < childNodeList.length; index++) {
         const child = childNodeList[index];
         const childNodeInfo = await this.#client.nodeInfo(child.Id);
@@ -318,6 +324,7 @@ export class CfgForestApplet extends Applet  {
           hideChevron: true,
           icon: grandChildNodeList.length > 0 ? "svg://azos.ico.folder" : "svg://azos.ico.draft",
           endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)} UTC</span>`,
+          isVisible: true,
         });
       }
     }
@@ -326,6 +333,11 @@ export class CfgForestApplet extends Applet  {
     this.tvExplorer.requestUpdate();
   }
 
+  /**
+   * Fetches and adds node information to the specified node data.
+   * @param {TreeNode} node - The node to add information to.
+   * @returns {Promise<void>}
+   */
   async addNodeInfo(node){
     if(node.isNodeInfoLoaded) return;
     node.isNodeInfoLoaded = true;
@@ -336,45 +348,6 @@ export class CfgForestApplet extends Applet  {
     if(this.isSelected) this.tvExplorer.selectedCallback(node);
   }
 
-
-  //! todo: implement this without relying on the node's data.FullPath
-  /**
-   * Loads the ancestors of a given node.
-   * This method retrieves the full path of the target node,
-   * splits it into segments, and iteratively sets each ancestor node as active in the tree view explorer.
-   * It ensures that the tree view is updated to reflect the active node and its ancestors.
-   */
-  // async #loadNodeAncestors(targetNodeId) {
-  //   const targetNodeData = await this.#client.nodeInfo(targetNodeId, this.#asOfUtc);
-  //   const paths = targetNodeData.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
-
-  //   for (let i = 0; i < paths.length; i++) {
-  //     const visibleNodes = this.tvExplorer.getAllVisibleNodes();
-
-  //     const path = paths[i];
-  //     const parentNode = visibleNodes.find(n => n.data.FullPath === path);
-
-  //     console.log(`Loading ancestor path: ${paths[i]}`, parentNode);
-  //     if(parentNode) {
-  //       // this.tvExplorer.selectNode(parentNode);
-
-  //       parentNode.isVisible = true;
-  //       // parentNode.open();
-  //       this.tvExplorer.requestUpdate();
-
-  //       this.tvExplorer.selectedNode = parentNode;
-  //       parentNode.isSelected = true;
-
-  //       this.tvExplorer.requestUpdate();
-
-  //       if(i === paths.length - 1) {
-  //         this.activeNodeData = parentNode.data;
-  //         this.activeNodeId = parentNode.data.Id;
-  //       }
-
-  //     }
-  //   }
-  // }
 
   /**
    * Refreshes the entire tree view by reloading the root node and its children.
@@ -388,12 +361,32 @@ export class CfgForestApplet extends Applet  {
       await this.#initializeTreeView();
       this.tvExplorer.selectNode(this.tvExplorer.root.children[0]);
 
-      // if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
-      //   await this.#loadNodeAncestors(currentNode.Id);
-      // } else {
-      //   this.activeNodeData = this.tvExplorer.root.data;
-      //   this.activeNodeId = this.tvExplorer.root.data.Id;
-      // // }
+      // reload the last selected node if it exists
+      if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
+        // Load ancestors of the current node starting at the root
+        const paths = currentNode.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
+
+        // skip the first root node child as it has been loaded already
+        for (let i = 0; i < paths.length; i++) {
+          const path = paths[i];
+          const visibleNodes = this.tvExplorer.getAllVisibleNodes(undefined, this.tvExplorer.root.children[0]);
+          const parentNode = visibleNodes.find(n => n.data.FullPath === path);
+          if(parentNode) {
+            await this.updateOnNodeSelect(parentNode)
+            this.tvExplorer.selectNode(parentNode);
+
+            /// select last node as active
+            if(i === paths.length - 1) {
+              this.activeNodeData = parentNode.data;
+              this.activeNodeId = parentNode.data.Id;
+            }
+          }
+
+        }
+      } else {
+        this.activeNodeData = this.tvExplorer.root.data;
+        this.activeNodeId = this.tvExplorer.root.data.Id;
+      }
 
     }, "Loading forests/trees");
   }
@@ -415,13 +408,8 @@ export class CfgForestApplet extends Applet  {
       : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${this.formatDT(asOfDisplay)} UTC</span></div>`;
 
     return html`
-      <az-forest-settings-dialog id="dlgSettings" scope="this" title="Explorer Settings"
-        .settings="${{
-          forests: this.forests,
-          activeForest: this.activeForest,
-          activeTree: this.activeTree,
-          activeAsOfUtc: this.activeAsOfUtc
-        }}"
+      <az-forest-settings-dialog id="dlgSettings" scope="this" title="Explorer Settings" .settings="${{
+        forests: this.forests, activeForest: this.activeForest, activeTree: this.activeTree,  activeAsOfUtc: this.activeAsOfUtc }}"
       ></az-forest-settings-dialog>
 
       <az-forest-node-version-dialog id="dlgNodeVersions" scope="this" title="Node Versions"
@@ -444,7 +432,16 @@ export class CfgForestApplet extends Applet  {
         <div slot="right-bottom">
 
           <div class="cardBasic">
-            <az-cforest-summary .source="${this.#activeNodeData}" .openVersions="${() => this.dlgNodeVersions.show()}" scope="this" id="cforestSummary"></az-cforest-summary>
+            <az-cforest-summary
+              id="cforestSummary"
+              scope="this"
+              .source="${this.#activeNodeData}"
+              .openVersions="${() => this.dlgNodeVersions.show({
+                source: this.#activeNodeData,
+                activeForest: this.activeForest,
+                activeTree: this.activeTree
+              })}"
+              ></az-cforest-summary>
           </div>
 
           <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>
@@ -468,4 +465,4 @@ export class CfgForestApplet extends Applet  {
   }
 }
 
-window.customElements.define("az-cfg-forest-applet", CfgForestApplet);
+window.customElements.define("az-cfg-forest-applet", ForestExplorerApplet);
