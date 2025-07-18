@@ -159,9 +159,9 @@ export class ForestExplorerApplet extends Applet  {
     title: "CfgForest Settings",
     handler: async () =>  {
       let args = {
-        forest:  this.ctx.activeForest,
-        tree:    this.ctx.activeTree,
-        asOfUtc: this.ctx.activeAsOfUtc
+        forest:  this.activeForest,
+        tree:    this.activeTree,
+        asOfUtc: this.activeAsOfUtc
       };
 
       const settings = (await this.dlgSettings.show(args)).modalResult;

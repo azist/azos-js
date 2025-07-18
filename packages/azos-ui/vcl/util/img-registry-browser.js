@@ -191,8 +191,7 @@ export class ImageRegistryBrowser extends AzosElement {
   async #showInfo(uri, recName, rec) {
     this.#selectedForInfoRec = { uri, recName, rec };
     this.update();
-    this.recInfo.show();
-    await this.recInfo.shownPromise;
+    await this.recInfo.show();
     this.#selectedForInfoRec = null;
     this.requestUpdate();
   }
@@ -322,11 +321,10 @@ export async function azdimg(arena = null){
   const box = new AzdimgBox(arena);
   box.title = "Image Registry Viewer";
   arena.shadowRoot.appendChild(box);
-  box.update();
-  try{
-    box.show();
-    await box.shownPromise;
-  }finally{
+  try {
+    box.update();
+    await box.show();
+  } finally {
     arena.shadowRoot.removeChild(box);
   }
 }
