@@ -19,12 +19,14 @@ export class TreeNode extends DisposableObject {
   #children;
   #state;
   #checkable;
+  #selectable;
   #nodeVisible = true;
   #chevronVisible = true;
   #showPath = true;
 
   #endContent = null;
   #isSelected = false;
+  #isLoading = false;
 
   #opened;
   #canClose;
@@ -57,17 +59,23 @@ export class TreeNode extends DisposableObject {
   get isOpened() { return this.#opened; }
   get isClosed() { return !this.#opened; }
 
-  get isSelected() { return this.#isSelected; }
-  set isSelected(v) { this.#isSelected = v; }
-
   get endContent() { return this.#endContent; }
   set endContent(v) { this.#endContent = v; }
+
+  get isSelectable() { return this.#selectable; }
+  set isSelectable(v) { this.#selectable = v; }
+
+  get isSelected() { return this.#isSelected; }
+  set isSelected(v) { this.#isSelected = v; }
 
   // User-
   get canOpen() { return this.#canOpen; }
   set canOpen(v) { this.#canOpen = v; }
   get canClose() { return this.#canClose; }
   set canClose(v) { this.#canClose = v; }
+
+  get isLoading() { return this.#isLoading; }
+  set isLoading(v) { this.#isLoading = v; }
 
   get data() { return this.#data; }
   set data(v) { this.#data = v; }
@@ -90,7 +98,7 @@ export class TreeNode extends DisposableObject {
 
   get isRoot() { return this.#parent === null; }
 
-  constructor(treeView, parent, title, { icon, checkable, canClose, canOpen, nodeVisible, opened, showPath, data, endContent } = {}) {
+  constructor(treeView, parent, title, { icon, checkable, canClose, canOpen, nodeVisible, opened, showPath, data, endContent, selectable } = {}) {
     super();
     this.#treeView = isOf(treeView, TreeView);
     this.#parent = isOfOrNull(parent, TreeNode);
@@ -99,6 +107,7 @@ export class TreeNode extends DisposableObject {
     this.#title = isStringOrNull(title);
     this.#icon = icon; // need to account for null (don't show) and undefined (show default)
     this.#checkable = checkable ?? false; // todo: Implement a checkmark
+    this.#selectable = selectable ?? true; // default to selectable
     this.#nodeVisible = nodeVisible ?? true;
     this.#endContent = endContent ?? null;
 
@@ -165,7 +174,5 @@ export class TreeNode extends DisposableObject {
     this.treeView.requestUpdate();
   }
 
-  selected() {
-    console.warn("TreeNode.selected() is not implemented. Override this method in subclasses to handle node selection.");
-  }
+  selected() {}
 }

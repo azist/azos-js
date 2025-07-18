@@ -57,12 +57,13 @@ class CfgForestSettings extends ModalDialog {
   #btnApplyClick(){
     this.selForest.validate();
     this.selTree.validate();
-    this.datAsOfDate.validate();
-    if(this.selForest.error || this.selTree.error || this.datAsOfDate.error) return;
+    this.tbAsOf.validate();
+    if(this.selForest.error || this.selTree.error || this.tbAsOf.error) return;
+    if(this.tbAsOf.value === undefined && this.tbAsOf.rawValue !== undefined) return;
     this.modalResult = {
       forest: this.selForest.value,
       tree: this.selTree.value,
-      asOfUtc: this.datAsOfDate.value || null
+      asOfUtc: this.tbAsOf.value || null
     };
     this.close();
   }
@@ -71,7 +72,7 @@ class CfgForestSettings extends ModalDialog {
    * Handles the click event for the Close button.
    * Resets the modal result to null and closes the dialog.
    */
-  #btnCloseClick(){
+  #btnCancelClick(){
     this.modalResult = null;
     this.close();
   }
@@ -90,6 +91,7 @@ class CfgForestSettings extends ModalDialog {
 
     const currentForestId = this.#tmpForestSelection || this.settings.activeForest;
     const currentTreeId = this.#tmpTreeSelection || this.settings.activeTree;
+    const asOfValue = this.#tmpAsOfUtc || this.settings.activeAsOfUtc || undefined;
 
     const forestOptions = this.settings.forests.map(forest => this.#optToOption(forest, currentForestId === forest.id));
     const treeOptions = this.settings.forests.find(f => f.id === currentForestId)?.trees?.map(tree => this.#optToOption({ id: tree, title: tree }, currentTreeId === tree));
@@ -102,7 +104,7 @@ class CfgForestSettings extends ModalDialog {
           title="Forest"
           rank="Normal"
           @change="${this.#onForestChange}"
-          .value="${this.#tmpForestSelection || this.settings.activeForest}"
+          .value="${currentForestId}"
           isRequired>${forestOptions}</az-select></div>
 
       <div class="strip-h">
@@ -111,26 +113,27 @@ class CfgForestSettings extends ModalDialog {
           scope="this"
           title="Tree"
           rank="Normal"
-          .value="${this.#tmpTreeSelection || this.settings.activeTree}"
+          .value="${currentTreeId}"
           isRequired>${treeOptions}</az-select></div>
 
       <div class="strip-h">
         <az-text
-          id="datAsOfDate"
+          id="tbAsOf"
           scope="this"
           title="As of Date"
           placeholder="01/21/2022 1:00 pm"
           dataType="date"
           datakind="datetime"
-          .value="${this.#tmpAsOfUtc || !this.settings.activeAsOfUtc ? undefined : this.settings.activeAsOfUtc}"
-          timeZone="UTC"></az-text>
+          timeZone="UTC"
+          .value="${asOfValue}"
+        ></az-text>
       </div>
 
       <div class="row">&nbsp;</div>
 
       <div class="row cols2">
-        <az-button id="btnApplySettings" title="Apply" @click="${this.#btnApplyClick}"></az-button>
-        <az-button id="btnCloseSettings" title="Close" @click="${this.#btnCloseClick}"></az-button>
+        <az-button id="btnApplySettings" scope="this" title="Apply" @click="${this.#btnApplyClick}"></az-button>
+        <az-button id="btnCloseSettings" scope="this" title="Cancel" @click="${this.#btnCancelClick}"></az-button>
       </div>`;
   }
 }

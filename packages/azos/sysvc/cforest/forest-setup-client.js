@@ -3,9 +3,6 @@ import * as aver from "../../aver.js";
 import { EntityId } from "../../entity-id.js";
 import { Atom } from "../../atom.js";
 
-// @todo: add source to guard helper functions to ensure tracability to error source
-
-
 function guardId(v, name = undefined){
   aver.isNotNull(v, `str|eid${name ? ` - ${name}` : ""}`);
   if (v instanceof EntityId) return v;
@@ -131,7 +128,7 @@ export class ForestSetupClient extends IClient {
       const response = await this.get(`/conf/forest/tree/node-list?${search}`, search, abortSignal);
       return response?.data?.data ?? null;
     } catch(error) {
-      if(error.response && error.code===404) {
+      if(error.code===404) {
         // If the node is not found, return an empty list
         return [];
       }
@@ -159,7 +156,7 @@ export class ForestSetupClient extends IClient {
       const response = await this.get(`/conf/forest/tree/node?${search}`, search, abortSignal);
       return response?.data?.data ?? null;
     } catch(error) {
-      if(error.response && error.code===404) {
+      if(error.code===404) {
         // If the node is not found, return an empty list
         return [];
       }
