@@ -18,7 +18,6 @@ class ForestSettingsDialog extends ModalDialog {
    * Updates the temporary forest selection and retrieves the corresponding trees.
    */
   #onForestChange(e){
-    console.log(`ForestSettingsDialog.#onForestChange() called`, e.target.value);
     const forestTrees = this.modalArgs.forests.find(f => f.id === e.target.value)?.trees || [];
     this.selTree.innerHTML = forestTrees.map(tree => `<option value="${tree}" title="${tree}">${tree}</option>`).join("");
     this.selTree.value = forestTrees[0] || "";
@@ -89,23 +88,17 @@ class ForestSettingsDialog extends ModalDialog {
   }
 
   renderBodyContent() {
-    console.log(`ForestSettingsDialog.renderBodyContent() called`, this.modalArgs);
-
     return html`
       <div class="strip-h">
         <az-select id="selForest" scope="this" title="Forest" rank="Normal" @change="${this.#onForestChange}" isRequired></az-select>
       </div>
-
       <div class="strip-h">
         <az-select id="selTree" scope="this" title="Tree" rank="Normal" isRequired></az-select>
       </div>
-
       <div class="strip-h">
         <az-text  id="tbAsOf" scope="this"  title="As of Date"  placeholder="01/21/2022 1:00 pm" dataType="date"  datakind="datetime"  timeZone="UTC" .value=${this.modalArgs?.asOfUtc || undefined}></az-text>
       </div>
-
       <div class="row">&nbsp;</div>
-
       <div class="row cols2">
         <az-button id="btnApplySettings" scope="this" title="Apply" @click="${this.#btnApplyClick}"></az-button>
         <az-button id="btnCloseSettings" scope="this" title="Cancel" @click="${this.#btnCancelClick}"></az-button>
