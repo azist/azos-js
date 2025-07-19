@@ -61,7 +61,7 @@ class ForestSettingsDialog extends ModalDialog {
     if(this.selForest.error || this.selTree.error || this.tbAsOf.error) return;
 
     // todo: the date input validation is borked - this patch will stop the dialog but the tbAsOf input will reset/render...
-    if(this.tbAsOf.value === undefined && this.tbAsOf.rawValue !== undefined) return;
+    if(this.tbAsOf.value === undefined && (this.tbAsOf.rawValue !== undefined && this.tbAsOf.rawValue !== "")) return;
     this.modalResult = {
       forest: this.selForest.value,
       tree: this.selTree.value,
