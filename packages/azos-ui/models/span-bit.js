@@ -51,12 +51,15 @@ export class SpanBit extends Bit {
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
 
-      <az-text
-        id="tbTitle"
+      <az-nls-map-bit
+        id="nlsBit"
         scope="this"
-        name="NLSMap"
-        title="NLSMap Placeholder"
-      ></az-text>
+        name="lclCode"
+        title="Localized Name"
+        description="Localized name of the Span"
+        .isReadonly="${this.isReadOnly}"
+        class="span4"
+      ></az-nls-map-bit>
     </div>
 
     <div class="row cols1">

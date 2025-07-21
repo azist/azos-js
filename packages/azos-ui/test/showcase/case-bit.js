@@ -11,6 +11,7 @@ import "../../../azos-ui/models/lat-lng-bit.js";
 import "../../../azos-ui/models/span-bit.js";
 import "../../../azos-ui/models/day-override-bit.js";
 import "../../../azos-ui/models/adlib-tag-bit.js";
+import "../../../azos-ui/models/schedule-bit.js";
 
 export class CaseBit extends CaseBase {
   renderControl() {
@@ -127,16 +128,16 @@ export class CaseBit extends CaseBase {
 <az-span-bit
   id="bitSpan"
   scope="this"
-  captionName="default schedule span"
+  captionName="Schedule Name"
   captionRange="open"
 ></az-span-bit>
 
 <br>
 
-<az-day-override-bit
+<az-day-override-item
   id="bitDayOverride"
   scope="this"
-></az-day-override-bit>
+></az-day-override-item>
 
 <br>
 
@@ -150,6 +151,10 @@ export class CaseBit extends CaseBase {
   boundsMax="5"
 ></az-adlib-tag-bit>
 
+<az-schedule-bit
+  id="bitSchedule"
+  scope="this"
+></az-schedule-bit>
     `;
   }
 }
