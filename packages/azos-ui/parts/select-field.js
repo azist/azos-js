@@ -7,7 +7,6 @@
 import { html, parseRank, parseStatus } from '../ui.js';
 import { FieldPart } from './field-part.js';
 import { baseStyles, textFieldStyles } from './styles.js';
-import * as aver from '../../azos/aver';
 import { isObject } from 'azos/types';
 
 export class SelectField extends FieldPart {
