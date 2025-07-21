@@ -253,8 +253,6 @@ export class ForestExplorerApplet extends Applet  {
       this.activeNodeId = node.data.Id;
 
       node.isLoading = true;
-      // const lastIcon = node.icon;
-      // node.icon = "svg://azos.ico.refresh";
       this.tvExplorer.requestUpdate();
 
       await this.addNodeInfo(node);
@@ -263,10 +261,10 @@ export class ForestExplorerApplet extends Applet  {
       node.open();
 
       node.isLoading = false;
-      // node.icon = lastIcon;
       this.tvExplorer.requestUpdate();
       this.requestUpdate();
       this.arena.requestUpdate();
+      return node; // return the node for further processing if needed
   }
 
   /**
@@ -275,12 +273,12 @@ export class ForestExplorerApplet extends Applet  {
    * by its path. The root node is then added to the tree view
    * explorer and set as the active/selected node.
    */
-  async #initializeTreeView(){
+  async #initializeTreeView(previousNodes = []) {
     // bind our select hook for the tree view to our node selection handler
     this.tvExplorer.selectedCallback = this.updateOnNodeSelect.bind(this);
-    this.tvExplorer.openedCallback = this.updateOnNodeSelect.bind(this); // todo: handle open
+    this.tvExplorer.openedCallback = this.updateOnNodeSelect.bind(this);
 
-    await Spinner.exec(async()=> {
+    await Spinner.exec(async ()=> {
       // clear any existing children
       this.tvExplorer.root.removeAllChildren();
 
@@ -291,10 +289,24 @@ export class ForestExplorerApplet extends Applet  {
         showPath: false,
         canOpen: true,
         icon: "svg://azos.ico.home",
-        endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${this.formatDT(rootNodeInfo?.DataVersion?.Utc)} UTC</span>`,
+        endContent: html`<span title="${rootNodeInfo?.DataVersion?.State}">${this.formatDT(rootNodeInfo?.DataVersion?.Utc)}</span>`,
         isVisible: true,
       });
       rootNode.isNodeInfoLoaded = true;
+      this.tvExplorer.selectNode(rootNode); // select the root node
+      this.tvExplorer.requestUpdate();
+      this.requestUpdate();
+      this.arena.requestUpdate();
+
+      // If there are previous nodes, select them after loading the root node and its children
+      if(previousNodes.length > 0) {
+        for (let i = 0; i < previousNodes.length; i++) {
+          const node = previousNodes[i];
+
+        }
+      }
+
+
     },"Loading forests/trees");
   }
 
@@ -325,8 +337,8 @@ export class ForestExplorerApplet extends Applet  {
           showPath: false,
           canOpen: grandChildNodeList.length > 0,
           hideChevron: true,
-          icon: grandChildNodeList.length > 0 ? "svg://azos.ico.folder" : "svg://azos.ico.draft",
-          endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)} UTC</span>`,
+          icon: grandChildNodeList.length > 0 ? "svg://azos.ico.folder" : "svg://azos.ico.moreHorizontal",
+          endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)}</span>`,
           isVisible: true,
         });
       }
@@ -346,7 +358,7 @@ export class ForestExplorerApplet extends Applet  {
     node.isNodeInfoLoaded = true;
     const nodeInfo = await this.#client.nodeInfo(node.data.Id);
     node.data = { ...node.data, ...nodeInfo  };
-    node.endContent = html`<span title="${node.data.DataVersion?.State}">${this.formatDT(node.data.DataVersion.Utc)} UTC</span>`;
+    node.endContent = html`<span title="${node.data.DataVersion?.State}">${this.formatDT(node.data.DataVersion.Utc)}</span>`;
     this.tvExplorer.requestUpdate();
     if(this.isSelected) this.tvExplorer.selectedCallback(node);
   }
@@ -358,40 +370,42 @@ export class ForestExplorerApplet extends Applet  {
    * If the current active node does not match the active tree and forest, it sets the active node to the root node.
    */
   async refreshTree(){
-    const currentNode = { ...this.activeNodeData };
+    const currentNode = this.tvExplorer.selectedNode;
+    const previousNodes = [ currentNode ]; // start with the current node
+
+    // if the current node is a root node then we need to select it after refreshing the data
+    if(!currentNode.isRoot) {
+      // to do so we'll capture the parents prior to refreshing the tree view
+      // collect all parent nodes of the current node
+      let currentNodeObj = currentNode.parent;
+      while (currentNodeObj) {
+        if(!currentNodeObj.isRoot) {
+          previousNodes.unshift(currentNodeObj); // reverse order to maintain hierarchy
+          currentNodeObj = currentNodeObj.isRoot ? null : currentNodeObj.parent;
+        } else {
+          currentNodeObj = null; // stop if we reach the root node
+        }
+      }
+      console.log("Refreshing tree view, previous nodes:", previousNodes);
+    }
 
     await Spinner.exec(async()=> {
-      await this.#initializeTreeView();
-      this.tvExplorer.selectedNode = this.tvExplorer.root.children[0];
-
-      // reload the last selected node if it exists
-      // if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
-      //   // Load ancestors of the current node starting at the root
-      //   const paths = currentNode.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
-
-      //   // skip the first root node child as it has been loaded already
-      //   for (let i = 0; i < paths.length; i++) {
-      //     const path = paths[i];
-      //     const visibleNodes = this.tvExplorer.getAllVisibleNodes(undefined, this.tvExplorer.root.children[0]);
-      //     const parentNode = visibleNodes.find(n => n.data.FullPath === path);
-      //     if(parentNode) {
-      //       await this.updateOnNodeSelect(parentNode)
-      //       this.tvExplorer.selectNode(parentNode);
-
-      //       /// select last node as active
-      //       if(i === paths.length - 1) {
-      //         this.activeNodeData = parentNode.data;
-      //         this.activeNodeId = parentNode.data.Id;
-      //       }
-      //     }
-
-      //   }
-      // } else {
-        // this.activeNodeData = this.tvExplorer.root.data;
-        // this.activeNodeId = this.tvExplorer.root.data.Id;
-      // }
-
-    }, "Loading forests/trees");
+      await this.#initializeTreeView(previousNodes);
+      for (let i = 0; i < previousNodes.length; i++) {
+        const node = previousNodes[i];
+        // find the node in the tree view and select it
+        const foundNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === node.data.Id);
+        if (foundNode) {
+          this.tvExplorer.selectNode(foundNode);
+          let navNode = await this.updateOnNodeSelect(foundNode, true); // force open to load children
+          navNode.open();
+          this.tvExplorer.selectedNode = navNode; // set the selected node to the opened node
+          console.log("Selected node after refresh:", navNode.title, navNode.data);
+          this.tvExplorer.requestUpdate();
+          this.requestUpdate();
+        }
+      }
+    }, "Refreshing forest tree view");
   }
 
   // Searches the tree view for a node with the specified path.
@@ -407,7 +421,7 @@ export class ForestExplorerApplet extends Applet  {
   render(){
     const asOfDisplay = this.activeAsOfUtc;
     const showAsOf = !this.activeAsOfUtc
-      ? html`<div class=""><strong>As of: </strong></span>Utc Now</div>`
+      ? html`<div class=""><strong>As of Utc: </strong></span>Now</div>`
       : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${this.formatDT(asOfDisplay)} UTC</span></div>`;
 
     return html`

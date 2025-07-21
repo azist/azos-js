@@ -60,7 +60,7 @@ class ForestNodeSummary extends Control {
         <div>
           <az-button id="btnAddNode"  title="Add Node"    rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.add" @click="${(e) => {}}">Add</az-button>
           <az-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit" @click="${(e) => {}}">Edit</az-button>
-          <az-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.tenancy" @click="${(e) => this.openVersions()}">Edit</az-button>
+          <az-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.calendarToday" @click="${(e) => this.openVersions()}">Edit</az-button>
         </div>
       </div>`;
   }

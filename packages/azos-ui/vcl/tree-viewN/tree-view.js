@@ -77,13 +77,14 @@ export class TreeView extends Control {
       margin-left: 0.5em;
     }
     .ghostPostfix {
-      font-size: var(--r6-fs);
-      font-style: italic;
+      font-size: 0.5em;
       width: 100%;
       display: flex;
       justify-content: right;
       opacity: 0.6;
       padding-right: 0.5em;
+      padding-top: 0.5lh;
+      color: var(--brand1-ink-sup);
     }
     .nodeTitle {
       white-space: nowrap;
