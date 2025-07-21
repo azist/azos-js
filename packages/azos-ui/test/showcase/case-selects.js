@@ -94,7 +94,7 @@ export class CaseSelects extends CaseBase {
 
     // Prepare options for the child select based on the first parent option
     const childOptions = [];
-    const selectedParentObj = this.dropdownData.find(({ value }) => value === this.selCascadeRootValueList?.value) || this.dropdownData[0];
+    const selectedParentObj = this.dropdownData.find(({ value }) => value === this.selParent?.value) || this.dropdownData[0];
     selectedParentObj.childOptions.forEach(({ value, title }) => childOptions.push(html`<option value="${value}" title="${title ?? value}">${title ?? value}</option>`));
 
     // Prepare options for the grandchild select based on the first child option
