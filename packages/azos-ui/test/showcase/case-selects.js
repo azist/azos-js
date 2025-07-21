@@ -66,47 +66,50 @@ export class CaseSelects extends CaseBase {
 ];
 
   #selParentChange(e) {
-    const selectedValue = e.target.value;
+    const selectedValue = e.target.value; // capture the new value on change
+    this.selParent.value = selectedValue; // set the parent select value to the new value
     const selectedData = this.dropdownData.find(({ value }) => value === selectedValue);
 
-    // set child dropdown options based on the selected parent
-    this.selChild.options = selectedData?.childOptions || [];
-    // default the value to the first item in the child options
-    this.selChild.value = selectedData?.childOptions[0]?.value;
+    // get children
+    const children = selectedData?.childOptions || []; // capture children from parent data
+    const childrenValueList = children.reduce((a,c) => ({ ...a, [c.value]: c.title ?? c.value }), {}); // create valueList dictionary from children
+    this.selChild.valueList = JSON.stringify(childrenValueList); // set the sel valueList
+    this.selChild.value = children[0]?.value;  // set the el value to the first item in the child options
 
-    // set grandchild options based on the first child option
-    const selectedChildObj = selectedData.childOptions.find(({ value }) => value === this.selChild.value);
-
-    // set grandchild dropdown options based on the selected child
-    this.selGrandchild.options = selectedChildObj?.grandchildOptions || [];
-
+    // get grandchildren
+    const selectedChildObj = children.find(({ value }) => value === this.selChild.value);
+    const grandchildren = selectedChildObj?.grandchildOptions || [];
+    const grandchildrenValueList = grandchildren.reduce((a,c) => ({ ...a, [c.value]: c.title ?? c.value }), {});
+    this.selGrandchild.valueList = JSON.stringify(grandchildrenValueList);
+    this.selGrandchild.value = grandchildren[0]?.value;  // set the el value to the first item in the child options
   }
 
   #selChildChange(e) {
-    const selectedValue = e.target.value;
-    const selectedChildData = this.selChild.options.find(({ value }) => value === selectedValue);
-
-    // set grandchild dropdown options based on the selected child
-    this.selGrandchild.options = selectedChildData?.grandchildOptions || [];
-    // default the value to the first item in the grandchild options
-    this.selGrandchild.value = this.selGrandchild.options[0]?.value || "";
+    const selectedChild = e.target.value;
+    const grandchildren = this.dropdownData.find(({ value }) => value === this.selParent.value).childOptions.find(({value}) => value === selectedChild).grandchildOptions || [];
+    const grandchildrenValueList = grandchildren.reduce((a,c) => ({ ...a, [c.value]: c.title ?? c.value }), {});
+    this.selGrandchild.valueList = JSON.stringify(grandchildrenValueList);
+    this.selGrandchild.value = grandchildren[0]?.value;  // set the el value to the first item in the child options
 
   }
 
   renderControl() {
     // Prepare options for the parent select
-    const parentOptions = [];
-    this.dropdownData.forEach(({ value, title }) => parentOptions.push(html`<option value="${value}" title="${title ?? value}">${title ?? value}</option>`));
+    let parentValueList = {};
+    this.dropdownData.forEach(({ value, title }) => parentValueList[value] = title ?? value);
+    parentValueList = JSON.stringify(parentValueList);
 
     // Prepare options for the child select based on the first parent option
-    const childOptions = [];
+    let childValueList = {};
     const selectedParentObj = this.dropdownData.find(({ value }) => value === this.selParent?.value) || this.dropdownData[0];
-    selectedParentObj.childOptions.forEach(({ value, title }) => childOptions.push(html`<option value="${value}" title="${title ?? value}">${title ?? value}</option>`));
+    selectedParentObj.childOptions.forEach(({ value, title }) => childValueList[value] = title ?? value);
+    childValueList = JSON.stringify(childValueList);
 
     // Prepare options for the grandchild select based on the first child option
-    const grandchildOptions = [];
+    let grandchildValueList = {};
     const selectedChildObj = selectedParentObj.childOptions.find(({ value }) => value === this.selChild?.value) || selectedParentObj.childOptions[0];
-    selectedChildObj.grandchildOptions.forEach(({ value, title }) => grandchildOptions.push(html`<option value="${value}" title="${title ?? value}">${title ?? value}</option>`));
+    selectedChildObj.grandchildOptions.forEach(({ value, title }) => grandchildValueList[value] = title ?? value);
+    grandchildValueList = JSON.stringify(grandchildValueList);
 
     return html`
 <h2>Selects/Combos</h2>
@@ -127,6 +130,17 @@ export class CaseSelects extends CaseBase {
   </az-select>
 </div>
 
+
+<h4>Select Options from Value List</h4>
+  <div class="strip-h">
+    <az-select
+      id="selValueList"
+      title="Select from the value list"
+      scope="this"
+      valueList='{"opt1": "Option 1", "opt2": "Option 2", "opt3": "Option 3"}'>
+    </az-select>
+  </div>
+
 <h4>Cascading Selects</h4>
 <div class="row cols3">
   <az-select
@@ -134,19 +148,21 @@ export class CaseSelects extends CaseBase {
     title="Select the parent option"
     scope="this"
     @change="${this.#selParentChange}"
-  >${parentOptions}
+    valueList="${parentValueList}">
   </az-select>
   <az-select
     id="selChild"
     title="Select the child option"
     scope="this"
     @change="${this.#selChildChange}"
-  >${childOptions}</az-select>
+    valueList="${childValueList}">
+  </az-select>
   <az-select
     id="selGrandchild"
     title="Select the grandchild option"
     scope="this"
-  >${grandchildOptions}</az-select>
+    valueList="${grandchildValueList}">
+  </az-select>
 </div>
 
 
