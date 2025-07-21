@@ -4,10 +4,11 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf } from 'azos/strings';
+import { isOneOf } from '../../azos/strings';
 import { html, parseRank, parseStatus } from '../ui.js';
 import { FieldPart } from './field-part.js';
 import { baseStyles, textFieldStyles } from './styles.js';
+import * as aver from '../../azos/aver';
 
 export class SelectField extends FieldPart {
   static properties = {
@@ -29,6 +30,24 @@ export class SelectField extends FieldPart {
   /** True if user can select multiple options */
   get isMultiple() { return isOneOf(this.itemType, ["multi", "multiple", "choices"]); }
 
+  /** options to be rendered for the select */
+  #options = [];
+  get options() { return this.#options; }
+  set options(opts) {
+    // Ensure options is an array
+    aver.isArray(opts);
+    // Validate each option object
+    opts.forEach(opt => {
+      aver.isObject(opt, "SelectField opts obj");
+      aver.isStringOrNull(opt.value, "SelectField opt value str|null");
+      aver.isStringOrNull(opt.title, "SelectField opt title str|null");
+    });
+    // Set the options
+    this.#options = opts;
+    this.requestUpdate();
+  }
+
+  /** Handle change events for the select element */
   #selChange(e) {
     this.value = e.target.value;
     this.inputChanged();
@@ -37,14 +56,16 @@ export class SelectField extends FieldPart {
   renderInput(effectivelyDisabled, effectivelyBrowse) {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
+    const isSelected = (o) => this.value !== undefined && this.value === o.value;
 
-    const allOptions = [...this.getElementsByTagName("option")];
+    const allOptions = this.#options.length > 0
+      ? this.#options.map(option => ({ ...option, selected: isSelected(option) }))
+      : [...this.getElementsByTagName("option")].map(option => {
+          return { value: option.getAttribute('value'), title: option.title,  selected: isSelected( option.getAttribute('value')) };
+        });
+
     const optionList = html`${allOptions.map((option) => html`
-      <option
-        value="${option.getAttribute('value')}"
-        .selected=${this.value !== undefined && this.value === option.getAttribute('value')}>
-          ${option.title}
-      </option>
+      <option value="${option.value}" .selected=${option.selected}>${option.title}</option>
     `)}`;
 
     const rdOnly = this.isReadonly || effectivelyBrowse;

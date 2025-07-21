@@ -159,6 +159,7 @@ export class ForestExplorerApplet extends Applet  {
     title: "CfgForest Settings",
     handler: async () =>  {
       let args = {
+        forests: this.#forests,
         forest:  this.activeForest,
         tree:    this.activeTree,
         asOfUtc: this.activeAsOfUtc
@@ -361,34 +362,34 @@ export class ForestExplorerApplet extends Applet  {
 
     await Spinner.exec(async()=> {
       await this.#initializeTreeView();
-      this.tvExplorer.selectNode(this.tvExplorer.root.children[0]);
+      this.tvExplorer.selectedNode = this.tvExplorer.root.children[0];
 
       // reload the last selected node if it exists
-      if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
-        // Load ancestors of the current node starting at the root
-        const paths = currentNode.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
+      // if(currentNode?.Tree === this.activeTree && currentNode?.Forest === this.activeForest && currentNode.FullPath !== "/") {
+      //   // Load ancestors of the current node starting at the root
+      //   const paths = currentNode.FullPath.split("/").map( (v,i,a) => `/${a.slice(1,i+1).join("/")}`);
 
-        // skip the first root node child as it has been loaded already
-        for (let i = 0; i < paths.length; i++) {
-          const path = paths[i];
-          const visibleNodes = this.tvExplorer.getAllVisibleNodes(undefined, this.tvExplorer.root.children[0]);
-          const parentNode = visibleNodes.find(n => n.data.FullPath === path);
-          if(parentNode) {
-            await this.updateOnNodeSelect(parentNode)
-            this.tvExplorer.selectNode(parentNode);
+      //   // skip the first root node child as it has been loaded already
+      //   for (let i = 0; i < paths.length; i++) {
+      //     const path = paths[i];
+      //     const visibleNodes = this.tvExplorer.getAllVisibleNodes(undefined, this.tvExplorer.root.children[0]);
+      //     const parentNode = visibleNodes.find(n => n.data.FullPath === path);
+      //     if(parentNode) {
+      //       await this.updateOnNodeSelect(parentNode)
+      //       this.tvExplorer.selectNode(parentNode);
 
-            /// select last node as active
-            if(i === paths.length - 1) {
-              this.activeNodeData = parentNode.data;
-              this.activeNodeId = parentNode.data.Id;
-            }
-          }
+      //       /// select last node as active
+      //       if(i === paths.length - 1) {
+      //         this.activeNodeData = parentNode.data;
+      //         this.activeNodeId = parentNode.data.Id;
+      //       }
+      //     }
 
-        }
-      } else {
-        this.activeNodeData = this.tvExplorer.root.data;
-        this.activeNodeId = this.tvExplorer.root.data.Id;
-      }
+      //   }
+      // } else {
+        // this.activeNodeData = this.tvExplorer.root.data;
+        // this.activeNodeId = this.tvExplorer.root.data.Id;
+      // }
 
     }, "Loading forests/trees");
   }
@@ -439,9 +440,7 @@ export class ForestExplorerApplet extends Applet  {
               scope="this"
               .source="${this.#activeNodeData}"
               .openVersions="${() => this.dlgNodeVersions.show({
-                source: this.#activeNodeData,
-                activeForest: this.activeForest,
-                activeTree: this.activeTree
+                source: this.#activeNodeData
               })}"
               ></az-cforest-summary>
           </div>
