@@ -68,23 +68,29 @@ export class CaseSelects extends CaseBase {
   #selParentChange(e) {
     const selectedValue = e.target.value;
     const selectedData = this.dropdownData.find(({ value }) => value === selectedValue);
+
     // set child dropdown options based on the selected parent
     this.selChild.options = selectedData?.childOptions || [];
     // default the value to the first item in the child options
-    this.selChild.value = this.selChild.options[0]?.value || "";
+    this.selChild.value = selectedData?.childOptions[0]?.value;
+
     // set grandchild options based on the first child option
-    const selectedChildObj = this.selChild.options.find(({ value }) => value === this.selChild.value);
+    const selectedChildObj = selectedData.childOptions.find(({ value }) => value === this.selChild.value);
+
     // set grandchild dropdown options based on the selected child
     this.selGrandchild.options = selectedChildObj?.grandchildOptions || [];
+
   }
 
   #selChildChange(e) {
     const selectedValue = e.target.value;
     const selectedChildData = this.selChild.options.find(({ value }) => value === selectedValue);
+
     // set grandchild dropdown options based on the selected child
     this.selGrandchild.options = selectedChildData?.grandchildOptions || [];
     // default the value to the first item in the grandchild options
     this.selGrandchild.value = this.selGrandchild.options[0]?.value || "";
+
   }
 
   renderControl() {
