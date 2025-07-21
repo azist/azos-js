@@ -1,8 +1,10 @@
 import { html, css } from "../../ui";
-import { ModalDialog } from "../../modal-dialog.js";
+import { ModalDialog } from "../../modal-dialog";
 import { Spinner } from "../../spinner";
 import { ForestSetupClient } from "../../../azos/sysvc/cforest/forest-setup-client";
 import "../../parts/select-field";
+import * as aver from "../../../azos/aver"
+import "../util/code-box";
 
 /**
  * Dialog for displaying, selecting, and viewing versions of a source forest node.
@@ -13,12 +15,6 @@ class ForestNodeVersionsDialog extends ModalDialog {
     az-select { width: -webkit-fill-available; }
   `];
 
-  static properties = {
-    source: { type: Object },
-    activeForest: { type: String },
-    activeTree: { type: String },
-  }
-
   #ref = { forestClient: ForestSetupClient };
 
   /**
@@ -27,6 +23,7 @@ class ForestNodeVersionsDialog extends ModalDialog {
   #selectedVersions = null;
   #selectedVersionDetails = null;
   #selectedVersionId = null;
+
   #versionOptions = [];
 
   connectedCallback() {
@@ -34,12 +31,16 @@ class ForestNodeVersionsDialog extends ModalDialog {
     this.link(this.#ref);
   }
 
+
   /**
-   * Shows the dialog and loads the versions for the selected node.
+   * Lifecycle hook for the Modal show() method
+   * this.modalArgs contains the initial settings passed to the dialog.
+   * It initializes the dialog with the provided source node's versions.
    */
-  show(){
-    this.#loadVersions();
-    return super.show();
+  async _show() {
+    aver.isObject(this.modalArgs, "version dlg modalArgs must be an object");
+    aver.isObject(this.modalArgs.source, "version dlg modalArgs.source must be an object");
+    await this.#loadVersions();
   }
 
   /**
@@ -78,7 +79,7 @@ class ForestNodeVersionsDialog extends ModalDialog {
    */
   async #loadVersionDetails(versionId) {
     this.#selectedVersionId  = this.source.DataVersion?.G_Version;
-    this.#selectedVersionDetails = await this.#ref.forestClient.nodeInfoVersion(`${this.source.Tree}.gver@${this.source.Forest}::${versionId}`);
+    this.#selectedVersionDetails = await this.#ref.forestClient.nodeInfoVersion(`${this.source.Tree}.gver@${this.source.Forest}::${versionId}`) || {};
     this.requestUpdate();
   }
 
@@ -98,7 +99,7 @@ class ForestNodeVersionsDialog extends ModalDialog {
       </div>
 
       <div class="row">
-        <az-object-inspector id="objectInspector" scope="this" .source=${this.#selectedVersionDetails}></az-object-inspector>
+        <az-code-box id="objectInspector" scope="this"  highlight="json" .source=${JSON.stringify(this.#selectedVersionDetails, null, 2)}></az-code-box>
       </div>
 
       <div class="row">

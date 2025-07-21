@@ -440,9 +440,7 @@ export class ForestExplorerApplet extends Applet  {
               scope="this"
               .source="${this.#activeNodeData}"
               .openVersions="${() => this.dlgNodeVersions.show({
-                source: this.#activeNodeData,
-                activeForest: this.activeForest,
-                activeTree: this.activeTree
+                source: this.#activeNodeData
               })}"
               ></az-cforest-summary>
           </div>

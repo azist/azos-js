@@ -13,15 +13,26 @@ class ForestSettingsDialog extends ModalDialog {
     az-text, az-select { width: -webkit-fill-available; }
   `];
 
+
+  /**
+   * Options to render in the forest selection dropdown.
+   */
+  #forestOptions = [];
+
+  /**
+   * Options to render in the tree selection dropdown.
+   */
+  #treeOptions = [];
+
   /**
    * Handles the change event for the forest selection dropdown.
    * Updates the temporary forest selection and retrieves the corresponding trees.
    */
   #onForestChange(e){
-    const forestTrees = this.modalArgs.forests.find(f => f.id === e.target.value)?.trees || [];
-    this.selTree.innerHTML = forestTrees.map(tree => `<option value="${tree}" title="${tree}">${tree}</option>`).join("");
-    this.selTree.value = forestTrees[0] || "";
-    this.selTree.requestUpdate();
+    const selectedForest = this.modalArgs.forests.find(f => f.id ===  e.target.value);
+    this.#treeOptions = selectedForest?.trees.map(tree => ({ value: tree, title: tree }));
+    this.selTree.options = this.#treeOptions;
+    this.selTree.value = selectedForest.trees[0];
   }
 
   /**
@@ -30,19 +41,23 @@ class ForestSettingsDialog extends ModalDialog {
    * It initializes the dialog with the provided forest, tree, and asOfUtc date.
    */
   async _show(){
-    aver.isObject(this.modalArgs, "modalArgs must be an object");
-    aver.isArray(this.modalArgs.forests, "modalArgs.forests must be an array");
-    aver.isString(this.modalArgs.forest, "modalArgs.forest must be a string");
-    aver.isString(this.modalArgs.tree, "modalArgs.tree must be a string");
-    aver.isStringOrNull(this.modalArgs.asOfUtc, "modalArgs.asOfUtc must be a string or null");
+    aver.isObject(this.modalArgs, "modalArgs obj");
+    aver.isArray(this.modalArgs.forests, "modalArgs.forests arr");
+    aver.isString(this.modalArgs.forest, "modalArgs.forest str");
+    aver.isString(this.modalArgs.tree, "modalArgs.tree str");
+    aver.isStringOrNull(this.modalArgs.asOfUtc, "modalArgs.asOfUtc str|null");
 
-    // initialize the forest select
-    this.selForest.innerHTML = this.modalArgs.forests.map(forest => `<option value="${forest.id}" title="${forest.id}">${forest.id}</option>`).join("");
-    this.selForest.value = this.modalArgs.forest;
+    // create a flat list of top level forest options
+    this.#forestOptions = this.modalArgs.forests.map(({ id }) => ({ value: id, title: id }));
+    this.selForest.options = this.#forestOptions || [];
+    this.selForest.value = this.modalArgs?.forest || this.modalArgs.forests[0].id;
 
-    // initialize the tree select
-    this.selTree.innerHTML = this.modalArgs.forests.find(f => f.id === this.modalArgs.forest)?.trees.map(tree => `<option value="${tree}" title="${tree}">${tree}</option>`).join("");
-    this.selTree.value = this.modalArgs.tree;
+    // create a flat list of tree options based on the selected forest
+    // if no forest is selected, default to the first forest's trees
+    const selectedForest = this.modalArgs.forests.find(f => f.id === this.selForest.value);
+    this.#treeOptions = (selectedForest || this.modalArgs.forests[0])?.trees.map(tree => ({ value: tree, title: tree }));
+    this.selTree.options = this.#treeOptions || undefined;
+    this.selTree.value = this.modalArgs?.tree || selectedForest.trees[0] || "";
 
     // initialize the asOfUtc text input
     this.tbAsOf.value = this.modalArgs.asOfUtc || undefined;
@@ -77,9 +92,13 @@ class ForestSettingsDialog extends ModalDialog {
   */
   #btnCancelClick(){
     // Overly aggressive cleanup of previous settings on close.
-    this.selForest.innerHTML = "";
+    this.#forestOptions = [];
+    this.#treeOptions = [];
+
+    this.selForest.options = undefined;
+    this.selTree.options = undefined;
+
     this.selForest.value = undefined;
-    this.selTree.innerHTML = "";
     this.selTree.value = undefined;
     this.tbAsOf.value = undefined;
 
@@ -90,13 +109,30 @@ class ForestSettingsDialog extends ModalDialog {
   renderBodyContent() {
     return html`
       <div class="strip-h">
-        <az-select id="selForest" scope="this" title="Forest" rank="Normal" @change="${this.#onForestChange}" isRequired></az-select>
+        <az-select
+          id="selForest"
+          scope="this"
+          title="Forest"
+          isRequired
+          rank="Normal"
+          @change="${this.#onForestChange}">
+          ${this.#forestOptions.map(opt => html`
+            <option value="${opt.value}">${opt.title}</option>
+          `)}</az-select>
       </div>
       <div class="strip-h">
-        <az-select id="selTree" scope="this" title="Tree" rank="Normal" isRequired></az-select>
+        <az-select
+          id="selTree"
+          scope="this"
+          title="Tree"
+          rank="Normal"
+          isRequired
+        >${this.#treeOptions.map(opt => html`
+          <option value="${opt.value}">${opt.title}</option>
+        `)}</az-select>
       </div>
       <div class="strip-h">
-        <az-text  id="tbAsOf" scope="this"  title="As of Date"  placeholder="01/21/2022 1:00 pm" dataType="date"  datakind="datetime"  timeZone="UTC" .value=${this.modalArgs?.asOfUtc || undefined}></az-text>
+        <az-text id="tbAsOf" scope="this" title="As of Date" placeholder="01/21/2022 1:00 pm" dataType="date" datakind="datetime" timeZone="UTC"></az-text>
       </div>
       <div class="row">&nbsp;</div>
       <div class="row cols2">
