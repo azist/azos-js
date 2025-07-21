@@ -23,7 +23,7 @@ import "./versions-dialog";
 import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
 
 /**
- * CfgForestApplet is an applet that provides a user interface for exploring and managing configuration forests, their trees, and their nodes.
+ * ForestExplorerApplet provides the user interface for exploring and managing configuration forests, their trees, and their nodes.
  */
 export class ForestExplorerApplet extends Applet  {
 

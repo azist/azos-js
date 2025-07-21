@@ -66,6 +66,7 @@ export class CaseSelects extends CaseBase {
 ];
 
   #selParentChange(e) {
+    // get parent selected
     const selectedValue = e.target.value; // capture the new value on change
     this.selParent.value = selectedValue; // set the parent select value to the new value
     const selectedData = this.dropdownData.find(({ value }) => value === selectedValue);
@@ -73,24 +74,23 @@ export class CaseSelects extends CaseBase {
     // get children
     const children = selectedData?.childOptions || []; // capture children from parent data
     const childrenValueList = children.reduce((a,c) => ({ ...a, [c.value]: c.title ?? c.value }), {}); // create valueList dictionary from children
-    this.selChild.valueList = JSON.stringify(childrenValueList); // set the sel valueList
+    this.selChild.valueList = childrenValueList; // set the sel valueList
     this.selChild.value = children[0]?.value;  // set the el value to the first item in the child options
 
     // get grandchildren
     const selectedChildObj = children.find(({ value }) => value === this.selChild.value);
     const grandchildren = selectedChildObj?.grandchildOptions || [];
     const grandchildrenValueList = grandchildren.reduce((a,c) => ({ ...a, [c.value]: c.title ?? c.value }), {});
-    this.selGrandchild.valueList = JSON.stringify(grandchildrenValueList);
-    this.selGrandchild.value = grandchildren[0]?.value;  // set the el value to the first item in the child options
+    this.selGrandchild.valueList = grandchildrenValueList;
+    this.selGrandchild.value = grandchildren[0]?.value;  // set the el value to the first item in the grandchild options
   }
 
   #selChildChange(e) {
     const selectedChild = e.target.value;
     const grandchildren = this.dropdownData.find(({ value }) => value === this.selParent.value).childOptions.find(({value}) => value === selectedChild).grandchildOptions || [];
     const grandchildrenValueList = grandchildren.reduce((a,c) => ({ ...a, [c.value]: c.title ?? c.value }), {});
-    this.selGrandchild.valueList = JSON.stringify(grandchildrenValueList);
-    this.selGrandchild.value = grandchildren[0]?.value;  // set the el value to the first item in the child options
-
+    this.selGrandchild.valueList = grandchildrenValueList;
+    this.selGrandchild.value = grandchildren[0]?.value;  // set the el value to the first item in the grandchild options
   }
 
   renderControl() {
