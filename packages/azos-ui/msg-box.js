@@ -66,11 +66,10 @@ export async function showMsg(status, title, message, rank = 3, pre = false){
   box.rank = rank;
   box.pre = pre;
   document.body.appendChild(box);
-  box.update();
-  try{
-    box.show();
-    await box.shownPromise;
-  }finally{
+  try {
+    box.update();
+    await box.show();
+  } finally {
     document.body.removeChild(box);
   }
 }

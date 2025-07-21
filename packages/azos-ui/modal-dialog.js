@@ -139,6 +139,7 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
 
   #shownPromise = null;
   #resolve = null;
+  #modalArgs = null;
   #modalResult = null;
 
   /** Optional `arena` allows for programmatic association, such as dialog boxes */
@@ -148,8 +149,11 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   /** Returns true if this dialog instance is already shown  */
   get isShown(){ return this.#shownPromise !== null;}
 
-  /** Returns a Promise which resolves with modal dialog result, or null if `show()` has not been called yet */
-  get shownPromise() { return this.#shownPromise; }
+  /** Gets modal args object which is set in a `show(args)` call and contains dialog show arguments */
+  get modalArgs() { return this.#modalArgs; }
+
+  /** Sets modal args object, which is typically passed in a `show(args)` call and contains dialog show arguments */
+  set modalArgs(v) { this.#modalArgs = v; }
 
   /** Gets modal result object which is set when this dialog is closed */
   get modalResult() { return this.#modalResult; }
@@ -157,21 +161,32 @@ dialog.error  { border: 2px solid var(--s-error-bg); }
   /** Sets modal result before this dialog gets closed */
   set modalResult(v) { this.#modalResult = v; }
 
+
   /**
-   * Opens a modal dialog box and instantly returns a promise
+   * Opens a modal dialog box and returns a promise
    * which is resolved on dialog close. You can then inspect `dialog.modalResult` property
-   * to see why/how/with what result dialog was closed
+   * to see why/how/with what result dialog was closed.
+   * The method calls the overridable `_show()` before dialog is shown so you can customize
+   * dialog setup process which happens just before actual show.
+   * @param {*} args - an optional args object which is set into `dialog.modalArgs` property. You can pass initial state on show
    * @returns {Promise<this>} a promise with is resolved upon dialog box closure
   */
-  show(){
+  async show(args){
     if (this.#shownPromise !== null) return this.#shownPromise;
     const dlg = this.#getDlgElm();
     this.#modalResult = null;
+    this.#modalArgs = args ?? null;
+    await this._show();
     dlg.showModal();
     this.#shownPromise = new Promise((resolve) => this.#resolve = resolve);
     ModalDialog.#instances.push(this);
-    return this.#shownPromise;
+    let result = await this.#shownPromise;
+    return result;
   }
+
+  /** Override to perform actions on show */
+  _show(){  }
+
 
   /**
    * Closes an open dialog box programmatically.

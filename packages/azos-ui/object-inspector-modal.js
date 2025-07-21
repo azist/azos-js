@@ -64,10 +64,9 @@ export class ObjectInspectorModal extends ModalDialog {
 export async function showObject(objToInspect, { title, ok, okBtnStatus } = {}, arena) {
   const modal = new ObjectInspectorModal(objToInspect, { title, ok, okBtnStatus }, arena);
   document.body.appendChild(modal);
-  modal.update();
   try {
-    modal.show();
-    return await modal.shownPromise;
+    modal.update();
+    return await modal.show();
   } finally {
     document.body.removeChild(modal);
   }
