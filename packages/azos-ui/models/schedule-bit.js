@@ -35,13 +35,16 @@ export class ScheduleBit extends Bit {
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
 
-      <az-text
-        id="tbTitle"
+      <az-nls-map-bit
+        id="nlsBit"
         scope="this"
-        name="NLSMap"
-        title="NLSMap Placeholder"
+        name="lclCode"
+        title="Local Schedule Name"
+        description="Localized Name of the Schedule"
+        .isReadonly="${this.isReadOnly}"
         class="span4"
-      ></az-text>
+        rank="small"
+      ></az-nls-map-bit>
 
       <az-span-bit
         id="bitSpan"
@@ -51,14 +54,16 @@ export class ScheduleBit extends Bit {
         title="${dflt(this.captionSpan, "Time Span")}"
       ></az-span-bit>
 
-      <az-day-override-bit
+      <az-day-override-item
         id="bitDayOverride"
         scope="this"
-      ></az-day-override-bit>
+        class="span3"
+      ></az-day-override-item>
 
       <az-adlib-tag-bit
         id="bitTag"
         scope="this"
+        class="span1"
       ></az-adlib-tag-bit>
 
     </div>

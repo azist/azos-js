@@ -128,16 +128,16 @@ export class CaseBit extends CaseBase {
 <az-span-bit
   id="bitSpan"
   scope="this"
-  captionName="default schedule span"
+  captionName="Schedule Name"
   captionRange="open"
 ></az-span-bit>
 
 <br>
 
-<az-day-override-bit
+<az-day-override-item
   id="bitDayOverride"
   scope="this"
-></az-day-override-bit>
+></az-day-override-item>
 
 <br>
 

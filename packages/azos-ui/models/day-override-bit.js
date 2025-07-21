@@ -5,17 +5,26 @@
 </FILE_LICENSE>*/
 
 
-import { TIME_ZONE_PROP } from "azos/types";
-import { dflt, dfltObject } from "azos/strings"
+import { DATA_VALUE_PROP, TIME_ZONE_PROP } from "azos/types";
+import { dflt, dfltObject, isNullOrWhiteSpace } from "azos/strings"
 import { TZ_UTC } from "azos/time";
 import { DATE_FORMAT, TIME_DETAILS } from "azos/localization";
 
-import { getEffectiveTimeZone, html } from "../ui.js";
-import { Bit } from "../bit.js";
+import { css, getEffectiveTimeZone, html, UiInputValue } from "../ui.js";
+import { Bit, ListBit } from "../bit.js";
 import { STL_INLINE_GRID } from "../styles";
 
-export class DayOverrideBit extends Bit {
-  static styles = [...Bit.styles, STL_INLINE_GRID];
+export class DayOverrideItem extends Bit {
+  //TODO: Update this styling, this is just example pulled from NlsMapItem 20250610 zwh
+  static styles = [...Bit.styles, css`
+      .item{
+        display: flex;
+      }
+      #tbName{ min-width: 10ch; max-width: 10ch; }
+      #tbDate{ min-width: 12ch; width: 20%; }
+      #nlsBit{ min-width: 20ch; width: 40%; }
+      #tbHours{ width: 40%; }
+    `];
 
   static properties = {
     captionName: { type: String },
@@ -28,15 +37,17 @@ export class DayOverrideBit extends Bit {
     const summary = dfltObject(this.tbName?.value, html`<span style="color: var(--ghost)">Day Override</span>`);
     // Always localize the DATE to UTC since we don't want that to be altered during localization elsewhere.
     // As the UTC date is a statutory date that will be compared against the application date in EVERY PARTICULAR LOCAL TIMEZONE
-    const subSummary = dflt(this.arena.app
+    const subSummary = isNullOrWhiteSpace(this.tbDate?.value) 
+                        ? "" 
+                        : this.arena.app
                           .localizer
                           .formatDateTime(
                             {
-                              dt:this.tbDate?.value,
-                              dtFormat:DATE_FORMAT.NUM_DATE,
-                              tmDetails: TIME_DETAILS.NONE,
+                              dt:this.tbDate?.value, 
+                              dtFormat:DATE_FORMAT.NUM_DATE, 
+                              tmDetails: TIME_DETAILS.NONE, 
                               timeZone: TZ_UTC
-                            }), "");
+                            });
     return {
       title: summary,
       subtitle: subSummary,
@@ -45,30 +56,29 @@ export class DayOverrideBit extends Bit {
 
   renderDetailContent() {
     return html`
-    <div class="row cols4">
+    <div class="item">
       <az-text
         id="tbName"
         scope="this"
         name="Name"
-        class="span4"
         .isReadonly="${this.isReadOnly}"
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
 
-      <az-text
-        id="tbTitle"
+      <az-nls-map-bit
+        id="nlsBit"
         scope="this"
-        name="NLSMap"
-        title="NLSMap Placeholder"
+        name="lclCode"
+        title="Localized Day"
+        description="Localized Name of the Day to be overridden"
         .isReadonly="${this.isReadOnly}"
-        class="span4"
-      ></az-text>
+        rank="small"
+      ></az-nls-map-bit>
 
       <az-text
         id="tbDate"
         scope="this"
         name="Date"
-        class="span2"
         contentWidth="50"
         titleWidth="50"
         title="Date"
@@ -82,12 +92,73 @@ export class DayOverrideBit extends Bit {
         id="tbHours"
         scope="this"
         name="Hours"
-        contentWidth="50"
-        titleWidth="50"
         title="${dflt(this.captionHours, "Hours")}"
-        class="span2"
       ></az-text>
     </div>`;
+  }
+}
+
+window.customElements.define("az-day-override-item", DayOverrideItem);
+
+export class DayOverrideBit extends ListBit {
+  static styles = [ListBit.styles];
+
+  makeOrMapElement(elmData, existingOnly = false)
+  {
+    if (this.indexOf(elmData) >= 0) return elmData;
+    const existing = this.find(el => el.tbName?.value === elmData)
+
+    if (existing) return existing;
+    if (existingOnly) return null;
+
+    const item = new DayOverrideItem();
+    item.rank = "medium";
+    item.noSummary = true;
+    return item;
+  }
+
+  _getSummaryData(effectDisabled, effectMutable){
+    const commands = effectMutable ? [this._cmdAdd, this._cmdRemove] : [];
+
+    const first = this.find(() => true);
+    const subtitle = first ? first.tbName?. value : "";
+
+    return {
+      title: `${dflt(this.title, this.description, this.name, "")} (${this.count})`,
+      subtitle: subtitle ?? "",
+      commands: commands
+    };
+  }
+
+  get [DATA_VALUE_PROP]() {
+    const result = {};
+    const array = super[DATA_VALUE_PROP];
+    for (const item of array){
+      result[item.name] = {d: item.d, h: item.h, c: item.c};
+    }
+    return result;
+  }
+
+  set [DATA_VALUE_PROP](v) {
+    if (v) {
+      let isUiInput = false;
+      if (v instanceof UiInputValue) {
+        isUiInput = true;
+        v = v.value();
+      }
+
+      if (!isArray(v)) {
+        let result = [];
+        for (const [ik, iv] of Object.entries(v)) {
+          result.push({name: ik, d: iv?.d, h: iv?.h, c: iv?.c});
+        }
+        v = isUiInput ? new UiInputValue(result) : result;
+      }
+    }
+
+    super[DATA_VALUE_PROP] = v;
+
+    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
   }
 }
 
