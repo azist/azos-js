@@ -43,7 +43,7 @@ import "../showcase/case-prose.js";
 import "../showcase/case-grid-split.js";
 import "../showcase/case-model-adlib.js"
 import "../showcase/case-model-nls.js"
-import "../showcase/case-model-schedule.js";
+//import "../showcase/case-model-schedule.js";
 import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
