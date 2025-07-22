@@ -77,13 +77,14 @@ export class TreeView extends Control {
       margin-left: 0.5em;
     }
     .ghostPostfix {
-      font-size: var(--r6-fs);
-      font-style: italic;
+      font-size: 0.5em;
       width: 100%;
       display: flex;
       justify-content: right;
       opacity: 0.6;
       padding-right: 0.5em;
+      padding-top: 0.5lh;
+      color: var(--brand1-ink-sup);
     }
     .nodeTitle {
       white-space: nowrap;
@@ -176,19 +177,16 @@ export class TreeView extends Control {
   }
 
   get selectedNode() { return this.#selectedNode; }
-  set selectedNode(node) {
+
+  async selectNode(node){
     if(!node || !node.isSelectable) return;
     if(this.#previouslySelectedNode) this.#previouslySelectedNode.isSelected = false;
     this.#previouslySelectedNode = node;
     this.#selectedNode = node;
     node.isSelected = true;
+    await this.selectedCallback?.(node);
     this.requestUpdate();
-    this.selectedCallback?.(node);
-  }
-
-  async selectNode(node){
-    this.selectedNode = node;
-    this.requestUpdate();
+    return node;
   }
 
   /**
@@ -197,7 +195,7 @@ export class TreeView extends Control {
    */
   _dispatchNodeUserActionEvent(node, eArgs) {
     // console.log("TreeView._dispatchNodeUserActionEvent", node, eArgs);
-    if(eArgs?.action === "click") this.selectedNode = node;
+    if(eArgs?.action === "click") this.selectNode(node);
     if(eArgs?.action === "opened") this.openedCallback?.(node);
     this.dispatchEvent(new CustomEvent("nodeUserAction", { detail: { node, ...eArgs } }))
   }

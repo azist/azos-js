@@ -12,7 +12,20 @@ import "../util/code-box";
 class ForestNodeVersionsDialog extends ModalDialog {
 
   static styles = [ ModalDialog.styles, css`
-    az-select { width: -webkit-fill-available; }
+    .fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      gap: 0.5em;
+      margin-top: 0.5em;
+    }
   `];
 
   #ref = { forestClient: ForestSetupClient };
@@ -40,27 +53,13 @@ class ForestNodeVersionsDialog extends ModalDialog {
   async _show() {
     aver.isObject(this.modalArgs, "version dlg modalArgs must be an object");
     aver.isObject(this.modalArgs.source, "version dlg modalArgs.source must be an object");
-    await this.#loadVersions();
-  }
 
-  /**
-   * Closes the dialog and resets the selected versions and details.
-   */
-  close() {
-    this.#selectedVersions = null;
-    this.#selectedVersionDetails = null;
-    this.#selectedVersionId = null;
-    this.#selectedVersionDetails = null;
-    this.objectInspector.source = {};
-    super.close();
-  }
+    /**
+     * Loads the versions for the selected node.
+     * It fetches the versions from the forest client and populates the version options.
+     * It also automatically loads the details of the currently selected version.
+     */
 
-  /**
-   * Loads the versions for the selected node.
-   * It fetches the versions from the forest client and populates the version options.
-   * It also automatically loads the details of the currently selected version.
-   */
-  async #loadVersions() {
     await Spinner.exec(async()=> {
       this.#selectedVersionId  = this.source.DataVersion?.G_Version;
       this.#selectedVersions = await this.#ref.forestClient.nodeVersionList(this.source.Id);
@@ -71,6 +70,12 @@ class ForestNodeVersionsDialog extends ModalDialog {
     }, "Loading versions...");
   }
 
+  /**
+   * Closes the dialog and resets the selected versions and details.
+   */
+  close() {
+    super.close();
+  }
 
   /**
    * Loads the details of a specific version by its ID.
@@ -86,7 +91,7 @@ class ForestNodeVersionsDialog extends ModalDialog {
   renderBodyContent(){
 
     return html`
-      <div class="row">
+      <div class="fields">
         <az-select
           id="selVersions"
           scope="this"
@@ -96,14 +101,11 @@ class ForestNodeVersionsDialog extends ModalDialog {
           @change="${e => this.#loadVersionDetails(e.target.value)}">
             ${this.#versionOptions.map(opt => html`<option value="${opt.value}" title="${opt.title}">${opt.title}</option>`)}
         </az-select>
-      </div>
+        </div>
 
-      <div class="row">
         <az-code-box id="objectInspector" scope="this"  highlight="json" .source=${JSON.stringify(this.#selectedVersionDetails, null, 2)}></az-code-box>
-      </div>
-
-      <div class="row">
-        <az-button @click="${() => this.close()}" title="Close" style="float: right;"></az-button>
+      <div class="buttons">
+        <az-button @click="${() => this.close()}" title="Close"></az-button>
       </div>`;
   }
 }
