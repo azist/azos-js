@@ -183,24 +183,6 @@ export class ForestExplorerApplet extends Applet  {
   });
 
   /**
-   * Applies the forest settings by updating the active forest, tree, and asOfUtc.
-   * If the settings are the same as the current active settings, it does nothing.
-   * @param {Object} settings - The settings object containing forest, tree, and asOfUtc.
-   * @param {string} settings.forest - The id of the forest to set as active.
-   * @param {string} settings.tree - The id of the tree to set as active.
-   * @param {string|null} settings.asOfUtc - The UTC timestamp to set as active, or null for "now".
-   */
-  async #applyForestSettings ({ forest, tree, asOfUtc }){
-    // console.log(`Applying settings: Forest=${forest}, Tree=${tree}, AsOfDate=${asOfUtc}`);
-    if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
-    this.activeForest = forest;
-    this.activeTree = tree;
-    this.activeAsOfUtc = asOfUtc;
-    this.activeNodeData = null;
-    this.refreshTree();
-  }
-
-  /**
    * Bootstrap the applet by initializing the client and tree view.
    */
   async appletBootstrap() {
@@ -238,6 +220,24 @@ export class ForestExplorerApplet extends Applet  {
   }
 
   /**
+   * Applies the forest settings by updating the active forest, tree, and asOfUtc.
+   * If the settings are the same as the current active settings, it does nothing.
+   * @param {Object} settings - The settings object containing forest, tree, and asOfUtc.
+   * @param {string} settings.forest - The id of the forest to set as active.
+   * @param {string} settings.tree - The id of the tree to set as active.
+   * @param {string|null} settings.asOfUtc - The UTC timestamp to set as active, or null for "now".
+   */
+  async #applyForestSettings ({ forest, tree, asOfUtc }){
+    // console.log(`Applying settings: Forest=${forest}, Tree=${tree}, AsOfDate=${asOfUtc}`);
+    if(this.activeForest === forest && this.activeTree === tree && this.activeAsOfUtc === asOfUtc) return;
+    this.activeForest = forest;
+    this.activeTree = tree;
+    this.activeAsOfUtc = asOfUtc;
+    this.activeNodeData = null;
+    this.refreshTree();
+  }
+
+  /**
    * Fetches trees for each forest and sets the active forest, tree, and asOfUtc.
    */
   async #loadForestsTrees() {
@@ -252,6 +252,7 @@ export class ForestExplorerApplet extends Applet  {
     this.#tree = this.activeTree || this.forests[0].trees[0];
     this.#asOfUtc = this.activeAsOfUtc || null;
   }
+
 
   /**
    * Cache map holding the nodeInfo and childNodeList results for each node id
@@ -336,14 +337,14 @@ export class ForestExplorerApplet extends Applet  {
    * explorer and set as the active/selected node.
    */
   async #initializeTreeView() {
-
+    let child = null;
     await Spinner.exec(async ()=> {
       // clear any existing children
       this.tvExplorer.root.removeAllChildren();
 
       // Load the root node for the currently active forest and tree
       const rootNodeInfo = await this.#client.probePath(this.#forest, this.#tree, "/", this.#asOfUtc);
-      const rootNode = this.tvExplorer.root.addChild(rootNodeInfo.PathSegment, {
+      child = this.tvExplorer.root.addChild(rootNodeInfo.PathSegment, {
         data: { ...rootNodeInfo },
         showPath: false,
         canOpen: true,
@@ -352,6 +353,8 @@ export class ForestExplorerApplet extends Applet  {
         isVisible: true,
       });
     },"Loading forests/trees");
+
+    return child;
   }
 
   /**
@@ -414,7 +417,7 @@ export class ForestExplorerApplet extends Applet  {
   getNodePathChain(node){
     const pathChain = [];
     while (node && !node.isRoot) {
-      pathChain.unshift({ id: node.data?.Id, segment: node.data?.PathSegment });
+      pathChain.unshift({ id: node.data?.Id, segment: node.data?.PathSegment, tree: node.data?.Tree, forest: node.data?.Forest });
       node = node.parent;
     }
     return pathChain;
@@ -458,9 +461,15 @@ export class ForestExplorerApplet extends Applet  {
     const previousPath = this.getNodePathChain(this.tvExplorer.selectedNode);
     await Spinner.exec(async () => {
       this.clearFetchCaches(); // clear caches to ensure fresh data
-      await this.#initializeTreeView();
-      const restoredNode = await this.restoreNodePath(previousPath);
-      this.tvExplorer.selectNode(restoredNode);
+      const currentNode = await this.#initializeTreeView();
+
+      if(previousPath[0].tree === this.activeTree && previousPath[0].forest === this.activeForest) {
+        const restoredNode = await this.restoreNodePath(previousPath);
+        this.tvExplorer.selectNode(restoredNode);
+      } else {
+        this.tvExplorer.selectNode(currentNode);
+      }
+
       this.tvExplorer.requestUpdate();
       this.requestUpdate();
     }, "Refreshing forest tree view");
