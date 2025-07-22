@@ -4,11 +4,10 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { isOneOf } from '../../azos/strings';
 import { html, parseRank, parseStatus } from '../ui.js';
 import { FieldPart } from './field-part.js';
 import { baseStyles, textFieldStyles } from './styles.js';
-import * as aver from '../../azos/aver';
+import { isObject } from 'azos/types';
 
 export class SelectField extends FieldPart {
   static properties = {
@@ -16,36 +15,8 @@ export class SelectField extends FieldPart {
      *  MUST BE BETWEEN 0 and 100 & less than (100 - titleWidth) - otherwise defaults to 40.
      */
     inputWidth: { type: Number },
-
-    /** Determines if this field is a standard dropdown select or a multiple select */
-    itemType: { type: String }
   }
   static styles = [baseStyles, textFieldStyles];
-
-  constructor() { super(); }
-
-  /** True if options are displayed in a dropdown menu */
-  get isDropdown() { return !this.isMultiple; }
-
-  /** True if user can select multiple options */
-  get isMultiple() { return isOneOf(this.itemType, ["multi", "multiple", "choices"]); }
-
-  /** options to be rendered for the select */
-  #options = [];
-  get options() { return this.#options; }
-  set options(opts) {
-    // Ensure options is an array
-    aver.isArray(opts);
-    // Validate each option object
-    opts.forEach(opt => {
-      aver.isObject(opt, "SelectField opts obj");
-      aver.isStringOrNull(opt.value, "SelectField opt value str|null");
-      aver.isStringOrNull(opt.title, "SelectField opt title str|null");
-    });
-    // Set the options
-    this.#options = opts;
-    this.requestUpdate();
-  }
 
   /** Handle change events for the select element */
   #selChange(e) {
@@ -53,20 +24,38 @@ export class SelectField extends FieldPart {
     this.inputChanged();
   }
 
+  // utility function to extract the options from the select element
+  #optionsFromElements() {
+    return [...this.getElementsByTagName("option")].map(option => ({
+      value: option.getAttribute('value'), title: option.title
+    }));
+  }
+
+  // utility function to extract the options from the valueList object
+  #optionsFromValueList(){
+    return Object.entries(this.valueList).map(([k, v]) => ({ value: k, title: v}));
+  }
+
+  // utility function to convert an option object to an option element
+  #optionToEl(option) {
+    return html`<option
+      value="${option.value}"
+      title="${option.title}"
+      .selected=${option.selected}>
+      ${option.title}
+    </option>`;
+  }
+
   renderInput(effectivelyDisabled, effectivelyBrowse) {
     const clsRank = `${parseRank(this.rank, true)}`;
     const clsStatusBg = `${parseStatus(this.status, true, "Bg")}`;
     const isSelected = (o) => this.value !== undefined && this.value === o.value;
 
-    const allOptions = this.#options.length > 0
-      ? this.#options.map(option => ({ ...option, selected: isSelected(option) }))
-      : [...this.getElementsByTagName("option")].map(option => {
-          return { value: option.getAttribute('value'), title: option.title,  selected: isSelected( option.getAttribute('value')) };
-        });
+    const allOptions = isObject(this.valueList)
+      ? this.#optionsFromValueList().map(option => ({ ...option, selected: isSelected(option) }))
+      : this.#optionsFromElements().map(option => ({ ...option, selected: isSelected(option) }));
 
-    const optionList = html`${allOptions.map((option) => html`
-      <option value="${option.value}" .selected=${option.selected}>${option.title}</option>
-    `)}`;
+    const optionList = html`${allOptions.map((option) => this.#optionToEl(option))}`;
 
     const rdOnly = this.isReadonly || effectivelyBrowse;
 
@@ -96,7 +85,6 @@ export class SelectField extends FieldPart {
   name="${this.id}"
   value="${this.value}"
   .disabled=${effectivelyDisabled}
-  .multiple=${this.isMultiple}
   .required=${this.isRequired}
   ?readonly=${rdOnly}
   @change="${this.#selChange}">
