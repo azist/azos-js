@@ -7,11 +7,11 @@
 import { dflt, dfltObject } from "azos/strings";
 
 import { html } from "../ui.js";
-import { Bit } from "../bit.js";
+import { Bit, ListBit } from "../bit.js";
 import { STL_INLINE_GRID } from "../styles";
-import { asAtom } from "azos/types";
+import { asAtom, DATA_VALUE_PROP, isArray } from "azos/types";
 
-export class AdlibTagBit extends Bit {
+export class AdlibTagItem extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
 
   static properties = {
@@ -78,4 +78,67 @@ export class AdlibTagBit extends Bit {
   }
 }
 
-window.customElements.define("az-adlib-tag-bit", AdlibTagBit)
+window.customElements.define("az-adlib-tag-item", AdlibTagItem)
+
+export class AdlibTagBit extends ListBit {
+  static styles = [ListBit.styles];
+
+  makeOrMapElement(elmData, existingOnly = false) {
+    if (this.indexOf(elmData) >= 0) return elmData;
+    
+    const existing = this.find(el => el.tbProp?.value === elmData);
+
+    if (existing) return existing;
+    if (existingOnly) return null;
+
+    const item = new AdlibTagItem();
+    item.rank = "medium";
+    item.noSummary = true;
+    return item;
+  }
+
+  _getSummaryData(effectDisabled, effectMutable){
+    const commands = effectMutable ? [this._cmdAdd, this._cmdRemove] : [];
+
+    const first = this.find(() => true);
+    const subtitle = first ? first.tbProp?.value : "";
+
+    return {
+      title: `${dflt(this.title, this.ariaDescription, this.name, "")} (${this.count})`,
+      subtitle: subtitle ?? "",
+      commands: commands,
+    };
+  }
+
+  get[DATA_VALUE_PROP](){
+    const result = {};
+    const array = super[DATA_VALUE_PROP];
+    for(const item of array){
+      // I'm not sure this will work, what happens when pname is duplicated for multiple values... we need something unique right?
+      result[item.pname] = {v: item.v};
+    }
+    return result;
+  }
+
+
+  set[DATA_VALUE_PROP](v){
+    if(v){
+      let isUiInput = false;
+      if (v instanceof UiInputValue) {
+        isUiInput = true;
+        v = v.value();
+      }
+
+      if(!isArray(v)) {
+        let result = [];
+        for (const [ik, iv] of Object.entries(v)) {
+          result.push({pname: ik, v:iv})
+        }
+      }
+    }
+
+    queueMicrotask(async() => { await this.updateComplete(); this.requestUpdate(); });
+  }
+}
+
+window.customElements.define("az-adlib-tag-bit", AdlibTagBit);
