@@ -65,16 +65,6 @@ export class DayOverrideItem extends Bit {
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
 
-      <az-nls-map-bit
-        id="nlsBit"
-        scope="this"
-        name="lclCode"
-        title="Localized Day"
-        description="Localized Name of the Day to be overridden"
-        .isReadonly="${this.isReadOnly}"
-        rank="small"
-      ></az-nls-map-bit>
-
       <az-text
         id="tbDate"
         scope="this"
@@ -94,6 +84,17 @@ export class DayOverrideItem extends Bit {
         name="Hours"
         title="${dflt(this.captionHours, "Hours")}"
       ></az-text>
+
+      <az-nls-map-bit
+        id="nlsBit"
+        scope="this"
+        name="lclCode"
+        title="Localized Day"
+        description="Localized Name of the Day to be overridden"
+        .isReadonly="${this.isReadOnly}"
+        rank="small"
+      ></az-nls-map-bit>
+      
     </div>`;
   }
 }
