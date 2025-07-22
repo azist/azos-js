@@ -315,7 +315,7 @@ export class ForestExplorerApplet extends Applet  {
    * @param {TreeNode} parentNode - The parent node to add children to.
    */
   async addChildrenNodes(parentNode){
-    if(parentNode.isChildNodeListLoaded) return;
+    if(parentNode.isChildNodeListLoaded) return parentNode.children;
     parentNode.isChildNodeListLoaded = true;
 
     aver.isObject(parentNode, "parentNode obj");
@@ -324,7 +324,9 @@ export class ForestExplorerApplet extends Applet  {
 
     const childNodeList = await this.#client.childNodeList(parentNode.data.Id, this.activeAsOfUtc) || [];
 
+    let children = [];
     if(childNodeList.length > 0) {
+
       parentNode.icon = "svg://azos.ico.folder";
       parentNode.showChevron = true;
 
@@ -332,7 +334,7 @@ export class ForestExplorerApplet extends Applet  {
         const child = childNodeList[index];
         const childNodeInfo = await this.#client.nodeInfo(child.Id);
         const grandChildNodeList = await this.#client.childNodeList(child.Id, this.activeAsOfUtc) || [];
-        parentNode.addChild(child.PathSegment, {
+        const childNode = parentNode.addChild(child.PathSegment, {
           data: { ...childNodeInfo },
           showPath: false,
           canOpen: grandChildNodeList.length > 0,
@@ -341,11 +343,14 @@ export class ForestExplorerApplet extends Applet  {
           endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)}</span>`,
           isVisible: true,
         });
+        children.push(childNode);
       }
     }
     parentNode.isChildNodeListLoaded = true;
     parentNode.isLoadingDetails = false;
     this.tvExplorer.requestUpdate();
+
+    return children;
   }
 
   /**
@@ -363,50 +368,107 @@ export class ForestExplorerApplet extends Applet  {
     if(this.isSelected) this.tvExplorer.selectedCallback(node);
   }
 
+  /**
+   * Walks up the parent nodes and returns chain array [{ id: "123",  segment: "abc" }]
+   * @param {TreeNode} node 
+   * @returns 
+   */
+  getNodePathChain(node){
+    const pathChain = [];
+    while (node && !node.isRoot) {
+      pathChain.unshift({
+        id: node.data?.Id,
+        segment: node.data?.PathSegment
+      });
+      node = node.parent;
+    }
+    return pathChain;
+  };
+
+  /**
+   * Array of previous node details (id,path) 
+   */
+  async restoreNodePath(pathChain) {
+    let parent = this.tvExplorer.root;
+    let foundNode = null;
+
+    for (let step of pathChain) {
+      await this.addChildrenNodes(parent); // load children
+      this.tvExplorer.requestUpdate();
+      foundNode = parent.children.find(c => c.data?.Id === step.id);
+      
+      if (!foundNode) {
+        // this.toastr.show(`Could not locate node: ${step.segment}`, { type: "warning" });
+        console.error(`Could not locate node: ${step.segment}`, { type: "warning" });
+        return null;
+      }
+
+      await this.updateOnNodeSelect(foundNode);
+      foundNode.open();
+      parent = foundNode;
+    }
+
+    return foundNode;
+  } 
+
+  async refreshTree(){
+    const previousPath = getNodePathChain(this.tvExplorer.selectedNode);
+
+    await Spinner.exec(async () => {
+      await this.#initializeTreeView();
+
+      const restoredNode = await this.restoreNodePath(previousPath);
+      if (restoredNode) {
+        this.tvExplorer.selectNode(restoredNode);
+        this.tvExplorer.requestUpdate();
+        this.requestUpdate();
+      }
+    }, "Refreshing forest tree view");
+  }
 
   /**
    * Refreshes the entire tree view by reloading the root node and its children.
    * After refresh it sets the active node to the previously active node if one is set.
    * If the current active node does not match the active tree and forest, it sets the active node to the root node.
    */
-  async refreshTree(){
-    const currentNode = this.tvExplorer.selectedNode;
-    const previousNodes = [ currentNode ]; // start with the current node
+  // async refreshTree(){
+  //   const currentNode = this.tvExplorer.selectedNode;
+  //   const previousNodes = [ currentNode ]; // start with the current node
 
-    // if the current node is a root node then we need to select it after refreshing the data
-    if(!currentNode.isRoot) {
-      // to do so we'll capture the parents prior to refreshing the tree view
-      // collect all parent nodes of the current node
-      let currentNodeObj = currentNode.parent;
-      while (currentNodeObj) {
-        if(!currentNodeObj.isRoot) {
-          previousNodes.unshift(currentNodeObj); // reverse order to maintain hierarchy
-          currentNodeObj = currentNodeObj.isRoot ? null : currentNodeObj.parent;
-        } else {
-          currentNodeObj = null; // stop if we reach the root node
-        }
-      }
-      console.log("Refreshing tree view, previous nodes:", previousNodes);
-    }
+  //   // if the current node is a root node then we need to select it after refreshing the data
+  //   if(!currentNode.isRoot) {
+  //     // to do so we'll capture the parents prior to refreshing the tree view
+  //     // collect all parent nodes of the current node
+  //     let currentNodeObj = currentNode.parent;
+  //     while (currentNodeObj) {
+  //       if(!currentNodeObj.isRoot) {
+  //         previousNodes.unshift(currentNodeObj); // reverse order to maintain hierarchy
+  //         currentNodeObj = currentNodeObj.isRoot ? null : currentNodeObj.parent;
+  //       } else {
+  //         currentNodeObj = null; // stop if we reach the root node
+  //       }
+  //     }
+  //     console.log("Refreshing tree view, previous nodes:", previousNodes);
+  //   }
 
-    await Spinner.exec(async()=> {
-      await this.#initializeTreeView(previousNodes);
-      for (let i = 0; i < previousNodes.length; i++) {
-        const node = previousNodes[i];
-        // find the node in the tree view and select it
-        const foundNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === node.data.Id);
-        if (foundNode) {
-          this.tvExplorer.selectNode(foundNode);
-          let navNode = await this.updateOnNodeSelect(foundNode, true); // force open to load children
-          navNode.open();
-          this.tvExplorer.selectedNode = navNode; // set the selected node to the opened node
-          console.log("Selected node after refresh:", navNode.title, navNode.data);
-          this.tvExplorer.requestUpdate();
-          this.requestUpdate();
-        }
-      }
-    }, "Refreshing forest tree view");
-  }
+  //   await Spinner.exec(async()=> {
+  //     await this.#initializeTreeView(previousNodes);
+  //     for (let i = 0; i < previousNodes.length; i++) {
+  //       const node = previousNodes[i];
+  //       // find the node in the tree view and select it
+  //       const foundNode = this.tvExplorer.getAllVisibleNodes().find(n => n.data.Id === node.data.Id);
+  //       if (foundNode) {
+  //         this.tvExplorer.selectNode(foundNode);
+  //         let navNode = await this.updateOnNodeSelect(foundNode, true); // force open to load children
+  //         navNode.open();
+  //         this.tvExplorer.selectedNode = navNode; // set the selected node to the opened node
+  //         console.log("Selected node after refresh:", navNode.title, navNode.data);
+  //         this.tvExplorer.requestUpdate();
+  //         this.requestUpdate();
+  //       }
+  //     }
+  //   }, "Refreshing forest tree view");
+  // }
 
   // Searches the tree view for a node with the specified path.
   // If found, it selects the node and updates the active node data and id.
