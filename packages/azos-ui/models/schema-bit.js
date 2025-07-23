@@ -56,7 +56,7 @@ export class SchemaBit extends Bit {
 
   render() {
 
-    const attrs = this.source?.attrs[0] || {};
+    const attrs = this.source?.attrs && this.source.attrs.length > 0 ? this.source.attrs[0] : {};
     const fields = this.source?.fields || [];
 
     const metadataJsonString = attrs.meta ? JSON.stringify(attrs.meta, null, 2) : "";
@@ -131,7 +131,7 @@ export class SchemaFieldBit extends Bit {
   static properties = { source: { type: Object } };
 
   render() {
-    const attrs = this.source?.attributes[0] || {};
+    const attrs = this.source?.attributes?.length > 0 ? this.source.attributes[0] || {} : {};
     const fldDescription = attrs.description !== this.source.name ? `${attrs.description}` : undefined;
     const description = [`${this.source.order}`, fldDescription, `${this.source.type}`].filter(d=>d).join(" :: ");
 
