@@ -36,7 +36,6 @@ export class SpanBit extends Bit {
     }
   }
 
-  //TODO: Add data validation after creating parse, parseComponent, parseMinute from C#
   renderDetailContent() {
 
     log.writeConsole(validateHourList("9am-12pm, 1:00pm-7:45pm"));
@@ -59,6 +58,7 @@ export class SpanBit extends Bit {
         description="Localized name of the Span"
         .isReadonly="${this.isReadOnly}"
         class="span4"
+        status="alert"
       ></az-nls-map-bit>
     </div>
 

@@ -42,6 +42,9 @@ import "../showcase/case-grids.js";
 import "../showcase/case-prose.js";
 import "../showcase/case-grid-split.js";
 import "../showcase/case-schema-bit.js";
+import "../showcase/case-model-adlib.js"
+import "../showcase/case-model-nls.js"
+import "../showcase/case-model-schedule.js";
 import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
@@ -114,6 +117,7 @@ export class ShowcaseApplet extends Applet {
     <select id="caseSelect" @change="${this.#onCaseChanged}" .value="${this.selectedCase ?? ""}">
       <option value="">Select a showcase item...</option>
       <option value="Accordion">Accordion</option>
+      <option value="AdlibTag">Adlib Tag Model</option>
       <option value="Buttons">Buttons</option>
       <option value="ButtonsWithIcons">Buttons With Icons</option>
       <option value="Bits">Bits</option>
@@ -127,8 +131,10 @@ export class ShowcaseApplet extends Applet {
       <option value="InputTests">Input Tests</option>
       <option value="Lookup">Lookup</option>
       <option value="Modals">Modals</option>
+      <option value="NlsMap">Nls Map Model</option>
       <option value="ObjectInspector">Object Inspector</option>
       <option value="RadioButtons">Radio Buttons</option>
+      <option value="Schedule">Schedule Model</option>
       <option value="Scheduler">Scheduler</option>
       <option value="Selects">Selects</option>
       <option value="Sizing">Sizing</option>
@@ -156,6 +162,7 @@ export class ShowcaseApplet extends Applet {
     const showcase = this.selectedCase;
     const showcaseMap = {
       Accordion: html`<az-case-accordion></az-case-accordion>`,
+      AdlibTag: html`<az-case-model-adlib></az-case-model-adlib>`,
       Buttons: html`<az-case-buttons></az-case-buttons>`,
       ButtonsWithIcons: html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`,
       Bits: html`<az-case-bit></az-case-bit>`,
@@ -168,9 +175,11 @@ export class ShowcaseApplet extends Applet {
       Images: html`<az-case-images></az-case-images>`,
       InputTests: html`<az-case-input-tests></az-case-input-tests>`,
       Lookup: html`<az-case-lookup></az-case-lookup>`,
+      NlsMap: html`<az-case-model-nls-map></az-case-model-nls-map>`,
       Modals: html`<az-case-modals></az-case-modals>`,
       ObjectInspector: html`<az-case-object-inspector></az-case-object-inspector>`,
       RadioButtons: html`<az-case-radios></az-case-radios>`,
+      Schedule: html`<az-case-model-schedule></az-case-model-schedule>`,
       Scheduler: html`<az-case-scheduler></az-case-scheduler>`,
       Selects: html`<az-case-selects></az-case-selects>`,
       Sizing: html`<az-case-sizing></az-case-sizing>`,
@@ -185,7 +194,6 @@ export class ShowcaseApplet extends Applet {
       Grids: html`<az-case-grids></az-case-grids>`,
       GridSplit: html`<az-case-grid-split></az-case-grid-split>`,
       Prose: html`<az-case-prose></az-case-prose>`,
-
     };
 
     return showcaseMap[showcase] || noContent;
