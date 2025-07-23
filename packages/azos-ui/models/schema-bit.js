@@ -1,6 +1,27 @@
 import { Bit } from "azos-ui/bit";
 import { html, css } from "azos-ui/ui";
 
+
+/**
+ * Example schema:
+ * {
+ *   "data": {
+ *   "handle": "#0",
+ *   "name": "Account",
+ *   "readonly": false,
+ *   "attrs": [
+ *     {
+ *       "target": "*",
+ *       "name": "Account",
+ *       "description": "Account",
+ *       "immutable": false,
+ *       "meta": "..."}"
+ *     }
+ *   ],
+ *   "fields": [...]
+ *  }
+ */
+
 export class SchemaBit extends Bit {
   static properties = {
     source: { type: Object }
@@ -52,6 +73,21 @@ export class SchemaBit extends Bit {
         status="default"
         rank="3">
 
+        <ul>
+          <li>Schema: ${this.source.name}</li>
+          <li>handle: ${this.source.handle}</li>
+          <li>Readonly: ${this.source.readonly ? "Yes" : "No"}</li>
+          <li>Fields: ${fields.length}</li>
+          <li>Attributes:
+            <ul>
+              ${attrs.target ? html`<li>Target: ${attrs.target}</li>` : ""}
+              ${attrs.name ? html`<li>Name: ${attrs.name}</li>` : ""}
+              ${attrs.description ? html`<li>Description: ${attrs.description}</li>` : ""}
+              ${attrs.immutable ? html`<li>Immutable: Yes</li>` :  html`<li>Immutable: No</li>`}
+            </ul>
+          </li>
+        </ul>
+
         <az-bit id="schemaMetadataBit" scope="this" title="Metadata" status="default" rank="5">
           <az-code-box highlight="js" source="${metadataJsonString}"></az-code-box>
         </az-bit>
@@ -95,8 +131,9 @@ export class SchemaFieldBit extends Bit {
   static properties = { source: { type: Object } };
 
   render() {
-    const attrs = this.source?.attributes || {};
-    const description = attrs.description !== this.source.name ? attrs.description : null;
+    const attrs = this.source?.attributes[0] || {};
+    const fldDescription = attrs.description !== this.source.name ? `${attrs.description}` : undefined;
+    const description = [`${this.source.order}`, fldDescription, `${this.source.type}`].filter(d=>d).join(" :: ");
 
     return this.source ? html`
       <az-bit
@@ -107,9 +144,18 @@ export class SchemaFieldBit extends Bit {
         status="default"
         rank="4">
 
+        <ul>
+          <li>Order: ${this.source.order}</li>
+          <li>Type: ${this.source.type}</li>
+          <li>GetOnly: ${this.source.getOnly ? "Yes" : "No"  }</li>
+          <li>Required: ${attrs.required ? "Yes" : "No"}</li>
+          <li>Max Length: ${attrs.maxLen || "N/A"}</li>
+        </ul>
+<!--
         <az-bit id="schemaFieldMetadataBit" scope="this" title="Metadata" status="default">
           <az-code-box highlight="js" scope="this" source="${JSON.stringify(attrs.meta, null, 2)}"></az-code-box>
         </az-bit>
+ !-->
       </az-bit>
     ` : html`<p>No field data available</p>`;
   }
