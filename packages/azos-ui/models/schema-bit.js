@@ -43,8 +43,8 @@ export class SchemaBit extends Bit {
     // prepare title and description for the bit
     const isUniqueTitle = this.title !== this.source?.name && this.title !== this.constructor.name;
     const title = `${ isUniqueTitle ? this.title : this.source?.name }`;
-    const subtitle = `${this.source?.fields.length ?? 0} fields${this.source?.attrs.description !== this.source?.attrs?.name
-      ? `: ${this.source?.attrs.description}`
+    const subtitle = `${this.source?.fields?.length ?? 0} fields${this.source?.attrs?.description !== this.source?.attrs?.name
+      ? `: ${this.source?.attrs?.description}`
       : ""
     }`;
 
