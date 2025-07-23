@@ -17,7 +17,7 @@ export class SchemaBit extends Bit {
     }
 
     .composite az-bit{
-      width: 28ch;
+      width: 22ch;
       transition: 1s;
     }
 
@@ -88,11 +88,10 @@ export class SchemaBit extends Bit {
               const description = [`${field.order}`, fldDescription, `${field.type}`].filter(d=>d).join(" :: ");
 
               return html`<az-bit id="schemaFieldBit-${i}" scope="this" title="${field.name}" group="schemaFields" rank="5">
-
                 <ul>
-                  <li>Order: ${this.source.order}</li>
-                  <li>Type: ${this.source.type}</li>
-                  <li>GetOnly: ${this.source.getOnly ? "Yes" : "No"  }</li>
+                  <li>Order: ${field.order}</li>
+                  <li>Type: ${field.type}</li>
+                  <li>GetOnly: ${field.getOnly ? "Yes" : "No"  }</li>
                   <li>Required: ${attrs.required ? "Yes" : "No"}</li>
                   <li>Max Length: ${attrs.maxLen || "N/A"}</li>
                 </ul>
