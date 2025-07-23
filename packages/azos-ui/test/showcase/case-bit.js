@@ -6,12 +6,15 @@
 
 import { html } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
+import schemaAccountDemo from "./_schema_account_example.json" assert { type: "json" };
+
 import "../../bit.js";
 import "../../../azos-ui/models/lat-lng-bit.js";
 import "../../../azos-ui/models/span-bit.js";
 import "../../../azos-ui/models/day-override-bit.js";
 import "../../../azos-ui/models/adlib-tag-bit.js";
 import "../../../azos-ui/models/schedule-bit.js";
+import "../../../azos-ui/models/schema-bit.js";
 
 export class CaseBit extends CaseBase {
   renderControl() {
@@ -116,6 +119,8 @@ export class CaseBit extends CaseBase {
   </p>
 </az-bit>
 
+<br>
+
 <az-lat-lng-bit
   id="bitLatLng"
   scope="this"
@@ -151,10 +156,20 @@ export class CaseBit extends CaseBase {
   boundsMax="5"
 ></az-adlib-tag-bit>
 
+<br>
+
 <az-schedule-bit
   id="bitSchedule"
   scope="this"
 ></az-schedule-bit>
+
+<br>
+
+<az-schema-bit
+  scope="this"
+  .source="${schemaAccountDemo.data}"
+  title="Schema: ${schemaAccountDemo.data.name}">
+</az-schema-bit>
     `;
   }
 }
