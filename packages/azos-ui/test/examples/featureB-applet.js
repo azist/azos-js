@@ -116,7 +116,7 @@ export class ExampleFeatureBApplet extends Applet{
      <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Block Data"></az-button>
      <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Set block"></az-button>
      <az-button id="btnValidate" scope="this" @click="${this.#btnValidateClick}" title="Validate block"></az-button>
-     <az-button id="btnValidate" scope="this" @click="${this.#btnModalClick}" title="Show Modal"></az-button>
+     <az-button id="btnModal" scope="this" @click="${this.#btnModalClick}" title="Show Modal"></az-button>
 
  <az-modal-dialog id="dlgPerson" scope="self" title="Person Data">
   <div slot="body">
