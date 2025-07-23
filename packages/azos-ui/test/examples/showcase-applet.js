@@ -41,6 +41,7 @@ import "../showcase/case-cards.js";
 import "../showcase/case-grids.js";
 import "../showcase/case-prose.js";
 import "../showcase/case-grid-split.js";
+import "../showcase/case-schema-bit.js";
 import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
@@ -117,6 +118,7 @@ export class ShowcaseApplet extends Applet {
       <option value="ButtonsWithIcons">Buttons With Icons</option>
       <option value="Bits">Bits</option>
       <option value="BitLists">Bit Lists</option>
+      <option value="SchemaBit">Schema Bit</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
       <option value="ErrorBox">Error Box</option>
@@ -158,6 +160,7 @@ export class ShowcaseApplet extends Applet {
       ButtonsWithIcons: html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`,
       Bits: html`<az-case-bit></az-case-bit>`,
       BitLists: html`<az-case-bit-lists></az-case-bit-lists>`,
+      SchemaBit: html`<az-case-schema-bit></az-case-schema-bit>`,
       Checkboxes: html`<az-case-checkboxes></az-case-checkboxes>`,
       CodeBox: html`<az-case-code-box></az-case-code-box>`,
       ErrorBox: html`<az-case-error-box></az-case-error-box>`,

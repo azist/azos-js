@@ -1,54 +1,118 @@
 import { Bit } from "azos-ui/bit";
-import { html } from "azos-ui/ui";
+import { html, css } from "azos-ui/ui";
 
 export class SchemaBit extends Bit {
   static properties = {
     source: { type: Object }
   }
 
+  static styles = [Bit.styles, css`
+    .strip-h {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 0.5em;
+      gap: 1ch;
+      justify-content: space-between;
+      margin-top: 1em;
+    }
+    `];
+
+  /**
+   * Schma bit will display the schema
+   *   main bit:
+   *     title: schema name
+   *     description: {count} fields {decription if different than name}
+   *     body:
+   *       text Account information
+   *       Metadata bit:
+   *         title: Metadata
+   *         description: none
+   *         body: current schema metadata
+   *       Repeating Field bits
+   */
+
+
   render() {
+
+    const attrs = this.source?.attrs[0] || {};
+    const fields = this.source?.fields || [];
+
+    const metadataJsonString = attrs.meta ? JSON.stringify(attrs.meta, null, 2) : "";
+    const description = `${fields.length || 0} fields${attrs.description !== attrs?.name ? `: ${attrs.description}` : ""}`;
+
     return this.source?.fields ? html`
-      <div class="schemaBit">
-        ${this.source?.attrs && this.source.attrs.length > 0 ? html`
 
-          ${ this.source.attrs.map( attrGrp => html`
-              <ul>
-                ${Object.entries(attrGrp).map(([key, value]) => html`
-                  <li><strong>${key}</strong>: ${value}</li>
-                `)}
-              </ul>
-          `)}
-        ` : html`<p>No attributes available</p>`}
+      <az-bit
+        id="schemaBit"
+        scope="this"
+        title="${attrs.name}"
+        description="${description}"
+        isExpanded=${true}
+        status="default"
+        rank="3">
 
-      <az-bit id="schemaBitFields" scope="this" title="Schema Fields (${this.source?.fields?.length || 0})" status="default" rank="5">
-        ${this.source?.fields ? this.source.fields.map( (field,i) => html`
-          <az-bit id="schemaBit${i}" scope="this" title="${field.name}" status="default">
-            <div class="schemaField">
-              <ul>
-                <li><strong>Name:</strong> ${field.name}</li>
-                <li><strong>Order:</strong> ${field.order || 0}</li>
-                <li><strong>Get Only:</strong> ${field.getOnly ? "Yes" : "No"}</li>
-                <li><strong>Type:</strong> ${field.type || "Unknown"}</li>
-              </ul>
+        <az-bit id="schemaMetadataBit" scope="this" title="Metadata" status="default" rank="5">
+          <az-code-box highlight="js" source="${metadataJsonString}"></az-code-box>
+        </az-bit>
 
-              ${ field.attributes && field.attributes.length > 0 ? field.attributes.map( attr => html`
+        <div class="strip-h">
+          ${fields
+            ? fields.map( (field,i) => html`
+              <az-schema-field-bit id="schemaFieldBit-${i}" scope="this" .source="${field}"></az-schema-field-bit>`)
+            : html`<li>No fields available</li>`}
+        </div>
 
-              <az-bit id="schemaFieldAttributes" scope="this" title="Attributes" status="default">
-                <ul>
-                  ${Object.entries(attr).map(([key, value]) => html`
-                    <li><strong>${key}:</strong> ${value}</li>
-                  `)}
-                </ul>
-              </az-bit>
-              `) : html`<p>No attributes available</p>`}
-
-            </div>
-          </az-bit>
-        `) : this.source?.fields === undefined ? html`<p>Loading Fields...</p>`
-        : html`<li>No fields available</li>`}
       </az-bit>
     </div>` : html`<p>No schema data available</p>`;
   }
 }
 
 window.customElements.define("az-schema-bit", SchemaBit);
+
+
+/**
+ * Example field:
+ * {
+ *    "name": "Id",
+ *    "order": 0,
+ *    "getOnly": false,
+ *    "type": "string",
+ *    "attributes": [
+ *      {
+ *        "target": "*",
+ *        "description": "Account ID",
+ *        "meta": "aggregatable=True aiPredictionField=False autoNumber=False byteLength=18 calculated=False calculatedFormula=null cascadeDelete=False caseSensitive=False compoundFieldName=null controllerName=null createable=False custom=False defaultValue=null defaultValueFormula=null defaultedOnCreate=True dependentPicklist=False deprecatedAndHidden=False digits=0 displayLocationInDecimal=False encrypted=False externalId=False extraTypeInfo=null filterable=True filteredLookupInfo=null formulaTreatNullNumberAsZero=False groupable=True highScaleNumber=False htmlFormatted=False idLookup=True inlineHelpText=null label=\"Account ID\" length=18 mask=null maskType=null name=Id nameField=False namePointing=False nillable=False permissionable=False polymorphicForeignKey=False precision=0 queryByDistance=False referenceTargetField=null relationshipName=null relationshipOrder=null restrictedDelete=False restrictedPicklist=False scale=0 searchPrefilterable=False soapType=tns:ID sortable=True type=id unique=False updateable=False writeRequiresMasterRead=False",
+ *        "backName": "Id",
+ *        "required": true,
+ *        "maxLen": 18
+ *      }
+ *    ]
+ *  },
+ */
+
+export class SchemaFieldBit extends Bit {
+  static properties = { source: { type: Object } };
+
+  render() {
+    const attrs = this.source?.attributes || {};
+    const description = attrs.description !== this.source.name ? attrs.description : null;
+
+    return this.source ? html`
+      <az-bit
+        id="schemaFieldBit"
+        scope="this"
+        title="${this.source.name}"
+        description="${description}"
+        status="default"
+        rank="4">
+
+        <az-bit id="schemaFieldMetadataBit" scope="this" title="Metadata" status="default">
+          <az-code-box highlight="js" scope="this" source="${JSON.stringify(attrs.meta, null, 2)}"></az-code-box>
+        </az-bit>
+      </az-bit>
+    ` : html`<p>No field data available</p>`;
+  }
+}
+
+window.customElements.define("az-schema-field-bit", SchemaFieldBit);
