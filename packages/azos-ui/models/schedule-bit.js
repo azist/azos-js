@@ -5,7 +5,7 @@
 </FILE_LICENSE>*/
 
 
-import { html } from "../ui.js";
+import { html, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 
 import { dflt, dfltObject } from "azos/strings"
@@ -28,8 +28,8 @@ export class ScheduleItem extends Bit {
 
   _getSummaryData(){
     return {
-      title: 'tezt',
-      subtitle: 'teztomg',
+      title: this?.captionTitle ?? this?.tbName?.value,
+      subtitle: '',
       commands: []
     }
   }
@@ -41,7 +41,7 @@ export class ScheduleItem extends Bit {
       <az-text
         id="tbName"
         scope="this"
-        name="Name"
+        name="name"
         class="span4"
         .isReadonly="${this.isReadOnly}"
         title="${dflt(this.captionName, "Name")}"
@@ -50,7 +50,7 @@ export class ScheduleItem extends Bit {
       <az-nls-map-bit
         id="nlsBit"
         scope="this"
-        name="lclCode"
+        name="nlsMap"
         title="Local Schedule Name"
         description="Localized Name of the Schedule"
         .isReadonly="${this.isReadOnly}"
@@ -61,7 +61,7 @@ export class ScheduleItem extends Bit {
       <az-span-bit
         id="bitSpan"
         scope="this"
-        name="Span"
+        name="weekdays"
         class="span4"
         rank="medium"
         status="info"
@@ -73,6 +73,7 @@ export class ScheduleItem extends Bit {
         scope="this"
         class="span4"
         rank="medium"
+        name="dayOverrides"
       ></az-day-override-item>
 
     </div>
@@ -97,7 +98,6 @@ export class ScheduleBit extends ListBit {
 
     const item = new ScheduleItem();
     item.rank = "medium";
-    item.noSummary = true;
     return item;
   }
 
@@ -115,11 +115,28 @@ export class ScheduleBit extends ListBit {
   }
 
   get[DATA_VALUE_PROP](){
-    
+    const result = {};
+    const array = super[DATA_VALUE_PROP];
+    for (const itme of array) {
+      result[item.name] = {}
+    }
   }
 
   set[DATA_VALUE_PROP](v){
+    if (v) {
+      let isUiInput = false;
+      if (v instanceof UiInputValue){
+        isUiInput = true;
+        v = v.value();
+      }
 
+      if (!isArray(v)){
+        let result = [];
+        for (const [ik, iv] of Object.entries(v)){
+          result.push({name: ik, nls:iv.nlsMap, wkd:iv.weekdays, ovd:iv.dayOverrides})
+        }
+      }
+    }
   }
 }
 window.customElements.define("az-schedule-bit", ScheduleBit);

@@ -20,9 +20,10 @@ export class CaseSchedule extends CaseBase {
 <h2> UI Bits (Fragments)</h2>
 
 <p> This is a sample content which is placed outside of bits. </p>
-
+//TODO: add button to display json output from schedule bit data look in feature b for display of Person Block data use showMsg from msg-box.js
 <az-schedule-bit
   id="bitSchedule"
+  title="Schedule Bit List"
   scope="this"
 ></az-schedule-bit>
     `;
