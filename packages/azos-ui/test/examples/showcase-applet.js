@@ -43,7 +43,8 @@ import "../showcase/case-prose.js";
 import "../showcase/case-grid-split.js";
 import "../showcase/case-model-adlib.js"
 import "../showcase/case-model-nls.js"
-//import "../showcase/case-model-schedule.js";
+import "../showcase/case-model-schedule.js";
+import "../showcase/case-bit-cells.js";
 import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
@@ -51,7 +52,7 @@ export class ShowcaseApplet extends Applet {
 
   constructor() {
     super();
-    this.selectedCase = "Bits";
+    this.selectedCase = "BitCells";
     this.x = 1;
   }
 
@@ -121,6 +122,7 @@ export class ShowcaseApplet extends Applet {
       <option value="ButtonsWithIcons">Buttons With Icons</option>
       <option value="Bits">Bits</option>
       <option value="BitLists">Bit Lists</option>
+      <option value="BitCells">Bit Cells</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
       <option value="ErrorBox">Error Box</option>
@@ -165,6 +167,7 @@ export class ShowcaseApplet extends Applet {
       ButtonsWithIcons: html`<az-case-buttons-with-icons></az-case-buttons-with-icons>`,
       Bits: html`<az-case-bit></az-case-bit>`,
       BitLists: html`<az-case-bit-lists></az-case-bit-lists>`,
+      BitCells: html`<az-case-bit-cells></az-case-bit-cells>`,
       Checkboxes: html`<az-case-checkboxes></az-case-checkboxes>`,
       CodeBox: html`<az-case-code-box></az-case-code-box>`,
       ErrorBox: html`<az-case-error-box></az-case-error-box>`,
