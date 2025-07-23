@@ -40,20 +40,15 @@ export class SchemaBit extends Bit {
   `];
 
   _getSummaryData(){
+    // prepare title and description for the bit
+    const isUniqueTitle = this.title !== this.source?.name && this.title !== this.constructor.name;
+    const title = `${ isUniqueTitle ? this.title : this.source?.name }`;
+    const subtitle = `${this.source?.fields.length ?? 0} fields${this.source?.attrs.description !== this.source?.attrs?.name
+      ? `: ${this.source?.attrs.description}`
+      : ""
+    }`;
 
-
-    // pull data from the source
-    const attrs = this.source?.attrs && this.source.attrs.length > 0 ? this.source.attrs[0] : {};
-    const fields = this.source?.fields || [];
-
-    // prepare description for the bit description
-    const subtitle = `${fields.length ?? 0} fields${attrs.description !== attrs?.name ? `: ${attrs.description}` : ""}`;
-
-    return {
-      title: `${ this.title !== this.source?.name && this.title !== this.constructor.name ? this.title : this.source?.name}`,
-      subtitle,
-      commands: []
-    };
+    return { title, subtitle, commands: [] };
   }
 
   renderDetailContent(){
