@@ -6,11 +6,11 @@
 
 import * as aver from 'azos/aver.js';
 import { asBool  } from 'azos/types.js';
-import { AzosElement, css, getEffectiveDataMode, getEffectiveSchema, html, noContent, parseRank, parseStatus, UiInputValue } from './ui.js';
+import { AzosElement, css, getEffectiveDataMode, getEffectiveSchema, getImmediateParentAzosElement, html, noContent, parseRank, parseStatus, UiInputValue } from './ui.js';
 import { Block } from './blocks.js';
 import { Command } from './cmd.js';
 import { DATA_MODE_PROP, DATA_MODE, arrayDelete, DATA_VALUE_PROP, DATA_BLOCK_PROP, DATA_VALUE_DESCRIPTOR_PROP, DATA_VALUE_DESCRIPTOR_IS_LIST, RESET_DIRTY_METHOD, ValidationError } from 'azos/types';
-import { dflt, isOneOf } from 'azos/strings';
+import { dflt, isEmpty, isOneOf } from 'azos/strings';
 import { TextField } from './parts/text-field.js';
 
 
@@ -177,12 +177,31 @@ export class Bit extends Block {
   static properties = {
     isExpanded: { type: Boolean, reflect: true },
     statusFlag: { type: String, reflect: true },
-    noSummary:  { type: Boolean, reflect: true }
+    noSummary:  { type: Boolean, reflect: true },
+    group:      { type: String, reflect: true}
   };
 
   #isExpanded = false;
   get isExpanded() { return this.noSummary || this.#isExpanded; }
   set isExpanded(value) { this.#isExpanded = asBool(value); }
+
+  /** Returns sibling bits with the same group id. Does NOT return self */
+  get groupSiblings(){
+    const result = [];
+
+    if (isEmpty(this.group)) return result;
+
+    let parent = this.parentNode;
+    if (!parent) result;
+
+    for(let one of parent.children){
+      if (one === this) continue;
+      if (one.group !== this.group) continue;
+      result.push(one);
+    }
+
+    return result;
+  }
 
   #statusFlag = null;
   get statusFlag() { return this.#statusFlag; }
@@ -205,13 +224,23 @@ export class Bit extends Block {
   /**
    * Toggles the expansion status and calls an event which can be cancelled to prevent a change
    * The summary toggle button calls this method to expand/collapse the details
+   * @param {boolean} [groupAutoClose=true] Pass false to prevent auto close of other bits in the same group
    * @returns {boolean} - true if the toggle was successful, false if it was cancelled by an event handler
   */
-  toggle(){
+  toggle(groupAutoClose = true){
     const evt = new CustomEvent("beforeExpandToggle", { bubbles: false, cancelable: true, composed: false, detail: { isExpanded: this.isExpanded } });
     this.dispatchEvent(evt);
     if (evt.defaultPrevented) return false; // Cancelled by the event handler
+
     this.isExpanded = !this.isExpanded;
+
+    if (this.isExpanded && groupAutoClose){
+      const siblings = this.groupSiblings;
+      for(const one of siblings){
+        one.collapse();
+      }
+    }
+
     return true;
   }
 
