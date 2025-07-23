@@ -17,7 +17,7 @@ export class SchemaBit extends Bit {
     }
 
     .composite az-bit{
-      width: 18ch;
+      width: 28ch;
       transition: 1s;
     }
 
@@ -25,10 +25,7 @@ export class SchemaBit extends Bit {
      transition-delay: .25s;
     }
 
-    XXXaz-bit.wide[isexpanded]{ width: 75%; }
-
-
-
+    .composite  az-bit[isexpanded]{ width: 100%; }
     `];
 
   /**
@@ -81,7 +78,7 @@ export class SchemaBit extends Bit {
         </ul>
 
         <az-bit id="schemaMetadataBit" scope="this" title="Metadata" status="default" rank="5">
-          <az-code-box highlight="js" source="${metadataJsonString}"></az-code-box>
+          <az-code-box source="${metadataJsonString}"></az-code-box>
         </az-bit>
 
         <div class="composite">
@@ -90,7 +87,7 @@ export class SchemaBit extends Bit {
               const fldDescription = attrs.description !== field.name ? `${attrs.description}` : undefined;
               const description = [`${field.order}`, fldDescription, `${field.type}`].filter(d=>d).join(" :: ");
 
-              return html`<az-bit id="schemaFieldBit-${i}" scope="this" title="${field.name}">
+              return html`<az-bit id="schemaFieldBit-${i}" scope="this" title="${field.name}" group="schemaFields" rank="5">
 
                 <ul>
                   <li>Order: ${this.source.order}</li>
@@ -100,7 +97,7 @@ export class SchemaBit extends Bit {
                   <li>Max Length: ${attrs.maxLen || "N/A"}</li>
                 </ul>
 
-                <az-code-box highlight="js" scope="this" source="${JSON.stringify(attrs.meta, null, 2)}"></az-code-box>
+                <az-code-box scope="this" source="${JSON.stringify(attrs.meta, null, 2)}"></az-code-box>
 
               </az-bit>`})
             : html`<li>No fields available</li>`
