@@ -4,6 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
+import { DATA_VALUE_PROP } from "azos/types";
 import { html } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
 import "../../bit.js";
@@ -12,20 +13,29 @@ import "../../../azos-ui/models/span-bit.js";
 import "../../../azos-ui/models/day-override-bit.js";
 import "../../../azos-ui/models/adlib-tag-bit.js";
 import "../../../azos-ui/models/schedule-bit.js";
+import { showMsg } from "../../msg-box.js";
 
 export class CaseSchedule extends CaseBase {
+
+  #btnGetClick(){
+    showMsg("ok", "Person Block Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.bitSchedule[DATA_VALUE_PROP], null, 2), 3, true);
+  }
+
   renderControl() {
     return html`
 
 <h2> UI Bits (Fragments)</h2>
 
 <p> This is a sample content which is placed outside of bits. </p>
-//TODO: add button to display json output from schedule bit data look in feature b for display of Person Block data use showMsg from msg-box.js
+<az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Schedule Data"></az-button>
+
 <az-schedule-bit
   id="bitSchedule"
   title="Schedule Bit List"
   scope="this"
 ></az-schedule-bit>
+
+
     `;
   }
 }

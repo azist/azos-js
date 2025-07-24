@@ -23,12 +23,9 @@ export class ScheduleItem extends Bit {
     captionSpan: { type: String },
   }
 
-  //get[TIME_ZONE_PROP]() { return TZ_UTC; }
-//TODO: convert to the bit list
-
   _getSummaryData(){
     return {
-      title: this?.captionTitle ?? this?.tbName?.value,
+      title: this?.captionTitle ?? this?.tbName?.value ?? "Schedule",
       subtitle: '',
       commands: []
     }
@@ -68,13 +65,13 @@ export class ScheduleItem extends Bit {
         title="${dflt(this.captionSpan, "Time Span")}"
       ></az-span-bit>
 
-      <az-day-override-item
+      <az-day-override-bit
         id="bitDayOverride"
         scope="this"
         class="span4"
         rank="medium"
         name="dayOverrides"
-      ></az-day-override-item>
+      ></az-day-override-bit>
 
     </div>
 
@@ -88,6 +85,8 @@ window.customElements.define("az-schedule-bit-item", ScheduleItem);
 export class ScheduleBit extends ListBit {
   
   static styles = [ListBit.styles];
+
+  getItemData
 
   makeOrMapElement(elmData, existingOnly = false) {
     if (this.indexOf(elmData) >= 0) return elmData;
@@ -117,9 +116,10 @@ export class ScheduleBit extends ListBit {
   get[DATA_VALUE_PROP](){
     const result = {};
     const array = super[DATA_VALUE_PROP];
-    for (const itme of array) {
-      result[item.name] = {}
+    for (const item of array) {
+      result[item.name] = {nls:item?.nls, wkd:item?.weekdays, ovd:item?.dayOverrides}
     }
+    return result;
   }
 
   set[DATA_VALUE_PROP](v){

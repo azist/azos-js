@@ -15,7 +15,6 @@ import { Bit, ListBit } from "../bit.js";
 import { STL_INLINE_GRID } from "../styles";
 
 export class DayOverrideItem extends Bit {
-  //TODO: Update this styling, this is just example pulled from NlsMapItem 20250610 zwh
   static styles = [...Bit.styles, css`
       .item{
         display: flex;
@@ -60,7 +59,7 @@ export class DayOverrideItem extends Bit {
       <az-text
         id="tbName"
         scope="this"
-        name="Name"
+        name="name"
         .isReadonly="${this.isReadOnly}"
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
@@ -68,7 +67,7 @@ export class DayOverrideItem extends Bit {
       <az-text
         id="tbDate"
         scope="this"
-        name="Date"
+        name="date"
         contentWidth="50"
         titleWidth="50"
         title="Date"
@@ -81,14 +80,14 @@ export class DayOverrideItem extends Bit {
       <az-text
         id="tbHours"
         scope="this"
-        name="Hours"
+        name="hours"
         title="${dflt(this.captionHours, "Hours")}"
       ></az-text>
 
       <az-nls-map-bit
         id="nlsBit"
         scope="this"
-        name="lclCode"
+        name="nls"
         title="Localized Day"
         description="Localized Name of the Day to be overridden"
         .isReadonly="${this.isReadOnly}"
@@ -135,7 +134,7 @@ export class DayOverrideBit extends ListBit {
     const result = {};
     const array = super[DATA_VALUE_PROP];
     for (const item of array){
-      result[item.name] = {d: item.d, h: item.h, c: item.c};
+      result[item.name] = {d: item.date, h: item.hours, nls: item.nls};
     }
     return result;
   }
@@ -151,7 +150,7 @@ export class DayOverrideBit extends ListBit {
       if (!isArray(v)) {
         let result = [];
         for (const [ik, iv] of Object.entries(v)) {
-          result.push({name: ik, d: iv?.d, h: iv?.h, c: iv?.c});
+          result.push({name: ik, d: iv?.date, h: iv?.hours, nls: iv?.nls});
         }
         v = isUiInput ? new UiInputValue(result) : result;
       }
