@@ -133,10 +133,13 @@ export class ScheduleBit extends ListBit {
       if (!isArray(v)){
         let result = [];
         for (const [ik, iv] of Object.entries(v)){
-          result.push({name: ik, nls:iv?.nls, wkd:iv.wkd, ovd:iv.ovd})
+          result.push({name: ik, nls:iv?.nls, wkd:iv?.wkd, ovd:iv?.ovd})
         }
       }
     }
+    super[DATA_VALUE_PROP] = v;
+
+    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
   }
 }
 window.customElements.define("az-schedule-bit", ScheduleBit);

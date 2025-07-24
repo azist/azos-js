@@ -43,19 +43,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
     captionName: { type: String },
     captionRange: { type: String },
     captionTitle: { type: String },
-    captionMon: { type: String },
-    captionTue: { type: String },
-    captionWed: { type: String },
-    captionThu: { type: String },
-    captionFri: { type: String },
-    captionSat: { type: String },
-    captionSun: { type: String },
   }
-
-  //TODO: Figure out how to set this value programmatically,
-  // might be the wrong approach... should probably pull the
-  // value from the drRange field. Ask about it 20250527 zwh
-  #dateRange = { start: "10/06/1989", end: "10/26/1992" }
 
   _getSummaryData() {
     const summary = this.tbName?.value;
@@ -115,7 +103,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
           title="${dflt(this.captionRange, "Range")}"
         ></az-date-range>
         <div class="composite">
-        <az-bit title="Monday" description="${dflt(this?.tbMonday?.value, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Monday" 
+        description="${dflt(this?.tbMonday?.value, "")}" 
+        rank="normal" 
+        status="alert" 
+        group="weekdays">
           <az-text
             id="tbMonday"
             scope="this"
@@ -128,7 +120,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Tuesday" description="${dflt(this?.tbTuesday?.value, "")}" "rank="normal" status="alert" group="weekdays">
+        <az-bit title="Tuesday" 
+        description="${dflt(this?.tbTuesday?.value, "")}" 
+        rank="normal" 
+        status="alert" 
+        group="weekdays">
           <az-text
             id="tbTuesday"
             scope="this"
@@ -141,7 +137,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Wednesday" description="${dflt(this?.tbWednesday?.value, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Wednesday" 
+        description="${dflt(this?.tbWednesday?.value, "")}" 
+        rank="normal" 
+        status="alert" 
+        group="weekdays">
           <az-text
             id="tbWednesday"
             scope="this"
@@ -154,7 +154,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Thursday" description="${dflt(this?.tbThursday?.value, "")}" rank="nromal" status="alert" group="weekdays">
+        <az-bit title="Thursday" 
+        description="${dflt(this?.tbThursday?.value, "")}" 
+        rank="normal" 
+        status="alert" 
+        group="weekdays">
           <az-text
             id="tbThursday"
             scope="this"
@@ -167,7 +171,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Friday" description="${dflt(this?.tbFriday?.value, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Friday" 
+        description="${dflt(this?.tbFriday?.value, "")}" 
+        rank="normal" 
+        status="alert" 
+        group="weekdays">
           <az-text
             id="tbFriday"
             scope="this"
@@ -180,7 +188,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Saturday" description="${dflt(this?.tbSaturday?.value, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Saturday" 
+        description="${dflt(this?.tbSaturday?.value, "")}" 
+        rank="normal" 
+        status="alert" 
+        group="weekdays">
           <az-text
             id="tbSaturday"
             scope="this"
@@ -193,7 +205,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Sunday" description="${dflt(this?.tbSunday?.value, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Sunday" 
+        description="${dflt(this?.tbSunday?.value, "")}" 
+        rank="normal" 
+        status="alert" 
+        group="weekdays">
           <az-text
             id="tbSunday"
             scope="this"
