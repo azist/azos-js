@@ -18,7 +18,7 @@ import { showMsg } from "../../msg-box.js";
 export class CaseSchedule extends CaseBase {
 
   #btnGetClick(){
-    showMsg("ok", "Person Block Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.bitSchedule[DATA_VALUE_PROP], null, 2), 3, true);
+    showMsg("ok", "Schedule Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.bitSchedule[DATA_VALUE_PROP], null, 2), 3, true);
   }
 
   renderControl() {
