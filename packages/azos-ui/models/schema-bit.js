@@ -38,11 +38,11 @@ export class SchemaBit extends Bit {
 
   _getSummaryData(){
 
-    
+
     // prepare title for the bit
     const isUniqueTitle = this.title !== this.source?.name && this.title !== this.constructor.name;
     const title = `${ isUniqueTitle ? this.title : this.source?.name }`;
-    
+
     // prepare subtitle for the bit
     const attrs = this.source?.attrs && this.source.attrs.length > 0 ? this.source.attrs[0] : {};
     // todo: check if there is any data where there are multiple attributes
@@ -84,6 +84,7 @@ export class SchemaBit extends Bit {
         `)}
       </ul>
 
+      <h3>Fields</h3>
       <div class="composite">
         ${fields ? fields.map( (field,i) => {
             return html`<az-bit id="schemaFieldBit-${i}" scope="this" title="${field.name}" group="schemaFields" rank="5">
@@ -108,10 +109,6 @@ export class SchemaBit extends Bit {
           : html`<li>No fields available</li>`
         }
       </div>
-
-      <az-bit title="View Raw JSON">
-        <az-code-box source="${JSON.stringify( (this?.source ?? {}) , null, 2)}"></az-code-box>
-      </az-bit>
     ` : html`<p>No schema data available</p>`;
   }
 }
