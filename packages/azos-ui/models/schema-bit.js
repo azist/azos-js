@@ -84,7 +84,6 @@ export class SchemaBit extends Bit {
             <az-text isreadonly title="description" value="${attr.description}"></az-text>
             <az-text isreadonly title="immutable" value="${attr.immutable}"></az-text>
 
-
             <az-bit id="schemaMetadataBit" scope="this" title="Metadata" status="default" isExpanded>
               <az-code-box source="${attr?.meta ? JSON.stringify(attr.meta, null, 2) : ""}"></az-code-box>
             </az-bit>
@@ -101,16 +100,30 @@ export class SchemaBit extends Bit {
       ${fields
         ? fields.map( (field,i) => html`
         <az-bit id="schemaFieldBit-${i}" scope="this" title="${field.name}" description="Order: ${field.order} - type: ${field.type}${field.getOnly ? " : GetOnly" : ""}" group="schemaFields" rank="4">
-            <div class="compositeTight">
+          <div class="compositeTight">
+
+            <div>
+              <az-text isreadonly title="Name"    value="${field.name}"></az-text>
+              <az-text isreadonly title="Order"   value="${field.order}"   style="width: 10ch"></az-text>
+              <az-text isreadonly title="Type"    value="${field.type}"    style="width: 10ch"></az-text>
+              <az-text isreadonly title="GetOnly" value="${field.getOnly}" style="width: 10ch"></az-text>
+              <h3>Attributes (${(field?.attributes ?? []).length})</h3>
+            </div>
+
             ${(field?.attributes ?? []).map((attr,ii) => html`
               <az-bit scope="this" id="fieldAttributeBit-${ii}" title="Target: ${attr.target}" description="${attr.description}" group="schemaAttributes" isExpanded>
-              <az-text isreadonly title="BackName" value="${attr.backName}"></az-text>
-              <az-text isreadonly title="maxLen" value="${attr.maxLen}"></az-text>
-              <az-text isreadonly title="required" value="${attr.required}"></az-text>
+                <az-text isreadonly title="Target"      value="${attr.target}"></az-text>
+                <az-text isreadonly title="Description" value="${attr.description}"></az-text>
+                <az-text isreadonly title="BackName"    value="${attr.backName}"></az-text>
+                <br>
+                <az-text isreadonly title="maxLen"      value="${attr.maxLen}"      style="width: 10ch"></az-text>
+                <az-text isreadonly title="required"    value="${attr.required}"    style="width: 10ch"></az-text>
 
 
-              <az-bit scope="this" id="fieldAttributeBit-${ii}" title="Metadata" status="default" isExpanded>
-                <az-code-box source="${attr?.meta ? JSON.stringify(attr.meta, null, 2) : ""}"></az-code-box>
+                <az-bit scope="this" id="fieldAttributeBit-${ii}" title="Metadata" status="default" isExpanded>
+                  <az-code-box source="${attr?.meta ? JSON.stringify(attr.meta, null, 2) : ""}"></az-code-box>
+                </az-bit>
+
               </az-bit>
             </div>`)}
           </div>
