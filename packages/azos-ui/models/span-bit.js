@@ -249,10 +249,11 @@ export class SpanBit extends ListBit {
     const array = super[DATA_VALUE_PROP];
     for (const item of array) {
       result[item.name] = {
-        nsl: item.nls, dr: item.dr,
+        nls: item.nls, dr:  item.dr,
         mon: item.mon, tue: item.tue,
         wed: item.wed, thu: item.thu,
-        fri: item.fri, sat: item.sat, sun: item.sun
+        fri: item.fri, sat: item.sat, 
+        sun: item.sun
       }
     }
     return result;
@@ -270,10 +271,10 @@ export class SpanBit extends ListBit {
         let result = [];
         for (const [ik, iv] of Object.entries(v)) {
           result.push({
-            name: ik, nls: iv.nls, dr: iv.dr,
-            mon: iv.mon, tue: iv.tue,
-            wed: iv.wed, thu: iv.thu,
-            fri: iv.fri, sat: iv.sat, sun: iv.sun
+            name: ik, nls: iv?.nls, dr: iv?.dr,
+            mon:  iv?.mon, tue: iv?.tue,
+            wed:  iv?.wed, thu: iv?.thu,
+            fri:  iv?.fri, sat: iv?.sat, sun: iv?.sun
           });
         }
       }

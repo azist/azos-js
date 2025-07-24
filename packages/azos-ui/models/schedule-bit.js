@@ -47,7 +47,7 @@ export class ScheduleItem extends Bit {
       <az-nls-map-bit
         id="nlsBit"
         scope="this"
-        name="nlsMap"
+        name="nls"
         title="Local Schedule Name"
         description="Localized Name of the Schedule"
         .isReadonly="${this.isReadOnly}"
@@ -58,7 +58,7 @@ export class ScheduleItem extends Bit {
       <az-span-bit
         id="bitSpan"
         scope="this"
-        name="weekdays"
+        name="wkd"
         class="span4"
         rank="medium"
         status="info"
@@ -70,7 +70,7 @@ export class ScheduleItem extends Bit {
         scope="this"
         class="span4"
         rank="medium"
-        name="dayOverrides"
+        name="ovd"
       ></az-day-override-bit>
 
     </div>
@@ -117,7 +117,7 @@ export class ScheduleBit extends ListBit {
     const result = {};
     const array = super[DATA_VALUE_PROP];
     for (const item of array) {
-      result[item.name] = {nls:item?.nls, wkd:item?.weekdays, ovd:item?.dayOverrides}
+      result[item.name] = {nls:item?.nls, wkd:item?.wkd, ovd:item?.ovd}
     }
     return result;
   }
@@ -133,7 +133,7 @@ export class ScheduleBit extends ListBit {
       if (!isArray(v)){
         let result = [];
         for (const [ik, iv] of Object.entries(v)){
-          result.push({name: ik, nls:iv.nlsMap, wkd:iv.weekdays, ovd:iv.dayOverrides})
+          result.push({name: ik, nls:iv?.nls, wkd:iv.wkd, ovd:iv.ovd})
         }
       }
     }
