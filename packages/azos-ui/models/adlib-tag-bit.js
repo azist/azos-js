@@ -109,7 +109,9 @@ export class AdlibTagBit extends ListBit {
       commands: commands,
     };
   }
-
+//TODO: this is wrong, I need to update this to fix issues with the numeric 
+// typing as that's property is now on the list item not the full list so is not set when adding to the page
+// 20250724 zwh
   get[DATA_VALUE_PROP](){
     const result = {};
     const array = super[DATA_VALUE_PROP];

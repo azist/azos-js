@@ -10,10 +10,11 @@ import { dflt, dfltObject, trim, isEmpty, isNullOrWhiteSpace } from "azos/string
 import { TZ_UTC } from "azos/time";
 import { DATE_FORMAT, TIME_DETAILS } from "azos/localization";
 
-import { html, css } from "../ui.js";
+import { html, css, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 
 import STL_INLINE_GRID from "../styles/grid.js";
+import { writeConsole } from "azos/log";
 
 export class SpanItem extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID, css`
@@ -64,6 +65,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
                                   tmDetails: TIME_DETAILS.NONE, 
                                   timeZone: TZ_UTC
                                 });
+    
     const end = this.arena.app.localizer.formatDateTime({
                                   dt:this.drRange?.value?.end, 
                                   dtFormat:DATE_FORMAT.NUM_DATE, 
@@ -71,8 +73,8 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
                                   timeZone: TZ_UTC
                                 });
 
-    const subSummary = isNullOrWhiteSpace(this.drRange?.value?.start) 
-                    || isNullOrWhiteSpace(this.drRange?.value?.end) ? "" 
+    const subSummary = this.drRange?.value?.start === undefined
+                    || this.drRange?.value?.end === undefined ? "" 
                     : start + " - " + end;
     return {
       title: dfltObject(summary, html`<span style="color: var(--ghost)">Span</span>`),
@@ -113,7 +115,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
           title="${dflt(this.captionRange, "Range")}"
         ></az-date-range>
         <div class="composite">
-        <az-bit title="Monday" description="${dflt(this.captionMon, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Monday" description="${dflt(this?.tbMonday?.value, "")}" rank="normal" status="alert" group="weekdays">
           <az-text
             id="tbMonday"
             scope="this"
@@ -126,7 +128,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Tuesday" description="${dflt(this.captionTue, "")}" "rank="normal" status="alert" group="weekdays">
+        <az-bit title="Tuesday" description="${dflt(this?.tbTuesday?.value, "")}" "rank="normal" status="alert" group="weekdays">
           <az-text
             id="tbTuesday"
             scope="this"
@@ -139,7 +141,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Wednesday" description="${dflt(this.captionWed, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Wednesday" description="${dflt(this?.tbWednesday?.value, "")}" rank="normal" status="alert" group="weekdays">
           <az-text
             id="tbWednesday"
             scope="this"
@@ -152,7 +154,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Thursday" description="${dflt(this.captionThu, "")}" rank="nromal" status="alert" group="weekdays">
+        <az-bit title="Thursday" description="${dflt(this?.tbThursday?.value, "")}" rank="nromal" status="alert" group="weekdays">
           <az-text
             id="tbThursday"
             scope="this"
@@ -165,7 +167,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Friday" description="${dflt(this.captionFri, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Friday" description="${dflt(this?.tbFriday?.value, "")}" rank="normal" status="alert" group="weekdays">
           <az-text
             id="tbFriday"
             scope="this"
@@ -178,7 +180,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Saturday" description="${dflt(this.captionSat, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Saturday" description="${dflt(this?.tbSaturday?.value, "")}" rank="normal" status="alert" group="weekdays">
           <az-text
             id="tbSaturday"
             scope="this"
@@ -191,7 +193,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             .isReadonly="${this.isReadOnly}"
           ></az-text>
         </az-bit>
-        <az-bit title="Sunday" description="${dflt(this.captionSun, "")}" rank="normal" status="alert" group="weekdays">
+        <az-bit title="Sunday" description="${dflt(this?.tbSunday?.value, "")}" rank="normal" status="alert" group="weekdays">
           <az-text
             id="tbSunday"
             scope="this"
@@ -249,8 +251,8 @@ export class SpanBit extends ListBit {
       result[item.name] = {
         nsl: item.nls, dr: item.dr,
         mon: item.mon, tue: item.tue,
-        w: item.wed, th: item.thu,
-        f: item.fri, st: item.sat, su: item.sun
+        wed: item.wed, thu: item.thu,
+        fri: item.fri, sat: item.sat, sun: item.sun
       }
     }
     return result;
