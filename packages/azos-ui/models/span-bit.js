@@ -22,13 +22,12 @@ export class SpanBit extends Bit {
   margin: 1em;
   gap: 0.5em;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  align-items: left;
-  flex-direction: column;
 }
 
 az-bit{
- width: 60ch;
+ width: 28ch;
  transition: 1s;
 }
 
@@ -36,7 +35,7 @@ az-bit:not([isexpanded]){
  transition-delay: .25s;
 }
 
-XXXaz-bit[isexpanded]{ width: 80ch; }
+XXXaz-bit[isexpanded]{ width: 23ch; }
 az-bit.wide[isexpanded]{ width: 100%; }`];
 
   static properties = {
@@ -89,7 +88,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="Localized name of the Span"
         .isReadonly="${this.isReadOnly}"
         class="span4"
-        status="alert"
       ></az-nls-map-bit-list>
     </div>
 
@@ -106,7 +104,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Monday" 
         description="${dflt(this?.tbMonday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="monday"
         group="weekdays">
           <az-text
@@ -124,7 +121,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Tuesday" 
         description="${dflt(this?.tbTuesday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="tuesday"
         group="weekdays">
           <az-text
@@ -142,7 +138,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Wednesday" 
         description="${dflt(this?.tbWednesday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="wednesday"
         group="weekdays">
           <az-text
@@ -160,7 +155,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Thursday" 
         description="${dflt(this?.tbThursday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="thursday"
         group="weekdays">
           <az-text
@@ -178,7 +172,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Friday" 
         description="${dflt(this?.tbFriday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="friday"
         group="weekdays">
           <az-text
@@ -195,8 +188,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         </az-bit>
         <az-bit title="Saturday" 
         description="${dflt(this?.tbSaturday?.value, "")}" 
-        rank="normal" 
-        status="alert" 
+        rank="normal"  
         name="saturday"
         group="weekdays">
           <az-text
@@ -214,7 +206,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Sunday" 
         description="${dflt(this?.tbSunday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="sunday"
         group="weekdays">
           <az-text
@@ -234,6 +225,9 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
     `;
   }
 
+  set[DATA_VALUE_PROP](v) {
+    //TODO WORK ON THIS so that you can set the data from the wrapped object to the correct fields
+  }
    
 }
 

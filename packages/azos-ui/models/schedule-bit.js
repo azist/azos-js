@@ -8,11 +8,12 @@
 import { html, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 
-import { dflt, dfltObject } from "azos/strings"
+import { dflt, dfltObject, isEmpty, isNullOrWhiteSpace, truncate } from "azos/strings"
 import { STL_INLINE_GRID } from "../styles";
 import {DATA_VALUE_PROP, isArray} from "azos/types";
 
 import "../models/span-bit.js";
+import { isNull } from "azos/aver";
 
 export class ScheduleBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
@@ -24,9 +25,17 @@ export class ScheduleBit extends Bit {
   }
 
   _getSummaryData(){
+    const subtitle = super[DATA_VALUE_PROP]?.spans 
+      ? truncate(super[DATA_VALUE_PROP]?.spans.map(span => span.name).join(", "), 35, "...")
+      : "";
+    const title = !isNullOrWhiteSpace(this?.captionTitle)
+      ? "\"" + this.captionTitle + "\""
+      : !isNullOrWhiteSpace(this?.tbName?.value)
+      ? "\"" + this.tbName?.value + "\""
+      : "";
     return {
-      title: this?.captionTitle ?? this?.tbName?.value ?? "Schedule",
-      subtitle: '',
+      title: "Schedule " + title,
+      subtitle: subtitle,
       commands: []
     }
   }
@@ -62,7 +71,7 @@ export class ScheduleBit extends Bit {
         class="span4"
         rank="medium"
         status="info"
-        title="${dflt(this.captionSpan, "Time Span")}"
+        title="${dflt(this.captionSpan, "Time Spans")}"
       ></az-span-bit-list>
 
       <az-day-override-bit-list
@@ -70,7 +79,9 @@ export class ScheduleBit extends Bit {
         scope="this"
         class="span4"
         rank="medium"
+        title="Day Overrides"
         name="overrides"
+        status="alert"
       ></az-day-override-bit-list>
 
     </div>
@@ -92,7 +103,7 @@ export class ScheduleBit extends Bit {
                                 saturday:span?.saturday?.sat,
                                 sunday:span?.sunday?.sun}});
                             };
-      result[obj.name] = {namd:obj?.name,
+      result[obj.name] = {
                           title:obj?.title, 
                           spans:innerSpans, 
                           overrides:obj?.overrides};
@@ -111,8 +122,25 @@ export class ScheduleBit extends Bit {
       if (!isArray(v)) {
         let result = [];
         for (const [ik, iv] of Object.entries(v)) {
+          let innerSpans = [];
+          for (const span of iv?.spans)
+          {
+            let spanName = Object.entries(span)[0];
+            innerSpans.push({
+              [spanName[0]]: {
+                "monday":{"mon":spanName[1]?.monday},
+                "tuesday":{"tue":spanName[1]?.tuesday},
+                "wednesday":{"wed":spanName[1]?.wednesday},
+                "thursday":{"thu":spanName[1]?.thursday},
+                "friday":{"fri":spanName[1]?.friday},
+                "saturday":{"sat":spanName[1]?.saturday},
+                "sunday":{"sun":spanName[1]?.sunday},
+              }
+            })
+          }
+
           result.push({
-            name: ik, title:iv?.title, spans:iv?.spans, overrides:iv?.overrides
+            name: ik, title:iv?.title, spans:innerSpans, overrides:iv?.overrides
           });
         }
       }

@@ -27,42 +27,63 @@ export class CaseSchedule extends CaseBase {
 
   #btnSetClick(){
     this.bitSchedule[DATA_VALUE_PROP] = new UiInputValue({
-        "name":"asdf",
-        "title": [
-                {
-                  "d": "poiwer",
-                  "iso": "eng",
-                  "n": "lksjdf"
-                }
-              ],
-        "spans": [
-              {
-                "poiu": {
-                  "monday": "asdf",
-                  "tuesday": "zxcv",
-                  "wednesday": "asdf",
-                  "thursday": "zcxv",
-                  "friday": "qwer",
-                  "saturday": "sdfg",
-                  "sunday": "erty"
-                }
-              }
-            ],
-        "overrides": [
-          {
-            "date": "2025-01-01T00:00:00.000Z",
-            "hours": "closed",
-            "name": "new year",
-            "title": [
-              {
-                "d": "poiwer",
-                "iso": "eng",
-                "n": "lksdjf"
-              }
-            ]
+  "Nonsense": {
+    "title": {
+      "eng": {
+        "n": "incomprehensible",
+        "d": "don't even try"
+      }
+    },
+    "spans": [
+      {
+        "qewrqwer": {
+          "monday": "c'thulu",
+          "tuesday": "narlethep",
+          "wednesday": "the one who slumbers",
+          "thursday": "the prince of insanity",
+          "friday": "rae'liegh",
+          "saturday": "jellyfish",
+          "sunday": "oipuwer"
+        }
+      },
+      {
+        "zxcvzxvzxcvzx": {
+          "monday": "vbnm",
+          "tuesday": "tyui",
+          "wednesday": "dtfh",
+          "thursday": "fghj",
+          "friday": "hgjk",
+          "saturday": "bnmjh",
+          "sunday": "rtyu"
+        }
+      },
+      {
+        "wtryertywerywer": {
+          "monday": "dtf",
+          "tuesday": "dxrft",
+          "wednesday": "sert",
+          "thursday": "cghy",
+          "friday": "awer",
+          "saturday": "bhjk",
+          "sunday": "hiuo"
+        }
+      }
+    ],
+    "overrides": [
+      {
+        "date": "2025-02-14T00:00:00.000Z",
+        "hours": "iopuewr",
+        "name": "quit",
+        "title": {
+          "eng": {
+            "n": "oiuroie",
+            "d": "lkj;adf"
           }
-        ]
-      });
+        }
+      }
+    ]
+  }
+});
   }
 
   

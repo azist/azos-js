@@ -73,7 +73,7 @@ export class DayOverrideBit extends Bit {
         titleWidth="50"
         title="Date"
         .isReadonly="${this.isReadOnly}"
-        displayFormat='<<v::ld{"dtFormat":"LongDate", "tmDetails":"NONE"}>>'
+        displayFormat='<<v::ld{"tmDetails":"NONE"}>>'
         dataKind="datetime"
         dataType="date"
       ></az-text>
