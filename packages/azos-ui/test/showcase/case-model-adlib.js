@@ -25,6 +25,15 @@ export class CaseAdlib extends CaseBase {
         id="bitTag"
         scope="this"
         class="span1"
+        title="Text Tag"
+      ></az-adlib-tag-bit>
+
+      <az-adlib-tag-bit
+        id="bitTag"
+        scope="this"
+        class="span1"
+        title="Numeric Tag"
+        isnumeric
       ></az-adlib-tag-bit>
 
     `;

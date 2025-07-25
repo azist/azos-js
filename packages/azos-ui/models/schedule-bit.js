@@ -14,7 +14,7 @@ import {DATA_VALUE_PROP, isArray} from "azos/types";
 
 import "../models/span-bit.js";
 
-export class ScheduleItem extends Bit {
+export class ScheduleBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
 
   static properties = {
@@ -23,12 +23,9 @@ export class ScheduleItem extends Bit {
     captionSpan: { type: String },
   }
 
-  //get[TIME_ZONE_PROP]() { return TZ_UTC; }
-//TODO: convert to the bit list
-
   _getSummaryData(){
     return {
-      title: this?.captionTitle ?? this?.tbName?.value,
+      title: this?.captionTitle ?? this?.tbName?.value ?? "Schedule",
       subtitle: '',
       commands: []
     }
@@ -47,45 +44,65 @@ export class ScheduleItem extends Bit {
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
 
-      <az-nls-map-bit
+      <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
-        name="nlsMap"
+        name="title"
         title="Local Schedule Name"
         description="Localized Name of the Schedule"
         .isReadonly="${this.isReadOnly}"
         class="span4"
         rank="medium"
-      ></az-nls-map-bit>
+      ></az-nls-map-bit-list>
 
-      <az-span-bit
+      <az-span-bit-list
         id="bitSpan"
         scope="this"
-        name="weekdays"
+        name="spans"
         class="span4"
         rank="medium"
         status="info"
         title="${dflt(this.captionSpan, "Time Span")}"
-      ></az-span-bit>
+      ></az-span-bit-list>
 
-      <az-day-override-item
+      <az-day-override-bit-list
         id="bitDayOverride"
         scope="this"
         class="span4"
         rank="medium"
-        name="dayOverrides"
-      ></az-day-override-item>
+        name="overrides"
+      ></az-day-override-bit-list>
 
     </div>
 
   `;
   }
 
+  get[DATA_VALUE_PROP](){
+    const result = {};
+    const obj = super[DATA_VALUE_PROP];
+     const innerSpans = {};
+     for (const span of obj.spans) {
+                              innerSpans[span?.name] = {
+                                monday:span?.monday?.mon,
+                                tuesday:span?.tuesday?.tue,
+                                wednesday:span?.wednesday?.wed,
+                                thursday:span?.thursday?.thu,
+                                friday:span?.friday?.fri,
+                                saturday:span?.saturday?.sat,
+                                sunday:span?.sunday?.sun};
+                            };
+      result[obj.name] = {title:obj?.title, 
+                          spans:innerSpans, 
+                          overrides:obj?.overrides};
+    
+    return result;
+  }
 }
 
-window.customElements.define("az-schedule-bit-item", ScheduleItem);
+window.customElements.define("az-schedule-bit", ScheduleBit);
 
-export class ScheduleBit extends ListBit {
+export class ScheduleBitList extends ListBit {
   
   static styles = [ListBit.styles];
 
@@ -96,7 +113,7 @@ export class ScheduleBit extends ListBit {
     if (existing) return existing;
     if (existingOnly) return null;
 
-    const item = new ScheduleItem();
+    const item = new ScheduleBit();
     item.rank = "medium";
     return item;
   }
@@ -113,30 +130,5 @@ export class ScheduleBit extends ListBit {
       commands: commands,
     };
   }
-
-  get[DATA_VALUE_PROP](){
-    const result = {};
-    const array = super[DATA_VALUE_PROP];
-    for (const itme of array) {
-      result[item.name] = {}
-    }
-  }
-
-  set[DATA_VALUE_PROP](v){
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue){
-        isUiInput = true;
-        v = v.value();
-      }
-
-      if (!isArray(v)){
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)){
-          result.push({name: ik, nls:iv.nlsMap, wkd:iv.weekdays, ovd:iv.dayOverrides})
-        }
-      }
-    }
-  }
 }
-window.customElements.define("az-schedule-bit", ScheduleBit);
+window.customElements.define("az-schedule-bit-list", ScheduleBitList);

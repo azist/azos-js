@@ -14,8 +14,7 @@ import { css, getEffectiveTimeZone, html, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 import { STL_INLINE_GRID } from "../styles";
 
-export class DayOverrideItem extends Bit {
-  //TODO: Update this styling, this is just example pulled from NlsMapItem 20250610 zwh
+export class DayOverrideBit extends Bit {
   static styles = [...Bit.styles, css`
       .item{
         display: flex;
@@ -37,7 +36,8 @@ export class DayOverrideItem extends Bit {
     const summary = dfltObject(this.tbName?.value, html`<span style="color: var(--ghost)">Day Override</span>`);
     // Always localize the DATE to UTC since we don't want that to be altered during localization elsewhere.
     // As the UTC date is a statutory date that will be compared against the application date in EVERY PARTICULAR LOCAL TIMEZONE
-    const subSummary = isNullOrWhiteSpace(this.tbDate?.value) 
+    const subSummary = this.tbDate?.value?.start === undefined
+                    || this.tbDate?.value?.end === undefined
                         ? "" 
                         : this.arena.app
                           .localizer
@@ -60,7 +60,7 @@ export class DayOverrideItem extends Bit {
       <az-text
         id="tbName"
         scope="this"
-        name="Name"
+        name="name"
         .isReadonly="${this.isReadOnly}"
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
@@ -68,7 +68,7 @@ export class DayOverrideItem extends Bit {
       <az-text
         id="tbDate"
         scope="this"
-        name="Date"
+        name="date"
         contentWidth="50"
         titleWidth="50"
         title="Date"
@@ -81,27 +81,27 @@ export class DayOverrideItem extends Bit {
       <az-text
         id="tbHours"
         scope="this"
-        name="Hours"
+        name="hours"
         title="${dflt(this.captionHours, "Hours")}"
       ></az-text>
 
-      <az-nls-map-bit
+      <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
-        name="lclCode"
+        name="title"
         title="Localized Day"
         description="Localized Name of the Day to be overridden"
         .isReadonly="${this.isReadOnly}"
         rank="small"
-      ></az-nls-map-bit>
+      ></az-nls-map-bit-list>
       
     </div>`;
   }
 }
 
-window.customElements.define("az-day-override-item", DayOverrideItem);
+window.customElements.define("az-day-override-bit", DayOverrideBit);
 
-export class DayOverrideBit extends ListBit {
+export class DayOverrideBitList extends ListBit {
   static styles = [ListBit.styles];
 
   makeOrMapElement(elmData, existingOnly = false)
@@ -112,7 +112,7 @@ export class DayOverrideBit extends ListBit {
     if (existing) return existing;
     if (existingOnly) return null;
 
-    const item = new DayOverrideItem();
+    const item = new DayOverrideBit();
     item.rank = "medium";
     item.noSummary = true;
     return item;
@@ -130,37 +130,6 @@ export class DayOverrideBit extends ListBit {
       commands: commands
     };
   }
-
-  get [DATA_VALUE_PROP]() {
-    const result = {};
-    const array = super[DATA_VALUE_PROP];
-    for (const item of array){
-      result[item.name] = {d: item.d, h: item.h, c: item.c};
-    }
-    return result;
-  }
-
-  set [DATA_VALUE_PROP](v) {
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue) {
-        isUiInput = true;
-        v = v.value();
-      }
-
-      if (!isArray(v)) {
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)) {
-          result.push({name: ik, d: iv?.d, h: iv?.h, c: iv?.c});
-        }
-        v = isUiInput ? new UiInputValue(result) : result;
-      }
-    }
-
-    super[DATA_VALUE_PROP] = v;
-
-    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
-  }
 }
 
-window.customElements.define("az-day-override-bit", DayOverrideBit);
+window.customElements.define("az-day-override-bit-list", DayOverrideBitList);

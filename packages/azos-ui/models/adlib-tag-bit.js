@@ -109,36 +109,6 @@ export class AdlibTagBit extends ListBit {
       commands: commands,
     };
   }
-
-  get[DATA_VALUE_PROP](){
-    const result = {};
-    const array = super[DATA_VALUE_PROP];
-    for(const item of array){
-      // I'm not sure this will work, what happens when pname is duplicated for multiple values... we need something unique right?
-      result[item.pname] = {v: item.v};
-    }
-    return result;
-  }
-
-
-  set[DATA_VALUE_PROP](v){
-    if(v){
-      let isUiInput = false;
-      if (v instanceof UiInputValue) {
-        isUiInput = true;
-        v = v.value();
-      }
-
-      if(!isArray(v)) {
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)) {
-          result.push({pname: ik, v:iv})
-        }
-      }
-    }
-
-    queueMicrotask(async() => { await this.updateComplete(); this.requestUpdate(); });
-  }
 }
 
 window.customElements.define("az-adlib-tag-bit", AdlibTagBit);
