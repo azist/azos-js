@@ -1,8 +1,9 @@
 
-import { css, html } from "../ui.js";
+import { css, html, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 import "../parts/text-field.js";
 import { dflt } from "azos/strings";
+import { DATA_VALUE_PROP, isArray } from "azos/types";
 
 /** Models an item in the Native Language Support Map - a mapping of names and descriptions per language ISO code */
 export class NlsMapBit extends Bit {
@@ -70,6 +71,40 @@ export class NlsMapBitList extends ListBit {
       commands: commands
     };
   }
+
+
+  /** Nls map represents array data as keys of object */
+  get [DATA_VALUE_PROP](){
+    const result = {};
+    const array = super[DATA_VALUE_PROP];
+    for(const item of array){
+      result[item.iso] = {n: item.n, d: item.d};
+    }
+    return result;
+  }
+
+  set [DATA_VALUE_PROP](v){
+    if (v) {
+      let isUiInput = false;
+      if (v instanceof UiInputValue) {//unwrap UiInputValue
+        isUiInput = true;
+        v = v.value();
+      }
+
+      if (!isArray(v)){
+        let result = [];
+        for(const [ik, iv] of Object.entries(v)){
+          result.push({iso: ik, n: iv?.n, d: iv?.d});
+        }
+        v = isUiInput ? new UiInputValue(result) : result;
+      }
+    }
+    super[DATA_VALUE_PROP] = v;
+
+    //We need to update again because the subtitle in this implementation depends on inner component state
+    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
+  }
+
 }
 
 window.customElements.define("az-nls-map-bit-list", NlsMapBitList);
