@@ -1,24 +1,32 @@
 import { Bit } from "azos-ui/bit";
 import { html, css } from "azos-ui/ui";
-import { isBool } from "azos/types";
+import STL_INLINE_GRID from "../styles/grid.js";
 
 /**
  * SchemaBit is a custom bit that displays schema information
  */
 export class SchemaBit extends Bit {
   static properties = {
-    source: { type: Object },
-    expandedOnLoad: { type: Boolean, default: true }, // whether the bit should be expanded on load, defaults to true
-    titleOverride: { type: String }, // allows overriding the title - defaults to the schema name from the source.data.name
+    source: { type: Object }
   }
 
   /**
    * Composite styles to render fields in a grid-like manner
    */
-  static styles = [Bit.styles, css`
+  static styles = [Bit.styles, STL_INLINE_GRID, css`
+
+    h3, h4 { margin: 0;}
 
     .composite {
       margin: 1em;
+      gap: 0.5em;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .compositeTight {
+      margin: 0em;
       gap: 0.5em;
       display: flex;
       flex-wrap: wrap;
@@ -37,19 +45,30 @@ export class SchemaBit extends Bit {
     .composite  az-bit[isexpanded]{
       width: 100%;
     }
+
+    .txtWide { width: 28ch;}
+    .txtNarrow { width: 10ch;}
   `];
 
   _getSummaryData(){
-    const attrs = this.source?.attrs && this.source.attrs.length > 0 ? this.source.attrs[0] : {};
 
-    // prepare title and description for the bit
+
+    // prepare title for the bit
     const isUniqueTitle = this.title !== this.source?.name && this.title !== this.constructor.name;
     const title = `${ isUniqueTitle ? this.title : this.source?.name }`;
 
+    // prepare subtitle for the bit
+    const attrs = this.source?.attrs && this.source.attrs.length > 0 ? this.source.attrs[0] : {};
+    // todo: check if there is any data where there are multiple attributes
+    //  if multiple attributes are there, which do we choose for the initial description?
+    //  do we choose the initial based on the target?
+    //   target === connection ?? target === `*` <-- leaning this way but need to confirm
+    const descriptionText = attrs?.description && attrs?.description !== title ? `${attrs.description} - ` : "";
     const fieldCountDisplay = `${this.source?.fields?.length ?? 0} fields`;
-    const descriptionText = attrs?.description && attrs?.description !== title ? `: ${attrs.description}` : "";
+    const readonlyText = this.source.readonly ? " - Readonly" : "";
+    const handleText = this.source.handle ? ` - Handle: ${this.source.handle}` : "";
 
-    const subtitle = `${fieldCountDisplay}${descriptionText}`;
+    const subtitle = `${descriptionText}${fieldCountDisplay}${readonlyText}${handleText}`;
 
     return { title, subtitle, commands: [] };
   }
@@ -57,55 +76,80 @@ export class SchemaBit extends Bit {
   renderDetailContent(){
 
     // pull data from the source
-    const attrs = this.source?.attrs && this.source.attrs.length > 0 ? this.source.attrs[0] : {};
-    const fields = this.source?.fields || [];
-
-    // prepare metadata string for display
-    const metadataJsonString = attrs.meta ? JSON.stringify(attrs.meta, null, 2) : "";
+    const attrs = this.source?.attrs ?? [];
+    const fields = this.source?.fields ?? [];
 
     // render only when we have the information to display
     return fields.length > 0 ? html`
-      <ul>
-        <li>Schema: ${this.source.name}</li>
-        <li>handle: ${this.source.handle}</li>
-        <li>Readonly: ${this.source.readonly ? "Yes" : "No"}</li>
-        <li>Fields: ${fields.length}</li>
-        <li>Attributes:
-          <ul>
-            ${attrs.target ? html`<li>Target: ${attrs.target}</li>` : ""}
-            ${attrs.name ? html`<li>Name: ${attrs.name}</li>` : ""}
-            ${attrs.description ? html`<li>Description: ${attrs.description}</li>` : ""}
-            ${attrs.immutable ? html`<li>Immutable: Yes</li>` :  html`<li>Immutable: No</li>`}
-          </ul>
-        </li>
-      </ul>
-
-      <az-bit id="schemaMetadataBit" scope="this" title="Metadata" status="default" rank="5">
-        <az-code-box source="${metadataJsonString}"></az-code-box>
-      </az-bit>
-
-      <div class="composite">
-        ${fields ? fields.map( (field,i) => {
-            const attrs = field.attributes?.length > 0 ? field.attributes[0] || {} : {};
-            const fldDescription = attrs.description !== field.name ? `${attrs.description}` : undefined;
-            const description = [`${field.order}`, fldDescription, `${field.type}`].filter(d=>d).join(" :: ");
-
-            return html`<az-bit id="schemaFieldBit-${i}" scope="this" title="${field.name}" group="schemaFields" rank="5">
-              <ul>
-                <li>Order: ${field.order}</li>
-                <li>Type: ${field.type}</li>
-                <li>GetOnly: ${field.getOnly ? "Yes" : "No"  }</li>
-                <li>Required: ${attrs.required ? "Yes" : "No"}</li>
-                <li>Max Length: ${attrs.maxLen || "N/A"}</li>
-              </ul>
-
-              <az-code-box scope="this" source="${JSON.stringify(attrs.meta, null, 2)}"></az-code-box>
-
-            </az-bit>`})
-          : html`<li>No fields available</li>`
-        }
+      <div style="width: 100%; margin-bottom: 1em;">
+        <az-text isreadonly title="Name"     value="${this.source?.name}"     class="txtWide"></az-text>
+        <az-text isreadonly title="readonly" value="${this.source?.readonly}" class="txtNarrow"></az-text>
+        <az-text isreadonly title="handle"   value="${this.source?.handle}"   class="txtNarrow"></az-text>
       </div>
-    ` : html`<p>No schema data available</p>`;
+
+
+      <h4>Attributes (${attrs.length})</h4>
+      <div class="row">
+
+        <div class="composite">
+          ${attrs.map(attr => html`
+          <az-bit scope="this" title="Target: ${attr.target}" group="schemaAttributes" rank="4" isExpanded>
+
+            <az-text isreadonly title="Name"        value="${attr.name}"        class="txtWide"></az-text>
+            <az-text isreadonly title="description" value="${attr.description}" class="txtWide"></az-text>
+            <az-text isreadonly title="immutable"   value="${attr.immutable}"   class="txtNarrow"></az-text>
+
+            <az-bit id="schemaMetadataBit" scope="this" title="Metadata" status="default" isExpanded style="margin-top:1em;" >
+              <az-code-box source="${attr?.meta ? JSON.stringify(attr.meta, null, 2) : ""}"></az-code-box>
+            </az-bit>
+
+          </az-bit>
+        </div>
+
+        `)}
+      </div>
+
+      <h4>Fields (${fields.length})</h4>
+      <div class="composite">
+
+      ${fields
+        ? fields.map( (field,i) => {
+
+          const fieldDescription = `Order: ${field.order} - type: ${field.type}${field.getOnly ? " : GetOnly" : ""}`;
+
+          return html`
+          <az-bit id="schemaFieldBit-${i}" scope="this" title="${field.name}" description="${fieldDescription}" group="schemaFields" rank="4">
+
+            <div style="width: 100%;">
+              <az-text isreadonly title="Name"    value="${field.name}"    class="txtWide"></az-text>
+              <az-text isreadonly title="Order"   value="${field.order}"   class="txtNarrow"></az-text>
+              <az-text isreadonly title="Type"    value="${field.type}"    class="txtNarrow"></az-text>
+              <az-text isreadonly title="GetOnly" value="${field.getOnly}" class="txtNarrow"></az-text>
+            </div>
+
+            <h3 style="margin: 1em 0;">Attributes (${(field?.attributes ?? []).length})</h3>
+
+            <div class="compositeTight">
+
+              ${(field?.attributes ?? []).map((attr,ii) => html`
+                <az-bit scope="this" id="fieldAttributeBit-${ii}" title="Target: ${attr.target}" description="${attr.description}" group="schemaAttributes" isExpanded>
+                  <az-text isreadonly title="Target"      value="${attr.target}"      class="txtWide"></az-text>
+                  <az-text isreadonly title="Description" value="${attr.description}" class="txtWide"></az-text>
+                  <az-text isreadonly title="BackName"    value="${attr.backName}"    class="txtWide"></az-text>
+                  <az-text isreadonly title="maxLen"      value="${attr.maxLen}"      class="txtNarrow"></az-text>
+                  <az-text isreadonly title="required"    value="${attr.required}"    class="txtNarrow"></az-text>
+
+                  <az-bit scope="this" id="fieldAttributeBit-${ii}" title="Metadata" status="default" isExpanded style="margin-top:1em;" >
+                    <az-code-box source="${attr?.meta ? JSON.stringify(attr.meta, null, 2) : ""}"></az-code-box>
+                  </az-bit>
+
+                </az-bit>
+              </div>`)}
+            </div>
+          </az-bit>`})
+        : html`<li>No fields available</li>`}
+    </div>`
+  : html`<p>No schema data available</p>`;
   }
 }
 
