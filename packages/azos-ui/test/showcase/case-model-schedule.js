@@ -21,9 +21,11 @@ export class CaseSchedule extends CaseBase {
     showMsg("ok", "Schedule Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.bitSchedule[DATA_VALUE_PROP], null, 2), 3, true);
   }
 
-  #btnGetBlockClick(){
-    showMsg("ok", "Schedule Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.bitSchedule[DATA_BLOCK_PROP], null, 2), 3, true);
+  #btnGetListClick(){
+    showMsg("ok", "Schedule List Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.bitScheduleList[DATA_VALUE_PROP], null, 2), 3, true);
   }
+
+  
 
   renderControl() {
     return html`
@@ -32,13 +34,20 @@ export class CaseSchedule extends CaseBase {
 
 <p> This is a sample content which is placed outside of bits. </p>
 <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Schedule Data"></az-button>
-<az-button id="btnBlock" scope="this" @click="${this.#btnGetBlockClick}" title="Get Block Data"></az-button>
+<az-button id="btnGetList" scope="this" @click="${this.#btnGetListClick}" title="Get List Data"></az-button>
 
 <az-schedule-bit
   id="bitSchedule"
-  title="Schedule Bit List"
+  title="Schedule Bit"
   scope="this"
 ></az-schedule-bit>
+
+
+<az-schedule-bit-list
+  id="bitScheduleList"
+  title="Schedule Bit List"
+  scope="this"
+></az-schedule-bit-list>
 
 
     `;

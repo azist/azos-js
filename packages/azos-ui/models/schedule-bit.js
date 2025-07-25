@@ -78,6 +78,26 @@ export class ScheduleBit extends Bit {
   `;
   }
 
+  get[DATA_VALUE_PROP](){
+    const result = {};
+    const obj = super[DATA_VALUE_PROP];
+     const innerSpans = {};
+     for (const span of obj.spans) {
+                              innerSpans[span?.name] = {
+                                monday:span?.monday?.mon,
+                                tuesday:span?.tuesday?.tue,
+                                wednesday:span?.wednesday?.wed,
+                                thursday:span?.thursday?.thu,
+                                friday:span?.friday?.fri,
+                                saturday:span?.saturday?.sat,
+                                sunday:span?.sunday?.sun};
+                            };
+      result[obj.name] = {title:obj?.title, 
+                          spans:innerSpans, 
+                          overrides:obj?.overrides};
+    
+    return result;
+  }
 }
 
 window.customElements.define("az-schedule-bit", ScheduleBit);
@@ -109,56 +129,6 @@ export class ScheduleBitList extends ListBit {
       subtitle: subtitle ?? "",
       commands: commands,
     };
-  }
-
-  get[DATA_VALUE_PROP](){
-    const result = {};
-    const array = super[DATA_VALUE_PROP];
-    for (const item of array) {
-      result[item.name] = {title:item?.title, 
-                          spans:{
-                            monday:item?.spans?.monday?.mon,
-                            tuesday:item?.spans?.tuesday?.tue,
-                            wednesday:item?.spans?.wednesday?.wed,
-                            thursday:item?.spans?.thursday?.thu,
-                            friday:item?.spans?.friday?.fri,
-                            saturday:item?.spans?.saturday?.sat,
-                            sunday:item?.spans?.sunday?.sun
-                          }
-                          , overrides:item?.overrides}
-    }
-    return result;
-  }
-
-  set[DATA_VALUE_PROP](v){
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue){
-        isUiInput = true;
-        v = v.value();
-      }
-
-      if (!isArray(v)){
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)){
-          result.push({name: ik, 
-                       title:iv?.title, 
-                       spans:{
-                            monday:iv?.spans?.mon?.value,
-                            tuesday:iv?.spans?.tue?.value,
-                            wednesday:iv?.spans?.wed?.value,
-                            thursday:iv?.spans?.thu?.value,
-                            friday:iv?.spans?.fri?.value,
-                            saturday:iv?.spans?.sat?.value,
-                            sunday:iv?.spans?.sun?.value
-                          }, 
-                       overrides:iv?.overrides})
-        }
-      }
-    }
-    super[DATA_VALUE_PROP] = v;
-
-    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
   }
 }
 window.customElements.define("az-schedule-bit-list", ScheduleBitList);
