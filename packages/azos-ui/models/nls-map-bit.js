@@ -1,9 +1,8 @@
 
-import { css, html, UiInputValue } from "../ui.js";
+import { css, html } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 import "../parts/text-field.js";
 import { dflt } from "azos/strings";
-import { DATA_VALUE_PROP, isArray } from "azos/types";
 
 /** Models an item in the Native Language Support Map - a mapping of names and descriptions per language ISO code */
 export class NlsMapBit extends Bit {

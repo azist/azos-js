@@ -81,23 +81,48 @@ export class ScheduleBit extends Bit {
   get[DATA_VALUE_PROP](){
     const result = {};
     const obj = super[DATA_VALUE_PROP];
-     const innerSpans = {};
+     let innerSpans = [];
      for (const span of obj.spans) {
-                              innerSpans[span?.name] = {
+                              innerSpans.push({[span?.name]: {
                                 monday:span?.monday?.mon,
                                 tuesday:span?.tuesday?.tue,
                                 wednesday:span?.wednesday?.wed,
                                 thursday:span?.thursday?.thu,
                                 friday:span?.friday?.fri,
                                 saturday:span?.saturday?.sat,
-                                sunday:span?.sunday?.sun};
+                                sunday:span?.sunday?.sun}});
                             };
-      result[obj.name] = {title:obj?.title, 
+      result[obj.name] = {namd:obj?.name,
+                          title:obj?.title, 
                           spans:innerSpans, 
                           overrides:obj?.overrides};
     
     return result;
   }
+
+  set[DATA_VALUE_PROP](v){
+    if (v) {
+      let isUiInput = false;
+      if (v instanceof UiInputValue) {
+        isUiInput = true;
+        v = v.value;
+      }
+
+      if (!isArray(v)) {
+        let result = [];
+        for (const [ik, iv] of Object.entries(v)) {
+          result.push({
+            name: ik, title:iv?.title, spans:iv?.spans, overrides:iv?.overrides
+          });
+        }
+      }
+    }
+
+    super[DATA_VALUE_PROP] = v;
+
+    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
+  }
+  
 }
 
 window.customElements.define("az-schedule-bit", ScheduleBit);
