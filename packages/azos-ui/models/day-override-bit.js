@@ -88,7 +88,7 @@ export class DayOverrideBit extends Bit {
       <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
-        name="nls"
+        name="title"
         title="Localized Day"
         description="Localized Name of the Day to be overridden"
         .isReadonly="${this.isReadOnly}"
@@ -129,37 +129,6 @@ export class DayOverrideBitList extends ListBit {
       subtitle: subtitle ?? "",
       commands: commands
     };
-  }
-
-  get [DATA_VALUE_PROP]() {
-    const result = {};
-    const array = super[DATA_VALUE_PROP];
-    for (const item of array){
-      result[item.name] = {d: item.date, h: item.hours, nls: item.nls};
-    }
-    return result;
-  }
-
-  set [DATA_VALUE_PROP](v) {
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue) {
-        isUiInput = true;
-        v = v.value();
-      }
-
-      if (!isArray(v)) {
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)) {
-          result.push({name: ik, d: iv?.date, h: iv?.hours, nls: iv?.nls});
-        }
-        v = isUiInput ? new UiInputValue(result) : result;
-      }
-    }
-
-    super[DATA_VALUE_PROP] = v;
-
-    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
   }
 }
 

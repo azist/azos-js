@@ -84,7 +84,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
       <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
-        name="nls"
+        name="title"
         title="Localized Name"
         description="Localized name of the Span"
         .isReadonly="${this.isReadOnly}"
@@ -107,6 +107,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="${dflt(this?.tbMonday?.value, "")}" 
         rank="normal" 
         status="alert" 
+        name="monday"
         group="weekdays">
           <az-text
             id="tbMonday"
@@ -124,6 +125,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="${dflt(this?.tbTuesday?.value, "")}" 
         rank="normal" 
         status="alert" 
+        name="tuesday"
         group="weekdays">
           <az-text
             id="tbTuesday"
@@ -141,6 +143,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="${dflt(this?.tbWednesday?.value, "")}" 
         rank="normal" 
         status="alert" 
+        name="wednesday"
         group="weekdays">
           <az-text
             id="tbWednesday"
@@ -158,6 +161,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="${dflt(this?.tbThursday?.value, "")}" 
         rank="normal" 
         status="alert" 
+        name="thursday"
         group="weekdays">
           <az-text
             id="tbThursday"
@@ -175,6 +179,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="${dflt(this?.tbFriday?.value, "")}" 
         rank="normal" 
         status="alert" 
+        name="friday"
         group="weekdays">
           <az-text
             id="tbFriday"
@@ -192,6 +197,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="${dflt(this?.tbSaturday?.value, "")}" 
         rank="normal" 
         status="alert" 
+        name="saturday"
         group="weekdays">
           <az-text
             id="tbSaturday"
@@ -209,6 +215,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="${dflt(this?.tbSunday?.value, "")}" 
         rank="normal" 
         status="alert" 
+        name="sunday"
         group="weekdays">
           <az-text
             id="tbSunday"
@@ -226,6 +233,8 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
       </div>
     `;
   }
+
+   
 }
 
 window.customElements.define("az-span-bit", SpanBit);
@@ -260,17 +269,17 @@ export class SpanBitList extends ListBit {
       commands: commands
     }
   }
-
+/*
   get [DATA_VALUE_PROP]() {
     const result = [];
     const array = super[DATA_VALUE_PROP];
     for (const item of array) {
       result[item.name] = {
-        nls: item.nls, dr:  item.dr,
-        mon: item.mon, tue: item.tue,
-        wed: item.wed, thu: item.thu,
-        fri: item.fri, sat: item.sat, 
-        sun: item.sun
+        title: item.title, dr:  item.dr,
+        monday: item.monday.mon, tuesday: item.tuesday.tue,
+        wednesday: item.wednesday.wed, thursday: item.thursday.thu,
+        friday: item.friday.fri, saturday: item.saturday.sat, 
+        sunday: item.sunday.sun
       }
     }
     return result;
@@ -288,10 +297,10 @@ export class SpanBitList extends ListBit {
         let result = [];
         for (const [ik, iv] of Object.entries(v)) {
           result.push({
-            name: ik, nls: iv?.nls, dr: iv?.dr,
-            mon:  iv?.mon, tue: iv?.tue,
-            wed:  iv?.wed, thu: iv?.thu,
-            fri:  iv?.fri, sat: iv?.sat, sun: iv?.sun
+            name: ik, title: iv?.title, dr: iv?.dr,
+            monday:  iv?.monday?.mon, tuesday: iv?.tuesday?.tue,
+            wednesday:  iv?.wednesday?.wed, thursday: iv?.thursday?.thu,
+            friday:  iv?.friday?.fri, saturday: iv?.saturday?.sat, sunday: iv?.sunday?.sun
           });
         }
       }
@@ -300,6 +309,7 @@ export class SpanBitList extends ListBit {
 
     queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
   }
+    */
 }
 
 window.customElements.define("az-span-bit-list", SpanBitList);

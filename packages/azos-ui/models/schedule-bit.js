@@ -47,7 +47,7 @@ export class ScheduleBit extends Bit {
       <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
-        name="nls"
+        name="title"
         title="Local Schedule Name"
         description="Localized Name of the Schedule"
         .isReadonly="${this.isReadOnly}"
@@ -58,7 +58,7 @@ export class ScheduleBit extends Bit {
       <az-span-bit-list
         id="bitSpan"
         scope="this"
-        name="wkd"
+        name="spans"
         class="span4"
         rank="medium"
         status="info"
@@ -70,7 +70,7 @@ export class ScheduleBit extends Bit {
         scope="this"
         class="span4"
         rank="medium"
-        name="ovd"
+        name="overrides"
       ></az-day-override-bit-list>
 
     </div>
@@ -85,8 +85,6 @@ window.customElements.define("az-schedule-bit", ScheduleBit);
 export class ScheduleBitList extends ListBit {
   
   static styles = [ListBit.styles];
-
-  getItemData
 
   makeOrMapElement(elmData, existingOnly = false) {
     if (this.indexOf(elmData) >= 0) return elmData;
@@ -117,7 +115,17 @@ export class ScheduleBitList extends ListBit {
     const result = {};
     const array = super[DATA_VALUE_PROP];
     for (const item of array) {
-      result[item.name] = {nls:item?.nls, wkd:item?.wkd, ovd:item?.ovd}
+      result[item.name] = {title:item?.title, 
+                          spans:{
+                            monday:item?.spans?.monday?.mon,
+                            tuesday:item?.spans?.tuesday?.tue,
+                            wednesday:item?.spans?.wednesday?.wed,
+                            thursday:item?.spans?.thursday?.thu,
+                            friday:item?.spans?.friday?.fri,
+                            saturday:item?.spans?.saturday?.sat,
+                            sunday:item?.spans?.sunday?.sun
+                          }
+                          , overrides:item?.overrides}
     }
     return result;
   }
@@ -133,7 +141,18 @@ export class ScheduleBitList extends ListBit {
       if (!isArray(v)){
         let result = [];
         for (const [ik, iv] of Object.entries(v)){
-          result.push({name: ik, nls:iv?.nls, wkd:iv?.wkd, ovd:iv?.ovd})
+          result.push({name: ik, 
+                       title:iv?.title, 
+                       spans:{
+                            monday:iv?.spans?.mon?.value,
+                            tuesday:iv?.spans?.tue?.value,
+                            wednesday:iv?.spans?.wed?.value,
+                            thursday:iv?.spans?.thu?.value,
+                            friday:iv?.spans?.fri?.value,
+                            saturday:iv?.spans?.sat?.value,
+                            sunday:iv?.spans?.sun?.value
+                          }, 
+                       overrides:iv?.overrides})
         }
       }
     }
