@@ -14,7 +14,7 @@ import { css, getEffectiveTimeZone, html, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 import { STL_INLINE_GRID } from "../styles";
 
-export class DayOverrideItem extends Bit {
+export class DayOverrideBit extends Bit {
   static styles = [...Bit.styles, css`
       .item{
         display: flex;
@@ -36,7 +36,8 @@ export class DayOverrideItem extends Bit {
     const summary = dfltObject(this.tbName?.value, html`<span style="color: var(--ghost)">Day Override</span>`);
     // Always localize the DATE to UTC since we don't want that to be altered during localization elsewhere.
     // As the UTC date is a statutory date that will be compared against the application date in EVERY PARTICULAR LOCAL TIMEZONE
-    const subSummary = isNullOrWhiteSpace(this.tbDate?.value) 
+    const subSummary = this.tbDate?.value?.start === undefined
+                    || this.tbDate?.value?.end === undefined
                         ? "" 
                         : this.arena.app
                           .localizer
@@ -84,7 +85,7 @@ export class DayOverrideItem extends Bit {
         title="${dflt(this.captionHours, "Hours")}"
       ></az-text>
 
-      <az-nls-map-bit
+      <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
         name="nls"
@@ -92,15 +93,15 @@ export class DayOverrideItem extends Bit {
         description="Localized Name of the Day to be overridden"
         .isReadonly="${this.isReadOnly}"
         rank="small"
-      ></az-nls-map-bit>
+      ></az-nls-map-bit-list>
       
     </div>`;
   }
 }
 
-window.customElements.define("az-day-override-item", DayOverrideItem);
+window.customElements.define("az-day-override-bit", DayOverrideBit);
 
-export class DayOverrideBit extends ListBit {
+export class DayOverrideBitList extends ListBit {
   static styles = [ListBit.styles];
 
   makeOrMapElement(elmData, existingOnly = false)
@@ -111,7 +112,7 @@ export class DayOverrideBit extends ListBit {
     if (existing) return existing;
     if (existingOnly) return null;
 
-    const item = new DayOverrideItem();
+    const item = new DayOverrideBit();
     item.rank = "medium";
     item.noSummary = true;
     return item;
@@ -162,4 +163,4 @@ export class DayOverrideBit extends ListBit {
   }
 }
 
-window.customElements.define("az-day-override-bit", DayOverrideBit);
+window.customElements.define("az-day-override-bit-list", DayOverrideBitList);

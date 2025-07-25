@@ -14,9 +14,9 @@ import { html, css, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 
 import STL_INLINE_GRID from "../styles/grid.js";
-import { writeConsole } from "azos/log";
 
-export class SpanItem extends Bit {
+//#region SpanBit
+export class SpanBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID, css`
 .composite {
   margin: 1em;
@@ -81,7 +81,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
 
-      <az-nls-map-bit
+      <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
         name="nls"
@@ -90,7 +90,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         .isReadonly="${this.isReadOnly}"
         class="span4"
         status="alert"
-      ></az-nls-map-bit>
+      ></az-nls-map-bit-list>
     </div>
 
     <div class="row">
@@ -228,10 +228,11 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
   }
 }
 
-window.customElements.define("az-span-item", SpanItem);
+window.customElements.define("az-span-bit", SpanBit);
+//#endregion
 
-
-export class SpanBit extends ListBit {
+//#region SpanBitList
+export class SpanBitList extends ListBit {
   static styles = [ListBit.styles];
 
   makeOrMapElement(elemData, existingOnly = false) {
@@ -241,7 +242,7 @@ export class SpanBit extends ListBit {
     if (existing) return existing;
     if (existingOnly) return null;
 
-    const item = new SpanItem();
+    const item = new SpanBit();
     item.rank = "medium";
     //item.noSummary = true;
     return item;
@@ -301,8 +302,8 @@ export class SpanBit extends ListBit {
   }
 }
 
-window.customElements.define("az-span-bit", SpanBit);
-
+window.customElements.define("az-span-bit-list", SpanBitList);
+//#endregion
 
 //#region Date logic
 

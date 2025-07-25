@@ -6,7 +6,7 @@ import { dflt } from "azos/strings";
 import { DATA_VALUE_PROP, isArray } from "azos/types";
 
 /** Models an item in the Native Language Support Map - a mapping of names and descriptions per language ISO code */
-export class NlsMapItem extends Bit {
+export class NlsMapBit extends Bit {
 
   static styles = [ListBit.styles, css`
     .item{
@@ -36,11 +36,11 @@ export class NlsMapItem extends Bit {
   }
 }
 
-window.customElements.define("az-nls-map-item", NlsMapItem);
+window.customElements.define("az-nls-map-bit", NlsMapBit);
 
 
 /** Provides a Native Language Support Map, a dictionary of lang iso -> (name, description) pairs */
-export class NlsMapBit extends ListBit {
+export class NlsMapBitList extends ListBit {
 
   static styles = [ListBit.styles];
 
@@ -52,7 +52,7 @@ export class NlsMapBit extends ListBit {
     if (existing) return existing;
     if (existingOnly) return null;
 
-    const item = new NlsMapItem();
+    const item = new NlsMapBit();
     item.rank = "medium";
     item.noSummary = true;
     return item;
@@ -107,5 +107,5 @@ export class NlsMapBit extends ListBit {
 
 }
 
-window.customElements.define("az-nls-map-bit", NlsMapBit);
+window.customElements.define("az-nls-map-bit-list", NlsMapBitList);
 

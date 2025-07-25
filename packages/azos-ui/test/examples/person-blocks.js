@@ -63,9 +63,9 @@ export class PersonBlock extends Block {
 
       </div>
 
-      <az-nls-map-bit scope="this" id="nlsMap" name="lclCodes"
+      <az-nls-map-bit-list scope="this" id="nlsMap" name="lclCodes"
                     title="Localized Codes"
-                    description="Example of using a NLS Map Bit"></az-nls-map-bit>
+                    description="Example of using a NLS Map Bit"></az-nls-map-bit-list>
 
       <h4>Processing Status</h4>
       <examples-status-block scope="this" id="blockProcessStatus" name="ProcessStatus"></examples-status-block>

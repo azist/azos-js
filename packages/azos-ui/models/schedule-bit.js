@@ -14,7 +14,7 @@ import {DATA_VALUE_PROP, isArray} from "azos/types";
 
 import "../models/span-bit.js";
 
-export class ScheduleItem extends Bit {
+export class ScheduleBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
 
   static properties = {
@@ -44,7 +44,7 @@ export class ScheduleItem extends Bit {
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
 
-      <az-nls-map-bit
+      <az-nls-map-bit-list
         id="nlsBit"
         scope="this"
         name="nls"
@@ -53,9 +53,9 @@ export class ScheduleItem extends Bit {
         .isReadonly="${this.isReadOnly}"
         class="span4"
         rank="medium"
-      ></az-nls-map-bit>
+      ></az-nls-map-bit-list>
 
-      <az-span-bit
+      <az-span-bit-list
         id="bitSpan"
         scope="this"
         name="wkd"
@@ -63,15 +63,15 @@ export class ScheduleItem extends Bit {
         rank="medium"
         status="info"
         title="${dflt(this.captionSpan, "Time Span")}"
-      ></az-span-bit>
+      ></az-span-bit-list>
 
-      <az-day-override-bit
+      <az-day-override-bit-list
         id="bitDayOverride"
         scope="this"
         class="span4"
         rank="medium"
         name="ovd"
-      ></az-day-override-bit>
+      ></az-day-override-bit-list>
 
     </div>
 
@@ -80,9 +80,9 @@ export class ScheduleItem extends Bit {
 
 }
 
-window.customElements.define("az-schedule-bit-item", ScheduleItem);
+window.customElements.define("az-schedule-bit", ScheduleBit);
 
-export class ScheduleBit extends ListBit {
+export class ScheduleBitList extends ListBit {
   
   static styles = [ListBit.styles];
 
@@ -95,7 +95,7 @@ export class ScheduleBit extends ListBit {
     if (existing) return existing;
     if (existingOnly) return null;
 
-    const item = new ScheduleItem();
+    const item = new ScheduleBit();
     item.rank = "medium";
     return item;
   }
@@ -142,4 +142,4 @@ export class ScheduleBit extends ListBit {
     queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
   }
 }
-window.customElements.define("az-schedule-bit", ScheduleBit);
+window.customElements.define("az-schedule-bit-list", ScheduleBitList);

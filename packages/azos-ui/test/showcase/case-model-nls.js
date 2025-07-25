@@ -21,7 +21,7 @@ export class CaseNlsMap extends CaseBase {
 
 <p> This is a sample content which is placed outside of bits. </p>
 
-<az-nls-map-bit
+<az-nls-map-bit-list
         id="nlsBit"
         scope="this"
         name="lclCode"
@@ -30,7 +30,7 @@ export class CaseNlsMap extends CaseBase {
         .isReadonly="${this.isReadOnly}"
         class="span4"
         status="alert"
-      ></az-nls-map-bit>
+      ></az-nls-map-bit-list>
     `;
   }
 }
