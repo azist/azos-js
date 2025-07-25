@@ -36,6 +36,7 @@ import "../showcase/case-sizing.js";
 import "../showcase/case-tab-view.js";
 import "../showcase/case-toasts.js";
 import "../showcase/case-tree-view.js";
+import "../showcase/case-tree-view-n.js";
 import "../showcase/case-launcher.js";
 import "../showcase/case-cards.js";
 import "../showcase/case-grids.js";
@@ -146,6 +147,7 @@ export class ShowcaseApplet extends Applet {
       <option value="TextFields">Text Fields</option>
       <option value="Toasts">Toasts</option>
       <option value="TreeView">Tree View</option>
+      <option value="TreeViewN">Tree ViewN - wip</option>
       <option value="Launcher">Launcher</option>
       <option value="Cards">Cards</option>
       <option value="Grids">Grids</option>
@@ -192,6 +194,7 @@ export class ShowcaseApplet extends Applet {
       TextFields: html`<az-case-text-fields></az-case-text-fields>`,
       Toasts: html`<az-case-toasts></az-case-toasts>`,
       TreeView: html`<az-case-tree-view></az-case-tree-view>`,
+      TreeViewN: html`<az-case-tree-view-n></az-case-tree-view-n>`,
       Launcher: html`<az-case-launcher></az-case-launcher>`,
       Cards: html`<az-case-cards></az-case-cards>`,
       Grids: html`<az-case-grids></az-case-grids>`,
