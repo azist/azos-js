@@ -91,7 +91,7 @@ export class AdlibTagListBit extends ListBit {
     if (existing) return existing;
     if (existingOnly) return null;
 
-    const item = new AdlibTagItem();
+    const item = new AdlibTagBit();
     item.rank = "medium";
     item.noSummary = true;
     return item;
