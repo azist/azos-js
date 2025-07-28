@@ -27,42 +27,49 @@ export class CaseSchedule extends CaseBase {
 
   #btnSetClick(){
     this.bitSchedule[DATA_VALUE_PROP] = new UiInputValue({
-        "name":"asdf",
-        "title": [
-                {
-                  "d": "poiwer",
-                  "iso": "eng",
-                  "n": "lksjdf"
-                }
-              ],
-        "spans": [
-              {
-                "poiu": {
-                  "monday": "asdf",
-                  "tuesday": "zxcv",
-                  "wednesday": "asdf",
-                  "thursday": "zcxv",
-                  "friday": "qwer",
-                  "saturday": "sdfg",
-                  "sunday": "erty"
-                }
-              }
-            ],
-        "overrides": [
-          {
-            "date": "2025-01-01T00:00:00.000Z",
-            "hours": "closed",
-            "name": "new year",
-            "title": [
-              {
-                "d": "poiwer",
-                "iso": "eng",
-                "n": "lksdjf"
-              }
-            ]
-          }
-        ]
-      });
+  "name": "Spans work, does this?",
+  "overrides": [
+    {
+      "date": "2025-01-15T00:00:00.000Z",
+      "hours": "Closed",
+      "name": "No work",
+      "title": {
+        "eng": {
+          "n": "No Work",
+          "d": "there is no work today"
+        }
+      }
+    }
+  ],
+  "spans": [
+    {
+      "name": "MEGA SPAN",
+      "title": {
+        "eng": {
+          "n": "MEGA SPAN",
+          "d": "hugely big span"
+        }
+      },
+      "range": {
+        "start": "2025-01-01T00:00:00.000Z",
+        "end": "2025-01-31T00:00:00.000Z"
+      },
+      "monday": "789",
+      "tuesday": "678",
+      "wednesday": "567",
+      "thursday": "456",
+      "friday": "345",
+      "saturday": "234",
+      "sunday": "123"
+    }
+  ],
+  "title": {
+    "eng": {
+      "n": "Spans work, does this?",
+      "d": "Hopefully this works for all components"
+    }
+  }
+});
   }
 
   

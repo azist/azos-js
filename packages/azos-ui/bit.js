@@ -489,7 +489,7 @@ export class ListBit extends Bit {
     let isUiInput = false;
     if (v instanceof UiInputValue) {//unwrap UiInputValue
       isUiInput = true;
-      v = v.value();
+      v = v.value;
     }
 
     aver.isArray(v, "ListBit needs array value");

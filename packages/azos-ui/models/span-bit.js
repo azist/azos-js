@@ -4,15 +4,14 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asInt, DATA_VALUE_PROP, isIntValue, isNumber, TIME_ZONE_PROP } from "azos/types"; 
-import { dflt, dfltObject, trim, isEmpty, isNullOrWhiteSpace } from "azos/strings";
-
-import { TZ_UTC } from "azos/time";
-import { DATE_FORMAT, TIME_DETAILS } from "azos/localization";
-
 import { html, css, UiInputValue } from "../ui.js";
-import { Bit, ListBit } from "../bit.js";
 
+import { DATE_FORMAT, TIME_DETAILS } from "azos/localization";
+import { dflt, dfltObject, trim, isEmpty, isNullOrWhiteSpace } from "azos/strings";
+import { TZ_UTC } from "azos/time";
+import { asInt, DATA_VALUE_PROP, isIntValue, isNumber, TIME_ZONE_PROP, isArray } from "azos/types";
+
+import { Bit, ListBit } from "../bit.js";
 import STL_INLINE_GRID from "../styles/grid.js";
 
 //#region SpanBit
@@ -22,13 +21,12 @@ export class SpanBit extends Bit {
   margin: 1em;
   gap: 0.5em;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  align-items: left;
-  flex-direction: column;
 }
 
 az-bit{
- width: 60ch;
+ width: 28ch;
  transition: 1s;
 }
 
@@ -36,7 +34,7 @@ az-bit:not([isexpanded]){
  transition-delay: .25s;
 }
 
-XXXaz-bit[isexpanded]{ width: 80ch; }
+XXXaz-bit[isexpanded]{ width: 23ch; }
 az-bit.wide[isexpanded]{ width: 100%; }`];
 
   static properties = {
@@ -48,22 +46,22 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
   _getSummaryData() {
     const summary = this.tbName?.value;
     const start = this.arena.app.localizer.formatDateTime({
-                                  dt:this.drRange?.value?.start, 
-                                  dtFormat:DATE_FORMAT.NUM_DATE, 
-                                  tmDetails: TIME_DETAILS.NONE, 
-                                  timeZone: TZ_UTC
-                                });
-    
+      dt: this.drRange?.value?.start,
+      dtFormat: DATE_FORMAT.NUM_DATE,
+      tmDetails: TIME_DETAILS.NONE,
+      timeZone: TZ_UTC
+    });
+
     const end = this.arena.app.localizer.formatDateTime({
-                                  dt:this.drRange?.value?.end, 
-                                  dtFormat:DATE_FORMAT.NUM_DATE, 
-                                  tmDetails: TIME_DETAILS.NONE, 
-                                  timeZone: TZ_UTC
-                                });
+      dt: this.drRange?.value?.end,
+      dtFormat: DATE_FORMAT.NUM_DATE,
+      tmDetails: TIME_DETAILS.NONE,
+      timeZone: TZ_UTC
+    });
 
     const subSummary = this.drRange?.value?.start === undefined
-                    || this.drRange?.value?.end === undefined ? "" 
-                    : start + " - " + end;
+      || this.drRange?.value?.end === undefined ? ""
+      : start + " - " + end;
     return {
       title: dfltObject(summary, html`<span style="color: var(--ghost)">Span</span>`),
       subtitle: subSummary,
@@ -89,7 +87,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         description="Localized name of the Span"
         .isReadonly="${this.isReadOnly}"
         class="span4"
-        status="alert"
       ></az-nls-map-bit-list>
     </div>
 
@@ -97,7 +94,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
       <az-date-range
           id="drRange"
           scope="this"
-          name="dr"
+          name="range"
           titlePosition="top-left"
           .isReadonly="${this.isReadOnly}"
           title="${dflt(this.captionRange, "Range")}"
@@ -106,7 +103,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Monday" 
         description="${dflt(this?.tbMonday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="monday"
         group="weekdays">
           <az-text
@@ -124,7 +120,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Tuesday" 
         description="${dflt(this?.tbTuesday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="tuesday"
         group="weekdays">
           <az-text
@@ -142,7 +137,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Wednesday" 
         description="${dflt(this?.tbWednesday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="wednesday"
         group="weekdays">
           <az-text
@@ -160,7 +154,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Thursday" 
         description="${dflt(this?.tbThursday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="thursday"
         group="weekdays">
           <az-text
@@ -178,7 +171,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Friday" 
         description="${dflt(this?.tbFriday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="friday"
         group="weekdays">
           <az-text
@@ -195,8 +187,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         </az-bit>
         <az-bit title="Saturday" 
         description="${dflt(this?.tbSaturday?.value, "")}" 
-        rank="normal" 
-        status="alert" 
+        rank="normal"  
         name="saturday"
         group="weekdays">
           <az-text
@@ -214,7 +205,6 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         <az-bit title="Sunday" 
         description="${dflt(this?.tbSunday?.value, "")}" 
         rank="normal" 
-        status="alert" 
         name="sunday"
         group="weekdays">
           <az-text
@@ -234,7 +224,57 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
     `;
   }
 
-   
+  get [DATA_VALUE_PROP]() {
+    let result = {};
+    const item = super[DATA_VALUE_PROP];
+    if (item) {
+      result = {
+        name: item?.name ?? "",
+        title: item?.title,
+        range: item?.range ?? { },
+        monday: item.monday?.mon ?? "",
+        tuesday: item.tuesday?.tue ?? "",
+        wednesday: item.wednesday?.wed ?? "",
+        thursday: item.thursday?.thu ?? "",
+        friday: item.friday?.fri ?? "",
+        saturday: item.saturday?.sat ?? "",
+        sunday: item.sunday?.sun ?? ""
+      };
+    }
+    return result;
+  }
+
+  set [DATA_VALUE_PROP](v) {
+    if (v) {
+      let isUiInput = false;
+      if (v instanceof UiInputValue) {
+        isUiInput = true;
+        v = v.value;
+      }
+
+      if (!isArray(v)) {
+        let result = {};
+
+        result = {
+          name: v?.name,
+          title: v?.title,
+          range: v?.range,
+          monday: { mon: v?.monday },
+          tuesday: { tue: v?.tuesday },
+          wednesday: { wed: v?.wednesday },
+          thursday: { thu: v?.thursday },
+          friday: { fri: v?.friday },
+          saturday: { sat: v?.saturday },
+          sunday: { sun: v?.sunday }
+        };
+        v = isUiInput ? new UiInputValue(result) : result
+      }
+    }
+
+    super[DATA_VALUE_PROP] = v;
+    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
+  }
+
 }
 
 window.customElements.define("az-span-bit", SpanBit);
@@ -269,47 +309,6 @@ export class SpanBitList extends ListBit {
       commands: commands
     }
   }
-/*
-  get [DATA_VALUE_PROP]() {
-    const result = [];
-    const array = super[DATA_VALUE_PROP];
-    for (const item of array) {
-      result[item.name] = {
-        title: item.title, dr:  item.dr,
-        monday: item.monday.mon, tuesday: item.tuesday.tue,
-        wednesday: item.wednesday.wed, thursday: item.thursday.thu,
-        friday: item.friday.fri, saturday: item.saturday.sat, 
-        sunday: item.sunday.sun
-      }
-    }
-    return result;
-  }
-
-  set [DATA_VALUE_PROP](v) {
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue) {
-        isUiInput = true;
-        v = v.value();
-      }
-
-      if (!isArray(v)) {
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)) {
-          result.push({
-            name: ik, title: iv?.title, dr: iv?.dr,
-            monday:  iv?.monday?.mon, tuesday: iv?.tuesday?.tue,
-            wednesday:  iv?.wednesday?.wed, thursday: iv?.thursday?.thu,
-            friday:  iv?.friday?.fri, saturday: iv?.saturday?.sat, sunday: iv?.sunday?.sun
-          });
-        }
-      }
-    }
-    super[DATA_VALUE_PROP] = v;
-
-    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
-  }
-    */
 }
 
 window.customElements.define("az-span-bit-list", SpanBitList);

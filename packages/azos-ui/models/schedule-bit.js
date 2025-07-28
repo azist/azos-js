@@ -8,11 +8,12 @@
 import { html, UiInputValue } from "../ui.js";
 import { Bit, ListBit } from "../bit.js";
 
-import { dflt, dfltObject } from "azos/strings"
+import { dflt, dfltObject, isEmpty, isNullOrWhiteSpace, truncate } from "azos/strings"
 import { STL_INLINE_GRID } from "../styles";
 import {DATA_VALUE_PROP, isArray} from "azos/types";
 
 import "../models/span-bit.js";
+import { isNull } from "azos/aver";
 
 export class ScheduleBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
@@ -24,9 +25,17 @@ export class ScheduleBit extends Bit {
   }
 
   _getSummaryData(){
+    const subtitle = super[DATA_VALUE_PROP]?.spans 
+      ? truncate(super[DATA_VALUE_PROP]?.spans.map(span => span.name).join(", "), 35, "...")
+      : "";
+    const title = !isNullOrWhiteSpace(this?.captionTitle)
+      ? "\"" + this.captionTitle + "\""
+      : !isNullOrWhiteSpace(this?.tbName?.value)
+      ? "\"" + this.tbName?.value + "\""
+      : "";
     return {
-      title: this?.captionTitle ?? this?.tbName?.value ?? "Schedule",
-      subtitle: '',
+      title: "Schedule " + title,
+      subtitle: subtitle,
       commands: []
     }
   }
@@ -62,7 +71,7 @@ export class ScheduleBit extends Bit {
         class="span4"
         rank="medium"
         status="info"
-        title="${dflt(this.captionSpan, "Time Span")}"
+        title="${dflt(this.captionSpan, "Time Spans")}"
       ></az-span-bit-list>
 
       <az-day-override-bit-list
@@ -70,59 +79,15 @@ export class ScheduleBit extends Bit {
         scope="this"
         class="span4"
         rank="medium"
+        title="Day Overrides"
         name="overrides"
+        status="alert"
       ></az-day-override-bit-list>
 
     </div>
 
   `;
   }
-
-  get[DATA_VALUE_PROP](){
-    const result = {};
-    const obj = super[DATA_VALUE_PROP];
-     let innerSpans = [];
-     for (const span of obj.spans) {
-                              innerSpans.push({[span?.name]: {
-                                monday:span?.monday?.mon,
-                                tuesday:span?.tuesday?.tue,
-                                wednesday:span?.wednesday?.wed,
-                                thursday:span?.thursday?.thu,
-                                friday:span?.friday?.fri,
-                                saturday:span?.saturday?.sat,
-                                sunday:span?.sunday?.sun}});
-                            };
-      result[obj.name] = {namd:obj?.name,
-                          title:obj?.title, 
-                          spans:innerSpans, 
-                          overrides:obj?.overrides};
-    
-    return result;
-  }
-
-  set[DATA_VALUE_PROP](v){
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue) {
-        isUiInput = true;
-        v = v.value;
-      }
-
-      if (!isArray(v)) {
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)) {
-          result.push({
-            name: ik, title:iv?.title, spans:iv?.spans, overrides:iv?.overrides
-          });
-        }
-      }
-    }
-
-    super[DATA_VALUE_PROP] = v;
-
-    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
-  }
-  
 }
 
 window.customElements.define("az-schedule-bit", ScheduleBit);
