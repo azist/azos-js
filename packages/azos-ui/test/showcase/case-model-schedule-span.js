@@ -15,7 +15,7 @@ import "../../../azos-ui/models/adlib-tag-bit.js";
 import { showMsg } from "../../msg-box.js";
 
 
-export class CaseSpan extends CaseBase {
+export class CaseScheduleSpan extends CaseBase {
 #btnGetClick(){
     showMsg("ok", "Span Data", "The following is obtained \n by calling [DATA_VALUE_PROP]: \n\n" +JSON.stringify(this.bitSpan[DATA_VALUE_PROP], null, 2), 3, true);
   }
@@ -62,4 +62,4 @@ export class CaseSpan extends CaseBase {
   }
 }
 
-window.customElements.define("az-case-model-span", CaseSpan);
+window.customElements.define("az-case-model-schedule-span", CaseScheduleSpan);
