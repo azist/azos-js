@@ -33,9 +33,7 @@ az-bit{
 az-bit:not([isexpanded]){
  transition-delay: .25s;
 }
-
-XXXaz-bit[isexpanded]{ width: 23ch; }
-az-bit.wide[isexpanded]{ width: 100%; }`];
+`];
 
   static properties = {
     captionName: { type: String },
@@ -75,6 +73,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         id="tbName"
         scope="this"
         name="name"
+        isrequired
         .isReadonly="${this.isReadOnly}"
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
@@ -84,6 +83,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
         scope="this"
         name="title"
         title="Localized Name"
+        isrequired
         description="Localized name of the Span"
         .isReadonly="${this.isReadOnly}"
         class="span4"
@@ -96,6 +96,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
           scope="this"
           name="range"
           titlePosition="top-left"
+          isrequired
           .isReadonly="${this.isReadOnly}"
           title="${dflt(this.captionRange, "Range")}"
         ></az-date-range>
@@ -109,10 +110,9 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             id="tbMonday"
             scope="this"
             name="mon"
-            title="Monday"
             titlePosition="mid-left"
-            titleWidth="25"
-            contentWidth="85"
+            titleWidth="0"
+            contentWidth="150"
             placeholder="9am-12pm, 1:00pm-7:45pm, ..."
             .isReadonly="${this.isReadOnly}"
           ></az-text>
@@ -126,10 +126,9 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             id="tbTuesday"
             scope="this"
             name="tue"
-            title="Tuesday"
             titlePosition="mid-left"
-            titleWidth="25"
-            contentWidth="85"
+            titleWidth="0"
+            contentWidth="150"
             placeholder="9am-12pm, 1:00pm-7:45pm, ..."
             .isReadonly="${this.isReadOnly}"
           ></az-text>
@@ -143,9 +142,8 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             id="tbWednesday"
             scope="this"
             name="wed"
-            title="Wednesday"
             titlePosition="mid-left"
-            titleWidth="30"
+            titleWidth="0"
             contentWidth="150"
             placeholder="9am-12pm, 1:00pm-7:45pm, ..."
             .isReadonly="${this.isReadOnly}"
@@ -160,10 +158,9 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             id="tbThursday"
             scope="this"
             name="thu"
-            title="Thursday"
             titlePosition="mid-left"
-            titleWidth="25"
-            contentWidth="85"
+            titleWidth="0"
+            contentWidth="150"
             placeholder="9am-12pm, 1:00pm-7:45pm, ..."
             .isReadonly="${this.isReadOnly}"
           ></az-text>
@@ -177,10 +174,9 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             id="tbFriday"
             scope="this"
             name="fri"
-            title="Friday"
             titlePosition="mid-left"
-            titleWidth="25"
-            contentWidth="85"
+            titleWidth="0"
+            contentWidth="150"
             placeholder="9am-12pm, 1:00pm-7:45pm, ..."
             .isReadonly="${this.isReadOnly}"
           ></az-text>
@@ -194,10 +190,9 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             id="tbSaturday"
             scope="this"
             name="sat"
-            title="Saturday"
             titlePosition="mid-left"
-            titleWidth="25"
-            contentWidth="85"
+            titleWidth="0"
+            contentWidth="150"
             placeholder="9am-12pm, 1:00pm-7:45pm, ..."
             .isReadonly="${this.isReadOnly}"
           ></az-text>
@@ -211,10 +206,9 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
             id="tbSunday"
             scope="this"
             name="sun"
-            title="Sunday"
             titlePosition="mid-left"
-            titleWidth="25"
-            contentWidth="85"
+            titleWidth="0"
+            contentWidth="150"
             placeholder="9am-12pm, 1:00pm-7:45pm, ..."
             .isReadonly="${this.isReadOnly}"
           ></az-text>

@@ -62,4 +62,4 @@ export class CaseSpan extends CaseBase {
   }
 }
 
-window.customElements.define("az-case-model-span", CaseSpan);
+window.customElements.define("az-case-model-schedule-span", CaseSpan);

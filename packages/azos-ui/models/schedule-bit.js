@@ -49,6 +49,7 @@ export class ScheduleBit extends Bit {
         scope="this"
         name="name"
         class="span4"
+        isrequired
         .isReadonly="${this.isReadOnly}"
         title="${dflt(this.captionName, "Name")}"
       ></az-text>

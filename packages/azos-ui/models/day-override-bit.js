@@ -61,6 +61,7 @@ export class DayOverrideBit extends Bit {
         id="tbName"
         scope="this"
         name="name"
+        isrequired
         .isReadonly="${this.isReadOnly}"
         title="${dflt(this.captionName, "Name")}"
       ></az-text>
@@ -72,6 +73,7 @@ export class DayOverrideBit extends Bit {
         contentWidth="50"
         titleWidth="50"
         title="Date"
+        isrequired
         .isReadonly="${this.isReadOnly}"
         displayFormat='<<v::ld{"tmDetails":"NONE"}>>'
         dataKind="datetime"
@@ -82,6 +84,7 @@ export class DayOverrideBit extends Bit {
         id="tbHours"
         scope="this"
         name="hours"
+        isrequired
         title="${dflt(this.captionHours, "Hours")}"
       ></az-text>
 
