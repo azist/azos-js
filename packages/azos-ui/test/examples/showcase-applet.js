@@ -47,6 +47,7 @@ import "../showcase/case-model-adlib.js"
 import "../showcase/case-model-nls.js"
 import "../showcase/case-model-schedule.js";
 import "../showcase/case-bit-cells.js";
+import "../showcase/case-model-span.js";
 import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
@@ -142,6 +143,7 @@ export class ShowcaseApplet extends Applet {
       <option value="Selects">Selects</option>
       <option value="Sizing">Sizing</option>
       <option value="SlideDeck">Slide Deck</option>
+      <option value="Span">Span Model</option>
       <option value="Switches">Switches</option>
       <option value="TabView">Tab View</option>
       <option value="TextFields">Text Fields</option>
@@ -189,6 +191,7 @@ export class ShowcaseApplet extends Applet {
       Selects: html`<az-case-selects></az-case-selects>`,
       Sizing: html`<az-case-sizing></az-case-sizing>`,
       SlideDeck: html`<az-case-slide-deck></az-case-slide-deck>`,
+      Span: html`<az-case-model-span></az-case-model-span>`,
       Switches: html`<az-case-switches></az-case-switches>`,
       TabView: html`<az-case-tab-view></az-case-tab-view>`,
       TextFields: html`<az-case-text-fields></az-case-text-fields>`,

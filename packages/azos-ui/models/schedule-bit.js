@@ -88,69 +88,6 @@ export class ScheduleBit extends Bit {
 
   `;
   }
-
-  get[DATA_VALUE_PROP](){
-    const result = {};
-    const obj = super[DATA_VALUE_PROP];
-     let innerSpans = [];
-     for (const span of obj.spans) {
-                              innerSpans.push({[span?.name]: {
-                                monday:span?.monday?.mon,
-                                tuesday:span?.tuesday?.tue,
-                                wednesday:span?.wednesday?.wed,
-                                thursday:span?.thursday?.thu,
-                                friday:span?.friday?.fri,
-                                saturday:span?.saturday?.sat,
-                                sunday:span?.sunday?.sun}});
-                            };
-      result[obj.name] = {
-                          title:obj?.title, 
-                          spans:innerSpans, 
-                          overrides:obj?.overrides};
-    
-    return result;
-  }
-
-  set[DATA_VALUE_PROP](v){
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue) {
-        isUiInput = true;
-        v = v.value;
-      }
-
-      if (!isArray(v)) {
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)) {
-          let innerSpans = [];
-          for (const span of iv?.spans)
-          {
-            let spanName = Object.entries(span)[0];
-            innerSpans.push({
-              [spanName[0]]: {
-                "monday":{"mon":spanName[1]?.monday},
-                "tuesday":{"tue":spanName[1]?.tuesday},
-                "wednesday":{"wed":spanName[1]?.wednesday},
-                "thursday":{"thu":spanName[1]?.thursday},
-                "friday":{"fri":spanName[1]?.friday},
-                "saturday":{"sat":spanName[1]?.saturday},
-                "sunday":{"sun":spanName[1]?.sunday},
-              }
-            })
-          }
-
-          result.push({
-            name: ik, title:iv?.title, spans:innerSpans, overrides:iv?.overrides
-          });
-        }
-      }
-    }
-
-    super[DATA_VALUE_PROP] = v;
-
-    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
-  }
-  
 }
 
 window.customElements.define("az-schedule-bit", ScheduleBit);

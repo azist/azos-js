@@ -88,7 +88,7 @@ export class NlsMapBitList extends ListBit {
       let isUiInput = false;
       if (v instanceof UiInputValue) {//unwrap UiInputValue
         isUiInput = true;
-        v = v.value();
+        v = v.value;
       }
 
       if (!isArray(v)){

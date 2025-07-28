@@ -4,15 +4,14 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { asInt, DATA_VALUE_PROP, isIntValue, isNumber, TIME_ZONE_PROP } from "azos/types"; 
-import { dflt, dfltObject, trim, isEmpty, isNullOrWhiteSpace } from "azos/strings";
-
-import { TZ_UTC } from "azos/time";
-import { DATE_FORMAT, TIME_DETAILS } from "azos/localization";
-
 import { html, css, UiInputValue } from "../ui.js";
-import { Bit, ListBit } from "../bit.js";
 
+import { DATE_FORMAT, TIME_DETAILS } from "azos/localization";
+import { dflt, dfltObject, trim, isEmpty, isNullOrWhiteSpace } from "azos/strings";
+import { TZ_UTC } from "azos/time";
+import { asInt, DATA_VALUE_PROP, isIntValue, isNumber, TIME_ZONE_PROP, isArray } from "azos/types";
+
+import { Bit, ListBit } from "../bit.js";
 import STL_INLINE_GRID from "../styles/grid.js";
 
 //#region SpanBit
@@ -47,22 +46,22 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
   _getSummaryData() {
     const summary = this.tbName?.value;
     const start = this.arena.app.localizer.formatDateTime({
-                                  dt:this.drRange?.value?.start, 
-                                  dtFormat:DATE_FORMAT.NUM_DATE, 
-                                  tmDetails: TIME_DETAILS.NONE, 
-                                  timeZone: TZ_UTC
-                                });
-    
+      dt: this.drRange?.value?.start,
+      dtFormat: DATE_FORMAT.NUM_DATE,
+      tmDetails: TIME_DETAILS.NONE,
+      timeZone: TZ_UTC
+    });
+
     const end = this.arena.app.localizer.formatDateTime({
-                                  dt:this.drRange?.value?.end, 
-                                  dtFormat:DATE_FORMAT.NUM_DATE, 
-                                  tmDetails: TIME_DETAILS.NONE, 
-                                  timeZone: TZ_UTC
-                                });
+      dt: this.drRange?.value?.end,
+      dtFormat: DATE_FORMAT.NUM_DATE,
+      tmDetails: TIME_DETAILS.NONE,
+      timeZone: TZ_UTC
+    });
 
     const subSummary = this.drRange?.value?.start === undefined
-                    || this.drRange?.value?.end === undefined ? "" 
-                    : start + " - " + end;
+      || this.drRange?.value?.end === undefined ? ""
+      : start + " - " + end;
     return {
       title: dfltObject(summary, html`<span style="color: var(--ghost)">Span</span>`),
       subtitle: subSummary,
@@ -95,7 +94,7 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
       <az-date-range
           id="drRange"
           scope="this"
-          name="dr"
+          name="range"
           titlePosition="top-left"
           .isReadonly="${this.isReadOnly}"
           title="${dflt(this.captionRange, "Range")}"
@@ -225,10 +224,57 @@ az-bit.wide[isexpanded]{ width: 100%; }`];
     `;
   }
 
-  set[DATA_VALUE_PROP](v) {
-    //TODO WORK ON THIS so that you can set the data from the wrapped object to the correct fields
+  get [DATA_VALUE_PROP]() {
+    let result = {};
+    const item = super[DATA_VALUE_PROP];
+    if (item) {
+      result = {
+        name: item?.name ?? "",
+        title: item?.title,
+        range: item?.range ?? { },
+        monday: item.monday?.mon ?? "",
+        tuesday: item.tuesday?.tue ?? "",
+        wednesday: item.wednesday?.wed ?? "",
+        thursday: item.thursday?.thu ?? "",
+        friday: item.friday?.fri ?? "",
+        saturday: item.saturday?.sat ?? "",
+        sunday: item.sunday?.sun ?? ""
+      };
+    }
+    return result;
   }
-   
+
+  set [DATA_VALUE_PROP](v) {
+    if (v) {
+      let isUiInput = false;
+      if (v instanceof UiInputValue) {
+        isUiInput = true;
+        v = v.value;
+      }
+
+      if (!isArray(v)) {
+        let result = {};
+
+        result = {
+          name: v?.name,
+          title: v?.title,
+          range: v?.range,
+          monday: { mon: v?.monday },
+          tuesday: { tue: v?.tuesday },
+          wednesday: { wed: v?.wednesday },
+          thursday: { thu: v?.thursday },
+          friday: { fri: v?.friday },
+          saturday: { sat: v?.saturday },
+          sunday: { sun: v?.sunday }
+        };
+        v = isUiInput ? new UiInputValue(result) : result
+      }
+    }
+
+    super[DATA_VALUE_PROP] = v;
+    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
+  }
+
 }
 
 window.customElements.define("az-span-bit", SpanBit);
@@ -263,47 +309,6 @@ export class SpanBitList extends ListBit {
       commands: commands
     }
   }
-/*
-  get [DATA_VALUE_PROP]() {
-    const result = [];
-    const array = super[DATA_VALUE_PROP];
-    for (const item of array) {
-      result[item.name] = {
-        title: item.title, dr:  item.dr,
-        monday: item.monday.mon, tuesday: item.tuesday.tue,
-        wednesday: item.wednesday.wed, thursday: item.thursday.thu,
-        friday: item.friday.fri, saturday: item.saturday.sat, 
-        sunday: item.sunday.sun
-      }
-    }
-    return result;
-  }
-
-  set [DATA_VALUE_PROP](v) {
-    if (v) {
-      let isUiInput = false;
-      if (v instanceof UiInputValue) {
-        isUiInput = true;
-        v = v.value();
-      }
-
-      if (!isArray(v)) {
-        let result = [];
-        for (const [ik, iv] of Object.entries(v)) {
-          result.push({
-            name: ik, title: iv?.title, dr: iv?.dr,
-            monday:  iv?.monday?.mon, tuesday: iv?.tuesday?.tue,
-            wednesday:  iv?.wednesday?.wed, thursday: iv?.thursday?.thu,
-            friday:  iv?.friday?.fri, saturday: iv?.saturday?.sat, sunday: iv?.sunday?.sun
-          });
-        }
-      }
-    }
-    super[DATA_VALUE_PROP] = v;
-
-    queueMicrotask(async () => { await this.updateComplete; this.requestUpdate(); });
-  }
-    */
 }
 
 window.customElements.define("az-span-bit-list", SpanBitList);

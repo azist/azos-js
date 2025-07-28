@@ -27,61 +27,47 @@ export class CaseSchedule extends CaseBase {
 
   #btnSetClick(){
     this.bitSchedule[DATA_VALUE_PROP] = new UiInputValue({
-  "Nonsense": {
-    "title": {
-      "eng": {
-        "n": "incomprehensible",
-        "d": "don't even try"
+  "name": "Spans work, does this?",
+  "overrides": [
+    {
+      "date": "2025-01-15T00:00:00.000Z",
+      "hours": "Closed",
+      "name": "No work",
+      "title": {
+        "eng": {
+          "n": "No Work",
+          "d": "there is no work today"
+        }
       }
-    },
-    "spans": [
-      {
-        "qewrqwer": {
-          "monday": "c'thulu",
-          "tuesday": "narlethep",
-          "wednesday": "the one who slumbers",
-          "thursday": "the prince of insanity",
-          "friday": "rae'liegh",
-          "saturday": "jellyfish",
-          "sunday": "oipuwer"
+    }
+  ],
+  "spans": [
+    {
+      "name": "MEGA SPAN",
+      "title": {
+        "eng": {
+          "n": "MEGA SPAN",
+          "d": "hugely big span"
         }
       },
-      {
-        "zxcvzxvzxcvzx": {
-          "monday": "vbnm",
-          "tuesday": "tyui",
-          "wednesday": "dtfh",
-          "thursday": "fghj",
-          "friday": "hgjk",
-          "saturday": "bnmjh",
-          "sunday": "rtyu"
-        }
+      "range": {
+        "start": "2025-01-01T00:00:00.000Z",
+        "end": "2025-01-31T00:00:00.000Z"
       },
-      {
-        "wtryertywerywer": {
-          "monday": "dtf",
-          "tuesday": "dxrft",
-          "wednesday": "sert",
-          "thursday": "cghy",
-          "friday": "awer",
-          "saturday": "bhjk",
-          "sunday": "hiuo"
-        }
-      }
-    ],
-    "overrides": [
-      {
-        "date": "2025-02-14T00:00:00.000Z",
-        "hours": "iopuewr",
-        "name": "quit",
-        "title": {
-          "eng": {
-            "n": "oiuroie",
-            "d": "lkj;adf"
-          }
-        }
-      }
-    ]
+      "monday": "789",
+      "tuesday": "678",
+      "wednesday": "567",
+      "thursday": "456",
+      "friday": "345",
+      "saturday": "234",
+      "sunday": "123"
+    }
+  ],
+  "title": {
+    "eng": {
+      "n": "Spans work, does this?",
+      "d": "Hopefully this works for all components"
+    }
   }
 });
   }
