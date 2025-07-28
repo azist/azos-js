@@ -11,7 +11,7 @@ import { Bit, ListBit } from "../bit.js";
 import { STL_INLINE_GRID } from "../styles";
 import { asAtom, DATA_VALUE_PROP, isArray } from "azos/types";
 
-export class AdlibTagItem extends Bit {
+export class AdlibTagBit extends Bit {
   static styles = [...Bit.styles, STL_INLINE_GRID];
 
   static properties = {
@@ -78,9 +78,9 @@ export class AdlibTagItem extends Bit {
   }
 }
 
-window.customElements.define("az-adlib-tag-item", AdlibTagItem)
+window.customElements.define("az-adlib-tag-bit", AdlibTagBit)
 
-export class AdlibTagBit extends ListBit {
+export class AdlibTagListBit extends ListBit {
   static styles = [ListBit.styles];
 
   makeOrMapElement(elmData, existingOnly = false) {
@@ -111,4 +111,4 @@ export class AdlibTagBit extends ListBit {
   }
 }
 
-window.customElements.define("az-adlib-tag-bit", AdlibTagBit);
+window.customElements.define("az-adlib-tag-list-bit", AdlibTagListBit);
