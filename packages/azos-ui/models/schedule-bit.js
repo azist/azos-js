@@ -60,6 +60,7 @@ export class ScheduleBit extends Bit {
         name="title"
         title="Local Schedule Name"
         description="Localized Name of the Schedule"
+        minLength=1
         .isReadonly="${this.isReadOnly}"
         class="span4"
         rank="medium"
@@ -72,6 +73,7 @@ export class ScheduleBit extends Bit {
         class="span4"
         rank="medium"
         status="info"
+        minLength=1
         title="${dflt(this.captionSpan, "Time Spans")}"
       ></az-span-bit-list>
 
@@ -80,6 +82,8 @@ export class ScheduleBit extends Bit {
         scope="this"
         class="span4"
         rank="medium"
+        minLength=0
+        maxLength=31
         title="Day Overrides"
         name="overrides"
         status="alert"

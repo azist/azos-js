@@ -83,7 +83,7 @@ az-bit:not([isexpanded]){
         scope="this"
         name="title"
         title="Localized Name"
-        isrequired
+        minLength=1
         description="Localized name of the Span"
         .isReadonly="${this.isReadOnly}"
         class="span4"
