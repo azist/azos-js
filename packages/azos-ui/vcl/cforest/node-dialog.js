@@ -103,24 +103,6 @@ export class ForestNodeDialog extends ModalDialog {
 
     this.close();
   }
-  // results look like this but the client will only return the data object
-  // {
-  //   "OK": true,
-  //   "change": "Processed",
-  //   "status": 0,
-  //   "affected": 1,
-  //   "message": "Saved",
-  //   "data": {
-  //     "Id": "reg.gnode@g8corp::4278192640:0:16272655858532358",
-  //     "Version": {
-  //       "G_Version": "4278192640:0:16272656126967815",
-  //       "Utc": "2021-12-02T17:44:07.992Z",
-  //       "Origin": "local",
-  //       "Actor": "usrn@idp::root",
-  //       "State": "Created"
-  //     }
-  //   }
-  // }
 
   /**
    * Handles the click event for the Close button.
