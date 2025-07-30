@@ -280,7 +280,7 @@ export class ForestExplorerApplet extends Applet  {
   async fetchNodeInfo(id){
     const nodeInfo = this.#nodeCache.has(id)
       ? this.#nodeCache.get(id)
-      : await this.#client.nodeInfo(id);
+      : await this.#client.nodeInfo(id, this.activeAsOfUtc);
 
     if(!this.#nodeCache.has(id))
       this.#nodeCache.set(id, nodeInfo);
@@ -386,7 +386,7 @@ export class ForestExplorerApplet extends Applet  {
           canOpen: grandChildNodeList.length > 0,
           hideChevron: true,
           icon: grandChildNodeList.length > 0 ? "svg://azos.ico.folder" : "svg://azos.ico.moreHorizontal",
-          endContent: html`<span title="${childNodeInfo.DataVersion?.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)}</span>`,
+          endContent: html`<span title="${childNodeInfo.DataVersion.State}">${this.formatDT(childNodeInfo.DataVersion.Utc)}</span>`,
           isVisible: true,
         });
         children.push(childNode);

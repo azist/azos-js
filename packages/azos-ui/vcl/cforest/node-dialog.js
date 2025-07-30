@@ -375,6 +375,19 @@ export class DeleteDialog extends ModalDialog {
     super();
   }
 
+    /**
+   * Lifecycle hook for the Modal show() method
+   * this.modalArgs contains the initial settings passed to the dialog.
+   */
+  async _show() {
+    // reset form on open
+    this.tbAsOf[DATA_VALUE_PROP] = undefined;
+    this.tbAsOf[RESET_DIRTY_METHOD]();
+    this.tbAsOf.error = null;
+
+    this.requestUpdate();
+  }
+
   get title() {
     return `Delete ${this.itemName || "Item"}`;
   }
@@ -403,7 +416,6 @@ export class DeleteDialog extends ModalDialog {
   }
 
   renderBody() {
-    if (this.tbAsOf?.value) this.tbAsOfUtc.value = undefined;
     return html`
       <main>
         <p class="delete-warning">You are about to delete the following item.</p>
@@ -413,7 +425,10 @@ export class DeleteDialog extends ModalDialog {
         </div>
 
 
-        <az-text scope="this" id="tbAsOf" name="AsOf" title="Delete As Of"  placeholder="01/21/2022 1:00 pm" dataType="date" datakind="datetime" timeZone="UTC" isrequired></az-text>
+        <az-text
+          scope="this" id="tbAsOf" name="AsOf" title="Delete As Of"
+          placeholder="01/21/2022 1:00 pm"
+          dataType="date" datakind="datetime" timeZone="UTC" isrequired></az-text>
         <div class="button-container">
           <az-button title="Cancel" @click="${this.#btnCancel}"></az-button>
           <az-button title="Delete" status="error" @click="${this.#btnDelete}"></az-button>
