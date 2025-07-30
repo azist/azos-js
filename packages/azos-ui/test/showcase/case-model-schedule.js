@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for more information.
 </FILE_LICENSE>*/
 
-import { DATA_BLOCK_PROP, DATA_VALUE_PROP } from "azos/types";
+import { DATA_BLOCK_PROP, DATA_VALUE_PROP, VALIDATE_METHOD } from "azos/types";
 import { html, UiInputValue } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
 import "../../bit.js";
@@ -72,6 +72,10 @@ export class CaseSchedule extends CaseBase {
 });
   }
 
+  #btnValidateClick(){
+    this.bitSchedule[VALIDATE_METHOD](null, "", true);
+  }
+
   
 
   renderControl() {
@@ -81,16 +85,19 @@ export class CaseSchedule extends CaseBase {
 
 <p> This is a sample content which is placed outside of bits. </p>
 <az-button id="btnGet" scope="this" @click="${this.#btnGetClick}" title="Get Schedule Data"></az-button>
-<az-button id="btnGetList" scope="this" @click="${this.#btnGetListClick}" title="Get List Data"></az-button>
 <az-button id="btnSet" scope="this" @click="${this.#btnSetClick}" title="Set Schedule Data"></az-button>
+<az-button id="btnValidate" scope="this" @click="${this.#btnValidateClick}" title="Validate Schedule Data"></az-button>
 
 <az-schedule-bit
-  id="bitSchedule"
-  title="Schedule Bit"
-  scope="this"
+id="bitSchedule"
+title="Schedule Bit"
+scope="this"
 ></az-schedule-bit>
 
+<br/>
+<br/>
 
+<az-button id="btnGetList" scope="this" @click="${this.#btnGetListClick}" title="Get List Data"></az-button>
 <az-schedule-bit-list
   id="bitScheduleList"
   title="Schedule Bit List"
