@@ -430,6 +430,9 @@ export class ForestExplorerApplet extends Applet  {
     const element = pathChain[pathIndex];
     let currNode = parent.children.find(n => n.data.Id === element.id && n.data.PathSegment === element.segment);
 
+    // If the current node is not found, return the parent node
+    if(!currNode?.data) return parent;
+
     // load current parent info
     const parentData = await this.fetchNodeInfo(currNode.data.Id);
     currNode.data = { ...currNode.data, ...parentData}
@@ -523,6 +526,9 @@ export class ForestExplorerApplet extends Applet  {
               .openVersions="${() => this.dlgNodeVersions.show({
                 source: this.#activeNodeData
               })}"
+              .nodeAddedCallback="${() => this.#forestRefreshCmd.exec(this.arena)}"
+              .nodeEditedCallback="${() => this.#forestRefreshCmd.exec(this.arena)}"
+              .nodeDeletedCallback="${() => this.#forestRefreshCmd.exec(this.arena)}"
               ></az-cforest-summary>
           </div>
 

@@ -2,16 +2,18 @@ import { html, css } from "../../ui";
 import { ModalDialog } from "../../modal-dialog";
 import * as aver from "../../../azos/aver";
 import { Block } from "../../blocks";
+
 import STL_INLINE_GRID from "../../styles/grid";
 import { DATA_VALUE_PROP, RESET_DIRTY_METHOD, VALIDATE_METHOD } from "azos/types";
 import { Spinner } from "../../spinner";
 import "../util/code-box";
+import { ForestSetupClient } from "azos/sysvc/cforest/forest-setup-client";
+import { toast } from "../../toast.js";
 
 
 export class ForestNodeDialog extends ModalDialog {
 
-  static styles = [ ModalDialog.styles, STL_INLINE_GRID, css`
-    az-button { width: 11ch; }
+  static styles = [ModalDialog.styles, STL_INLINE_GRID, css`
     .fields {
       display: flex;
       flex-direction: column;
@@ -24,16 +26,26 @@ export class ForestNodeDialog extends ModalDialog {
       gap: 0.5em;
       justify-content: flex-end;
     }
-
-    az-text { width: 100%;}
+    .buttons az-button { width: 11ch; }
+    .row.compact {
+      margin-bottom: 0;
+    }
+    az-text { width: 100%; }
     az-bit { margin-bottom: 0.5em; }
   `];
+
+  #client = { forestClient: ForestSetupClient };
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.link(this.#client);
+  }
 
   /**
    * Lifecycle hook for the Modal show() method
    * this.modalArgs contains the initial settings passed to the dialog.
    */
-  async _show(){
+  async _show() {
     aver.isObject(this.modalArgs, "modalArgs obj");
     aver.isString(this.modalArgs.Forest, "modalArgs.Forest str");
     aver.isString(this.modalArgs.Tree, "modalArgs.Tree str");
@@ -42,9 +54,9 @@ export class ForestNodeDialog extends ModalDialog {
     aver.isString(this.modalArgs.PathSegment, "modalArgs.PathSegment str");
     aver.isString(this.modalArgs.Properties, "modalArgs.Properties str");
     aver.isString(this.modalArgs.LevelConfig, "modalArgs.LevelConfig str");
-    aver.isBool(this.modalArgs.isNew, "modalArgs.isNew bool");
+    aver.isString(this.modalArgs.action, "modalArgs.action str");
 
-    this.title = this.modalArgs?.isNew ? "Add New Node" : "Edit Node Details";
+    this.title = this.modalArgs?.action === "add" ? "Add New Node" : "Edit Node Details";
 
     this.#resetBlockNodeDetails();
 
@@ -52,62 +64,85 @@ export class ForestNodeDialog extends ModalDialog {
     this.bitExistingNode[DATA_VALUE_PROP] = this.modalArgs;
 
     // if this is an add we need to set the details node to the current and the form to an empty state
-    this.bitNode[DATA_VALUE_PROP] = this.modalArgs?.isNew ? {} : this.modalArgs;
+    this.bitNode[DATA_VALUE_PROP] = this.modalArgs?.action === "add" ? {} : this.modalArgs;
+
+    if (this.modalArgs?.action === "add") {
+      this.bitNode.tbLevelConfig.value = `{"conf":{}}`;
+      this.bitNode.tbProperties.value = `{"prop":{}}`;
+    }
+
+    this.bitNodeDetails.expand();
 
     // todo: confirm these requestUpdates are needed
     queueMicrotask(() => this.bitNode.requestUpdate());
+    queueMicrotask(() => this.bitNodeDetails.requestUpdate());
     this.requestUpdate();
 
-    console.log({ action: this.modalArgs?.isNew ? "add" : "edit", existing: this.bitExistingNode[DATA_VALUE_PROP], node: this.bitNode[DATA_VALUE_PROP] });
+    // console.log({ action: this.modalArgs?.action, existing: this.bitExistingNode[DATA_VALUE_PROP], node: this.bitNode[DATA_VALUE_PROP] });
   }
+
 
   /**
    * Handles the click event for the Apply button.
    * Closes the dialog if all validations pass.
    * If any validation fails, it prevents closing the dialog.
    */
-  #btnApplyClick(){
+  async #btnApplyClick() {
 
     // validate all information needed is available
     this.bitNode[VALIDATE_METHOD](this, null, true);
 
-    if(this.bitNode.error) return;
+    // todo: confirm UTC field processing correctly
 
-    // here we return all the new values for processing within the main applet
-    this.modalResult = this.bitNode[DATA_VALUE_PROP];
+    // on any errors stop processing and return to the open dlg
+    if (this.bitNode.error) return;
 
-    // call client and attempt update
-    const clientValues = {
-      Forest: this.modalArgs.Forest,
-      Tree: this.modalArgs.Tree,
-      G_Parent: this.modalArgs.Gdid,
-      StartUtc: this.bitNode[DATA_VALUE_PROP].StartUtc,
-      PathSegment: this.bitNode[DATA_VALUE_PROP].PathSegment,
-      LevelConfig: this.bitNode[DATA_VALUE_PROP].LevelConfig,
-      Properties: this.bitNode[DATA_VALUE_PROP].Properties,
-    };
+    // holds the results of the save operation
+    let results = null;
 
-    console.log("ForestNodeAddDialog modalResult", clientValues);
+    // let the user know somthing is happening
+    const msg = `Saving node ${this.modalArgs?.action ? "adding" : "editing"}...`;
+    await Spinner.exec(async () => {
+      const userValues = this.bitNode[DATA_VALUE_PROP]
 
-    Spinner.exec(async spin => {
+      // setup for all actions
+      let nodeObj = {
+        Forest: this.modalArgs.Forest,
+        Tree: this.modalArgs.Tree,
+        StartUtc: userValues.StartUtc,
+        PathSegment: userValues.PathSegment,
+        Config: userValues.LevelConfig,
+        Properties: userValues.Properties,
+      };
 
-      // todo: actual save logic should be implemented here
+      // add StartUTC if it has a value
+      nodeObj.StartUtc = userValues.StartUtc ? userValues.StartUtc : null;
 
+      // on updates we need the Gdid of the existing node we're editing
+      if (this.modalArgs.action === "edit") nodeObj = {
+        ...nodeObj,
+        Gdid: this.modalArgs.Gdid, // ensure Gdid is set for updates
+        G_Parent: this.modalArgs.G_Parent, // ensure G_Parent is set for updates
+      };
 
-      // Simulate a client call to save the node
-      const delay = Math.random() * 1_000 + 500; // Random delay between 500ms and 1500ms
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }, `Saving node ${this.modalArgs?.isNew ? "adding" : "editing"}...`, { scope: this });
+      // on add we need the parent
+      if (this.modalArgs.action === "add") {
+        nodeObj.G_Parent = this.modalArgs.Gdid;
+      }
 
+      // do the action (save w/Gdid is update, w/o Gdid is new)
+      results = await this.#client.forestClient.saveNode(nodeObj);
+    }, msg);
 
-
+    // here we return all the new values for post-processing in the main applet (treeview refreshing, etc.)
+    this.modalResult = { "some": "result", ...results, ...this.bitNode[DATA_VALUE_PROP] };
     this.close();
   }
 
   /**
    * Handles the click event for the Close button.
    */
-  #btnCancelClick(){
+  #btnCancelClick() {
     this.modalResult = null;
     this.#resetBlockNodeDetails();
     this.close();
@@ -129,25 +164,49 @@ export class ForestNodeDialog extends ModalDialog {
     this.bitNodeDetails.error = null;
   }
 
+  async #btnDeleteClick() {
+    this.dlgNodeDelete.data = this.modalArgs;
+    this.dlgNodeDelete.deleteFn = async (item, asOf) => {
+      const result = await this.#client.forestClient.deleteNode(item.Id, asOf);
+      console.log("Delete result:", result);
+      this.modalResult = result;
+      return result;
+    };
+
+    this.modalResult = (await this.dlgNodeDelete.show()).modalResult;
+    if (!this.modalResult) {
+      toast("Deletion cancelled", { status: "info" });
+      return;
+    }
+    this.close();
+  }
+
   renderBodyContent() {
 
-    // set titles based on isNew flag
-    const detailsTitle = `${ this.modalArgs?.isNew ? "Parent node" : "Current node"} ${this.modalArgs?.Id}`;
-    const detailsDescription = `${ this.modalArgs?.isNew ? "Parent" : "Current"} location: ${this.modalArgs?.Tree}@${this.modalArgs?.Forest}::/${this.modalArgs?.FullPath}`;
+    // set titles based on action type
+    const title = `${this.modalArgs?.action === "add" ? "Parent node" : "Current node"} ${this.modalArgs?.Id}`;
+    const description = `${this.modalArgs?.action === "add" ? "Parent" : "Current"} location: ${this.modalArgs?.Tree}@${this.modalArgs?.Forest}::/${this.modalArgs?.FullPath}`;
+    const actionTitle = this.modalArgs?.action === "add" ? "Add New Node" : "Edit Node Details";
 
     return html`
-    <az-bit scope="this" id="bitNodeContainer" title=${detailsTitle} description=${detailsDescription} rank="5">
+    <az-bit scope="this" id="bitNodeContainer" title=${title} description=${description} rank="5">
      <az-cforest-node scope="this" id="bitExistingNode"></az-cforest-node>
     </az-bit>
 
-    <az-bit title="New Node Details" scope="this" id="bitNodeDetails" isExpanded>
+    <az-bit title="${actionTitle}" scope="this" id="bitNodeDetails" isExpanded>
       <az-cforest-node-mutable scope="this" id="bitNode"></az-cforest-node-mutable>
     </az-bit>
 
-    <div class="buttons">
-      <az-button id="btnApplySettings" scope="this" title="Apply" @click="${this.#btnApplyClick}"></az-button>
-      <az-button id="btnCloseSettings" scope="this" title="Cancel" @click="${this.#btnCancelClick}"></az-button>
-    </div>`;
+    <div class="row cols2 compact">
+      ${this.modalArgs?.action === "edit" && this.modalArgs?.PathSegment !== "/" ? html`<az-button icon="svg://azos.ico.delete" id="btnDelete" scope="this" title="Delete Node" status="error" @click="${this.#btnDeleteClick}"></az-button>` : html`<div></div>`}
+      <div class="buttons">
+        <az-button id="btnApplySettings" scope="this" title="Apply" @click="${this.#btnApplyClick}"></az-button>
+        <az-button id="btnCloseSettings" scope="this" title="Cancel" @click="${this.#btnCancelClick}"></az-button>
+      </div>
+    </div>
+
+    <az-dialog-delete scope="this" id="dlgNodeDelete" displayProp="Id"></az-dialog-delete>
+    `;
   }
 }
 
@@ -159,9 +218,9 @@ window.customElements.define("az-forest-node-dialog", ForestNodeDialog);
 
 
 
-export class CfgForestNode extends Block  {
+export class CfgForestNode extends Block {
 
-  static styles = [ Block.styles, STL_INLINE_GRID, css`
+  static styles = [Block.styles, STL_INLINE_GRID, css`
     :host { min-width: 80vw; }
     az-text { width: 100%;}
     h3 { margin-top:0; }
@@ -176,6 +235,7 @@ export class CfgForestNode extends Block  {
       <div><az-text scope="this" id="tbTree" name="Tree" title="Tree" isreadonly></az-text></div>
       <div class="span2"><az-text scope="this" id="tbGParent" name="G_Parent" title="Parent Id" isreadonly></az-text></div>
       <div class="span2"><az-text scope="this" id="tbId" name="Id" title="Node Id" isreadonly></az-text></div>
+      <div class="span2"><az-text scope="this" id="tbGdid" name="Gdid" title="Node Gdid" isreadonly></az-text></div>
     </div>
 
     <az-cforest-node-data-version scope="this" id="blockDataVersion" name="DataVersion"></az-cforest-node-data-version>
@@ -201,7 +261,7 @@ window.customElements.define("az-cforest-node", CfgForestNode);
 
 export class CfgForestNodeDataVersion extends Block {
 
-  static styles = [ Block.styles, STL_INLINE_GRID ];
+  static styles = [Block.styles, STL_INLINE_GRID];
 
   static properties = {
     additionalData: { type: Object },
@@ -226,7 +286,7 @@ window.customElements.define("az-cforest-node-data-version", CfgForestNodeDataVe
 
 export class CfgForestNodeMutable extends Block {
 
-  static styles = [ Block.styles, STL_INLINE_GRID, css`
+  static styles = [Block.styles, STL_INLINE_GRID, css`
 
     az-button { width: 11ch; }
 
@@ -256,12 +316,110 @@ export class CfgForestNodeMutable extends Block {
           <az-text scope="this" id="tbPathSegment" name="PathSegment" title="Path Segment" isrequired></az-text>
         </div>
         <div>
-          <az-text scope="this" id="tbStartUtc" name="StartUtc" title="Start UTC"  placeholder="01/21/2022 1:00 pm" dataType="date" datakind="datetime" timeZone="UTC"></az-text>
+          <az-text scope="this" id="tbStartUtc" name="StartUtc" title="Start UTC"  placeholder="01/21/2022 1:00 pm" dataType="date" datakind="datetime" timeZone="UTC" isrequired></az-text>
         </div>
       </div>
-      <az-text multiline scope="this" id="tbLevelConfig" name="LevelConfig" title="Level Configuration" isRequired></az-text>
-      <az-text multiline scope="this" id="tbProperties" name="Properties" title="Properties" isRequired></az-text>`;
+      <az-text multiline scope="this" id="tbLevelConfig" name="LevelConfig" title="Level Configuration" isRequired minlength="9"></az-text>
+      <az-text multiline scope="this" id="tbProperties" name="Properties" title="Properties" isRequired minlength="9"></az-text>`;
   }
 }
 
 window.customElements.define("az-cforest-node-mutable", CfgForestNodeMutable);
+
+
+/**
+ * DeleteDialog component for confirming and executing delete operations
+ * @property {Object} data - Data about the item being deleted
+ * @property {Function} deleteFn - Function to call to perform the deletion
+ */
+export class DeleteDialog extends ModalDialog {
+  static styles = [
+    ModalDialog.styles,
+    css`
+      main {
+        display: flex;
+        flex-direction: column;
+        padding: 1em;
+      }
+
+      .delete-warning {
+        color: var(--s-error-fg-ctl);
+      }
+
+      .delete-details {
+        padding: 0.75em;
+        background-color: var(--paper2);
+        border-radius: var(--r5-brad-ctl);
+      }
+
+      .delete-item-name {
+        font-weight: bold;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5em;
+        margin-top: 1em;
+      }
+    `,
+  ];
+
+  static properties = {
+    data: { type: Object },
+    deleteFn: { type: Function },
+  };
+
+  constructor() {
+    super();
+  }
+
+  get title() {
+    return `Delete ${this.itemName || "Item"}`;
+  }
+
+  async #btnDelete() {
+    this.tbAsOf[VALIDATE_METHOD](this, null, true);
+    if (this.tbAsOf.error) {
+      toast("Please provide a valid date for deletion", { status: "error" });
+      return;
+    }
+
+    const res = await this.deleteFn(this.data, this.tbAsOf.value);
+    if (!res) {
+      toast("Deletion failed", { status: "error" });
+      return;
+    }
+
+    this.modalResult = res;
+    toast("Item deleted successfully", { status: "ok" });
+    this.close();
+  }
+
+  #btnCancel() {
+    this.modalResult = null;
+    this.close();
+  }
+
+  renderBody() {
+    if (this.tbAsOf?.value) this.tbAsOfUtc.value = undefined;
+    return html`
+      <main>
+        <p class="delete-warning">You are about to delete the following item.</p>
+
+        <div class="delete-details">
+          <div class="delete-item-name">${this.data?.Id}</div>
+        </div>
+
+
+        <az-text scope="this" id="tbAsOf" name="AsOf" title="Delete As Of"  placeholder="01/21/2022 1:00 pm" dataType="date" datakind="datetime" timeZone="UTC" isrequired></az-text>
+        <div class="button-container">
+          <az-button title="Cancel" @click="${this.#btnCancel}"></az-button>
+          <az-button title="Delete" status="error" @click="${this.#btnDelete}"></az-button>
+        </div>
+      </main>
+    `;
+  }
+}
+
+window.customElements.define("az-dialog-delete", DeleteDialog);
