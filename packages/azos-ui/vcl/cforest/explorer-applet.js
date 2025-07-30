@@ -526,9 +526,7 @@ export class ForestExplorerApplet extends Applet  {
               .openVersions="${() => this.dlgNodeVersions.show({
                 source: this.#activeNodeData
               })}"
-              .nodeAddedCallback="${() => this.#forestRefreshCmd.exec(this.arena)}"
-              .nodeEditedCallback="${() => this.#forestRefreshCmd.exec(this.arena)}"
-              .nodeDeletedCallback="${() => this.#forestRefreshCmd.exec(this.arena)}"
+              .nodeChangedCallback="${() => this.#forestRefreshCmd.exec(this.arena)}"
               ></az-cforest-summary>
           </div>
 
