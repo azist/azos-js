@@ -72,6 +72,7 @@ export class ForestNodeDialog extends ModalDialog {
     }
 
     this.bitNodeDetails.expand();
+    this.bitNodeContainer.collapse();
 
     // todo: confirm these requestUpdates are needed
     queueMicrotask(() => this.bitNode.requestUpdate());
@@ -135,7 +136,7 @@ export class ForestNodeDialog extends ModalDialog {
     }, msg);
 
     // here we return all the new values for post-processing in the main applet (treeview refreshing, etc.)
-    this.modalResult = { "some": "result", ...results, ...this.bitNode[DATA_VALUE_PROP] };
+    this.modalResult = results;
     this.close();
   }
 
