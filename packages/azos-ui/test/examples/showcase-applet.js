@@ -48,6 +48,7 @@ import "../showcase/case-model-nls.js"
 import "../showcase/case-model-schedule.js";
 import "../showcase/case-bit-cells.js";
 import "../showcase/case-model-schedule-span.js";
+import "../showcase/case-model-entity-id.js";
 import { DIRTY_PROP } from "azos/types";
 //#endregion IMPORTS
 
@@ -129,6 +130,7 @@ export class ShowcaseApplet extends Applet {
       <option value="BitCells">Bit Cells</option>
       <option value="Checkboxes">Checkboxes</option>
       <option value="CodeBox">Code Box</option>
+      <option value="EntityId">Entity Id Model</option>
       <option value="ErrorBox">Error Box</option>
       <option value="DateRange">Date Range</option>
       <option value="Images">Images</option>
@@ -177,6 +179,7 @@ export class ShowcaseApplet extends Applet {
       BitCells: html`<az-case-bit-cells></az-case-bit-cells>`,
       Checkboxes: html`<az-case-checkboxes></az-case-checkboxes>`,
       CodeBox: html`<az-case-code-box></az-case-code-box>`,
+      EntityId: html`<az-case-model-entity-id></az-case-model-entity-id>`,
       ErrorBox: html`<az-case-error-box></az-case-error-box>`,
       DateRange: html`<az-case-date-range></az-case-date-range>`,
       Images: html`<az-case-images></az-case-images>`,

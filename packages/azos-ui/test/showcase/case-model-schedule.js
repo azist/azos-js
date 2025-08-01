@@ -71,12 +71,10 @@ export class CaseSchedule extends CaseBase {
   }
 });
   }
-
+  
   #btnValidateClick(){
     this.bitSchedule[VALIDATE_METHOD](null, "", true);
   }
-
-  
 
   renderControl() {
     return html`

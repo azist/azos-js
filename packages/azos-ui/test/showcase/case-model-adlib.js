@@ -7,11 +7,7 @@
 import { html } from "../../ui.js";
 import { CaseBase } from "./case-base.js";
 import "../../bit.js";
-import "../../../azos-ui/models/lat-lng-bit.js";
-import "../../../azos-ui/models/span-bit.js";
-import "../../../azos-ui/models/day-override-bit.js";
 import "../../../azos-ui/models/adlib-tag-bit.js";
-import "../../../azos-ui/models/schedule-bit.js";
 
 export class CaseAdlib extends CaseBase {
   renderControl() {
