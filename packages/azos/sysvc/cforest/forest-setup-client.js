@@ -54,6 +54,10 @@ export class ForestSetupClient extends IClient {
    */
   async saveNode(node, abortSignal = null) {
     aver.isObject( node, "node");
+    aver.isString(node.Forest, "node.Forest");
+    aver.isString(node.Tree, "node.Tree");
+    aver.isStringOrNull(node.G_Parent, "node.G_Parent");
+    aver.isStringOrNull(node.Gdid, "node.Gdid");
     if (node.Gdid) {
       // Update existing node
       const response = await this.put('/conf/forest/tree/node', { node }, null, abortSignal);
@@ -74,7 +78,7 @@ export class ForestSetupClient extends IClient {
    */
   async deleteNode(id, startUtc = null, abortSignal = null) {
     id = guardId(id, "deleteNode"); // Ensure id is a valid EntityId
-    const params = { id };
+    const params = { id: id.toString() };
     if (startUtc) params.asofutc = startUtc;
     const response = await this.delete('/conf/forest/tree/node', params, abortSignal);
     return response?.data?.data ?? null;
