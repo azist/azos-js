@@ -662,54 +662,5 @@ export const STOCK_IMAGES = Object.freeze([
    f: "svg",
    c: `<svg viewBox="0 -960 960 960"><path d="M768-160q-108.08 0-216.73-49.77-108.65-49.77-200.19-141.31-90.77-91.54-140.93-200.84Q160-661.23 160-768v-32h177.54l33.92 163.31-107.84 100.38q27.38 47.46 56.69 86.69 29.31 39.24 61.07 70.77 32.08 33.62 72.35 62.81 40.27 29.19 91.81 57.58L650-366.77l150 30.23V-160h-32ZM244.85-573.85l83.69-76.77L305.38-760H200.23q1.15 45.77 12.31 92.19 11.15 46.43 32.31 93.96Zm338 333.39q36.92 18.54 83.57 28.92 46.66 10.39 93.58 11.08v-104.16l-95.54-19-81.61 83.16Zm-338-333.39Zm338 333.39Z"/></svg>`,
    attrs: { fas: true },
- },
-  // ENTERPRISE
-  {
-    uri: "azos.ico.businessEnterprise",
-    f: "svg",
-    c: `<svg viewBox="0 -960 960 960"><circle cx="480" cy="-480" r="320" fill="currentColor"/><path d="M160-480h640M480-160v-640" stroke="#fff" stroke-width="60"/></svg>`,
-    attrs: { fas: true },
-  },
-  {
-    uri: "azos.ico.businessEnterpriseOpen",
-    f: "svg",
-    c: `<svg viewBox="0 -960 960 960"><circle cx="480" cy="-480" r="320" fill="none" stroke="currentColor" stroke-width="60"/><circle cx="480" cy="-480" r="40" fill="currentColor"/><circle cx="160" cy="-480" r="40" fill="currentColor"/><circle cx="800" cy="-480" r="40" fill="currentColor"/><circle cx="480" cy="-800" r="40" fill="currentColor"/><circle cx="480" cy="-160" r="40" fill="currentColor"/></svg>`,
-    attrs: { fas: true },
-  },
-
-  // COMPANY
-  {
-    uri: "azos.ico.businessCompany",
-    f: "svg",
-    c: `<svg viewBox="0 -960 960 960"><rect x="280" y="-680" width="400" height="400" rx="40" fill="currentColor"/><rect x="400" y="-560" width="40" height="40" fill="#fff"/><rect x="520" y="-560" width="40" height="40" fill="#fff"/></svg>`,
-    attrs: { fas: true },
-  },
-  {
-    uri: "azos.ico.businessCompanyOpen",
-    f: "svg",
-    c: `<svg viewBox="0 -960 960 960"><rect x="280" y="-680" width="400" height="400" rx="40" fill="none" stroke="currentColor" stroke-width="60"/><rect x="380" y="-580" width="60" height="60" rx="12" fill="currentColor"/><rect x="520" y="-580" width="60" height="60" rx="12" fill="currentColor"/><rect x="380" y="-440" width="60" height="60" rx="12" fill="currentColor"/><rect x="520" y="-440" width="60" height="60" rx="12" fill="currentColor"/></svg>`,
-    attrs: { fas: true },
-  },
-
-  // DIVISION
-  {
-    uri: "azos.ico.businessDivision",
-    f: "svg",
-    c: `<svg viewBox="0 -960 960 960"><circle cx="480" cy="-480" r="140" fill="currentColor"/></svg>`,
-    attrs: { fas: true },
-  },
-  {
-    uri: "azos.ico.businessDivisionOpen",
-    f: "svg",
-    c: `<svg viewBox="0 -960 960 960"><circle cx="480" cy="-480" r="140" fill="none" stroke="currentColor" stroke-width="60"/><circle cx="480" cy="-240" r="40" fill="currentColor"/><circle cx="280" cy="-680" r="40" fill="currentColor"/><circle cx="680" cy="-680" r="40" fill="currentColor"/><line x1="480" y1="-480" x2="480" y2="-240" stroke="currentColor" stroke-width="60" stroke-linecap="round"/><line x1="480" y1="-480" x2="280" y2="-680" stroke="currentColor" stroke-width="60" stroke-linecap="round"/><line x1="480" y1="-480" x2="680" y2="-680" stroke="currentColor" stroke-width="60" stroke-linecap="round"/></svg>`,
-    attrs: { fas: true },
-  },
-
-  // UNIT
-  {
-    uri: "azos.ico.businessUnit",
-    f: "svg",
-    c: `<svg viewBox="0 -960 960 960"><rect x="380" y="-580" width="200" height="200" rx="30" fill="currentColor"/></svg>`,
-    attrs: { fas: true },
-  },
+ }
 ]);
