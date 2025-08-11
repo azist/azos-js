@@ -40,6 +40,7 @@ import "../showcase/case-tree-view-n.js";
 import "../showcase/case-launcher.js";
 import "../showcase/case-cards.js";
 import "../showcase/case-grids.js";
+import "../showcase/case-sticky-container.js";
 import "../showcase/case-prose.js";
 import "../showcase/case-grid-split.js";
 import "../showcase/case-schema-bit.js";
@@ -144,6 +145,7 @@ export class ShowcaseApplet extends Applet {
       <option value="Selects">Selects</option>
       <option value="Sizing">Sizing</option>
       <option value="SlideDeck">Slide Deck</option>
+      <option value="StickyContainer">Sticky Container</option>
       <option value="Switches">Switches</option>
       <option value="TabView">Tab View</option>
       <option value="TextFields">Text Fields</option>
@@ -192,6 +194,7 @@ export class ShowcaseApplet extends Applet {
       Sizing: html`<az-case-sizing></az-case-sizing>`,
       SlideDeck: html`<az-case-slide-deck></az-case-slide-deck>`,
       ScheduleSpan: html`<az-case-model-schedule-span></az-case-model-schedule-span>`,
+      StickyContainer: html`<az-case-sticky-container></az-case-sticky-container>`,
       Switches: html`<az-case-switches></az-case-switches>`,
       TabView: html`<az-case-tab-view></az-case-tab-view>`,
       TextFields: html`<az-case-text-fields></az-case-text-fields>`,
