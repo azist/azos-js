@@ -2,6 +2,8 @@ import { html, css, Control } from "../../ui";
 import { toast } from "../../toast";
 import { writeToClipboard } from "../util/clipboard";
 import "./node-dialog";
+import { Button } from "../../parts/button";
+import { baseStyles, buttonStyles, iconStyles } from "../../parts/styles";
 
 /**
  * Component for displaying a summary of a selected node in a forest context.
@@ -24,6 +26,7 @@ class ForestNodeSummary extends Control {
       justify-content: flex-start;
       gap: 0.5em;
       margin-bottom: 0;
+      container: buttonbar / inline-size;
     }
 
     .btnSettings {
@@ -77,9 +80,9 @@ class ForestNodeSummary extends Control {
           <h6>${this.source?.DataVersion?.Utc} (${this.source?.DataVersion?.State})</h6>
         </div>
         <div>
-          <az-button id="btnAddNode"  title="Add Node"    rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.add" @click="${(e) => this.#addNode(this.source)}">Add</az-button>
-          <az-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit" @click="${(e) => this.#editNode(this.source)}">Edit</az-button>
-          <az-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.calendarToday" @click="${(e) => this.openVersions()}">Edit</az-button>
+          <az-contained-button id="btnAddNode"  title="Add Node"    rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.add" @click="${(e) => this.#addNode(this.source)}">Add</az-contained-button>
+          <az-contained-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit" @click="${(e) => this.#editNode(this.source)}">Edit</az-contained-button>
+          <az-contained-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.calendarToday" @click="${(e) => this.openVersions()}">Edit</az-contained-button>
         </div>
       </div>
 
@@ -90,3 +93,22 @@ class ForestNodeSummary extends Control {
 }
 
 window.customElements.define("az-cforest-summary", ForestNodeSummary);
+
+// buttons that shrink when the container "buttonbar" is narrow
+class ContainedButton extends Button {
+  static styles = [ baseStyles, buttonStyles, iconStyles, css`
+    :host { margin: 0; }
+    button .icon { width: var(--icon-size); }
+    @container buttonbar (width < 640px) {
+      button {
+        padding: 7px;
+        margin: 0px;
+        & span { display: none; }
+      }
+
+      button .icon { margin:0; width: var(--icon-size); }
+    }
+  `];
+}
+
+window.customElements.define("az-contained-button", ContainedButton);

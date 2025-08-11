@@ -8,6 +8,7 @@ import { Spinner } from "../../spinner";
 import "../../bit";
 
 import "../util/code-box";
+import "../util/sticky-container";
 import "../tabs/tab-view";
 import "../tabs/tab";
 
@@ -64,21 +65,35 @@ export class ForestExplorerApplet extends Applet  {
       flex: 1;
     }
 
-    .minHeightEnforced {
-      min-height: 60vh;
+    .scrollerTitle {
+      padding: 0.5em 0.5em 0 0.5em;
+    }
+
+    .tvScroller {
+      max-height: calc(100vh - 14.5em);
+      min-height: 50vh;
+      overflow: auto;
+      margin: 0;
+      padding: 0 1em;
     }
 
     @media (max-width: 600px) {
-      .minHeightEnforced {
-        min-height: auto; /* Override for small screens */
+      .tvScroller {
+        min-height: auto;
+        max-height: 24vh;
       }
-   }
+      .maxHeightEnforced {
+        min-height: auto;
+        max-height: auto;
+      }
+    }
+
   `];
 
   #client = null;
 
   // Holds the forests and their trees
-  // will be updated after the firstUp2dated
+  // will be updated after the firstUpdated
   #forests = [];
   get forests() { return this.#forests; }
   set forests(value) { this.#forests = value; }
@@ -215,7 +230,9 @@ export class ForestExplorerApplet extends Applet  {
       this.requestUpdate();
       this.arena.requestUpdate();
     }, "Loading forests/trees");
+  }
 
+  disconnectedCallback(){
 
   }
 
@@ -491,8 +508,8 @@ export class ForestExplorerApplet extends Applet  {
   render(){
     const asOfDisplay = this.activeAsOfUtc;
     const showAsOf = !this.activeAsOfUtc
-      ? html`<div class=""><strong>As of Utc: </strong></span>Now</div>`
-      : html`<div class=""><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${this.formatDT(asOfDisplay)} UTC</span></div>`;
+      ? html`<div class="scrollerTitle"><strong>As of Utc: </strong></span>Now</div>`
+      : html`<div class="scrollerTitle"><span class="asOfUtc" @click="${() => this.#forestSettingsCmd.exec(this.arena)}"><strong>As of: </strong>${this.formatDT(asOfDisplay)} UTC</span></div>`;
 
     return html`
       <az-forest-settings-dialog id="dlgSettings" scope="this" title="Explorer Settings" .settings="${{
@@ -509,13 +526,23 @@ export class ForestExplorerApplet extends Applet  {
         .onCFSettingsClick="${() => this.#forestSettingsCmd.exec(this.arena)}"
       ></az-cforest-breadcrumbs>
 
-      <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8">
+      <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8" .onResized="${() => this.adjustStickyWidth()}">
         <div slot="left-top">
-          <div class="cardBasic">
-            ${showAsOf}<hr style="opacity: 0.5;"/>
-            <az-tree-view-n id="tvExplorer" scope="this" class="minHeightEnforced"></az-tree-view-n>
-          </div>
+
+          <az-sticky-container top="60" minWidth="600">
+            <div class="cardBasic">
+              ${showAsOf}<hr style="opacity: 0.5;"/>
+              <az-tree-view-n id="tvExplorer" scope="this" class="tvScroller"></az-tree-view-n>
+            </div>
+
+          </az-sticky-container>
+
+
+
+
         </div>
+
+
         <div slot="right-bottom">
 
           <div class="cardBasic">
@@ -531,16 +558,16 @@ export class ForestExplorerApplet extends Applet  {
           </div>
 
           <az-tab-view title="Draggable TabView" activeTabIndex="0" isDraggable>
-            <az-tab title="Selected Node" .canClose="${false}">
+            <az-tab title="Selected Node" .canClose="${false}" class="maxHeightEnforced">
               <az-code-box id="objectInspector0" scope="self" highlight="json" .source=${JSON.stringify(this.#activeNodeData, null, 2)}></az-code-box>
             </az-tab>
-            <az-tab title="Level Config" .canClose="${false}">
+            <az-tab title="Level Config" .canClose="${false}" class="maxHeightEnforced">
               <az-code-box id="objectInspector1" scope="self" highlight="json" .source=${this.formatCV(this.#activeNodeData?.LevelConfig)}></az-code-box>
             </az-tab>
-            <az-tab title="Effective Config" .canClose="${false}">
+            <az-tab title="Effective Config" .canClose="${false}" class="maxHeightEnforced">
               <az-code-box id="objectInspector2" scope="self" highlight="json" .source=${this.formatCV(this.#activeNodeData?.EffectiveConfig)}></az-code-box>
             </az-tab>
-            <az-tab title="Properties" .canClose="${false}">
+            <az-tab title="Properties" .canClose="${false}" class="maxHeightEnforced">
               <az-code-box id="objectInspector3" scope="self" highlight="json" .source=${this.formatCV(this.#activeNodeData?.Properties)}></az-code-box>
             </az-tab>
           </az-tab-view>
