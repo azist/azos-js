@@ -38,6 +38,7 @@ class ForestNodeSummary extends Control {
     .buttonBar> :last-child {
       margin-left: auto;
     }
+
   `];
 
   async #addNode(parentNode) {
@@ -62,8 +63,7 @@ class ForestNodeSummary extends Control {
     if(!this.source) return html`<span class="no-version">No selected version</span>`;
     const title = this.source.PathSegment || "No selected node";
 
-    const copyBtn = html`<az-button
-      id="btnCopyPath"
+    const copyBtn = html`<az-button id="btnCopyPath"
       rank="6"
       icon="svg://azos.ico.copy"
       title="Copy Id"
@@ -80,35 +80,15 @@ class ForestNodeSummary extends Control {
           <h6>${this.source?.DataVersion?.Utc} (${this.source?.DataVersion?.State})</h6>
         </div>
         <div>
-          <az-contained-button id="btnAddNode"  title="Add Node"    rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.add" @click="${(e) => this.#addNode(this.source)}">Add</az-contained-button>
-          <az-contained-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit" @click="${(e) => this.#editNode(this.source)}">Edit</az-contained-button>
-          <az-contained-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.calendarToday" @click="${(e) => this.openVersions()}">Edit</az-contained-button>
+          <az-button id="btnAddNode"  title="Add Node"    rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.add"           @click="${(e) => this.#addNode(this.source)}" >Add</az-button>
+          <az-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit"          @click="${(e) => this.#editNode(this.source)}">Edit</az-button>
+          <az-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.calendarToday" @click="${(e) => this.openVersions()}"        >Edit</az-button>
         </div>
       </div>
 
       <az-forest-node-dialog id="dlgNode" scope="this" title="Node Editing"></az-forest-node-dialog>
 `;
-        // .deleteFn=${async() => await Spinner.exec(async () => await this.#ref.svcAkitClient.deleteUserAsync(this.selectedUser, this.selectedUser.Realm))}
   }
 }
 
 window.customElements.define("az-cforest-summary", ForestNodeSummary);
-
-// buttons that shrink when the container "buttonbar" is narrow
-class ContainedButton extends Button {
-  static styles = [ baseStyles, buttonStyles, iconStyles, css`
-    :host { margin: 0; }
-    button .icon { width: var(--icon-size); }
-    @container buttonbar (width < 640px) {
-      button {
-        padding: 7px;
-        margin: 0px;
-        & span { display: none; }
-      }
-
-      button .icon { margin:0; width: var(--icon-size); }
-    }
-  `];
-}
-
-window.customElements.define("az-contained-button", ContainedButton);

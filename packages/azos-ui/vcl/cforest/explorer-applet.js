@@ -512,7 +512,7 @@ export class ForestExplorerApplet extends Applet  {
         .onCFSettingsClick="${() => this.#forestSettingsCmd.exec(this.arena)}"
       ></az-cforest-breadcrumbs>
 
-      <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8" .onResized="${() => this.adjustStickyWidth()}">
+      <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8">
         <div slot="left-top">
           <az-sticky-container top="60" minWidth="600">
 
