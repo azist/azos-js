@@ -56,15 +56,6 @@ export class ForestExplorerApplet extends Applet  {
       overflow: auto;
     }
 
-    .horizontalBtnBar {
-      display: flex;
-      width: 100%;
-    }
-
-    .horizontalBtnBar az-button {
-      flex: 1;
-    }
-
     .scrollerTitle {
       padding: 0.5em 0.5em 0 0.5em;
     }
@@ -87,7 +78,6 @@ export class ForestExplorerApplet extends Applet  {
         max-height: auto;
       }
     }
-
   `];
 
   #client = null;
@@ -230,10 +220,6 @@ export class ForestExplorerApplet extends Applet  {
       this.requestUpdate();
       this.arena.requestUpdate();
     }, "Loading forests/trees");
-  }
-
-  disconnectedCallback(){
-
   }
 
   /**
@@ -528,20 +514,15 @@ export class ForestExplorerApplet extends Applet  {
 
       <az-grid-split id="splitGridView" scope="this" splitLeftCols="4" splitRightCols="8" .onResized="${() => this.adjustStickyWidth()}">
         <div slot="left-top">
-
           <az-sticky-container top="60" minWidth="600">
+
             <div class="cardBasic">
               ${showAsOf}<hr style="opacity: 0.5;"/>
               <az-tree-view-n id="tvExplorer" scope="this" class="tvScroller"></az-tree-view-n>
             </div>
 
           </az-sticky-container>
-
-
-
-
         </div>
-
 
         <div slot="right-bottom">
 
