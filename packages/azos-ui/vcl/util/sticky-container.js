@@ -21,8 +21,20 @@ export class StickyContainer extends Control {
   #isFixed = false;
   #startingOffset = 0;
 
-  #scrollListener = null;
-  #resizeListener = null;
+  #scrollListener = () => {
+    if(window.scrollY >= this.#startingOffset) {
+        if(!this.#isFixed && window.innerWidth >= this.minWidth) this.fix();
+    } else if(this.#isFixed) {
+        this.unfix();
+    }
+  };
+
+  #resizeListener = () => {
+      if(!this.#isFixed) return;
+    const r = this.#placeholder.getBoundingClientRect();
+    this.style.left = `${Math.floor(r.left)}px`;
+    this.style.width = `${Math.floor(r.width)}px`;
+  };
 
   constructor() {
     super();
@@ -30,27 +42,12 @@ export class StickyContainer extends Control {
 
   connectedCallback() {
     super.connectedCallback();
-
     if(this.top === undefined) this.top = 0;
     if(this.minWidth === undefined) this.minWidth = 600; // default min width for sticky
-
     // create a placeholder to retain the current layout
     this.#placeholder = document.createElement("div");
-
-    if(!this.#scrollListener)this.#scrollListener = window.addEventListener("scroll", () => {
-      if(window.scrollY >= this.#startingOffset) {
-          if(!this.#isFixed && window.innerWidth >= this.minWidth) this.fix();
-      } else if(this.#isFixed) {
-          this.unfix();
-      }
-    }, { passive: true });
-
-    if(!this.#resizeListener) this.#resizeListener = window.addEventListener("resize", () => {
-       if(!this.#isFixed) return;
-      const r = this.#placeholder.getBoundingClientRect();
-      this.style.left = `${Math.floor(r.left)}px`;
-      this.style.width = `${Math.floor(r.width)}px`;
-    }, { passive: true });
+    window.addEventListener("scroll", this.#scrollListener, { passive: true });
+    window.addEventListener("resize", this.#resizeListener, { passive: true });
   }
 
   firstUpdated() {
@@ -59,8 +56,8 @@ export class StickyContainer extends Control {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if(this.#scrollListener) window.removeEventListener("scroll", this.#scrollListener);
-    if(this.#resizeListener) window.removeEventListener("resize", this.#resizeListener);
+    window.removeEventListener("scroll", this.#scrollListener);
+    window.removeEventListener("resize", this.#resizeListener);
     this.stopResizeListener();
     this.#placeholder = null;
   }
@@ -76,7 +73,7 @@ export class StickyContainer extends Control {
     this.style.top = `${Math.floor(this.top)}px`;
     this.style.left = `${Math.floor(rect.left)}px`;
     this.style.width = `${Math.floor(rect.width)}px`;
-    this.style.zIndex = "1000"; // ensure it's above other elements
+    this.style.zIndex = "99"; // ensure it's above other elements but below the menu
 
     this.#isFixed = true;
 
