@@ -21,16 +21,16 @@ export class StickyContainer extends Control {
   #isFixed = false;
   #startingOffset = 0;
 
-  #scrollListener = () => {
+  _scrollListener(){
     if(window.scrollY >= this.#startingOffset) {
-        if(!this.#isFixed && window.innerWidth >= this.minWidth) this.fix();
+      if(!this.#isFixed && window.innerWidth >= this.minWidth) this.fix();
     } else if(this.#isFixed) {
-        this.unfix();
+      this.unfix();
     }
   };
 
-  #resizeListener = () => {
-      if(!this.#isFixed) return;
+  _resizeListener() {
+    if(!this.#isFixed) return;
     const r = this.#placeholder.getBoundingClientRect();
     this.style.left = `${Math.floor(r.left)}px`;
     this.style.width = `${Math.floor(r.width)}px`;
@@ -38,6 +38,8 @@ export class StickyContainer extends Control {
 
   constructor() {
     super();
+    this._scrollListener = this._scrollListener.bind(this);
+    this._resizeListener = this._resizeListener.bind(this);
   }
 
   connectedCallback() {
@@ -46,8 +48,8 @@ export class StickyContainer extends Control {
     if(this.minWidth === undefined) this.minWidth = 600; // default min width for sticky
     // create a placeholder to retain the current layout
     this.#placeholder = document.createElement("div");
-    window.addEventListener("scroll", this.#scrollListener, { passive: true });
-    window.addEventListener("resize", this.#resizeListener, { passive: true });
+    window.addEventListener("scroll", this._scrollListener);
+    window.addEventListener("resize", this._resizeListener);
   }
 
   firstUpdated() {
@@ -56,8 +58,8 @@ export class StickyContainer extends Control {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener("scroll", this.#scrollListener);
-    window.removeEventListener("resize", this.#resizeListener);
+    window.removeEventListener("scroll", this._scrollListener);
+    window.removeEventListener("resize", this._resizeListener);
     this.stopResizeListener();
     this.#placeholder = null;
   }
