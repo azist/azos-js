@@ -2,6 +2,8 @@ import { html, css, Control } from "../../ui";
 import { toast } from "../../toast";
 import { writeToClipboard } from "../util/clipboard";
 import "./node-dialog";
+import { Button } from "../../parts/button";
+import { baseStyles, buttonStyles, iconStyles } from "../../parts/styles";
 
 /**
  * Component for displaying a summary of a selected node in a forest context.
@@ -24,6 +26,7 @@ class ForestNodeSummary extends Control {
       justify-content: flex-start;
       gap: 0.5em;
       margin-bottom: 0;
+      container: buttonbar / inline-size;
     }
 
     .btnSettings {
@@ -35,6 +38,7 @@ class ForestNodeSummary extends Control {
     .buttonBar> :last-child {
       margin-left: auto;
     }
+
   `];
 
   async #addNode(parentNode) {
@@ -59,8 +63,7 @@ class ForestNodeSummary extends Control {
     if(!this.source) return html`<span class="no-version">No selected version</span>`;
     const title = this.source.PathSegment || "No selected node";
 
-    const copyBtn = html`<az-button
-      id="btnCopyPath"
+    const copyBtn = html`<az-button id="btnCopyPath"
       rank="6"
       icon="svg://azos.ico.copy"
       title="Copy Id"
@@ -77,15 +80,14 @@ class ForestNodeSummary extends Control {
           <h6>${this.source?.DataVersion?.Utc} (${this.source?.DataVersion?.State})</h6>
         </div>
         <div>
-          <az-button id="btnAddNode"  title="Add Node"    rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.add" @click="${(e) => this.#addNode(this.source)}">Add</az-button>
-          <az-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit" @click="${(e) => this.#editNode(this.source)}">Edit</az-button>
-          <az-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.calendarToday" @click="${(e) => this.openVersions()}">Edit</az-button>
+          <az-button id="btnAddNode"  title="Add Node"    rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.add"           @click="${(e) => this.#addNode(this.source)}" >Add</az-button>
+          <az-button id="btnEditNode" title="Edit Node"   rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.edit"          @click="${(e) => this.#editNode(this.source)}">Edit</az-button>
+          <az-button id="btnVersions" title="Versions..." rank="4" class="selectedNodeBtn" position="left" icon="svg://azos.ico.calendarToday" @click="${(e) => this.openVersions()}"        >Edit</az-button>
         </div>
       </div>
 
       <az-forest-node-dialog id="dlgNode" scope="this" title="Node Editing"></az-forest-node-dialog>
 `;
-        // .deleteFn=${async() => await Spinner.exec(async () => await this.#ref.svcAkitClient.deleteUserAsync(this.selectedUser, this.selectedUser.Realm))}
   }
 }
 

@@ -197,6 +197,7 @@ export class TreeView extends Control {
     // console.log("TreeView._dispatchNodeUserActionEvent", node, eArgs);
     if(eArgs?.action === "click") this.selectNode(node);
     if(eArgs?.action === "opened") this.openedCallback?.(node);
+    if(eArgs?.action === "closed") this.closedCallback?.(node);
     this.dispatchEvent(new CustomEvent("nodeUserAction", { detail: { node, ...eArgs } }))
   }
 
@@ -262,8 +263,10 @@ export class TreeView extends Control {
   #focusNode(node, previousNode = null, emitEvent = true) {
     this.nodeInFocus = node;
     const nodeElement = this.$(`tn${node.treeNodeId}`);
-    nodeElement.tabindex = 0;
-    nodeElement.focus();
+    if (nodeElement) {
+      nodeElement.tabindex = 0;
+      nodeElement.focus();
+    }
     if (emitEvent) this._dispatchNodeUserActionEvent(node, { action: "focusChanged" });
     if (previousNode?.isVisible) this.$(`tn${previousNode.treeNodeId}`).tabindex = -1;
   }
