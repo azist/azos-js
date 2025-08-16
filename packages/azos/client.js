@@ -276,7 +276,7 @@ export class IClient extends Module{
 
       return result;//all OK ======================
     } catch(cause) {
-      const res = cause.responseBody() ?? null;
+      const res = types.isFunction(cause?.responseBody) ? cause.responseBody() : null;
       const clErr = new ClientError(`Error calling '${method} ${uri}: ${(cause.message ?? cause)}'}`, `${this.constructor.name}.call()`, cause, cause.code ?? 599, res);
       this.writeLog(LOG_TYPE.TRACE, "Error making client call", clErr, {method, uri});
       throw clErr;
