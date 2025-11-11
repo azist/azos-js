@@ -1,7 +1,7 @@
 # Copilot Instructions for azos-js
 
 ## Project Overview
-- **azos-js** provides base types, services, and UI components for modular JavaScript applications, targeting large enterprise systems.
+- **azos-js** provides base types, services, and UI components for modular JavaScript applications, targeting large enterprise systems with heavy security and data entry
 - The architecture is layered: core logic (`packages/azos`), UI framework (`packages/azos-ui`), and design assets (`elm/design`).
 - All business logic is organized in modules, using inversion of control and service location via the linker.
 - UI follows a uniform design system with modular CSS and theming via CSS variables.
