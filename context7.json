@@ -1,0 +1,9 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "azos-js unistack framework",
+  "description": "Provides Azos base types and services functionality for Java Script apps",
+  "folders": ["packages/azos", "packages/azos-ui"],
+  "excludeFolders": ["elm", "out"],
+  "excludeFiles": [],
+  "rules": ["Use Azist/azos on server", "Close connections properly"]
+}
